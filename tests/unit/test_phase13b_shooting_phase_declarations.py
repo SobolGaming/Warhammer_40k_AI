@@ -60,6 +60,9 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
+from warhammer40k_core.core.visibility import (
+    VisibilityBlockerKind,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -147,9 +150,6 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
     TerrainFloorDefinition,
     TerrainWallDefinition,
-)
-from warhammer40k_core.geometry.visibility import (
-    VisibilityBlockerKind,
 )
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,

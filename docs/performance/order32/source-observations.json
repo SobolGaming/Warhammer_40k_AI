@@ -1,0 +1,35 @@
+{
+  "co_versioned_comparison": "No co-versioned 40k.app version number was exposed; no matching-version agreement is claimed.",
+  "observations": [
+    {
+      "app_data_version": null,
+      "canonical_url": "https://www.40k.app/rules/06-other-concepts",
+      "observation_id": "order32:40k-app:06.01:2026-09-08",
+      "observation_sha256": "3d9aa5162350fa10f181ef8e49850ec7e606f1fb3cca576b93df60f117e229d4",
+      "observed_at": "2026-09-08T17:17:05Z",
+      "provider": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
+      "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model\u2019s unit and in the observed model\u2019s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).\nMODEL VISIBLE\nIf any part of another model is visible to the observing model, that model is visible.\nMODEL FULLY VISIBLE\nIf every part of another model that is facing the observing model is visible to the observing model (so the only thing blocking visibility to any part of that other model is that model itself), that model is fully visible.\nUNIT VISIBLE\nIf one or more models in a unit are visible to the observing model, that unit is visible.\nUNIT FULLY VISIBLE\nIf every model in a unit is fully visible to the observing model, that unit is fully visible. When determining this, the observing model can see through other models in that unit.",
+      "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4"
+    },
+    {
+      "app_data_version": "931",
+      "canonical_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observation_id": "order32:gdm:v931:visibility-faq",
+      "observation_sha256": "bc5eec60fa0cf2776b3c8cf50a86b7b3303acc47d4a1091adbce3b4c6907cae7",
+      "observed_at": "2026-09-08T17:17:05Z",
+      "observed_url": "https://game-datamissions.com/11th/rules/changelog?v=931",
+      "provider": "Game Datamissions",
+      "provider_non_affiliation_recorded": true,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
+      "source_text": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?\nLine of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed"
+    }
+  ],
+  "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+  "recorded_at": "2026-09-08T17:17:05Z",
+  "schema": "order32-preimplementation-source-observations-v1",
+  "source_status": "Registered in the maintained-mirror audit and source-authority registry, and as two supplemental clauses in core_other_concepts_2026_08. The original P06A/P06B clauses and their four evidence rows are preserved.",
+  "status": "registered_reviewed_source_artifacts"
+}

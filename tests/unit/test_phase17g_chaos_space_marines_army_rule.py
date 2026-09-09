@@ -372,7 +372,7 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
     resolved_event_type: str,
 ) -> None:
     session, status = _daemonforge_shooting_status(
-        game_id="daemonforge-positive-seed-2",
+        game_id="order32-daemonforge-positive-17",
         attacker_datasheet_id=army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
         choose_dark_pact=True,
     )
@@ -464,7 +464,7 @@ def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -
     ("game_id", "attacker_datasheet_id", "choose_dark_pact", "expected_wound_roll"),
     [
         (
-            "daemonforge-ineligible-step3-other-result-5",
+            "order32-daemonforge-other-result-1",
             army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
             True,
             5,
@@ -475,7 +475,7 @@ def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -
             False,
             1,
         ),
-        ("daemonforge-ineligible-step3-other-unit-3", "000004209", False, 1),
+        ("order32-daemonforge-other-unit-2", "000004209", False, 1),
     ],
 )
 def test_defiler_daemonforge_does_not_offer_ineligible_wound_rerolls(

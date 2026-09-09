@@ -3,6 +3,7 @@ from __future__ import annotations
 from warhammer40k_core.core.modifiers import resolve_targeting_range
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
+from warhammer40k_core.core.visibility import TerrainVisibilityContext
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -15,7 +16,6 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
-from warhammer40k_core.geometry.visibility import TerrainVisibilityContext
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -121,12 +121,17 @@ def _target_model_has_gone_to_ground_against_attacker(
     witness = context.resolve_line_of_sight()
     if witness.unit_fully_visible:
         return False
-    return any(
-        record.blocks_full_visibility
-        and blocker_record_is_solid(
-            ruleset_descriptor=ruleset_descriptor,
-            record=record,
-            terrain_features=terrain_features,
-        )
-        for record in witness.all_blocker_records()
+    return context.not_fully_visible_because_of(
+        witness,
+        target_model_id=target_model.model_id,
+        sources=tuple(
+            record
+            for record in witness.all_blocker_records()
+            if record.blocks_full_visibility
+            and blocker_record_is_solid(
+                ruleset_descriptor=ruleset_descriptor,
+                record=record,
+                terrain_features=terrain_features,
+            )
+        ),
     )

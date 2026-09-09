@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.polygons import (
     Point2D,
     polygon_self_intersects,
@@ -19,6 +18,11 @@ from warhammer40k_core.geometry.terrain_classification import (
 from warhammer40k_core.geometry.validation import IdentifierValidator
 from warhammer40k_core.geometry.visibility_corridor import (
     line_of_sight_corridor_intersects_polygon_union,
+)
+from warhammer40k_core.geometry.visibility_footprints import (
+    model_intersects_visibility_polygon,
+    model_within_visibility_polygons,
+    visibility_polygon_within_union,
 )
 from warhammer40k_core.geometry.volume import Model
 
@@ -168,20 +172,14 @@ def classification_is_solid(classification: TerrainAreaClassification) -> bool:
 
 def model_intersects_terrain_area(model: Model, area: TerrainVisibilityArea) -> bool:
     _validate_model_and_area(model, area)
-    return shapely_backend.base_footprint_intersects_polygon_union(
-        model.base,
-        model.pose,
-        area.footprint_polygons,
+    return any(
+        model_intersects_visibility_polygon(model, polygon) for polygon in area.footprint_polygons
     )
 
 
 def model_wholly_within_terrain_area(model: Model, area: TerrainVisibilityArea) -> bool:
     _validate_model_and_area(model, area)
-    return shapely_backend.base_footprint_within_polygon_union(
-        model.base,
-        model.pose,
-        area.footprint_polygons,
-    )
+    return model_within_visibility_polygons(model, area.footprint_polygons)
 
 
 def line_of_sight_corridor_intersects_terrain_area(
@@ -222,7 +220,7 @@ def feature_ids_associated_with_terrain_areas(
             )
         feature_footprint = feature.rules_footprint_points()
         if any(
-            shapely_backend.polygon_within_polygon_union(
+            visibility_polygon_within_union(
                 feature_footprint,
                 area.footprint_polygons,
             )

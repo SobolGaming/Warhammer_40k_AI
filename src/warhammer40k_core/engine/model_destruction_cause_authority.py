@@ -715,13 +715,11 @@ def validate_model_destruction_cause_authority_restore(
     decisions_by_id = {record.record_id: record for record in decision_records}
     event_indexes = {event.event_id: index for index, event in enumerate(event_records)}
     consumed_by_event_id: dict[str, ModelDestructionCauseAuthority] = {}
-    logical_death_indexes: list[int] = []
     for authority in authorities:
         logical_death_event = authority.logical_death_event
         if events_by_id.get(logical_death_event.event_id) != logical_death_event:
             raise GameLifecycleError("Model destruction cause logical-death event drift.")
         logical_death_index = event_indexes[logical_death_event.event_id]
-        logical_death_indexes.append(logical_death_index)
         source_event_indexes: list[int] = []
         for source_event in authority.source_event_records:
             if events_by_id.get(source_event.event_id) != source_event:
@@ -767,10 +765,10 @@ def validate_model_destruction_cause_authority_restore(
                 "Model destruction cause source event must precede consumption."
             )
         consumed_by_event_id[destroyed_event.event_id] = authority
-    if logical_death_indexes != sorted(logical_death_indexes):
-        raise GameLifecycleError(
-            "Model logical-death events do not follow cause-authority sequence."
-        )
+    # Producers can record several deaths before routing their reactions. A
+    # reaction can register another cause before a remaining casualty receives
+    # its authority, so unrelated registrations need not follow death chronology.
+    # Parent/child chronology remains mandatory below.
     authorities_by_id = {authority.cause_id: authority for authority in authorities}
     for child in authorities:
         for parent_cause_id in child.parent_cause_ids:

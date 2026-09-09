@@ -573,6 +573,8 @@ def test_p06b_mortal_wounds_source_artifact_is_pinned_typed_and_executable() -> 
             (
                 core_other_concepts_2026_08.VISIBILITY_SOURCE_ID,
                 core_other_concepts_2026_08.MORTAL_WOUNDS_SOURCE_ID,
+                "gw-11e-core-rules:other-concepts:visibility-classifications",
+                "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
             )
         )
     )
@@ -583,6 +585,8 @@ def test_p06_other_concepts_runtime_consumer_ids_resolve() -> None:
     rules = (
         core_other_concepts_2026_08.source_rule_record(),
         core_other_concepts_2026_08.source_rule_record_by_id("mortal-wounds"),
+        core_other_concepts_2026_08.source_rule_record_by_id("visibility-classifications"),
+        core_other_concepts_2026_08.source_rule_record_by_id("visibility-any-part-faq"),
     )
     consumer_ids = {consumer_id for rule in rules for consumer_id in rule.runtime_consumer_ids} | {
         consumer_id
@@ -599,6 +603,33 @@ def test_p06_other_concepts_runtime_consumer_ids_resolve() -> None:
         for attribute in qualified_name.split("."):
             resolved = getattr(resolved, attribute)
         assert resolved is not None, consumer_id
+
+
+@pytest.mark.parametrize(
+    ("slug", "text_hash"),
+    [
+        (
+            "visibility-classifications",
+            "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
+        ),
+        (
+            "visibility-any-part-faq",
+            "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
+        ),
+    ],
+)
+def test_p06c_supplemental_visibility_clauses_load_with_reviewed_hashes(
+    slug: str, text_hash: str
+) -> None:
+    rule = core_other_concepts_2026_08.source_rule_record_by_id(slug)
+    assert rule.source_id == f"gw-11e-core-rules:other-concepts:{slug}"
+    assert rule.transcription_sha256 == text_hash
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert (
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair"
+        in rule.runtime_consumer_ids
+    )
 
 
 def test_p06a_visibility_source_artifact_rejects_text_and_byte_drift() -> None:

@@ -18,6 +18,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.visibility import TerrainVisibilityContext
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
@@ -116,7 +117,6 @@ from warhammer40k_core.engine.triggered_movement import (
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
-from warhammer40k_core.geometry.visibility import TerrainVisibilityContext
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:

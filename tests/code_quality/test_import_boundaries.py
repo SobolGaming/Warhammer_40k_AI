@@ -29,9 +29,6 @@ LEGACY_GEOMETRY_CORE_IMPORTS = frozenset(
         "src/warhammer40k_core/geometry/terrain.py imports warhammer40k_core.core.terrain_display",
         "src/warhammer40k_core/geometry/terrain_factory.py imports "
         "warhammer40k_core.core.terrain_display",
-        "src/warhammer40k_core/geometry/visibility.py imports "
-        "warhammer40k_core.core.ruleset_descriptor",
-        "src/warhammer40k_core/geometry/visibility.py imports warhammer40k_core.core.validation",
     }
 )
 

@@ -385,7 +385,7 @@ def test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         catalog=lethal_retained_attack_catalog(),
-        game_id="order-30-retained-transport",
+        game_id="order32-retained-transport-0",
         enemy_unit_specs=(
             ("enemy", "core-transport", "core-transport", 1),
             ("passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),

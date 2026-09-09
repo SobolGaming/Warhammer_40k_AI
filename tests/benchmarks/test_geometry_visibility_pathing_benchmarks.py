@@ -17,7 +17,7 @@ from warhammer40k_core.geometry.pathing import PathQuery, PathWitness
 from warhammer40k_core.geometry.pose import Facing, Point3, Pose
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import ObstacleVolume, TerrainVolume
-from warhammer40k_core.geometry.visibility import VisibilityQuery
+from warhammer40k_core.geometry.visibility_query import VisibilityQuery
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 pytestmark = pytest.mark.benchmark

@@ -10,6 +10,40 @@ type Point2D = tuple[float, float]
 GEOMETRY_EPSILON = 1e-6
 
 
+def validate_footprint_polygon(field_name: str, value: object) -> tuple[Point2D, ...]:
+    """Shared eager validation for public footprint APIs; preserves their input contract."""
+    if type(value) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    raw_points = cast(tuple[object, ...], value)
+    if len(raw_points) < 3:
+        raise GeometryError(f"{field_name} must contain at least three points.")
+    points: list[Point2D] = []
+    for raw_point in raw_points:
+        if type(raw_point) is not tuple:
+            raise GeometryError(f"{field_name} points must be 2-tuples.")
+        point = cast(tuple[object, ...], raw_point)
+        if len(point) != 2:
+            raise GeometryError(f"{field_name} points must be 2-tuples.")
+        raw_x, raw_y = point
+        if (
+            not isinstance(raw_x, int | float)
+            or type(raw_x) is bool
+            or not isinstance(raw_y, int | float)
+            or type(raw_y) is bool
+        ):
+            raise GeometryError(f"{field_name} coordinates must be numbers.")
+        x, y = float(raw_x), float(raw_y)
+        if not math.isfinite(x) or not math.isfinite(y):
+            raise GeometryError(f"{field_name} coordinates must be finite.")
+        points.append((x, y))
+    polygon = tuple(points)
+    if polygon[0] == polygon[-1]:
+        raise GeometryError(f"{field_name} must be unclosed.")
+    if abs(signed_polygon_area(polygon)) <= 1e-9 or polygon_self_intersects(polygon):
+        raise GeometryError(f"{field_name} must be a simple polygon with positive area.")
+    return polygon
+
+
 def signed_polygon_area(vertices: tuple[Point2D, ...]) -> float:
     points = _validate_polygon_vertices("vertices", vertices)
     return _signed_polygon_area(points)

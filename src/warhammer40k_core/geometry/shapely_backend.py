@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import importlib
-import math
 from functools import lru_cache
 from typing import TYPE_CHECKING, Protocol, cast
 
 from warhammer40k_core.geometry.polygons import (
     Point2D,
-    polygon_self_intersects,
-    signed_polygon_area,
+    validate_footprint_polygon,
 )
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -174,7 +172,7 @@ def footprint_for_deployment_zone_shape(shape: DeploymentZoneShape) -> _Geometry
 
 
 def footprint_for_polygon(polygon: tuple[Point2D, ...]) -> _Geometry:
-    return _geometry_module().Polygon(_validate_polygon("polygon", polygon))
+    return _geometry_module().Polygon(validate_footprint_polygon("polygon", polygon))
 
 
 def footprint_for_polygon_union(
@@ -183,7 +181,7 @@ def footprint_for_polygon_union(
     if type(polygons) is not tuple or not polygons:
         raise GeometryError("polygon union must be a non-empty tuple.")
     validated_polygons = tuple(
-        _validate_polygon(f"polygon union member {index}", polygon)
+        validate_footprint_polygon(f"polygon union member {index}", polygon)
         for index, polygon in enumerate(cast(tuple[object, ...], polygons))
     )
     return _cached_polygon_union_footprint(validated_polygons)
@@ -734,43 +732,6 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
     if number < 0.0:
         raise GeometryError(f"{field_name} must be non-negative.")
     return number
-
-
-def _validate_polygon(
-    field_name: str,
-    value: object,
-) -> tuple[Point2D, ...]:
-    if type(value) is not tuple:
-        raise GeometryError(f"{field_name} must be a tuple.")
-    raw_points = cast(tuple[object, ...], value)
-    if len(raw_points) < 3:
-        raise GeometryError(f"{field_name} must contain at least three points.")
-    points: list[Point2D] = []
-    for raw_point in raw_points:
-        if type(raw_point) is not tuple:
-            raise GeometryError(f"{field_name} points must be 2-tuples.")
-        point = cast(tuple[object, ...], raw_point)
-        if len(point) != 2:
-            raise GeometryError(f"{field_name} points must be 2-tuples.")
-        raw_x, raw_y = point
-        if (
-            not isinstance(raw_x, int | float)
-            or type(raw_x) is bool
-            or not isinstance(raw_y, int | float)
-            or type(raw_y) is bool
-        ):
-            raise GeometryError(f"{field_name} coordinates must be numbers.")
-        x = float(raw_x)
-        y = float(raw_y)
-        if not math.isfinite(x) or not math.isfinite(y):
-            raise GeometryError(f"{field_name} coordinates must be finite.")
-        points.append((x, y))
-    polygon = tuple(points)
-    if polygon[0] == polygon[-1]:
-        raise GeometryError(f"{field_name} must be unclosed.")
-    if abs(signed_polygon_area(polygon)) <= _EPSILON or polygon_self_intersects(polygon):
-        raise GeometryError(f"{field_name} must be a simple polygon with positive area.")
-    return polygon
 
 
 def _vertical_gap(

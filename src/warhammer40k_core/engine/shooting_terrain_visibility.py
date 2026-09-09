@@ -16,6 +16,7 @@ from warhammer40k_core.core.terrain_areas import (
     aggregate_logical_terrain_area_classification,
     validate_placed_terrain_area_logical_groups,
 )
+from warhammer40k_core.core.visibility import VisibilityBlockerRecord
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, SpatialIndexState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -25,7 +26,6 @@ from warhammer40k_core.geometry.terrain_area_visibility import (
     classification_is_solid,
     model_intersects_terrain_area,
 )
-from warhammer40k_core.geometry.visibility import VisibilityBlockerRecord
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
@@ -165,13 +165,9 @@ def _feature_is_solid(
 
 
 def _model_intersects_feature(model: Model, feature: TerrainFeatureDefinition) -> bool:
-    from warhammer40k_core.geometry import shapely_backend
+    from warhammer40k_core.geometry.visibility_footprints import model_intersects_visibility_polygon
 
-    return shapely_backend.base_footprint_intersects_polygon(
-        model.base,
-        model.pose,
-        feature.rules_footprint_points(),
-    )
+    return model_intersects_visibility_polygon(model, feature.rules_footprint_points())
 
 
 def _validate_terrain_features(

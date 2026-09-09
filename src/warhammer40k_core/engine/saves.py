@@ -14,9 +14,9 @@ from warhammer40k_core.core.dice import (
 from warhammer40k_core.core.modifiers import bound_modified_roll
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.visibility import BenefitOfCoverResult, BenefitOfCoverResultPayload
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance
-from warhammer40k_core.geometry.visibility import BenefitOfCoverResult, BenefitOfCoverResultPayload
 
 
 class SaveKind(StrEnum):

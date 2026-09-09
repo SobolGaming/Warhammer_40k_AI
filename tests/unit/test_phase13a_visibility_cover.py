@@ -12,23 +12,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
-from warhammer40k_core.engine.battlefield_state import SpatialIndexState
-from warhammer40k_core.engine.shooting_terrain_visibility import model_within_solid_terrain
-from warhammer40k_core.geometry.base import CircularBase
-from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
-from warhammer40k_core.geometry.terrain import (
-    ObstacleVolume,
-    TerrainFeatureDefinition,
-    TerrainFloorDefinition,
-    TerrainWallDefinition,
-)
-from warhammer40k_core.geometry.terrain_area_visibility import (
-    TerrainVisibilityArea,
-    feature_is_associated_with_terrain_area,
-)
-from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
-from warhammer40k_core.geometry.terrain_factory import TerrainFactory
-from warhammer40k_core.geometry.visibility import (
+from warhammer40k_core.core.visibility import (
     BenefitOfCoverResult,
     BenefitOfCoverResultPayload,
     CoverSourceReason,
@@ -44,6 +28,23 @@ from warhammer40k_core.geometry.visibility import (
     VisibilityResult,
     visibility_blocker_kind_from_token,
 )
+from warhammer40k_core.engine.battlefield_state import SpatialIndexState
+from warhammer40k_core.engine.shooting_terrain_visibility import model_within_solid_terrain
+from warhammer40k_core.geometry.base import CircularBase, RectangularBase
+from warhammer40k_core.geometry.continuous_visibility import ContinuousVisibilityEvidence
+from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
+from warhammer40k_core.geometry.terrain import (
+    ObstacleVolume,
+    TerrainFeatureDefinition,
+    TerrainFloorDefinition,
+    TerrainWallDefinition,
+)
+from warhammer40k_core.geometry.terrain_area_visibility import (
+    TerrainVisibilityArea,
+    feature_is_associated_with_terrain_area,
+)
+from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
+from warhammer40k_core.geometry.terrain_factory import TerrainFactory
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
@@ -810,7 +811,8 @@ def test_model_volume_participates_in_los_visibility_and_full_visibility() -> No
     witness = context.resolve_line_of_sight()
 
     assert witness.unit_visible
-    assert not witness.unit_fully_visible
+    # Every facing part can use an appropriate point on the observer top cap.
+    assert witness.unit_fully_visible
     assert any(
         record.blocker_kind is VisibilityBlockerKind.TERRAIN_VOLUME
         and record.blocker_id == "low-wall"
@@ -818,10 +820,73 @@ def test_model_volume_participates_in_los_visibility_and_full_visibility() -> No
     )
 
 
-def test_phase13a_model_silhouette_sampling_budget_is_explicit() -> None:
+@pytest.mark.parametrize(
+    ("terrain_height", "model_bottom", "model_height", "cover"),
+    [(4.0, 0.0, 4.0, True), (1.0, 1.0, 3.0, True), (1.0, 0.0, 4.0, False)],
+)
+def test_p06c_cover_attributes_independent_joint_and_incidental_terrain(
+    terrain_height: float, model_bottom: float, model_height: float, cover: bool
+) -> None:
+    # Across the upper half of the XY corridor, terrain occupies z=[0,terrain_height].
+    # The model independently covers all heights, or completes the upper wall.
+    # A low wall alone leaves EVERY facing target part visible from the top of
+    # the observer. Cover therefore needs the same-part joint cause, not merely
+    # a blocked alternative origin or a different part hidden by another model.
+    feature = TerrainFeatureDefinition(
+        feature_id="causal-terrain",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=-1.0,
+        footprint_center_y_inches=1.0,
+        footprint_width_inches=0.1,
+        footprint_depth_inches=2.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=-1.0, center_y_inches=1.0, width_inches=0.1, depth_inches=2.0
+        ).footprint_polygon,
+        display_geometry=_display_geometry(
+            center_x_inches=-1.0, center_y_inches=1.0, width_inches=0.1, depth_inches=2.0
+        ),
+        walls=(TerrainWallDefinition("wall", -1.0, 1.0, 0.0, 0.1, 2.0, terrain_height),),
+    )
+    blocker = Model(
+        "other-model",
+        Pose.at(-1, 1, model_bottom),
+        RectangularBase(0.1, 2),
+        ModelVolume(model_height),
+    )
     context = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=_ruleset(),
-        los_cache_key="los:manual-sampling-budget",
+        los_cache_key="los:causal-cover",
+        observer_model=_model("observer", -3, 0, height=4),
+        target_models=(_model("target", 3, 0, height=4),),
+        target_model_keywords=_target_model_keywords("target"),
+        terrain_features=(feature,),
+        dynamic_model_blockers=(blocker,),
+    )
+    witness = context.resolve_line_of_sight()
+    assert witness.unit_visible
+    assert not witness.unit_fully_visible
+    terrain_sources = tuple(
+        record
+        for record in witness.all_blocker_records()
+        if record.blocker_kind is VisibilityBlockerKind.TERRAIN_VOLUME
+    )
+    assert terrain_sources
+    assert (
+        context.not_fully_visible_because_of(
+            witness, target_model_id="target", sources=terrain_sources
+        )
+        is cover
+    )
+    assert context.benefit_of_cover(witness).has_benefit is cover
+    if terrain_height == 1:
+        terrain_only = replace(context, dynamic_model_blockers=())
+        assert terrain_only.resolve_line_of_sight().unit_fully_visible
+
+
+def test_p06c_clear_domain_is_certified_without_a_sampling_budget() -> None:
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:continuous-clear-domain",
         observer_model=_model("observer", -3.0, 0.0, height=4.0),
         target_models=(_model("target", 3.0, 0.0, height=4.0),),
         target_model_keywords=_target_model_keywords("target"),
@@ -830,10 +895,54 @@ def test_phase13a_model_silhouette_sampling_budget_is_explicit() -> None:
     witness = context.resolve_line_of_sight()
     record = witness.model_records[0]
 
-    assert record.checked_ray_count == 49
-    assert tuple(record.clear_ray_indices) == tuple(range(49))
+    assert record.evidence.checked_witness_count == 0
+    assert record.evidence.full_visibility_proof == "clear_enclosure"
     assert witness.unit_visible
     assert witness.unit_fully_visible
+
+
+@pytest.mark.parametrize("second_uncovered_model", [False, True])
+def test_p06c_disabled_area_cover_cannot_suppress_or_substitute_for_model_evidence(
+    second_uncovered_model: bool,
+) -> None:
+    ruleset = _ruleset()
+    policy = ruleset.terrain_visibility_policy
+    ruleset = replace(
+        ruleset,
+        descriptor_hash="",
+        terrain_visibility_policy=replace(
+            policy, cover_policy=replace(policy.cover_policy, grants_benefit_of_cover=False)
+        ),
+    )
+    woods = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
+    targets: tuple[Model, ...] = (_model("obscured", 5, 0),)
+    x, y = 5.0, 0.0
+    if second_uncovered_model:
+        targets = (*targets, _model("clear", -4, 3))
+        x, y = -4.0, 3.0
+    area = TerrainVisibilityArea(
+        terrain_area_id="disabled-cover",
+        member_terrain_area_ids=("disabled-cover",),
+        classification=TerrainAreaClassification.LIGHT,
+        footprint_polygons=(((x - 1, y - 1), (x + 1, y - 1), (x + 1, y + 1), (x - 1, y + 1)),),
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset,
+        los_cache_key="los:disabled-area-cover",
+        observer_model=_model("observer", -5, 0),
+        target_models=targets,
+        target_model_keywords=_target_model_keywords(
+            *(m.model_id for m in targets), keywords=("INFANTRY",)
+        ),
+        terrain_features=(woods,),
+        terrain_areas=(area,),
+    )
+    witness = context.resolve_line_of_sight()
+    assert witness.unit_visible
+    assert not witness.unit_fully_visible
+    cover = context.benefit_of_cover(witness)
+    assert cover.has_benefit is not second_uncovered_model
+    assert cover.source_terrain_area_ids == ()
 
 
 def test_los_cache_key_changes_when_terrain_revision_changes() -> None:
@@ -862,6 +971,79 @@ def test_los_cache_key_changes_when_terrain_revision_changes() -> None:
     assert empty_witness.los_cache_key != woods_witness.los_cache_key
     assert empty_witness.unit_fully_visible
     assert not woods_witness.unit_fully_visible
+
+
+def test_p06c_same_key_witness_rejects_geometry_keyword_and_policy_drift() -> None:
+    feature = _visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:deliberately-reused",
+        observer_model=_model("observer", -5, 0),
+        target_models=(_model("target", 5, 0),),
+        target_model_keywords=_target_model_keywords("target"),
+        terrain_features=(feature,),
+    )
+    witness = context.resolve_line_of_sight()
+    assert not witness.unit_visible
+    for _ in range(3):
+        assert context.resolve_line_of_sight() is witness
+    restored = TerrainVisibilityContext.from_payload(json.loads(json.dumps(context.to_payload())))
+    assert restored.resolve_line_of_sight() == witness
+    assert restored.resolve_line_of_sight_uncached() == witness
+    changed = (
+        replace(context, observer_keywords=("AIRCRAFT",)),
+        replace(context, target_model_keywords=(("target", ("AIRCRAFT",)),)),
+        replace(context, observer_model=replace(context.observer_model, pose=Pose.at(-5, 10))),
+        replace(context, terrain_features=(), terrain_volumes=()),
+    )
+    for other in changed:
+        current = other.resolve_line_of_sight()
+        assert current.unit_visible
+        assert current.context_fingerprint != witness.context_fingerprint
+        assert current == other.resolve_line_of_sight_uncached()
+        with pytest.raises(GeometryError, match="geometry, keywords or policy"):
+            other.benefit_of_cover(witness)
+
+
+def test_p06c_result_cache_is_bounded_and_uncached_queries_bypass_result_reuse() -> None:
+    from warhammer40k_core.core.visibility import (
+        _resolve_context,  # pyright: ignore[reportPrivateUsage]
+    )
+    from warhammer40k_core.geometry.continuous_visibility import resolve_visibility_pair
+
+    _resolve_context.cache_clear()
+    resolve_visibility_pair.cache_clear()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:independent-reset",
+        observer_model=_model("observer", -3, 0),
+        target_models=(_model("target", 3, 0),),
+        target_model_keywords=_target_model_keywords("target"),
+    )
+    first = context.resolve_line_of_sight()
+    before = resolve_visibility_pair.cache_info()
+    assert context.resolve_line_of_sight_uncached() == first
+    assert resolve_visibility_pair.cache_info() == before
+    for index in range(130):
+        changed = replace(context, target_models=(_model("target", 3, index),))
+        assert changed.resolve_line_of_sight() == changed.resolve_line_of_sight_uncached()
+    assert _resolve_context.cache_info().currsize == 128
+    assert _resolve_context.cache_info().maxsize == 128
+    assert resolve_visibility_pair.cache_info().maxsize == 4096
+    assert context.resolve_line_of_sight() == first
+
+
+@pytest.mark.parametrize("keyword", ["aircraft", "Air Craft", " AIRCRAFT"])
+def test_p06c_visibility_rejects_locally_renormalized_keyword_inputs(keyword: str) -> None:
+    with pytest.raises(GeometryError, match="canonical catalog"):
+        TerrainVisibilityContext.from_ruleset_descriptor(
+            ruleset_descriptor=_ruleset(),
+            los_cache_key="los:canonical-keywords",
+            observer_model=_model("observer", -3, 0),
+            target_models=(_model("target", 3, 0),),
+            target_model_keywords=_target_model_keywords("target"),
+            observer_keywords=(keyword,),
+        )
 
 
 def test_phase13a_visibility_and_cover_payloads_round_trip_without_object_reprs() -> None:
@@ -903,7 +1085,6 @@ def test_phase13a_visibility_objects_fail_fast_on_invalid_shapes() -> None:
     blocker = VisibilityBlockerRecord(
         blocker_kind=VisibilityBlockerKind.TERRAIN_FEATURE,
         blocker_id="woods-alpha",
-        ray_index=0,
         terrain_feature_id="woods-alpha",
         terrain_feature_kind=TerrainFeatureKind.WOODS,
         line_of_sight_policy=LineOfSightPolicy.DENSE_COVER,
@@ -914,8 +1095,9 @@ def test_phase13a_visibility_objects_fail_fast_on_invalid_shapes() -> None:
         target_model_id="target",
         model_visible=True,
         model_fully_visible=False,
-        checked_ray_count=1,
-        clear_ray_indices=(0,),
+        evidence=ContinuousVisibilityEvidence(
+            "a" * 64, True, False, "real_algebraic_exists", "real_algebraic_target_parts"
+        ),
         blocker_records=(blocker,),
     )
 
@@ -923,7 +1105,6 @@ def test_phase13a_visibility_objects_fail_fast_on_invalid_shapes() -> None:
         VisibilityBlockerRecord(
             blocker_kind=VisibilityBlockerKind.TERRAIN_FEATURE,
             blocker_id="bad",
-            ray_index=0,
             terrain_feature_id="bad",
             terrain_feature_kind=TerrainFeatureKind.WOODS,
             line_of_sight_policy=LineOfSightPolicy.DENSE_COVER,
@@ -934,23 +1115,22 @@ def test_phase13a_visibility_objects_fail_fast_on_invalid_shapes() -> None:
         VisibilityBlockerRecord(
             blocker_kind=VisibilityBlockerKind.TERRAIN_FEATURE,
             blocker_id="bad",
-            ray_index=0,
             terrain_feature_id="other",
             terrain_feature_kind=TerrainFeatureKind.WOODS,
             line_of_sight_policy=LineOfSightPolicy.DENSE_COVER,
             blocks_model_visibility=False,
             blocks_full_visibility=True,
         )
-    with pytest.raises(GeometryError, match="clear_ray_indices"):
+    with pytest.raises(GeometryError, match="predicates must match continuous evidence"):
         ModelLineOfSightRecord(
             target_model_id="target",
             model_visible=False,
             model_fully_visible=False,
-            checked_ray_count=1,
-            clear_ray_indices=(0,),
+            evidence=record.evidence,
         )
     with pytest.raises(GeometryError, match="visible_model_ids"):
         LineOfSightWitness(
+            context_fingerprint="a" * 64,
             ruleset_descriptor_hash="hash",
             los_cache_key="los:key",
             observer_model_id="observer",
@@ -1031,6 +1211,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
     with pytest.raises(GeometryError, match="ruleset hash"):
         context.benefit_of_cover(
             LineOfSightWitness(
+                context_fingerprint=witness.context_fingerprint,
                 ruleset_descriptor_hash="other-hash",
                 los_cache_key=witness.los_cache_key,
                 observer_model_id=witness.observer_model_id,
@@ -1203,5 +1384,5 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             observer_model=observer,
             target_models=(target,),
             target_model_keywords=_target_model_keywords(target.model_id),
-            observer_keywords=("AIRCRAFT", "aircraft"),
+            observer_keywords=("AIRCRAFT", "AIRCRAFT"),
         )

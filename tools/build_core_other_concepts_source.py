@@ -29,6 +29,13 @@ REVIEW_AUDIT_ROW_ID = "category:06"
 REVIEW_AUDIT_OBSERVATION_SHA256 = "646b405724eb9f1a7f441fed3b3af0cae62925c72fb4b069fc17118fbab13b73"
 VISIBILITY_OBSERVED_AT = "2026-08-31T11:41:03-04:00"
 MORTAL_WOUNDS_OBSERVED_AT = "2026-08-31T13:01:46-04:00"
+MAINTAINED_POLICY = "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
+P06C_OBSERVED_AT = "2026-09-08T17:17:05Z"
+P06C_AUDIT_ID = "core-visibility-maintained-app-mirrors-2026-09-08"
+P06C_AUDIT_PATH = (
+    ROOT / "data/source_audits/maintained_app_mirrors/visibility_2026_09_08.audit.json"
+)
+P06C_OBSERVATIONS_PATH = ROOT / "docs/performance/order32/source-observations.json"
 
 VISIBILITY_SOURCE_TEXT = """VISIBILITY
 Line of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model’s unit and in the observed model’s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07)."""
@@ -43,7 +50,7 @@ Some attacks or rules inflict mortal wounds on units. Each time a unit suffers o
 2. Resolve Damage: The selected model loses 1 wound. If this reduces that model’s remaining wounds to 0, it is destroyed."""
 
 VISIBILITY_RUNTIME_CONSUMER_IDS = [
-    "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+    "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
     "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
     "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
     "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
@@ -141,19 +148,112 @@ def _evidence_rows(
     return [review, mirror]
 
 
+def _p06c_supplement() -> tuple[
+    list[dict[str, object]], list[dict[str, object]], dict[str, object]
+]:
+    observations = json.loads(P06C_OBSERVATIONS_PATH.read_text(encoding="utf-8"))["observations"]
+    rules: list[dict[str, object]] = []
+    evidence: list[dict[str, object]] = []
+    audits: list[dict[str, object]] = []
+    consumers = [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+    ]
+    for observation, slug, section, heading in zip(
+        observations,
+        ("visibility-classifications", "visibility-any-part-faq"),
+        ("06.01.01", "06.01 FAQ"),
+        ("VISIBILITY CLASSIFICATIONS", "VISIBILITY ANY-PART FAQ"),
+        strict=True,
+    ):
+        source_id = f"gw-11e-core-rules:other-concepts:{slug}"
+        text_hash = _sha256_text(observation["source_text"])
+        if text_hash != observation["transcription_sha256"]:
+            raise ValueError("P06C reviewed observation transcription hash drifted.")
+        rules.append(
+            {
+                "rule_id": slug,
+                "source_id": source_id,
+                "section_id": section,
+                "section_heading": heading,
+                "source_text": observation["source_text"],
+                "transcription_sha256": text_hash,
+                "load_support_status": "loaded",
+                "semantic_execution_status": "executable_engine_runtime",
+                "runtime_consumer_ids": consumers,
+            }
+        )
+        review = _evidence_rows(
+            rule_id=slug,
+            rule_source_id=source_id,
+            section_id=section,
+            section_heading=heading,
+            observed_at=P06C_OBSERVED_AT,
+            transcription_sha256=text_hash,
+            runtime_consumer_ids=consumers,
+        )[0]
+        evidence.append(review)
+        audit = {
+            "row_id": slug,
+            "provider_name": observation["provider"],
+            "source_url": observation["canonical_url"],
+            "observed_at": P06C_OBSERVED_AT,
+            "app_version": observation["app_data_version"],
+            "policy_id": MAINTAINED_POLICY,
+            "rule_source_id": source_id,
+            "transcription_sha256": text_hash,
+            "provider_non_affiliation_recorded": True,
+        }
+        audit_hash = _sha256_payload(audit)
+        audits.append({**audit, "source_observation_sha256": audit_hash})
+        mirror = {
+            **review,
+            "evidence_id": f"core-visibility-mirror-2026-09-08:{slug}",
+            "evidence_kind": "third_party_mirror",
+            "authority": "project_authoritative_app_mirror",
+            "project_authority_policy_id": MAINTAINED_POLICY,
+            "review_audit_id": P06C_AUDIT_ID,
+            "review_audit_row_id": slug,
+            "review_audit_source_observation_sha256": audit_hash,
+            "provider_name": observation["provider"],
+            "source_title": f"{observation['provider']} {section} {heading}",
+            "source_platform": "Web",
+            "source_url": observation["canonical_url"],
+            "observed_at": None if observation["app_data_version"] else P06C_OBSERVED_AT,
+            "app_version": observation["app_data_version"],
+            "verification_status": "authoritative_app_mirror",
+            "provider_non_affiliation_recorded": True,
+        }
+        mirror["observation_sha256"] = _evidence_observation_sha256(mirror)
+        evidence.append(mirror)
+    return (
+        rules,
+        evidence,
+        {
+            "audit_id": P06C_AUDIT_ID,
+            "observed_at": P06C_OBSERVED_AT,
+            "rows": audits,
+            "co_version_comparison": "Full visibility definitions and v931 any-part FAQ are separate operative clauses; no co-versioned provider agreement is claimed.",
+            "historical_provenance": "Existing P06A visibility and P06B mortal-wounds source text, provenance and observation hashes remain unchanged; visibility runtime bindings migrate to the core policy owner. The official historical Core Rules PDF remains retained.",
+            "owner_interpretation_record": "docs/performance/order32/cover-disambiguation.json",
+        },
+    )
+
+
 def build_payload() -> dict[str, object]:
+    supplemental_rules, supplemental_evidence, _audit = _p06c_supplement()
     visibility_transcription_sha256 = _sha256_text(VISIBILITY_SOURCE_TEXT)
     mortal_wounds_transcription_sha256 = _sha256_text(MORTAL_WOUNDS_SOURCE_TEXT)
     payload: dict[str, object] = {
         "artifact_schema": "core-v2-other-concepts-source-v1",
         "source_package_id": "gw-11e-core-other-concepts",
-        "source_version": "40k-app-other-concepts-observed-2026-08-31",
+        "source_version": "maintained-app-mirrors-observed-2026-09-08",
         "source_document": {
-            "document_id": "40k-app-other-concepts-2026-08-31",
-            "source_title": "40k.app Core Rules Other Concepts",
+            "document_id": "maintained-app-mirrors-other-concepts-2026-09-08",
+            "source_title": "Reviewed Core Rules Other Concepts and Visibility FAQ",
             "source_url": SOURCE_URL,
-            "observed_at": MORTAL_WOUNDS_OBSERVED_AT,
-            "project_authority_policy_id": PROJECT_AUTHORITY_POLICY_ID,
+            "observed_at": P06C_OBSERVED_AT,
+            "project_authority_policy_id": MAINTAINED_POLICY,
         },
         "rules": [
             {
@@ -178,6 +278,7 @@ def build_payload() -> dict[str, object]:
                 "semantic_execution_status": "executable_engine_runtime",
                 "runtime_consumer_ids": MORTAL_WOUNDS_RUNTIME_CONSUMER_IDS,
             },
+            *supplemental_rules,
         ],
         "evidence": [
             *_evidence_rows(
@@ -198,6 +299,7 @@ def build_payload() -> dict[str, object]:
                 transcription_sha256=mortal_wounds_transcription_sha256,
                 runtime_consumer_ids=MORTAL_WOUNDS_RUNTIME_CONSUMER_IDS,
             ),
+            *supplemental_evidence,
         ],
         "package_hash": "",
     }
@@ -211,13 +313,19 @@ def main() -> int:
     )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    rendered = json.dumps(build_payload(), indent=2, sort_keys=True) + "\n"
-    if args.check:
-        if not ARTIFACT_PATH.is_file() or ARTIFACT_PATH.read_text(encoding="utf-8") != rendered:
-            raise SystemExit("Other Concepts source artifact is stale.")
-        return 0
-    ARTIFACT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    ARTIFACT_PATH.write_text(rendered, encoding="utf-8", newline="\n")
+    for path, payload in (
+        (ARTIFACT_PATH, build_payload()),
+        (P06C_AUDIT_PATH, _p06c_supplement()[2]),
+    ):
+        rendered = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        if args.check:
+            if not path.is_file() or path.read_text(encoding="utf-8") != rendered:
+                raise SystemExit(
+                    f"Other Concepts source artifact is stale: {path.relative_to(ROOT)}"
+                )
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(rendered, encoding="utf-8", newline="\n")
     return 0
 
 

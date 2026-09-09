@@ -852,6 +852,66 @@ def test_fortification_cover_keyword_ignores_destroyed_blocker_model() -> None:
     )
 
 
+def test_p06c_allocated_cover_uses_firing_model_keywords_in_a_heterogeneous_unit() -> None:
+    from warhammer40k_core.geometry.terrain_factory import TerrainFactory
+
+    source_army, target_army = _mustered_core_armies()
+    attacker = source_army.units[0]
+    aircraft = replace(
+        attacker.own_models[1],
+        keyword_assignment=replace(
+            attacker.own_models[1].keyword_assignment,
+            keywords=tuple(sorted((*attacker.own_models[1].keywords, "AIRCRAFT"))),
+        ),
+    )
+    attacker = replace(
+        attacker, own_models=(attacker.own_models[0], aircraft, *attacker.own_models[2:])
+    )
+    source_army = replace(source_army, units=(attacker,))
+    target = target_army.units[0]
+    battlefield = replace(
+        _battlefield_for_units(
+            source_army=source_army,
+            source_unit=attacker,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target,
+            target_x=40.0,
+        ),
+        terrain_features=TerrainFactory.woods_fixture(center_x_inches=25.0, center_y_inches=10.0),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    assert "AIRCRAFT" in attacker.keywords
+    assert "AIRCRAFT" not in attacker.own_models[0].keywords
+    profile = _first_catalog_weapon_profile()
+    for firing_model, expected_cover in ((attacker.own_models[0], True), (aircraft, False)):
+        pool = RangedAttackPool(
+            attacker_model_instance_id=firing_model.model_instance_id,
+            weapon_instance_id="weapon-instance:test:p06c:observer-keywords",
+            wargear_id="p06c-observer-keywords",
+            weapon_profile_id=profile.profile_id,
+            weapon_profile=profile,
+            target_unit_instance_id=target.unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+            attacks=1,
+            target_visible_model_ids=target.own_model_ids(),
+            target_in_range_model_ids=target.own_model_ids(),
+        )
+        cover = attack_sequence_hazardous._cover_for_allocated_model(
+            state=state,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            pool=pool,
+            allocated_model_id=target.own_models[0].model_instance_id,
+        )
+        assert cover is not None
+        assert cover.has_benefit is expected_cover
+
+
 def test_charge_end_forced_battle_shock_reroll_pauses_and_resumes() -> None:
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]

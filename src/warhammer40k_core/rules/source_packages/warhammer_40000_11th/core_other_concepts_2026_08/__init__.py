@@ -37,7 +37,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "d2ed90878ed9b54bee86c89432e0c9a452705da959b7bc7cf4934ada1e1cf16d"
+EXPECTED_ARTIFACT_SHA256: Final = "1c9c948d244a5709db7262907f3cba55edd390662873d3ac8b8ff088e207ee89"
 
 
 def _load_artifact() -> CoreOtherConceptsSourcePackageArtifact:
@@ -96,7 +96,7 @@ def source_package() -> RuleSourcePackage:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 8, 31),
+        source_date=date(2026, 9, 8),
     )
     document_id = SourceDocumentId(
         package_id=package_id,
@@ -123,7 +123,7 @@ def source_package() -> RuleSourcePackage:
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-other-concepts-source-observed-2026-08-31"
+                    version="core-v2-other-concepts-source-observed-2026-09-08"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
@@ -134,7 +134,7 @@ def source_package() -> RuleSourcePackage:
     return RuleSourcePackage(
         source_catalog=source_catalog,
         source_evidence_catalog=SourceEvidenceCatalog(records=source_evidence_records()),
-        evidence_required_source_ids=(MORTAL_WOUNDS_SOURCE_ID, VISIBILITY_SOURCE_ID),
+        evidence_required_source_ids=tuple(sorted(rule.source_id for rule in _ARTIFACT.rules)),
         source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     )
 

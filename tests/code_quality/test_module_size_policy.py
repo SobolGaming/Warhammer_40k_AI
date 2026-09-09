@@ -30,7 +30,6 @@ LEGACY_OVERSIZED_MODULE_LIMITS = {
     "src/warhammer40k_core/engine/transports.py": 3567,
     "src/warhammer40k_core/engine/triggered_movement.py": 2271,
     "src/warhammer40k_core/geometry/pathing.py": 2422,
-    "src/warhammer40k_core/geometry/visibility.py": 1922,
     "src/warhammer40k_core/rules/mfm_source.py": 1742,
     "src/warhammer40k_core/rules/rule_parser.py": 2887,
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"

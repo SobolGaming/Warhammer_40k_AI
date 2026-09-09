@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `13.0.0`
+Contract version: `14.0.0`
+
+Contract 14 replaces sampled visibility witnesses with continuous analytic
+evidence and complete context fingerprints. Shooting candidates publish the new
+nested evidence contract; see [13-to-14.md](migrations/13-to-14.md).
 
 Contract 12 implements Fight On Death retention before removal, deferred
 destruction reactions, full retained target/ability presence, executable

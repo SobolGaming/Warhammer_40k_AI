@@ -102,6 +102,9 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.visibility import (
+    BenefitOfCoverResult,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -403,9 +406,6 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
     TerrainFloorDefinition,
     TerrainWallDefinition,
-)
-from warhammer40k_core.geometry.visibility import (
-    BenefitOfCoverResult,
 )
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text

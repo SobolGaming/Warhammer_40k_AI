@@ -1843,6 +1843,28 @@ Required Phase 12 adapter-contract tests:
 
 Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` records deterministic feature sources through `source_feature_ids` and feature `source_records`, and terrain-area sources through `source_terrain_area_ids` and typed area records containing the terrain-area ID, classification, LoS policy, and cover-source reason. The current 11th Edition producer uses `not_fully_visible_because_of_feature` for feature evidence and `within_terrain_area` or `not_fully_visible_because_of_terrain_area` for area evidence; `wholly_within_feature` remains deserializable for historical evidence but does not independently grant 11th Edition cover.
 
+Order 32 replaces sampled model-visibility evidence with continuous analytic
+predicates under [Contract 14](../contracts/migrations/13-to-14.md).
+`LineOfSightWitness.context_fingerprint` binds the complete immutable
+context, including geometry, source IDs, model-owned keywords, terrain policy,
+ruleset identity and cache key. Each model record contains `evidence`, with
+`algorithm_id`, a pure-geometry `input_fingerprint`, both predicates, proof-kind
+tokens, `checked_witness_count`, and optional exact `clear_corridor` or
+`hidden_target_part` coordinates. Coordinates use canonical rational `n/d`
+strings. `checked_ray_count`, `clear_ray_indices`, and blocker `ray_index` are
+removed from this model-level contract. Low-level explicit ray-query payloads
+retain their actual ray counts.
+
+Finite candidate sightlines only prove their checked positive claim. Full
+visibility certifies every self-facing target part with a potentially different
+self-valid observer origin; it never means that every candidate ray was clear.
+Unresolved proof search uses the complete real-polynomial predicate and raises
+an explicit computation error if no result is obtained. No elapsed time enters
+authoritative records. Blocker records identify applicable source geometry and
+policy; they do not independently establish terrain-caused Cover. Adapters must
+consume engine-owned visibility and Cover results. Restored or submitted
+evidence must match the current complete context, not just a reused cache key.
+
 The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived per model from that model's component-unit keywords and Light, Dense, or Mixed terrain-area occupancy, together with authoritative unit-scoped current/previous-turn ranged-attack history. An Unknown classification does not establish the Light/Dense feature required by Hidden. During the first turn, the previous-turn no-ranged-attacks condition is true. Detection-range filtering is likewise model-scoped. Benefit of Cover is granted only when every alive model in the target rules unit independently qualifies: an `INFANTRY`/`BEASTS`/`SWARM` model is within any terrain area regardless of classification, or that model is not fully visible because of intervening terrain. A within-area Cover record for an Unknown area carries `WITHIN_TERRAIN_AREA` evidence without claiming that the area is Obscuring or Hidden-qualifying. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation therefore evaluates cover against the entire alive target rules unit even though damage remains allocated to one model.
 
 Phase 13B and later shooting slices add player-facing attacker and defender choices. They must not introduce UI, headless, replay, or network-specific mutation paths. Every accepted choice must pass through the same lifecycle submission path and produce deterministic replay-facing records.

@@ -21,7 +21,7 @@
       "review_audit_source_observation_sha256": null,
       "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
       "runtime_consumer_ids": [
-        "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
@@ -56,7 +56,7 @@
       "review_audit_source_observation_sha256": "646b405724eb9f1a7f441fed3b3af0cae62925c72fb4b069fc17118fbab13b73",
       "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
       "runtime_consumer_ids": [
-        "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
@@ -136,15 +136,135 @@
       "source_url": "https://www.40k.app/rules/06-other-concepts",
       "transcription_sha256": "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831",
       "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-other-concepts-source-review:visibility-classifications",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "1c957a22acf5fd65960b4b3e6878d9595b0f0ea1bfc91e95bd7640dbbc006373",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 06.01.01 Visibility Classifications",
+      "source_url": null,
+      "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-visibility-mirror-2026-09-08:visibility-classifications",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "b401b2f0e9fe7659f73d5da2673ad7cda858bf2e395630ba1583113fe4f844ec",
+      "observed_at": "2026-09-08T17:17:05Z",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+      "review_audit_row_id": "visibility-classifications",
+      "review_audit_source_observation_sha256": "3398b5017348df28c7427171878963d797b23245eb6f56eb0e1df8c1c017ddf5",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app 06.01.01 VISIBILITY CLASSIFICATIONS",
+      "source_url": "https://www.40k.app/rules/06-other-concepts",
+      "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-other-concepts-source-review:visibility-any-part-faq",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "3d876bcadfa01bcf585178b492cc87121c1f42757dadff7f3d78f878cab63a17",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 06.01 FAQ Visibility Any-Part Faq",
+      "source_url": null,
+      "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": "931",
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-visibility-mirror-2026-09-08:visibility-any-part-faq",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "0eb915b515067bb5f70563b66e5ff97e0797e5b7048bc144806a25f9c4e87f67",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "Game Datamissions",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+      "review_audit_row_id": "visibility-any-part-faq",
+      "review_audit_source_observation_sha256": "d2d36d50451e0e498860bc04a5682c29fbdf54ca964ef9a24fed36fe7d585972",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "Game Datamissions 06.01 FAQ VISIBILITY ANY-PART FAQ",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
+      "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a",
+  "package_hash": "d8b159dafe25df81c5a6caa0528e5a6814e6e335df85ae2014268b5e8331991c",
   "rules": [
     {
       "load_support_status": "loaded",
       "rule_id": "visibility",
       "runtime_consumer_ids": [
-        "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
         "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
@@ -175,15 +295,43 @@
       "source_id": "gw-11e-core-rules:other-concepts:mortal-wounds",
       "source_text": "MORTAL WOUNDS\nSome attacks or rules inflict mortal wounds on units. Each time a unit suffers one or more mortal wounds, its controlling player must resolve the following sequence for each of those mortal wounds, until either all of them have been inflicted or that unit is destroyed:\n1. Select Model: Select one model in that unit by following the first instruction below that applies:\n- If a non\u2011CHARACTER model in that unit has lost one or more wounds, you must select that model.\n- Otherwise, if that unit contains one or more non\u2011CHARACTER models, you must select one of those models.\n- Otherwise, if one or more CHARACTER models in that unit have lost one or more wounds, you must select one of those models.\n- Otherwise, you must select one CHARACTER model in that unit.\n2. Resolve Damage: The selected model loses 1 wound. If this reduces that model\u2019s remaining wounds to 0, it is destroyed.",
       "transcription_sha256": "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831"
+    },
+    {
+      "load_support_status": "loaded",
+      "rule_id": "visibility-classifications",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "section_heading": "VISIBILITY CLASSIFICATIONS",
+      "section_id": "06.01.01",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+      "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model\u2019s unit and in the observed model\u2019s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).\nMODEL VISIBLE\nIf any part of another model is visible to the observing model, that model is visible.\nMODEL FULLY VISIBLE\nIf every part of another model that is facing the observing model is visible to the observing model (so the only thing blocking visibility to any part of that other model is that model itself), that model is fully visible.\nUNIT VISIBLE\nIf one or more models in a unit are visible to the observing model, that unit is visible.\nUNIT FULLY VISIBLE\nIf every model in a unit is fully visible to the observing model, that unit is fully visible. When determining this, the observing model can see through other models in that unit.",
+      "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4"
+    },
+    {
+      "load_support_status": "loaded",
+      "rule_id": "visibility-any-part-faq",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.continuous_visibility:resolve_visibility_pair",
+        "warhammer40k_core.core.visibility:TerrainVisibilityContext.resolve_line_of_sight"
+      ],
+      "section_heading": "VISIBILITY ANY-PART FAQ",
+      "section_id": "06.01 FAQ",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+      "source_text": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?\nLine of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed"
     }
   ],
   "source_document": {
-    "document_id": "40k-app-other-concepts-2026-08-31",
-    "observed_at": "2026-08-31T13:01:46-04:00",
-    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
-    "source_title": "40k.app Core Rules Other Concepts",
+    "document_id": "maintained-app-mirrors-other-concepts-2026-09-08",
+    "observed_at": "2026-09-08T17:17:05Z",
+    "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "source_title": "Reviewed Core Rules Other Concepts and Visibility FAQ",
     "source_url": "https://www.40k.app/rules/06-other-concepts"
   },
   "source_package_id": "gw-11e-core-other-concepts",
-  "source_version": "40k-app-other-concepts-observed-2026-08-31"
+  "source_version": "maintained-app-mirrors-observed-2026-09-08"
 }

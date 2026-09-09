@@ -133,7 +133,7 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        game_id="order-30-own-hazard-7" if with_feel_no_pain else "order-30-own-hazard-5",
+        game_id="order32-own-hazard-fnp-2" if with_feel_no_pain else "order32-own-hazard-11",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -1015,7 +1015,7 @@ def test_order_30_unending_fidelity_rejects_a_model_that_already_fought() -> Non
 
 @pytest.mark.parametrize(
     ("game_id", "child_before_parent"),
-    [("order-30-presence", False), ("order-30-presence-5", True)],
+    [("order-30-presence", False), ("order32-nested-retained-0", True)],
 )
 def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority(
     game_id: str,
