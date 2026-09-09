@@ -7,9 +7,9 @@ which is reported separately from the measured Shooting slice.
 
 | Case | Base mean s | Head mean s | Head max s | Mean change | Base / head LOS calls |
 |---|---:|---:|---:|---:|---:|
-| visible-self-observer | 0.0944 | 0.1079 | 0.1140 | +14.3% | 44 / 50 |
-| unseen-no-observer | 0.3375 | 0.3805 | 0.4289 | +12.7% | 283 / 318 |
-| unseen-friendly-observer | 0.2573 | 0.2994 | 0.3292 | +16.3% | 291 / 326 |
+| visible-self-observer | 0.1031 | 0.1099 | 0.1145 | +6.6% | 44 / 50 |
+| unseen-no-observer | 0.3478 | 0.3904 | 0.4480 | +12.2% | 283 / 318 |
+| unseen-friendly-observer | 0.2624 | 0.3040 | 0.3282 | +15.9% | 291 / 326 |
 
 All 42 timed base/head slices completed. Head generates the now-legal ordinary
 weapon options, and wrapper calls increase by 6 for visible and 35 for unseen
@@ -29,7 +29,7 @@ it is not a universal geometric bound. The wrapper-call limits also leave
 bounded headroom over measured counts.
 
 An illustrative 100 activations at the slowest measured mean consume about
-38 seconds for this one-attack slice alone. This is an estimate, not observed
+39 seconds for this one-attack slice alone. This is an estimate, not observed
 calls in a complete game: real multi-weapon attack counts, other phases and
 setup still need measurement against the standing <60 s mean and <=300 s
 observed maximum objectives. Full-game certification is outstanding.
@@ -41,7 +41,7 @@ Reproduce from the repository root:
     uv run pytest tests/code_quality/test_order33_indirect_shooting.py --no-cov -q
 
 Reports retain commit, runtime diff, manifest, script/helper/lock hashes. Final head timing identifies commit
-5fa1db619def01ae1c67678320512b5747061cf9 and its runtime manifest hash. Earlier incomplete-driver observations remain under
+9a1d9cfd5f3e9c05e8c621b0c50e01011ff12a75 and its runtime manifest hash. Earlier incomplete-driver observations remain under
 provisional-driver/ and are not delivery evidence. Order 32's exception is not
 extended. Correctness and independent review remain separate requirements.
 
@@ -50,3 +50,7 @@ Initial option generation, real Movement choices and persistence restoration
 are included in setup. The fixture hash pins this configuration and policy.
 Prototype and initial completed-run reports remain available in Git history;
 the final reports use the typed profiler API and matching base/head driver hashes.
+
+The R33-001 engagement repair was remeasured on both revisions with matching
+driver/helper hashes. Budgets are unchanged; earlier reviewed measurements are
+preserved in Git history. The repair adds no engagement or visibility query.
