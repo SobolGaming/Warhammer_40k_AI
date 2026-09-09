@@ -8,15 +8,15 @@
   "mode": "work_counts_instrumented_not_timing_evidence",
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
-    "scripts/measure_indirect_shooting.py": "8c85b73ecc441f559a28f0b2956ec3df6252d2a9a624c6eaeeea5594051c64e2",
-    "tests/indirect_shooting_helpers.py": "0be55491872dba68ae9714b4bbd2a9687df1de67fef65a0d2e5f73cc72fdbc13"
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "477adabd2c2b399f57a9982f9e377db52f0a75f91495e28ecff7631740805cca"
   },
   "results": {
     "visible-self-observer": {
       "samples": [
         {
-          "setup_seconds": 3.9987571249948815,
-          "slice_seconds": 0.3084193749818951,
+          "setup_seconds": 4.002826667041518,
+          "slice_seconds": 0.3199103749357164,
           "work_counts": {
             "resolve_line_of_sight": 44,
             "resolve_visibility_pair": 20,
@@ -27,18 +27,18 @@
           "hit_count": 1
         }
       ],
-      "mean_seconds": 0.3084193749818951,
-      "median_seconds": 0.3084193749818951,
-      "p95_seconds": 0.3084193749818951,
-      "maximum_seconds": 0.3084193749818951,
+      "mean_seconds": 0.3199103749357164,
+      "median_seconds": 0.3199103749357164,
+      "p95_seconds": 0.3199103749357164,
+      "maximum_seconds": 0.3199103749357164,
       "completion_rate": 1.0,
-      "slices_per_second": 3.2423384557429387
+      "slices_per_second": 3.125875489974161
     },
     "unseen-no-observer": {
       "samples": [
         {
-          "setup_seconds": 2.1215120420092717,
-          "slice_seconds": 1.4114084580214694,
+          "setup_seconds": 2.104193791979924,
+          "slice_seconds": 1.3969360829796642,
           "work_counts": {
             "resolve_line_of_sight": 283,
             "resolve_visibility_pair": 20,
@@ -49,18 +49,18 @@
           "hit_count": 1
         }
       ],
-      "mean_seconds": 1.4114084580214694,
-      "median_seconds": 1.4114084580214694,
-      "p95_seconds": 1.4114084580214694,
-      "maximum_seconds": 1.4114084580214694,
+      "mean_seconds": 1.3969360829796642,
+      "median_seconds": 1.3969360829796642,
+      "p95_seconds": 1.3969360829796642,
+      "maximum_seconds": 1.3969360829796642,
       "completion_rate": 1.0,
-      "slices_per_second": 0.70851212086529
+      "slices_per_second": 0.7158523658913587
     },
     "unseen-friendly-observer": {
       "samples": [
         {
-          "setup_seconds": 2.193387957988307,
-          "slice_seconds": 1.0721904590027407,
+          "setup_seconds": 2.2037499169819057,
+          "slice_seconds": 1.037211041082628,
           "work_counts": {
             "resolve_line_of_sight": 291,
             "_target_visible_to_friendly_unit": 2,
@@ -70,12 +70,12 @@
           "hit_count": 1
         }
       ],
-      "mean_seconds": 1.0721904590027407,
-      "median_seconds": 1.0721904590027407,
-      "p95_seconds": 1.0721904590027407,
-      "maximum_seconds": 1.0721904590027407,
+      "mean_seconds": 1.037211041082628,
+      "median_seconds": 1.037211041082628,
+      "p95_seconds": 1.037211041082628,
+      "maximum_seconds": 1.037211041082628,
       "completion_rate": 1.0,
-      "slices_per_second": 0.9326701162124814
+      "slices_per_second": 0.9641239442999107
     }
   },
   "full_game_certified": false

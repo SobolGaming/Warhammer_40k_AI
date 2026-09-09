@@ -8,186 +8,186 @@
   "mode": "uninstrumented_timing",
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
-    "scripts/measure_indirect_shooting.py": "8c85b73ecc441f559a28f0b2956ec3df6252d2a9a624c6eaeeea5594051c64e2",
-    "tests/indirect_shooting_helpers.py": "0be55491872dba68ae9714b4bbd2a9687df1de67fef65a0d2e5f73cc72fdbc13"
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "477adabd2c2b399f57a9982f9e377db52f0a75f91495e28ecff7631740805cca"
   },
   "results": {
     "visible-self-observer": {
       "samples": [
         {
-          "setup_seconds": 4.059907749993727,
-          "slice_seconds": 0.10354066698346287,
+          "setup_seconds": 3.9379920000210404,
+          "slice_seconds": 0.09885783295612782,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.066709333914332,
-          "slice_seconds": 0.09489916602615267,
+          "setup_seconds": 2.018681166926399,
+          "slice_seconds": 0.09277812507934868,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1289359169313684,
-          "slice_seconds": 0.09596687508746982,
+          "setup_seconds": 2.0564017080469057,
+          "slice_seconds": 0.09459366695955396,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.0684326249174774,
-          "slice_seconds": 0.09544658300001174,
+          "setup_seconds": 2.040988583001308,
+          "slice_seconds": 0.09391487494576722,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1203644580673426,
-          "slice_seconds": 0.0957682499429211,
+          "setup_seconds": 2.0784310000017285,
+          "slice_seconds": 0.0942827919498086,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.071399000007659,
-          "slice_seconds": 0.0946919999551028,
+          "setup_seconds": 2.030873292009346,
+          "slice_seconds": 0.09348791697993875,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.122166167013347,
-          "slice_seconds": 0.09684804198332131,
+          "setup_seconds": 2.0688191660447046,
+          "slice_seconds": 0.09260133397765458,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         }
       ],
-      "mean_seconds": 0.09673736899692033,
-      "median_seconds": 0.0957682499429211,
-      "p95_seconds": 0.10354066698346287,
-      "maximum_seconds": 0.10354066698346287,
+      "mean_seconds": 0.09435950612117137,
+      "median_seconds": 0.09391487494576722,
+      "p95_seconds": 0.09885783295612782,
+      "maximum_seconds": 0.09885783295612782,
       "completion_rate": 1.0,
-      "slices_per_second": 10.33726687389891
+      "slices_per_second": 10.59776636299743
     },
     "unseen-no-observer": {
       "samples": [
         {
-          "setup_seconds": 2.1263957500923425,
-          "slice_seconds": 0.3834281249437481,
+          "setup_seconds": 2.073984458926134,
+          "slice_seconds": 0.3795379580697045,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1006851670099422,
-          "slice_seconds": 0.36447412497363985,
+          "setup_seconds": 2.0694591669598594,
+          "slice_seconds": 0.3673414170043543,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.099758750060573,
-          "slice_seconds": 0.32348429097328335,
+          "setup_seconds": 2.106457833084278,
+          "slice_seconds": 0.3173403749242425,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.104681708966382,
-          "slice_seconds": 0.3277528330218047,
+          "setup_seconds": 2.0629837500164285,
+          "slice_seconds": 0.31902870791964233,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1606335409451276,
-          "slice_seconds": 0.322020124993287,
+          "setup_seconds": 2.109427332994528,
+          "slice_seconds": 0.31913812505081296,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.110615124925971,
-          "slice_seconds": 0.3258535839850083,
+          "setup_seconds": 2.071069792029448,
+          "slice_seconds": 0.3270052910083905,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.152306125033647,
-          "slice_seconds": 0.32258220796938986,
+          "setup_seconds": 2.149370832950808,
+          "slice_seconds": 0.3333833330543712,
           "work_counts": {},
           "decision_count": 7,
           "hit_count": 1
         }
       ],
-      "mean_seconds": 0.338513612980023,
-      "median_seconds": 0.3258535839850083,
-      "p95_seconds": 0.3834281249437481,
-      "maximum_seconds": 0.3834281249437481,
+      "mean_seconds": 0.3375393152902169,
+      "median_seconds": 0.3270052910083905,
+      "p95_seconds": 0.3795379580697045,
+      "maximum_seconds": 0.3795379580697045,
       "completion_rate": 1.0,
-      "slices_per_second": 2.9540909483572637
+      "slices_per_second": 2.962617848354045
     },
     "unseen-friendly-observer": {
       "samples": [
         {
-          "setup_seconds": 2.160315625020303,
-          "slice_seconds": 0.27780108305159956,
+          "setup_seconds": 2.1288059160578996,
+          "slice_seconds": 0.2723738339263946,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.2096833750838414,
-          "slice_seconds": 0.25305874994955957,
+          "setup_seconds": 2.1615305839804932,
+          "slice_seconds": 0.25587508303578943,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.203353042015806,
-          "slice_seconds": 0.25431929097976536,
+          "setup_seconds": 2.160735375015065,
+          "slice_seconds": 0.25382545799948275,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1547737079672515,
-          "slice_seconds": 0.2569395420141518,
+          "setup_seconds": 2.1421987910289317,
+          "slice_seconds": 0.25044037494808435,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.198747624992393,
-          "slice_seconds": 0.25403370801359415,
+          "setup_seconds": 2.1761058749398217,
+          "slice_seconds": 0.2557220000308007,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1593997919699177,
-          "slice_seconds": 0.2560771250864491,
+          "setup_seconds": 2.117472124984488,
+          "slice_seconds": 0.25312675000168383,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         },
         {
-          "setup_seconds": 2.1994125000201166,
-          "slice_seconds": 0.25371912494301796,
+          "setup_seconds": 2.1645556250587106,
+          "slice_seconds": 0.25996112497523427,
           "work_counts": {},
           "decision_count": 9,
           "hit_count": 1
         }
       ],
-      "mean_seconds": 0.2579926605768768,
-      "median_seconds": 0.25431929097976536,
-      "p95_seconds": 0.27780108305159956,
-      "maximum_seconds": 0.27780108305159956,
+      "mean_seconds": 0.25733208927392426,
+      "median_seconds": 0.2557220000308007,
+      "p95_seconds": 0.2723738339263946,
+      "maximum_seconds": 0.2723738339263946,
       "completion_rate": 1.0,
-      "slices_per_second": 3.876079256533809
+      "slices_per_second": 3.886029149421479
     }
   },
   "full_game_certified": false

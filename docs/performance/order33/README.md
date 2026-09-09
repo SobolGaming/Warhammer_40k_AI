@@ -7,9 +7,9 @@ which is reported separately from the measured Shooting slice.
 
 | Case | Base mean s | Head mean s | Head max s | Mean change | Base / head LOS calls |
 |---|---:|---:|---:|---:|---:|
-| visible-self-observer | 0.0967 | 0.1075 | 0.1096 | +11.1% | 44 / 50 |
-| unseen-no-observer | 0.3385 | 0.3867 | 0.4384 | +14.2% | 283 / 318 |
-| unseen-friendly-observer | 0.2580 | 0.3049 | 0.3344 | +18.2% | 291 / 326 |
+| visible-self-observer | 0.0944 | 0.1079 | 0.1140 | +14.3% | 44 / 50 |
+| unseen-no-observer | 0.3375 | 0.3805 | 0.4289 | +12.7% | 283 / 318 |
+| unseen-friendly-observer | 0.2573 | 0.2994 | 0.3292 | +16.3% | 291 / 326 |
 
 All 42 timed base/head slices completed. Head generates the now-legal ordinary
 weapon options, and wrapper calls increase by 6 for visible and 35 for unseen
@@ -22,13 +22,14 @@ query and attack-modifier builder each execute twice per accepted declaration
 Initial budgets are in budgets.json: head mean <0.45 s, maximum <0.55 s and
 mean/base ratio <1.25 on this provisional host. Observed within-case variation
 and the added legal-profile work informed these limits. CI enforces stable work
-ceilings, including at most 25 distinct model-pair solves (five by five),
+ceilings, including at most 25 additional model-pair solves in the timed interval,
 and two observer/build queries per declaration; it does not impose host-specific
-timing thresholds on shared runners. The absolute call limits leave bounded
-headroom over measured head counts.
+timing thresholds on shared runners. The exact-solve allowance is the observed 20 plus five solves of headroom;
+it is not a universal geometric bound. The wrapper-call limits also leave
+bounded headroom over measured counts.
 
 An illustrative 100 activations at the slowest measured mean consume about
-39 seconds for this one-attack slice alone. This is an estimate, not observed
+38 seconds for this one-attack slice alone. This is an estimate, not observed
 calls in a complete game: real multi-weapon attack counts, other phases and
 setup still need measurement against the standing <60 s mean and <=300 s
 observed maximum objectives. Full-game certification is outstanding.
@@ -39,8 +40,13 @@ Reproduce from the repository root:
     uv run python -m scripts.measure_indirect_shooting --samples 1 --work-counts --output work.json
     uv run pytest tests/code_quality/test_order33_indirect_shooting.py --no-cov -q
 
-Reports retain commit, runtime diff, manifest, script/helper/lock hashes. The head
-timing was measured before its commit; its runtime manifest hash identifies the
-tested production tree. Earlier incomplete-driver observations remain under
+Reports retain commit, runtime diff, manifest, script/helper/lock hashes. Final head timing identifies commit
+5fa1db619def01ae1c67678320512b5747061cf9 and its runtime manifest hash. Earlier incomplete-driver observations remain under
 provisional-driver/ and are not delivery evidence. Order 32's exception is not
 extended. Correctness and independent review remain separate requirements.
+
+The timed interval starts with an already-pending unit-selection request.
+Initial option generation, real Movement choices and persistence restoration
+are included in setup. The fixture hash pins this configuration and policy.
+Prototype and initial completed-run reports remain available in Git history;
+the final reports use the typed profiler API and matching base/head driver hashes.

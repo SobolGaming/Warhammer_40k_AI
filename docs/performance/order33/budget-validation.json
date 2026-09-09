@@ -1,0 +1,31 @@
+{
+  "base_commit": "8ef8cb83622eb30066fbd113aa94bd87e2ec4fe3",
+  "head_commit": "5fa1db619def01ae1c67678320512b5747061cf9",
+  "runtime_manifest_sha256": "eb3965569dfbe31affdd3c4f0ba9b2912278df71bd9f9e4a7f8d972ec5f481be",
+  "driver_hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "477adabd2c2b399f57a9982f9e377db52f0a75f91495e28ecff7631740805cca"
+  },
+  "checks": [
+    {
+      "case": "visible-self-observer",
+      "head_to_base_mean_ratio": 1.1434144599436367,
+      "work_limits_passed": true,
+      "timing_limits_passed": true
+    },
+    {
+      "case": "unseen-no-observer",
+      "head_to_base_mean_ratio": 1.1272690728616304,
+      "work_limits_passed": true,
+      "timing_limits_passed": true
+    },
+    {
+      "case": "unseen-friendly-observer",
+      "head_to_base_mean_ratio": 1.1634906811759183,
+      "work_limits_passed": true,
+      "timing_limits_passed": true
+    }
+  ],
+  "full_game_certified": false
+}

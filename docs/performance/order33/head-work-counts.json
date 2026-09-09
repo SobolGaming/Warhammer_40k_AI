@@ -1,22 +1,22 @@
 {
   "workload_id": "order33-indirect-shooting-slice-v1",
-  "commit": "8ef8cb83622eb30066fbd113aa94bd87e2ec4fe3",
-  "runtime_diff_sha256": "67b4a6075240cf40246b0cfa4db3c044d3dd53dc6e54561dd3ad9a96162a4c70",
-  "engine_manifest_sha256": "3b8d4a89cc924dd3bb86e414e1f9b104cbde4d153cbd8ff9d34c85e4bf0bad15",
+  "commit": "5fa1db619def01ae1c67678320512b5747061cf9",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "eb3965569dfbe31affdd3c4f0ba9b2912278df71bd9f9e4a7f8d972ec5f481be",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "mode": "work_counts_instrumented_not_timing_evidence",
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
-    "scripts/measure_indirect_shooting.py": "8c85b73ecc441f559a28f0b2956ec3df6252d2a9a624c6eaeeea5594051c64e2",
-    "tests/indirect_shooting_helpers.py": "0be55491872dba68ae9714b4bbd2a9687df1de67fef65a0d2e5f73cc72fdbc13"
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "477adabd2c2b399f57a9982f9e377db52f0a75f91495e28ecff7631740805cca"
   },
   "results": {
     "visible-self-observer": {
       "samples": [
         {
-          "setup_seconds": 4.16575849999208,
-          "slice_seconds": 0.3468531669350341,
+          "setup_seconds": 3.9898863750277087,
+          "slice_seconds": 0.34549729200080037,
           "work_counts": {
             "resolve_line_of_sight": 50,
             "resolve_visibility_pair": 20,
@@ -27,18 +27,18 @@
           "hit_count": 1
         }
       ],
-      "mean_seconds": 0.3468531669350341,
-      "median_seconds": 0.3468531669350341,
-      "p95_seconds": 0.3468531669350341,
-      "maximum_seconds": 0.3468531669350341,
+      "mean_seconds": 0.34549729200080037,
+      "median_seconds": 0.34549729200080037,
+      "p95_seconds": 0.34549729200080037,
+      "maximum_seconds": 0.34549729200080037,
       "completion_rate": 1.0,
-      "slices_per_second": 2.88306434920717
+      "slices_per_second": 2.894378691679249
     },
     "unseen-no-observer": {
       "samples": [
         {
-          "setup_seconds": 2.1300677920226008,
-          "slice_seconds": 1.5780945000005886,
+          "setup_seconds": 2.108435667003505,
+          "slice_seconds": 1.5688389160204679,
           "work_counts": {
             "resolve_line_of_sight": 318,
             "resolve_visibility_pair": 20,
@@ -49,18 +49,18 @@
           "hit_count": 1
         }
       ],
-      "mean_seconds": 1.5780945000005886,
-      "median_seconds": 1.5780945000005886,
-      "p95_seconds": 1.5780945000005886,
-      "maximum_seconds": 1.5780945000005886,
+      "mean_seconds": 1.5688389160204679,
+      "median_seconds": 1.5688389160204679,
+      "p95_seconds": 1.5688389160204679,
+      "maximum_seconds": 1.5688389160204679,
       "completion_rate": 1.0,
-      "slices_per_second": 0.6336756132155755
+      "slices_per_second": 0.6374140708700736
     },
     "unseen-friendly-observer": {
       "samples": [
         {
-          "setup_seconds": 2.191490791970864,
-          "slice_seconds": 1.1933541659964249,
+          "setup_seconds": 2.203965208027512,
+          "slice_seconds": 1.1770185419591144,
           "work_counts": {
             "resolve_line_of_sight": 326,
             "_target_visible_to_friendly_unit": 2,
@@ -70,12 +70,12 @@
           "hit_count": 1
         }
       ],
-      "mean_seconds": 1.1933541659964249,
-      "median_seconds": 1.1933541659964249,
-      "p95_seconds": 1.1933541659964249,
-      "maximum_seconds": 1.1933541659964249,
+      "mean_seconds": 1.1770185419591144,
+      "median_seconds": 1.1770185419591144,
+      "p95_seconds": 1.1770185419591144,
+      "maximum_seconds": 1.1770185419591144,
       "completion_rate": 1.0,
-      "slices_per_second": 0.8379741978484834
+      "slices_per_second": 0.8496042877417446
     }
   },
   "full_game_certified": false
