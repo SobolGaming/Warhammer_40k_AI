@@ -1,10 +1,12 @@
 # Order 34 Action and shooting restriction assessment
 
-The final repaired-runtime evidence for **R34-003** is in
-[review-repair/README.md](review-repair/README.md): 98 current-runtime samples and
-all required timing/work budgets pass. It preserves all original cases and adds
-live selection, attached and retained-reaction workloads. The 9699f8f8 reports
-remain in `review-9699/`; the e57 evidence below is historical.
+Current runtime evidence after the R34-002 relabelling repair is in
+[review-relabel/README.md](review-relabel/README.md): 98 samples and all unchanged
+timing/work budgets pass. The prior [review-repair set](review-repair/README.md)
+was independently accepted when R34-003 closed at 29c6cdc0 and remains preserved.
+Both sets retain all original cases and live selection, attached-selection and
+retained-reaction workloads. The 9699f8f8 reports remain in `review-9699/`;
+the e57 evidence below is historical.
 
 ## Historical e57 measurements
 

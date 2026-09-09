@@ -6,6 +6,10 @@ exact source inventories are present. PR #436 contains R32-001's retained
 observer correction. The initial checkout was clean. Work uses
 `codex/order-34-action-restrictions`.
 
+The subsequent R34-002 checkpoint relabelling correction and its focused
+bug-class/scope audit are recorded in [the repair report](ORDER_34_RELABELLING_REPAIR.md).
+It preserves this acceptance matrix and the independently closed R34-001/R34-003 findings.
+
 ## Acceptance matrix established before implementation
 
 Complete operative 16.01, 10.02, 10.04–10.07 and 15.09 were read directly

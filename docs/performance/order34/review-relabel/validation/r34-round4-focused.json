@@ -1,0 +1,13 @@
+{
+  "name": "r34-round4-focused",
+  "command": "uv run ruff format src/warhammer40k_core/engine/model_attack_history.py tests/activity_restriction_assertions.py tests/code_quality/test_order34_action_restrictions.py tests/unit/test_phase13b_shooting_declarations.py tests/unit/test_phase12c_core_stratagems.py\nuv run python scripts/build_engine_build_identity.py\nuv run python scripts/build_external_contract.py\nuv run pytest tests/unit/test_phase13b_shooting_declarations.py -k 'order34 or r34_002' tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration tests/integration/test_fight_on_death_presence.py::test_order_30_retained_model_fights_from_original_base_then_is_removed tests/integration/test_retained_shooting.py -k 'order34 or r34_002 or r34_001 or fire_overwatch_requests_out_of_phase_shooting_declaration or retained_model_fights_from_original_base_then_is_removed' tests/code_quality/test_order34_action_restrictions.py -q --no-cov --tb=short --junitxml=/private/tmp/order34-evidence/r34-round4-focused.xml",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T21:18:00.712089+00:00",
+  "deadline_seconds": 360.0,
+  "log": "/private/tmp/order34-evidence/r34-round4-focused.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 69550,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 123.206
+}

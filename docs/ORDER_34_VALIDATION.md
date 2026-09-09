@@ -1,5 +1,9 @@
 # Order 34 validation and independent-review handoff
 
+The subsequent independent review left R34-002 open for relabelled completion
+history and closed R34-003. See the [current relabelling repair and validation](ORDER_34_RELABELLING_REPAIR.md).
+The evidence below describes the previously reviewed 29c6cdc0 candidate.
+
 PR: https://github.com/SobolGaming/Warhammer_40k_AI/pull/438
 
 Base: `e56c1a4caf2a6915548222caed0872627f8dbf43`.
