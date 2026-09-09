@@ -1,0 +1,18 @@
+{
+  "workload_id": "order34-action-restriction-slice-v1",
+  "status": "Initial measured Order 34 budgets; no Order 32 deferral",
+  "work_limits": {
+    "rules_unit_view_by_id": 540,
+    "rules_unit_identity_ids": 120,
+    "persisting_effects_for_lineage": 540,
+    "record_persisting_effect": 1,
+    "expire_persisting_effects_at_boundary": 4
+  },
+  "provisional_timing_limits_seconds": {
+    "mean": 0.2,
+    "maximum": 0.25,
+    "head_to_base_mean_ratio": 1.25
+  },
+  "timing_ci_enforced": false,
+  "full_game_certified": false
+}

@@ -16,7 +16,7 @@ MODELS_ATTACKED_EVENT_TYPE = "attack_sequence_models_attacked"
 
 
 def record_attack_sequence_completed(
-    *, decisions: DecisionController, sequence: AttackSequence
+    *, state: GameState, decisions: DecisionController, sequence: AttackSequence
 ) -> None:
     payload = {
         "sequence_id": sequence.sequence_id,
@@ -34,6 +34,9 @@ def record_attack_sequence_completed(
         if len(prior) != 1 or prior[0].payload != payload:
             raise GameLifecycleError("Attack sequence completion history drift.")
         return
+    from warhammer40k_core.engine.activity_restrictions import record_completed_shooting_restriction
+
+    record_completed_shooting_restriction(state=state, sequence=sequence)
     decisions.event_log.append("attack_sequence_completed", payload)
 
 

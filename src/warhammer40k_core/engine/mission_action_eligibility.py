@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.activity_restrictions import has_activity_restriction
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    rules_unit_identity_ids,
     rules_unit_is_battle_shocked,
     rules_unit_view_by_id,
 )
@@ -47,7 +47,7 @@ def mission_action_unit_ineligibility_reason(
     placed_alive_models = _placed_alive_models(state=state, rules_unit=rules_unit)
     if not placed_alive_models:
         return MISSION_ACTION_UNIT_OFF_BATTLEFIELD
-    keyword_set = _rules_unit_keyword_set(rules_unit)
+    keyword_set = frozenset(rules_unit.keywords)
     if "AIRCRAFT" in keyword_set:
         return MISSION_ACTION_UNIT_AIRCRAFT
     if "FORTIFICATION" in keyword_set:
@@ -98,16 +98,13 @@ def mission_action_unit_ineligibility_reason(
         for unit_id in state_unit_ids
     ):
         return MISSION_ACTION_UNIT_FELL_BACK
-    if _rules_unit_has_shot_this_shooting_phase(
+    if has_activity_restriction(
         state=state,
-        state_unit_ids=state_unit_ids,
+        rules_unit=rules_unit,
+        activity="completed_shooting",
     ):
         return MISSION_ACTION_UNIT_ALREADY_SHOT
-    if rules_unit_started_mission_action_this_turn(
-        state=state,
-        player_id=requested_player_id,
-        unit_instance_id=rules_unit.unit_instance_id,
-    ):
+    if has_activity_restriction(state=state, rules_unit=rules_unit, activity="started_action"):
         return MISSION_ACTION_UNIT_ALREADY_STARTED_ACTION
     return None
 
@@ -123,23 +120,7 @@ def rules_unit_started_mission_action_this_turn(
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     if rules_unit.owner_player_id != requested_player_id:
         return False
-    requested_identity_ids = frozenset(
-        rules_unit_identity_ids(
-            state=state,
-            unit_instance_id=rules_unit.unit_instance_id,
-        )
-    )
-    return any(
-        action_state.player_id == requested_player_id
-        and action_state.battle_round_started == state.battle_round
-        and not requested_identity_ids.isdisjoint(
-            rules_unit_identity_ids(
-                state=state,
-                unit_instance_id=action_state.unit_instance_id,
-            )
-        )
-        for action_state in state.mission_action_states
-    )
+    return has_activity_restriction(state=state, rules_unit=rules_unit, activity="started_action")
 
 
 def mission_action_prevents_rules_unit_from_shooting_this_phase(
@@ -153,28 +134,9 @@ def mission_action_prevents_rules_unit_from_shooting_this_phase(
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     if rules_unit.owner_player_id != requested_player_id:
         return False
-    if state.current_battle_phase is not BattlePhase.SHOOTING:
+    if "TITANIC" in rules_unit.keywords:
         return False
-    if "TITANIC" in _rules_unit_keyword_set(rules_unit):
-        return False
-    requested_identity_ids = frozenset(
-        rules_unit_identity_ids(
-            state=state,
-            unit_instance_id=rules_unit.unit_instance_id,
-        )
-    )
-    return any(
-        action_state.player_id == requested_player_id
-        and action_state.battle_round_started == state.battle_round
-        and action_state.phase_started == BattlePhase.SHOOTING.value
-        and not requested_identity_ids.isdisjoint(
-            rules_unit_identity_ids(
-                state=state,
-                unit_instance_id=action_state.unit_instance_id,
-            )
-        )
-        for action_state in state.mission_action_states
-    )
+    return has_activity_restriction(state=state, rules_unit=rules_unit, activity="started_action")
 
 
 def _placed_alive_models(
@@ -198,27 +160,6 @@ def _rules_unit_state_unit_ids(rules_unit: RulesUnitView) -> tuple[str, ...]:
     return tuple(
         dict.fromkeys((rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids))
     )
-
-
-def _rules_unit_keyword_set(rules_unit: RulesUnitView) -> frozenset[str]:
-    return frozenset(_canonical_keyword(keyword) for keyword in rules_unit.keywords)
-
-
-def _rules_unit_has_shot_this_shooting_phase(
-    *,
-    state: GameState,
-    state_unit_ids: tuple[str, ...],
-) -> bool:
-    if state.current_battle_phase is not BattlePhase.SHOOTING:
-        return False
-    shooting_state = state.shooting_phase_state
-    if shooting_state is None:
-        return False
-    return any(unit_id in shooting_state.shot_unit_ids for unit_id in state_unit_ids)
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).replace("-", " ").replace("_", " ").upper()
 
 
 def _validated_player_id(*, state: GameState, player_id: str) -> str:

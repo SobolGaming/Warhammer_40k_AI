@@ -122,7 +122,6 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_action_eligibility import (
-    MISSION_ACTION_UNIT_ALREADY_STARTED_ACTION,
     mission_action_unit_ineligibility_reason,
     rules_unit_started_mission_action_this_turn,
 )
@@ -185,7 +184,6 @@ from warhammer40k_core.engine.phases.movement import (
 from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     ShootingPhaseHandler,
-    ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_battlefield_departure import (
@@ -7066,6 +7064,7 @@ def test_local_session_exposes_held_mission_action_and_decline_continues_shootin
     ] == [option.option_id for option in request.options]
 
     action_session = session.fork()
+    action_initial = action_session.lifecycle.to_payload()
     action_option = next(
         option
         for option in request.options
@@ -7088,6 +7087,57 @@ def test_local_session_exposes_held_mission_action_and_decline_continues_shootin
         == started.unit_instance_id
         for event in action_session.lifecycle.decision_controller.event_log.records
     )
+    for index in range(30):
+        if action_state.active_player_id != "player-a":
+            break
+        assert rules_unit_started_mission_action_this_turn(
+            state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+        )
+        pending = action_session.advance_until_decision_or_terminal().decision_request
+        assert pending is not None
+        if action_state.active_player_id != "player-a":
+            break
+        if pending.decision_type in {"select_shooting_unit", "select_charging_unit"}:
+            assert started.unit_instance_id not in {option.option_id for option in pending.options}
+        option = next(
+            (
+                value
+                for value in pending.options
+                if value.option_id.startswith("complete_")
+                or value.option_id == DECLINE_MISSION_ACTION_START_OPTION_ID
+                or "decline" in value.option_id
+            ),
+            pending.options[0],
+        )
+        action_session.submit_option(
+            request_id=pending.request_id,
+            option_id=option.option_id,
+            result_id=f"order34-action-turn:{index}",
+        )
+    assert action_state.active_player_id == "player-b"
+    assert not rules_unit_started_mission_action_this_turn(
+        state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+    )
+    checkpoint = action_session.to_persistence_payload()
+    restored_action_session = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(checkpoint))
+    )
+    assert restored_action_session.to_persistence_payload() == checkpoint
+    for viewer in ("player-a", "player-b"):
+        assert restored_action_session.view(viewer_player_id=viewer) == action_session.view(
+            viewer_player_id=viewer
+        )
+        assert restored_action_session.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == action_session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order34-action-through-turn-end",
+            initial_lifecycle_payload=action_initial,
+            final_lifecycle=action_session.lifecycle,
+        )
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
 
     shooting_status = session.submit_option(
         request_id=request.request_id,
@@ -7291,6 +7341,68 @@ def test_titanic_unit_can_start_action_while_engaged() -> None:
     )
 
 
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.CHARGE, BattlePhase.FIGHT])
+@pytest.mark.parametrize("titanic", [False, True])
+@pytest.mark.parametrize("interrupted", [False, True])
+def test_order34_action_restriction_survives_phase_and_action_status(
+    phase: BattlePhase, titanic: bool, interrupted: bool
+) -> None:
+    from warhammer40k_core.engine.phases.shooting import shooting_unit_can_select_to_shoot
+
+    config = _config()
+    if titanic:
+        config = replace(
+            config,
+            army_catalog=replace(
+                config.army_catalog,
+                datasheets=tuple(
+                    replace(
+                        row,
+                        keywords=replace(
+                            row.keywords, keywords=(*row.keywords.keywords, "TITANIC")
+                        ),
+                    )
+                    if row.datasheet_id == "core-intercessor-like-infantry"
+                    else row
+                    for row in config.army_catalog.datasheets
+                ),
+            ),
+        )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    unit_id = "army-alpha:intercessor-unit-1"
+    action = _start_mission_action_via_lifecycle(
+        lifecycle=lifecycle, target_suffix="center", result_id="order34-start"
+    )
+    if interrupted:
+        state.interrupt_mission_action(action_id=action.action_id, reason="unit_left_battlefield")
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    restored = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
+    restored_state = restored.state
+    assert restored_state is not None
+    assert lifecycle.config is not None
+    assert (
+        shooting_unit_can_select_to_shoot(
+            state=restored_state,
+            unit=restored_state.army_definitions[0].unit_by_id(unit_id),
+            army_catalog=lifecycle.config.army_catalog,
+            player_id="player-a",
+        )
+        is titanic
+    )
+    assert rules_unit_started_mission_action_this_turn(
+        state=restored_state, player_id="player-a", unit_instance_id=unit_id
+    )
+
+
 def test_titanic_action_unit_remains_eligible_to_shoot() -> None:
     lifecycle = _battle_lifecycle(
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
@@ -7372,6 +7484,8 @@ def test_attached_rules_unit_has_one_canonical_action_option_and_state_identity(
         "mission-action:phase11e-attached-start-cleanse"
     )
     assert action_state.unit_instance_id == attached_id
+    # With no other eligible activation, the facade reaches the opponent's turn.
+    assert state.active_player_id == "player-b"
     assert (
         mission_action_unit_ineligibility_reason(
             state=state,
@@ -7379,12 +7493,12 @@ def test_attached_rules_unit_has_one_canonical_action_option_and_state_identity(
             unit_instance_id=leader_id,
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
-        == MISSION_ACTION_UNIT_ALREADY_STARTED_ACTION
+        is None
     )
 
 
 def test_attached_rules_unit_canonical_shot_state_blocks_all_component_action_options() -> None:
-    config = _config_with_player_a_attached_unit()
+    config = _config_with_player_a_attached_unit(include_independent_unit=True)
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     lifecycle.state = _battle_state_from_config(
@@ -7402,12 +7516,7 @@ def test_attached_rules_unit_canonical_shot_state_blocks_all_component_action_op
             unit_instance_id=component_id,
             target_suffix="center",
         )
-    state.shooting_phase_state = ShootingPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        selected_unit_ids=(attached_id,),
-        shot_unit_ids=(attached_id,),
-    )
+    _complete_shooting_for_action_test(lifecycle, unit_instance_id=attached_id)
 
     waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
 
@@ -7807,6 +7916,72 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
     assert terminal_replay_result.reproduced_event_count == len(
         replay_snapshot.decision_controller.event_log.records
     )
+
+
+@pytest.mark.parametrize("retained", [False, True])
+def test_order34_action_titanic_exception_uses_current_retained_component_keywords(
+    retained: bool,
+) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+
+    from warhammer40k_core.engine.mission_action_eligibility import (
+        mission_action_prevents_rules_unit_from_shooting_this_phase,
+    )
+
+    config = _config_with_player_a_attached_unit(include_independent_unit=True)
+    config = replace(
+        config,
+        army_catalog=replace(
+            config.army_catalog,
+            datasheets=tuple(
+                replace(
+                    row,
+                    keywords=replace(row.keywords, keywords=(*row.keywords.keywords, "TITANIC")),
+                )
+                if row.datasheet_id == "core-character-leader"
+                else row
+                for row in config.army_catalog.datasheets
+            ),
+        ),
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(config, decisions=lifecycle.decision_controller)
+    state = lifecycle.state
+    assert state.battlefield_state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    action = _attached_cleanse_action(state=state, action_id="order34-retained-action")
+    state.record_mission_action_state(action)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    leader = state.army_definitions[0].unit_by_id("army-alpha:leader-unit")
+    model_id = leader.own_models[0].model_instance_id
+    placement = state.battlefield_state.model_placement_by_id(model_id)
+    destroy_model_by_rule(state=state, model_instance_id=model_id)
+    if retained:
+        retain_destroyed_model_for_fixture(
+            state=state,
+            placement=placement,
+            effect_id="order34-retained",
+            source_rule_id="order34:retention-source",
+            source_phase=BattlePhase.FIGHT,
+            decisions=lifecycle.decision_controller,
+        )
+    for unit_id in ("attached-unit:army-alpha:bodyguard-unit", "army-alpha:bodyguard-unit"):
+        assert (
+            mission_action_prevents_rules_unit_from_shooting_this_phase(
+                state=state, player_id="player-a", unit_instance_id=unit_id
+            )
+            is not retained
+        )
+        assert rules_unit_started_mission_action_this_turn(
+            state=state, player_id="player-a", unit_instance_id=unit_id
+        )
+    assert not rules_unit_started_mission_action_this_turn(
+        state=state, player_id="player-a", unit_instance_id="army-alpha:intercessor-unit-2"
+    )
+    restored = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
+    assert restored.state is not None
+    assert restored.state.to_payload() == state.to_payload()
 
 
 def test_attached_action_cannot_complete_after_component_fails_battle_shock() -> None:
@@ -8821,9 +8996,7 @@ def test_cleanse_mission_action_filters_ineligible_vehicle_units() -> None:
 
 
 def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> None:
-    lifecycle = _battle_lifecycle(
-        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
-    )
+    lifecycle = _battle_lifecycle_with_player_a_vehicle()
     state = lifecycle.state
     assert state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -8833,12 +9006,7 @@ def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> 
         unit_instance_id=unit_id,
         target_suffix="center",
     )
-    state.shooting_phase_state = ShootingPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        selected_unit_ids=(unit_id,),
-        shot_unit_ids=(unit_id,),
-    )
+    _complete_shooting_for_action_test(lifecycle, unit_instance_id=unit_id)
 
     waiting = request_mission_action_start(
         state=state,
@@ -8866,9 +9034,7 @@ def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> 
 def test_automatic_mission_action_opportunity_excludes_unavailable_units(
     ineligible_state: str,
 ) -> None:
-    lifecycle = _battle_lifecycle(
-        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
-    )
+    lifecycle = _battle_lifecycle_with_player_a_vehicle()
     state = lifecycle.state
     assert state is not None
     assert state.battlefield_state is not None
@@ -8883,12 +9049,7 @@ def test_automatic_mission_action_opportunity_excludes_unavailable_units(
     if ineligible_state == "battle_shocked":
         state.battle_shocked_unit_ids = [unit_id]
     elif ineligible_state == "already_shot":
-        state.shooting_phase_state = ShootingPhaseState(
-            battle_round=state.battle_round,
-            active_player_id="player-a",
-            selected_unit_ids=(unit_id,),
-            shot_unit_ids=(unit_id,),
-        )
+        _complete_shooting_for_action_test(lifecycle, unit_instance_id=unit_id)
     elif ineligible_state == "destroyed":
         state.battlefield_state = state.battlefield_state.with_removed_models(
             tuple(
@@ -10148,6 +10309,71 @@ def _mission_action_state(
         scoring_source_id="cleanse",
         victory_points=5,
     )
+
+
+def _complete_shooting_for_action_test(lifecycle: GameLifecycle, *, unit_instance_id: str) -> None:
+    from tests.phase13b_shooting_declaration_helpers import _proposal_from_request
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.event_log import validate_json_value
+
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    target_id = state.army_definitions[1].units[0].unit_instance_id
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    placement = state.battlefield_state.unit_placement_by_id(
+        rules_unit.component_unit_instance_ids[0]
+    )
+    origin = placement.model_placements[0].pose.position
+    state.battlefield_state = replace(state.battlefield_state, terrain_features=())
+    _place_unit_near_point(
+        state, unit_instance_id=target_id, x_inches=origin.x + 12.0, y_inches=origin.y
+    )
+    for unit in state.army_definitions[0].units:
+        if unit.unit_instance_id not in rules_unit.component_unit_instance_ids:
+            _place_unit_near_point(
+                state,
+                unit_instance_id=unit.unit_instance_id,
+                x_inches=origin.x,
+                y_inches=origin.y + 6.0,
+            )
+    session = LocalGameSession(lifecycle=lifecycle)
+    for index in range(100):
+        shooting = state.shooting_phase_state
+        if (
+            shooting is not None
+            and unit_instance_id in shooting.shot_unit_ids
+            and shooting.attack_sequence is None
+            and shooting.pending_completed_attack_sequence is None
+        ):
+            return
+        request = pending_request(session)
+        if request.decision_type == START_MISSION_ACTION_DECISION_TYPE:
+            option_id = DECLINE_MISSION_ACTION_START_OPTION_ID
+        elif request.decision_type == "select_shooting_unit":
+            option_id = unit_instance_id
+        elif request.decision_type == "select_shooting_type":
+            option_id = "normal"
+        elif request.decision_type == "submit_shooting_declaration":
+            proposal = _proposal_from_request(request=request, target_unit_id=target_id)
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"order34-fixture-shot:{index}",
+                payload=validate_json_value(proposal.to_payload()),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+            continue
+        else:
+            submit_fixture_request(session, request)
+            continue
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order34-fixture-shot:{index}",
+            option_id=option_id,
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    raise AssertionError("Action fixture shooting did not complete within its decision budget")
 
 
 def _attached_cleanse_action(

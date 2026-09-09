@@ -1,4 +1,4 @@
-"""Hash-pinned 10.07 Indirect Shooting policy for P10."""
+"""Hash-pinned 16.01 Action restriction policy for P16."""
 
 from __future__ import annotations
 
@@ -23,18 +23,26 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "ce825fb4882d3cfe009afa2f49572adb6e464e48ef9082dfe058e26b52bcaf3e"
-SOURCE_PACKAGE_ID: Final = "gw-11e-core-indirect-shooting"
+EXPECTED_ARTIFACT_SHA256: Final = "b9027d83c608961b9cde5baae546bbb97336235b8b9a6297b182cf0e93fad8aa"
+SOURCE_PACKAGE_ID: Final = "gw-11e-core-actions"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-09"
-INDIRECT_SHOOTING_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:indirect-shooting"
-REMAIN_STATIONARY_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:remain-stationary"
+ACTION_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:performing-actions"
+SOURCE_IDS: Final = tuple(
+    f"{SOURCE_PACKAGE_ID}:{slug}"
+    for slug in (
+        "performing-actions",
+        "normal-shooting",
+        "assault-shooting",
+        "close-quarters-shooting",
+    )
+)
 
 
-class IndirectShootingSourceError(ValueError):
-    """The reviewed Indirect Shooting source identity or provenance has drifted."""
+class ActionRestrictionSourceError(ValueError):
+    """The reviewed Action restriction source identity or provenance has drifted."""
 
 
-class IndirectShootingSourceRule(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+class ActionRestrictionSourceRule(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     source_id: str
     section_id: str
     source_text: str
@@ -44,71 +52,69 @@ class IndirectShootingSourceRule(msgspec.Struct, frozen=True, forbid_unknown_fie
     runtime_consumer_ids: tuple[str, ...]
 
 
-class IndirectShootingAttackPolicy(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
-    source_rule_id: str
-    no_visible_rule_id: str
-    cover_rule_id: str
-    no_hit_rerolls_rule_id: str
-    stationary_visible_rule_id: str
-    minimum_unmodified_success: int
-    stationary_visible_minimum_unmodified_success: int
+class ActionRestrictionPolicy(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    action_source_rule_id: str
+    after_shooting_descriptor_id: str
+    after_shooting_source_rule_ids: tuple[str, ...]
+    action_expiration: str
+    shooting_expiration: str
+    shooting_exempt_keyword: str
 
 
-class IndirectShootingSourceArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+class ActionRestrictionSourceArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     artifact_schema: str
     source_package_id: str
     source_version: str
-    rules: tuple[IndirectShootingSourceRule, ...]
-    attack_policy: IndirectShootingAttackPolicy
+    rules: tuple[ActionRestrictionSourceRule, ...]
+    restriction_policy: ActionRestrictionPolicy
     evidence: tuple[RuleEvidencePayload, ...]
     package_hash: str
 
 
-def validate_source_artifact_bytes(raw: bytes) -> IndirectShootingSourceArtifact:
+def validate_source_artifact_bytes(raw: bytes) -> ActionRestrictionSourceArtifact:
     if hashlib.sha256(raw).hexdigest() != EXPECTED_ARTIFACT_SHA256:
-        raise IndirectShootingSourceError(
-            "Indirect Shooting source bytes drifted from their reviewed pin."
+        raise ActionRestrictionSourceError(
+            "Action restriction source bytes drifted from their reviewed pin."
         )
     try:
-        artifact = msgspec.json.decode(raw, type=IndirectShootingSourceArtifact)
+        artifact = msgspec.json.decode(raw, type=ActionRestrictionSourceArtifact)
     except msgspec.DecodeError as exc:
-        raise IndirectShootingSourceError("Indirect Shooting source schema is invalid.") from exc
+        raise ActionRestrictionSourceError("Action restriction source schema is invalid.") from exc
     if (
-        artifact.artifact_schema != "core-v2-core-indirect-shooting-source-v1"
+        artifact.artifact_schema != "core-v2-core-actions-source-v1"
         or artifact.source_package_id != SOURCE_PACKAGE_ID
         or artifact.source_version != SOURCE_VERSION
-        or tuple(rule.source_id for rule in artifact.rules)
-        != (INDIRECT_SHOOTING_SOURCE_ID, REMAIN_STATIONARY_SOURCE_ID)
+        or tuple(rule.source_id for rule in artifact.rules) != SOURCE_IDS
     ):
-        raise IndirectShootingSourceError("Indirect Shooting source identity drifted.")
+        raise ActionRestrictionSourceError("Action restriction source identity drifted.")
     for rule in artifact.rules:
         if hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256:
-            raise IndirectShootingSourceError(
-                "Indirect Shooting source transcription hash drifted."
+            raise ActionRestrictionSourceError(
+                "Action restriction source transcription hash drifted."
             )
         if (
             rule.load_support_status != "loaded"
             or rule.semantic_execution_status != "partial_engine_runtime"
             or not rule.runtime_consumer_ids
         ):
-            raise IndirectShootingSourceError(
-                "Indirect Shooting source execution evidence is incomplete."
+            raise ActionRestrictionSourceError(
+                "Action restriction source execution evidence is incomplete."
             )
-    policy = artifact.attack_policy
+    policy = artifact.restriction_policy
     if (
-        policy.source_rule_id != INDIRECT_SHOOTING_SOURCE_ID
-        or policy.minimum_unmodified_success != 6
-        or policy.stationary_visible_minimum_unmodified_success != 4
-        or not all(
-            (
-                policy.no_visible_rule_id,
-                policy.cover_rule_id,
-                policy.no_hit_rerolls_rule_id,
-                policy.stationary_visible_rule_id,
-            )
+        policy.action_source_rule_id != ACTION_SOURCE_ID
+        or policy.after_shooting_descriptor_id != "core:after-shooting-action-restriction"
+        or policy.after_shooting_source_rule_ids
+        != (
+            *SOURCE_IDS[1:],
+            "gw-11e-core-indirect-shooting:indirect-shooting",
+            "gw-11e-core-stratagems:rule:snap-shooting",
         )
+        or policy.action_expiration != "end_turn"
+        or policy.shooting_expiration != "end_phase"
+        or policy.shooting_exempt_keyword != "TITANIC"
     ):
-        raise IndirectShootingSourceError("Indirect Shooting attack descriptor drifted.")
+        raise ActionRestrictionSourceError("Action restriction descriptor drifted.")
     return artifact
 
 
@@ -116,10 +122,10 @@ _ARTIFACT: Final = validate_source_artifact_bytes(
     package_artifact_bytes(__name__, "artifacts/package.json")
 )
 PACKAGE_HASH: Final = _ARTIFACT.package_hash
-ATTACK_POLICY: Final = _ARTIFACT.attack_policy
+RESTRICTION_POLICY: Final = _ARTIFACT.restriction_policy
 
 
-def source_rules() -> tuple[IndirectShootingSourceRule, ...]:
+def source_rules() -> tuple[ActionRestrictionSourceRule, ...]:
     return _ARTIFACT.rules
 
 
@@ -142,8 +148,8 @@ def _build_source_package() -> RuleSourcePackage:
         ),
         documents=(
             SourceDocument(
-                document_id=SourceDocumentId(package_id=package_id, document_id="p10"),
-                title="Reviewed maintained App-data Indirect Shooting",
+                document_id=SourceDocumentId(package_id=package_id, document_id="p16"),
+                title="Reviewed maintained App-data Action restriction",
                 source_texts=tuple(
                     RuleSourceText.from_raw(
                         source_id=rule.source_id,

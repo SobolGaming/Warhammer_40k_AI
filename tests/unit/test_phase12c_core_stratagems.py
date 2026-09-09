@@ -3118,6 +3118,16 @@ def test_phase15e_epic_challenge_registers_selected_character_model_precision() 
 
 
 def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() -> None:
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+    from warhammer40k_core.engine.mission_action_eligibility import (
+        MISSION_ACTION_UNIT_ALREADY_SHOT,
+        mission_action_unit_ineligibility_reason,
+    )
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+
     lifecycle = _battle_lifecycle(
         active_player_id="player-b",
         pose_replacements=(
@@ -3163,12 +3173,13 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
         )
     )
 
-    shooting_status = lifecycle.submit_decision(
-        _target_proposal_result(
-            request=request,
-            result_id="phase13d-fire-overwatch-supported",
-            proposal=proposal,
-        )
+    session = LocalGameSession(lifecycle=lifecycle)
+    assert session.advance_until_decision_or_terminal().decision_request == request
+    initial = lifecycle.to_payload()
+    shooting_status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="phase13d-fire-overwatch-supported",
+        payload=validate_json_value({"proposal": proposal.to_payload()}),
     )
     shooting_request = _decision_request(shooting_status)
 
@@ -3186,6 +3197,15 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     assert state.out_of_phase_shooting_state.parent_phase is BattlePhase.MOVEMENT
     assert _has_event(lifecycle.decision_controller, "fire_overwatch_shooting_requested")
     assert not _has_event(lifecycle.decision_controller, "persisting_effect_recorded")
+    assert (
+        mission_action_unit_ineligibility_reason(
+            state=state,
+            player_id="player-a",
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+        is None
+    )
     request_payload = cast(dict[str, object], shooting_request.payload)
     proposal_payload = cast(dict[str, object], request_payload["proposal_request"])
     target_candidates = cast(list[dict[str, object]], proposal_payload["target_candidates"])
@@ -3197,27 +3217,20 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
         request=shooting_request,
         target_unit_id="army-beta:enemy-unit",
     )
-    status = lifecycle.submit_decision(
-        DecisionResult(
-            result_id="phase13d-fire-overwatch-declaration",
-            request_id=shooting_request.request_id,
-            decision_type=shooting_request.decision_type,
-            actor_id=shooting_request.actor_id,
-            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-            payload=validate_json_value(declaration.to_payload()),
-        )
+    status = session.submit_parameterized_payload(
+        result_id="phase13d-fire-overwatch-declaration",
+        request_id=shooting_request.request_id,
+        payload=validate_json_value(declaration.to_payload()),
     )
     for index in range(12):
         if _state(lifecycle).out_of_phase_shooting_state is None:
             break
         request = _decision_request(status)
         if request.decision_type == STRATAGEM_DECISION_TYPE:
-            status = lifecycle.submit_decision(
-                DecisionResult.for_request(
-                    result_id=f"phase13d-fire-overwatch-attack-{index}",
-                    request=request,
-                    selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
-                )
+            status = session.submit_option(
+                result_id=f"phase13d-fire-overwatch-attack-{index}",
+                request_id=request.request_id,
+                option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
             )
             continue
         assert request.decision_type in {
@@ -3226,12 +3239,10 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
             "select_precision_allocation",
         }
         option = request.options[0]
-        status = lifecycle.submit_decision(
-            DecisionResult.for_request(
-                result_id=f"phase13d-fire-overwatch-attack-{index}",
-                request=request,
-                selected_option_id=option.option_id,
-            )
+        status = session.submit_option(
+            result_id=f"phase13d-fire-overwatch-attack-{index}",
+            request_id=request.request_id,
+            option_id=option.option_id,
         )
 
     assert _state(lifecycle).out_of_phase_shooting_state is None
@@ -3244,6 +3255,69 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     attack_pools = cast(list[dict[str, object]], accepted["attack_pools"])
     assert SNAP_SHOOTING_RULE_ID in cast(list[str], attack_pools[0]["targeting_rule_ids"])
     assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+    # 15.09 creates the Action lock only after actual shooting, in player-b's
+    # Movement occurrence. The firing player's boundary must not expire it.
+    restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
+    restored_session = LocalGameSession(lifecycle=restored)
+    for viewer in ("player-a", "player-b"):
+        assert restored_session.view(viewer_player_id=viewer) == session.view(
+            viewer_player_id=viewer
+        )
+        assert restored_session.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order34-snap", initial_lifecycle_payload=initial, final_lifecycle=lifecycle
+        )
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+    restored_state = _state(restored)
+    for observed in (state, restored_state):
+        assert (
+            mission_action_unit_ineligibility_reason(
+                state=observed,
+                player_id="player-a",
+                unit_instance_id="army-alpha:intercessor-unit-1",
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+            == MISSION_ACTION_UNIT_ALREADY_SHOT
+        )
+        assert (
+            observed.expire_persisting_effects_at_boundary(
+                EffectExpirationBoundary.phase_end(
+                    battle_round=observed.battle_round,
+                    phase=BattlePhase.MOVEMENT,
+                    player_id="player-a",
+                )
+            )
+            == ()
+        )
+        assert (
+            mission_action_unit_ineligibility_reason(
+                state=observed,
+                player_id="player-a",
+                unit_instance_id="army-alpha:intercessor-unit-1",
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+            == MISSION_ACTION_UNIT_ALREADY_SHOT
+        )
+        observed.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_end(
+                battle_round=observed.battle_round,
+                phase=BattlePhase.MOVEMENT,
+                player_id="player-b",
+            )
+        )
+        assert (
+            mission_action_unit_ineligibility_reason(
+                state=observed,
+                player_id="player-a",
+                unit_instance_id="army-alpha:intercessor-unit-1",
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+            is None
+        )
 
 
 def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() -> None:
@@ -6898,6 +6972,10 @@ def _complete_current_command_for_fixture(lifecycle: GameLifecycle) -> GameLifec
 
 
 def _advance_battle_phase_for_fixture(lifecycle: GameLifecycle) -> None:
+    from warhammer40k_core.engine.battle_round_flow import (
+        _emit_objective_control_boundary_event_if_missing,
+    )
+
     state = _state(lifecycle)
     objective_state_ids_before = tuple(
         value.state_id for value in state.primary_objective_turn_start_states
@@ -6905,6 +6983,17 @@ def _advance_battle_phase_for_fixture(lifecycle: GameLifecycle) -> None:
     snapshot_ids_before = tuple(
         value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
     )
+    record = state.determine_current_phase_end_objective_control()
+    _emit_objective_control_boundary_event_if_missing(
+        decisions=lifecycle.decision_controller, record=record
+    )
+    if state.current_battle_phase is BattlePhase.FIGHT:
+        record = state.prepare_current_turn_end_boundary(
+            completed_phase=BattlePhase.FIGHT, runtime_modifier_registry=None
+        )
+        _emit_objective_control_boundary_event_if_missing(
+            decisions=lifecycle.decision_controller, record=record
+        )
     state.advance_to_next_battle_phase(event_log=lifecycle.decision_controller.event_log)
     record_new_primary_turn_start_evidence_events(
         state=state,

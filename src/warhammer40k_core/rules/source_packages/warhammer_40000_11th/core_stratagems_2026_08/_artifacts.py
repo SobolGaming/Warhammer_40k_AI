@@ -48,8 +48,8 @@ EXPECTED_CATEGORY_12_AUDIT_FINGERPRINT: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "25a89aadcee9ec31939dd08fedcec76e2bd1983aea1b94472a17c4721d89f17c"
-EXPECTED_PACKAGE_HASH: Final = "f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7"
+EXPECTED_ARTIFACT_SHA256: Final = "f69bb96a4248f8b14e9ec247ac88bee3855372cd1f40eee270402d2b4e3ed303"
+EXPECTED_PACKAGE_HASH: Final = "65110e9292beae53778b0d3955c7633c0c692d29925f892d1f1d73d03f9325a9"
 EXPECTED_ANOMALY_OBSERVATION_SHA256: Final = (
     "561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46"
 )
@@ -169,6 +169,7 @@ EXPECTED_RUNTIME_CONSUMERS_BY_RULE_ID: Final = {
         "warhammer40k_core.engine.phases.shooting_declaration_validation:"
         "_attack_pools_or_validation",
         "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction",
     ),
     "insane-bravery": (
         "warhammer40k_core.engine.stratagem_catalog:"

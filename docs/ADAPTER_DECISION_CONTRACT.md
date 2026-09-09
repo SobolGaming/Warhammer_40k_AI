@@ -1290,7 +1290,19 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   persists that canonical rules-unit ID and the selected `target_id`. A unit that
   started an Action cannot declare a Charge for the rest of that turn even if the
   Action completes immediately or is interrupted, and cannot shoot in that
-  Shooting phase unless its rules unit is `TITANIC`. Immediate zero-VP actions complete in the same
+  turn unless its current rules-present unit is `TITANIC`. This exception leaves
+  ordinary shooting restrictions intact. Accepted starts record a source-linked
+  `PersistingEffect` (`core_unit_activity_restriction`, `started_action`) targeting
+  canonical and component identities until the exact active-player turn ends;
+  completion, failure and cancellation do not remove it. Completed ranged attack
+  sequences record `completed_shooting` through the shared executor for Normal,
+  Assault, Close-quarters, Indirect and Snap, including supported out-of-phase
+  routes. This prevents Action starts until the actual parent phase ends. Expiry
+  uses battle round, active player and phase, and existing effect lineage covers
+  retained components and separation. Merely offering, declining or rejecting a
+  request records neither activity. Existing finite/parameterized submissions,
+  engine validation and viewer scoping remain the contract; no new decision or
+  adapter mutation path is introduced. Immediate zero-VP actions complete in the same
   decision handler without creating a VP transaction; Booby Trap records an
   engine-owned terrain trap state for later primary scoring and Plunder records
   an engine-owned terrain plunder state for later secondary scoring. Turn-end

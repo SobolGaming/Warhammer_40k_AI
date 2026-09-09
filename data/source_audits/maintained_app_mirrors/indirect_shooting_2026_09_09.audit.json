@@ -31,5 +31,5 @@
     "source_id": "gw-11e-core-rules",
     "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
   },
-  "co_version_comparison": "Complete 10.07 observed directly in the browser. No App version exposed and no co-version comparison asserted. Partial status excludes the Order 34 Action clause."
+  "co_version_comparison": "Complete 10.07 observed directly in the browser. No App version exposed and no co-version comparison asserted. Order 34 binds the retained Action clause; unrelated source semantics remain partial."
 }

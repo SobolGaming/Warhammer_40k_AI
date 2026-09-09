@@ -19457,6 +19457,97 @@ def test_r33_001_retained_engagement_survives_restoration(attached: bool) -> Non
     assert replay.status is ReplayRunStatus.REPRODUCED
 
 
+@pytest.mark.parametrize(
+    "mode",
+    [ShootingType.NORMAL, ShootingType.ASSAULT, ShootingType.CLOSE_QUARTERS, ShootingType.INDIRECT],
+)
+def test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary(
+    mode: ShootingType,
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        SHOOTER,
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.activity_restrictions import has_activity_restriction
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    session = indirect_session(
+        observer=True,
+        assault=mode is ShootingType.ASSAULT,
+        shooter_keyword="VEHICLE" if mode is ShootingType.CLOSE_QUARTERS else None,
+        engager_distance=1.0 if mode is ShootingType.CLOSE_QUARTERS else None,
+    )
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    request = select_indirect_declaration(session, mode)
+    state = _state(session.lifecycle)
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=SHOOTER)
+    assert not has_activity_restriction(state=state, rules_unit=unit, activity="completed_shooting")
+    checkpoint = session.to_persistence_payload()
+    malformed = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order34:malformed",
+        payload={"forged": True},
+    )
+    assert malformed.status_kind is LifecycleStatusKind.INVALID
+    assert session.to_persistence_payload() == checkpoint
+    submit_indirect_declaration(session, request)
+    complete_indirect_attack(session)
+    assert state.current_battle_phase is BattlePhase.SHOOTING
+    assert has_activity_restriction(state=state, rules_unit=unit, activity="completed_shooting")
+    assert state.shooting_phase_state is not None
+    assert SHOOTER in state.shooting_phase_state.shot_unit_ids
+    next_request = pending_request(session)
+    assert next_request.decision_type == "select_shooting_unit"
+    assert SHOOTER not in {option.option_id for option in next_request.options}
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id=f"order34:{mode.value}",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    assert restored.to_persistence_payload() == checkpoint
+    standalone = GameLifecycle.from_payload(json.loads(json.dumps(session.lifecycle.to_payload())))
+    assert standalone.to_payload() == session.lifecycle.to_payload()
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    for current in (state, _state(restored.lifecycle)):
+        current.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_end(
+                battle_round=current.battle_round, phase=BattlePhase.SHOOTING, player_id="player-b"
+            )
+        )
+        assert has_activity_restriction(
+            state=current, rules_unit=unit, activity="completed_shooting"
+        )
+        current.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_end(
+                battle_round=current.battle_round, phase=BattlePhase.SHOOTING, player_id="player-a"
+            )
+        )
+        assert not has_activity_restriction(
+            state=current, rules_unit=unit, activity="completed_shooting"
+        )
+        assert current.shooting_phase_state is not None
+        assert SHOOTER in current.shooting_phase_state.shot_unit_ids
+
+
 def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -> None:
     from tests.indirect_shooting_helpers import (
         INDIRECT_PROFILE,
