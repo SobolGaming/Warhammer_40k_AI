@@ -187,3 +187,20 @@ current source tree is unchanged from `c87d5352`; final aggregate validation use
 the new fixture tree. The measured production/runtime and executed benchmark
 helper functions remain unchanged from `5b6752ff`; the performance artifact's
 later-fixture audit identifies the two unmeasured helper functions that changed.
+
+The next aggregate found two additional direct-executor call sites in the same
+mission-scoring test module. The complete five-call inventory is now corrected,
+including its out-of-phase Snap and attached-target cases, using the existing
+shared declaration helper and explicit normal-activation phase state. The entire
+scoring module passes **226 tests** in `r34-complete-scoring-module-repair`.
+No production source changed; failed aggregate evidence remains separate from
+the final repaired candidate's required complete covered run.
+
+The full Secondary certification inventory also exposed Cleanse's legacy synthetic
+completed-Action setup. Both Action families now share a real accepted submission
+helper; Cleanse completes through the existing GameState owner. The synthetic
+completed-Action constructor was removed from that shared fixture module.
+All **112 Secondary certification and scoring-authority tests** pass in
+`r34-all-secondary-action-fixtures`, including both players' Cleanse and Plunder
+score/retain, restoration, viewer and replay cases. This closes the fixture bug
+class across both Action seeders, not just the first Plunder failure.

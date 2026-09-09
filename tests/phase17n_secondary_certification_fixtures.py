@@ -21,7 +21,6 @@ from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_areas,
 )
-from warhammer40k_core.engine.missions import mission_pack_for_id
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
@@ -99,7 +98,7 @@ def certification_unit_selections_for_row(
     *,
     player_id: str,
 ) -> tuple[UnitMusterSelection, ...]:
-    if row.secondary_mission_id not in {*_DESTRUCTION_SEEDERS, *_SEEDERS, "plunder"}:
+    if row.secondary_mission_id not in {*_DESTRUCTION_SEEDERS, *_SEEDERS, *_ACTION_SEEDERS}:
         raise AssertionError(
             "Step 6G matrix roster has no fixture for Secondary mission "
             f"{row.secondary_mission_id}."
@@ -192,11 +191,12 @@ def seed_positive_secondary_condition(
     decisions: DecisionController | None = None,
 ) -> SecondaryPositiveExpectation:
     _park_units_in_safe_zones(state, scoring_player_id=row.scoring_player_id)
-    if row.secondary_mission_id == "plunder":
+    action_seeder = _ACTION_SEEDERS.get(row.secondary_mission_id)
+    if action_seeder is not None:
         if decisions is None:
-            raise AssertionError("Plunder lifecycle fixture requires its decision controller.")
+            raise AssertionError("Action lifecycle fixture requires its decision controller.")
         _bind_card_selection(state, row)
-        return _seed_plunder(state, row, decisions=decisions)
+        return action_seeder(state, row, decisions=decisions)
     destruction_seeder = _DESTRUCTION_SEEDERS.get(row.secondary_mission_id)
     expectation = (
         _SEEDERS[row.secondary_mission_id](state, row)
@@ -449,13 +449,21 @@ def _seed_centre_ground(
 def _seed_cleanse(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    *,
+    decisions: DecisionController,
 ) -> SecondaryPositiveExpectation:
     marker = _no_mans_land_non_home_markers(state, player_id=row.scoring_player_id)[0]
-    _record_cleanse(
-        state,
+    unit = _intercessors(state, player_id=row.scoring_player_id)[0]
+    _place_unit_at(state, unit.unit_instance_id, marker.x_inches, marker.y_inches)
+    action = _submit_certification_action(
+        state=state,
+        decisions=decisions,
         player_id=row.scoring_player_id,
-        objective_marker_id=marker.objective_marker_id,
+        unit_instance_id=unit.unit_instance_id,
+        mission_action_id="cleanse-objective",
+        target_id=marker.objective_marker_id,
     )
+    state.complete_mission_action(action_id=action.action_id, completion_phase=BattlePhase.FIGHT)
     return SecondaryPositiveExpectation(
         expected_amount=2,
         expected_rule_ids=frozenset({"cleanse-tactical-one-objective"}),
@@ -646,36 +654,14 @@ def _seed_plunder(
     point = area.members[0].footprint_polygon[0]
     unit = _intercessors(state, player_id=row.scoring_player_id)[-1]
     _place_unit_at(state, unit.unit_instance_id, point.x_inches, point.y_inches)
-    prior_phase_index = state.battle_phase_index
-    prior_shooting_state = state.shooting_phase_state
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
-    state.replace_shooting_phase_state(
-        ShootingPhaseState(battle_round=state.battle_round, active_player_id=row.scoring_player_id)
-    )
-    waiting = request_mission_action_start(
+    _submit_certification_action(
         state=state,
         decisions=decisions,
         player_id=row.scoring_player_id,
+        unit_instance_id=unit.unit_instance_id,
         mission_action_id="plunder-terrain",
-        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        target_id=area.logical_terrain_area_id,
     )
-    request = waiting.decision_request
-    assert request is not None
-    option = next(
-        option
-        for option in request.options
-        if cast(dict[str, JsonValue], option.payload)["target_id"] == area.logical_terrain_area_id
-        and cast(dict[str, JsonValue], option.payload)["unit_instance_id"] == unit.unit_instance_id
-    )
-    GameLifecycle(state=state, decision_controller=decisions).submit_decision(
-        DecisionResult.for_request(
-            result_id=f"phase17n-step6g-plunder:{row.scoring_player_id}:{area.logical_terrain_area_id}",
-            request=request,
-            selected_option_id=option.option_id,
-        )
-    )
-    state.battle_phase_index = prior_phase_index
-    state.replace_shooting_phase_state(prior_shooting_state)
     return SecondaryPositiveExpectation(
         expected_amount=5,
         expected_rule_ids=frozenset({"plunder-tactical"}),
@@ -782,67 +768,46 @@ def _record_destruction(
     )
 
 
-def _record_cleanse(state: GameState, *, player_id: str, objective_marker_id: str) -> None:
-    action_id = f"phase17n-step6g-cleanse:{objective_marker_id}"
-    source_id = _record_completed_zero_vp_mission_action(
-        state,
-        mission_action_id="cleanse-objective",
-        action_id=action_id,
-        target_id=objective_marker_id,
-        player_id=player_id,
-    )
-    state.record_secondary_objective_cleanse(
-        player_id=player_id,
-        objective_marker_id=objective_marker_id,
-        action_id=action_id,
-        phase=BattlePhase.FIGHT,
-        source_id=source_id,
-    )
-
-
-def _record_completed_zero_vp_mission_action(
-    state: GameState,
+def _submit_certification_action(
     *,
-    mission_action_id: str,
-    action_id: str,
-    target_id: str,
+    state: GameState,
+    decisions: DecisionController,
     player_id: str,
-) -> str:
-    if state.mission_setup is None:
-        raise AssertionError("Step 6G mission action fixture requires MissionSetup.")
-    mission_action = mission_pack_for_id(state.mission_setup.mission_pack_id).mission_action(
-        mission_action_id
+    unit_instance_id: str,
+    mission_action_id: str,
+    target_id: str,
+) -> MissionActionState:
+    prior_phase_index = state.battle_phase_index
+    prior_shooting_state = state.shooting_phase_state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.replace_shooting_phase_state(
+        ShootingPhaseState(battle_round=state.battle_round, active_player_id=player_id)
     )
-    unit_instance_id = _units_for_player(state, player_id)[0].unit_instance_id
-    started = MissionActionState.start(
-        action_id=action_id,
-        mission_action_id=mission_action.mission_action_id,
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=decisions,
         player_id=player_id,
-        unit_instance_id=unit_instance_id,
-        target_id=target_id,
-        condition_target_id=target_id,
-        mission_id=mission_action.mission_id,
-        battle_round=state.battle_round,
-        phase=mission_action.start_phase,
-        start_timing=mission_action.start_timing,
-        completion_timing=mission_action.completion_timing,
-        eligible_unit_instance_ids=(unit_instance_id,),
-        interruption_conditions=mission_action.interruption_conditions,
-        scoring_source_id=mission_action.scoring_source_id,
-        victory_points=mission_action.victory_points,
+        mission_action_id=mission_action_id,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
-    completion_phase = (
-        BattlePhase.FIGHT.value
-        if mission_action.completion_timing == "turn_end"
-        else mission_action.start_phase
+    request = waiting.decision_request
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["target_id"] == target_id
+        and cast(dict[str, JsonValue], option.payload)["unit_instance_id"] == unit_instance_id
     )
-    completed = started.complete_without_award(
-        battle_round=state.battle_round,
-        phase=completion_phase,
-        completion_timing=mission_action.completion_timing,
+    GameLifecycle(state=state, decision_controller=decisions).submit_decision(
+        DecisionResult.for_request(
+            result_id=f"phase17n-step6g-{mission_action_id}:{player_id}:{target_id}",
+            request=request,
+            selected_option_id=option.option_id,
+        )
     )
-    state.record_mission_action_state(completed)
-    return mission_action.source_id
+    state.battle_phase_index = prior_phase_index
+    state.replace_shooting_phase_state(prior_shooting_state)
+    return state.mission_action_states[-1]
 
 
 def _place_unit_at(
@@ -949,7 +914,6 @@ _SEEDERS = {
     "behind-enemy-lines": _seed_behind_enemy_lines,
     "burden-of-trust": _seed_burden,
     "centre-ground": _seed_centre_ground,
-    "cleanse": _seed_cleanse,
     "defend-stronghold": _seed_defend_stronghold,
     "display-of-might": _seed_display_of_might,
     "engage-on-all-fronts": _seed_engage,
@@ -969,3 +933,5 @@ __all__ = [
     "seed_positive_secondary_condition",
     "seed_sequential_tactical_turn_cap_conditions",
 ]
+
+_ACTION_SEEDERS = {"cleanse": _seed_cleanse, "plunder": _seed_plunder}
