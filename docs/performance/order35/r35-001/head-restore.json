@@ -1,0 +1,110 @@
+{
+  "commit": "031bdd5e59b3ce46ef5bcc5f03e25d685517402a",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "timing_boundary": "GameLifecycle.from_payload only; prepared JSON checkpoint; one process, no test workers; seven repetitions per checkpoint",
+  "samples": [
+    {
+      "discounted": false,
+      "sample": 0,
+      "seconds": 0.3104367919731885,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 1,
+      "seconds": 0.30614533310290426,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 2,
+      "seconds": 0.34238983294926584,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 3,
+      "seconds": 0.3053262080065906,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 4,
+      "seconds": 0.30586920806672424,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 5,
+      "seconds": 0.3064847920322791,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 6,
+      "seconds": 0.3052765409229323,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 0,
+      "seconds": 0.3100534579716623,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 1,
+      "seconds": 0.30776283296290785,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 2,
+      "seconds": 0.31232925003860146,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 3,
+      "seconds": 0.318335291929543,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 4,
+      "seconds": 0.31060620897915214,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 5,
+      "seconds": 0.3108415000606328,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 6,
+      "seconds": 0.31160333298612386,
+      "outcome": "restored"
+    }
+  ],
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/rapid_ingress_helpers.py": "645e16294b559ba4fd88283c9a64e1dc80d470e5b6a89aa2bd4896c9e0e0e750",
+    "tests/core_stratagem_helpers.py": "90a4dd5fa5d14ebd2b1a48865d661d7f3ce37af64383f6f08642e9b0c2bdfd62",
+    "/private/tmp/order35-evidence/measure_r35_001_restore.py": "8752c015cb919c06301140b133c1592e1a8834056eceff5d97e782d69bb66d37"
+  },
+  "summaries": {
+    "False": {
+      "mean": 0.31170410100769785,
+      "max": 0.34238983294926584
+    },
+    "True": {
+      "mean": 0.3116474107040891,
+      "max": 0.318335291929543
+    }
+  }
+}

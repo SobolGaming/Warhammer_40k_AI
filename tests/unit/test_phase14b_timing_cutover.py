@@ -433,7 +433,7 @@ def _move_unit_to_reserves(
     reserve_state = ReserveState.declared_before_battle(
         player_id=player_id,
         unit_instance_id=unit_instance_id,
-        reserve_kind=ReserveKind.RESERVES,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
         destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2026_27(),
     )
     state.record_reserve_state(reserve_state)

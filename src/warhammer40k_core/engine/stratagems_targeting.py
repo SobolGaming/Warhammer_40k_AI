@@ -2,6 +2,12 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.rapid_ingress_eligibility import (
+    rapid_ingress_window_error,
+    rapid_ingress_reserve_error,
+    rapid_ingress_target_error,
+)
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.fight_eligibility_queries import (
@@ -243,12 +249,11 @@ def _target_binding_error(
             return "unit_not_pending_battle_shock_test"
         return None
     if target_spec.target_policy_id == RAPID_INGRESS_TARGET_POLICY_ID:
-        if _require_target_unit_id(target_binding) not in _rapid_ingress_unit_ids(
+        return rapid_ingress_target_error(
             state=state,
             player_id=player_id,
-        ):
-            return "unit_not_eligible_for_rapid_ingress"
-        return None
+            unit_instance_id=_require_target_unit_id(target_binding),
+        )
     if target_spec.target_policy_id == STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID:
         if _require_target_unit_id(target_binding) not in _strategic_reserves_ingress_unit_ids(
             state=state,
@@ -686,12 +691,13 @@ def _battle_shock_test_unit_ids(*, state: GameState, player_id: str) -> tuple[st
 
 
 def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
+    if rapid_ingress_window_error(state=state, player_id=player_id) is not None:
+        return ()
     return tuple(
         sorted(
             reserve_state.unit_instance_id
             for reserve_state in state.unarrived_reserve_states_for_player(player_id)
-            if reserve_state.status is ReserveStatus.IN_RESERVES
-            and not reserve_state_is_cult_ambush(reserve_state)
+            if rapid_ingress_reserve_error(state=state, reserve=reserve_state) is None
         )
     )
 
