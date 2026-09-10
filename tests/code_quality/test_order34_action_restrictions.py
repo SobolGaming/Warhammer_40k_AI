@@ -209,42 +209,42 @@ def test_r34_002_restoration_validates_all_shooting_participation_decisions() ->
         and node.name == "validate_declared_model_attack_completions"
     )
     calls = {
-        node.func.id
+        node.func.id: node
         for node in ast.walk(function)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     assert {
-        "validate_retained_model_attack_history",
+        "validate_model_attack_history",
         "validate_primary_mission_shooting_event_decision_authority",
-    } <= calls
-    shooting = next(
-        node
-        for node in function.body
-        if isinstance(node, ast.Assign)
-        and any(isinstance(target, ast.Name) and target.id == "shooting" for target in node.targets)
+        "_validate_melee_declaration_authority",
+    } <= calls.keys()
+    call = calls["validate_model_attack_history"]
+    assert len(call.keywords) == 1
+    assert call.keywords[0].arg == "event_records"
+    assert ast.unparse(call.keywords[0].value) == "event_records"
+    first_loop = next(node for node in function.body if isinstance(node, ast.For))
+    assert call.lineno < first_loop.lineno
+    history = ast.parse((ENGINE / "activity_restriction_history.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "validate_model_attack_history"
+        and ast.unparse(node.keywords[0].value) == "prior_events"
+        for node in ast.walk(history)
     )
-    # Both independent claims contribute: undeclared shooting cannot be dropped,
-    # nor can a shooting declaration disappear through a relabelled participation.
-    assert isinstance(shooting.value, ast.BinOp)
-    assert isinstance(shooting.value.op, ast.BitOr)
-    assert "MODELS_ATTACKED_EVENT_TYPE" in ast.unparse(shooting)
-    assert "declarations" in ast.unparse(shooting)
-    declarations = next(
+    validator = next(
         node
-        for node in function.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "declarations" for target in node.targets
-        )
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_validate_model_attack_history"
     )
-    assert "shooting_declaration_accepted" in ast.unparse(declarations)
-    assert "out_of_phase_shooting_declaration_accepted" in ast.unparse(declarations)
-    models = next(
-        node
-        for node in function.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "model_ids" for target in node.targets
-        )
-    )
-    assert "declarations" in ast.unparse(models)
+    assert {
+        "shooting_declaration_accepted",
+        "out_of_phase_shooting_declaration_accepted",
+        "melee_declaration_accepted",
+        "attack_sequence_completed",
+        "attack_sequence_attacks_resolved",
+    } <= {
+        node.value
+        for node in ast.walk(validator)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }

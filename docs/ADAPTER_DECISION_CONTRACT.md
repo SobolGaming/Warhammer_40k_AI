@@ -1314,11 +1314,14 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   declaration prefix; absence of a declaration does not establish an executor
   origin. Copying completion events and matching effects into an unactivated
   session is invalid.
-  Accepted shooting declarations and asserted shooting participation both define
-  the validation inventory. A participation's attack kind or model list cannot
-  exclude its declaration from authentication. Relabelling a completed shot as
-  another attack kind, with or without removing its effect, is invalid; genuine
-  melee and accepted partial-executor checkpoints retain their existing paths.
+  Every participation and executor completion is bound to its preceding accepted
+  declaration before filtering attack kind, sequence or model identity. Orphaned,
+  renamed or duplicate completion pairs are invalid even when labelled non-shooting
+  or given empty/foreign model lists. Melee classification requires its original
+  accepted melee request/result and deterministic sequence identity; a fabricated
+  melee declaration cannot replace a shooting origin. Relabelling a completed shot,
+  with or without removing its effect, is invalid. Genuine melee and accepted
+  partial-executor checkpoints remain valid.
   This reconstruction runs at restoration, outside live eligibility queries.
   Immediate zero-VP actions complete in the same
   decision handler without creating a VP transaction; Booby Trap records an

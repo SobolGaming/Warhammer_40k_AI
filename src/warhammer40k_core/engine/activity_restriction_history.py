@@ -14,7 +14,7 @@ from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.model_attack_history import (
     MODELS_ATTACKED_EVENT_TYPE,
-    validate_retained_model_attack_history,
+    validate_model_attack_history,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
@@ -89,9 +89,7 @@ def restore_checkpoint_activity_restrictions(
         for unit in army.units
         for model in unit.own_models
     }
-    validate_retained_model_attack_history(
-        event_records=prior_events, model_instance_ids=frozenset(model_owners)
-    )
+    validate_model_attack_history(event_records=prior_events)
     completed_sequences: set[str] = set()
     for event in prior_events:
         if event.event_type != "attack_sequence_completed":

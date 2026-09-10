@@ -118,8 +118,24 @@ def validate_retained_model_attack_history(
     """Bind prior-action restrictions to the declared models and executor boundary."""
     if not model_instance_ids:
         return
+    _validate_model_attack_history(
+        event_records=event_records, model_instance_ids=model_instance_ids
+    )
+
+
+def validate_model_attack_history(*, event_records: tuple[EventRecord, ...]) -> None:
+    """Authenticate all attack origins before any consumer filters kind or subject."""
+    _validate_model_attack_history(event_records=event_records, model_instance_ids=None)
+
+
+def _validate_model_attack_history(
+    *, event_records: tuple[EventRecord, ...], model_instance_ids: frozenset[str] | None
+) -> None:
+    # None deliberately validates the complete inventory, including orphan claims
+    # with empty/foreign models; retained-model queries may select known subjects.
     declarations: dict[str, dict[str, JsonValue]] = {}
     participations: set[str] = set()
+    completions: set[tuple[str, str]] = set()
     for event in event_records:
         if event.event_type in {
             "shooting_declaration_accepted",
@@ -128,7 +144,7 @@ def validate_retained_model_attack_history(
         }:
             expected = _participation_for_declaration(event)
             declared_ids = _model_ids(expected["model_instance_ids"])
-            if not declared_ids.intersection(model_instance_ids):
+            if model_instance_ids is not None and not declared_ids.intersection(model_instance_ids):
                 continue
             sequence_id = _identifier(expected["sequence_id"])
             if sequence_id in declarations:
@@ -138,7 +154,9 @@ def validate_retained_model_attack_history(
             payload = _object(event.payload)
             sequence_id = _identifier(payload.get("sequence_id"))
             if sequence_id not in declarations:
-                if _model_ids(payload.get("model_instance_ids")).intersection(model_instance_ids):
+                if model_instance_ids is None or _model_ids(
+                    payload.get("model_instance_ids")
+                ).intersection(model_instance_ids):
                     raise GameLifecycleError("Model attack history lacks its declaration.")
                 continue
             if sequence_id in participations or payload != declarations[sequence_id]:
@@ -147,8 +165,14 @@ def validate_retained_model_attack_history(
         elif event.event_type in {"attack_sequence_completed", "attack_sequence_attacks_resolved"}:
             payload = _object(event.payload)
             sequence_id = _identifier(payload.get("sequence_id"))
+            if model_instance_ids is None and sequence_id not in declarations:
+                raise GameLifecycleError("Model attack history completion lacks its declaration.")
             if sequence_id in declarations and sequence_id not in participations:
                 raise GameLifecycleError("Model attack history is missing its completed attacks.")
+            completion = (event.event_type, sequence_id)
+            if sequence_id in declarations and completion in completions:
+                raise GameLifecycleError("Model attack history has duplicate completions.")
+            completions.add(completion)
 
 
 def _participation_for_declaration(event: EventRecord) -> dict[str, JsonValue]:
@@ -222,47 +246,7 @@ def validate_declared_model_attack_completions(
     Mid-executor checkpoints retain the accepted declaration prefix. An omitted
     declaration is not evidence of an authenticated executor starting boundary.
     """
-    declarations = tuple(
-        _participation_for_declaration(event)
-        for event in event_records
-        if event.event_type
-        in {"shooting_declaration_accepted", "out_of_phase_shooting_declaration_accepted"}
-    )
-    # Neither side of the declaration/participation binding may opt itself out.
-    shooting = frozenset(
-        _identifier(_object(event.payload).get("sequence_id"))
-        for event in event_records
-        if event.event_type == MODELS_ATTACKED_EVENT_TYPE
-        and _object(event.payload).get("attack_phase") == "shooting"
-    ) | frozenset(_identifier(declaration["sequence_id"]) for declaration in declarations)
-    relevant = tuple(
-        event
-        for event in event_records
-        if event.event_type
-        in {"shooting_declaration_accepted", "out_of_phase_shooting_declaration_accepted"}
-        or (
-            event.event_type
-            in {
-                MODELS_ATTACKED_EVENT_TYPE,
-                "attack_sequence_completed",
-                "attack_sequence_attacks_resolved",
-            }
-            and _identifier(_object(event.payload).get("sequence_id")) in shooting
-        )
-    )
-    model_ids = frozenset(
-        model_id
-        for payload in (
-            *declarations,
-            *(
-                _object(event.payload)
-                for event in relevant
-                if event.event_type == MODELS_ATTACKED_EVENT_TYPE
-            ),
-        )
-        for model_id in _model_ids(payload.get("model_instance_ids"))
-    )
-    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+    validate_model_attack_history(event_records=event_records)
 
     from warhammer40k_core.engine.primary_mission_event_decision_authority import (
         validate_primary_mission_shooting_event_decision_authority,
@@ -272,14 +256,20 @@ def validate_declared_model_attack_completions(
     records = {record.result.result_id: record for record in decision_records}
     ranged_history = {record.result_id: record for record in state.ranged_attack_history_records}
     for index, event in enumerate(event_records):
+        if event.event_type == "melee_declaration_accepted":
+            _validate_melee_declaration_authority(
+                state=state,
+                event_records=event_records,
+                decision_records=decision_records,
+                index=index,
+            )
+            continue
         if event.event_type not in {
             "shooting_declaration_accepted",
             "out_of_phase_shooting_declaration_accepted",
         }:
             continue
         expected = _participation_for_declaration(event)
-        if expected["sequence_id"] not in shooting:
-            continue
         payload = _object(event.payload)
         authority_payload = dict(payload)
         if event.event_type == "out_of_phase_shooting_declaration_accepted":
@@ -313,3 +303,46 @@ def validate_declared_model_attack_completions(
             != expected["model_instance_ids"]
         ):
             raise GameLifecycleError("Model attack history declaration model authority drifted.")
+
+
+def _validate_melee_declaration_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    index: int,
+) -> None:
+    from warhammer40k_core.engine.fight_resolution import (
+        MeleeDeclarationProposalRequest,
+        melee_declaration_proposal_from_payload,
+    )
+    from warhammer40k_core.engine.mutation_decision_authority import (
+        validate_mutation_decision_closure,
+    )
+
+    payload = _object(event_records[index].payload)
+    record = validate_mutation_decision_closure(
+        event_records=event_records,
+        decision_records=decision_records,
+        mutation_index=index,
+        request_id=_identifier(payload.get("request_id")),
+        result_id=_identifier(payload.get("result_id")),
+    )
+    request = MeleeDeclarationProposalRequest.from_decision_request(record.request)
+    proposal = melee_declaration_proposal_from_payload(record.result.payload)
+    if (
+        not proposal.validation_result_for_request(request).is_valid
+        or request.game_id != state.game_id
+        or record.request.actor_id != request.actor_id
+        or payload.get("game_id") != request.game_id
+        or payload.get("battle_round") != request.battle_round
+        or payload.get("phase") != "fight"
+        or payload.get("proposal_request") != request.to_payload()
+        or payload.get("proposal") != proposal.to_payload()
+        or payload.get("attack_sequence_id")
+        != (
+            f"melee-sequence:{request.game_id}:round-{request.battle_round:02d}:"
+            f"{proposal.unit_instance_id}:{record.result.result_id}"
+        )
+    ):
+        raise GameLifecycleError("Model attack history melee declaration authority drifted.")
