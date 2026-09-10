@@ -1,8 +1,14 @@
 # Core Rules 40k.app Comparison Evidence
 
-This report is generated from the checked-in offline audit artifact. By explicit repository-owner policy, 40k.app is treated as a verbatim authoritative mirror of the maintained Warhammer 40,000 App for Core Rules. The site remains a non-affiliated hosting provider and is never queried by the runtime engine.
+This report combines the immutable August 25 source audit with the current canonical roadmap inventory. Historical observations are not rewritten as fresh evidence. By explicit repository-owner policy, 40k.app is treated as a verbatim authoritative mirror of the maintained Warhammer 40,000 App for Core Rules. The site remains a non-affiliated hosting provider and is never queried by the runtime engine.
 
 Faction review is explicitly excluded, including faction detachments and faction datasheet content.
+
+## September 10 review
+
+The [fresh clause review](CORE_RULES_ROADMAP_REVIEW_2026_09_10.md) records the browser observations, repository checks and qualifications behind the updated plan. It does not certify all 25 categories or introduce runtime source evidence. New observations follow [the maintained-mirror policy](CORE_RULES_SOURCE_POLICY.md); the August audit retains its historical policy and fingerprints.
+
+Current 12.08 explicitly requires Objective Consolidation to finish unengaged and within objective range, superseding the old observation's uncertainty below. The Engaging body clause versus retained v931 Ongoing erratum remains unresolved under C12-04/P12B; their version equivalence is unproven. P18G separately owns clear Assault/Shock eligibility, while P18F retains the engagement-owner pause. Category 17 now has C17-01/P17 and cannot be treated as REVALIDATE-only.
 
 ## Authority boundary
 
@@ -13,37 +19,39 @@ Faction review is explicitly excluded, including faction detachments and faction
 
 ## Category inventory
 
-| Category | Provider locator | Provider comparison | Implementation evaluation | Planned PRs |
+| Category | Provider locator | Historical provider comparison (August 25) | Current planning disposition | Roadmap PRs (including implemented) |
 |---|---|---|---|---|
-| 01 Core Concepts | [01.00](https://www.40k.app/rules/01-core-concepts) | authoritative_app_mirror | assessed_remediation_planned | P01 |
-| 02 Datasheets | [02.00](https://www.40k.app/rules/02-datasheets) | authoritative_app_mirror | assessed_remediation_planned | P02A, P02B, P02C |
-| 03 Moving | [03.00](https://www.40k.app/rules/03-moving) | authoritative_app_mirror | assessed_remediation_planned | P03A, P03B |
-| 04 Making Attacks | [04.00](https://www.40k.app/rules/04-making-attacks) | authoritative_app_mirror | assessed_remediation_planned | P04 |
-| 05 Attack Sequence | [05.00](https://www.40k.app/rules/05-attack-sequence) | authoritative_app_mirror | assessed_remediation_planned | P05A, P05B, P05C |
-| 06 Other Concepts | [06.00](https://www.40k.app/rules/06-other-concepts) | authoritative_app_mirror | assessed_remediation_planned | P06A, P06B |
-| 07 The Battle Round | [07.00](https://www.40k.app/rules/07-the-battle-round) | authoritative_app_mirror | assessed_no_standalone_remediation | PFINAL |
-| 08 Command Phase | [08.00](https://www.40k.app/rules/08-command-phase) | authoritative_app_mirror | assessed_remediation_planned | P08A, P08B |
-| 09 Movement Phase | [09.00](https://www.40k.app/rules/09-movement-phase) | authoritative_app_mirror | assessed_remediation_planned | P09A, P09B |
-| 10 Shooting Phase | [10.00](https://www.40k.app/rules/10-shooting-phase) | authoritative_app_mirror | assessed_remediation_planned | P10 |
-| 11 Charge Phase | [11.00](https://www.40k.app/rules/11-charge-phase) | authoritative_app_mirror | assessed_remediation_planned | P11A |
-| 12 Fight Phase | [12.00](https://www.40k.app/rules/12-fight-phase) | authoritative_app_mirror_controls_repository_conflict | assessed_remediation_planned | P12 |
-| 13 Terrain | [13.00](https://www.40k.app/rules/13-terrain) | authoritative_app_mirror_supersedes_pdf | assessed_no_standalone_remediation | PFINAL |
-| 14 Objectives | [14.00](https://www.40k.app/rules/14-objectives) | authoritative_app_mirror | assessed_remediation_planned | P14 |
-| 15 Stratagems | [15.00](https://www.40k.app/rules/15-stratagems) | authoritative_app_internal_numbering_drift | assessed_remediation_planned | P15A, P15B, P15C, P15D, P15E |
-| 16 Actions | [16.00](https://www.40k.app/rules/16-actions) | authoritative_app_mirror | assessed_no_standalone_remediation | PFINAL |
-| 17 Monsters And Vehicles | [17.00](https://www.40k.app/rules/17-monsters-and-vehicles) | authoritative_app_mirror | assessed_no_standalone_remediation | PFINAL |
-| 18 Transports | [18.00](https://www.40k.app/rules/18-transports) | authoritative_app_mirror | assessed_remediation_planned | P18A, P18B, P18C |
-| 19 Attached Units | [19.00](https://www.40k.app/rules/19-attached-units) | authoritative_app_mirror | assessed_remediation_planned | P19 |
-| 20 Strategic Reserves | [20.00](https://www.40k.app/rules/20-strategic-reserves) | authoritative_app_mirror | assessed_remediation_planned | P20 |
-| 21 Flying and Surging | [21.00](https://www.40k.app/rules/21-flying-and-surging) | repository_transcription_not_observed_on_authoritative_app_mirror | assessed_remediation_planned | P21A, P21B |
-| 22 Other Rules And Abilities | [22.00](https://www.40k.app/rules/22-other-rules-and-abilities) | authoritative_app_mirror | assessed_remediation_planned | P22 |
-| 23 Aircraft | [23.00](https://www.40k.app/rules/23-aircraft) | authoritative_app_mirror | assessed_remediation_planned | P23 |
-| 24 Core Abilities | [24.00](https://www.40k.app/rules/24-core-abilities) | repository_transcription_not_observed_on_authoritative_app_mirror | assessed_remediation_planned | P24A, P24B, P24C1, P24C2, P24D, P24E |
-| 25 Muster Armies | [25.00](https://www.40k.app/rules/25-muster-armies) | authoritative_app_mirror | assessed_remediation_planned | P25A, P25B, P25C |
+| 01 Core Concepts | [01.00](https://www.40k.app/rules/01-core-concepts) | authoritative_app_mirror | owned; see roadmap | P01, P01B, P01C, P01D |
+| 02 Datasheets | [02.00](https://www.40k.app/rules/02-datasheets) | authoritative_app_mirror | owned; see roadmap | P02A, P02B, P02C, P02D, P02E |
+| 03 Moving | [03.00](https://www.40k.app/rules/03-moving) | authoritative_app_mirror | owned; see roadmap | P03A, P03B |
+| 04 Making Attacks | [04.00](https://www.40k.app/rules/04-making-attacks) | authoritative_app_mirror | owned; see roadmap | P04, P04B |
+| 05 Attack Sequence | [05.00](https://www.40k.app/rules/05-attack-sequence) | authoritative_app_mirror | owned; see roadmap | P05A, P05B, P05C, P05D |
+| 06 Other Concepts | [06.00](https://www.40k.app/rules/06-other-concepts) | authoritative_app_mirror | owned; see roadmap | P06A, P06B, P06C |
+| 07 The Battle Round | [07.00](https://www.40k.app/rules/07-the-battle-round) | authoritative_app_mirror | REVALIDATE | PFINAL |
+| 08 Command Phase | [08.00](https://www.40k.app/rules/08-command-phase) | authoritative_app_mirror | owned; see roadmap | P08A, P08B |
+| 09 Movement Phase | [09.00](https://www.40k.app/rules/09-movement-phase) | authoritative_app_mirror | owned; see roadmap | P09A, P09B |
+| 10 Shooting Phase | [10.00](https://www.40k.app/rules/10-shooting-phase) | authoritative_app_mirror | owned; see roadmap | P10 |
+| 11 Charge Phase | [11.00](https://www.40k.app/rules/11-charge-phase) | authoritative_app_mirror | owned; see roadmap | P11A, P11B, P15E |
+| 12 Fight Phase | [12.00](https://www.40k.app/rules/12-fight-phase) | authoritative_app_mirror_controls_repository_conflict | owned; see roadmap | P12, P12B |
+| 13 Terrain | [13.00](https://www.40k.app/rules/13-terrain) | authoritative_app_mirror_supersedes_pdf | REVALIDATE | PFINAL |
+| 14 Objectives | [14.00](https://www.40k.app/rules/14-objectives) | authoritative_app_mirror | owned; see roadmap | P14 |
+| 15 Stratagems | [15.00](https://www.40k.app/rules/15-stratagems) | authoritative_app_internal_numbering_drift | owned; see roadmap | P15D, P15F, P15G, P15A, P15B, P15H, P15I, P15E, P15C |
+| 16 Actions | [16.00](https://www.40k.app/rules/16-actions) | authoritative_app_mirror | owned; see roadmap | P16 |
+| 17 Monsters And Vehicles | [17.00](https://www.40k.app/rules/17-monsters-and-vehicles) | authoritative_app_mirror | owned; see roadmap | P17 |
+| 18 Transports | [18.00](https://www.40k.app/rules/18-transports) | authoritative_app_mirror | owned; see roadmap | P18C, P18D, P18E, P18G, P18A, P18B, P18H, P18F, P20 |
+| 19 Attached Units | [19.00](https://www.40k.app/rules/19-attached-units) | authoritative_app_mirror | owned; see roadmap | P19 |
+| 20 Strategic Reserves | [20.00](https://www.40k.app/rules/20-strategic-reserves) | authoritative_app_mirror | owned; see roadmap | P20, P20B |
+| 21 Flying and Surging | [21.00](https://www.40k.app/rules/21-flying-and-surging) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P21A, P21B |
+| 22 Other Rules And Abilities | [22.00](https://www.40k.app/rules/22-other-rules-and-abilities) | authoritative_app_mirror | owned; see roadmap | P22, P22B |
+| 23 Aircraft | [23.00](https://www.40k.app/rules/23-aircraft) | authoritative_app_mirror | owned; see roadmap | P23 |
+| 24 Core Abilities | [24.00](https://www.40k.app/rules/24-core-abilities) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P24F, P24G, P24D, P24C1, P24I, P24A, P24H, P24E, P24C2, P24B, P24J |
+| 25 Muster Armies | [25.00](https://www.40k.app/rules/25-muster-armies) | authoritative_app_mirror | owned; see roadmap | P25A, P25B, P25C |
 
 Implementation findings were assessed for every category. Their itemized current behavior, required behavior, exact App rule basis, dependencies, and one-PR-at-a-time sequence are retained in `docs/CORE_RULES_REMEDIATION_ROADMAP.md`. Source/provider findings below are tracked separately so corpus provenance does not imply gameplay execution.
 
-## Source and provider findings
+## Historical source and provider findings
+
+The following statements describe the August 25 assessment. They are retained for provenance, not asserted as the current implementation or mirror wording. The September 10 review above and the canonical roadmap control current planning.
 
 ### 40k-app-numbering-05-03-02 - Category 05
 
