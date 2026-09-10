@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-fight-retained",
+  "command": "uv run pytest tests/unit/test_phase15c_fight_order.py tests/integration/test_fight_on_death_presence.py tests/integration/test_retained_shooting.py -q -n auto --dist=worksteal --no-cov --tb=short --junitxml=/private/tmp/order34-evidence/r34-round5-fight-retained.xml",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T23:57:42.372682+00:00",
+  "deadline_seconds": 360.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-fight-retained.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 91860,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 25.854
+}

@@ -1,5 +1,8 @@
 # Order 34 validation and independent-review handoff
 
+The subsequent R34-002 sequence-identity correction and current validation are in
+[the sequence repair report](ORDER_34_SEQUENCE_REPAIR.md). This report is historical.
+
 The subsequent independent review left R34-002 open for relabelled completion
 history and closed R34-003. See the [current relabelling repair and validation](ORDER_34_RELABELLING_REPAIR.md).
 The evidence below describes the previously reviewed 29c6cdc0 candidate.

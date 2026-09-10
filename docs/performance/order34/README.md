@@ -1,5 +1,8 @@
 # Order 34 Action and shooting restriction assessment
 
+Latest runtime evidence: [R34-002 sequence-origin repair](review-sequence/README.md).
+The earlier measurement sets below remain historical evidence.
+
 Current runtime evidence after the R34-002 relabelling repair is in
 [review-relabel/README.md](review-relabel/README.md): 98 samples and all unchanged
 timing/work budgets pass. The prior [review-repair set](review-repair/README.md)

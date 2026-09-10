@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-reproduction",
+  "command": "uv run pytest tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration -q -n0 --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T23:53:11.263591+00:00",
+  "deadline_seconds": 180.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-reproduction.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 90728,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 9.178
+}

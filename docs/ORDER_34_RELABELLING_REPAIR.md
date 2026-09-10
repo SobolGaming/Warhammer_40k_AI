@@ -1,5 +1,8 @@
 # R34-002 completed-shooting relabelling repair
 
+The subsequent R34-002 sequence-identity correction and current validation are in
+[the sequence repair report](ORDER_34_SEQUENCE_REPAIR.md). This report is historical.
+
 PR: https://github.com/SobolGaming/Warhammer_40k_AI/pull/438
 
 Base: `e56c1a4caf2a6915548222caed0872627f8dbf43`.

@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices ___
+tests/integration/test_ws13_adapter_phase_families.py:1647: in test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:249: in validate_declared_model_attack_completions
+    validate_model_attack_history(event_records=event_records)
+src/warhammer40k_core/engine/model_attack_history.py:128: in validate_model_attack_history
+    _validate_model_attack_history(event_records=event_records, model_instance_ids=None)
+src/warhammer40k_core/engine/model_attack_history.py:160: in _validate_model_attack_history
+    raise GameLifecycleError("Model attack history lacks its declaration.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+=========================== short test summary info ============================
+FAILED tests/integration/test_ws13_adapter_phase_families.py::test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices - warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+1 failed in 3.52s

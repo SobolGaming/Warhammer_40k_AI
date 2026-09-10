@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-fixture-focused",
+  "command": "uv run ruff format tests/completed_attack_fixture_helpers.py tests/integration/test_horror_split_materialization.py tests/integration/test_ws13_adapter_phase_families.py tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py\nuv run pytest tests/integration/test_horror_split_materialization.py tests/integration/test_ws13_adapter_phase_families.py tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py -q -n auto --dist=worksteal --no-cov --tb=short --junitxml=/private/tmp/order34-evidence/r34-round5-fixture-focused.xml",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-10T00:17:51.580741+00:00",
+  "deadline_seconds": 300.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-fixture-focused.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 99281,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 35.0
+}
