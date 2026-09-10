@@ -78,6 +78,8 @@ Classification rules that a token hit-list would flatten:
 | "if your unit has the X keyword" | `keyword_effect_gate` (T3), not a grant |
 | WHEN-phase "Your Shooting phase." | T1. T3 `phase_condition` is an IF inside EFFECT |
 | "Waaagh! is active" | state-token condition. T5 owns the ledger |
+| Command Re-roll "you" | bearer `player`, not `army` and not grain `player` |
+| Command Re-roll listed roll types | condition `dice_roll_type` (`roll_types`). T2 owns the reroll EFFECT |
 
 ## 3. Closed grammar
 
@@ -90,12 +92,18 @@ Classification rules that a token hit-list would flatten:
 | `this_model` | Datasheet "this model" | 0 | `this_model` |
 | `this_unit` | Datasheet "this unit" | 0 | `this_unit` |
 | `attached_rules_unit` | Leader and Bodyguard as one rules unit | `leading` 2, `attached` 13 as conditions | group-aware APIs; no bearer kind |
+| `player` | The player as the activation subject ("you") | 0 as TARGET; Core Command Re-roll | `player` |
 | `army` | Army-wide subject | 0 as TARGET | `player` |
+
+`player` is not an alias of `army`. Command Re-roll is on you; an army-wide
+clause is on the army. Grain `player` is a TARGET noun ("you" as the selected
+object) and is also not that bearer.
 
 June Stratagems always select an activation object, then talk about "your
 unit". Enhancement pages use `enhancement_bearer`. Datasheets use `this_model`
-/ `this_unit`. Those three zeros stay in the closed set. T4 owns mustering
-who may *take* an Enhancement; T3 owns the runtime bearer atom.
+/ `this_unit`. Core Command Re-roll uses `player`. Those zeros stay in the
+closed set. T4 owns mustering who may *take* an Enhancement; T3 owns the
+runtime bearer atom.
 
 ### 3.2 Target clauses
 
@@ -194,12 +202,15 @@ the family counts.
 | `count_size` | Contains N+ models, or a model-count exclude | 4 | `TARGET_CONSTRAINT` nearest |
 | `leading` | Is leading, or is not leading | 2 | **none** as a condition kind |
 | `just_shot` | Has just shot (PSY-CHAFF VOLLEY) | 1 | stored policy exists; kind unused as condition |
+| `dice_roll_type` | TARGET roll is one of a listed type set | 0 | `DICE_ROLL_TYPE`; parameter `roll_types` |
 | `phase_condition` | If it is a named phase | 0 | `PHASE_GATE` |
 | `turn_owner_condition` | If it is your / your opponent's turn | 0 | `PHASE_GATE` parameters |
 | `riled_up` | "Riled up" (War Horde Enhancement) | 0 | state token; T5 / F-ORK-01 |
 
-The June zeros stay in the closed set: Core and datasheet IF-clauses use
-phase and turn ownership, and App 946 War Horde uses "riled up".
+The June zeros stay in the closed set: Core Command Re-roll uses
+`dice_roll_type`, Core and datasheet IF-clauses use phase and turn ownership,
+and App 946 War Horde uses "riled up". `dice_roll_type` is eligibility of the
+`dice_roll` grain, not T2 `reroll`.
 
 Stored `required_keywords` occupy 386 rows. That field is a TARGET-noun
 heuristic from ALLCAPS tokens. It is not a condition-family count and is
@@ -237,7 +248,7 @@ Stratagem.
 
 | Stratagem | Bearer / TARGET / conditions |
 | --- | --- |
-| Command Re-roll | Bearer `player`. Grain `dice_roll`. Condition: listed roll types |
+| Command Re-roll | Bearer `player`. Grain `dice_roll`. Condition `dice_roll_type` (`roll_types`) |
 | Epic Challenge | `activation_object` CHARACTER unit. Condition: selected to fight (T1 WHEN) |
 | Insane Bravery | `activation_object` + `battle_shocked` |
 | Crushing Impact | `activation_object` MONSTER or VEHICLE |
@@ -271,7 +282,8 @@ above. Do not invent a second catalogue. Stored `friendly_unit` plus empty
 `conditions` is not that binding.
 
 `enemy_unit`, `dice_roll`, `this_model`, `this_unit`, `player`,
-`VISIBILITY_PREDICATE`, `PHASE_GATE` and `FREQUENCY_LIMIT` already exist.
+`DICE_ROLL_TYPE`, `VISIBILITY_PREDICATE`, `PHASE_GATE` and `FREQUENCY_LIMIT`
+already exist.
 June Stratagem TARGET lines do not use all of them. That is
 `kind_unused_by_profiles`, not `gap_no_kind`.
 
@@ -296,7 +308,9 @@ Demand, each requiring a real consumer before a new kind exists:
 - WHEN windows remain T1, including `selected_as_target` as a WHEN event
   and "selected as a target of that charge".
 - EFFECT families remain T2, including `keyword_grant`, `ignore_modifiers`
-  ("excluding modifiers"), and placement "place into Strategic Reserves".
+  ("excluding modifiers"), placement "place into Strategic Reserves", and
+  the Command Re-roll reroll itself. Listed roll-type eligibility is T3
+  `dice_roll_type`.
 - Resource ledger identity remains T5.
 - Finite versus parameterized target *decisions* remain T6. T3 only names
   the selectable atoms.

@@ -49,7 +49,7 @@
       "condition_profile_count_sum": 1520,
       "histogram_weighted_sum": 1520,
       "row_sum": 1025,
-      "note": "not_selected_to_fight includes the 62 shoot-or-fight unions. keyword_exclude excludes T2 'excluding modifiers'. in_reserves is TARGET location, not EFFECT place-into-Reserves."
+      "note": "not_selected_to_fight includes the 62 shoot-or-fight unions. keyword_exclude excludes T2 'excluding modifiers'. in_reserves is TARGET location, not EFFECT place-into-Reserves. T3-001 adds Core-demand player bearer and dice_roll_type at June count 0; assignment totals are unchanged."
     }
   },
   "closed_axes": {
@@ -60,7 +60,18 @@
     "allegiance": ["your", "opponent", "anaphoric", "unspecified"],
     "grain": ["unit", "model", "marker", "objective_marker", "dice_roll", "player"],
     "count": ["one", "up_to_n", "one_or_more", "that"],
-    "composition": ["singleton", "union", "pair"]
+    "composition": ["singleton", "union", "pair"],
+    "bearer_ids": [
+      "activation_object",
+      "enhancement_bearer",
+      "this_model",
+      "this_unit",
+      "attached_rules_unit",
+      "player",
+      "army"
+    ],
+    "player_bearer_is_not_army": true,
+    "player_bearer_is_not_player_grain": true
   },
   "classification_rules": [
     {
@@ -123,6 +134,20 @@
       "flattened_token": "selected as a target of that charge",
       "owner": "T1",
       "not_family_id": "selected_as_target"
+    },
+    {
+      "id": "command_reroll_player_is_not_army",
+      "flattened_token": "you re-roll one of the listed rolls",
+      "bearer_id": "player",
+      "not_bearer_id": "army"
+    },
+    {
+      "id": "listed_roll_types_are_dice_roll_type",
+      "flattened_token": "Hit roll, Wound roll, or other listed roll types",
+      "family_id": "dice_roll_type",
+      "parameter_id": "roll_types",
+      "not_family_id": "reroll",
+      "note": "T2 owns the reroll EFFECT."
     }
   ],
   "bearers": [
@@ -131,7 +156,8 @@
     {"bearer_id": "this_model", "profile_count": 0, "existing_target_kind": "this_model", "coverage": "june_stratagem_zero_datasheet_demand"},
     {"bearer_id": "this_unit", "profile_count": 0, "existing_target_kind": "this_unit", "coverage": "june_stratagem_zero_datasheet_demand"},
     {"bearer_id": "attached_rules_unit", "profile_count": 0, "condition_hits": {"leading": 2, "attached": 13}, "coverage": "runtime_group_apis"},
-    {"bearer_id": "army", "profile_count": 0, "existing_target_kind": "player", "coverage": "june_stratagem_zero_army_demand"}
+    {"bearer_id": "player", "profile_count": 0, "existing_target_kind": "player", "coverage": "june_stratagem_zero_core_demand", "note": "Core Command Re-roll. Not an alias of army. Not grain player."},
+    {"bearer_id": "army", "profile_count": 0, "existing_target_kind": "player", "coverage": "june_stratagem_zero_army_demand", "note": "Army-wide subject. Shares RuleTargetKind player with the player bearer; IDs stay distinct."}
   ],
   "target_tokens": [
     {"token_id": "friendly_allegiance", "profile_count": 1018, "axis": "allegiance"},
@@ -184,6 +210,7 @@
     {"family_id": "count_size", "profile_count": 4, "existing_condition_kind": "target_constraint", "coverage": "nearest"},
     {"family_id": "leading", "profile_count": 2, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
     {"family_id": "just_shot", "profile_count": 1, "existing_condition_kind": null, "coverage": "gap_no_condition_kind", "examples": ["PSY-CHAFF VOLLEY"]},
+    {"family_id": "dice_roll_type", "profile_count": 0, "existing_condition_kind": "dice_roll_type", "coverage": "june_stratagem_zero_kind_exists", "parameter_id": "roll_types", "parameter_value_kind": "finite_roll_type_set", "note": "Core Command Re-roll. Eligibility of the dice_roll grain. Not T2 reroll."},
     {"family_id": "phase_condition", "profile_count": 0, "existing_condition_kind": "phase_gate", "coverage": "june_stratagem_zero_kind_exists"},
     {"family_id": "turn_owner_condition", "profile_count": 0, "existing_condition_kind": "phase_gate", "coverage": "june_stratagem_zero_kind_exists"},
     {"family_id": "riled_up", "profile_count": 0, "existing_condition_kind": null, "coverage": "june_stratagem_zero_enhancement_demand", "note": "War Horde Enhancement state token. F-ORK-01."}
@@ -232,12 +259,25 @@
     "enemy_select",
     "dice_roll",
     "player",
+    "dice_roll_type",
     "phase_condition",
     "turn_owner_condition",
     "riled_up"
   ],
   "core_stratagems": [
-    {"title": "Command Re-roll", "section": "15.02", "bearer": "player", "grain": "dice_roll"},
+    {
+      "title": "Command Re-roll",
+      "section": "15.02",
+      "bearer": "player",
+      "grain": "dice_roll",
+      "conditions": ["dice_roll_type"],
+      "condition_parameters": {
+        "dice_roll_type": {
+          "parameter_id": "roll_types",
+          "existing_condition_kind": "dice_roll_type"
+        }
+      }
+    },
     {"title": "Epic Challenge", "section": "15.03", "bearer": "activation_object", "grain": "unit"},
     {"title": "Insane Bravery", "section": "15.04", "bearer": "activation_object", "conditions": ["battle_shocked"]},
     {"title": "Crushing Impact", "section": "15.05", "bearer": "activation_object", "grain": "unit"},
@@ -263,7 +303,7 @@
     {
       "name": "Core 15",
       "url": "https://www.40k.app/rules/15-stratagems",
-      "note": "Authoritative Core Stratagem TARGET and bearer for this survey. Command Re-roll is dice_roll."
+      "note": "Authoritative Core Stratagem TARGET and bearer for this survey. Command Re-roll is player bearer, dice_roll grain, and dice_roll_type."
     }
   ],
   "holds": [
