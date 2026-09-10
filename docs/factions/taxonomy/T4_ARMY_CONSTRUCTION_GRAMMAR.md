@@ -135,16 +135,22 @@ P25C must add typed, source-neutral records:
 
 | Family ID | Meaning |
 | --- | --- |
-| `required_unit` | Roster must include at least one unit matching the selector |
-| `prohibited_unit` | Roster must not include a unit matching the selector |
-| `required_other_detachment` | Roster must also include another detachment matching the selector |
-| `prohibited_other_detachment` | Roster must not include another detachment matching the selector |
+| `required_unit` | Roster must include at least one unit matching the `UnitSelector` |
+| `prohibited_unit` | Roster must not include a unit matching the `UnitSelector` |
+| `required_other_detachment` | Roster must also include another detachment matching the `DetachmentSelector` |
+| `prohibited_other_detachment` | Roster must not include another detachment matching the `DetachmentSelector` |
 
-Selectors are source-ID-linked. They must not gate on display names. Legal
-selector atoms demanded by this corpus: datasheet identity, keyword all/any,
-keyword exclusion, characteristic thresholds (example: Wounds 14+), and
-Epic Hero / CHARACTER / Battleline membership. Runtime must not parse rule
-text.
+Unit and other-detachment families do not share one selector type. A
+`UnitSelector` cannot name a detachment, and a `DetachmentSelector` cannot
+name a datasheet. Both are source-ID-linked and must not gate on display
+names. `UnitSelector` atoms demanded by this corpus: datasheet identity,
+keyword all/any, keyword exclusion, characteristic thresholds (example:
+Wounds 14+), and Epic Hero / CHARACTER / Battleline membership.
+`DetachmentSelector` atoms: one canonical project-owned detachment ID, or a
+closed set of such IDs, with an optional exclude wrapper. "Another"
+detachment is any selected detachment other than the constraint owner.
+Runtime must not parse rule text. No faction rows are required to ship these
+empty selector types.
 
 Sampled Keywords headings are often **keyword grants**, not must/cannot
 include (see §6). Sampled Restrictions headings are often **related-army
@@ -215,10 +221,15 @@ Parsed from the 40 guides' detachment tables at the snapshot in §2.
 | DP 3 listings | 96 |
 | Listings with a Keywords heading | 50 (21 unique names) |
 | Listings with a Restrictions heading | 25 (25 unique names) |
+| Combined Keywords or Restrictions unique names | 44 |
 | Listings with both Keywords and Restrictions | The Lost Brethren; Company of Hunters |
 | Enhancement-zero listings | 0 |
 | Stratagem-zero listings | 16 (5 unique names) |
 | Listings with two Core Force Dispositions | 1 (War Horde) |
+
+The combined Keywords/Restrictions unique-name count is 21 + 25 − 2: The Lost
+Brethren and Company of Hunters appear in both heading lists and are not
+counted twice.
 
 Enhancement-only (Stratagem inventory 0), unique names:
 
@@ -316,7 +327,7 @@ Wolf, Shadowmark Talon, Spearpoint Task Force, The Angelic Host, The Lost
 Brethren, Unforgiven Task Force, Vindication Task Force.
 
 FM0 extracts every Keywords/Restrictions body from retained pages onto the
-families in §8. This survey does not claim those 46 unique names are fully
+families in §8. This survey does not claim those 44 unique names are fully
 transcribed.
 
 ## 7. Related-army admission and caps
@@ -398,8 +409,12 @@ F-SCOPE).
 | `god_battleline_pairing` | Per-keyword non-Battleline ≤ Battleline |
 | `datasheet_faction_access` | Datasheet-carried permission into a host army |
 
-P25C may add these as source-neutral record types with no rows. Evaluation of
-populated rows is FM0. P25C must not branch on faction IDs.
+These families are FM0 content records. The JSON catalog assigns them to FM0,
+not to P25C. That assignment is the owner: P25C must not add extra related-army
+kinds, empty or otherwise, to the Core constraint schema. When FM0 later
+populates them, they reuse the P25C `UnitSelector` (and `DetachmentSelector`
+if a pact names another detachment) rather than inventing a parallel selector
+language. P25C still must not branch on faction IDs.
 
 ## 8. Typed P25C constraint catalog
 
@@ -412,17 +427,20 @@ DetachmentDefinition
 ConstructionConstraint
   constraint_id: stable project ID
   source_id: retained source ID
-  kind: required_unit
-       | prohibited_unit
-       | required_other_detachment
-       | prohibited_other_detachment
-  selector: ConstructionSelector
+  kind: required_unit | prohibited_unit
+        unit_selector: UnitSelector
+  kind: required_other_detachment | prohibited_other_detachment
+        detachment_selector: DetachmentSelector
 ```
 
-`ConstructionSelector` is a closed typed union (datasheet IDs, keyword
-all/any/none, characteristic predicates, Epic Hero / Battleline / CHARACTER
-flags, exclude-selector). No display-name or locally re-normalized token
-gates.
+`UnitSelector` is a closed typed union: datasheet IDs, keyword all/any/none,
+characteristic predicates, Epic Hero / Battleline / CHARACTER flags, and an
+exclude wrapper. `DetachmentSelector` is a separate closed typed union:
+one canonical project-owned detachment ID, a closed set of such IDs, and an
+optional exclude wrapper. A unit family must carry a `UnitSelector`; an
+other-detachment family must carry a `DetachmentSelector`. Neither union
+includes the other domain. No display-name or locally re-normalized token
+gates. Shipping the empty selector types does not populate faction rows.
 
 Core-owned evaluators in the same P25C PR:
 
@@ -436,6 +454,8 @@ Core-owned evaluators in the same P25C PR:
 Do **not** in P25C:
 
 - Populate Shadow Legion, Corsair, Chapter, or pact rows.
+- Add the §7.2 related-army families to the Core constraint schema; those
+  remain FM0.
 - Treat extra listing tags as Force Dispositions.
 - Invent an Onslaught Core table row.
 - Keep "empty `unit_datasheet_ids` means awaiting source" once the grant/constraint
@@ -480,10 +500,12 @@ Read-only findings for later Core or FM0 work:
 
 P25C may start. It has:
 
-- the Core 25.04 constraint families and selectors this corpus actually needs;
+- the Core 25.04 constraint families and the separate `UnitSelector` /
+  `DetachmentSelector` types those families need;
 - the Core-owned evaluators it must certify without faction rows;
 - the split against P25A/P25B;
-- the related-army family list so its schema is not Shadow-Legion-shaped;
+- the related-army family list as FM0 demand, so P25C keeps `UnitSelector`
+  reusable without adding those kinds now;
 - the War Horde dual Core Force Disposition and extra-tag warning;
 - the Enhancement-only legality warning;
 - the Onslaught hold so it does not invent a Core battle-size row.

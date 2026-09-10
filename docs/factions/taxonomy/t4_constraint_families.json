@@ -3,6 +3,7 @@
   "track_id": "T4",
   "not_a_runtime_artifact": true,
   "not_a_content_set_record": true,
+  "related_army_families_owner": "FM0",
   "survey_document": "docs/factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md",
   "snapshot": {
     "observed_on": "2026-09-05",
@@ -21,6 +22,11 @@
     "keywords_heading_unique_names": 21,
     "restrictions_heading_listings": 25,
     "restrictions_heading_unique_names": 25,
+    "keywords_or_restrictions_unique_names": 44,
+    "both_keywords_and_restrictions_unique_names": [
+      "Company of Hunters",
+      "The Lost Brethren"
+    ],
     "enhancement_zero_listings": 0,
     "stratagem_zero_listings": 16,
     "stratagem_zero_unique_names": 5,
@@ -174,19 +180,22 @@
       "family_id": "required_unit",
       "owner": "P25C",
       "core_owned_evaluator": true,
-      "populate_faction_rows_in_p25c": false
+      "populate_faction_rows_in_p25c": false,
+      "selector": "UnitSelector"
     },
     {
       "family_id": "prohibited_unit",
       "owner": "P25C",
       "core_owned_evaluator": true,
-      "populate_faction_rows_in_p25c": false
+      "populate_faction_rows_in_p25c": false,
+      "selector": "UnitSelector"
     },
     {
       "family_id": "required_other_detachment",
       "owner": "P25C",
       "core_owned_evaluator": true,
       "populate_faction_rows_in_p25c": false,
+      "selector": "DetachmentSelector",
       "hold_id": "T4-HOLD-OTHER-DETACHMENT-EXAMPLE"
     },
     {
@@ -194,6 +203,7 @@
       "owner": "P25C",
       "core_owned_evaluator": true,
       "populate_faction_rows_in_p25c": false,
+      "selector": "DetachmentSelector",
       "hold_id": "T4-HOLD-OTHER-DETACHMENT-EXAMPLE"
     },
     {
@@ -251,7 +261,8 @@
       "family_id": "army_faction_admission_gate",
       "owner": "FM0",
       "core_owned_evaluator": false,
-      "populate_faction_rows_in_p25c": false
+      "populate_faction_rows_in_p25c": false,
+      "note": "FM0 record family. P25C must not add this kind to the Core schema."
     },
     {
       "family_id": "related_army_points_cap",
@@ -374,8 +385,34 @@
     "T4-HOLD-OTHER-DETACHMENT-EXAMPLE",
     "F-SCOPE-01"
   ],
+  "construction_selectors": {
+    "UnitSelector": {
+      "used_by": ["required_unit", "prohibited_unit"],
+      "atoms": [
+        "datasheet_id",
+        "keyword_all",
+        "keyword_any",
+        "keyword_none",
+        "characteristic_predicate",
+        "epic_hero_flag",
+        "battleline_flag",
+        "character_flag",
+        "exclude_wrapper"
+      ]
+    },
+    "DetachmentSelector": {
+      "used_by": ["required_other_detachment", "prohibited_other_detachment"],
+      "atoms": [
+        "canonical_detachment_id",
+        "canonical_detachment_id_set",
+        "exclude_wrapper"
+      ],
+      "note": "Separate from UnitSelector. A unit family cannot carry this type. Shipping the empty type does not populate faction rows."
+    }
+  },
   "p25c_must_not": [
     "Populate or evaluate faction-specific constraint rows",
+    "Add FM0 related-army families to the Core constraint schema",
     "Store extra listing tags as Core Force Dispositions",
     "Invent an Onslaught Core battle-size row",
     "Reject empty stratagem inventories as missing source",
