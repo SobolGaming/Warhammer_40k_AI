@@ -143,3 +143,94 @@ def record_shooting_declaration_for_executor_fixture(
         else "shooting_declaration_accepted",
         validate_json_value(payload),
     )
+
+
+def record_melee_declaration_for_executor_fixture(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+    result_id: str,
+) -> None:
+    from warhammer40k_core.engine.fight_resolution import (
+        MELEE_DECLARATION_PROPOSAL_KIND,
+        MeleeDeclarationProposal,
+        MeleeDeclarationProposalRequest,
+        MeleeTargetAllocation,
+        MeleeWeaponDeclaration,
+        build_melee_declaration_request,
+    )
+
+    expected_id = (
+        f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
+        f"{sequence.attacking_unit_instance_id}:{result_id}"
+    )
+    if sequence.source_phase is not BattlePhase.FIGHT or sequence.sequence_id != expected_id:
+        raise AssertionError("Melee executor fixture requires its exact declaration sequence ID")
+    assert state.active_player_id is not None
+    request = build_melee_declaration_request(
+        request_id=f"melee-fixture-request:{result_id}",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=state.active_player_id,
+        actor_id=sequence.attacker_player_id,
+        unit_instance_id=sequence.attacking_unit_instance_id,
+        source_decision_request_id=f"melee-fixture-activation-request:{result_id}",
+        source_decision_result_id=f"melee-fixture-activation-result:{result_id}",
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        available_weapons=tuple(
+            validate_json_value(pool.to_payload()) for pool in sequence.attack_pools
+        ),
+        target_unit_instance_ids=tuple(
+            sorted({pool.target_unit_instance_id for pool in sequence.attack_pools})
+        ),
+    )
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(request)
+    proposal = MeleeDeclarationProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=MELEE_DECLARATION_PROPOSAL_KIND,
+        player_id=sequence.attacker_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=sequence.attacking_unit_instance_id,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        declarations=tuple(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=pool.attacker_model_instance_id,
+                wargear_id=pool.wargear_id,
+                weapon_profile_id=pool.weapon_profile_id,
+                target_allocations=(
+                    MeleeTargetAllocation(target_unit_instance_id=pool.target_unit_instance_id),
+                ),
+            )
+            for pool in sequence.attack_pools
+        ),
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    )
+    decisions.event_log.append(
+        "melee_declaration_accepted",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "phase_body_status": "melee_declaration_accepted",
+                "request_id": request.request_id,
+                "result_id": result_id,
+                "proposal_request": proposal_request.to_payload(),
+                "proposal": proposal.to_payload(),
+                "attack_sequence_id": sequence.sequence_id,
+                "one_shot_weapon_use_records": [],
+            }
+        ),
+    )

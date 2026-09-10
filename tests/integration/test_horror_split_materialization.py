@@ -2556,6 +2556,22 @@ def _split_scenario(
             sequence=attack_sequence,
             result_id=attack_sequence.sequence_id.split("attack-sequence:", 1)[1],
         )
+    else:
+        from tests.completed_attack_fixture_helpers import (
+            record_melee_declaration_for_executor_fixture,
+        )
+
+        result_id = "horror-split-melee"
+        attack_sequence = replace(
+            attack_sequence,
+            sequence_id=(
+                f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
+                f"{attack_sequence.attacking_unit_instance_id}:{result_id}"
+            ),
+        )
+        record_melee_declaration_for_executor_fixture(
+            state=state, decisions=decisions, sequence=attack_sequence, result_id=result_id
+        )
     if destruction_kind == "hazardous" and emit_destruction_events:
         decisions.event_log.append(
             "hazardous_mortal_wounds_applied",
