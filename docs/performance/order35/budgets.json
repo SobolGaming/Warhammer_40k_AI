@@ -1,0 +1,13 @@
+{
+  "workload_id": "order35-rapid-ingress-v2",
+  "reference_mean_ratio": 1.5,
+  "reference_mean_allowance_seconds": 0.001,
+  "max_seconds": {"legal": 0.05, "first_round": 0.001, "aircraft": 0.001, "mixed": 0.25, "placement": 0.5},
+  "work_limits": {
+    "legal": {"unarrived_reserve_states_for_player": 12, "rules_unit_view_by_id": 8},
+    "first_round": {"unarrived_reserve_states_for_player": 0, "rules_unit_view_by_id": 0},
+    "aircraft": {"unarrived_reserve_states_for_player": 2, "rules_unit_view_by_id": 3},
+    "mixed": {"unarrived_reserve_states_for_player": 12, "rules_unit_view_by_id": 64},
+    "placement": {"unarrived_reserve_states_for_player": 18, "rules_unit_view_by_id": 250, "resolve_reserve_arrival": 1}
+  }
+}

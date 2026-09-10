@@ -26,6 +26,7 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
 from warhammer40k_core.engine.stratagems_eligibility import _enumerated_target_bindings
+from warhammer40k_core.engine.stratagems_model import StratagemTargetBinding, StratagemTargetKind
 from warhammer40k_core.engine.stratagems_selection import _stratagem_unavailable_reason
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +39,7 @@ WORK_METRICS = frozenset(
         "resolve_visibility_pair",
         "_rapid_ingress_unit_ids",
         "rapid_ingress_target_error",
+        "reserve_state_for_unit",
     }
 )
 
@@ -72,6 +74,18 @@ def sample(*, case: str, profile: bool = False) -> dict[str, object]:
     bindings = _enumerated_target_bindings(
         state=state, player_id=context.player_id, definition=record.definition, context=context
     )
+    target_reason = None
+    if case in {"first_round", "aircraft"}:
+        target_reason = _stratagem_unavailable_reason(
+            state=state,
+            record=record,
+            context=context,
+            target_binding=StratagemTargetBinding(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                target_player_id=context.player_id,
+                target_unit_instance_id="army-beta:reserve-0",
+            ),
+        )
     submitted = False
     status = None
     if case in {"legal", "mixed", "placement"}:
@@ -111,6 +125,7 @@ def sample(*, case: str, profile: bool = False) -> dict[str, object]:
         "inventory_size": len(inventory),
         "eligible_targets": len(bindings),
         "unavailable_reason": reason,
+        "target_unavailable_reason": target_reason,
         "submitted": submitted,
         "work_counts": counts,
     }
@@ -163,10 +178,13 @@ def main() -> None:
         "mode": "profile" if args.work_counts else "uninstrumented_timing",
         "hardware_status": "provisional; one process, no concurrent test workers",
         "timing_boundary": (
-            "setup separate; availability, target enumeration; legal Movement-end "
+            "setup separate; availability, target enumeration, rejected target preflight; "
+            "legal Movement-end "
             "facade target submission; placement case also completes placement and parent resume"
         ),
         "terrain_shapes": 0,
+        "rng_source": "engine game_id=phase12c-game; no random choices in measured slice",
+        "cpu_allocation": "one benchmark process; host CPU allocation not pinned",
         "models_per_unit": 5,
         "decision_policy": "remain stationary; select legal reserve target",
         "hashes": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in inputs},

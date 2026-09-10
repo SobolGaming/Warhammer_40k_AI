@@ -7382,10 +7382,11 @@ def test_order35_first_round_direct_facade_submission_is_atomic(
     assert session.lifecycle.to_payload() == before
 
 
+@pytest.mark.parametrize("rewrite_requested_event", [False, True])
 @pytest.mark.parametrize("checkpoint", ["target", "placement"])
 @pytest.mark.parametrize("mutation", ["round", "target", "origin"])
 def test_order35_pending_restore_rejects_eligibility_and_origin_forgery(
-    checkpoint: str, mutation: str
+    checkpoint: str, mutation: str, rewrite_requested_event: bool
 ) -> None:
     from tests.rapid_ingress_helpers import (
         ingress_session,
@@ -7421,6 +7422,13 @@ def test_order35_pending_restore_rejects_eligibility_and_origin_forgery(
     else:
         proposal["context"]["stratagem_handler_id"] = "generic:ingress-move"
         proposal["context"]["from_start_of_battle"] = True
+    if rewrite_requested_event:
+        for event in cast(dict[str, Any], payload["decisions"])["event_log"]:
+            if (
+                event["event_type"] == "decision_requested"
+                and event["payload"]["request_id"] == request.request_id
+            ):
+                event["payload"] = json.loads(json.dumps(pending))
     with pytest.raises(GameLifecycleError):
         GameLifecycle.from_payload(payload)
 
