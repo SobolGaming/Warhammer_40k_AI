@@ -310,7 +310,7 @@ waves may run as parallel agent packets under the data-first contract (D3).
 | U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00 |
 | U2 | Content-set diff (S4) between the packaged version and the staged version |
 | U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format |
-| U4 | Automatic, layer-specific status invalidation (rules below): semantic execution claims, roster legality claims and certification claims are bound to separate evidence tuples; a diff demotes exactly the layers whose tuple changed to `stale`; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row |
+| U4 | Automatic, layer-specific status invalidation (rules below): semantic execution, roster legality and certification claims are bound to separate evidence tuples; a changed transcription hash is provenance, not automatic semantic demotion, and requires impact classification plus a recorded carry-forward or a stale claim; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row |
 | U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it |
 | U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
 | U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the engine build identity and the content-set version of every participating faction; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it |
@@ -362,35 +362,67 @@ rejected with a typed reason in a new V+1 roster; a deliberately uncovered
 
 #### Layered invalidation (U4)
 
-| Layer | Claims | Evidence tuple | Demoted when |
+Layer A separates **immutable source provenance** from the **semantic
+dependency fingerprint**. The transcription hash authenticates the retained
+operative text under F00 (that text includes points rows such as the Exorcist
+surcharge). A new observation therefore often has a new transcription hash
+even when gameplay semantics are unchanged. The hash is never treated as a
+semantic descriptor and never compared for Layer A equivalence.
+
+| Layer | Claims | Evidence | Demoted when |
 | --- | --- | --- | --- |
-| A: semantic execution | L4, L5 | source ID; transcription hash; effect RuleIR hash; timing/window descriptor; target grammar; restriction grammar; bearer grammar; binding IDs and parameters; handler identity for named-handler-backed clauses | Any element changes, or the change cannot be classified |
-| B: roster legality | L6 | cost rows hash; composition hash; wargear/options hash; keywords hash; Leader/Support and attachment hash; army-construction constraint hash; geometry evidence IDs | Any element changes |
-| C: certification | L7, L8 | All Layer A and B tuples of every entity in the certified rosters and interactions, plus the content-set version and packaged build identity | Any contributing tuple changes |
+| A: semantic execution | L4, L5 | Provenance: source ID and the current observation's transcription hash, retained as immutable pins. Semantic fingerprint: effect RuleIR hash; timing/window descriptor; target grammar; restriction grammar; bearer grammar; binding IDs and parameters; handler identity for named-handler-backed clauses | The semantic fingerprint changes, or a transcription change cannot be classified / cannot be carried forward |
+| B: roster legality | L6 | cost rows hash; composition hash; wargear/options hash; keywords hash; Leader/Support and attachment hash; army-construction constraint hash; geometry evidence IDs | Any roster-legality element changes |
+| C: certification | L7, L8 | The current Layer A and B evidence of every entity in the certified rosters and interactions, plus the content-set version and packaged build identity | Any contributing Layer A or B semantic/roster element changes, or the content-set/build identity changes without a recorded re-attestation |
 
-A Layer B change demotes L6–L8 for the affected rosters and preserves Layer A
-claims. A Layer A change demotes L4–L8 for the affected entity and every
-certified roster that uses it. Equality of the effect RuleIR alone never proves
-equivalence: a changed WHEN clause, target set, restriction or bearer text with
-an unchanged effect is a Layer A change. For named-handler-backed clauses, a
-recorded human review is additionally required before a text change can be
-classified as editorial; without it the claim stays `stale`.
+**Carry-forward.** A changed source transcription initially requires impact
+classification. Existing Layer A execution evidence may be carried forward to
+the new source observation only through a recorded equivalence review linking
+the old and new transcription hashes and establishing that all applicable
+semantic descriptors, bindings, and handler-backed clauses remain equivalent.
+Points-only changes preserve unchanged Layer A evidence while invalidating
+affected Layer B and dependent Layer C claims. Unclassified changes remain
+stale.
 
-Acceptance fixtures for U3/U4: changed timing with unchanged effect IR
-invalidates the affected Layer A claim; a verified editorial-only change
-preserves it; a points-only change preserves Layer A evidence and triggers the
-required Layer B roster validation.
+A Layer A fingerprint change demotes L4–L8 for the affected entity and every
+certified roster that uses it. Equality of the effect RuleIR alone never
+proves equivalence: a changed WHEN clause, target set, restriction or bearer
+text with an unchanged effect is a Layer A fingerprint change. For
+named-handler-backed clauses, the carry-forward review must also confirm
+handler identity and handler-backed eligibility; without that review the
+claim stays `stale`.
+
+**Layer C re-attestation.** Layer C always binds to a content-set version and
+packaged build identity. Carry-forward of Layer A (editorial) or preservation
+of Layer A while refreshing Layer B (points-only) never silently preserves
+L7/L8 on the new identity. Those claims are re-attested: the status artifact
+records the new content-set/build pins and the review or roster-validation
+evidence that authorizes them. Until that re-attestation exists, L7/L8 for
+the affected rosters are `stale` even when Layer A remains current.
+
+Acceptance fixtures for U3/U4 (implementation tests required when U3/U4
+land; this documentation PR only defines them):
+
+1. Changed timing with unchanged effect IR and a new transcription hash
+   invalidates Layer A (and dependent Layer C).
+2. A reviewed editorial-only change uses different old and new transcription
+   hashes, carries Layer A forward through the recorded equivalence review,
+   and re-attests Layer C to the new content-set/build identity without
+   requiring a semantic re-implementation.
+3. A points-only change uses different old and new transcription hashes,
+   preserves Layer A through carry-forward, invalidates affected Layer B
+   claims, and re-attests dependent Layer C only after roster validation.
 
 Impact classes assigned by U3:
 
 | Class | Example | Layers demoted | Required work |
 | --- | --- | --- | --- |
-| Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | B (affected rosters), C | Regenerate cost records; re-run roster validation and re-certify affected rosters; Layer A evidence preserved |
-| Text hash equal | Page re-rendered, same operative text | none | Re-pin observation |
-| Editorial equivalent | Wording tweak with every Layer A element unchanged and, for named-handler-backed clauses, a recorded review confirming equivalence | none | Re-pin hashes; record the review |
+| Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | B (affected rosters); C until re-attested | Regenerate cost records; re-run roster validation; carry Layer A forward with a recorded hash-link review that the semantic fingerprint is unchanged (points live in provenance text, not in the fingerprint); re-attest Layer C to the new content-set/build identity |
+| Text hash equal | Page re-rendered, same operative text | none | Re-pin observation; provenance hash already matches |
+| Editorial equivalent | Wording tweak; semantic fingerprint unchanged | C until re-attested | Record the equivalence review linking old and new transcription hashes; carry Layer A forward; re-attest Layer C to the new content-set/build identity. Named-handler-backed clauses require the review to confirm handler identity |
 | Timing, target, restriction or bearer changed, effect IR equal | WHEN clause moves to a different window; bearer widened | A, C | Demote to `stale`; re-map and re-certify L4–L8 |
 | Effect IR changed | Acts of Faith battle-round → turn start | A, C | Demote to `stale`; re-certify L4–L8 |
-| Unclassified clause change | Classifier cannot attribute the diff | A, C | `stale` pending human review; no automatic re-pin |
+| Unclassified clause change | Classifier cannot attribute the diff | A, C | `stale` pending human review; no automatic carry-forward |
 | Structural add | Nazdreg; Brute Bosses; a new Enhancement | n/a | Staging observation until official provenance is registered; then L0–L8 from scratch; no Python unless a new family is needed |
 | Structural remove | More Dakka!; a removed Stratagem | C for rosters using it | Tombstone with `retired_in`; current-version mustering rejection regression; Python removed only when no packaged version references it |
 | Attachment or keyword change | Eldrad's narrowed Leader list | B, C | Regenerate attachment records; fieldability regressions |
