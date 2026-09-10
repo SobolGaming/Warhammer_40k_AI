@@ -1,0 +1,79 @@
+{
+  "workload_id": "order34-action-restriction-slice-v1",
+  "commit": "bf9bd4225fd135ff59c17bbaa7d1c08b6c32b4a5",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "6bfca3d1eeefb2472e538881452d554243168593985931efa5ef84d85bf9d686",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "hardware_status": "provisional local host; execution evidence records workload scheduling",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "query_repetitions": 100,
+  "samples": [
+    {
+      "setup_seconds": 1.571539165917784,
+      "slice_seconds": 0.10412170900963247,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    },
+    {
+      "setup_seconds": 0.05621299997437745,
+      "slice_seconds": 0.10170862509403378,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    },
+    {
+      "setup_seconds": 0.05604200006928295,
+      "slice_seconds": 0.10201629193034023,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    },
+    {
+      "setup_seconds": 0.05686116707511246,
+      "slice_seconds": 0.10209304094314575,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    },
+    {
+      "setup_seconds": 0.055951124988496304,
+      "slice_seconds": 0.1023765840800479,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    },
+    {
+      "setup_seconds": 0.05626574996858835,
+      "slice_seconds": 0.10205995896831155,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    },
+    {
+      "setup_seconds": 0.05584529205225408,
+      "slice_seconds": 0.10178366594482213,
+      "work_counts": {},
+      "decision_count": 1,
+      "action_count": 1
+    }
+  ],
+  "mean_seconds": 0.10230855371004768,
+  "median_seconds": 0.10205995896831155,
+  "p95_seconds": 0.10412170900963247,
+  "maximum_seconds": 0.10412170900963247,
+  "completion_rate": 1.0,
+  "slices_per_second": 9.774353792881254,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_action_restrictions.py": "537cd664ed3386e977d6b33ae9810e4861440018928426b246ca017a89fbab80",
+    "scripts/measure_action_restriction_live.py": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/phase17n_primary_mission_helpers.py": "b4b4b05479437fea4ed3824349eedf241e75320cfb1bc60105781dec4836070b"
+  },
+  "full_game_certified": false
+}

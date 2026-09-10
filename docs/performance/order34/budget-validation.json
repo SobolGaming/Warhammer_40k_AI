@@ -1,0 +1,37 @@
+{
+  "base_sha": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "head_sha": "e57e8be02aa744354d8d078a78be39024ab44643",
+  "comparability_hashes_match": true,
+  "checks": {
+    "action": {
+      "base_mean": 0.11297897602032338,
+      "head_mean": 0.11457482742012612,
+      "head_maximum": 0.11870195902884007,
+      "ratio": 1.0141252067952506,
+      "passed": true
+    },
+    "visible-self-observer": {
+      "base_mean": 0.1187549584345626,
+      "head_mean": 0.11812087497673929,
+      "head_maximum": 0.1214303330052644,
+      "ratio": 0.994660572777913,
+      "passed": true
+    },
+    "unseen-no-observer": {
+      "base_mean": 0.4088828808661284,
+      "head_mean": 0.41289050569425206,
+      "head_maximum": 0.46799233299680054,
+      "ratio": 1.0098014003903377,
+      "passed": true
+    },
+    "unseen-friendly-observer": {
+      "base_mean": 0.32381592843947665,
+      "head_mean": 0.3259629463011931,
+      "head_maximum": 0.355483082938008,
+      "ratio": 1.0066303651956323,
+      "passed": true
+    }
+  },
+  "all_passed": true,
+  "full_game_certified": false
+}

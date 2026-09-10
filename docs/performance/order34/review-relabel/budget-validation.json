@@ -1,0 +1,180 @@
+{
+  "base_sha": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "head_sha": "bf9bd4225fd135ff59c17bbaa7d1c08b6c32b4a5",
+  "comparability_hashes_match": true,
+  "timing_checks": {
+    "action": {
+      "base_mean": 0.10435190469226134,
+      "head_mean": 0.10230855371004768,
+      "head_maximum": 0.10412170900963247,
+      "ratio": 0.9804186517894465,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "unrestricted": {
+      "base_mean": 0.05988746429128306,
+      "head_mean": 0.057152601424604654,
+      "head_maximum": 0.06261104193981737,
+      "ratio": 0.9543332999811701,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "attached_selection": {
+      "base_mean": 0.0052761487230392435,
+      "head_mean": 0.0031913809943944216,
+      "head_maximum": 0.003438832936808467,
+      "ratio": 0.6048694155376416,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "retained": {
+      "base_mean": 0.17071919630481197,
+      "head_mean": 0.16999607155698218,
+      "head_maximum": 0.19351483299396932,
+      "ratio": 0.9957642446574158,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "visible-self-observer": {
+      "base_mean": 0.09964899402776999,
+      "head_mean": 0.10037186914788825,
+      "head_maximum": 0.10327329102437943,
+      "ratio": 1.0072542139252987,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "unseen-no-observer": {
+      "base_mean": 0.35506803570647855,
+      "head_mean": 0.36542772616459324,
+      "head_maximum": 0.4158140830695629,
+      "ratio": 1.0291766349440665,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "unseen-friendly-observer": {
+      "base_mean": 0.2812548811115058,
+      "head_mean": 0.2923497024624209,
+      "head_maximum": 0.3136741250054911,
+      "ratio": 1.0394475690770908,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    }
+  },
+  "work_checks": {
+    "action": {
+      "base": {
+        "rules_unit_view_by_id": 425,
+        "persisting_effects_for_lineage": 119,
+        "rules_unit_identity_ids": 514,
+        "expire_persisting_effects_at_boundary": 4
+      },
+      "head": {
+        "rules_unit_view_by_id": 524,
+        "rules_unit_identity_ids": 112,
+        "record_persisting_effect": 1,
+        "expire_persisting_effects_at_boundary": 4,
+        "persisting_effects_for_lineage": 523
+      },
+      "passed": true
+    },
+    "unrestricted": {
+      "base": {
+        "rules_unit_view_by_id": 211,
+        "applies_to_unit": 6432,
+        "resolve_line_of_sight": 90,
+        "resolve_visibility_pair": 7,
+        "_legal_charging_unit_ids": 2,
+        "rules_unit_identity_ids": 13,
+        "resolve_visibility_pair_uncached": 7,
+        "expire_persisting_effects_at_boundary": 4,
+        "_legal_shooting_unit_ids": 2,
+        "persisting_effects_for_lineage": 178
+      },
+      "head": {
+        "rules_unit_view_by_id": 219,
+        "applies_to_unit": 7155,
+        "resolve_line_of_sight": 69,
+        "resolve_visibility_pair": 7,
+        "_legal_charging_unit_ids": 2,
+        "invalid_shooting_unit_selection_status": 1,
+        "rules_unit_identity_ids": 6,
+        "expire_persisting_effects_at_boundary": 4,
+        "persisting_effects_for_lineage": 192,
+        "resolve_visibility_pair_uncached": 7,
+        "_legal_shooting_unit_ids": 3
+      },
+      "passed": true
+    },
+    "attached_selection": {
+      "base": {
+        "rules_unit_view_by_id": 23,
+        "applies_to_unit": 832,
+        "resolve_line_of_sight": 30,
+        "rules_unit_identity_ids": 2,
+        "_legal_shooting_unit_ids": 1,
+        "persisting_effects_for_lineage": 26
+      },
+      "head": {
+        "rules_unit_view_by_id": 25,
+        "applies_to_unit": 1056,
+        "resolve_line_of_sight": 9,
+        "_legal_shooting_unit_ids": 2,
+        "persisting_effects_for_lineage": 30,
+        "invalid_shooting_unit_selection_status": 1
+      },
+      "passed": true
+    },
+    "retained": {
+      "base": {
+        "rules_unit_view_by_id": 276,
+        "applies_to_unit": 5226,
+        "resolve_line_of_sight": 45,
+        "resolve_visibility_pair": 6,
+        "_legal_charging_unit_ids": 1,
+        "rules_unit_identity_ids": 26,
+        "resolve_visibility_pair_uncached": 6,
+        "expire_persisting_effects_at_boundary": 10,
+        "_legal_shooting_unit_ids": 2,
+        "persisting_effects_for_lineage": 165
+      },
+      "head": {
+        "rules_unit_view_by_id": 290,
+        "applies_to_unit": 5732,
+        "resolve_line_of_sight": 48,
+        "resolve_visibility_pair": 6,
+        "_legal_charging_unit_ids": 1,
+        "_legal_shooting_unit_ids": 3,
+        "rules_unit_identity_ids": 23,
+        "resolve_visibility_pair_uncached": 6,
+        "expire_persisting_effects_at_boundary": 10,
+        "persisting_effects_for_lineage": 179,
+        "invalid_shooting_unit_selection_status": 1
+      },
+      "passed": true
+    }
+  },
+  "all_required_budgets_passed": true,
+  "full_attached_declaration_diagnostic": "historical incomplete diagnostic at e56c1a4c/5b6752ff in ../review-repair; unchanged solver; not rerun for bf9bd422",
+  "full_game_certified": false
+}

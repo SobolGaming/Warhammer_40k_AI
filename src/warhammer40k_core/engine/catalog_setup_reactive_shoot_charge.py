@@ -39,6 +39,9 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.mission_action_eligibility import (
+    rules_unit_started_mission_action_this_turn,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -519,6 +522,11 @@ def _first_candidate_for_player_and_trigger(
             can_charge = _clause_has_action(
                 clause=clause,
                 action=CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID,
+            )
+            can_charge = can_charge and not rules_unit_started_mission_action_this_turn(
+                state=state,
+                player_id=player_id,
+                unit_instance_id=source_rules_unit.unit_instance_id,
             )
             if not can_shoot and not can_charge:
                 continue
@@ -1069,6 +1077,15 @@ def _setup_reactive_payload_drift_reason(
         player_id=actor_id,
         target_unit_ids=(target_unit_id,),
     )
+    if (
+        action == CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID
+        and rules_unit_started_mission_action_this_turn(
+            state=state,
+            player_id=actor_id,
+            unit_instance_id=source_rules_unit.unit_instance_id,
+        )
+    ):
+        return "setup_reactive_charge_unit_started_action"
     if action == CATALOG_SETUP_REACTIVE_SHOOT_OPTION_ID and not shoot_target_is_eligible:
         return "setup_reactive_shoot_target_eligibility_drift"
     return None

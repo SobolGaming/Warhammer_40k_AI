@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-final-commit",
+  "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8\ngit diff --check\ngit add tests/completed_attack_fixture_helpers.py tests/integration/test_horror_split_materialization.py tests/integration/test_ws13_adapter_phase_families.py tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py\ngit commit -m 'test: retain accepted melee authority in executor fixtures'\ngit rev-parse HEAD HEAD:src HEAD:tests",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-10T00:21:07.128700+00:00",
+  "deadline_seconds": 90.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-final-commit.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 910,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 0.514
+}

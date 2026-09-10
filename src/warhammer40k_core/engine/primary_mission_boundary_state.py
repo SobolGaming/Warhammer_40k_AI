@@ -23,6 +23,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
+from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.movement_model import (
     AdvancedUnitState,
@@ -307,6 +308,8 @@ def primary_mission_action_boundary_state_from_checkpoint(
     *,
     state: GameState,
     checkpoint: PrimaryMissionBoundaryCheckpoint,
+    event_records: tuple[EventRecord, ...],
+    checkpoint_event_id: str,
 ) -> GameState:
     """Rebuild an Action-opportunity state from its boundary checkpoint."""
 
@@ -341,6 +344,16 @@ def primary_mission_action_boundary_state_from_checkpoint(
         )
         for row in prior_uses
     ]
+    from warhammer40k_core.engine.activity_restriction_history import (
+        restore_checkpoint_activity_restrictions,
+    )
+
+    restore_checkpoint_activity_restrictions(
+        state=clone,
+        prior_uses=prior_uses,
+        event_records=event_records,
+        checkpoint_event_id=checkpoint_event_id,
+    )
     prior_action_ids = {row.action_id for row in prior_uses}
     clone.primary_terrain_trap_states = [
         row for row in state.primary_terrain_trap_states if row.action_id in prior_action_ids

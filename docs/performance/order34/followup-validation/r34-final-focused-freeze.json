@@ -1,0 +1,14 @@
+{
+  "name": "r34-final-focused-freeze",
+  "command": "uv run ruff format tests/completed_attack_fixture_helpers.py tests/integration/test_horror_split_materialization.py tests/unit/test_phase17g_chaos_knights_army_rule.py\nuv run pytest tests/unit/test_phase13b_shooting_declarations.py tests/integration/test_horror_split_materialization.py tests/unit/test_phase17g_chaos_knights_army_rule.py -k 'r34_002 or selected_target_continuation_phase_tamper or selected_target_mortal_wounds_finalize_horror' -q -n 4 --dist=worksteal --tb=short --no-cov\nuv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T18:57:19.137624+00:00",
+  "deadline_seconds": 180.0,
+  "log": "/private/tmp/order34-evidence/r34-final-focused-freeze.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 23426,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 21.064,
+  "committed_log": "r34-final-focused-freeze.txt"
+}

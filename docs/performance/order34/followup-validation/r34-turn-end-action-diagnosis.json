@@ -1,0 +1,14 @@
+{
+  "name": "r34-turn-end-action-diagnosis",
+  "command": "uv run pytest tests/unit/test_phase17n_primary_scoring_conditions.py::test_phase17n_turn_end_action_commits_marker_with_completion_event_authority -q --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:39:34.904904+00:00",
+  "deadline_seconds": 60.0,
+  "log": "/private/tmp/order34-evidence/r34-turn-end-action-diagnosis.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 36432,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 15.23,
+  "committed_log": "r34-turn-end-action-diagnosis.txt"
+}

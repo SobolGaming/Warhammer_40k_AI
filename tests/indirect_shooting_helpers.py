@@ -56,6 +56,7 @@ def indirect_session(
     shooter_keyword: str | None = None,
     engager_distance: float | None = None,
     engager_attached: bool = False,
+    assault: bool = False,
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     if shooter_keyword is not None:
@@ -81,7 +82,7 @@ def indirect_session(
             continue
         ordinary = replace(
             wargear.weapon_profiles[0],
-            keywords=(),
+            keywords=(WeaponKeyword.ASSAULT,) if assault else (),
             abilities=(),
             attack_profile=AttackProfile.fixed(attacks),
             skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, ballistic_skill),
@@ -203,11 +204,13 @@ def indirect_session(
                 parameters={"roll_type": "hit", "attack_role": "attacker"},
             )
         )
-    complete_movement_before_shooting(session, stationary=stationary)
+    complete_movement_before_shooting(session, stationary=stationary, assault=assault)
     return LocalGameSession.from_persistence_payload(session.to_persistence_payload())
 
 
-def complete_movement_before_shooting(session: LocalGameSession, *, stationary: bool) -> None:
+def complete_movement_before_shooting(
+    session: LocalGameSession, *, stationary: bool, assault: bool = False
+) -> None:
     selected_unit_id = ""
     for index in range(30):
         request = pending_request(session)
@@ -224,7 +227,9 @@ def complete_movement_before_shooting(session: LocalGameSession, *, stationary: 
             )
         elif request.decision_type == "select_movement_action":
             action = (
-                "normal_move"
+                "advance"
+                if selected_unit_id == SHOOTER and assault
+                else "normal_move"
                 if selected_unit_id == SHOOTER and not stationary
                 else "remain_stationary"
             )
@@ -237,8 +242,8 @@ def complete_movement_before_shooting(session: LocalGameSession, *, stationary: 
                 proposal_request_id=offered.request_id,
                 proposal_kind=offered.proposal_kind,
                 unit_instance_id=selected_unit_id,
-                movement_phase_action="normal_move",
-                movement_mode="normal",
+                movement_phase_action="advance" if assault else "normal_move",
+                movement_mode="advance" if assault else "normal",
                 witness=straight_line_witness_for_unit(
                     session.lifecycle, unit_instance_id=selected_unit_id, dx=0.5
                 ),

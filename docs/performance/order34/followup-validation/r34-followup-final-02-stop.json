@@ -1,0 +1,6 @@
+{
+  "controller_pid": 35479,
+  "signal": "SIGINT",
+  "reason": "Known failed aggregate drained to two active workers while sixteen workers waited; obtain its failure summary before the repaired final rerun.",
+  "verified_process": "35475 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/private/tmp/order34-evidence/r34-followup-final-02-behavior.xml -vv --tb=short --maxfail=8"
+}

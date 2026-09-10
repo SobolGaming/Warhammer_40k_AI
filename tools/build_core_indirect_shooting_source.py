@@ -59,6 +59,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
                 "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
                 "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
                 "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+                "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction",
             ],
         ),
         (
@@ -179,7 +180,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         },
         "co_version_comparison": (
             "Complete 10.07 observed directly in the browser. No App version exposed and no "
-            "co-version comparison asserted. Partial status excludes the Order 34 Action clause."
+            "co-version comparison asserted. Order 34 binds the retained Action clause; unrelated source semantics remain partial."
         ),
     }
 

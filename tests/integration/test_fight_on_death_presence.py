@@ -424,6 +424,8 @@ def test_order_30_cleanup_feel_no_pain_pauses_and_restores_before_source_removal
 
 
 def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> None:
+    from tests.activity_restriction_assertions import assert_completed_melee_is_authenticated
+
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
@@ -477,6 +479,7 @@ def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> 
         assert restored.to_payload() == session.lifecycle.to_payload()
     assert accepted
     assert retained_melee
+    assert_completed_melee_is_authenticated(session)
     assert state.battlefield_state is not None
     assert model_id in state.battlefield_state.removed_model_ids
     assert (

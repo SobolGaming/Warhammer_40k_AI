@@ -1,0 +1,18 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 30%]
+........................................................................ [ 61%]
+........................................................................ [ 92%]
+.................                                                        [100%]
+233 passed in 51.50s
+All checks passed!
+2920 files already formatted
+Success: no issues found in 2819 source files
+WARNING: there is a new pyright version available (v1.1.411 -> v1.1.413).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+
+/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/tests/phase13b_shooting_declaration_helpers.py
+  /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/tests/phase13b_shooting_declaration_helpers.py:1503:28 - error: "_psychic_modifier_history_origin" is protected and used outside of the class in which it is declared (reportPrivateUsage)
+  /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/tests/phase13b_shooting_declaration_helpers.py:1506:15 - error: "_psychic_modifier_history_origin" is protected and used outside of the class in which it is declared (reportPrivateUsage)
+2 errors, 0 warnings, 0 informations

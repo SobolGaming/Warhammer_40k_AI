@@ -1,0 +1,13 @@
+RUF043 Pattern passed to `match=` contains metacharacters but is neither escaped nor raw
+   --> tests/activity_restriction_assertions.py:153:54
+    |
+151 |             participation[field] = declaration[field]
+152 |         assert forged["decisions"]["records"] == original["decisions"]["records"]
+153 |         with pytest.raises(GameLifecycleError, match="Model attack history|Mutation decision"):
+    |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+154 |             GameLifecycle.from_payload(forged)
+155 |     assert session.lifecycle.to_payload() == original
+    |
+help: Use a raw string or `re.escape()` to make the intention explicit
+
+Found 1 error.

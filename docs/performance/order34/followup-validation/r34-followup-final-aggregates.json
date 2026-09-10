@@ -1,0 +1,33 @@
+{
+  "name": "r34-followup-final-aggregates",
+  "command": "export COVERAGE_FILE=/private/tmp/order34-evidence/r34-followup-final.coverage\nPATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/private/tmp/order34-evidence/r34-followup-final-behavior.xml --tb=short\nuv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/private/tmp/order34-evidence/r34-followup-final-quality.xml --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T18:58:23.111602+00:00",
+  "deadline_seconds": 1200.0,
+  "log": "/private/tmp/order34-evidence/r34-followup-final-aggregates.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 23826,
+  "outcome": "orphan_processes",
+  "remaining_processes_before_recovery": [
+    "23839 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23840 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23841 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23842 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23845 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23849 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23855 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23862 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23869 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23877 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23887 23826 R          05:30 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23896 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23907 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23917 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23927 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23938 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23949 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))",
+    "23960 23826 R          05:29 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))"
+  ],
+  "exit_status": -2,
+  "elapsed_seconds": 330.134
+}

@@ -1,0 +1,42 @@
+.                                                                        [100%]
+1 passed in 3.97s
+All checks passed!
+2921 files already formatted
+Success: no issues found in 2820 source files
+WARNING: there is a new pyright version available (v1.1.411 -> v1.1.413).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+
+0 errors, 0 warnings, 0 informations
+
+╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
+╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
+ ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
+ ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
+╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
+╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
+  └──▶║║                    ▲ 
+      ╚╝────────────────────┘
+
+
+---------
+Contracts
+---------
+
+Analyzed 2497 files, 12242 dependencies.
+----------------------------------------
+
+Core must not import rules, engine, or adapters KEPT
+Geometry must not import rules, engine, adapters, or interfaces KEPT
+Polygon geometry must not import domain or runtime packages KEPT
+Adapters are leaf modules KEPT
+Rules must not import engine or adapters KEPT
+Interfaces may only import adapters and engine KEPT
+Profiling may not import adapters or interfaces KEPT
+No runtime package imports profiling KEPT
+Runtime packages must not import AI KEPT
+AI must not import profiling or interfaces KEPT
+No runtime package imports interfaces KEPT
+
+Contracts: 11 kept, 0 broken.
+ruff check...............................................................Passed
+ruff format..............................................................Passed

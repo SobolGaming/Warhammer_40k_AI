@@ -1,0 +1,13 @@
+{
+  "name": "r34-001-corruption-proof",
+  "command": "cd /private/tmp/order34-reviewed\nPYTHONPATH=.:src /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python -m pytest tests/integration/test_retained_shooting.py -q -s -k r34_001_action_blocks --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T17:50:56.759245+00:00",
+  "deadline_seconds": 90.0,
+  "log": "/private/tmp/order34-evidence/r34-001-corruption-proof.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 5785,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 6.98
+}

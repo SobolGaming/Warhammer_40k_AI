@@ -10,7 +10,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     geometry_model_for_placement,
 )
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
@@ -246,6 +246,7 @@ def primary_mission_action_start_evidence_for_selection(
     decline_option_id: str,
     boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference,
     boundary_checkpoint_evidence: PrimaryMissionBoundaryCheckpoint,
+    event_records: tuple[EventRecord, ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> PrimaryMissionActionStartEvidence:
     """Recompute the complete legal inventory before capturing selected start evidence."""
@@ -259,6 +260,8 @@ def primary_mission_action_start_evidence_for_selection(
     boundary_state = primary_mission_action_boundary_state_from_checkpoint(
         state=state,
         checkpoint=boundary_checkpoint_evidence,
+        event_records=event_records,
+        checkpoint_event_id=boundary_checkpoint.checkpoint_event_id,
     )
     boundary_registry = RuntimeModifierRegistry.empty()
     if action.target_policy not in PRIMARY_MISSION_ACTION_TARGET_POLICIES:

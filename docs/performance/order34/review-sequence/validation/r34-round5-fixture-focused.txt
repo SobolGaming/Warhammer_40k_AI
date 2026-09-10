@@ -1,0 +1,39 @@
+2 files reformatted, 2 files left unchanged
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 48%]
+............................................F....................F...F.. [ 97%]
+....                                                                     [100%]
+=================================== FAILURES ===================================
+___ test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices ___
+[gw5] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/integration/test_ws13_adapter_phase_families.py:1671: in test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices
+    session = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/adapters/local_session.py:119: in to_persistence_payload
+    raise LocalGameSessionPersistenceError(
+E   warhammer40k_core.adapters.local_session.LocalGameSessionPersistenceError: LocalGameSession persistence requires its initial replay snapshot.
+_ test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death[2-3-0] _
+[gw1] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py:719: in test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death
+    assert (
+E   AssertionError: assert ((None is not None) or False)
+E    +  where None = FightPhaseState(battle_round=1, active_player_id='player-b', current_step=<FightPhaseStepKind.FIGHT: 'fight'>, step_st...pile_in_completed_activation_result_ids=(), phase_complete=False, forced_activation_context=None, suspended_state=None).attack_sequence
+E    +  and   False = any(<generator object test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death.<locals>.<genexpr> at 0x11d1326c0>)
+_ test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death[3-2-1] _
+[gw7] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py:719: in test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death
+    assert (
+E   AssertionError: assert ((None is not None) or False)
+E    +  where None = FightPhaseState(battle_round=1, active_player_id='player-b', current_step=<FightPhaseStepKind.FIGHT: 'fight'>, step_st...pile_in_completed_activation_result_ids=(), phase_complete=False, forced_activation_context=None, suspended_state=None).attack_sequence
+E    +  and   False = any(<generator object test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death.<locals>.<genexpr> at 0x11afdba00>)
+=========================== short test summary info ============================
+FAILED tests/integration/test_ws13_adapter_phase_families.py::test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices - warhammer40k_core.adapters.local_session.LocalGameSessionPersistenceError: LocalGameSession persistence requires its initial replay snapshot.
+FAILED tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py::test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death[2-3-0] - AssertionError: assert ((None is not None) or False)
+ +  where None = FightPhaseState(battle_round=1, active_player_id='player-b', current_step=<FightPhaseStepKind.FIGHT: 'fight'>, step_st...pile_in_completed_activation_result_ids=(), phase_complete=False, forced_activation_context=None, suspended_state=None).attack_sequence
+ +  and   False = any(<generator object test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death.<locals>.<genexpr> at 0x11d1326c0>)
+FAILED tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py::test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death[3-2-1] - AssertionError: assert ((None is not None) or False)
+ +  where None = FightPhaseState(battle_round=1, active_player_id='player-b', current_step=<FightPhaseStepKind.FIGHT: 'fight'>, step_st...pile_in_completed_activation_result_ids=(), phase_complete=False, forced_activation_context=None, suspended_state=None).attack_sequence
+ +  and   False = any(<generator object test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death.<locals>.<genexpr> at 0x11afdba00>)
+3 failed, 145 passed in 34.41s

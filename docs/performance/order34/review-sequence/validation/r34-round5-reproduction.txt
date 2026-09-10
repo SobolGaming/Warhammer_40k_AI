@@ -1,0 +1,20 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction _
+tests/unit/test_phase13b_shooting_declarations.py:19808: in test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction
+    assert_completed_shooting_kind_is_authenticated(
+tests/activity_restriction_assertions.py:97: in assert_completed_shooting_kind_is_authenticated
+    with pytest.raises(GameLifecycleError, match="Model attack history"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'warhammer40k_core.engine.phase.GameLifecycleError'>
+___ test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration ____
+tests/unit/test_phase12c_core_stratagems.py:3279: in test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration
+    assert_completed_shooting_kind_is_authenticated(
+tests/activity_restriction_assertions.py:97: in assert_completed_shooting_kind_is_authenticated
+    with pytest.raises(GameLifecycleError, match="Model attack history"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'warhammer40k_core.engine.phase.GameLifecycleError'>
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction - Failed: DID NOT RAISE <class 'warhammer40k_core.engine.phase.GameLifecycleError'>
+FAILED tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration - Failed: DID NOT RAISE <class 'warhammer40k_core.engine.phase.GameLifecycleError'>
+2 failed in 8.17s

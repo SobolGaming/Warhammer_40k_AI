@@ -13,7 +13,8 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
         "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ]
     },
     {
@@ -51,7 +52,8 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
         "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
       "evidence_id": "core-indirect-shooting-review:indirect-shooting",
       "evidence_kind": "project_reviewed_app_transcription",
@@ -82,7 +84,8 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
         "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
       "evidence_id": "core-indirect-shooting-mirror:indirect-shooting:40k-app",
       "evidence_kind": "third_party_mirror",
@@ -159,5 +162,5 @@
       "provider_non_affiliation_recorded": true
     }
   ],
-  "package_hash": "8b7ea3b7628763d79e6b66619a7a08e2137dff479d3ba81200ed7689bf100670"
+  "package_hash": "2c8e76b5551496b5f0834634606e839677bebd23adaab61782c60037578fc3a1"
 }

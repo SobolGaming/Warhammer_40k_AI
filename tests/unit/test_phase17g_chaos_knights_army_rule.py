@@ -117,6 +117,7 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
@@ -139,6 +140,10 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration, DetachmentSelection
+from warhammer40k_core.engine.model_attack_history import (
+    record_attack_sequence_completed,
+    record_models_attacked,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -1635,7 +1640,7 @@ def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -
     assert continuation.continuation_phase is (
         CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
     )
-    assert len(state.persisting_effects) == 0
+    assert _selected_target_modifier_effects(state) == ()
     assert not _events_of_type(
         lifecycle.decision_controller,
         CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
@@ -1664,7 +1669,7 @@ def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -
     assert second_provider_status.decision_request == second_provider_request
     assert second_provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert restored.decision_controller.queue.pending_requests == (second_provider_request,)
-    assert len(restored.state.persisting_effects) == 0
+    assert _selected_target_modifier_effects(restored.state) == ()
 
     for provider_decision_index in range(50):
         remaining_continuation = (
@@ -1681,11 +1686,11 @@ def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -
         )
         if restored.state.pending_catalog_selected_target_battle_shock_continuation is None:
             break
-        assert len(restored.state.persisting_effects) == 0
+        assert _selected_target_modifier_effects(restored.state) == ()
     else:
         raise AssertionError("second provider outcome did not close")
 
-    assert len(restored.state.persisting_effects) == 1
+    assert len(_selected_target_modifier_effects(restored.state)) == 1
     requested = _events_of_type(restored.decision_controller, "battle_shock_test_requested")
     resolved = _events_of_type(
         restored.decision_controller,
@@ -1736,7 +1741,7 @@ def test_phase_start_selected_target_battle_shock_waits_for_delirium_outcome_via
 
 def test_selected_target_continuation_phase_tamper_rejects_before_provider_mutation() -> None:
     lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="phase17g-selected-target-delirium-phase-tamper"
+        game_id="order34-complete-boundary-phase_tamper-1"
     )
     payload = deepcopy(lifecycle.to_payload())
     state_payload = cast(dict[str, Any], payload["state"])
@@ -1768,7 +1773,7 @@ def test_selected_target_continuation_phase_tamper_rejects_before_provider_mutat
         )
     )
     result = DecisionResult.for_request(
-        result_id="phase17g-selected-target-delirium-phase-tamper:decline",
+        result_id="order34-complete-boundary-phase_tamper-1:decline",
         request=provider_request,
         selected_option_id="decline",
     )
@@ -1796,7 +1801,7 @@ def test_selected_target_continuation_phase_tamper_rejects_before_provider_mutat
 
 def test_selected_target_continuation_rejects_completed_provider_in_pending_phase() -> None:
     lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="phase17g-selected-target-delirium-completed-provider-phase"
+        game_id="order34-complete-boundary-provider-3"
     )
     state = lifecycle.state
     if state is None:
@@ -1815,10 +1820,7 @@ def test_selected_target_continuation_rejects_completed_provider_in_pending_phas
         session.submit_option(
             request_id=provider_request.request_id,
             option_id="decline",
-            result_id=(
-                "phase17g-selected-target-delirium-completed-provider-phase:"
-                f"decline:{provider_decision_index}"
-            ),
+            result_id=(f"order34-complete-boundary-provider-3:decline:{provider_decision_index}"),
         )
         if state.pending_catalog_selected_target_battle_shock_continuation is None:
             break
@@ -1843,7 +1845,7 @@ def test_selected_target_continuation_rejects_completed_provider_in_pending_phas
 def test_selected_target_remaining_effect_request_requires_retained_ancestry() -> None:
     selected_target_record = _selected_target_battle_shock_then_mortal_record()
     lifecycle, bundle, _provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1",
+        game_id="order34-complete-boundary-remaining-1",
         selected_target_record=selected_target_record,
     )
     state = lifecycle.state
@@ -1862,10 +1864,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         session.submit_option(
             request_id=provider_request.request_id,
             option_id="decline",
-            result_id=(
-                "phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1:"
-                f"provider:{provider_decision_index}"
-            ),
+            result_id=(f"order34-complete-boundary-remaining-1:provider:{provider_decision_index}"),
         )
     else:
         raise AssertionError("selected-target provider outcome did not reach remaining effects")
@@ -1887,7 +1886,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         forged_request
     )
     result = DecisionResult.for_request(
-        result_id=("phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1:forged-result"),
+        result_id=("order34-complete-boundary-remaining-1:forged-result"),
         request=forged_request,
         selected_option_id="decline",
     )
@@ -1918,10 +1917,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         restored_session.submit_option(
             request_id=current_request.request_id,
             option_id="decline",
-            result_id=(
-                "phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1:"
-                f"nested:{nested_decision_index}"
-            ),
+            result_id=(f"order34-complete-boundary-remaining-1:nested:{nested_decision_index}"),
         )
     else:
         raise AssertionError("selected-target remaining effects did not complete")
@@ -2538,7 +2534,7 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     game_id = (
         "phase17g-selected-target-delirium-reroll-ordered-2"
         if reroll
-        else "phase17g-selected-target-delirium-direct"
+        else "order34-complete-boundary-direct-1"
     )
     selected_target_record = _selected_target_battle_shock_then_modifier_record()
     extra_contributions: tuple[RuntimeContentContribution, ...] = ()
@@ -2631,7 +2627,7 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     assert continuation is not None
     assert continuation.provider_pending_request == provider_request
     assert (continuation.battle_shock_reroll_result_id is not None) is reroll
-    assert state.persisting_effects == []
+    assert _selected_target_modifier_effects(state) == ()
     assert not _events_of_type(
         lifecycle.decision_controller,
         CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
@@ -2664,7 +2660,7 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
             result_id=f"{game_id}:fnp-result:{provider_decision_index}",
         )
         if restored.state.pending_catalog_selected_target_battle_shock_continuation is not None:
-            assert restored.state.persisting_effects == []
+            assert _selected_target_modifier_effects(restored.state) == ()
             assert not _events_of_type(
                 restored.decision_controller,
                 CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
@@ -2673,7 +2669,7 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
         raise AssertionError("selected-target provider outcome did not close")
     assert final_status.decision_request is not None
     assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
-    assert len(restored.state.persisting_effects) == 1
+    assert len(_selected_target_modifier_effects(restored.state)) == 1
     assert (
         len(
             _events_of_type(
@@ -2806,7 +2802,7 @@ def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePh
     assert continuation is not None
     assert continuation.phase is phase
     assert continuation.final_event_type == expected_final_event_type
-    assert state.persisting_effects == []
+    assert _selected_target_modifier_effects(state) == ()
     assert not _events_of_type(lifecycle.decision_controller, expected_final_event_type)
 
     restored = GameLifecycle.from_payload(
@@ -2832,12 +2828,12 @@ def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePh
             result_id=f"{game_id}:fnp-result:{provider_decision_index}",
         )
         if restored.state.pending_catalog_selected_target_battle_shock_continuation is not None:
-            assert restored.state.persisting_effects == []
+            assert _selected_target_modifier_effects(restored.state) == ()
             assert not _events_of_type(restored.decision_controller, expected_final_event_type)
     else:
         raise AssertionError("phase-start provider outcome did not close")
     assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
-    assert len(restored.state.persisting_effects) == 1
+    assert len(_selected_target_modifier_effects(restored.state)) == 1
     assert len(_events_of_type(restored.decision_controller, expected_final_event_type)) == 1
     assert (
         len(
@@ -3128,6 +3124,18 @@ def _phase_start_selected_target_battle_shock_record(
     )
 
 
+def _selected_target_modifier_effects(state: GameState) -> tuple[PersistingEffect, ...]:
+    from warhammer40k_core.engine.activity_restrictions import activity_restriction_payload
+
+    # Completed shooting already owns an independent activity effect. These
+    # assertions concern when the pending selected-target modifier is committed.
+    return tuple(
+        effect
+        for effect in state.persisting_effects
+        if activity_restriction_payload(effect) is None
+    )
+
+
 def _queue_selected_target_delirium_request(
     *,
     lifecycle: GameLifecycle,
@@ -3141,7 +3149,6 @@ def _queue_selected_target_delirium_request(
     source_unit = unit_by_id(state, "army-beta:intercessor-unit-3")
     target_unit = unit_by_id(state, "army-alpha:intercessor-unit-1")
     profile = _weapon_profile()
-    declaration_request_id = f"{state.game_id}:selected-target-declaration-request"
     declaration_result_id = f"{state.game_id}:selected-target-declaration-result"
     sequence = AttackSequence(
         sequence_id=f"attack-sequence:{declaration_result_id}",
@@ -3164,42 +3171,15 @@ def _queue_selected_target_delirium_request(
         ),
     ).advanced_after_attack()
     decisions = lifecycle.decision_controller
-    declaration_request = DecisionRequest(
-        request_id=declaration_request_id,
-        decision_type="phase17g_selected_target_declaration",
-        actor_id=source_army.player_id,
-        payload=validate_json_value(
-            {"attack_pools": [pool.to_payload() for pool in sequence.attack_pools]}
-        ),
-        options=(
-            DecisionOption(
-                option_id="accept",
-                label="Accept declaration",
-                payload=validate_json_value(
-                    {"attack_pools": [pool.to_payload() for pool in sequence.attack_pools]}
-                ),
-            ),
-        ),
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
     )
-    decisions.request_decision(declaration_request)
-    declaration_result = DecisionResult.for_request(
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
         result_id=declaration_result_id,
-        request=declaration_request,
-        selected_option_id="accept",
-    )
-    decisions.submit_result(declaration_result)
-    decisions.event_log.append(
-        "shooting_declaration_accepted",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": source_army.player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "unit_instance_id": source_unit.unit_instance_id,
-            "request_id": declaration_request_id,
-            "result_id": declaration_result_id,
-            "attack_pools": [pool.to_payload() for pool in sequence.attack_pools],
-        },
     )
     decisions.event_log.append(
         "attack_sequence_step",
@@ -3210,14 +3190,9 @@ def _queue_selected_target_delirium_request(
             "payload": {"successful": True},
         },
     )
-    completed = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": sequence.sequence_id,
-            "attacker_player_id": source_army.player_id,
-            "attacking_unit_instance_id": source_unit.unit_instance_id,
-        },
-    )
+    record_models_attacked(state=state, decisions=decisions, sequence=sequence)
+    record_attack_sequence_completed(state=state, decisions=decisions, sequence=sequence)
+    completed = decisions.event_log.records[-1]
     runtime = CatalogSelectedTargetEffectRuntime(
         ability_indexes_by_player_id={
             source_army.player_id: AbilityCatalogIndex.from_records((selected_target_record,)),

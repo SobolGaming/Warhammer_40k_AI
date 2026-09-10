@@ -1,0 +1,32 @@
+e56c1a4caf2a6915548222caed0872627f8dbf43
+328c5b67fdd1ffe74e0693959ae70b0dd6ddfef4
+Timeout (0:00:15)!
+Thread 0x00000001f70fa180 (most recent call first):
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/lib/python3.14/site-packages/z3/z3core.py", line 4331 in Z3_solver_check_assumptions
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/lib/python3.14/site-packages/z3/z3.py", line 7309 in check
+  File "/private/tmp/order34-base/src/warhammer40k_core/geometry/visibility_algebra.py", line 198 in decide
+  File "/private/tmp/order34-base/src/warhammer40k_core/geometry/visibility_formulas.py", line 575 in <genexpr>
+  File "/private/tmp/order34-base/src/warhammer40k_core/geometry/visibility_formulas.py", line 575 in decide_full
+  File "/private/tmp/order34-base/src/warhammer40k_core/geometry/continuous_visibility.py", line 351 in resolve_visibility_pair_uncached
+  File "/private/tmp/order34-base/src/warhammer40k_core/geometry/continuous_visibility.py", line 283 in resolve_visibility_pair
+  File "/private/tmp/order34-base/src/warhammer40k_core/core/visibility.py", line 447 in _resolve_model_line_of_sight
+  File "/private/tmp/order34-base/src/warhammer40k_core/core/visibility.py", line 302 in <genexpr>
+  File "/private/tmp/order34-base/src/warhammer40k_core/core/visibility.py", line 301 in _resolve_line_of_sight
+  File "/private/tmp/order34-base/src/warhammer40k_core/core/visibility.py", line 644 in _resolve_context
+  File "/private/tmp/order34-base/src/warhammer40k_core/core/visibility.py", line 291 in resolve_line_of_sight
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/shooting_targets.py", line 1208 in _best_line_of_sight_range_evidence
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/shooting_targets.py", line 834 in _target_candidate
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/shooting_targets.py", line 432 in <genexpr>
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/shooting_targets.py", line 431 in shooting_target_candidates_for_unit
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/phases/shooting_requests.py", line 207 in _request_shooting_declaration
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/phases/shooting_handler.py", line 249 in begin_phase
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/battle_round_flow.py", line 286 in advance
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/lifecycle.py", line 817 in _advance_once
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/lifecycle.py", line 745 in advance_until_decision_or_terminal
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/lifecycle.py", line 1809 in _apply_shooting_phase_decision
+  File "/private/tmp/order34-base/src/warhammer40k_core/engine/lifecycle.py", line 884 in submit_decision
+  File "/private/tmp/order34-base/src/warhammer40k_core/adapters/decisions.py", line 48 in submit_option
+  File "/private/tmp/order34-base/src/warhammer40k_core/adapters/local_session.py", line 366 in submit_option
+  File "/private/tmp/order34-base/tests/indirect_shooting_helpers.py", line 274 in select_indirect_declaration
+  File "/private/tmp/order34-base/scripts/measure_action_restriction_live.py", line 121 in live_sample
+  File "<string>", line 1 in <module>

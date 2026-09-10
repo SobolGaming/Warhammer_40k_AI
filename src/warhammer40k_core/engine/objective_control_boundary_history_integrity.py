@@ -117,7 +117,7 @@ def _validate_noninitial_phase_start_transition_history(
         (index, event)
         for index, event in enumerate(event_records)
         if event.event_type == "battle_phase_completed"
-        and _completed_phase_objective_control_context(state=state, event=event) == prior_context
+        and completed_phase_objective_control_context(state=state, event=event) == prior_context
     )
     if len(completed_matches) != 1 or completed_matches[0][0] >= start_index:
         raise GameLifecycleError(
@@ -308,7 +308,7 @@ def _validate_phase_end_objective_control_history(
     for event in event_records:
         if event.event_type != "battle_phase_completed":
             continue
-        context = _completed_phase_objective_control_context(state=state, event=event)
+        context = completed_phase_objective_control_context(state=state, event=event)
         if context in completed_contexts:
             raise GameLifecycleError(
                 "ObjectiveControlRecord completed phase history duplicates a phase context."
@@ -446,7 +446,7 @@ def _validate_completed_turn_end_objective_control_history(
         )
 
 
-def _completed_phase_objective_control_context(
+def completed_phase_objective_control_context(
     *,
     state: GameState,
     event: EventRecord,
