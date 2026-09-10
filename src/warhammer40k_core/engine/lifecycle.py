@@ -973,6 +973,7 @@ class GameLifecycle:
             state=lifecycle._require_state(),
             pending_request=lifecycle._pending_decision_request(),
             decision_records=lifecycle.decision_controller.records,
+            event_records=lifecycle.decision_controller.event_log.records,
         )
         validate_reaction_queue_consistency(
             state=lifecycle._require_state(),

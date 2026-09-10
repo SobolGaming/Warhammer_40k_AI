@@ -843,6 +843,11 @@ def _proposal_context_error(
         return "stale_battle_round"
     if submitted_proposal.phase is not request_proposal.phase:
         return "stale_phase"
+    if (
+        request_proposal.catalog_record.definition.handler_id == CORE_RAPID_INGRESS_HANDLER_ID
+        and submitted_proposal.context != request_proposal.context
+    ):
+        return "wrong_context"
     return _context_state_drift(state=state, context=request_proposal.context)
 
 

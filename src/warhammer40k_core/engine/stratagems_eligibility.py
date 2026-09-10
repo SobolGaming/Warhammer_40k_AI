@@ -5,6 +5,8 @@ from __future__ import annotations
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 
 from collections.abc import Callable
+from warhammer40k_core.engine.rapid_ingress_eligibility import rapid_ingress_window_error
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
@@ -155,8 +157,9 @@ def _handler_unavailable_reason(
             return "no_eligible_battle_shock_test"
         return None
     if definition.handler_id == CORE_RAPID_INGRESS_HANDLER_ID:
-        if context.active_player_id == context.player_id:
-            return "rapid_ingress_requires_opponent_turn"
+        window_error = rapid_ingress_window_error(state=state, player_id=context.player_id)
+        if window_error is not None:
+            return window_error
         if target_binding is None:
             return (
                 None
@@ -1098,6 +1101,30 @@ def _enumerated_target_bindings(
             )
             is None
             else ()
+        )
+    if target_spec.target_policy_id == RAPID_INGRESS_TARGET_POLICY_ID:
+        candidates = tuple(
+            StratagemTargetBinding(
+                target_kind=target_spec.target_kind,
+                target_player_id=player_id,
+                target_unit_instance_id=unit_id,
+            )
+            for unit_id in _rapid_ingress_unit_ids(state=state, player_id=player_id)
+        )
+        return tuple(
+            binding
+            for binding in candidates
+            if _target_binding_error(
+                state=state,
+                player_id=player_id,
+                target_spec=target_spec,
+                policy=definition.restriction_policy,
+                target_binding=binding,
+                context=context,
+                ruleset_descriptor=None,
+                army_catalog=None,
+            )
+            is None
         )
     bindings: list[StratagemTargetBinding] = []
     for army in state.army_definitions:

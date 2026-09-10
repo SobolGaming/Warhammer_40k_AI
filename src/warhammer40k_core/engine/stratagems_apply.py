@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.rapid_ingress_authority import rapid_ingress_placement_error
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -477,6 +479,9 @@ def invalid_stratagem_placement_proposal_status(
                 {"proposal_validation": validate_json_value(validation.to_payload())}
             ),
         )
+    origin_error = rapid_ingress_placement_error(state=state, proposal=proposal_request)
+    if origin_error is not None:
+        return _invalid(state, "Rapid Ingress placement origin or eligibility drift.", origin_error)
     reserve_state = state.reserve_state_for_unit(submitted.unit_instance_id)
     if reserve_state is None or reserve_state.status is not ReserveStatus.IN_RESERVES:
         return _invalid(state, "Stratagem placement proposal reserve drift.", "reserve_drift")

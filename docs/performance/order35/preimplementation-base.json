@@ -1,0 +1,345 @@
+{
+  "workload_id": "order35-rapid-ingress-v1",
+  "commit": "42760e107d361f30bdf19b5d9fa6c2cc67fb9c7a",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "hardware_status": "provisional; one process, no concurrent test workers",
+  "timing_boundary": "setup separate; availability, target enumeration and legal Movement-end facade target submission; stop at placement request",
+  "terrain_shapes": 0,
+  "models_per_unit": 5,
+  "decision_policy": "remain stationary; select legal reserve target",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_rapid_ingress.py": "5273cf1013296052211574cadcee3d43bb50d24a2f8bbd25da3ddd52cd66ef71",
+    "tests/rapid_ingress_helpers.py": "0586f0dd091c10e41c35fa423370dbe3c73185b16960efd3d7b48d0c964f9c05",
+    "tests/core_stratagem_helpers.py": "d098224f87a1f1f08d8ca4216dacec9ea241b18f337c426e06a88ee2751cf9a5",
+    "tests/setup_completion_helpers.py": "c95866658729694a06365e7b517d84d330abb4b56c8db5ef886b62127b535d25",
+    "tests/unit_keyword_helpers.py": "3f290f4f7bcd08cdb65d01f8b3cb062da3ba919aa426a4ba190fae1eafd862a5",
+    "tests/psychic_modifier_helpers.py": "6b6b802c4cb40d4f657d6e68c9b74d1b462f9ab0e5f0b29146c2f809355e4bd9"
+  },
+  "summaries": {
+    "legal": {
+      "mean": 0.010610005984615003,
+      "median": 0.010572124971076846,
+      "p95": 0.0108162920223549,
+      "max": 0.0108162920223549,
+      "samples": 7,
+      "completion_rate": 1.0,
+      "slices_per_second": 94.25065371782505
+    },
+    "first_round": {
+      "mean": 5.130371677556208e-05,
+      "median": 5.024997517466545e-05,
+      "p95": 5.64999645575881e-05,
+      "max": 5.64999645575881e-05,
+      "samples": 7,
+      "completion_rate": 1.0,
+      "slices_per_second": 19491.765175117645
+    },
+    "aircraft": {
+      "mean": 5.4357157621000495e-05,
+      "median": 5.6124990805983543e-05,
+      "p95": 6.250001024454832e-05,
+      "max": 6.250001024454832e-05,
+      "samples": 7,
+      "completion_rate": 1.0,
+      "slices_per_second": 18396.841258190758
+    },
+    "mixed": {
+      "mean": 0.06739656558992076,
+      "median": 0.05837725009769201,
+      "p95": 0.09145904204342514,
+      "max": 0.09145904204342514,
+      "samples": 7,
+      "completion_rate": 1.0,
+      "slices_per_second": 14.837551309136014
+    }
+  },
+  "samples": [
+    {
+      "case": "legal",
+      "setup_seconds": 2.2834748330060393,
+      "slice_seconds": 0.010606708005070686,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "legal",
+      "setup_seconds": 0.4272474580211565,
+      "slice_seconds": 0.0108162920223549,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "legal",
+      "setup_seconds": 0.4253179160878062,
+      "slice_seconds": 0.01046691695228219,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "legal",
+      "setup_seconds": 0.4263620830606669,
+      "slice_seconds": 0.010569749982096255,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "legal",
+      "setup_seconds": 0.4610429999884218,
+      "slice_seconds": 0.010719249956309795,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "legal",
+      "setup_seconds": 0.4296037080930546,
+      "slice_seconds": 0.010572124971076846,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "legal",
+      "setup_seconds": 0.42697545792907476,
+      "slice_seconds": 0.010519000003114343,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.2663462080527097,
+      "slice_seconds": 4.658394027501345e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.26396283390931785,
+      "slice_seconds": 4.733307287096977e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.26507029205095023,
+      "slice_seconds": 5.64999645575881e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.2643438329687342,
+      "slice_seconds": 5.579204298555851e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.264456040924415,
+      "slice_seconds": 4.891701973974705e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.26502654200885445,
+      "slice_seconds": 5.024997517466545e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.26444195793010294,
+      "slice_seconds": 5.3750001825392246e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.42881095805205405,
+      "slice_seconds": 4.724995233118534e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.42638970795087516,
+      "slice_seconds": 6.17919722571969e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.4305418749572709,
+      "slice_seconds": 4.6375091187655926e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.4267785419942811,
+      "slice_seconds": 5.6124990805983543e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.4286623749649152,
+      "slice_seconds": 5.033309571444988e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.4330886659445241,
+      "slice_seconds": 5.6124990805983543e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.48273212497588247,
+      "slice_seconds": 6.250001024454832e-05,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "submitted": false,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.1691837499383837,
+      "slice_seconds": 0.0569321250077337,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.1108969169436023,
+      "slice_seconds": 0.09145904204342514,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.1164307079743594,
+      "slice_seconds": 0.05837725009769201,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.0887265829369426,
+      "slice_seconds": 0.09057466697413474,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.119593832991086,
+      "slice_seconds": 0.05731750000268221,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.1240005829604343,
+      "slice_seconds": 0.05770524998661131,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.1485154590336606,
+      "slice_seconds": 0.05941012501716614,
+      "inventory_size": 16,
+      "eligible_targets": 16,
+      "unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {}
+    }
+  ],
+  "full_game_certified": false
+}
