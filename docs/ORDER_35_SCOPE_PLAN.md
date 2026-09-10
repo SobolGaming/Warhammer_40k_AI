@@ -81,3 +81,7 @@ actual placement and parent continuation because preflight now authenticates
 that checkpoint; it will be measured on the same exact base and head with
 identical benchmark/fixture hashes. This extends evidence without dropping any
 of the originally measured cases.
+
+Final author validation and exact tested identities are recorded in
+[ORDER_35_VALIDATION.md](ORDER_35_VALIDATION.md). Local gates passed; full CI and
+independent approval remain separate requirements.
