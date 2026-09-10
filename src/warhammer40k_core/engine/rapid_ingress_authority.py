@@ -23,6 +23,7 @@ from warhammer40k_core.engine.stratagems_model import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 
 
 def rapid_ingress_placement_error(
@@ -114,6 +115,7 @@ def validate_pending_rapid_ingress_authority(
     pending_request: DecisionRequest | None,
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
 ) -> None:
     if pending_request is None:
         return
@@ -134,7 +136,9 @@ def validate_pending_rapid_ingress_authority(
         validate_primary_reserve_arrival_ingress_use_authority,
     )
     from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
-    from warhammer40k_core.engine.stratagems_selection import _stratagem_unavailable_reason
+    from warhammer40k_core.engine.stratagems_requests import (
+        _parameterized_stratagem_unavailable_reason,  # pyright: ignore[reportPrivateUsage]
+    )
 
     core = next(
         record
@@ -150,8 +154,12 @@ def validate_pending_rapid_ingress_authority(
         )
         if target.catalog_record != core or target.target_binding is not None:
             raise GameLifecycleError("Pending Rapid Ingress target source drift.")
-        error = _stratagem_unavailable_reason(
-            state=state, record=core, context=target.context, target_binding=None
+        error = _parameterized_stratagem_unavailable_reason(
+            state=state,
+            record=core,
+            context=target.context,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            require_legal_affordable_target=False,
         )
         if error is not None:
             raise GameLifecycleError(f"Pending Rapid Ingress target is ineligible: {error}.")

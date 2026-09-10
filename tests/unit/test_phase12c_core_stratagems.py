@@ -7434,7 +7434,10 @@ def test_order35_pending_restore_rejects_eligibility_and_origin_forgery(
 
 
 @pytest.mark.parametrize("reacting_player", ["player-a", "player-b"])
-def test_order35_checkpoints_preserve_exact_replay_and_both_viewers(reacting_player: str) -> None:
+@pytest.mark.parametrize("discounted", [False, True])
+def test_order35_checkpoints_preserve_exact_replay_and_both_viewers(
+    reacting_player: str, discounted: bool
+) -> None:
     from tests.rapid_ingress_helpers import (
         ingress_placement,
         ingress_session,
@@ -7446,9 +7449,18 @@ def test_order35_checkpoints_preserve_exact_replay_and_both_viewers(reacting_pla
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 
-    session = ingress_session(reacting_player=reacting_player)
+    session = ingress_session(reacting_player=reacting_player, automatic_discount=discounted)
+    state = _state(session.lifecycle)
+    if discounted:
+        state.spend_command_points(
+            player_id=reacting_player,
+            amount=state.command_point_total(reacting_player),
+            source_id="test:order35:zero-cp",
+        )
+        assert state.command_point_total(reacting_player) == 0
     session._initial_replay_lifecycle_payload = session.lifecycle.to_payload()  # pyright: ignore[reportPrivateUsage]
     request = reach_ingress_window(session)
+    assert request.decision_type == "submit_stratagem_target_proposal"
     for checkpoint in ("target", "placement", "arrived"):
         payload = _lifecycle_payload_copy(session.lifecycle)
         assert GameLifecycle.from_payload(payload).to_payload() == payload
@@ -7465,7 +7477,14 @@ def test_order35_checkpoints_preserve_exact_replay_and_both_viewers(reacting_pla
                 EventStreamCursor(), viewer_player_id=viewer
             ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
         if checkpoint == "target":
+            restored_request = _decision_request(submit_ingress_target(restored, request))
             request = _decision_request(submit_ingress_target(session, request))
+            assert restored_request == request
+            assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+            use = _state(restored.lifecycle).stratagem_use_records[-1]
+            assert use.command_point_cost == (0 if discounted else 1)
+            assert bool(use.command_point_modifier_ids) is discounted
+            session = restored
         elif checkpoint == "placement":
             status = session.submit_parameterized_payload(
                 request_id=request.request_id,
@@ -7473,6 +7492,25 @@ def test_order35_checkpoints_preserve_exact_replay_and_both_viewers(reacting_pla
                 payload=validate_json_value(ingress_placement(session, request).to_payload()),
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID
+
+
+@pytest.mark.parametrize("reacting_player", ["player-a", "player-b"])
+def test_order35_pending_restore_rejects_unaffordable_target_without_discount(
+    reacting_player: str,
+) -> None:
+    from tests.rapid_ingress_helpers import ingress_session, reach_ingress_window
+
+    session = ingress_session(reacting_player=reacting_player)
+    request = reach_ingress_window(session)
+    assert request.decision_type == "submit_stratagem_target_proposal"
+    state = _state(session.lifecycle)
+    state.spend_command_points(
+        player_id=reacting_player,
+        amount=state.command_point_total(reacting_player),
+        source_id="test:order35:unaffordable-checkpoint",
+    )
+    with pytest.raises(GameLifecycleError, match="insufficient_command_points"):
+        GameLifecycle.from_payload(_lifecycle_payload_copy(session.lifecycle))
 
 
 @pytest.mark.parametrize(

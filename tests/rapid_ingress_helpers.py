@@ -9,6 +9,12 @@ from tests.core_stratagem_helpers import _battle_lifecycle, _config, _reserve_pl
 from tests.psychic_modifier_helpers import pending_request
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -27,6 +33,12 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as keyword_lexicon,
+)
 
 
 def ingress_session(
@@ -34,11 +46,40 @@ def ingress_session(
     battle_round: int = 2,
     reacting_player: str = "player-b",
     inventory: tuple[str, ...] = ("INFANTRY",),
+    automatic_discount: bool = False,
 ) -> LocalGameSession:
     # Both player identities react using identical armies and authoritative turn order.
     active = "player-a" if reacting_player == "player-b" else "player-b"
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     sheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    if automatic_discount:
+        source = RuleSourceText.from_raw(
+            source_id="test:order35:automatic-discount",
+            raw_text=(
+                "Each time you target this model's unit with a Stratagem, reduce the CP cost "
+                "of that use of that Stratagem by 1CP."
+            ),
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+        )
+        rule_ir = compile_rule_source_text(
+            source,
+            source_keyword_sequence_parts=keyword_lexicon.canonical_datasheet_keyword_sequence_parts(),
+        ).rule_ir
+        sheet = replace(
+            sheet,
+            abilities=(
+                *sheet.abilities,
+                DatasheetAbilityDescriptor(
+                    ability_id="order35-automatic-discount",
+                    name="Automatic discount fixture",
+                    source_id=source.source_id,
+                    support=CatalogAbilitySupport.GENERIC_RULE_IR,
+                    source_kind=CatalogAbilitySourceKind.DATASHEET,
+                    effect_description=source.raw_text,
+                    rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+                ),
+            ),
+        )
     variants = tuple(
         replace(
             sheet,

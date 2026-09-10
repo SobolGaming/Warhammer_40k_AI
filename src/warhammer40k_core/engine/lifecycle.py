@@ -969,12 +969,6 @@ class GameLifecycle:
             decision_records=lifecycle.decision_controller.records,
             pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
-        validate_pending_battlefield_request_consistency(
-            state=lifecycle._require_state(),
-            pending_request=lifecycle._pending_decision_request(),
-            decision_records=lifecycle.decision_controller.records,
-            event_records=lifecycle.decision_controller.event_log.records,
-        )
         validate_reaction_queue_consistency(
             state=lifecycle._require_state(),
             reaction_queue=lifecycle.reaction_queue,
@@ -985,6 +979,17 @@ class GameLifecycle:
             preserve_existing_bundle=runtime_content_bundle is not None,
         )
         refreshed_bundle = lifecycle._runtime_content_bundle
+        validate_pending_battlefield_request_consistency(
+            state=lifecycle._require_state(),
+            pending_request=lifecycle._pending_decision_request(),
+            decision_records=lifecycle.decision_controller.records,
+            event_records=lifecycle.decision_controller.event_log.records,
+            stratagem_cost_modifier_registry=(
+                None
+                if refreshed_bundle is None
+                else refreshed_bundle.stratagem_cost_modifier_registry
+            ),
+        )
         _bs_restore.validate_restored_battle_shock_continuations(
             state=lifecycle._require_state(),
             decisions=lifecycle.decision_controller,

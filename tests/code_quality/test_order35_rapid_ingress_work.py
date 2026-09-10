@@ -47,3 +47,21 @@ def test_rapid_ingress_target_preflight_does_not_reenumerate_all_reserves() -> N
     }
     assert "rapid_ingress_target_error" in calls
     assert "_rapid_ingress_unit_ids" not in calls
+
+
+def test_pending_rapid_ingress_uses_target_aware_affordability_with_runtime_modifiers() -> None:
+    tree = ast.parse((ROOT / "src/warhammer40k_core/engine/rapid_ingress_authority.py").read_text())
+    calls = [
+        (node.func.id, node)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    ]
+    assert not any(name == "_stratagem_unavailable_reason" for name, _ in calls)
+    checks = [node for name, node in calls if name == "_parameterized_stratagem_unavailable_reason"]
+    assert len(checks) == 1
+    assert any(
+        keyword.arg == "stratagem_cost_modifier_registry"
+        and isinstance(keyword.value, ast.Name)
+        and keyword.value.id == "stratagem_cost_modifier_registry"
+        for keyword in checks[0].keywords
+    )

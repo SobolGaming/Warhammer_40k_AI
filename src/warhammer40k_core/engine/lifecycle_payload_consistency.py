@@ -20,6 +20,7 @@ from warhammer40k_core.engine.prebattle import (
 from warhammer40k_core.engine.rapid_ingress_authority import (
     validate_pending_rapid_ingress_authority,
 )
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.unit_split_runtime import validate_unit_split_checkpoint
 
 
@@ -76,12 +77,14 @@ def validate_pending_battlefield_request_consistency(
     pending_request: DecisionRequest | None,
     decision_records: tuple[DecisionRecord, ...],
     event_records: tuple[EventRecord, ...],
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
 ) -> None:
     validate_pending_rapid_ingress_authority(
         state=state,
         pending_request=pending_request,
         decision_records=decision_records,
         event_records=event_records,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     validate_unit_split_checkpoint(
         state=state,
