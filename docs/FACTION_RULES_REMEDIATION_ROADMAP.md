@@ -248,7 +248,7 @@ complete-provenance record is admitted.
 | --- | --- |
 | T1 | Stratagem WHEN taxonomy over every distinct Stratagem: the closed window set and the gap list against the current 27 `TimingTriggerKind` values plus reaction and opportunity windows. **Delivered** read-only to Track G in [T1_STRATAGEM_WHEN_TAXONOMY.md](factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md); the previous "26" count was stale |
 | T2 | Effect taxonomy for abilities, Enhancements, Stratagems and detachment rules: RuleIR template catalogue with counts (hit/wound/save/damage modifiers, rerolls, weapon keyword and profile grants, Feel No Pain and damage reduction, invulnerable/save grants, movement permissions, redeploy/teleport, reserves changes, mortal wounds, fight-order changes, target restrictions, keyword grants, resource gain/spend, healing/revival/return, transport interactions, weapon grants, attachment changes, OC changes, CP gain/refund, Battle-shock manipulation). **Delivered** read-only to Track G in [T2_EFFECT_TAXONOMY.md](factions/taxonomy/T2_EFFECT_TAXONOMY.md) |
-| T3 | Bearer, target and condition grammar, including state tokens such as "riled up" or "Waaagh! active", ranges, visibility, phase and turn ownership |
+| T3 | Bearer, target and condition grammar, including state tokens such as "riled up" or "Waaagh! active", ranges, visibility, phase and turn ownership. **Delivered** read-only to Track G in [T3_BEARER_TARGET_CONDITION_GRAMMAR.md](factions/taxonomy/T3_BEARER_TARGET_CONDITION_GRAMMAR.md) |
 | T4 | Army-construction grammar: DP budgets per battle size, multiple detachments per army, force-disposition consistency, duplicate-detachment prohibition, required and prohibited units and detachments, Enhancement counts, Enhancement-only detachments (Brute Bosses has six Enhancements and no Stratagems), related-army admission and caps, model-specific Warlord and bearer. **Delivered** read-only to Core P25C in [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) before P25C is implemented |
 | T5 | Resource and state-token taxonomy across all 28 army rules (Miracle dice, Pain, Blessings, Battle Focus, Waaagh!, Strands of Fate, Yield, Cabal, Doctrina, Dread, Oath, Vows, Ka'tah, Orders, Kill Teams, Cult Ambush, Reanimation, Synapse/Shadow, Greater Good, Gate of Infinity, Assigned Agents, Code Chivalric, Power from Pain, Thrill Seekers, Dark Pacts, Nurgle's Gift, Shadow of Chaos): which share a typed `ResourceLedger` service and which remain bespoke state machines under the named-handler budget |
 | T6 | Decision-kind and viewer-visibility demand: finite options versus parameterized proposals per rule family; adapter contract deltas |
@@ -257,7 +257,8 @@ Output: `semantic_demand_matrix.json` plus a generated table, regenerated on
 every content-set change. Pre-gate surveys are planning evidence; FM0
 regenerates the matrix from the retained content set and reconciles it with
 the surveys. T1's [`t1_when_windows.json`](factions/taxonomy/t1_when_windows.json),
-T2's [`t2_effect_families.json`](factions/taxonomy/t2_effect_families.json)
+T2's [`t2_effect_families.json`](factions/taxonomy/t2_effect_families.json),
+T3's [`t3_bearer_target_conditions.json`](factions/taxonomy/t3_bearer_target_conditions.json)
 and T4's [`t4_constraint_families.json`](factions/taxonomy/t4_constraint_families.json)
 are planning evidence only and are not that matrix.
 
@@ -272,7 +273,10 @@ windows and opponent reaction windows (T1 delivered the closed WHEN set and
 gap list in [T1_STRATAGEM_WHEN_TAXONOMY.md](factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md));
 the EFFECT catalogue (T2 delivered the closed family set and gap list in
 [T2_EFFECT_TAXONOMY.md](factions/taxonomy/T2_EFFECT_TAXONOMY.md));
-bearer, target and condition grammar (T3); army-construction constraint
+bearer, target and condition grammar (T3 delivered the closed bearer, TARGET
+clause and condition set in
+[T3_BEARER_TARGET_CONDITION_GRAMMAR.md](factions/taxonomy/T3_BEARER_TARGET_CONDITION_GRAMMAR.md));
+army-construction constraint
 records on Core P25C surfaces (T4 delivered the grammar in
 [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md));
 shared resource ledgers (T5); decision-kind and viewer-visibility demand (T6).
@@ -548,6 +552,8 @@ Permitted in parallel with the remaining Core Rules orders:
   [T1_STRATAGEM_WHEN_TAXONOMY.md](factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md).
   T2 is delivered:
   [T2_EFFECT_TAXONOMY.md](factions/taxonomy/T2_EFFECT_TAXONOMY.md).
+  T3 is delivered:
+  [T3_BEARER_TARGET_CONDITION_GRAMMAR.md](factions/taxonomy/T3_BEARER_TARGET_CONDITION_GRAMMAR.md).
   T4 is delivered:
   [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md);
 - the S2 identity model design document: ID registry scheme, crosswalk schema,
