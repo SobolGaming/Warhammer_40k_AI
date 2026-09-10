@@ -1,0 +1,14 @@
+{
+  "name": "r34-final-base-attached-diagnostic",
+  "command": "git rev-parse HEAD HEAD:src\nPYTHONPATH=.:src /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python -c 'import faulthandler; faulthandler.dump_traceback_later(15); from scripts.measure_action_restriction_live import live_sample; print(live_sample(profile=True, case=\"attached\"))'",
+  "cwd": "/private/tmp/order34-base",
+  "start_utc": "2026-09-09T19:31:41.119849+00:00",
+  "deadline_seconds": 30.0,
+  "log": "/private/tmp/order34-evidence/r34-final-base-attached-diagnostic.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 33105,
+  "outcome": "timeout",
+  "exit_status": -15,
+  "elapsed_seconds": 30.207,
+  "committed_log": "r34-final-base-attached-diagnostic.txt"
+}

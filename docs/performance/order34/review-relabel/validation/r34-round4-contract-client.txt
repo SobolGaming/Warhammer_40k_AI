@@ -1,0 +1,79 @@
+src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_actions_2026_09/artifacts/package.json: b9027d83c608961b9cde5baae546bbb97336235b8b9a6297b182cf0e93fad8aa
+data/source_audits/maintained_app_mirrors/actions_2026_09_09.audit.json: 8a892909f39bad2c421bb8b554f1b74ff7644187a42a66516b067430ad1bbe6f
+src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_indirect_shooting_2026_09/artifacts/package.json: ce825fb4882d3cfe009afa2f49572adb6e464e48ef9082dfe058e26b52bcaf3e
+data/source_audits/maintained_app_mirrors/indirect_shooting_2026_09_09.audit.json: 615a5eb5da7ed60010ee9cae39b65215500738f1d89407a6698b8d8276463779
+Engine build identity is current: warhammer40k-core-v2:runtime-tree-sha256-v1:5a5378bf4bcfdc69a49e723c4a9e1fe5237a08019dbae5b0a383b1e38608ce65
+Building wheel...
+Successfully built /private/var/folders/8h/xvtnq1wn6_v5bpknbvb9vl880000gp/T/phase18d-installed-wheel-25lk454n/wheel/warhammer40k_core_v2-0.1.0-py3-none-any.whl
+Using CPython 3.14.5 interpreter at: /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+Creating virtual environment at: /private/var/folders/8h/xvtnq1wn6_v5bpknbvb9vl880000gp/T/phase18d-installed-wheel-25lk454n/environment
+Activate with: source /private/var/folders/8h/xvtnq1wn6_v5bpknbvb9vl880000gp/T/phase18d-installed-wheel-25lk454n/environment/bin/activate
+Using Python 3.14.5 environment at: /private/var/folders/8h/xvtnq1wn6_v5bpknbvb9vl880000gp/T/phase18d-installed-wheel-25lk454n/environment
+Resolved 16 packages in 547ms
+Prepared 1 package in 163ms
+Installed 16 packages in 73ms
+ + annotated-types==0.8.0
+ + attrs==26.1.0
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + msgspec==0.21.1
+ + numpy==2.5.3
+ + orjson==3.12.0
+ + pydantic==2.13.5
+ + pydantic-core==2.46.5
+ + referencing==0.37.0
+ + rpds-py==2026.6.3
+ + shapely==2.1.2
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + warhammer40k-core-v2==0.1.0 (from file:///private/var/folders/8h/xvtnq1wn6_v5bpknbvb9vl880000gp/T/phase18d-installed-wheel-25lk454n/wheel/warhammer40k_core_v2-0.1.0-py3-none-any.whl)
+ + z3-solver==4.15.4.0
+{"engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5a5378bf4bcfdc69a49e723c4a9e1fe5237a08019dbae5b0a383b1e38608ce65", "engine_resource_count": 2636, "package_path": "/private/var/folders/8h/xvtnq1wn6_v5bpknbvb9vl880000gp/T/phase18d-installed-wheel-25lk454n/environment/lib/python3.14/site-packages/warhammer40k_core/adapters/external_contract.py", "schema_count": 27, "validated_request_families": ["create", "finite", "parameterized", "session_create", "session_command", "parameterized_session_command"]}
+
+added 42 packages in 2s
+npm warn install-scripts 2 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   esbuild@0.28.1 (postinstall: node install.js)
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+
+> @warhammer40k-core/phase18m-conformance@0.1.0 check
+> npm run check:generated && npm run typecheck
+
+
+> @warhammer40k-core/phase18m-conformance@0.1.0 check:generated
+> node scripts/check-generated.mjs
+
+
+> @warhammer40k-core/phase18m-conformance@0.1.0 typecheck
+> tsc --noEmit
+
+
+> @warhammer40k-core/phase18m-conformance@0.1.0 test:unit
+> tsx --test src/**/*.test.ts
+
+✔ generated client round-trips the Phase 18J battlefield coordinate contract (262.38625ms)
+✔ published geometry fixture crosses every generated battlefield union surface (192.018666ms)
+✔ canonical replay comparison ignores JSON property order and whitespace (0.561292ms)
+✔ canonical replay comparison preserves semantic array and value differences (0.18625ms)
+✔ generated client constructs every published interaction conformance case (255.389125ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 633.921042
+
+> @warhammer40k-core/phase18m-conformance@0.1.0 conformance
+> tsx src/main.ts
+
+{
+  "assertion_count": 342,
+  "client_language": "typescript",
+  "contract_version": "14.0.0",
+  "replay_sha256": "e1dbd328761732588a3a324778ebc78e43e93e123df5f195787ea44ab06593e4",
+  "scenario_id": "phase18m-a-certified-setup",
+  "status": "passed"
+}

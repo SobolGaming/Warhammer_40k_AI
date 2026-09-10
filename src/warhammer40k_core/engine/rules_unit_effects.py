@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.aura_applications import (
     non_stacking_aura_applications,
@@ -113,3 +113,39 @@ def rules_unit_persisting_effects(
             for effect in state.persisting_effects_for_unit(identity_id)
         )
     )
+
+
+def validate_persisting_effects(
+    effects: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+    player_ids: tuple[str, ...],
+) -> list[PersistingEffect]:
+    from warhammer40k_core.engine.activity_restrictions import activity_restriction_payload
+
+    if not isinstance(effects, list):
+        raise GameLifecycleError("GameState persisting_effects must be a list.")
+    unit_ids = known_effect_target_unit_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
+    validated: list[PersistingEffect] = []
+    seen: set[str] = set()
+    for effect in cast(list[object], effects):
+        if type(effect) is not PersistingEffect:
+            raise GameLifecycleError(
+                "GameState persisting_effects must contain PersistingEffect values."
+            )
+        if effect.owner_player_id not in player_ids:
+            raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
+        if not unit_ids:
+            raise GameLifecycleError("PersistingEffect requires mustered army definitions.")
+        if any(unit_id not in unit_ids for unit_id in effect.target_unit_instance_ids):
+            raise GameLifecycleError("PersistingEffect target unit is unknown.")
+        if effect.effect_id in seen:
+            raise GameLifecycleError("GameState persisting_effects must be unique.")
+        activity_restriction_payload(effect)
+        seen.add(effect.effect_id)
+        validated.append(effect)
+    return sorted(validated, key=lambda effect: effect.effect_id)

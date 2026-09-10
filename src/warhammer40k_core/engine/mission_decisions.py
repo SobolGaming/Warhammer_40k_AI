@@ -959,6 +959,7 @@ def _apply_start_mission_action(
             decline_option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
             boundary_checkpoint=boundary_checkpoint,
             boundary_checkpoint_evidence=_checkpoint,
+            event_records=decisions.event_log.records,
             runtime_modifier_registry=runtime_modifier_registry,
         )
     eligible_unit_instance_ids = (

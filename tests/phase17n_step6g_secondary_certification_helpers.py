@@ -277,6 +277,7 @@ def secondary_certification_session(
         state,
         row,
         event_log=decisions.event_log,
+        decisions=decisions,
     )
     if not any(
         snapshot.active_player_id == state.active_player_id

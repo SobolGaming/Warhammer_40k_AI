@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-fight-failure-probe",
+  "command": "uv run pytest tests/integration/test_ws13_adapter_phase_families.py::test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices -q -n0 --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-10T00:15:08.135731+00:00",
+  "deadline_seconds": 120.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-fight-failure-probe.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 98624,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 4.822
+}

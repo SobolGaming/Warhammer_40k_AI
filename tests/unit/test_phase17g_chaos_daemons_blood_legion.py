@@ -3717,7 +3717,17 @@ def _destroy_enemy_unit_with_gateway_attack(
         ),
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
     )
-    sequence_id = "phase17g-gateway-attack-destruction"
+    from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
+
+    state.replace_shooting_phase_state(
+        ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            shot_unit_ids=(attacker.unit_instance_id,),
+        )
+    )
+    sequence_id = "attack-sequence:phase17g-gateway-attack-destruction"
     attack_context_id = f"{sequence_id}:pool-001:attack-001"
     hit_spec = attack_sequence_hit_roll_spec(
         weapon_profile_id=weapon_profile.profile_id,
@@ -3736,23 +3746,34 @@ def _destroy_enemy_unit_with_gateway_attack(
         attack_context_id=attack_context_id,
     )
 
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
+        result_id=sequence_id.removeprefix("attack-sequence:"),
+    )
     remaining, _allocated_model_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=decisions,
         ruleset_descriptor=config.ruleset_descriptor,
-        attack_sequence=AttackSequence.start(
-            sequence_id=sequence_id,
-            attacker_player_id="player-a",
-            attacking_unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
-            attack_pools=(
-                _attack_pool_for_test(
-                    attacker=attacker,
-                    defender=defender,
-                    weapon_profile=weapon_profile,
-                    attacks=1,
-                ),
-            ),
-        ),
+        attack_sequence=sequence,
         already_allocated_model_ids=(),
         dice_manager=DiceRollManager(
             sequence_id,

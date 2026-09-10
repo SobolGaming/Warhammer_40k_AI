@@ -1,0 +1,180 @@
+{
+  "base_sha": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "head_sha": "5b6752ff07bc5b86e91054a7822ee7ea7dadf7cb",
+  "comparability_hashes_match": true,
+  "timing_checks": {
+    "action": {
+      "base_mean": 0.12494266671793801,
+      "head_mean": 0.12001120229251683,
+      "head_maximum": 0.12097929208539426,
+      "ratio": 0.9605301811225615,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "unrestricted": {
+      "base_mean": 0.07519289255807442,
+      "head_mean": 0.07276786314988774,
+      "head_maximum": 0.07852504099719226,
+      "ratio": 0.967749220362633,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "attached_selection": {
+      "base_mean": 0.006873416714370251,
+      "head_mean": 0.004221702310522752,
+      "head_maximum": 0.004699583048932254,
+      "ratio": 0.6142072401483297,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "retained": {
+      "base_mean": 0.2113149464296709,
+      "head_mean": 0.21272189288200544,
+      "head_maximum": 0.24628012510947883,
+      "ratio": 1.0066580546057247,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "visible-self-observer": {
+      "base_mean": 0.12519274986282522,
+      "head_mean": 0.12768344040627458,
+      "head_maximum": 0.13670466595795006,
+      "ratio": 1.0198948465160995,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "unseen-no-observer": {
+      "base_mean": 0.42738474399915766,
+      "head_mean": 0.4354089463262686,
+      "head_maximum": 0.49082795809954405,
+      "ratio": 1.0187751257848519,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    },
+    "unseen-friendly-observer": {
+      "base_mean": 0.33445824998697,
+      "head_mean": 0.3463878154455285,
+      "head_maximum": 0.38802441698499024,
+      "ratio": 1.0356683246982943,
+      "sample_counts": [
+        7,
+        7
+      ],
+      "passed": true
+    }
+  },
+  "work_checks": {
+    "action": {
+      "base": {
+        "rules_unit_view_by_id": 425,
+        "rules_unit_identity_ids": 514,
+        "expire_persisting_effects_at_boundary": 4,
+        "persisting_effects_for_lineage": 119
+      },
+      "head": {
+        "rules_unit_view_by_id": 524,
+        "record_persisting_effect": 1,
+        "rules_unit_identity_ids": 112,
+        "expire_persisting_effects_at_boundary": 4,
+        "persisting_effects_for_lineage": 523
+      },
+      "passed": true
+    },
+    "unrestricted": {
+      "base": {
+        "rules_unit_view_by_id": 211,
+        "applies_to_unit": 6432,
+        "resolve_line_of_sight": 90,
+        "resolve_visibility_pair": 7,
+        "_legal_charging_unit_ids": 2,
+        "rules_unit_identity_ids": 13,
+        "resolve_visibility_pair_uncached": 7,
+        "expire_persisting_effects_at_boundary": 4,
+        "_legal_shooting_unit_ids": 2,
+        "persisting_effects_for_lineage": 178
+      },
+      "head": {
+        "rules_unit_view_by_id": 219,
+        "applies_to_unit": 7155,
+        "resolve_line_of_sight": 69,
+        "resolve_visibility_pair": 7,
+        "_legal_charging_unit_ids": 2,
+        "persisting_effects_for_lineage": 192,
+        "invalid_shooting_unit_selection_status": 1,
+        "rules_unit_identity_ids": 6,
+        "expire_persisting_effects_at_boundary": 4,
+        "resolve_visibility_pair_uncached": 7,
+        "_legal_shooting_unit_ids": 3
+      },
+      "passed": true
+    },
+    "attached_selection": {
+      "base": {
+        "rules_unit_view_by_id": 23,
+        "applies_to_unit": 832,
+        "resolve_line_of_sight": 30,
+        "rules_unit_identity_ids": 2,
+        "_legal_shooting_unit_ids": 1,
+        "persisting_effects_for_lineage": 26
+      },
+      "head": {
+        "rules_unit_view_by_id": 25,
+        "applies_to_unit": 1056,
+        "resolve_line_of_sight": 9,
+        "_legal_shooting_unit_ids": 2,
+        "persisting_effects_for_lineage": 30,
+        "invalid_shooting_unit_selection_status": 1
+      },
+      "passed": true
+    },
+    "retained": {
+      "base": {
+        "rules_unit_view_by_id": 276,
+        "applies_to_unit": 5226,
+        "resolve_line_of_sight": 45,
+        "resolve_visibility_pair": 6,
+        "_legal_charging_unit_ids": 1,
+        "rules_unit_identity_ids": 26,
+        "resolve_visibility_pair_uncached": 6,
+        "expire_persisting_effects_at_boundary": 10,
+        "_legal_shooting_unit_ids": 2,
+        "persisting_effects_for_lineage": 165
+      },
+      "head": {
+        "rules_unit_view_by_id": 290,
+        "applies_to_unit": 5732,
+        "resolve_line_of_sight": 48,
+        "resolve_visibility_pair": 6,
+        "_legal_charging_unit_ids": 1,
+        "_legal_shooting_unit_ids": 3,
+        "rules_unit_identity_ids": 23,
+        "resolve_visibility_pair_uncached": 6,
+        "expire_persisting_effects_at_boundary": 10,
+        "persisting_effects_for_lineage": 179,
+        "invalid_shooting_unit_selection_status": 1
+      },
+      "passed": true
+    }
+  },
+  "all_required_budgets_passed": true,
+  "full_attached_declaration_diagnostic": "incomplete: exact visibility solver exceeds deadline on both base and head; retained separately",
+  "full_game_certified": false
+}

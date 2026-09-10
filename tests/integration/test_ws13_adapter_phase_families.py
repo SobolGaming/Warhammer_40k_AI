@@ -967,16 +967,26 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
         source_model_instance_id=attack_pool.attacker_model_instance_id,
         source_weapon_profile=attack_pool.weapon_profile,
         target_unit_instance_id=defender.unit_instance_id,
-        attack_context_id="ws13-mortal-wound-model-choice:pool-001:attack-001",
+        attack_context_id="attack-sequence:ws13-mortal-wound-model-choice:pool-001:attack-001",
         mortal_wounds=1,
     )
     sequence = AttackSequence(
-        sequence_id="ws13-mortal-wound-model-choice",
+        sequence_id="attack-sequence:ws13-mortal-wound-model-choice",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(attack_pool,),
         pool_index=1,
         deferred_mortal_wounds=(deferred,),
+    )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id="ws13-mortal-wound-model-choice",
     )
     remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
@@ -1015,6 +1025,8 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
         decline_allowed=True,
     )
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    # This executor checkpoint retains an accepted declaration before adapter choices begin.
+    session._initial_replay_lifecycle_payload = lifecycle.to_payload()  # pyright: ignore[reportPrivateUsage]
     request = _assert_request(
         session.advance_until_decision_or_terminal(),
         SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
@@ -1536,22 +1548,32 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         weapon_profile=weapon_profile,
         attacks=1,
     )
+    from tests.completed_attack_fixture_helpers import record_melee_declaration_for_executor_fixture
+
+    result_id = "ws13-fight-mortal-wound-declaration"
+    sequence_id = (
+        f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
+        f"{attacker.unit_instance_id}:{result_id}"
+    )
     deferred = DeferredMortalWounds(
         source_rule_id="weapon-ability:devastating-wounds",
         source_model_instance_id=attack_pool.attacker_model_instance_id,
         source_weapon_profile=attack_pool.weapon_profile,
         target_unit_instance_id=defender.unit_instance_id,
-        attack_context_id="ws13-fight-mortal-wound-model-fnp:pool-001:attack-001",
+        attack_context_id=f"{sequence_id}:pool-001:attack-001",
         mortal_wounds=1,
     )
     sequence = AttackSequence(
-        sequence_id="ws13-fight-mortal-wound-model-fnp",
+        sequence_id=sequence_id,
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(attack_pool,),
         source_phase=BattlePhase.FIGHT,
         pool_index=1,
         deferred_mortal_wounds=(deferred,),
+    )
+    record_melee_declaration_for_executor_fixture(
+        state=state, decisions=lifecycle.decision_controller, sequence=sequence, result_id=result_id
     )
     remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
@@ -1633,6 +1655,7 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         }
     )
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    session._initial_replay_lifecycle_payload = lifecycle.to_payload()  # pyright: ignore[reportPrivateUsage]
     restored_model_request = _assert_request(
         session.advance_until_decision_or_terminal(),
         SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,

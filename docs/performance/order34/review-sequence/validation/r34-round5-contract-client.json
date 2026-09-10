@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-contract-client",
+  "command": "uv run --no-sync python tools/build_core_actions_source.py --check\nuv run --no-sync python tools/build_core_indirect_shooting_source.py --check\nuv run --no-sync python tools/build_core_stratagem_app_source.py --check\nuv run --no-sync python scripts/build_engine_build_identity.py --check\nuv run --no-sync python scripts/build_external_contract.py --check --base-ref e56c1a4caf2a6915548222caed0872627f8dbf43\nuv run --no-sync python scripts/smoke_installed_contract_wheel.py\nexport PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/private/tmp/order33-evidence/npm-runtime/node_modules/.bin:${PATH}\"\ncd conformance/typescript\nnpm ci --no-audit --no-fund\nnpm run check\nnpm run test:unit\nnpm run conformance",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-10T00:05:57.014526+00:00",
+  "deadline_seconds": 480.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-contract-client.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 94939,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 182.676
+}

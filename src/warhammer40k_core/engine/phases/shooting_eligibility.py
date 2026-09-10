@@ -72,21 +72,19 @@ def _legal_shooting_unit_ids(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+    candidate_unit_ids: tuple[str, ...] | None = None,
 ) -> tuple[str, ...]:
     scenario = _battlefield_scenario(state)
     active_player_id = _active_player_id(state)
     placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
     legal: list[str] = []
     for unit_id in placed_unit_ids:
+        if candidate_unit_ids is not None and unit_id not in candidate_unit_ids:
+            continue
         if (
             unit_id in shooting_state.selected_unit_ids
             or unit_id in shooting_state.shot_unit_ids
             or unit_id in shooting_state.skipped_unit_ids
-            or mission_action_prevents_rules_unit_from_shooting_this_phase(
-                state=state,
-                player_id=active_player_id,
-                unit_instance_id=unit_id,
-            )
         ):
             continue
         rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
@@ -372,6 +370,14 @@ def _legal_shooting_types_for_rules_unit(
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[ShootingType, ...]:
     actor_id = _active_player_id(state) if player_id is None else player_id
+    if not _rules_unit_can_select_to_shoot(
+        state=state,
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+        player_id=actor_id,
+    ):
+        return ()
+
     resolved_target_unit_ids = (
         _enemy_placed_unit_ids(state=state, player_id=actor_id)
         if target_unit_ids is None
@@ -604,6 +610,13 @@ def shooting_rules_unit_has_legal_declaration_against_targets(
     player_id: str,
     target_unit_ids: tuple[str, ...],
 ) -> bool:
+    if not _rules_unit_can_select_to_shoot(
+        state=state,
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+        player_id=player_id,
+    ):
+        return False
     return _rules_unit_has_legal_shooting_declaration(
         state=state,
         scenario=_battlefield_scenario(state),
@@ -655,29 +668,12 @@ def _unit_can_select_to_shoot(
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
 ) -> bool:
-    actor_id = _active_player_id(state) if player_id is None else player_id
-    advanced_state = state.advanced_unit_state_for_unit(
-        player_id=actor_id,
-        battle_round=state.battle_round,
-        unit_instance_id=unit.unit_instance_id,
+    return _rules_unit_can_select_to_shoot(
+        state=state,
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id),
+        army_catalog=army_catalog,
+        player_id=player_id,
     )
-    if (
-        advanced_state is not None
-        and not advanced_state.can_shoot
-        and not _unit_has_assault_ranged_weapon(
-            state=state,
-            unit=unit,
-            army_catalog=army_catalog,
-            player_id=actor_id,
-        )
-    ):
-        return False
-    fell_back_state = state.fell_back_unit_state_for_unit(
-        player_id=actor_id,
-        battle_round=state.battle_round,
-        unit_instance_id=unit.unit_instance_id,
-    )
-    return not (fell_back_state is not None and not fell_back_state.can_shoot)
 
 
 def _rules_unit_can_select_to_shoot(
@@ -688,6 +684,12 @@ def _rules_unit_can_select_to_shoot(
     player_id: str | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
+    if mission_action_prevents_rules_unit_from_shooting_this_phase(
+        state=state,
+        player_id=actor_id,
+        unit_instance_id=rules_unit.unit_instance_id,
+    ):
+        return False
     if _rules_unit_advanced_is_restricted_to_assault_weapons(
         state=state,
         rules_unit=rules_unit,

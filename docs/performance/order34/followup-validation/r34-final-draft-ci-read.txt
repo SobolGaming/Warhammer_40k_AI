@@ -1,0 +1,52 @@
+{
+  "head": "533300706bbe3e8d850d41cbfe1d2c1013fe0196",
+  "base": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "draft": true,
+  "checks": [
+    {
+      "name": "lint",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "contract-conformance",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "code-quality",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "semantic-audit-macos",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "mypy",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "pyright",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "behavior-shard-${{ matrix.shard_id }}",
+      "status": "COMPLETED",
+      "conclusion": "SKIPPED"
+    },
+    {
+      "name": "quality-fast",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS"
+    },
+    {
+      "name": "coverage-gate",
+      "status": "COMPLETED",
+      "conclusion": "SKIPPED"
+    }
+  ]
+}

@@ -224,7 +224,8 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
         "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
       "semantic_execution_status": "partial_engine_runtime",
       "source_url": null,
@@ -242,7 +243,8 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
         "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
       "semantic_execution_status": "partial_engine_runtime",
       "source_url": "https://www.40k.app/rules/15-stratagems",
@@ -327,7 +329,7 @@
       "transcription_sha256": "b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff"
     }
   ],
-  "package_hash": "f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7",
+  "package_hash": "65110e9292beae53778b0d3955c7633c0c692d29925f892d1f1d73d03f9325a9",
   "rules": [
     {
       "command_point_cost": 1,
@@ -455,7 +457,8 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
         "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
-        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
+        "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
       "runtime_rule_id": "core:snap-shooting",
       "section_id": "15.09",

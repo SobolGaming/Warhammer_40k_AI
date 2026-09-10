@@ -722,7 +722,11 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     ) or any(
         event.event_type == "attack_sequence_completed"
         and isinstance(event.payload, dict)
-        and event.payload.get("sequence_id") == "attack-sequence:malevolent-melee"
+        and event.payload.get("sequence_id")
+        == (
+            f"melee-sequence:{replayed_state.game_id}:round-{replayed_state.battle_round:02d}:"
+            f"{fixture.enemy_one.unit_instance_id}:malevolent-melee"
+        )
         for event in replayed.decision_controller.event_log.records
     )
     assert current_fight_state.active_activation is None
@@ -1544,7 +1548,12 @@ def _resolve_malevolent_attack(
             abilities=(*profile.abilities, AbilityDescriptor.sustained_hits(1)),
         )
     sequence = _attack_sequence(
-        sequence_id=f"attack-sequence:malevolent-{attack_kind.value}",
+        sequence_id=(
+            f"melee-sequence:{fixture.state.game_id}:round-{fixture.state.battle_round:02d}:"
+            f"{attacker.unit_instance_id}:malevolent-melee"
+            if source_phase is BattlePhase.FIGHT
+            else f"attack-sequence:malevolent-{attack_kind.value}"
+        ),
         attacker=attacker,
         defender=defender,
         profile=profile,
@@ -1607,6 +1616,17 @@ def _resolve_malevolent_attack(
             )
         )
     decisions = DecisionController()
+    if source_phase is BattlePhase.FIGHT:
+        from tests.completed_attack_fixture_helpers import (
+            record_melee_declaration_for_executor_fixture,
+        )
+
+        record_melee_declaration_for_executor_fixture(
+            state=fixture.state,
+            decisions=decisions,
+            sequence=sequence,
+            result_id="malevolent-melee",
+        )
     manager = DiceRollManager(
         fixture.state.game_id,
         event_log=decisions.event_log,

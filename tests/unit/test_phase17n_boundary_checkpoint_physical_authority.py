@@ -394,6 +394,8 @@ def test_secondary_action_checkpoint_cannot_reset_authenticated_movement_on_rest
     state.primary_objective_turn_start_states = []
     state.primary_rules_unit_turn_start_snapshots = []
     state.mission_action_states = []
+    # This fixture resets its preliminary Action setup before recording the tested history.
+    state.persisting_effects = []
     state.decision_request_count = 0
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.replace_shooting_phase_state(

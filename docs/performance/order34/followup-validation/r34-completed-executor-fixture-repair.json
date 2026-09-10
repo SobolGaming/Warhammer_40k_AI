@@ -1,0 +1,14 @@
+{
+  "name": "r34-completed-executor-fixture-repair",
+  "command": "uv run ruff format tests/unit/test_phase13b_shooting_declarations.py tests/phase13b_shooting_declaration_helpers.py\nuv run pytest tests/unit/test_phase13b_shooting_declarations.py -k 'deferred_devastating_mortal_wounds_route_each_model_choice or destruction_reaction_waits_for_attacking_unit_attacks or successful_deadly_demise_applies_mortal_wounds_before_removal or fight_on_death_only_unit_is_targetable_without_new_damage or mixed_fight_on_death_target' -n 4 --dist=worksteal -q --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:12:07.053344+00:00",
+  "deadline_seconds": 180.0,
+  "log": "/private/tmp/order34-evidence/r34-completed-executor-fixture-repair.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 27677,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 7.835,
+  "committed_log": "r34-completed-executor-fixture-repair.txt"
+}

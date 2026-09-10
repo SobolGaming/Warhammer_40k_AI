@@ -1,0 +1,194 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "commit": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "38151852a5797700df25e38bcd3a1d2fb594dd9e7468e1eb9c87d7fb1251a570",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "uninstrumented_timing",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9"
+  },
+  "results": {
+    "visible-self-observer": {
+      "samples": [
+        {
+          "setup_seconds": 4.415685417014174,
+          "slice_seconds": 0.13059179100673646,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3018949169199914,
+          "slice_seconds": 0.12394299998413771,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3256444999715313,
+          "slice_seconds": 0.1242239170242101,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.26952941599302,
+          "slice_seconds": 0.1236940419767052,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.341303625027649,
+          "slice_seconds": 0.12578529096208513,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.271801291964948,
+          "slice_seconds": 0.12342041602823883,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.344793749973178,
+          "slice_seconds": 0.1246907920576632,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.12519274986282522,
+      "median_seconds": 0.1242239170242101,
+      "p95_seconds": 0.13059179100673646,
+      "maximum_seconds": 0.13059179100673646,
+      "completion_rate": 1.0,
+      "slices_per_second": 7.9876830015772375
+    },
+    "unseen-no-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.349136042059399,
+          "slice_seconds": 0.4876132080098614,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.372120333951898,
+          "slice_seconds": 0.42162066604942083,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3117128330050036,
+          "slice_seconds": 0.41498079197481275,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.363230000017211,
+          "slice_seconds": 0.4144831249723211,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3278748330194503,
+          "slice_seconds": 0.41604658297728747,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3606193750165403,
+          "slice_seconds": 0.41629245900548995,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.304095624946058,
+          "slice_seconds": 0.42065637500490993,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.42738474399915766,
+      "median_seconds": 0.41629245900548995,
+      "p95_seconds": 0.4876132080098614,
+      "maximum_seconds": 0.4876132080098614,
+      "completion_rate": 1.0,
+      "slices_per_second": 2.3398121108458914
+    },
+    "unseen-friendly-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.4145527919754386,
+          "slice_seconds": 0.35148545796982944,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3439045830164105,
+          "slice_seconds": 0.3185929589672014,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.4215173750417307,
+          "slice_seconds": 0.33073837496340275,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.412288208026439,
+          "slice_seconds": 0.32412041700445116,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3549403339857236,
+          "slice_seconds": 0.320654291077517,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.4355684160254896,
+          "slice_seconds": 0.32800699991639704,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.359931959072128,
+          "slice_seconds": 0.36760925000999123,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.33445824998697,
+      "median_seconds": 0.32800699991639704,
+      "p95_seconds": 0.36760925000999123,
+      "maximum_seconds": 0.36760925000999123,
+      "completion_rate": 1.0,
+      "slices_per_second": 2.9899098020125336
+    }
+  },
+  "full_game_certified": false
+}

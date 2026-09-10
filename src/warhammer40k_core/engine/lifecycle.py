@@ -290,9 +290,6 @@ from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
 )
-from warhammer40k_core.engine.phases.shooting import (
-    invalid_catalog_post_shoot_decision_status as invalid_post_shoot_status,
-)
 from warhammer40k_core.engine.prebattle import (
     SELECT_PREBATTLE_ACTION_DECISION_TYPE,
     SELECT_REDEPLOY_UNIT_DECISION_TYPE,
@@ -1737,53 +1734,11 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        state = self._require_state()
-        if request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
-            result.validate_for_request(request)
-            invalid_status = self._shooting_phase_handler.invalid_shooting_type_selection_status(
-                state=state,
-                request=request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE:
-            invalid_status = (
-                self._shooting_phase_handler.invalid_shooting_unit_selected_grant_status(
-                    state=state,
-                    request=request,
-                    result=result,
-                )
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
-            result.validate_for_request(request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
-                state=state,
-                request=request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if request.decision_type == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE:
-            invalid_status = (
-                self._shooting_phase_handler.invalid_shooting_phase_start_faction_rule_status(
-                    state=state,
-                    request=request,
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            )
-            if invalid_status is not None:
-                return invalid_status
-        invalid_status = invalid_post_shoot_status(state=state, request=request, result=result)
-        if invalid_status is not None:
-            return invalid_status
-        return None
+        from warhammer40k_core.engine.lifecycle_shooting_prevalidation import (
+            pre_validate_shooting_decision,
+        )
+
+        return pre_validate_shooting_decision(lifecycle=self, request=request, result=result)
 
     def _apply_shooting_phase_decision(
         self,
@@ -3382,6 +3337,13 @@ def _validate_payload_consistency(
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
+    from warhammer40k_core.engine.activity_restriction_restore import (
+        validate_activity_restriction_inventory,
+    )
+
+    validate_activity_restriction_inventory(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
     _rsi.validate_reserve_state_consistency(state=state)
     _tsi.validate_transport_cargo_state_consistency(state=state)
     validate_prebattle_alternation_restore(

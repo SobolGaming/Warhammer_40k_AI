@@ -1,0 +1,90 @@
+{
+  "schema_version": "order34-review-performance-spec-v1",
+  "base_commit": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "measured_head_commit": "bf9bd4225fd135ff59c17bbaa7d1c08b6c32b4a5",
+  "source_tree": "3a8cf3a2979f54251538cb204c2d86cca41f0726",
+  "engine_manifest_sha256": "6bfca3d1eeefb2472e538881452d554243168593985931efa5ef84d85bf9d686",
+  "hardware": {
+    "cpu": "Apple M5 Pro",
+    "memory_bytes": 68719476736,
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.5"
+  },
+  "hardware_status": "provisional local host; not full-game reference certification",
+  "samples_per_revision_per_case": 7,
+  "uninstrumented_sample_count": 98,
+  "profile_samples_per_revision": 4,
+  "cases": [
+    {
+      "id": "action",
+      "driver": "scripts/measure_action_restrictions.py",
+      "query_repetitions_per_family": 100,
+      "families": [
+        "Action eligibility",
+        "shooting eligibility",
+        "charge Action restriction"
+      ],
+      "boundaries": [
+        "Shooting phase end",
+        "Charge phase end",
+        "Fight phase end",
+        "turn end"
+      ]
+    },
+    {
+      "id": "unrestricted",
+      "driver": "scripts/measure_action_restriction_live.py",
+      "live_effect_count": 32,
+      "behavior": "Legal unit selection/preflight, Normal declaration, completed shooting and charge transitions"
+    },
+    {
+      "id": "attached_selection",
+      "driver": "scripts/measure_action_restriction_live.py",
+      "live_effect_count": 32,
+      "behavior": "Legal attached-target unit selection/preflight through the shooting-type request; full target declaration is a separate diagnostic"
+    },
+    {
+      "id": "retained",
+      "driver": "scripts/measure_action_restriction_live.py",
+      "live_effect_count": 32,
+      "behavior": "Accepted Shoot On Death, out-of-phase declaration and completed attack, retained cleanup/parent continuation and charge transitions"
+    },
+    {
+      "id": "visible-self-observer",
+      "driver": "scripts/measure_indirect_shooting.py"
+    },
+    {
+      "id": "unseen-no-observer",
+      "driver": "scripts/measure_indirect_shooting.py"
+    },
+    {
+      "id": "unseen-friendly-observer",
+      "driver": "scripts/measure_indirect_shooting.py"
+    }
+  ],
+  "input_manifest": "benchmark-input-manifest.json",
+  "timing_policy": {
+    "setup_in_timed_interval": false,
+    "coverage": false,
+    "profiling": false,
+    "parallel_timing": false,
+    "competing_task_owned_test_workers": false,
+    "cpu_affinity": "not pinned",
+    "sample_policy": "retain every completed sample, including first setup separately"
+  },
+  "budgets": [
+    "../budgets.json",
+    "../../order33/budgets.json"
+  ],
+  "full_attached_declaration_diagnostic": {
+    "case": "attached",
+    "status": "historical incomplete diagnostic; not rerun for this restoration-only change",
+    "base_commit": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+    "head_commit": "5b6752ff07bc5b86e91054a7822ee7ea7dadf7cb",
+    "traces": [
+      "../review-repair/r34-final-base-attached-diagnostic.txt",
+      "../review-repair/r34-final-head-attached-diagnostic.txt"
+    ]
+  },
+  "full_game_certified": false
+}

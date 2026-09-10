@@ -1,0 +1,185 @@
+bringing up nodes...
+bringing up nodes...
+
+.E.......................F......EEEEFEE                                  [100%]
+==================================== ERRORS ====================================
+_ ERROR collecting tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py _
+ImportError while importing test module '/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.14.5-macos-aarch64-none/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:4: in <module>
+    from tests.phase17n_step6g_secondary_certification_helpers import (
+tests/phase17n_step6g_secondary_certification_helpers.py:13: in <module>
+    from tests.phase17n_secondary_certification_fixtures import (
+tests/phase17n_secondary_certification_fixtures.py:6: in <module>
+    from warhammer40k_core.engine.shooting_phase_state import ShootingPhaseState
+E   ModuleNotFoundError: No module named 'warhammer40k_core.engine.shooting_phase_state'
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[witness-model-outside-unit] _
+[gw1] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destroyed-player-id] _
+[gw1] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[source-model-outside-unit] _
+[gw1] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[duplicate-state] _
+[gw3] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[unknown-source-rules-unit] _
+[gw3] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[unknown-destroyed-unit] _
+[gw2] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destruction-game-id] _
+[gw0] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:341: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10910: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+=================================== FAILURES ===================================
+______ test_local_session_projects_and_submits_mortal_wound_model_choice _______
+[gw3] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/integration/test_ws13_adapter_phase_families.py:1051: in test_local_session_projects_and_submits_mortal_wound_model_choice
+    session = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/adapters/local_session.py:119: in to_persistence_payload
+    raise LocalGameSessionPersistenceError(
+E   warhammer40k_core.adapters.local_session.LocalGameSessionPersistenceError: LocalGameSession persistence requires its initial replay snapshot.
+_ test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn _
+[gw0] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase11e_mission_scoring_cleanup.py:1060: in test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+=========================== short test summary info ============================
+ERROR tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py - ImportError while importing test module '/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.14.5-macos-aarch64-none/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:4: in <module>
+    from tests.phase17n_step6g_secondary_certification_helpers import (
+tests/phase17n_step6g_secondary_certification_helpers.py:13: in <module>
+    from tests.phase17n_secondary_certification_fixtures import (
+tests/phase17n_secondary_certification_fixtures.py:6: in <module>
+    from warhammer40k_core.engine.shooting_phase_state import ShootingPhaseState
+E   ModuleNotFoundError: No module named 'warhammer40k_core.engine.shooting_phase_state'
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[witness-model-outside-unit] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destroyed-player-id] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[source-model-outside-unit] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[duplicate-state] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[unknown-source-rules-unit] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[unknown-destroyed-unit] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destruction-game-id] - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+FAILED tests/integration/test_ws13_adapter_phase_families.py::test_local_session_projects_and_submits_mortal_wound_model_choice - warhammer40k_core.adapters.local_session.LocalGameSessionPersistenceError: LocalGameSession persistence requires its initial replay snapshot.
+FAILED tests/unit/test_phase11e_mission_scoring_cleanup.py::test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+2 failed, 30 passed, 8 errors in 17.79s

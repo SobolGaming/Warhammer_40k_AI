@@ -1,6 +1,10 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.mission_action_eligibility import (
+    mission_action_prevents_rules_unit_from_shooting_this_phase,
+    rules_unit_started_mission_action_this_turn,
+)
 
 from typing import TYPE_CHECKING
 
@@ -130,6 +134,12 @@ def _heroic_intervention_target_binding_error(
     target_binding: StratagemTargetBinding,
 ) -> str | None:
     target_unit_id = _require_target_unit_id(target_binding)
+    if rules_unit_started_mission_action_this_turn(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=target_unit_id,
+    ):
+        return "heroic_intervention_unit_started_action"
     if _target_unit_has_keyword(
         state=state, target_binding=target_binding, keyword="VEHICLE"
     ) and not (
@@ -419,6 +429,12 @@ def _explosives_context_error(
     if not _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="GRENADES"):
         return "unit_not_grenades"
     explosives_unit_id = _require_target_unit_id(target_binding)
+    if mission_action_prevents_rules_unit_from_shooting_this_phase(
+        state=state,
+        player_id=context.player_id,
+        unit_instance_id=explosives_unit_id,
+    ):
+        return "explosives_unit_started_action"
     if (
         state.advanced_unit_state_for_unit(
             player_id=context.player_id,
@@ -859,6 +875,12 @@ def _heroic_intervention_charge_move_request_error(
         return "heroic_intervention_actor_drift"
     if use_record.stratagem_id != "heroic-intervention":
         return "heroic_intervention_use_drift"
+    if not proposal.is_no_move_choice and rules_unit_started_mission_action_this_turn(
+        state=state,
+        player_id=use_record.player_id,
+        unit_instance_id=proposal.unit_instance_id,
+    ):
+        return "heroic_intervention_unit_started_action"
     maximum_distance = _heroic_intervention_maximum_distance(proposal_request)
     mode = _heroic_intervention_mode_from_request(proposal_request)
     current_reachable = _heroic_intervention_reachable_target_distances(

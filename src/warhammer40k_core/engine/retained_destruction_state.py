@@ -68,6 +68,7 @@ class RetainedModelDestruction:
     sources: tuple[DestructionReactionSource, ...]
     eligible_sources: tuple[DestructionReactionSource, ...]
     stage: RetainedDestructionStage
+    excluded_actions: tuple[RetainedAttackAction, ...] = ()
     request_id: str | None = None
     result_id: str | None = None
     selected_source_id: str | None = None
@@ -115,6 +116,14 @@ class RetainedModelDestruction:
             for source in self.eligible_sources
         ):
             raise GameLifecycleError("Retention options require optional attack sources.")
+        if (
+            type(self.excluded_actions) is not tuple
+            or any(type(action) is not RetainedAttackAction for action in self.excluded_actions)
+            or self.excluded_actions not in ((), (RetainedAttackAction.SHOOT,))
+        ):
+            raise GameLifecycleError("Retained destruction excluded actions are invalid.")
+        if self.selected_action is not None and self.selected_action in self.excluded_actions:
+            raise GameLifecycleError("Retained action was excluded from its source decision.")
         selected_source = next(
             (
                 source
@@ -208,6 +217,7 @@ class RetainedModelDestruction:
                     "owner_context": self.owner_context,
                     "sources": [source.to_payload() for source in self.sources],
                     "eligible_sources": [source.to_payload() for source in self.eligible_sources],
+                    "excluded_actions": [action.value for action in self.excluded_actions],
                     "stage": self.stage.value,
                     "request_id": self.request_id,
                     "result_id": self.result_id,
@@ -232,6 +242,7 @@ class RetainedModelDestruction:
             "sources",
             "eligible_sources",
             "stage",
+            "excluded_actions",
             "request_id",
             "result_id",
             "selected_source_id",
@@ -244,6 +255,9 @@ class RetainedModelDestruction:
         placement = payload["placement"]
         if not isinstance(context, dict) or not isinstance(placement, dict):
             raise GameLifecycleError("Retained destruction placement or context is invalid.")
+        exclusions = payload["excluded_actions"]
+        if not isinstance(exclusions, list) or exclusions not in ([], ["shoot"]):
+            raise GameLifecycleError("Retained destruction excluded actions are invalid.")
         try:
             owner = DestructionOwnerKind(_identifier("owner_kind", payload["owner_kind"]))
             stage = RetainedDestructionStage(_identifier("stage", payload["stage"]))
@@ -272,6 +286,10 @@ class RetainedModelDestruction:
             owner_context=context,
             sources=_sources_from_payload(payload["sources"]),
             eligible_sources=_sources_from_payload(payload["eligible_sources"]),
+            excluded_actions=tuple(
+                RetainedAttackAction(_identifier("excluded_action", action))
+                for action in exclusions
+            ),
             stage=stage,
             request_id=_optional_identifier(payload, "request_id"),
             result_id=_optional_identifier(payload, "result_id"),

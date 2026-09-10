@@ -1,0 +1,13 @@
+{
+  "name": "r34-base-attached-stall-diagnostic",
+  "command": "cd /private/tmp/order34-base\nPYTHONPATH=.:src /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python -c 'import faulthandler; faulthandler.dump_traceback_later(15); from scripts.measure_action_restriction_live import live_sample; print(live_sample(profile=True, case=\"attached\"))'",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T17:59:10.661917+00:00",
+  "deadline_seconds": 30.0,
+  "log": "/private/tmp/order34-evidence/r34-base-attached-stall-diagnostic.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 7733,
+  "outcome": "timeout",
+  "exit_status": -15,
+  "elapsed_seconds": 30.172
+}

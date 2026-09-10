@@ -23,7 +23,7 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "f422d6df45f43ecc6f5f4927fc24fe1d58bdf727e242200deb0f3eeffe559b1c"
+EXPECTED_ARTIFACT_SHA256: Final = "ce825fb4882d3cfe009afa2f49572adb6e464e48ef9082dfe058e26b52bcaf3e"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-indirect-shooting"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-09"
 INDIRECT_SHOOTING_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:indirect-shooting"

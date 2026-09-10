@@ -1,0 +1,14 @@
+{
+  "name": "r34-live-calibration-03",
+  "command": "PYTHONPATH=.:src uv run python scripts/measure_action_restrictions.py --live-case attached --samples 1 --work-counts --output /private/tmp/order34-evidence/live-attached-calibration.json\nPYTHONPATH=.:src uv run python scripts/measure_action_restrictions.py --live-case retained --samples 1 --work-counts --output /private/tmp/order34-evidence/live-retained-calibration.json",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T17:46:54.581665+00:00",
+  "deadline_seconds": 150.0,
+  "log": "/private/tmp/order34-evidence/r34-live-calibration-03.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 4717,
+  "outcome": "timeout",
+  "exit_status": -15,
+  "elapsed_seconds": 150.06,
+  "committed_log": "r34-live-calibration-03.txt"
+}

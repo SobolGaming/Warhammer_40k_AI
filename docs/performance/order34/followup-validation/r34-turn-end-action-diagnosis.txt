@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_phase17n_turn_end_action_commits_marker_with_completion_event_authority _
+tests/unit/test_phase17n_primary_scoring_conditions.py:5468: in test_phase17n_turn_end_action_commits_marker_with_completion_event_authority
+    restored_lifecycle = GameLifecycle.from_payload(
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:57: in validate_activity_restriction_inventory
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase17n_primary_scoring_conditions.py::test_phase17n_turn_end_action_commits_marker_with_completion_event_authority - warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+1 failed in 12.91s

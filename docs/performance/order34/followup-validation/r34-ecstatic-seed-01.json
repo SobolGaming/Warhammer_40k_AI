@@ -1,0 +1,14 @@
+{
+  "name": "r34-ecstatic-seed-01",
+  "command": "uv run pytest tests/unit/test_phase17_emperors_children_daemon_prince.py::test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting -q --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:54:38.155777+00:00",
+  "deadline_seconds": 60.0,
+  "log": "/private/tmp/order34-evidence/r34-ecstatic-seed-01.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 39913,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 17.097,
+  "committed_log": "r34-ecstatic-seed-01.txt"
+}

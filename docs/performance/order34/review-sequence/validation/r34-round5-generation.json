@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-generation",
+  "command": "uv run ruff format src/warhammer40k_core/engine/model_attack_history.py tests/activity_restriction_assertions.py tests/code_quality/test_order34_action_restrictions.py\nuv run python scripts/build_engine_build_identity.py\nuv run python scripts/build_external_contract.py",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T23:55:03.630237+00:00",
+  "deadline_seconds": 180.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-generation.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 91142,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 31.386
+}

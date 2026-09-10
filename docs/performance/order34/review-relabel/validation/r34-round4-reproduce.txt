@@ -1,0 +1,50 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction _
+tests/activity_restriction_assertions.py:73: in assert_completed_shooting_kind_is_authenticated
+    GameLifecycle.from_payload(forged)
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:57: in validate_activity_restriction_inventory
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_phase13b_shooting_declarations.py:19806: in test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction
+    assert_completed_shooting_kind_is_authenticated(
+tests/activity_restriction_assertions.py:72: in assert_completed_shooting_kind_is_authenticated
+    with pytest.raises(GameLifecycleError, match="Model attack history"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Model attack history'
+E     Actual message: 'Activity restriction inventory differs from accepted activity and completed boundary history.'
+___ test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration ____
+tests/activity_restriction_assertions.py:73: in assert_completed_shooting_kind_is_authenticated
+    GameLifecycle.from_payload(forged)
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:57: in validate_activity_restriction_inventory
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_phase12c_core_stratagems.py:3277: in test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration
+    assert_completed_shooting_kind_is_authenticated(
+tests/activity_restriction_assertions.py:72: in assert_completed_shooting_kind_is_authenticated
+    with pytest.raises(GameLifecycleError, match="Model attack history"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Model attack history'
+E     Actual message: 'Activity restriction inventory differs from accepted activity and completed boundary history.'
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction - AssertionError: Regex pattern did not match.
+  Expected regex: 'Model attack history'
+  Actual message: 'Activity restriction inventory differs from accepted activity and completed boundary history.'
+FAILED tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration - AssertionError: Regex pattern did not match.
+  Expected regex: 'Model attack history'
+  Actual message: 'Activity restriction inventory differs from accepted activity and completed boundary history.'
+2 failed in 7.67s

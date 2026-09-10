@@ -29,6 +29,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
 )
+from warhammer40k_core.engine.effects import EffectExpirationBoundary
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -397,6 +398,11 @@ def phase17n_action_turn_end_record(
     assert state.battlefield_state is not None
     if controlled_target_id != action.target_id:
         raise AssertionError("Primary Action turn-end target drifted.")
+    state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.turn_end(
+            battle_round=state.battle_round, player_id=action.player_id
+        )
+    )
     resolved = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
@@ -1131,6 +1137,12 @@ def phase17n_state_with_setup(
 
 
 def _enter_turn_end(state: GameState) -> None:
+    assert state.active_player_id is not None
+    state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.turn_end(
+            battle_round=state.battle_round, player_id=state.active_player_id
+        )
+    )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     state.replace_shooting_phase_state(None)
 

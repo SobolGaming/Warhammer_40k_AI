@@ -1,0 +1,13 @@
+{
+  "name": "r34-round5-freeze-commit",
+  "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8\ngit diff --check\ngit add src/warhammer40k_core/engine/model_attack_history.py src/warhammer40k_core/engine/activity_restriction_history.py src/warhammer40k_core/_engine_build_manifest.json contracts/examples contracts/manifest.json docs/ADAPTER_DECISION_CONTRACT.md docs/ORDER_34_SEQUENCE_REPAIR.md tests/activity_restriction_assertions.py tests/code_quality/test_order34_action_restrictions.py tests/integration/test_fight_on_death_presence.py\ngit commit -m 'fix: authenticate all completed attack origins before classification'\ngit rev-parse HEAD HEAD:src HEAD:tests",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-10T00:01:23.808945+00:00",
+  "deadline_seconds": 90.0,
+  "log": "/private/tmp/order34-evidence/r34-round5-freeze-commit.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 93114,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 0.465
+}
