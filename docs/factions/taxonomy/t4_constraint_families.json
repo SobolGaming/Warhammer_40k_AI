@@ -1,0 +1,385 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "T4",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md",
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "corpus_listing_counts": {
+    "detachment_listing_rows": 506,
+    "unique_listing_names": 270,
+    "dp_1": 156,
+    "dp_2": 254,
+    "dp_3": 96,
+    "keywords_heading_listings": 50,
+    "keywords_heading_unique_names": 21,
+    "restrictions_heading_listings": 25,
+    "restrictions_heading_unique_names": 25,
+    "enhancement_zero_listings": 0,
+    "stratagem_zero_listings": 16,
+    "stratagem_zero_unique_names": 5,
+    "dual_core_force_disposition_listings": 1
+  },
+  "core_force_dispositions": [
+    "Take and Hold",
+    "Purge the Foe",
+    "Priority Assets",
+    "Reconnaissance",
+    "Disruption"
+  ],
+  "dual_core_force_disposition": {
+    "listing_name": "War Horde",
+    "view": "orks",
+    "dp": 3,
+    "core_force_dispositions": ["Take and Hold", "Purge the Foe"],
+    "source_url": "https://www.40k.app/factions/orks/detachments/war-horde"
+  },
+  "enhancement_only_detachments": [
+    {
+      "listing_name": "Brute Bosses",
+      "enhancements": 6,
+      "stratagems": 0,
+      "dp": 1,
+      "core_force_disposition": "Purge the Foe",
+      "views": ["orks"]
+    },
+    {
+      "listing_name": "Wurrband",
+      "enhancements": 3,
+      "stratagems": 0,
+      "dp": 1,
+      "core_force_disposition": "Disruption",
+      "views": ["orks"]
+    },
+    {
+      "listing_name": "Librarius Conclave",
+      "enhancements": 5,
+      "stratagems": 0,
+      "dp": 1,
+      "core_force_disposition": "Reconnaissance",
+      "views": [
+        "space-marines",
+        "black-templars",
+        "blood-angels",
+        "dark-angels",
+        "deathwatch",
+        "imperial-fists",
+        "iron-hands",
+        "raven-guard",
+        "salamanders",
+        "space-wolves",
+        "ultramarines",
+        "white-scars"
+      ]
+    },
+    {
+      "listing_name": "Sanctified Orators",
+      "enhancements": 1,
+      "stratagems": 0,
+      "dp": 1,
+      "core_force_disposition": "Disruption",
+      "views": ["adepta-sororitas"]
+    },
+    {
+      "listing_name": "The Living Miracle",
+      "enhancements": 1,
+      "stratagems": 0,
+      "dp": 1,
+      "core_force_disposition": "Disruption",
+      "views": ["black-templars"]
+    }
+  ],
+  "extra_listing_tags": {
+    "note": "Not Core Force Dispositions. Do not store on force_disposition_ids.",
+    "tags": {
+      "Abhuman": ["Abhuman Auxiliaries", "Grizzled Company"],
+      "Acrobatic": [
+        "Fateful Performance",
+        "Ghosts of the Webway",
+        "Serpent's Brood",
+        "Twilight Flickers"
+      ],
+      "Armigers": ["Spearhead-at-Arms", "Throne-bonded Outriders"],
+      "Armoury": ["Might of the Moritoi", "Solar Spearhead"],
+      "Auxiliary": ["Auxiliary Cadre", "Kroot Hunting Pack"],
+      "Battlesuit": ["Experimental Prototype Cadre", "Retaliation Cadre"],
+      "Covens": ["Covenite Coterie", "Tools of Torment"],
+      "Data-psalm": ["Data-psalm Conclave", "Luminen Auto-Choir"],
+      "Doomed": ["Rage-cursed Onslaught", "The Lost Brethren", "Wrath of the Doomed"],
+      "Dynasty": ["Awakened Dynasty", "Hand of the Dynasty"],
+      "Grace": ["Angelic Inheritors", "Legacy of Grace"],
+      "Hearthband": ["Hearthband", "Hearthguard Covenant"],
+      "Hosts": ["Host of Ascension", "Xenocult Masses"],
+      "Hypercrypt": ["Hypercrypt Legion", "The Phaeron's Armoury"],
+      "Kabal": ["Kabalite Agonysts", "Kabalite Cartel"],
+      "Lions": ["Lions of the Emperor", "Tharanatoi Hammerblow"],
+      "Mutant": ["Servants of Change", "Warpmeld Pact"],
+      "Nightmare": ["Murdertalon Raiders", "Nightmare Hunt"],
+      "Purestrain": ["Biosanctic Broodsurge", "Purestrain Broodswarm"],
+      "Recon": ["Designation Force", "Recon Element"],
+      "Reverend": ["Champions of Faith", "Sacred Champions"],
+      "Wych Cult": ["Exhibition of Slaughter", "Spectacle of Spite"]
+    }
+  },
+  "battle_size_core_table_observed": {
+    "owner": "P25A",
+    "locator": "https://www.40k.app/rules/25-muster-armies",
+    "rows": [
+      {
+        "battle_size": "incursion",
+        "points": 1000,
+        "detachment_points": 2,
+        "enhancement_limit": 2,
+        "ordinary_unit_limit": 2,
+        "battleline_and_dedicated_transport_limit": 4,
+        "single_3dp_detachment_exception": true
+      },
+      {
+        "battle_size": "strike_force",
+        "points": 2000,
+        "detachment_points": 3,
+        "enhancement_limit": 4,
+        "ordinary_unit_limit": 3,
+        "battleline_and_dedicated_transport_limit": 6,
+        "single_3dp_detachment_exception": false
+      }
+    ],
+    "epic_hero_limit": 1,
+    "onslaught": {
+      "status": "unresolved_vs_core_table",
+      "hold_id": "T4-HOLD-ONSLAUGHT",
+      "engine_policy_not_core_evidence": {
+        "points": 3000,
+        "detachment_points": 4,
+        "enhancement_limit": 4,
+        "ordinary_unit_limit": 3,
+        "battleline_limit": 6
+      }
+    }
+  },
+  "constraint_families": [
+    {
+      "family_id": "duplicate_detachment_prohibition",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "required_unit",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "prohibited_unit",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "required_other_detachment",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false,
+      "hold_id": "T4-HOLD-OTHER-DETACHMENT-EXAMPLE"
+    },
+    {
+      "family_id": "prohibited_other_detachment",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false,
+      "hold_id": "T4-HOLD-OTHER-DETACHMENT-EXAMPLE"
+    },
+    {
+      "family_id": "force_disposition_intersection",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false,
+      "note": "Army selects one Core Force Disposition present on every selected detachment."
+    },
+    {
+      "family_id": "support_must_attach",
+      "owner": "P25C",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false,
+      "note": "Certify the existing Support attachment path."
+    },
+    {
+      "family_id": "battle_size_budget",
+      "owner": "P25A",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "upgrade_copy_accounting",
+      "owner": "P25A",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "model_specific_warlord",
+      "owner": "P25B",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "model_specific_enhancement_bearer",
+      "owner": "P25B",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "warlord_cannot_over_must",
+      "owner": "P25B",
+      "core_owned_evaluator": true,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "keyword_grant",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false,
+      "note": "Mustering effective keywords; Track G keyword family. May change Battleline construction limits."
+    },
+    {
+      "family_id": "army_faction_admission_gate",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "related_army_points_cap",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "related_army_count_xor",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "related_army_category_count_cap",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "allied_warlord_prohibition",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "allied_enhancement_prohibition",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "faction_keyword_replacement",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "god_battleline_pairing",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    },
+    {
+      "family_id": "datasheet_faction_access",
+      "owner": "FM0",
+      "core_owned_evaluator": false,
+      "populate_faction_rows_in_p25c": false
+    }
+  ],
+  "sampled_construction_shapes": [
+    {
+      "name": "Shadow Legion Thralls of the First Prince",
+      "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "families": [
+        "prohibited_unit",
+        "related_army_points_cap",
+        "keyword_grant"
+      ]
+    },
+    {
+      "name": "Cult of Blood Keywords",
+      "url": "https://www.40k.app/factions/world-eaters/detachments/cult-of-blood",
+      "families": ["keyword_grant"]
+    },
+    {
+      "name": "Armoured Speartip Keywords",
+      "url": "https://www.40k.app/factions/space-marines/detachments/armoured-speartip",
+      "families": ["keyword_grant"]
+    },
+    {
+      "name": "Khorne Daemonkin Restrictions",
+      "url": "https://www.40k.app/factions/blood-legions/detachments/khorne-daemonkin",
+      "families": [
+        "related_army_points_cap",
+        "allied_warlord_prohibition"
+      ]
+    },
+    {
+      "name": "Tallyband Summoners Plague Legions",
+      "url": "https://www.40k.app/factions/plague-legions/detachments/tallyband-summoners",
+      "families": [
+        "related_army_points_cap",
+        "allied_warlord_prohibition"
+      ]
+    },
+    {
+      "name": "Daemonic Pact",
+      "url": "https://www.40k.app/factions/chaos-daemons/army-rules",
+      "families": [
+        "related_army_points_cap",
+        "allied_warlord_prohibition",
+        "allied_enhancement_prohibition",
+        "god_battleline_pairing"
+      ]
+    },
+    {
+      "name": "Freeblades",
+      "url": "https://www.40k.app/factions/imperial-knights/army-rules",
+      "families": [
+        "related_army_count_xor",
+        "allied_warlord_prohibition",
+        "allied_enhancement_prohibition"
+      ]
+    },
+    {
+      "name": "Space Marine Chapters",
+      "url": "https://www.40k.app/factions/space-marines/army-rules",
+      "families": ["prohibited_unit", "army_faction_admission_gate"],
+      "note": "Deathwatch Agents exception names out-of-scope Legends content; do not ingest."
+    }
+  ],
+  "holds": [
+    "T4-HOLD-ONSLAUGHT",
+    "T4-HOLD-ASSIGNED-AGENTS",
+    "T4-HOLD-DISPARATE-PATHS",
+    "T4-HOLD-PACT-BODIES",
+    "T4-HOLD-DAEMONKIN-PARALLELS",
+    "T4-HOLD-BROOD-BROTHERS",
+    "T4-HOLD-OTHER-DETACHMENT-EXAMPLE",
+    "F-SCOPE-01"
+  ],
+  "p25c_must_not": [
+    "Populate or evaluate faction-specific constraint rows",
+    "Store extra listing tags as Core Force Dispositions",
+    "Invent an Onslaught Core battle-size row",
+    "Reject empty stratagem inventories as missing source",
+    "Keep empty unit_datasheet_ids as awaiting source once constraint records exist",
+    "Branch generic lifecycle code on faction, detachment, Enhancement, or display-name tokens"
+  ]
+}
