@@ -80,6 +80,6 @@ The [roadmap findings and sequence](FACTION_RULES_REMEDIATION_ROADMAP.md#initial
 | `docs/factions/<faction>.md` | Existing generated historical coverage evidence; preserved under its generator contract |
 | [Faction Rules Remediation Roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) | Findings, evidence gates, dependencies and ordered implementation work |
 | [Faction Audit Sources](FACTION_AUDIT_SOURCES.md) | Observed versions, scope, counting and reconciliation method, pinned repository artifacts |
-| [Track T taxonomy](factions/taxonomy/README.md) | Pre-gate semantic surveys; T1 Stratagem WHEN taxonomy and T4 army-construction grammar are delivered |
+| [Track T taxonomy](factions/taxonomy/README.md) | Pre-gate semantic surveys; T1 Stratagem WHEN taxonomy, T2 effect taxonomy and T4 army-construction grammar are delivered |
 
 Do not hand-edit the older generated reports to change a support claim. Fix the owning source/execution evidence and regenerate them in the corresponding implementation PR. Keep the readable guide synchronized with the evidence actually established.
