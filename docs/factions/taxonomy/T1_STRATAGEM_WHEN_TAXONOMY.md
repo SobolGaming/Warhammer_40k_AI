@@ -19,15 +19,18 @@ A Stratagem window is a composition, not a display-name match:
 
 | Axis | Closed token set |
 | --- | --- |
+| Phase clauses | Ordered alternatives of `{turn_owner, phase, boundary}`. Owner is per clause and must not be lifted over the union |
 | Turn owner | `your`, `opponent`, `either`, `any`, `unspecified` |
-| Phase set | `command`, `movement`, `shooting`, `charge`, `fight`, `any`, `turn`, plus optional `reinforcements_step` |
+| Phase | `command`, `movement`, `shooting`, `charge`, `fight`, `any`, `turn`, plus optional `reinforcements_step` |
 | Boundary | §3.2 |
-| Event | `none` or a §3.3 event ID |
+| Event | `none` or a §3.3 event ID; unions of events are `event_set` |
 | Envelope | finite `use_stratagem`, `ReactionWindow`, `OpportunityWindow`, `OutOfPhaseActionContext` |
 
 The closed window set is those axes and tokens. Observed WHEN clauses are
 assignments onto that set. Track G must not explode each observed combination
-into its own enum member.
+into its own enum member. A single `turn_owner` plus `phase_set` is not a
+legal descriptor: "Your Shooting phase or the Fight phase" is `{your,
+shooting}` or `{unspecified, fight}`, not `your` over `{shooting, fight}`.
 
 The roadmap's previous "26 `TimingTriggerKind` values" is stale. The engine
 enum has **27** members. This survey gaps against those 27 plus reaction and
@@ -68,17 +71,34 @@ re-read of `when_descriptor`. It does not change the generator.
 
 ## 3. Closed window set
 
-### 3.1 Turn owner and phase set
+### 3.1 Phase clauses (owner per alternative)
 
-Turn owner is taken from the WHEN head clause, not from the Stratagem's
-effect. `Fight phase.` and `Command phase.` with no "your" / "opponent" are
+Each alternative in a WHEN head is one phase clause `{turn_owner, phase,
+boundary}`. Owner is read from that alternative, not from the Stratagem's
+effect and not from the first alternative alone.
+
+`Fight phase.` and `Command phase.` with no "your" / "opponent" are
 `unspecified` (either player's matching phase). `Any phase` is `any`.
-`Either player's turn; Fight phase` is `either`.
+`Either player's turn; Fight phase` is `either` on the turn clause and
+`unspecified` on Fight.
 
-Phase set is a closed list, not a single `BattlePhaseKind`. The activation
-profiles already store unions: 156 rows are `shooting`+`fight`, 14 are
-`movement`+`charge`. Track G descriptors must carry `phase_set`. A single
-phase field cannot represent "Your Shooting phase or the Fight phase".
+Unions keep every clause's owner. Flattening to one `turn_owner` plus a
+`phase_set` is T1-001 and is invalid:
+
+| WHEN head (paraphrased) | Legal clauses | Illegal flatten |
+| --- | --- | --- |
+| Your Shooting phase or the Fight phase | `{your, shooting}` or `{unspecified, fight}` | `your` + `{shooting, fight}` |
+| Your opponent's Shooting phase or the Fight phase | `{opponent, shooting}` or `{unspecified, fight}` | `opponent` + `{shooting, fight}` |
+| Your Movement phase or your Charge phase | `{your, movement}` or `{your, charge}` | same owner is still a clause list |
+
+Retained mixed-owner rows: **159** (25 distinct descriptors). Dominant patterns:
+opponent Shooting or unspecified Fight (85); your Shooting or unspecified Fight
+(71). Same-owner multi-clause rows: 17 (your Movement or your Charge is 12).
+
+The activation profiles' stored `phase_tokens` still collapse those unions
+(156 `shooting`+`fight`, 14 `movement`+`charge`) and do not store per-clause
+owner. FM0 must not copy that collapse. Track G descriptors carry a clause
+list. A single `BattlePhaseKind` cannot represent the union.
 
 ### 3.2 Boundaries
 
@@ -110,15 +130,15 @@ consumer; this survey forbids inventing both.
 
 | Event ID | Engine `TimingTriggerKind` | Coverage on the 2026-06-21 profiles |
 | --- | --- | --- |
-| `none` | phase boundary only | 622 |
-| `selected_as_target` | `after_unit_selected_as_target` | 178; includes "selected its targets" and "when an enemy unit targets" |
+| `none` | phase boundary only | 616 |
+| `selected_as_target` | `after_unit_selected_as_target` | 179; includes "selected its targets", "selected ts targets", and "when an enemy unit targets" |
 | `ends_fall_back_move` | `just_after_friendly_unit_falls_back` or `after_enemy_unit_ends_move` | 39 |
 | `has_shot` | `just_after_friendly_unit_has_shot` / `just_after_enemy_unit_has_shot` | 35 |
 | `ends_normal_advance_or_fall_back` | `after_enemy_unit_ends_move` | 32 |
 | `unit_destroyed` | `after_unit_destroyed` | 23 stored as `start_phase` |
 | `ends_charge_move` | `after_unit_ends_charge_move` | 16 |
-| `mortal_wound` | **none** | 11 |
 | `declares_charge` | **none** | 10 |
+| `mortal_wound` | **none** | 9; suffers or is allocated a mortal wound, without naming an attack |
 | `selected_to_fall_back` | `just_after_enemy_unit_selected_to_fall_back` | 6 |
 | `model_destroyed_deadly_demise` | `after_model_destroyed` | 6 stored as `start_phase` |
 | `just_before_consolidate` | **none** | 5 |
@@ -126,6 +146,8 @@ consumer; this survey forbids inventing both.
 | `attacks_resolved` | `after_unit_attacks_resolved` | 4 stored as `just_after_enemy_unit_has_fought` |
 | `has_fought` | `just_after_enemy_unit_has_fought`; friendly has-fought has **no** kind | 3 |
 | `just_after_advance` | **none** | 3 |
+| `attack_allocated` | **none** | 2; THIEVES OF PAIN and PROTECTION OF THE DARK PRINCE (`event_set` with `mortal_wound`) |
+| `finished_making_attacks` | nearest `after_unit_attacks_resolved` | 2; GUIDED DISRUPTION, SHOCK BOMBARDMENT |
 | `selected_to_shoot` | `just_after_friendly_unit_selected_to_shoot` | 2 |
 | `selected_to_fight` | `just_after_friendly_unit_selected_to_fight` | 2 |
 | `selected_to_advance` | **none** (not `selected_to_move`) | 2 |
@@ -135,6 +157,9 @@ consumer; this survey forbids inventing both.
 | `once_per_battle_ability_used` | **none** | 2 |
 | `cult_ambush_marker_move` | **none** (`after_enemy_unit_ends_move` is the wrong event) | 2 |
 | `dice_roll` | `after_dice_roll` | 1 faction row; Core Command Re-roll is the primary consumer |
+| `starts_charge_move` | **none** | 1; SINGLE-MINDED STRIKE |
+| `just_before_surge_move` | **none** | 1; SYNAPTIC GOADING |
+| `psychic_test_before_ritual` | **none** | 1; ARCANE FOCUS |
 | `charge_targets_before_move` | **none** | 1 |
 | `unit_set_up` | `model_placed_on_battlefield` | 1 stored as `start_phase` |
 | `ends_normal_move` | **none** for a friendly unit; enemy uses `after_enemy_unit_ends_move` | 1 |
@@ -147,17 +172,20 @@ consumer; this survey forbids inventing both.
 | `before_detachment_rule_targets` | **none** | 1 |
 | `enemy_ends_move_generic` | `after_enemy_unit_ends_move` if the move is a battlefield move | 1 |
 
-Live App 946 / Core 15 events **absent** from the June profile event counts:
+`attack_allocated` is a WHEN event, not an effect clause. Many Stratagems
+subtract Damage "each time an attack is allocated" in the EFFECT after
+`selected_as_target`; those remain `selected_as_target`. THIEVES OF PAIN and
+PROTECTION OF THE DARK PRINCE fire in any phase just after an attack or a
+mortal wound is allocated. That is not `mortal_wound` alone.
+
+Live App 946 / Core 15 events still **absent** from the June profile counts
+(true zeros):
 
 | Event ID | Sample | Engine kind |
 | --- | --- | --- |
 | `selected_to_move` | War Horde Fungus-fuel Injection: your Movement phase, when a friendly unit is selected to move | `just_after_friendly_unit_selected_to_move` (unused by June profiles) |
 | `becomes_battle_shocked` | War Horde Breakin' Heads | **none** |
 | `before_battle_shock_roll` | Core Insane Bravery, Battle-shock step | **none** |
-| `starts_charge_move` | June leftover: when a unit starts a Charge move | **none** |
-| `just_before_surge_move` | June leftover: just before a Surge move | **none** |
-| `finished_making_attacks` | June leftover: friendly unit finished making its attacks | nearest `after_unit_attacks_resolved` |
-| `psychic_test_before_ritual` | June leftover: just after a Psychic test, before resolving that Ritual | **none** |
 
 Do not treat "selected to Advance" as `selected_to_move`. The June heuristic
 looks for the substring `selected to move` and therefore missed Advance
@@ -183,9 +211,11 @@ pattern; it does not add a Corsair-named trigger.
 
 ## 4. Profile coverage and heuristic mis-maps
 
-1,025 activation profiles classify onto **102** distinct
-`(turn_owner, phase_set, boundary, event)` tuples. That tuple count is an
-observation, not a kind budget.
+1,025 activation profiles classify onto **107** distinct
+`(phase_clauses, event)` tuples, where `phase_clauses` is the ordered list of
+`{turn_owner, phase, boundary}` alternatives. That tuple count is an
+observation, not a kind budget. The previous flatten to one `turn_owner` plus
+`phase_set` produced 102 tuples and hid the 159 mixed-owner rows.
 
 Assigned `trigger_kind` histogram (heuristic, not the taxonomy):
 
@@ -279,7 +309,8 @@ Demand for Track G, each requiring a real consumer before a new kind exists:
 - Command Battle-shock step and just-before Battle-shock roll (Insane Bravery).
 - Fight step as distinct from the Fight phase (Counter-offensive).
 - Reinforcements-step start / during / end / before.
-- Mortal-wound allocated or suffered (Any phase).
+- Mortal-wound suffered or allocated (Any phase), distinct from `attack_allocated`.
+- Attack allocated, including the Any-phase `event_set` with mortal-wound allocation (THIEVES OF PAIN, PROTECTION OF THE DARK PRINCE).
 - Unit destroyed before removing the last model / before Deadly Demise.
 - Friendly unit has fought / finished making its attacks.
 - Charge declared, charge targets selected before the move, starts a Charge move.
@@ -289,10 +320,11 @@ Demand for Track G, each requiring a real consumer before a new kind exists:
 - Once-per-battle ability used; psychic ability or Psychic test before a Ritual.
 - Enemy move relative to Cult Ambush markers.
 - Detachment-owned hooks (Malefic Surge, completed Contract, before selecting Detachment-rule targets).
-- Multi-event unions (`has shot or fought`) as `event_set`, not a new enum member per pair.
+- Multi-event unions (`has shot or fought`, `attack_allocated` with `mortal_wound`) as `event_set`, not a new enum member per pair.
 
-Union **phases** are `phase_set` on the descriptor. Union **events** are
-`event_set`. Do not add `shooting_or_fight` as a `TimingTriggerKind`.
+Union **phases** are a list of phase clauses with owner preserved on each
+clause. Union **events** are `event_set`. Do not add `shooting_or_fight` as a
+`TimingTriggerKind`, and do not lift one turn owner over the list.
 
 ## 8. Engine gaps this survey is not fixing
 
@@ -313,7 +345,7 @@ Union **phases** are `phase_set` on the descriptor. Union **events** are
 | T1-HOLD-APP-WHEN | App 946 WHEN text is not retained for every distinct Stratagem | S3a, then FM0 demand-matrix rows |
 | T1-HOLD-PROFILE-STALENESS | 1,025 profiles dated 2026-06-21; 40 admitted views at App-data 946; Orks rewrite is later | S3a / S3d |
 | T1-HOLD-SUBSTEP-VS-KIND | Reinforcements, Battle-shock step, Fight step: metadata versus new kinds | Track G with a real consumer |
-| T1-HOLD-UNION-PHASE | Descriptor `phase_set` / `event_set` versus exploding kinds | Track G; T1 forbids exploding |
+| T1-HOLD-UNION-PHASE | Clause-list versus exploding kinds; owner stays on each alternative | Track G; T1 forbids exploding and forbids a lifted `turn_owner` |
 | T1-HOLD-INSANE-BRAVERY-STEP | Current App WHEN versus shipped Command start | Core P15 remainder or Track G remap |
 | F-ORK-01 | War Horde and other Orks Stratagem WHEN may be new at v946 | FM0.5 |
 
@@ -321,8 +353,10 @@ Union **phases** are `phase_set` on the descriptor. Union **events** are
 
 Track G's timing-window family may be designed. It has:
 
-- the closed axes (owner, phase set, boundary, event, envelope);
-- the event and boundary catalogs, including which existing kinds they bind;
+- the closed axes (phase-clause list with owner per alternative, event,
+  envelope);
+- the event and boundary catalogs, including which existing kinds they bind
+  and the `attack_allocated` family;
 - the gap list against all **27** `TimingTriggerKind` values plus reaction and
   opportunity envelopes;
 - Core 15 and sampled App 946 confirmation that selected-to-move and

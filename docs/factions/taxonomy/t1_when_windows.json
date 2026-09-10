@@ -68,7 +68,10 @@
     "unique_when_descriptor": 236,
     "factions": 23,
     "detachments": 173,
-    "observed_owner_phase_boundary_event_tuples": 102,
+    "observed_phase_clause_event_tuples": 107,
+    "mixed_owner_union_rows": 159,
+    "mixed_owner_unique_when_descriptor": 25,
+    "same_owner_union_rows": 17,
     "heuristic_default": "start_phase",
     "stored_trigger_kind": {
       "start_phase": 660,
@@ -101,6 +104,9 @@
     }
   },
   "closed_axes": {
+    "phase_clause_fields": ["turn_owner", "phase", "boundary"],
+    "unions_are_clause_lists": true,
+    "do_not_lift_single_turn_owner": true,
     "turn_owner": ["your", "opponent", "either", "any", "unspecified"],
     "phase_tokens": [
       "command",
@@ -125,19 +131,88 @@
       "during_reinforcements_step",
       "end_reinforcements_step"
     ],
-    "phase_set_not_single_kind": true,
     "event_set_not_exploded_kind": true
   },
+  "mixed_owner_unions": {
+    "profile_rows": 159,
+    "unique_when_descriptor": 25,
+    "note": "Owner is per clause. Lifting one turn_owner over a phase_set is invalid (T1-001).",
+    "patterns": [
+      {
+        "clauses": [
+          {"turn_owner": "opponent", "phase": "shooting"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 85,
+        "example": "Your opponent's Shooting phase or the Fight phase"
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "shooting"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 71,
+        "example": "Your Shooting phase or the Fight phase"
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "movement"},
+          {"turn_owner": "unspecified", "phase": "charge"}
+        ],
+        "profile_count": 2
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "charge"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 1
+      }
+    ]
+  },
+  "same_owner_unions": {
+    "profile_rows": 17,
+    "patterns": [
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "movement"},
+          {"turn_owner": "your", "phase": "charge"}
+        ],
+        "profile_count": 12
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "shooting"},
+          {"turn_owner": "your", "phase": "charge"}
+        ],
+        "profile_count": 3
+      },
+      {
+        "clauses": [
+          {"turn_owner": "unspecified", "phase": "shooting"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 1
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "shooting"},
+          {"turn_owner": "your", "phase": "fight"}
+        ],
+        "profile_count": 1
+      }
+    ]
+  },
   "events": [
-    {"event_id": "none", "engine_trigger_kind": null, "uses_boundary": true, "profile_count": 622, "coverage": "boundary_only"},
-    {"event_id": "selected_as_target", "engine_trigger_kind": "after_unit_selected_as_target", "profile_count": 178, "coverage": "covered"},
+    {"event_id": "none", "engine_trigger_kind": null, "uses_boundary": true, "profile_count": 616, "coverage": "boundary_only"},
+    {"event_id": "selected_as_target", "engine_trigger_kind": "after_unit_selected_as_target", "profile_count": 179, "coverage": "covered"},
     {"event_id": "ends_fall_back_move", "engine_trigger_kind": "just_after_friendly_unit_falls_back", "alt_engine_trigger_kind": "after_enemy_unit_ends_move", "profile_count": 39, "coverage": "covered"},
     {"event_id": "has_shot", "engine_trigger_kind": "just_after_friendly_unit_has_shot", "alt_engine_trigger_kind": "just_after_enemy_unit_has_shot", "profile_count": 35, "coverage": "covered"},
     {"event_id": "ends_normal_advance_or_fall_back", "engine_trigger_kind": "after_enemy_unit_ends_move", "profile_count": 32, "coverage": "covered"},
     {"event_id": "unit_destroyed", "engine_trigger_kind": "after_unit_destroyed", "profile_count": 23, "coverage": "mis_mapped_to_start_phase"},
     {"event_id": "ends_charge_move", "engine_trigger_kind": "after_unit_ends_charge_move", "profile_count": 16, "coverage": "covered"},
-    {"event_id": "mortal_wound", "engine_trigger_kind": null, "profile_count": 11, "coverage": "gap_no_kind"},
     {"event_id": "declares_charge", "engine_trigger_kind": null, "profile_count": 10, "coverage": "gap_no_kind"},
+    {"event_id": "mortal_wound", "engine_trigger_kind": null, "profile_count": 9, "coverage": "gap_no_kind", "note": "Suffers or is allocated a mortal wound without naming an attack."},
     {"event_id": "selected_to_fall_back", "engine_trigger_kind": "just_after_enemy_unit_selected_to_fall_back", "profile_count": 6, "coverage": "covered"},
     {"event_id": "model_destroyed_deadly_demise", "engine_trigger_kind": "after_model_destroyed", "profile_count": 6, "coverage": "mis_mapped_to_start_phase"},
     {"event_id": "just_before_consolidate", "engine_trigger_kind": null, "profile_count": 5, "coverage": "gap_no_kind"},
@@ -145,6 +220,8 @@
     {"event_id": "attacks_resolved", "engine_trigger_kind": "after_unit_attacks_resolved", "profile_count": 4, "coverage": "mis_mapped_to_has_fought"},
     {"event_id": "has_fought", "engine_trigger_kind": "just_after_enemy_unit_has_fought", "friendly_kind": null, "profile_count": 3, "coverage": "partial_friendly_gap"},
     {"event_id": "just_after_advance", "engine_trigger_kind": null, "profile_count": 3, "coverage": "gap_no_kind"},
+    {"event_id": "attack_allocated", "engine_trigger_kind": null, "uses_event_set": true, "event_set_with": ["mortal_wound"], "profile_count": 2, "coverage": "gap_no_kind", "examples": ["THIEVES OF PAIN", "PROTECTION OF THE DARK PRINCE"], "note": "WHEN fires just after an attack or a mortal wound is allocated. Distinct from selected_as_target effects that mention allocation."},
+    {"event_id": "finished_making_attacks", "engine_trigger_kind": "after_unit_attacks_resolved", "profile_count": 2, "coverage": "profile_nearest_kind", "examples": ["GUIDED DISRUPTION", "SHOCK BOMBARDMENT"]},
     {"event_id": "selected_to_shoot", "engine_trigger_kind": "just_after_friendly_unit_selected_to_shoot", "profile_count": 2, "coverage": "covered"},
     {"event_id": "selected_to_fight", "engine_trigger_kind": "just_after_friendly_unit_selected_to_fight", "profile_count": 2, "coverage": "covered"},
     {"event_id": "selected_to_advance", "engine_trigger_kind": null, "not_the_same_as": "selected_to_move", "profile_count": 2, "coverage": "gap_no_kind"},
@@ -154,6 +231,9 @@
     {"event_id": "once_per_battle_ability_used", "engine_trigger_kind": null, "profile_count": 2, "coverage": "gap_no_kind"},
     {"event_id": "cult_ambush_marker_move", "engine_trigger_kind": null, "profile_count": 2, "coverage": "gap_no_kind"},
     {"event_id": "dice_roll", "engine_trigger_kind": "after_dice_roll", "profile_count": 1, "coverage": "covered"},
+    {"event_id": "starts_charge_move", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind", "examples": ["SINGLE-MINDED STRIKE"]},
+    {"event_id": "just_before_surge_move", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind", "examples": ["SYNAPTIC GOADING"]},
+    {"event_id": "psychic_test_before_ritual", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind", "examples": ["ARCANE FOCUS"]},
     {"event_id": "charge_targets_before_move", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
     {"event_id": "unit_set_up", "engine_trigger_kind": "model_placed_on_battlefield", "profile_count": 1, "coverage": "mis_mapped_to_start_phase"},
     {"event_id": "ends_normal_move", "engine_trigger_kind": null, "enemy_alt": "after_enemy_unit_ends_move", "profile_count": 1, "coverage": "gap_friendly"},
@@ -167,11 +247,7 @@
     {"event_id": "enemy_ends_move_generic", "engine_trigger_kind": "after_enemy_unit_ends_move", "profile_count": 1, "coverage": "covered_if_battlefield_move"},
     {"event_id": "selected_to_move", "engine_trigger_kind": "just_after_friendly_unit_selected_to_move", "profile_count": 0, "coverage": "live_app_946_and_engine_kind_unused_by_profiles"},
     {"event_id": "becomes_battle_shocked", "engine_trigger_kind": null, "profile_count": 0, "coverage": "live_app_946_gap_no_kind"},
-    {"event_id": "before_battle_shock_roll", "engine_trigger_kind": null, "profile_count": 0, "coverage": "core_15_gap_no_kind"},
-    {"event_id": "starts_charge_move", "engine_trigger_kind": null, "profile_count": 0, "coverage": "profile_leftover_gap_no_kind"},
-    {"event_id": "just_before_surge_move", "engine_trigger_kind": null, "profile_count": 0, "coverage": "profile_leftover_gap_no_kind"},
-    {"event_id": "finished_making_attacks", "engine_trigger_kind": "after_unit_attacks_resolved", "profile_count": 0, "coverage": "profile_leftover_nearest_kind"},
-    {"event_id": "psychic_test_before_ritual", "engine_trigger_kind": null, "profile_count": 0, "coverage": "profile_leftover_gap_no_kind"}
+    {"event_id": "before_battle_shock_roll", "engine_trigger_kind": null, "profile_count": 0, "coverage": "core_15_gap_no_kind"}
   ],
   "kinds_needed_but_unused_by_profiles": [
     "during_phase",
