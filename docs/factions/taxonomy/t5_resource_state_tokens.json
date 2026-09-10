@@ -1,0 +1,725 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "T5",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/taxonomy/T5_RESOURCE_STATE_TOKEN_TAXONOMY.md",
+  "delivered_to": "Track G shared resource ledgers",
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "reporting_groups": 28,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "cited_demand": {
+    "t2_resource_gain_spend_june_rows": 60,
+    "t3_state_token_june_assignments": 30,
+    "note": "T5 cites T2 and T3. It does not recount June Stratagem families."
+  },
+  "named_handler_budget": {
+    "source_package_id": "gw-11e-phase17i-named-handler-budget-2026-27",
+    "source_date": "2026-07-03",
+    "pre_ws14_army_rule_execution_id_count": 23,
+    "t5_does_not_change_the_budget": true,
+    "execution_ids": [
+      "phase17f:phase17e:adepta-sororitas:army-rule",
+      "phase17f:phase17e:adeptus-custodes:army-rule",
+      "phase17f:phase17e:adeptus-mechanicus:army-rule",
+      "phase17f:phase17e:aeldari:army-rule",
+      "phase17f:phase17e:astra-militarum:army-rule",
+      "phase17f:phase17e:black-templars:army-rule",
+      "phase17f:phase17e:chaos-daemons:army-rule",
+      "phase17f:phase17e:chaos-knights:army-rule",
+      "phase17f:phase17e:chaos-space-marines:army-rule",
+      "phase17f:phase17e:death-guard:army-rule",
+      "phase17f:phase17e:drukhari:army-rule",
+      "phase17f:phase17e:emperors-children:army-rule",
+      "phase17f:phase17e:genestealer-cults:army-rule",
+      "phase17f:phase17e:grey-knights:army-rule",
+      "phase17f:phase17e:imperial-knights:army-rule",
+      "phase17f:phase17e:leagues-of-votann:army-rule",
+      "phase17f:phase17e:necrons:army-rule",
+      "phase17f:phase17e:orks:army-rule",
+      "phase17f:phase17e:space-marines:army-rule",
+      "phase17f:phase17e:tau-empire:army-rule",
+      "phase17f:phase17e:thousand-sons:army-rule",
+      "phase17f:phase17e:tyranids:army-rule",
+      "phase17f:phase17e:world-eaters:army-rule"
+    ],
+    "no_pre_ws14_army_rule_row": ["kill_teams", "assigned_agents"]
+  },
+  "closed_axes": {
+    "runtime_fits": [
+      "faction_integer_ledger",
+      "unit_integer_ledger",
+      "core_command_point_ledger",
+      "specialized_face_pool",
+      "pulse_flag",
+      "mode_machine",
+      "designated_target",
+      "aura_zone",
+      "placement_reserve",
+      "protocol",
+      "composition",
+      "contextual_status"
+    ],
+    "do_not_lift_single_fit_over_a_split": true,
+    "same_fit_is_not_same_resource_kind": true,
+    "same_t3_token_name_is_not_same_ledger": true,
+    "pain_and_power_from_pain_are_one_token": true,
+    "synapse_and_shadow_in_the_warp_are_two_tokens": true,
+    "command_points_are_not_faction_resource_ledger": true,
+    "pulse_flag_is_not_a_spend_pool": true
+  },
+  "classification_rules": [
+    {
+      "id": "no_pain_power_split",
+      "flattened_token": "Pain and Power from Pain",
+      "token_id": "pain",
+      "note": "One token. Roadmap lists both names."
+    },
+    {
+      "id": "no_synapse_shadow_lift",
+      "flattened_token": "Synapse/Shadow",
+      "token_ids": ["synapse", "shadow_in_the_warp"],
+      "note": "Two aura tokens on one reporting group."
+    },
+    {
+      "id": "no_battle_focus_lift",
+      "flattened_token": "Battle Focus",
+      "token_id": "battle_focus",
+      "runtime_fits": ["faction_integer_ledger", "mode_machine"],
+      "note": "Token count is the ledger half. Manoeuvre pick is named/T6."
+    },
+    {
+      "id": "no_cult_ambush_lift",
+      "flattened_token": "Cult Ambush",
+      "token_id": "cult_ambush",
+      "runtime_fits": ["faction_integer_ledger", "placement_reserve"],
+      "note": "Resurgence points are the ledger half. Markers are placement."
+    },
+    {
+      "id": "no_cabal_integer_without_s3a",
+      "flattened_token": "Cabal",
+      "token_id": "cabal",
+      "runtime_fits": ["mode_machine"],
+      "note": "Current named handler is ritual attempts, not an integer Cabal-points kind. T2 resource_gain_spend wording is EFFECT demand."
+    },
+    {
+      "id": "no_waaagh_riled_up_ledger",
+      "flattened_token": "Waaagh! active and riled up",
+      "token_ids": ["waaagh", "riled_up"],
+      "note": "Two pulse tokens. They do not share a ledger."
+    },
+    {
+      "id": "no_miracle_dice_integer_kind",
+      "flattened_token": "Miracle dice",
+      "token_id": "miracle_dice",
+      "runtime_fits": ["specialized_face_pool"]
+    },
+    {
+      "id": "no_cp_into_faction_ledger",
+      "flattened_token": "Command points",
+      "token_id": "command_points",
+      "runtime_fits": ["core_command_point_ledger"]
+    },
+    {
+      "id": "no_pact_as_ledger",
+      "flattened_token": "Related-army Pact headings",
+      "owner": "T4"
+    },
+    {
+      "id": "no_strands_ledger_from_name",
+      "flattened_token": "Strands of Fate",
+      "token_id": "strands_of_fate",
+      "note": "Not a current App 946 heading. Current Aeldari headings are Battle Focus and Disparate Paths."
+    }
+  ],
+  "existing_resource_kinds": [
+    {
+      "resource_kind": "drukhari_pain_token",
+      "token_id": "pain",
+      "ledger": "FactionResourceLedger"
+    },
+    {
+      "resource_kind": "leagues_of_votann_yield_points",
+      "token_id": "yield",
+      "ledger": "FactionResourceLedger"
+    },
+    {
+      "resource_kind": "battle_focus_token",
+      "token_id": "battle_focus",
+      "half_id": "token_pool",
+      "ledger": "FactionResourceLedger"
+    },
+    {
+      "resource_kind": "resurgence_points",
+      "token_id": "cult_ambush",
+      "half_id": "resurgence_points",
+      "ledger": "FactionResourceLedger"
+    },
+    {
+      "resource_kind": "aeldari:aspect-shrine-token",
+      "token_id": "aspect_shrine_token",
+      "ledger": "UnitResourceLedger"
+    }
+  ],
+  "tokens": [
+    {
+      "token_id": "miracle_dice",
+      "class": "army_rule",
+      "roadmap_names": ["Miracle dice"],
+      "app_heading": "Acts of Faith",
+      "views": ["adepta-sororitas"],
+      "runtime_fits": ["specialized_face_pool"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:adepta-sororitas:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "pain",
+      "class": "army_rule",
+      "roadmap_names": ["Pain", "Power from Pain"],
+      "app_heading": "Power From Pain",
+      "views": ["drukhari"],
+      "runtime_fits": ["faction_integer_ledger"],
+      "existing_resource_kind": "drukhari_pain_token",
+      "named_handler_execution_id": "phase17f:phase17e:drukhari:army-rule",
+      "shares_typed_resource_ledger": true
+    },
+    {
+      "token_id": "blessings_of_khorne",
+      "class": "army_rule",
+      "roadmap_names": ["Blessings"],
+      "app_heading": "Blessings of Khorne",
+      "views": ["world-eaters", "blood-legions"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:world-eaters:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "battle_focus",
+      "class": "army_rule",
+      "roadmap_names": ["Battle Focus"],
+      "app_heading": "Battle Focus",
+      "views": ["aeldari", "harlequins", "ynnari"],
+      "runtime_fits": ["faction_integer_ledger", "mode_machine"],
+      "split": [
+        {
+          "half_id": "token_pool",
+          "runtime_fit": "faction_integer_ledger",
+          "existing_resource_kind": "battle_focus_token"
+        },
+        {
+          "half_id": "manoeuvre_pick",
+          "runtime_fit": "mode_machine",
+          "owner": "named_handler_and_T6"
+        }
+      ],
+      "existing_resource_kind": "battle_focus_token",
+      "named_handler_execution_id": "phase17f:phase17e:aeldari:army-rule",
+      "shares_typed_resource_ledger": true,
+      "shares_ledger_note": "token half only"
+    },
+    {
+      "token_id": "waaagh",
+      "class": "army_rule",
+      "roadmap_names": ["Waaagh!"],
+      "app_heading": "Waaagh!",
+      "views": ["orks"],
+      "runtime_fits": ["pulse_flag"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:orks:army-rule",
+      "t3_june_state_token_hits": 7,
+      "shares_typed_resource_ledger": false,
+      "does_not_share_ledger_with": ["riled_up"]
+    },
+    {
+      "token_id": "strands_of_fate",
+      "class": "army_rule",
+      "roadmap_names": ["Strands of Fate"],
+      "app_heading": null,
+      "views": [],
+      "runtime_fits": [],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": false,
+      "june_app_heading_zero": true,
+      "hold_id": "T5-HOLD-STRANDS"
+    },
+    {
+      "token_id": "yield",
+      "class": "army_rule",
+      "roadmap_names": ["Yield"],
+      "app_heading": "Prioritised Efficiency",
+      "views": ["leagues-of-votann"],
+      "runtime_fits": ["faction_integer_ledger"],
+      "existing_resource_kind": "leagues_of_votann_yield_points",
+      "named_handler_execution_id": "phase17f:phase17e:leagues-of-votann:army-rule",
+      "shares_typed_resource_ledger": true
+    },
+    {
+      "token_id": "cabal",
+      "class": "army_rule",
+      "roadmap_names": ["Cabal"],
+      "app_heading": "Cabal of Sorcerers",
+      "views": ["thousand-sons", "scintillating-legions"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:thousand-sons:army-rule",
+      "shares_typed_resource_ledger": false,
+      "hold_id": "T5-HOLD-CABAL-SHAPE",
+      "note": "Current runtime is CABAL_SELECTION_KIND ritual attempts."
+    },
+    {
+      "token_id": "doctrina",
+      "class": "army_rule",
+      "roadmap_names": ["Doctrina"],
+      "app_heading": "Doctrina Imperatives",
+      "views": ["adeptus-mechanicus"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:adeptus-mechanicus:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "dread",
+      "class": "army_rule",
+      "roadmap_names": ["Dread"],
+      "app_heading": "Harbingers of Dread",
+      "views": ["chaos-knights"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:chaos-knights:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "oath_of_moment",
+      "class": "army_rule",
+      "roadmap_names": ["Oath"],
+      "app_heading": "Oath of Moment",
+      "views": [
+        "space-marines",
+        "ultramarines",
+        "imperial-fists",
+        "iron-hands",
+        "salamanders",
+        "raven-guard",
+        "white-scars",
+        "blood-angels",
+        "dark-angels",
+        "space-wolves",
+        "deathwatch"
+      ],
+      "runtime_fits": ["designated_target"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:space-marines:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "vows",
+      "class": "army_rule",
+      "roadmap_names": ["Vows"],
+      "app_heading": "Templar Vows",
+      "views": ["black-templars"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:black-templars:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "katah",
+      "class": "army_rule",
+      "roadmap_names": ["Ka'tah"],
+      "app_heading": "Martial Ka’tah",
+      "views": ["adeptus-custodes"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:adeptus-custodes:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "orders",
+      "class": "army_rule",
+      "roadmap_names": ["Orders"],
+      "app_heading": "Voice of Command",
+      "views": ["astra-militarum"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:astra-militarum:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "kill_teams",
+      "class": "army_rule",
+      "roadmap_names": ["Kill Teams"],
+      "app_heading": "Kill Teams",
+      "views": ["deathwatch"],
+      "runtime_fits": ["composition"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "cult_ambush",
+      "class": "army_rule",
+      "roadmap_names": ["Cult Ambush"],
+      "app_heading": "Cult Ambush",
+      "views": ["genestealer-cults"],
+      "runtime_fits": ["faction_integer_ledger", "placement_reserve"],
+      "split": [
+        {
+          "half_id": "resurgence_points",
+          "runtime_fit": "faction_integer_ledger",
+          "existing_resource_kind": "resurgence_points"
+        },
+        {
+          "half_id": "markers",
+          "runtime_fit": "placement_reserve",
+          "owner": "named_handler"
+        }
+      ],
+      "existing_resource_kind": "resurgence_points",
+      "named_handler_execution_id": "phase17f:phase17e:genestealer-cults:army-rule",
+      "shares_typed_resource_ledger": true,
+      "shares_ledger_note": "Resurgence half only"
+    },
+    {
+      "token_id": "reanimation",
+      "class": "army_rule",
+      "roadmap_names": ["Reanimation"],
+      "app_heading": "Reanimation Protocols",
+      "views": ["necrons"],
+      "runtime_fits": ["protocol"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:necrons:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "synapse",
+      "class": "army_rule",
+      "roadmap_names": ["Synapse/Shadow"],
+      "app_heading": "Synapse",
+      "views": ["tyranids"],
+      "runtime_fits": ["aura_zone"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:tyranids:army-rule",
+      "shares_typed_resource_ledger": false,
+      "paired_token_id": "shadow_in_the_warp"
+    },
+    {
+      "token_id": "shadow_in_the_warp",
+      "class": "army_rule",
+      "roadmap_names": ["Synapse/Shadow"],
+      "app_heading": "Shadow in the Warp",
+      "views": ["tyranids"],
+      "runtime_fits": ["aura_zone"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:tyranids:army-rule",
+      "shares_typed_resource_ledger": false,
+      "paired_token_id": "synapse"
+    },
+    {
+      "token_id": "greater_good",
+      "class": "army_rule",
+      "roadmap_names": ["Greater Good"],
+      "app_heading": "For the Greater Good",
+      "views": ["tau-empire"],
+      "runtime_fits": ["aura_zone"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:tau-empire:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "gate_of_infinity",
+      "class": "army_rule",
+      "roadmap_names": ["Gate of Infinity"],
+      "app_heading": "Gate of Infinity",
+      "views": ["grey-knights"],
+      "runtime_fits": ["protocol"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:grey-knights:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "assigned_agents",
+      "class": "army_rule",
+      "roadmap_names": ["Assigned Agents"],
+      "app_heading": "Assigned Agents",
+      "views": ["imperial-agents"],
+      "runtime_fits": ["composition"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "code_chivalric",
+      "class": "army_rule",
+      "roadmap_names": ["Code Chivalric"],
+      "app_heading": "Code Chivalric",
+      "views": ["imperial-knights"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:imperial-knights:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "thrill_seekers",
+      "class": "army_rule",
+      "roadmap_names": ["Thrill Seekers"],
+      "app_heading": "Thrill Seekers",
+      "views": ["emperors-children", "legions-of-excess"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:emperors-children:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "dark_pacts",
+      "class": "army_rule",
+      "roadmap_names": ["Dark Pacts"],
+      "app_heading": "Dark Pacts",
+      "views": ["chaos-space-marines"],
+      "runtime_fits": ["mode_machine"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:chaos-space-marines:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "nurgles_gift",
+      "class": "army_rule",
+      "roadmap_names": ["Nurgle's Gift"],
+      "app_heading": "Nurgle’s Gift (Aura)",
+      "views": ["death-guard", "plague-legions"],
+      "runtime_fits": ["aura_zone"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:death-guard:army-rule",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "shadow_of_chaos",
+      "class": "army_rule",
+      "roadmap_names": ["Shadow of Chaos"],
+      "app_heading": "The Shadow of Chaos",
+      "views": ["chaos-daemons"],
+      "runtime_fits": ["aura_zone"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": "phase17f:phase17e:chaos-daemons:army-rule",
+      "shares_typed_resource_ledger": false,
+      "does_not_share_ledger_with": ["shroud_of_chaos"]
+    },
+    {
+      "token_id": "command_points",
+      "class": "core",
+      "roadmap_names": [],
+      "app_heading": null,
+      "views": [],
+      "runtime_fits": ["core_command_point_ledger"],
+      "existing_resource_kind": null,
+      "existing_ledger": "CommandPointLedger",
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": true,
+      "shares_ledger_note": "Core CP ledger only"
+    },
+    {
+      "token_id": "aspect_shrine_token",
+      "class": "datasheet",
+      "roadmap_names": [],
+      "app_heading": null,
+      "views": ["aeldari"],
+      "runtime_fits": ["unit_integer_ledger"],
+      "existing_resource_kind": "aeldari:aspect-shrine-token",
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": true
+    },
+    {
+      "token_id": "drones",
+      "class": "army_rule_extra",
+      "roadmap_names": [],
+      "app_heading": "Drones",
+      "views": ["tau-empire"],
+      "runtime_fits": ["composition"],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "da_boss",
+      "class": "army_rule_extra",
+      "roadmap_names": [],
+      "app_heading": "Da Boss",
+      "views": ["orks"],
+      "runtime_fits": [],
+      "existing_resource_kind": null,
+      "named_handler_execution_id": null,
+      "shares_typed_resource_ledger": false,
+      "hold_id": "F-ORK-01"
+    },
+    {
+      "token_id": "righteous",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 6,
+      "adjacent_army_token": "miracle_dice",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "afflicted",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 4,
+      "adjacent_army_token": "nurgles_gift",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "halo_override",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 4,
+      "adjacent_army_token": "doctrina",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "desperate_pact",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 3,
+      "adjacent_army_token": "dark_pacts",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "focus_of_hatred",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 2,
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "blessed",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 2,
+      "adjacent_army_token": "blessings_of_khorne",
+      "shares_typed_resource_ledger": false,
+      "note": "Not a Blessings of Khorne pick."
+    },
+    {
+      "token_id": "malevolent",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 1,
+      "adjacent_army_token": "cabal",
+      "shares_typed_resource_ledger": false
+    },
+    {
+      "token_id": "shroud_of_chaos",
+      "class": "t3_contextual",
+      "runtime_fits": ["contextual_status"],
+      "t3_june_state_token_hits": 1,
+      "adjacent_army_token": "shadow_of_chaos",
+      "shares_typed_resource_ledger": false,
+      "note": "Not army-rule shadow_of_chaos."
+    },
+    {
+      "token_id": "riled_up",
+      "class": "t3_contextual",
+      "runtime_fits": ["pulse_flag"],
+      "t3_june_state_token_hits": 0,
+      "june_stratagem_zero_enhancement_demand": true,
+      "adjacent_army_token": "waaagh",
+      "shares_typed_resource_ledger": false,
+      "does_not_share_ledger_with": ["waaagh"],
+      "hold_id": "F-ORK-01"
+    }
+  ],
+  "not_t5_headings": {
+    "owner": "T4",
+    "construction_and_related_army": [
+      "Disparate Paths",
+      "Daemonic Pact",
+      "Pact of Blood",
+      "Pact of Excess",
+      "Pact of Decay",
+      "Pact of Sorcery",
+      "Cults of the Dark Gods",
+      "Corsairs and Travelling Players",
+      "Super-heavy Walker",
+      "Dreadblades",
+      "Freeblades",
+      "Bondsman",
+      "Space Marine Chapters"
+    ],
+    "overlay_not_extra_ledger_kinds": [
+      "Heirs of Sigismund",
+      "The Sons of Sanguinius",
+      "The Unforgiven",
+      "The Ravenwing",
+      "The Deathwing",
+      "Sons of Russ",
+      "Sagas",
+      "Curse of the Wulfen"
+    ],
+    "t2_movement_not_ledgers": ["Unstable energies", "Special Move Types"]
+  },
+  "holds": [
+    {
+      "id": "T5-HOLD-APP-ARMY-RULE",
+      "hold": "App 946 army-rule operative text is not retained for every heading",
+      "unblocks": "S3a, then FM0"
+    },
+    {
+      "id": "T5-HOLD-STRANDS",
+      "hold": "Strands of Fate is not a current Aeldari heading",
+      "unblocks": "S3a"
+    },
+    {
+      "id": "T5-HOLD-CABAL-SHAPE",
+      "hold": "Current handler is ritual attempts; June/T2 wording still says Cabal spend",
+      "unblocks": "S3a"
+    },
+    {
+      "id": "T5-HOLD-BATTLE-FOCUS-SPLIT",
+      "hold": "Token ledger versus manoeuvre pick",
+      "unblocks": "Track G / T6"
+    },
+    {
+      "id": "T5-HOLD-CULT-AMBUSH-SPLIT",
+      "hold": "Markers versus Resurgence points",
+      "unblocks": "Track G"
+    },
+    {
+      "id": "T2-HOLD-RESOURCE-SPLIT",
+      "hold": "Answered here for the ledger question; T2 EFFECT counts stay T2",
+      "unblocks": "this survey"
+    },
+    {
+      "id": "F-ORK-01",
+      "hold": "Orks v946 Waaagh!, Da Boss and riled up may be new",
+      "unblocks": "FM0.5"
+    }
+  ],
+  "not_in_this_pr": [
+    "engine kinds",
+    "named-handler budget change",
+    "semantic_demand_matrix.json",
+    "T6 decision-kind survey",
+    "src/ or packaged data changes"
+  ],
+  "reconciliation": {
+    "roadmap_parenthetical_name_count": 27,
+    "roadmap_unique_token_count": 27,
+    "pain_alias_count": 2,
+    "synapse_shadow_token_count": 2,
+    "extra_token_count": 4,
+    "t3_contextual_only_token_count": 9,
+    "catalog_token_count": 40,
+    "named_handler_army_rule_row_count": 23,
+    "t3_state_token_hit_sum": 30,
+    "t3_state_token_hit_note": "7+6+4+4+3+2+2+1+1+0 from T3 named tokens, including waaagh and riled_up. Not a new June recount.",
+    "existing_integer_kind_count": 5,
+    "note": "28 reporting groups are not 28 ledger kinds. 23 named handlers are not the token enum."
+  }
+}

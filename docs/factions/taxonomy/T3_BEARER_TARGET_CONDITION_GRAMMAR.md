@@ -1,6 +1,6 @@
 # T3 — Bearer, target and condition grammar
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T2 effect taxonomy](T2_EFFECT_TAXONOMY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T2 effect taxonomy](T2_EFFECT_TAXONOMY.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T3. It is planning evidence delivered read-only to
 Track G's bearer, target and condition surfaces. It does not implement engine
@@ -30,9 +30,11 @@ have [Lethal Hits]" is T2.
 engine-owned consumers only.** It must not add speculative kinds from this gap
 list without a real source-backed consumer in the same PR.
 
-T1 still owns WHEN windows. T2 still owns EFFECT families. T5 still owns which
-resources share a `ResourceLedger`. T6 still owns finite versus parameterized
-decisions. T3 names the atoms those tracks bind.
+T1 still owns WHEN windows. T2 still owns EFFECT families. T5 delivered which
+resources share a `ResourceLedger` in
+[T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md).
+T6 still owns finite versus parameterized decisions. T3 names the atoms
+those tracks bind.
 
 ## 2. Methodology and snapshot
 
@@ -218,7 +220,7 @@ not the closed keyword-require grammar.
 
 ### 3.5 State tokens
 
-T3 names the tokens. T5 decides which share a `ResourceLedger`.
+T3 names the tokens. T5 delivered which share a `ResourceLedger`.
 
 June EFFECT/TARGET hits: Righteous (6), Halo Override (4), Desperate Pact (3),
 Afflicted (4), Waaagh! (7), Focus of Hatred (2), Blessed (2), Malevolent (1),
@@ -332,7 +334,7 @@ Demand, each requiring a real consumer before a new kind exists:
 | T3-HOLD-PROFILE-STALENESS | 1,025 profiles dated 2026-06-21 | S3a / S3d |
 | T3-HOLD-UNION-TARGET | Clause-list versus a lifted `target_kind`; action sets stay sets | Track G |
 | T3-HOLD-STORED-KIND | Generator `_target_kind_and_policy` is a heuristic | Track G / FM0 |
-| T3-HOLD-STATE-SPLIT | Named tokens are T3; which share a ledger is T5 | T5 |
+| T3-HOLD-STATE-SPLIT | Named tokens are T3; which share a ledger is answered in [T5](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) | this survey / T5 |
 | F-ORK-01 | Orks bearer and "riled up" inventory may be new at v946 | FM0.5 |
 
 ## 9. What "T3 delivered to Track G" means

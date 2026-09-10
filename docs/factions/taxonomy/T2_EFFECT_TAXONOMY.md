@@ -1,6 +1,6 @@
 # T2 — Effect taxonomy
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T3 bearer/target/condition grammar](T3_BEARER_TARGET_CONDITION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T3 bearer/target/condition grammar](T3_BEARER_TARGET_CONDITION_GRAMMAR.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T2. It is planning evidence delivered read-only to
 Track G's generic effect families. It does not implement engine semantics, add
@@ -30,9 +30,10 @@ It must not add speculative templates from this gap list without a real
 source-backed consumer in the same PR. Existing generic RuleIR consumers stay
 on their current templates until a later order remaps them.
 
-T3 still owns bearer, target and condition grammar. T5 still owns which
-resources share a `ResourceLedger`. T2 only names the effect families those
-tracks will bind.
+T3 still owns bearer, target and condition grammar. T5 delivered which
+resources share a `ResourceLedger` in
+[T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md).
+T2 only names the effect families those tracks bind.
 
 ## 2. Methodology and snapshot
 
@@ -327,7 +328,7 @@ must be stored as RuleIR rather than `effect_kind` strings.
 | T2-HOLD-PROFILE-STALENESS | 1,025 profiles dated 2026-06-21 | S3a / S3d |
 | T2-HOLD-MULTI-FAMILY | One EFFECT is a family set; stored `template_id` cannot flatten it | Track G |
 | T2-HOLD-TOKEN-FLATTENING | Naive token hits flatten eligibility into Charge-now, keyword gates into grants, Leadership tests into characteristic modifiers, and Stratagem frequency into ability reuse | Track G / FM0 |
-| T2-HOLD-RESOURCE-SPLIT | `resource_gain_spend` counts mixed ledgers | T5 |
+| T2-HOLD-RESOURCE-SPLIT | `resource_gain_spend` counts mixed ledgers. Ledger split answered in [T5](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md); T2 EFFECT counts stay T2 | this survey / T5 |
 | F-ORK-01 | Orks EFFECT inventory may be new at v946 | FM0.5 |
 
 ## 9. What "T2 delivered to Track G" means
