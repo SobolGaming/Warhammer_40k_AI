@@ -1,0 +1,283 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "T3",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/taxonomy/T3_BEARER_TARGET_CONDITION_GRAMMAR.md",
+  "delivered_to": "Track G bearer, target and condition surfaces",
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "corpus_listing_counts": {
+    "enhancement_upgrade_audit_table_rows": 1756,
+    "stratagem_audit_table_rows": 2520,
+    "note": "September audits have no TARGET column. Distinct-rule identity is S2."
+  },
+  "activation_profiles": {
+    "source_package_id": "gw-11e-phase17s-faction-stratagem-activation-2026-27",
+    "source_date": "2026-06-21",
+    "profile_rows": 1025,
+    "unique_target_descriptor": 857,
+    "stored_rule_ir_template_id": "phase17s:stratagem-activation-target-binding",
+    "stored_conditions_always_empty": true,
+    "restrictions_descriptor_unique_values": 1,
+    "restrictions_descriptor": "matched play same stratagem per phase",
+    "stored_target_kind": {"friendly_unit": 1023, "any_unit": 2},
+    "stored_target_policy_id": {
+      "friendly_unit": 627,
+      "selected_target_unit": 184,
+      "not_selected_to_shoot_unit": 107,
+      "not_selected_to_fight_unit": 71,
+      "selected_to_move_unit": 32,
+      "just_shot_unit": 2,
+      "enemy_unit": 2
+    },
+    "stored_enemy_unit_is_false": ["ECSTATIC SLAUGHTER", "DUTY UNENDING"],
+    "stored_just_shot_false_positive": ["Phantasmal Mirage"],
+    "stored_required_keywords_rows": 386,
+    "stored_excluded_keywords_rows": 81,
+    "assigned_target_rows": 1025,
+    "unassigned_target_rows": 0,
+    "condition_rows_with_zero_families": 158,
+    "condition_assignment_total": 1520,
+    "families_per_row": {"0": 158, "1": 436, "2": 280, "3": 99, "4": 35, "5": 15, "6": 2},
+    "reconciliation": {
+      "condition_profile_count_sum": 1520,
+      "histogram_weighted_sum": 1520,
+      "row_sum": 1025,
+      "note": "not_selected_to_fight includes the 62 shoot-or-fight unions. keyword_exclude excludes T2 'excluding modifiers'. in_reserves is TARGET location, not EFFECT place-into-Reserves."
+    }
+  },
+  "closed_axes": {
+    "target_is_clause_list": true,
+    "do_not_lift_single_target_kind": true,
+    "selection_state_is_action_set": true,
+    "phase_if_is_not_when": true,
+    "allegiance": ["your", "opponent", "anaphoric", "unspecified"],
+    "grain": ["unit", "model", "marker", "objective_marker", "dice_roll", "player"],
+    "count": ["one", "up_to_n", "one_or_more", "that"],
+    "composition": ["singleton", "union", "pair"]
+  },
+  "classification_rules": [
+    {
+      "id": "no_engagement_enemy_as_enemy_select",
+      "flattened_token": "enemy unit inside not within Engagement Range",
+      "family_id": "engagement",
+      "not_family_id": "enemy_select"
+    },
+    {
+      "id": "no_lift_target_union",
+      "flattened_token": "that unit, or one friendly JUMP PACK within 3\"",
+      "note": "Clause list. Do not lift friendly_unit."
+    },
+    {
+      "id": "pair_is_two_objects",
+      "flattened_token": "one unit and one objective marker",
+      "composition": "pair"
+    },
+    {
+      "id": "selection_state_is_set",
+      "flattened_token": "selected to shoot or fight",
+      "actions": ["shoot", "fight"]
+    },
+    {
+      "id": "target_keyword_is_not_grant",
+      "flattened_token": "one KEYWORD unit from your army",
+      "owner": "target_clause",
+      "not_family_id": "keyword_grant"
+    },
+    {
+      "id": "if_keyword_is_gate",
+      "flattened_token": "if your unit has the X keyword",
+      "family_id": "keyword_effect_gate"
+    },
+    {
+      "id": "phase_if_is_not_when",
+      "flattened_token": "if it is your Shooting phase",
+      "family_id": "phase_condition",
+      "not_owner": "T1"
+    },
+    {
+      "id": "no_has_just_destroyed_as_just_destroyed",
+      "flattened_token": "has just destroyed an enemy unit",
+      "not_family_id": "just_destroyed"
+    },
+    {
+      "id": "no_place_into_reserves_as_in_reserves",
+      "flattened_token": "place it into Strategic Reserves",
+      "owner": "T2",
+      "not_family_id": "in_reserves"
+    },
+    {
+      "id": "no_excluding_modifiers_as_keyword_exclude",
+      "flattened_token": "excluding modifiers to saving throws",
+      "owner": "T2",
+      "not_family_id": "keyword_exclude"
+    },
+    {
+      "id": "no_charge_as_a_target_as_selected_as_target",
+      "flattened_token": "selected as a target of that charge",
+      "owner": "T1",
+      "not_family_id": "selected_as_target"
+    }
+  ],
+  "bearers": [
+    {"bearer_id": "activation_object", "profile_count": 1025, "existing_target_kind": "friendly_unit", "coverage": "partial"},
+    {"bearer_id": "enhancement_bearer", "profile_count": 0, "existing_target_kind": "this_model", "coverage": "june_stratagem_zero_enhancement_demand"},
+    {"bearer_id": "this_model", "profile_count": 0, "existing_target_kind": "this_model", "coverage": "june_stratagem_zero_datasheet_demand"},
+    {"bearer_id": "this_unit", "profile_count": 0, "existing_target_kind": "this_unit", "coverage": "june_stratagem_zero_datasheet_demand"},
+    {"bearer_id": "attached_rules_unit", "profile_count": 0, "condition_hits": {"leading": 2, "attached": 13}, "coverage": "runtime_group_apis"},
+    {"bearer_id": "army", "profile_count": 0, "existing_target_kind": "player", "coverage": "june_stratagem_zero_army_demand"}
+  ],
+  "target_tokens": [
+    {"token_id": "friendly_allegiance", "profile_count": 1018, "axis": "allegiance"},
+    {"token_id": "unit_grain", "profile_count": 978, "axis": "grain"},
+    {"token_id": "anaphoric", "profile_count": 119, "axis": "allegiance"},
+    {"token_id": "model_grain", "profile_count": 40, "axis": "grain"},
+    {"token_id": "destroyed_permitted", "profile_count": 37, "axis": "qualifier"},
+    {"token_id": "target_pair", "profile_count": 20, "axis": "composition"},
+    {"token_id": "multi_select", "profile_count": 23, "axis": "count"},
+    {"token_id": "target_union", "profile_count": 20, "axis": "composition"},
+    {"token_id": "marker", "profile_count": 2, "axis": "grain", "examples": ["EVASIVE VANGUARD", "ALONG SHADOWED TRAILS"]},
+    {"token_id": "enemy_select", "profile_count": 0, "axis": "allegiance", "existing_target_kind": "enemy_unit", "coverage": "june_stratagem_zero_core_and_effect_demand"},
+    {"token_id": "dice_roll", "profile_count": 0, "axis": "grain", "existing_target_kind": "dice_roll", "coverage": "june_stratagem_zero_core_demand"},
+    {"token_id": "player", "profile_count": 0, "axis": "grain", "existing_target_kind": "player", "coverage": "june_stratagem_zero_core_demand"}
+  ],
+  "selection_state": {
+    "is_action_set": true,
+    "actions": [
+      {"action_id": "shoot", "profile_count": 171, "union_with_fight": 62},
+      {"action_id": "fight", "profile_count": 138, "union_with_shoot": 62},
+      {"action_id": "move", "profile_count": 32, "union_with_charge": 7},
+      {"action_id": "charge", "profile_count": 9, "union_with_move": 7, "charge_only_examples": ["BLOOD BEGETS SKULLS", "UNHOLY HASTE"]}
+    ]
+  },
+  "condition_families": [
+    {"family_id": "distance", "profile_count": 217, "existing_condition_kind": "distance_predicate", "existing_template_id": "phase17c:distance-predicate", "coverage": "covered"},
+    {"family_id": "selected_as_target", "profile_count": 183, "existing_condition_kind": "target_constraint", "coverage": "partial", "note": "TARGET 'selected as the target'. Charge-as-a-target remains T1."},
+    {"family_id": "not_selected_to_shoot", "profile_count": 171, "existing_condition_kind": "target_constraint", "coverage": "nearest"},
+    {"family_id": "engagement", "profile_count": 165, "existing_condition_kind": "distance_predicate", "coverage": "partial"},
+    {"family_id": "not_selected_to_fight", "profile_count": 138, "existing_condition_kind": "target_constraint", "coverage": "nearest", "note": "Includes shoot-or-fight unions."},
+    {"family_id": "keyword_exclude", "profile_count": 126, "existing_condition_kind": "keyword_gate", "existing_template_id": "phase17c:keyword-gate", "coverage": "partial", "note": "Not T2 excluding modifiers. Stored excluded_keywords is 81 TARGET rows."},
+    {"family_id": "battle_shocked", "profile_count": 69, "existing_condition_kind": null, "coverage": "gap_no_condition_kind", "note": "T2 owns the Battle-shock EFFECT."},
+    {"family_id": "keyword_effect_gate", "profile_count": 58, "existing_condition_kind": "keyword_gate", "existing_template_id": "phase17c:keyword-gate", "coverage": "covered"},
+    {"family_id": "on_battlefield", "profile_count": 54, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "wholly_within", "profile_count": 41, "existing_condition_kind": "distance_predicate", "existing_template_id": "phase17c:distance-predicate", "coverage": "covered"},
+    {"family_id": "just_destroyed", "profile_count": 37, "existing_condition_kind": null, "coverage": "gap_no_condition_kind", "note": "TARGET object was destroyed. T1 owns destruction WHEN. 'Has just destroyed' is not this family."},
+    {"family_id": "not_selected_to_move", "profile_count": 32, "existing_condition_kind": "target_constraint", "coverage": "nearest"},
+    {"family_id": "visibility", "profile_count": 31, "existing_condition_kind": "visibility_predicate", "coverage": "kind_unused_by_stored_profiles"},
+    {"family_id": "state_token", "profile_count": 30, "existing_template_id": "phase17c:contextual-status", "coverage": "partial", "owner_split": "T5"},
+    {"family_id": "objective_range", "profile_count": 28, "existing_condition_kind": "distance_predicate", "coverage": "partial"},
+    {"family_id": "embarked", "profile_count": 26, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "frequency", "profile_count": 25, "existing_condition_kind": "frequency_limit", "coverage": "kind_unused_by_stored_profiles"},
+    {"family_id": "in_reserves", "profile_count": 25, "existing_effect_kind": "placement_permission", "coverage": "gap_no_condition_kind", "note": "TARGET location. EFFECT place-into-Reserves is T2."},
+    {"family_id": "attached", "profile_count": 13, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "deadly_demise", "profile_count": 12, "existing_condition_kind": "keyword_gate", "coverage": "nearest"},
+    {"family_id": "disembarked", "profile_count": 10, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "not_selected_to_charge", "profile_count": 9, "existing_condition_kind": "target_constraint", "coverage": "nearest"},
+    {"family_id": "models_destroyed", "profile_count": 8, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "below_starting_strength", "profile_count": 5, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "count_size", "profile_count": 4, "existing_condition_kind": "target_constraint", "coverage": "nearest"},
+    {"family_id": "leading", "profile_count": 2, "existing_condition_kind": null, "coverage": "gap_no_condition_kind"},
+    {"family_id": "just_shot", "profile_count": 1, "existing_condition_kind": null, "coverage": "gap_no_condition_kind", "examples": ["PSY-CHAFF VOLLEY"]},
+    {"family_id": "phase_condition", "profile_count": 0, "existing_condition_kind": "phase_gate", "coverage": "june_stratagem_zero_kind_exists"},
+    {"family_id": "turn_owner_condition", "profile_count": 0, "existing_condition_kind": "phase_gate", "coverage": "june_stratagem_zero_kind_exists"},
+    {"family_id": "riled_up", "profile_count": 0, "existing_condition_kind": null, "coverage": "june_stratagem_zero_enhancement_demand", "note": "War Horde Enhancement state token. F-ORK-01."}
+  ],
+  "state_tokens": [
+    {"token_id": "waaagh", "profile_count": 7},
+    {"token_id": "righteous", "profile_count": 6},
+    {"token_id": "afflicted", "profile_count": 4},
+    {"token_id": "halo_override", "profile_count": 4},
+    {"token_id": "desperate_pact", "profile_count": 3},
+    {"token_id": "focus_of_hatred", "profile_count": 2},
+    {"token_id": "blessed", "profile_count": 2},
+    {"token_id": "malevolent", "profile_count": 1},
+    {"token_id": "shroud_of_chaos", "profile_count": 1},
+    {"token_id": "riled_up", "profile_count": 0, "note": "App 946 War Horde Enhancement demand."}
+  ],
+  "rule_target_kinds": [
+    "aura_units",
+    "dice_roll",
+    "enemy_unit",
+    "friendly_unit",
+    "player",
+    "selected_target",
+    "selected_unit",
+    "stratagem_use",
+    "this_model",
+    "this_unit",
+    "weapon"
+  ],
+  "rule_condition_kinds": [
+    "aura",
+    "dice_roll_gate",
+    "dice_roll_type",
+    "distance_predicate",
+    "frequency_limit",
+    "keyword_gate",
+    "phase_gate",
+    "target_constraint",
+    "visibility_predicate"
+  ],
+  "june_true_zeros": [
+    "enhancement_bearer",
+    "this_model",
+    "this_unit",
+    "army",
+    "enemy_select",
+    "dice_roll",
+    "player",
+    "phase_condition",
+    "turn_owner_condition",
+    "riled_up"
+  ],
+  "core_stratagems": [
+    {"title": "Command Re-roll", "section": "15.02", "bearer": "player", "grain": "dice_roll"},
+    {"title": "Epic Challenge", "section": "15.03", "bearer": "activation_object", "grain": "unit"},
+    {"title": "Insane Bravery", "section": "15.04", "bearer": "activation_object", "conditions": ["battle_shocked"]},
+    {"title": "Crushing Impact", "section": "15.05", "bearer": "activation_object", "grain": "unit"},
+    {"title": "Explosives", "section": "15.06", "bearer": "activation_object"},
+    {"title": "Rapid Ingress", "section": "15.07", "bearer": "activation_object", "conditions": ["in_reserves"]},
+    {"title": "Fire Overwatch", "section": "15.08", "bearer": "activation_object"},
+    {"title": "Snap Shooting", "section": "15.09", "not_a_stratagem": true},
+    {"title": "Smokescreen", "section": "15.10", "bearer": "activation_object"},
+    {"title": "Heroic Intervention", "section": "15.11", "bearer": "activation_object", "conditions": ["engagement"]},
+    {"title": "Counter-offensive", "section": "15.12", "bearer": "activation_object"}
+  ],
+  "live_samples": [
+    {
+      "name": "War Horde",
+      "url": "https://www.40k.app/factions/orks/detachments/war-horde",
+      "note": "Enhancements use enhancement_bearer and riled_up. Stratagem TARGETS are your + unit with ORKS keyword require."
+    },
+    {
+      "name": "Shadow Legion",
+      "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "note": "Detachment clauses use keyword_effect_gate. Enhancements use enhancement_bearer. Stratagem TARGETS use the same closed axes."
+    },
+    {
+      "name": "Core 15",
+      "url": "https://www.40k.app/rules/15-stratagems",
+      "note": "Authoritative Core Stratagem TARGET and bearer for this survey. Command Re-roll is dice_roll."
+    }
+  ],
+  "holds": [
+    "T3-HOLD-APP-TARGET",
+    "T3-HOLD-PROFILE-STALENESS",
+    "T3-HOLD-UNION-TARGET",
+    "T3-HOLD-STORED-KIND",
+    "T3-HOLD-STATE-SPLIT",
+    "F-ORK-01"
+  ],
+  "not_in_this_pr": [
+    "src changes",
+    "RuleTargetKind or RuleConditionKind additions",
+    "activation-profile remap",
+    "semantic_demand_matrix.json"
+  ]
+}
