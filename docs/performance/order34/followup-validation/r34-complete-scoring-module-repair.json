@@ -1,0 +1,14 @@
+{
+  "name": "r34-complete-scoring-module-repair",
+  "command": "uv run pytest tests/unit/test_phase11e_mission_scoring_cleanup.py -q -n 8 --dist=worksteal --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T20:08:36.547998+00:00",
+  "deadline_seconds": 240.0,
+  "log": "/private/tmp/order34-evidence/r34-complete-scoring-module-repair.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 44278,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 67.227,
+  "committed_log": "r34-complete-scoring-module-repair.txt"
+}

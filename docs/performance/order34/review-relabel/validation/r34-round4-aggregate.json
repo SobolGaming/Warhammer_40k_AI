@@ -1,0 +1,13 @@
+{
+  "name": "r34-round4-aggregate",
+  "command": "export COVERAGE_FILE=/private/tmp/order34-evidence/r34-round4-aggregate.coverage\nPATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/private/tmp/order34-evidence/r34-round4-behavior.xml -vv --tb=short\nuv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/private/tmp/order34-evidence/r34-round4-quality.xml --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T21:26:14.632264+00:00",
+  "deadline_seconds": 1800.0,
+  "log": "/private/tmp/order34-evidence/r34-round4-aggregate.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 72246,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 454.829
+}

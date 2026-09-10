@@ -278,6 +278,8 @@ def _attached_root_failure_checkpoint() -> tuple[
 def test_phase17n_restore_rejects_coordinated_prior_shooting_history_erasure() -> None:
     state, decisions, history_unit_id = _pending_action_opportunity_after_shooting()
     forged_state = deepcopy(state)
+    # The coordinated forgery also removes the completed-activity authority.
+    forged_state.persisting_effects = []
     shooting_state = forged_state.shooting_phase_state
     assert shooting_state is not None
     forged_state.replace_shooting_phase_state(
@@ -297,9 +299,50 @@ def test_phase17n_restore_rejects_coordinated_prior_shooting_history_erasure() -
 
     with pytest.raises(
         GameLifecycleError,
-        match="Primary mission boundary shooting state lacks exact authority",
+        match="Activity restriction inventory differs",
     ):
         GameLifecycle.from_payload(forged_payload)
+
+
+def test_order34_historical_completed_shooting_survives_current_effect_expiry() -> None:
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+    from warhammer40k_core.engine.mission_action_eligibility import (
+        mission_action_unit_ineligibility_reason,
+    )
+    from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+        primary_mission_boundary_checkpoint_for_request,
+    )
+    from warhammer40k_core.engine.primary_mission_boundary_state import (
+        primary_mission_action_boundary_state_from_checkpoint,
+    )
+
+    state, decisions, unit_id = _pending_action_opportunity_after_shooting()
+    reference, checkpoint, _ = primary_mission_boundary_checkpoint_for_request(
+        event_records=decisions.event_log.records,
+        request_id=decisions.queue.pending_requests[0].request_id,
+    )
+    state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.phase_end(
+            battle_round=state.battle_round, phase=BattlePhase.SHOOTING, player_id="player-a"
+        )
+    )
+    before = deepcopy(state.to_payload())
+    historical = primary_mission_action_boundary_state_from_checkpoint(
+        state=state,
+        checkpoint=checkpoint,
+        event_records=decisions.event_log.records,
+        checkpoint_event_id=reference.checkpoint_event_id,
+    )
+    assert (
+        mission_action_unit_ineligibility_reason(
+            state=historical,
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+        == "mission_action_unit_already_shot"
+    )
+    assert state.to_payload() == before
 
 
 def _pending_action_opportunity_after_movement(
@@ -572,7 +615,7 @@ def _pending_action_opportunity_after_shooting() -> tuple[
     )
     completed_status = lifecycle.submit_decision(
         DecisionResult(
-            result_id="phase17n-shot-declaration",
+            result_id="phase17n-shot-declaration-no-damage",
             request_id=declaration_request.request_id,
             decision_type=declaration_request.decision_type,
             actor_id=declaration_request.actor_id,
@@ -581,6 +624,27 @@ def _pending_action_opportunity_after_shooting() -> tuple[
         )
     )
     assert completed_status.status_kind.value != "invalid"
+    # A declaration is not completed shooting: resolve its remaining attack choices first.
+    for index in range(50):
+        if any(
+            event.event_type == "attack_sequence_completed" for event in decisions.event_log.records
+        ):
+            break
+        request = _request(completed_status.decision_request)
+        option = next(
+            (option for option in request.options if option.option_id == "decline"),
+            request.options[0],
+        )
+        completed_status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase17n-complete-shot:{index}",
+                request=request,
+                selected_option_id=option.option_id,
+            )
+        )
+        assert completed_status.status_kind.value != "invalid"
+    else:
+        raise AssertionError("Shooting did not reach its completed-attacks boundary.")
     assert state.shooting_phase_state is not None
     assert history_unit_id in state.shooting_phase_state.shot_unit_ids
     assert any(

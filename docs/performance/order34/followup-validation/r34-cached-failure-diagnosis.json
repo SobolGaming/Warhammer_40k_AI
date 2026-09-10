@@ -1,0 +1,14 @@
+{
+  "name": "r34-cached-failure-diagnosis",
+  "command": "uv run pytest tests --ignore=tests/code_quality --lf -n 8 --dist=worksteal --no-cov -vv --maxfail=10 --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:07:05.972758+00:00",
+  "deadline_seconds": 300.0,
+  "log": "/private/tmp/order34-evidence/r34-cached-failure-diagnosis.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 26514,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 28.619,
+  "committed_log": "r34-cached-failure-diagnosis.txt"
+}

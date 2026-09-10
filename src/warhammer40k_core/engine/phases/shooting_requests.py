@@ -358,6 +358,12 @@ def request_out_of_phase_shooting_declaration(
         armies=tuple(state.army_definitions),
         unit_instance_id=unit_instance_id,
     )
+    if mission_action_prevents_rules_unit_from_shooting_this_phase(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=selected_rules_unit_id,
+    ):
+        raise GameLifecycleError("Action restriction prevents out-of-phase shooting.")
     selection = ShootingUnitSelection(
         player_id=player_id,
         battle_round=state.battle_round,

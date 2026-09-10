@@ -1,0 +1,6 @@
+{
+  "process_group": 23826,
+  "signal": "SIGINT",
+  "remaining_processes": [],
+  "outcome": "interrupted workers exited during coverage cleanup; no remaining group"
+}

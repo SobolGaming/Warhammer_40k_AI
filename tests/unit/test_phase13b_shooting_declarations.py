@@ -2129,7 +2129,7 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         source_model_instance_id=pool_a.attacker_model_instance_id,
         source_weapon_profile=pool_a.weapon_profile,
         target_unit_instance_id=target_a.unit_instance_id,
-        attack_context_id="phase13d-dev-queue:pool-001:attack-001",
+        attack_context_id="attack-sequence:phase13d-dev-queue:pool-001:attack-001",
         mortal_wounds=1,
     )
     deferred_b = DeferredMortalWounds(
@@ -2137,11 +2137,11 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         source_model_instance_id=pool_b.attacker_model_instance_id,
         source_weapon_profile=pool_b.weapon_profile,
         target_unit_instance_id=target_b.unit_instance_id,
-        attack_context_id="phase13d-dev-queue:pool-002:attack-001",
+        attack_context_id="attack-sequence:phase13d-dev-queue:pool-002:attack-001",
         mortal_wounds=1,
     )
     sequence = AttackSequence(
-        sequence_id="phase13d-dev-queue",
+        sequence_id="attack-sequence:phase13d-dev-queue",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(pool_a, pool_b),
@@ -2149,6 +2149,16 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         deferred_mortal_wounds=(deferred_a, deferred_b),
     )
 
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    )
     remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
@@ -7611,7 +7621,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
         keywords=(WeaponKeyword.HAZARDOUS,),
     )
-    attack_context_id = "phase14c-hazardous-fnp:pool-001:attack-001"
+    attack_context_id = "attack-sequence:phase14c-hazardous-fnp:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
@@ -7655,7 +7665,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
         ),
     )
     sequence = AttackSequence.start(
-        sequence_id="phase14c-hazardous-fnp",
+        sequence_id="attack-sequence:phase14c-hazardous-fnp",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -7666,6 +7676,16 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
                 attacks=1,
             ),
         ),
+    )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
     )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
@@ -12264,7 +12284,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         damage_profile=DamageProfile.fixed(first_target.wounds_remaining),
         keywords=(WeaponKeyword.TORRENT,),
     )
-    sequence_id = "order-9-p05a-destruction-boundary"
+    sequence_id = "attack-sequence:order-9-p05a-destruction-boundary"
     sequence = AttackSequence.start(
         sequence_id=sequence_id,
         attacker_player_id="player-a",
@@ -12277,6 +12297,16 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
                 attacks=3,
             ),
         ),
+    )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
     )
     wound_results = tuple(
         _fixed_roll_result(
@@ -12423,7 +12453,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     )
     with pytest.raises(
         GameLifecycleError,
-        match="Pending attack destruction boundary evidence drift",
+        match="Model attack history is missing its completed attacks",
     ):
         GameLifecycle.from_payload(forged_pre_boundary_checkpoint)
 
@@ -12830,6 +12860,18 @@ def _retain_attack_casualty_for_fight_on_death(
     reduce_to_last_model: bool,
 ) -> str:
     state = _state(lifecycle)
+    # This source now declares a real shot; place its firing model in range as
+    # part of canonical setup, before the fixture emits any attack history.
+    prepared = _scenario_with_unit_pose(
+        scenario=battlefield_scenario_for_state(state=state),
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_compact_test_unit_poses(
+            origin=Pose.at(18.0, 40.0), model_count=len(attacker.own_models)
+        ),
+    )
+    state.replace_battlefield_state(prepared.battlefield_state)
     if reduce_to_last_model:
         target_model = _reduce_unit_to_last_model_with_mortal_wounds(
             lifecycle,
@@ -12864,7 +12906,7 @@ def _retain_attack_casualty_for_fight_on_death(
         damage_profile=DamageProfile.fixed(target_model.wounds_remaining),
     )
     sequence = AttackSequence.start(
-        sequence_id=f"{fixture_id}-sequence",
+        sequence_id=f"attack-sequence:{fixture_id}-sequence",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -12876,6 +12918,23 @@ def _retain_attack_casualty_for_fight_on_death(
             ),
         ),
     )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id=f"{fixture_id}-selection",
+    )
+    _apply_shooting_declaration_without_advancing(
+        lifecycle,
+        request=declaration_request,
+        proposal=_proposal_from_request(
+            request=declaration_request,
+            target_unit_id=defender.unit_instance_id,
+            weapon_profile_id=weapon_profile.profile_id,
+        ),
+        result_id=f"{fixture_id}-sequence",
+    )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
@@ -12884,7 +12943,7 @@ def _retain_attack_casualty_for_fight_on_death(
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )
-    attack_context_id = f"{fixture_id}-sequence:pool-001:attack-001"
+    attack_context_id = f"{sequence.sequence_id}:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
@@ -16029,7 +16088,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
     )
     sequence = AttackSequence.start(
-        sequence_id="phase13e-success-deadly-demise",
+        sequence_id="attack-sequence:phase13e-success-deadly-demise",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -16041,6 +16100,16 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
             ),
         ),
     )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
@@ -16049,7 +16118,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )
-    attack_context_id = "phase13e-success-deadly-demise:pool-001:attack-001"
+    attack_context_id = "attack-sequence:phase13e-success-deadly-demise:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
@@ -19457,6 +19526,161 @@ def test_r33_001_retained_engagement_survives_restoration(attached: bool) -> Non
     assert replay.status is ReplayRunStatus.REPRODUCED
 
 
+@pytest.mark.parametrize(
+    "mode",
+    [ShootingType.NORMAL, ShootingType.ASSAULT, ShootingType.CLOSE_QUARTERS, ShootingType.INDIRECT],
+)
+def test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary(
+    mode: ShootingType,
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        SHOOTER,
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.activity_restrictions import has_activity_restriction
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    session = indirect_session(
+        observer=True,
+        assault=mode is ShootingType.ASSAULT,
+        shooter_keyword="VEHICLE" if mode is ShootingType.CLOSE_QUARTERS else None,
+        engager_distance=1.0 if mode is ShootingType.CLOSE_QUARTERS else None,
+    )
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    request = select_indirect_declaration(session, mode)
+    state = _state(session.lifecycle)
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=SHOOTER)
+    assert not has_activity_restriction(state=state, rules_unit=unit, activity="completed_shooting")
+    checkpoint = session.to_persistence_payload()
+    malformed = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order34:malformed",
+        payload={"forged": True},
+    )
+    assert malformed.status_kind is LifecycleStatusKind.INVALID
+    assert session.to_persistence_payload() == checkpoint
+    submit_indirect_declaration(session, request)
+    complete_indirect_attack(session)
+    assert state.current_battle_phase is BattlePhase.SHOOTING
+    assert has_activity_restriction(state=state, rules_unit=unit, activity="completed_shooting")
+    assert state.shooting_phase_state is not None
+    assert SHOOTER in state.shooting_phase_state.shot_unit_ids
+    next_request = pending_request(session)
+    assert next_request.decision_type == "select_shooting_unit"
+    assert SHOOTER not in {option.option_id for option in next_request.options}
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id=f"order34:{mode.value}",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    assert restored.to_persistence_payload() == checkpoint
+    standalone = GameLifecycle.from_payload(json.loads(json.dumps(session.lifecycle.to_payload())))
+    assert standalone.to_payload() == session.lifecycle.to_payload()
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    for current in (state, _state(restored.lifecycle)):
+        current.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_end(
+                battle_round=current.battle_round, phase=BattlePhase.SHOOTING, player_id="player-b"
+            )
+        )
+        assert has_activity_restriction(
+            state=current, rules_unit=unit, activity="completed_shooting"
+        )
+        current.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_end(
+                battle_round=current.battle_round, phase=BattlePhase.SHOOTING, player_id="player-a"
+            )
+        )
+        assert not has_activity_restriction(
+            state=current, rules_unit=unit, activity="completed_shooting"
+        )
+        assert current.shooting_phase_state is not None
+        assert SHOOTER in current.shooting_phase_state.shot_unit_ids
+
+
+@pytest.mark.parametrize("pending_step", ["unit", "type", "declaration"])
+def test_order34_pending_shooting_revalidates_action_restriction_before_queue_pop(
+    pending_step: str,
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        SHOOTER,
+        TARGET,
+        indirect_session,
+        select_indirect_declaration,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.actions import MissionActionState
+
+    session = indirect_session(observer=True)
+    request = pending_request(session)
+    if pending_step == "declaration":
+        request = select_indirect_declaration(session, ShootingType.NORMAL)
+    elif pending_step == "type":
+        session.submit_option(
+            request_id=request.request_id, result_id="order34-stale-select", option_id=SHOOTER
+        )
+        request = pending_request(session)
+    state = _state(session.lifecycle)
+    # A typed, engine-owned accepted-start fixture simulates authoritative drift
+    # after option/declaration enumeration, before this adapter submits its choice.
+    state.record_mission_action_state(
+        MissionActionState.start(
+            action_id="order34-stale-action",
+            mission_action_id="cleanse-objective",
+            player_id="player-a",
+            unit_instance_id=SHOOTER,
+            target_id="order34-objective",
+            condition_target_id="order34-objective",
+            mission_id="cleanse",
+            battle_round=state.battle_round,
+            phase=BattlePhase.SHOOTING.value,
+            start_timing="shooting_phase",
+            completion_timing="turn_end",
+            eligible_unit_instance_ids=(SHOOTER,),
+            interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
+            scoring_source_id="cleanse",
+            victory_points=0,
+        )
+    )
+    before = session.lifecycle.to_payload()
+    if pending_step == "declaration":
+        proposal = _proposal_from_request(request=request, target_unit_id=TARGET)
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="order34-stale-declaration",
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    else:
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id="order34-stale-option",
+            option_id=SHOOTER if pending_step == "unit" else "normal",
+        )
+    assert status.status_kind is LifecycleStatusKind.INVALID, status
+    assert session.lifecycle.to_payload() == before
+    assert session.lifecycle.decision_controller.queue.peek_next() == request
+
+
 def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -> None:
     from tests.indirect_shooting_helpers import (
         INDIRECT_PROFILE,
@@ -19520,3 +19744,152 @@ def test_order33_lower_failure_range_still_requires_the_modified_hit_value(modif
         modifier=modifier,
         ballistic_skill=4,
     )
+
+
+@pytest.mark.parametrize("mutation", ["missing", "extra", "target", "player", "round"])
+def test_r34_002_completed_shooting_inventory_is_authenticated(mutation: str) -> None:
+    from tests.indirect_shooting_helpers import (
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(observer=True)
+    request = select_indirect_declaration(session, ShootingType.NORMAL)
+    submit_indirect_declaration(session, request)
+    complete_indirect_attack(session)
+    original = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(json.loads(json.dumps(original))).to_payload() == original
+    forged = json.loads(json.dumps(original))
+    effects = forged["state"]["persisting_effects"]
+    effect = next(
+        row
+        for row in effects
+        if row["effect_payload"].get("effect_kind") == "core_unit_activity_restriction"
+    )
+    if mutation == "missing":
+        effects.remove(effect)
+    elif mutation == "extra":
+        extra = json.loads(json.dumps(effect))
+        extra["effect_payload"]["activity_id"] += ":forged"
+        extra["effect_id"] += ":forged"
+        effects.append(extra)
+    elif mutation == "target":
+        effect["target_unit_instance_ids"] = ["army-alpha:observer"]
+    elif mutation == "player":
+        effect["expiration"]["player_id"] = "player-b"
+    else:
+        effect["started_battle_round"] += 1
+        effect["expiration"]["battle_round"] += 1
+    with pytest.raises(GameLifecycleError, match="Activity restriction"):
+        GameLifecycle.from_payload(forged)
+
+
+def test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction() -> None:
+    from tests.activity_restriction_assertions import (
+        assert_completed_shooting_kind_is_authenticated,
+    )
+    from tests.indirect_shooting_helpers import (
+        SHOOTER,
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(observer=True)
+    request = select_indirect_declaration(session, ShootingType.NORMAL)
+    submit_indirect_declaration(session, request)
+    complete_indirect_attack(session)
+    state = _state(session.lifecycle)
+    assert state.shooting_phase_state is not None
+    assert SHOOTER in state.shooting_phase_state.shot_unit_ids
+    assert_completed_shooting_kind_is_authenticated(
+        session, player_id="player-a", unit_instance_id=SHOOTER
+    )
+
+
+@pytest.mark.parametrize(
+    "mutation", ["extra_pair", "foreign_game", "retimed_pair", "unaccepted_declaration"]
+)
+def test_r34_002_unactivated_unit_rejects_unproven_completion_pair(mutation: str) -> None:
+    from tests.indirect_shooting_helpers import (
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    donor = indirect_session(observer=True)
+    request = select_indirect_declaration(donor, ShootingType.NORMAL)
+    submit_indirect_declaration(donor, request)
+    complete_indirect_attack(donor)
+    fresh = indirect_session(observer=True)
+    original = fresh.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(json.loads(json.dumps(original))).to_payload() == original
+    assert not any(
+        event.event_type in {"shooting_unit_selected", "shooting_declaration_accepted"}
+        for event in fresh.lifecycle.decision_controller.event_log.records
+    )
+    state = fresh.lifecycle.state
+    assert state is not None
+    assert state.shooting_phase_state is not None
+    assert state.shooting_phase_state.shot_unit_ids == ()
+    copied_types = {"attack_sequence_models_attacked", "attack_sequence_completed"}
+    if mutation == "unaccepted_declaration":
+        copied_types.add("shooting_declaration_accepted")
+    for event in donor.lifecycle.decision_controller.event_log.records:
+        if event.event_type in copied_types:
+            payload = json.loads(json.dumps(event.payload))
+            if event.event_type == "attack_sequence_models_attacked":
+                if mutation == "foreign_game":
+                    payload["game_id"] = "foreign-donor-game"
+                elif mutation == "retimed_pair":
+                    payload["battle_round"] += 1
+            fresh.lifecycle.decision_controller.event_log.append(event.event_type, payload)
+    donor_state = donor.lifecycle.state
+    assert donor_state is not None
+    state.persisting_effects.extend(donor_state.persisting_effects)
+    forged = json.loads(json.dumps(fresh.lifecycle.to_payload()))
+    if mutation == "retimed_pair":
+        effect = forged["state"]["persisting_effects"][-1]
+        effect["started_battle_round"] += 1
+        effect["expiration"]["battle_round"] += 1
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"(Activity restriction|Model attack history|Mutation decision authority)",
+    ):
+        GameLifecycle.from_payload(forged)
+
+
+@pytest.mark.parametrize("mutation", ["missing_activation", "retimed_activation", "foreign_models"])
+def test_r34_002_completion_requires_original_declaration_subject_and_timing(mutation: str) -> None:
+    from tests.indirect_shooting_helpers import (
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(observer=True)
+    request = select_indirect_declaration(session, ShootingType.NORMAL)
+    submit_indirect_declaration(session, request)
+    # A real checkpoint inside the executor retains its accepted declaration.
+    pending = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(json.loads(json.dumps(pending))).to_payload() == pending
+    complete_indirect_attack(session)
+    forged = json.loads(json.dumps(session.lifecycle.to_payload()))
+    if mutation == "missing_activation":
+        forged["state"]["ranged_attack_history_records"] = []
+    elif mutation == "retimed_activation":
+        forged["state"]["ranged_attack_history_records"][0]["battle_round"] += 1
+    else:
+        for event in forged["decisions"]["event_log"]:
+            payload = event["payload"]
+            if event["event_type"] == "shooting_declaration_accepted":
+                payload["attack_pools"][0]["attacker_model_instance_id"] = "foreign-model"
+            elif event["event_type"] == "attack_sequence_models_attacked":
+                payload["model_instance_ids"] = ["foreign-model"]
+    with pytest.raises(GameLifecycleError, match="Model attack history"):
+        GameLifecycle.from_payload(forged)

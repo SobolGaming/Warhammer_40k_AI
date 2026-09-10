@@ -1,0 +1,30 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks ____
+tests/unit/test_phase13b_shooting_declarations.py:12458: in test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks
+    GameLifecycle.from_payload(forged_pre_boundary_checkpoint)
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:265: in validate_declared_model_attack_completions
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+src/warhammer40k_core/engine/model_attack_history.py:151: in validate_retained_model_attack_history
+    raise GameLifecycleError("Model attack history is missing its completed attacks.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history is missing its completed attacks.
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_phase13b_shooting_declarations.py:12454: in test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks
+    with pytest.raises(
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Pending attack destruction boundary evidence drift'
+E     Actual message: 'Model attack history is missing its completed attacks.'
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks - AssertionError: Regex pattern did not match.
+  Expected regex: 'Pending attack destruction boundary evidence drift'
+  Actual message: 'Model attack history is missing its completed attacks.'
+1 failed in 5.72s

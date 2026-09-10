@@ -250,6 +250,9 @@ from warhammer40k_core.engine.return_on_death import (
     PendingReturnOnDeath,
 )
 from warhammer40k_core.engine.rules_unit_effects import known_effect_target_unit_ids
+from warhammer40k_core.engine.rules_unit_effects import (
+    validate_persisting_effects as _validate_persisting_effects,
+)
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -2846,14 +2849,9 @@ class GameState:
         )
 
     def record_mission_action_state(self, action_state: MissionActionState) -> None:
-        if type(action_state) is not MissionActionState:
-            raise GameLifecycleError("mission_action_state must be a MissionActionState.")
-        if action_state.player_id not in self.player_ids:
-            raise GameLifecycleError("MissionActionState player_id is not in this game.")
-        if any(stored.action_id == action_state.action_id for stored in self.mission_action_states):
-            raise GameLifecycleError("MissionActionState already exists for action_id.")
-        self.mission_action_states.append(action_state)
-        self.mission_action_states.sort(key=lambda state: state.action_id)
+        from warhammer40k_core.engine.activity_restrictions import record_mission_action_state
+
+        record_mission_action_state(state=self, action=action_state)
 
     def mission_action_state_by_id(self, action_id: str) -> MissionActionState:
         requested_action_id = _validate_identifier("action_id", action_id)
@@ -6803,39 +6801,6 @@ def _validate_scoring_window_states(
         seen.add(state.window_id)
         validated.append(state)
     return sorted(validated, key=lambda state: state.window_id)
-
-
-def _validate_persisting_effects(
-    effects: object,
-    *,
-    army_definitions: list[ArmyDefinition],
-    starting_strength_records: list[StartingStrengthRecord],
-    player_ids: tuple[str, ...],
-) -> list[PersistingEffect]:
-    if not isinstance(effects, list):
-        raise GameLifecycleError("GameState persisting_effects must be a list.")
-    unit_ids = known_effect_target_unit_ids(
-        army_definitions=army_definitions,
-        starting_strength_records=starting_strength_records,
-    )
-    validated: list[PersistingEffect] = []
-    seen: set[str] = set()
-    for effect in cast(list[object], effects):
-        if type(effect) is not PersistingEffect:
-            raise GameLifecycleError(
-                "GameState persisting_effects must contain PersistingEffect values."
-            )
-        if effect.owner_player_id not in player_ids:
-            raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
-        if not unit_ids:
-            raise GameLifecycleError("PersistingEffect requires mustered army definitions.")
-        if any(unit_id not in unit_ids for unit_id in effect.target_unit_instance_ids):
-            raise GameLifecycleError("PersistingEffect target unit is unknown.")
-        if effect.effect_id in seen:
-            raise GameLifecycleError("GameState persisting_effects must be unique.")
-        seen.add(effect.effect_id)
-        validated.append(effect)
-    return sorted(validated, key=lambda effect: effect.effect_id)
 
 
 def _validate_tracked_target_records(

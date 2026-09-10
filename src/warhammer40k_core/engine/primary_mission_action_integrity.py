@@ -323,6 +323,8 @@ def _validate_lifecycle_policy_evidence(
     boundary_state = primary_mission_action_boundary_state_from_checkpoint(
         state=state,
         checkpoint=checkpoint,
+        event_records=event_records,
+        checkpoint_event_id=start_evidence.boundary_checkpoint.checkpoint_event_id,
     )
     validate_primary_mission_action_start_evidence(
         state=boundary_state,

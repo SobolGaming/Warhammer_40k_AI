@@ -1,0 +1,32 @@
+5b6752ff07bc5b86e91054a7822ee7ea7dadf7cb
+7342088900a27801964819690229b8471b59bbc7
+Timeout (0:00:15)!
+Thread 0x00000001f70fa180 (most recent call first):
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/lib/python3.14/site-packages/z3/z3core.py", line 4331 in Z3_solver_check_assumptions
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/lib/python3.14/site-packages/z3/z3.py", line 7309 in check
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/geometry/visibility_algebra.py", line 198 in decide
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/geometry/visibility_formulas.py", line 575 in <genexpr>
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/geometry/visibility_formulas.py", line 575 in decide_full
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/geometry/continuous_visibility.py", line 351 in resolve_visibility_pair_uncached
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/geometry/continuous_visibility.py", line 283 in resolve_visibility_pair
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/core/visibility.py", line 447 in _resolve_model_line_of_sight
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/core/visibility.py", line 302 in <genexpr>
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/core/visibility.py", line 301 in _resolve_line_of_sight
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/core/visibility.py", line 644 in _resolve_context
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/core/visibility.py", line 291 in resolve_line_of_sight
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/shooting_targets.py", line 1208 in _best_line_of_sight_range_evidence
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/shooting_targets.py", line 834 in _target_candidate
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/shooting_targets.py", line 432 in <genexpr>
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/shooting_targets.py", line 431 in shooting_target_candidates_for_unit
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/phases/shooting_requests.py", line 207 in _request_shooting_declaration
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/phases/shooting_handler.py", line 249 in begin_phase
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/battle_round_flow.py", line 286 in advance
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/lifecycle.py", line 814 in _advance_once
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/lifecycle.py", line 742 in advance_until_decision_or_terminal
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/lifecycle.py", line 1764 in _apply_shooting_phase_decision
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/engine/lifecycle.py", line 881 in submit_decision
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/adapters/decisions.py", line 48 in submit_option
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src/warhammer40k_core/adapters/local_session.py", line 366 in submit_option
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/tests/indirect_shooting_helpers.py", line 274 in select_indirect_declaration
+  File "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/scripts/measure_action_restriction_live.py", line 121 in live_sample
+  File "<string>", line 1 in <module>

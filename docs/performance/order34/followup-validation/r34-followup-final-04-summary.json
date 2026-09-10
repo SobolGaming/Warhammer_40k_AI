@@ -1,0 +1,18 @@
+{
+  "behavior": {
+    "tests": 6927,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_seconds": 690.988
+  },
+  "quality": {
+    "tests": 410,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_seconds": 117.454
+  },
+  "coverage_percent": 85.05,
+  "runner_elapsed_seconds": 812.092
+}

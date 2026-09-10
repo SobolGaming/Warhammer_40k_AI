@@ -91,6 +91,7 @@ def _apply_shooting_unit_selection_decision(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        candidate_unit_ids=(unit_instance_id,),
     )
     if unit_instance_id not in legal_unit_ids:
         raise GameLifecycleError("Shooting unit selection is not currently legal.")

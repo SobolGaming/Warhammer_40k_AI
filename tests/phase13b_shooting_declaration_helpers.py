@@ -1492,8 +1492,20 @@ def _apply_shooting_declaration_without_advancing(
         decisions=lifecycle.decision_controller,
     )
     if invalid_status is not None:
-        raise AssertionError(invalid_status.message)
+        raise AssertionError(f"{invalid_status.message}: {invalid_status.payload}")
+    from warhammer40k_core.engine.psychic_modifier_history_origin import (
+        capture_psychic_history_origin,
+    )
+
+    # This fixture pauses before dice execution but preserves the real lifecycle origin.
+    prior = lifecycle._psychic_modifier_history_origin  # pyright: ignore[reportPrivateUsage]
+    history_origin = capture_psychic_history_origin(
+        lifecycle=lifecycle,
+        request=request,
+        existing=prior,
+    )
     lifecycle.decision_controller.submit_result(result)
+    lifecycle._psychic_modifier_history_origin = history_origin  # pyright: ignore[reportPrivateUsage]
     status = handler.apply_decision(
         state=state,
         result=result,

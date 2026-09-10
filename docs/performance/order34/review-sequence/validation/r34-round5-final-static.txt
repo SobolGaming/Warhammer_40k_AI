@@ -1,0 +1,3 @@
+All checks passed!
+Would reformat: tests/activity_restriction_assertions.py
+1 file would be reformatted, 2920 files already formatted

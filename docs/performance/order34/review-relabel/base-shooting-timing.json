@@ -1,0 +1,194 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "commit": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "38151852a5797700df25e38bcd3a1d2fb594dd9e7468e1eb9c87d7fb1251a570",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "uninstrumented_timing",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9"
+  },
+  "results": {
+    "visible-self-observer": {
+      "samples": [
+        {
+          "setup_seconds": 3.8468332500196993,
+          "slice_seconds": 0.10135333298239857,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 1.9697943340288475,
+          "slice_seconds": 0.09880799998063594,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.003031582920812,
+          "slice_seconds": 0.09963487507775426,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 1.9723804999375716,
+          "slice_seconds": 0.10052083304617554,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 1.9982553329318762,
+          "slice_seconds": 0.09897712501697242,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 1.9679649999598041,
+          "slice_seconds": 0.09916858409997076,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0036172500113025,
+          "slice_seconds": 0.09908020799048245,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.09964899402776999,
+      "median_seconds": 0.09916858409997076,
+      "p95_seconds": 0.10135333298239857,
+      "maximum_seconds": 0.10135333298239857,
+      "completion_rate": 1.0,
+      "slices_per_second": 10.035224236396425
+    },
+    "unseen-no-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.0032449590507895,
+          "slice_seconds": 0.40515183296520263,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.022425999981351,
+          "slice_seconds": 0.34849245904479176,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 1.988147458061576,
+          "slice_seconds": 0.3469344999175519,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0301238340325654,
+          "slice_seconds": 0.3461058749817312,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0252867919625714,
+          "slice_seconds": 0.34769316599704325,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0209672920173034,
+          "slice_seconds": 0.34576599998399615,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 1.9908799580298364,
+          "slice_seconds": 0.34533241705503315,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.35506803570647855,
+      "median_seconds": 0.3469344999175519,
+      "p95_seconds": 0.40515183296520263,
+      "maximum_seconds": 0.40515183296520263,
+      "completion_rate": 1.0,
+      "slices_per_second": 2.8163616530851643
+    },
+    "unseen-friendly-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.0841573330108076,
+          "slice_seconds": 0.2939865000080317,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.032357000047341,
+          "slice_seconds": 0.27212987490929663,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.061779166921042,
+          "slice_seconds": 0.274759833002463,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.06436516600661,
+          "slice_seconds": 0.27233674994204193,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0388873330084607,
+          "slice_seconds": 0.2743978339713067,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.077263040933758,
+          "slice_seconds": 0.2790977089898661,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0309289160650223,
+          "slice_seconds": 0.30207566695753485,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.2812548811115058,
+      "median_seconds": 0.274759833002463,
+      "p95_seconds": 0.30207566695753485,
+      "maximum_seconds": 0.30207566695753485,
+      "completion_rate": 1.0,
+      "slices_per_second": 3.5554938497353286
+    }
+  },
+  "full_game_certified": false
+}

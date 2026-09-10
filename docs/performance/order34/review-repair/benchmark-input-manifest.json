@@ -1,0 +1,20 @@
+{
+  "scope": "Three measurement drivers and their recursive local tests/scripts imports; identical bytes installed in base and head",
+  "files_sha256": {
+    "scripts/measure_action_restriction_live.py": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+    "scripts/measure_action_restrictions.py": "537cd664ed3386e977d6b33ae9810e4861440018928426b246ca017a89fbab80",
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/generic_modifier_helpers.py": "03e2c0fc9376229b6ba2cd399a2de3d0f62a520e2ebedaaa66876ef6bcd2e2dd",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+    "tests/movement_submission_helpers.py": "ec7210655821f70306f37c354094a632e1da81344adb05e508642bc45ed41bd6",
+    "tests/phase11c_command_phase_helpers.py": "dae09d91a5300d487cb4d47bd287b106e6a04d0d487baf5c72c71290db93f8c2",
+    "tests/phase13b_shooting_declaration_helpers.py": "6d8d4ec8f51b4e96e485a23b993168b8f2ace7c269959658466ebf9d73f10839",
+    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473",
+    "tests/phase17n_primary_mission_helpers.py": "66e3fc4cc0208d40f72cfb30af4bcdf579c36794775f36254bd84ba640e3e0a5",
+    "tests/psychic_modifier_helpers.py": "6b6b802c4cb40d4f657d6e68c9b74d1b462f9ab0e5f0b29146c2f809355e4bd9",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/setup_completion_helpers.py": "c95866658729694a06365e7b517d84d330abb4b56c8db5ef886b62127b535d25",
+    "tests/unit_keyword_helpers.py": "3f290f4f7bcd08cdb65d01f8b3cb062da3ba919aa426a4ba190fae1eafd862a5",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  }
+}

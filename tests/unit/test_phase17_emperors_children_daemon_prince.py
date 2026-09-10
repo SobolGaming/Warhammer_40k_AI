@@ -1020,7 +1020,7 @@ def _ecstatic_death_chain_session() -> tuple[
             "retained": Pose.at(x=11.0, y=20.0),
             "child": Pose.at(x=12.0, y=20.0),
         },
-        game_id="ecstatic-chain-p02-4",
+        game_id="order34-ecstatic-chain-1",
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",
         model_count=1,

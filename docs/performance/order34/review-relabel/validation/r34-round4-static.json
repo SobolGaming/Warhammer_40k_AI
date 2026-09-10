@@ -1,0 +1,13 @@
+{
+  "name": "r34-round4-static",
+  "command": "uv run ruff check .\nuv run ruff format --check .\nuv run mypy src tests\nuv run pyright\nuv run --no-sync python scripts/build_test_shards.py --check --shard-count 8\nuv run lint-imports\nuv run pre-commit run --all-files",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T21:19:27.909889+00:00",
+  "deadline_seconds": 240.0,
+  "log": "/private/tmp/order34-evidence/r34-round4-static.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 70081,
+  "outcome": "success",
+  "exit_status": 0,
+  "elapsed_seconds": 35.772
+}

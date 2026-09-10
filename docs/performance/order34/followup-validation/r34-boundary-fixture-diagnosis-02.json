@@ -1,0 +1,14 @@
+{
+  "name": "r34-boundary-fixture-diagnosis-02",
+  "command": "uv run pytest 'tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py::test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-a]' tests/unit/test_phase11e_mission_scoring_cleanup.py::test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn 'tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destruction-game-id]' -q --no-cov --tb=short",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:42:26.752323+00:00",
+  "deadline_seconds": 90.0,
+  "log": "/private/tmp/order34-evidence/r34-boundary-fixture-diagnosis-02.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 37107,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 18.197,
+  "committed_log": "r34-boundary-fixture-diagnosis-02.txt"
+}

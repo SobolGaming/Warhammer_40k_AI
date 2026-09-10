@@ -1,0 +1,14 @@
+{
+  "measured_commit": "5b6752ff07bc5b86e91054a7822ee7ea7dadf7cb",
+  "source_tree": "7342088900a27801964819690229b8471b59bbc7",
+  "changed_benchmark_input_file": "tests/phase17n_primary_mission_helpers.py",
+  "changed_functions": [
+    "_enter_turn_end",
+    "phase17n_action_turn_end_record"
+  ],
+  "unchanged_measured_entry_points": [
+    "phase17n_action_opportunity_fixture",
+    "_action_ready_state"
+  ],
+  "reason": "Later fixture repairs alter turn-end helpers not called by the timing drivers; measured production source, drivers and called helper functions are unchanged. Raw reports retain the exact 5b workload bytes and hashes installed in both checkouts."
+}

@@ -40,6 +40,8 @@ def retained_attack_actions(source: DestructionReactionSource) -> tuple[Retained
 
 def retained_attack_options(
     sources: tuple[DestructionReactionSource, ...],
+    *,
+    excluded_actions: tuple[RetainedAttackAction, ...] = (),
 ) -> tuple[DecisionOption, ...]:
     from warhammer40k_core.engine.damage_allocation import DECLINE_DESTRUCTION_REACTION_OPTION_ID
 
@@ -53,6 +55,8 @@ def retained_attack_options(
     for source in sources:
         actions = retained_attack_actions(source)
         for action in actions:
+            if action in excluded_actions:
+                continue
             options.append(
                 DecisionOption(
                     option_id=source.source_id

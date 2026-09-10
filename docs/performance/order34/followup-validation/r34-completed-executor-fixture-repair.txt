@@ -1,0 +1,28 @@
+2 files reformatted
+bringing up nodes...
+bringing up nodes...
+
+FF...                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation _
+[gw3] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase13b_shooting_declarations.py:13164: in test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation
+    awaiting_model_id = _retain_attack_casualty_for_fight_on_death(
+tests/unit/test_phase13b_shooting_declarations.py:12916: in _retain_attack_casualty_for_fight_on_death
+    _apply_shooting_declaration_without_advancing(
+tests/phase13b_shooting_declaration_helpers.py:1495: in _apply_shooting_declaration_without_advancing
+    raise AssertionError(invalid_status.message)
+E   AssertionError: Shooting declaration proposal is not currently legal.
+___ test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage ____
+[gw2] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase13b_shooting_declarations.py:13032: in test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage
+    retained_id = _retain_attack_casualty_for_fight_on_death(
+tests/unit/test_phase13b_shooting_declarations.py:12916: in _retain_attack_casualty_for_fight_on_death
+    _apply_shooting_declaration_without_advancing(
+tests/phase13b_shooting_declaration_helpers.py:1495: in _apply_shooting_declaration_without_advancing
+    raise AssertionError(invalid_status.message)
+E   AssertionError: Shooting declaration proposal is not currently legal.
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation - AssertionError: Shooting declaration proposal is not currently legal.
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage - AssertionError: Shooting declaration proposal is not currently legal.
+2 failed, 3 passed in 6.99s

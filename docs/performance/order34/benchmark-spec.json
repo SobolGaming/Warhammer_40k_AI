@@ -1,0 +1,29 @@
+{
+  "workload_id": "order34-action-restriction-slice-v1",
+  "base_commit": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "measured_head_commit": "e57e8be02aa744354d8d078a78be39024ab44643",
+  "samples_per_revision_per_case": 7,
+  "profile_samples_per_revision": 1,
+  "query_repetitions_per_family": 100,
+  "families": [
+    "action eligibility",
+    "shooting eligibility",
+    "charge Action restriction"
+  ],
+  "boundaries": [
+    "Shooting phase end",
+    "Charge phase end",
+    "Fight phase end",
+    "turn end"
+  ],
+  "shooting_workload": "scripts/measure_indirect_shooting.py",
+  "fixture_policy": "Identical final driver, helper and lock hashes on base and head; deterministic canonical domain fixtures and decisions",
+  "setup_in_timed_interval": false,
+  "coverage_in_timing": false,
+  "profiling_in_timing": false,
+  "parallel_timing": false,
+  "cpu_affinity": "not pinned",
+  "hardware_status": "provisional local Apple M5 Pro, 64 GiB RAM; not a declared full-game reference workload",
+  "cold_start": "first setup retained separately; all seven completed timed intervals retained",
+  "full_game_certified": false
+}

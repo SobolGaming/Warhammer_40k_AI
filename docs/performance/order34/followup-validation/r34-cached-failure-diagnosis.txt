@@ -1,0 +1,205 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.5, pytest-9.0.3, pluggy-1.6.0 -- /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+cachedir: .pytest_cache
+benchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI
+configfile: pyproject.toml
+plugins: benchmark-5.2.3, cov-7.1.0, xdist-3.8.0, hypothesis-6.152.9
+created: 8/8 workers
+8 workers [54 items]
+
+scheduling tests via WorkStealingScheduling
+
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-False-VEHICLE] 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_payloads 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks[normal-True] 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_feel_no_pain_descriptor_registers_sources_for_each_model 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[True-MONSTER] 
+tests/unit/test_phase13b_shooting_declarations.py::test_p18c_fully_destroyed_cargo_skips_its_placement_request 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_validation_errors_are_typed 
+[gw4] [  1%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_validation_errors_are_typed 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound 
+[gw1] [  3%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_p18c_fully_destroyed_cargo_skips_its_placement_request 
+tests/unit/test_phase13b_shooting_declarations.py::test_p18c_pending_cargo_order_keeps_interleaved_attached_components_adjacent 
+[gw2] [  5%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_payloads 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requirements 
+[gw3] [  7%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_feel_no_pain_descriptor_registers_sources_for_each_model 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_feel_no_pain_keyword_without_descriptor_fails_fast 
+[gw4] [  9%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scope 
+[gw4] [ 11%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scope 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_ignore_psychic_attack_source_without_mortal_wound_scope 
+[gw3] [ 12%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_feel_no_pain_keyword_without_descriptor_fails_fast 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal 
+[gw1] [ 14%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_p18c_pending_cargo_order_keeps_interleaved_attached_components_adjacent 
+tests/unit/test_phase13b_shooting_declarations.py::test_p18c_retained_attached_lineage_accepts_living_embarked_component[bodyguard-unit] 
+[gw2] [ 16%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requirements 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_invalid_placement_retries_before_removal 
+[gw4] [ 18%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mortal_wounds_ignore_psychic_attack_source_without_mortal_wound_scope 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts 
+[gw4] [ 20%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_multi_model_mortal_fnp_pause_persists_first_logical_death_boundary 
+[gw0] [ 22%] FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice 
+tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks 
+[gw2] [ 24%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_invalid_placement_retries_before_removal 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal 
+[gw2] [ 25%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_apply_rejects_invalid_recorded_contexts 
+[gw2] [ 27%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_apply_rejects_invalid_recorded_contexts 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal 
+[gw1] [ 29%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_p18c_retained_attached_lineage_accepts_living_embarked_component[bodyguard-unit] 
+tests/unit/test_phase13b_shooting_declarations.py::test_p18c_retained_attached_lineage_accepts_living_embarked_component[leader-unit] 
+[gw2] [ 31%] FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_descriptor_registers_sources_for_each_model 
+[gw2] [ 33%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_descriptor_registers_sources_for_each_model 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-False-MONSTER] 
+[gw3] [ 35%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction[shoot-on-death] 
+[gw1] [ 37%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_p18c_retained_attached_lineage_accepts_living_embarked_component[leader-unit] 
+tests/unit/test_phase13b_shooting_declarations.py::test_p18c_hazard_destroyed_attached_component_uses_frozen_cargo_authority 
+[gw4] [ 38%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_multi_model_mortal_fnp_pause_persists_first_logical_death_boundary 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast 
+[gw4] [ 40%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[False-VEHICLE] 
+[gw0] [ 42%] FAILED tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage 
+[gw1] [ 44%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_p18c_hazard_destroyed_attached_component_uses_frozen_cargo_authority 
+tests/unit/test_phase13b_shooting_declarations.py::test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot 
+[gw1] [ 46%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value[-1] 
+[gw0] [ 48%] FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit 
+[gw0] [ 50%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice 
+[gw0] [ 51%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise 
+[gw3] [ 53%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction[shoot-on-death] 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction[fight-on-death] 
+[gw0] [ 55%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal 
+[gw0] [ 57%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal 
+tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue 
+[gw7] [ 59%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[True-MONSTER] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_retained_engagement_survives_restoration[False] 
+[gw0] [ 61%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-True-VEHICLE] 
+[gw6] [ 62%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-False-VEHICLE] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-False-MONSTER] 
+[gw3] [ 64%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction[fight-on-death] 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks[indirect-False] 
+[gw2] [ 66%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-False-MONSTER] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-True-VEHICLE] 
+[gw4] [ 68%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[False-VEHICLE] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[False-MONSTER] 
+[gw5] [ 70%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks[normal-True] 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks[indirect-True] 
+[gw0] [ 72%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-True-VEHICLE] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-True-MONSTER] 
+[gw6] [ 74%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-False-MONSTER] 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value[1] 
+[gw3] [ 75%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks[indirect-False] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-False-VEHICLE] 
+[gw2] [ 77%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-True-VEHICLE] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-True-MONSTER] 
+[gw4] [ 79%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[False-MONSTER] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[True-VEHICLE] 
+[gw5] [ 81%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks[indirect-True] 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed 
+[gw7] [ 83%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_retained_engagement_survives_restoration[False] 
+tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_retained_engagement_survives_restoration[True] 
+[gw0] [ 85%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[True-True-MONSTER] 
+[gw3] [ 87%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-False-VEHICLE] 
+[gw2] [ 88%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_indirect_mode_requires_unengaged_rules_unit[False-True-MONSTER] 
+[gw4] [ 90%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_new_engagement_rejects_pending_indirect_declaration[True-VEHICLE] 
+[gw5] [ 92%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed 
+[gw1] [ 94%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value[-1] 
+tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value[0] 
+[gw7] [ 96%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_r33_001_retained_engagement_survives_restoration[True] 
+[gw6] [ 98%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value[1] 
+[gw1] [100%] PASSED tests/unit/test_phase13b_shooting_declarations.py::test_order33_lower_failure_range_still_requires_the_modified_hit_value[0] 
+
+=================================== FAILURES ===================================
+___ test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice ___
+[gw0] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase13b_shooting_declarations.py:2183: in test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:252: in validate_declared_model_attack_completions
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+src/warhammer40k_core/engine/model_attack_history.py:142: in validate_retained_model_attack_history
+    raise GameLifecycleError("Model attack history lacks its declaration.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+_ test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal __
+[gw2] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase13b_shooting_declarations.py:16189: in test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal
+    GameLifecycle.from_payload(source_owner_drift)
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:252: in validate_declared_model_attack_completions
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+src/warhammer40k_core/engine/model_attack_history.py:142: in validate_retained_model_attack_history
+    raise GameLifecycleError("Model attack history lacks its declaration.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_phase13b_shooting_declarations.py:16185: in test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal
+    with pytest.raises(
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Destruction source rules unit must belong to the destroying player'
+E     Actual message: 'Model attack history lacks its declaration.'
+___ test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks ____
+[gw0] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase13b_shooting_declarations.py:12553: in test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks
+    restored = GameLifecycle.from_payload(checkpoint)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:252: in validate_declared_model_attack_completions
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+src/warhammer40k_core/engine/model_attack_history.py:142: in validate_retained_model_attack_history
+    raise GameLifecycleError("Model attack history lacks its declaration.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+___ test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage ____
+[gw0] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase13b_shooting_declarations.py:13077: in test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage
+    status = _submit_payload(
+tests/phase13b_shooting_declaration_helpers.py:1517: in _submit_payload
+    return lifecycle.submit_decision(
+src/warhammer40k_core/engine/lifecycle.py:874: in submit_decision
+    history_origin = _pmh.capture_psychic_history_origin(
+src/warhammer40k_core/engine/psychic_modifier_history_origin.py:85: in capture_psychic_history_origin
+    return PsychicModifierHistoryOrigin.from_payload(payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/psychic_modifier_history_origin.py:61: in from_payload
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Psychic historical origin must precede the first declaration.
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice - warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal - AssertionError: Regex pattern did not match.
+  Expected regex: 'Destruction source rules unit must belong to the destroying player'
+  Actual message: 'Model attack history lacks its declaration.'
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks - warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+FAILED tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_fight_on_death_only_unit_is_targetable_without_new_damage - warhammer40k_core.engine.phase.GameLifecycleError: Psychic historical origin must precede the first declaration.
+======================== 4 failed, 50 passed in 27.90s =========================
