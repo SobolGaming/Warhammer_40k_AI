@@ -85,7 +85,7 @@ not distinct-rule denominators.
 | --- | --- | ---: | --- |
 | `hit_modifier` | Add or subtract from the Hit roll | 45 | `phase17c:dice-roll-modifier` |
 | `wound_modifier` | Add or subtract from the Wound roll | 55 | `phase17c:dice-roll-modifier` |
-| `save_modifier` | Saving-throw or AP improve/worsen | 71 | `phase17c:dice-roll-modifier` |
+| `save_modifier` | Saving-throw or AP improve/worsen | 71 | AP: `phase17c:characteristic-modifier`. Saving throw: `phase17c:dice-roll-modifier`. June rows are AP |
 | `damage_modifier` | Change a weapon's Damage characteristic | 6 | `phase17c:characteristic-modifier` |
 | `strength_modifier` | Strength of a weapon or attack | 33 | `phase17c:characteristic-modifier` |
 | `attacks_characteristic` | Attacks characteristic | 9 | `phase17c:characteristic-modifier` |
@@ -101,7 +101,8 @@ not distinct-rule denominators.
 | `damage_reduction` | Subtract from the Damage of an **allocated** attack | 14 | `phase17c:allocated-attack-damage-characteristic-modifier` |
 
 `save_modifier` (AP / saving throw) is not `damage_reduction` (allocated
-Damage). `weapon_ability_grant` is not `weapon_grant` (giving a new weapon).
+Damage). AP is a characteristic operation, not a saving-throw modifier.
+`weapon_ability_grant` is not `weapon_grant` (giving a new weapon).
 
 ### 3.2 Defence, return and survival
 
@@ -124,15 +125,15 @@ Damage). `weapon_ability_grant` is not `weapon_grant` (giving a new weapon).
 | `movement_permission` | Eligible to shoot or charge after Advance or Fall Back | 92 | `phase17c:grant-ability` / datasheet charge-after-movement |
 | `movement_distance` | Change Move | 26 | `phase17c:movement-distance-modifier` |
 | `extra_move` | D6 / Stimulus / Surge / extra Normal move | 68 | nearest `out-of-phase-action` |
-| `ignore_terrain` | Move through terrain or models | 21 | **none** |
+| `ignore_terrain` | Move through terrain or models | 21 | `RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION`; no generic template |
 | `redeploy_teleport` | Remove from the battlefield into Reserves | 41 | `phase17c:placement-permission-restriction` |
 | `reserves_change` | Arrival, ingress, battle-round-as-higher, Deep Strike | 64 | `phase17c:placement-permission-restriction` |
 | `placement_setup` | Set up wholly within an edge or area | 30 | `phase17c:placement-permission-restriction` |
 | `transport` | Embark, disembark, Transport interactions | 40 | **none** as a generic EFFECT family |
 | `pile_in_consolidate` | Pile-in or Consolidate distance or timing | 17 | **none** |
 | `desperate_escape` | Force or modify Desperate Escape | 12 | `phase17c:desperate-escape-requirement` |
-| `charge_roll_modifier` | Add, subtract, or re-roll a Charge roll | 28 | `phase17c:dice-roll-modifier` |
-| `advance_roll_modifier` | Add, subtract, or replace an Advance roll | 18 | `phase17c:dice-roll-modifier` |
+| `charge_roll_modifier` | Add, subtract, or re-roll a Charge roll | 28 | add/subtract: `phase17c:dice-roll-modifier`. Re-roll: `phase17c:reroll-permission` |
+| `advance_roll_modifier` | Add, subtract, or replace an Advance roll | 18 | add/subtract: `phase17c:dice-roll-modifier`. Re-roll: `phase17c:reroll-permission`. Skip-roll +N Move: `movement-distance-modifier` for the Move change; skipping the roll has no template and is not `dice-roll-override` |
 | `out_of_phase_shoot` | Shoot as if it were the Shooting phase / Snap | 16 | `phase17c:out-of-phase-action` |
 | `out_of_phase_charge` | Resolve a Charge now (not merely become eligible) | 5 | `phase17c:out-of-phase-action` |
 
@@ -168,7 +169,7 @@ the same family and is not one of the 1,025 June rows.
 | `fight_order` | Fights First or must be the next unit selected | 2 | **none** as a generic Stratagem template |
 | `fight_eligibility_range` | Models within 3" are eligible to fight | 2 | **none** |
 | `attachment_change` | Start leading, or rewrite Bodyguard / Precision allocation | 2 | **none** |
-| `unit_split` | Split into one-model units | 1 | **none** |
+| `unit_split` | Split into one-model units | 1 | `RuleEffectKind.SPLIT_UNIT`; no generic template |
 | `scout_infiltrate_deep_strike` | Scouts, Infiltrators, Deep Strike | 14 | `phase17c:grant-ability` |
 | `weapon_grant` | Give a new weapon (not a keyword on an existing one) | 0 in June Stratagems | Enhancement demand; **none** |
 | `once_per_battle_reuse` | Once-per-battle ability may be used again | 2 | generalize P22B ledgers |
@@ -183,8 +184,17 @@ App pages rather than delete the families.
 
 ### 3.6 Multi-family rows
 
-Of 1,025 retained Stratagem EFFECTS: 555 match one family, 332 match two, 107
+Of 1,025 retained Stratagem EFFECTS: 555 match one family, 333 match two, 106
 match three, 25 match four, 6 match five. **470** rows are multi-family.
+Those sizes weight to **1,669** assignments, equal to the sum of the family
+`profile_count` values.
+
+The previously published 332 / 107 histogram still counted MOLECULAR TARGETING
+as a third family via a false `keyword_grant`. That row is `ws_bs_modifier`
+and `ignore_modifiers` only. GIFT OF CHANGE is a one-family `revival_return`
+row. The family counts already reflected both facts; only the histogram was
+stale.
+
 Track G descriptors carry a family **set**. A single `template_id` on the
 stored activation payload cannot represent that set.
 
@@ -258,7 +268,10 @@ Those samples sit on the same closed set. They do not add families.
 ### 6.1 Families with an existing template that profiles do not store
 
 June profiles store only target-binding RuleIR. FM0 must bind the §3 families
-to the templates in the tables, not invent a second catalogue.
+to the templates in the tables, not invent a second catalogue. Where a family's
+published meaning spans several RuleIR operations, bind each operation to its
+template. Do not treat `dice-roll-modifier` as covering AP characteristic
+changes, Charge re-rolls, or Advance replacements.
 
 ### 6.2 Families with no generic template
 
@@ -266,7 +279,7 @@ Demand, each requiring a real consumer before a new template exists:
 
 - `ignore_modifiers`
 - `lone_operative_range`
-- `ignore_terrain`
+- `ignore_terrain` (`RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION` exists)
 - `transport` as an EFFECT (capacity and disembark already have Core owners)
 - `pile_in_consolidate`
 - `order_issue`
@@ -276,7 +289,7 @@ Demand, each requiring a real consumer before a new template exists:
 - `fight_order` as a Stratagem-generic template
 - `fight_eligibility_range`
 - `attachment_change`
-- `unit_split`
+- `unit_split` (`RuleEffectKind.SPLIT_UNIT` exists)
 - `weapon_grant`
 - `stratagem_cost` as a reusable EFFECT (Core 15.01.01 is the first consumer)
 - `action` lock/start
@@ -325,7 +338,8 @@ Track G's effect-family work may be designed. It has:
   (`leadership_test`, charge/advance-roll modifiers, mortal wounds);
 - June Stratagem demand counts with multi-family rows preserved and token
   flattening forbidden;
-- the map onto existing `RuleTemplate` IDs and the gap list;
+- the map onto existing `RuleTemplate` IDs, operation-aware where one family
+  spans several RuleIR operations, and the gap list;
 - Core 15 and sampled App 946 confirmation that Enhancement and detachment
   EFFECTS use the same set;
 - the hold that per-entity App 946 counts wait on S3a.
