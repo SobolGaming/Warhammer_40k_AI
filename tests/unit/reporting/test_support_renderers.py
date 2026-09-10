@@ -433,9 +433,10 @@ def test_core_rules_40k_app_audit_retains_exact_review_only_category_inventory()
     assert "40k.app is treated as a verbatim authoritative mirror" in report
     assert "non-affiliated hosting provider" in report
     assert audit.project_authority_policy_id in report
-    assert "Implementation evaluation" in report
-    assert "Planned PRs" in report
-    assert "P24A, P24B, P24C1, P24C2, P24D, P24E" in report
+    assert "Current planning disposition" in report
+    assert "Roadmap PRs (including implemented)" in report
+    assert "Historical provider comparison (August 25)" in report
+    assert "P24J" in report
     assert "How it is currently recorded" in report
     assert "How it should be treated" in report
     assert "Specific rule/source basis" in report

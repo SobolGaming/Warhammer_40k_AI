@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -85,6 +86,60 @@ EXPECTED_REMEDIATION_PR_IDS_BY_CATEGORY = {
     "24": ("P24A", "P24B", "P24C1", "P24C2", "P24D", "P24E"),
     "25": ("P25A", "P25B", "P25C"),
 }
+
+
+@dataclass(frozen=True, slots=True)
+class RoadmapRow:
+    order: int
+    pr_id: str
+    finding_ids: tuple[str, ...]
+    prerequisites: tuple[str, ...]
+    gate: str
+
+
+def roadmap_rows(document: str) -> tuple[RoadmapRow, ...]:
+    """Read current planning without changing the immutable source-audit inventory."""
+    rows: list[RoadmapRow] = []
+    seen_prs: set[str] = set()
+    seen_findings: set[str] = set()
+    for line in document.splitlines():
+        if not re.match(r"^\| \d+ \| (?:P\w+|S-MIRRORS) \|", line):
+            continue
+        cells = tuple(cell.strip() for cell in line.strip("|").split("|"))
+        if len(cells) != 8:
+            raise ValueError("Core roadmap row must have eight columns.")
+        order = int(cells[0])
+        pr_id = cells[1]
+        if order != len(rows) + 1 or pr_id in seen_prs:
+            raise ValueError("Core roadmap orders and PR identities must be unique and sequential.")
+        findings = () if pr_id == "S-MIRRORS" else tuple(cells[2].split(", "))
+        for finding in findings:
+            if (
+                re.fullmatch(r"C(?:\d{2}|AUDIT)-\d{2}[A-Z]?", finding) is None
+                or finding in seen_findings
+            ):
+                raise ValueError("Core roadmap finding closure keys must be valid and unique.")
+            seen_findings.add(finding)
+        prerequisites = () if cells[6] == "—" or pr_id == "PFINAL" else tuple(cells[6].split(", "))
+        rows.append(RoadmapRow(order, pr_id, findings, prerequisites, cells[7]))
+        seen_prs.add(pr_id)
+    if not rows or rows[-1].pr_id != "PFINAL":
+        raise ValueError("Core roadmap must end with the certification gate.")
+    return tuple(rows)
+
+
+def category_pr_ids(rows: tuple[RoadmapRow, ...]) -> dict[str, tuple[str, ...]]:
+    inventory: dict[str, list[str]] = {f"{number:02d}": [] for number in range(1, 26)}
+    for row in rows:
+        for finding in row.finding_ids:
+            if finding == "CAUDIT-01":
+                continue
+            category = finding[1:3]
+            if category not in inventory:
+                raise ValueError("Core roadmap finding is outside categories 01-25.")
+            if row.pr_id not in inventory[category]:
+                inventory[category].append(row.pr_id)
+    return {category: tuple(prs) for category, prs in inventory.items()}
 
 
 @dataclass(frozen=True, slots=True)
@@ -227,16 +282,38 @@ def core_rules_forty_k_app_audit_markdown(
     audit: CoreRulesFortyKAppAudit | None = None,
 ) -> str:
     reviewed = core_rules_forty_k_app_audit() if audit is None else audit
+    planned = category_pr_ids(
+        roadmap_rows(
+            (ROOT / "docs" / "CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
+        )
+    )
     lines = [
         "# Core Rules 40k.app Comparison Evidence",
         "",
-        "This report is generated from the checked-in offline audit artifact. By explicit "
+        "This report combines the immutable August 25 source audit with the current canonical "
+        "roadmap inventory. Historical observations are not rewritten as fresh evidence. "
+        "By explicit "
         "repository-owner policy, 40k.app is treated as a verbatim authoritative mirror of the "
         "maintained Warhammer 40,000 App for Core Rules. The site remains a non-affiliated "
         "hosting provider and is never queried by the runtime engine.",
         "",
         "Faction review is explicitly excluded, including faction detachments and faction "
         "datasheet content.",
+        "",
+        "## September 10 review",
+        "",
+        "The [fresh clause review](CORE_RULES_ROADMAP_REVIEW_2026_09_10.md) records the "
+        "browser observations, repository checks and qualifications behind the updated plan. "
+        "It does not certify all 25 categories or introduce runtime source evidence. New "
+        "observations follow [the maintained-mirror policy](CORE_RULES_SOURCE_POLICY.md); "
+        "the August audit retains its historical policy and fingerprints.",
+        "",
+        "Current 12.08 explicitly requires Objective Consolidation to finish unengaged and "
+        "within objective range, superseding the old observation's uncertainty below. The "
+        "Engaging body clause versus retained v931 Ongoing erratum remains unresolved under "
+        "C12-04/P12B; their version equivalence is unproven. P18G separately owns clear "
+        "Assault/Shock eligibility, while P18F retains the engagement-owner pause. Category 17 "
+        "now has C17-01/P17 and cannot be treated as REVALIDATE-only.",
         "",
         "## Authority boundary",
         "",
@@ -250,14 +327,15 @@ def core_rules_forty_k_app_audit_markdown(
         "",
         "## Category inventory",
         "",
-        "| Category | Provider locator | Provider comparison | Implementation evaluation | "
-        "Planned PRs |",
+        "| Category | Provider locator | Historical provider comparison (August 25) | "
+        "Current planning disposition | Roadmap PRs (including implemented) |",
         "|---|---|---|---|---|",
     ]
     lines.extend(
         f"| {row.category_id} {row.category_title} | [{row.section_id}]({row.provider_url}) | "
-        f"{row.provider_comparison_status} | {row.implementation_status} | "
-        f"{', '.join(row.remediation_pr_ids) if row.remediation_pr_ids else 'PFINAL'} |"
+        f"{row.provider_comparison_status} | "
+        f"{'owned; see roadmap' if planned[row.category_id] else 'REVALIDATE'} | "
+        f"{', '.join(planned[row.category_id]) if planned[row.category_id] else 'PFINAL'} |"
         for row in reviewed.categories
     )
     lines.extend(
@@ -269,7 +347,11 @@ def core_rules_forty_k_app_audit_markdown(
             "findings below are tracked separately so corpus provenance does not imply gameplay "
             "execution.",
             "",
-            "## Source and provider findings",
+            "## Historical source and provider findings",
+            "",
+            "The following statements describe the August 25 assessment. They are retained "
+            "for provenance, not asserted as the current implementation or mirror wording. "
+            "The September 10 review above and the canonical roadmap control current planning.",
             "",
         )
     )
