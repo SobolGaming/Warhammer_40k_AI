@@ -246,7 +246,7 @@ complete-provenance record is admitted.
 
 | ID | Deliverable |
 | --- | --- |
-| T1 | Stratagem WHEN taxonomy over every distinct Stratagem: the closed window set and the gap list against the current 26 `TimingTriggerKind` values plus reaction and opportunity windows |
+| T1 | Stratagem WHEN taxonomy over every distinct Stratagem: the closed window set and the gap list against the current 27 `TimingTriggerKind` values plus reaction and opportunity windows. **Delivered** read-only to Track G in [T1_STRATAGEM_WHEN_TAXONOMY.md](factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md); the previous "26" count was stale |
 | T2 | Effect taxonomy for abilities, Enhancements, Stratagems and detachment rules: RuleIR template catalogue with counts (hit/wound/save/damage modifiers, rerolls, weapon keyword and profile grants, Feel No Pain and damage reduction, invulnerable/save grants, movement permissions, redeploy/teleport, reserves changes, mortal wounds, fight-order changes, target restrictions, keyword grants, resource gain/spend, healing/revival/return, transport interactions, weapon grants, attachment changes, OC changes, CP gain/refund, Battle-shock manipulation) |
 | T3 | Bearer, target and condition grammar, including state tokens such as "riled up" or "Waaagh! active", ranges, visibility, phase and turn ownership |
 | T4 | Army-construction grammar: DP budgets per battle size, multiple detachments per army, force-disposition consistency, duplicate-detachment prohibition, required and prohibited units and detachments, Enhancement counts, Enhancement-only detachments (Brute Bosses has six Enhancements and no Stratagems), related-army admission and caps, model-specific Warlord and bearer. **Delivered** read-only to Core P25C in [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) before P25C is implemented |
@@ -256,8 +256,9 @@ complete-provenance record is admitted.
 Output: `semantic_demand_matrix.json` plus a generated table, regenerated on
 every content-set change. Pre-gate surveys are planning evidence; FM0
 regenerates the matrix from the retained content set and reconciles it with
-the surveys. T4's [`t4_constraint_families.json`](factions/taxonomy/t4_constraint_families.json)
-is planning evidence only and is not that matrix.
+the surveys. T1's [`t1_when_windows.json`](factions/taxonomy/t1_when_windows.json)
+and T4's [`t4_constraint_families.json`](factions/taxonomy/t4_constraint_families.json)
+are planning evidence only and are not that matrix.
 
 ### Track G: generic engine families
 
@@ -266,7 +267,9 @@ a typed hook or RuleIR handler, the engine-owned consumer and mutation, the
 adapter contract update, replay and restore coverage, one priority-faction
 consumer, one non-priority regression, and flips its demand-matrix rows to
 executable. Candidate families, to be confirmed and ordered by T1–T6: timing
-windows and opponent reaction windows; attack-sequence modifiers and rerolls
+windows and opponent reaction windows (T1 delivered the closed WHEN set and
+gap list in [T1_STRATAGEM_WHEN_TAXONOMY.md](factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md));
+attack-sequence modifiers and rerolls
 (extend existing); weapon keyword and profile grants (extend); Feel No Pain and
 damage reduction; save grants; movement permissions including ignore-terrain,
 extra moves, redeploy/teleport and reserves ingress changes; target and
@@ -544,7 +547,9 @@ Permitted in parallel with the remaining Core Rules orders:
 
 - this roadmap and its maintenance;
 - T1–T6 surveys as documents under `docs/factions/taxonomy/`, with methodology,
-  counts and observation fingerprints. T4 is delivered:
+  counts and observation fingerprints. T1 is delivered:
+  [T1_STRATAGEM_WHEN_TAXONOMY.md](factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md).
+  T4 is delivered:
   [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md);
 - the S2 identity model design document: ID registry scheme, crosswalk schema,
   Space Marines overlay model, related-army ownership;
