@@ -1,0 +1,110 @@
+{
+  "commit": "3ab4f45c2ce3de2c1453c597cba91ff642c5da19",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "timing_boundary": "GameLifecycle.from_payload only; prepared JSON checkpoint; one process, no test workers; seven repetitions per checkpoint",
+  "samples": [
+    {
+      "discounted": false,
+      "sample": 0,
+      "seconds": 0.3157226250041276,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 1,
+      "seconds": 0.30795279203448445,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 2,
+      "seconds": 0.3473117499379441,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 3,
+      "seconds": 0.30604662490077317,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 4,
+      "seconds": 0.30481945897918195,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 5,
+      "seconds": 0.30523220798932016,
+      "outcome": "restored"
+    },
+    {
+      "discounted": false,
+      "sample": 6,
+      "seconds": 0.3060206660302356,
+      "outcome": "restored"
+    },
+    {
+      "discounted": true,
+      "sample": 0,
+      "seconds": 0.034420209005475044,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    },
+    {
+      "discounted": true,
+      "sample": 1,
+      "seconds": 0.035341667011380196,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    },
+    {
+      "discounted": true,
+      "sample": 2,
+      "seconds": 0.03422370890621096,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    },
+    {
+      "discounted": true,
+      "sample": 3,
+      "seconds": 0.03426883299835026,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    },
+    {
+      "discounted": true,
+      "sample": 4,
+      "seconds": 0.0340091249672696,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    },
+    {
+      "discounted": true,
+      "sample": 5,
+      "seconds": 0.03411041700746864,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    },
+    {
+      "discounted": true,
+      "sample": 6,
+      "seconds": 0.034044999978505075,
+      "outcome": "Pending Rapid Ingress target is ineligible: insufficient_command_points."
+    }
+  ],
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/rapid_ingress_helpers.py": "645e16294b559ba4fd88283c9a64e1dc80d470e5b6a89aa2bd4896c9e0e0e750",
+    "tests/core_stratagem_helpers.py": "90a4dd5fa5d14ebd2b1a48865d661d7f3ce37af64383f6f08642e9b0c2bdfd62",
+    "/private/tmp/order35-evidence/measure_r35_001_restore.py": "8752c015cb919c06301140b133c1592e1a8834056eceff5d97e782d69bb66d37"
+  },
+  "summaries": {
+    "False": {
+      "mean": 0.3133008749822953,
+      "max": 0.3473117499379441
+    },
+    "True": {
+      "mean": 0.03434556569637997,
+      "max": 0.035341667011380196
+    }
+  }
+}

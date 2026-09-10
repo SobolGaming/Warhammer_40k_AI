@@ -1,9 +1,12 @@
 # Order 35 / P15G / C15-07 — author validation
 
 [PR #441](https://github.com/SobolGaming/Warhammer_40k_AI/pull/441) repairs Rapid
-Ingress eligibility. All required local gates passed. Full CI on the final
-published head and owner-initiated independent review remain separate, outstanding
-requirements. The author has neither approved nor merged this PR.
+Ingress eligibility. The independent review identified R35-001 on head
+`3ab4f45c`: discounted pending target checkpoints failed restoration. Current
+repair evidence and validation are in [R35-001 validation](ORDER_35_R35_001_VALIDATION.md).
+The remainder of this document preserves the pre-review candidate's evidence;
+it does not validate the repaired head. The author has neither approved nor
+merged this PR.
 
 ## Source and scope
 
