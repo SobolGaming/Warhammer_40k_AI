@@ -44,6 +44,7 @@ and target decisions.
 | Feed fingerprint | [updates](https://www.40k.app/factions/updates) `9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202` at 2026-09-05T20:36:35.214Z |
 | Reporting groups | 28 faction reporting groups; 40 admitted guides |
 | Army-rule headings | Current headings from those 40 guides |
+| Detachment headings | All **506** App 946 audit listing rows (T4 unique names **270**) |
 | T2 EFFECT demand | `resource_gain_spend` **60** June Stratagem rows |
 | T3 condition demand | `state_token` **30** June rows; T3 named tokens in T3 §3.5 and this catalog §4.2 |
 | Operative samples | Live [War Horde](https://www.40k.app/factions/orks/detachments/war-horde), [Shadow Legion](https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion), [Adepta Sororitas](https://www.40k.app/factions/adepta-sororitas), [Drukhari](https://www.40k.app/factions/drukhari) |
@@ -74,6 +75,12 @@ Classification rules that a token hit-list would flatten:
 | Miracle dice | face pool, not an integer `FactionResourceLedger` kind |
 | Command points | Core `CommandPointLedger`, not `FactionResourceLedger` |
 | Related-army Pact headings | T4 construction, not T5 ledgers |
+| Blessings of Khorne and Blood Tithe | mode pick **and** Khorne Daemonkin BTP ledger |
+| Shadow of Chaos and Flux tokens | army aura **and** Scintillating Legion integer spend |
+| Thrill Seekers and Slaanesh pledge | army mode **and** Coterie pledge counter |
+| Pain tokens and Combat Drugs | army integer pool **and** Spectacle of Spite heading (shape unknown) |
+| Miracle dice and Sacred Rites | face pool **and** Army of Faith heading (shape unknown) |
+| Strands of Fate as a missing army heading | current **Seer Council** detachment heading; shape unknown |
 
 ## 3. Closed split
 
@@ -139,7 +146,7 @@ the token.
 | `blessings_of_khorne` | Blessings of Khorne | `mode_machine` | yes |
 | `battle_focus` | Battle Focus | `faction_integer_ledger` (`battle_focus_token`) **and** `mode_machine` | yes |
 | `waaagh` | Waaagh! | `pulse_flag` | yes |
-| `strands_of_fate` | not a current App 946 heading | none; historical name only | no current heading |
+| `strands_of_fate` | Strands of Fate (Seer Council) | unknown until S3a | no army-rule heading; detachment grain |
 | `yield` | Prioritised Efficiency | `faction_integer_ledger` (`leagues_of_votann_yield_points`) | yes |
 | `cabal` | Cabal of Sorcerers | `mode_machine`; integer kind only if S3a retains a pool | yes; ritual attempts |
 | `doctrina` | Doctrina Imperatives | `mode_machine` | yes |
@@ -162,10 +169,11 @@ the token.
 | `nurgles_gift` | Nurgle’s Gift (Aura) | `aura_zone` | yes |
 | `shadow_of_chaos` | The Shadow of Chaos | `aura_zone` | yes |
 
-`strands_of_fate` stays in the closed set as a June/App **zero against the
-current heading**. Current Aeldari / Harlequins / Ynnari headings are
-Battle Focus and Disparate Paths. Do not mint a Strands ledger from the
-roadmap name.
+`strands_of_fate` is not a current **army-rule** heading. Current Aeldari /
+Harlequins / Ynnari army headings are Battle Focus and Disparate Paths.
+It **is** a current App 946 **Seer Council** detachment heading. June
+Stratagems do not spend or gain it. Do not mint a ledger from the
+roadmap name or from the heading alone.
 
 ### 4.2 T3-named contextual tokens
 
@@ -196,9 +204,14 @@ not recount them.
 | `aspect_shrine_token` | Aeldari datasheet token | `unit_integer_ledger` (`aeldari:aspect-shrine-token`) |
 | `drones` | T’au heading | `composition` |
 | `da_boss` | Orks v946 heading | unknown until F-ORK-01 / S3a |
+| `blood_tithe` | Khorne Daemonkin (detachment) | `faction_integer_ledger`; no kind yet |
+| `flux_token` | Fates In Flux (detachment) | `faction_integer_ledger`; no kind yet |
+| `slaanesh_pledge` | Pledges to the Dark Prince (detachment) | `faction_integer_ledger`; T5-HOLD-PLEDGE-SHAPE |
+| `combat_drugs` | Spectacle of Spite (detachment) | unknown; not `pain` |
+| `sacred_rites` | Army of Faith (detachment) | unknown; not `miracle_dice` |
 
 Orks "Unstable energies" and "Special Move Types" are movement EFFECT
-demand (T2), not ledgers.
+demand (T2), not ledgers. Detachment inventory and false friends are §4.5.
 
 ### 4.4 Headings T5 must not steal
 
@@ -211,6 +224,80 @@ Chapter overlay headings (Heirs of Sigismund, Sons of Sanguinius, The
 Unforgiven, Ravenwing, Deathwing, Sons of Russ, Sagas, Curse of the
 Wulfen) are not extra `ResourceLedger` kinds. S3a records whether any
 is a distinct runtime machine.
+
+### 4.5 Detachment pool inventory
+
+T5's first pass followed the roadmap army-rule parenthetical and missed
+detachment-owned pools. This inventory closes that hole.
+
+Method: every App 946 audit `Rule headings` line (506 listing rows, 40
+views, T4 unique names 270) plus a June scan of all 1,025
+`when`/`target`/`effect` descriptors for spend, gain, increment, discard,
+or named-token language. September audits still have no EFFECT column.
+Detachment rule bodies remain S3a. This is not a new T2 recount; the 60
+`resource_gain_spend` rows stay T2.
+
+#### Confirmed detachment integer pools
+
+June text is explicit gain, spend, or increment. No `resource_kind`
+exists today. Track G may bind `FactionResourceLedger` only with a real
+consumer.
+
+| Token ID | App heading | Listing | June Stratagem demand | Fit |
+| --- | --- | --- | --- | --- |
+| `blood_tithe` | Blood Tithe | [Khorne Daemonkin](https://www.40k.app/factions/blood-legions/detachments/khorne-daemonkin) (Blood Legions listing; June row filed under `world-eaters`) | A WORTHY SKULL: gain D3 BTP, then spend BTP | `faction_integer_ledger` |
+| `flux_token` | Fates In Flux | [Scintillating Legion](https://www.40k.app/factions/chaos-daemons/detachments/scintillating-legion) | four rows spend a Flux token (Impossible Eclipse, Pyrogenesis, Flickering Reality, Delirium Unmade) | `faction_integer_ledger` |
+| `slaanesh_pledge` | Pledges to the Dark Prince | [Coterie of the Conceited](https://www.40k.app/factions/emperors-children/detachments/coterie-of-the-conceited) (also Legions of Excess) | Unbound Arrogance: increase the pledge by 1 | `faction_integer_ledger`; thresholds may also be a mode (T5-HOLD-PLEDGE-SHAPE) |
+
+`blood_tithe` is not Blessings of Khorne. `flux_token` is not Shadow of
+Chaos. `slaanesh_pledge` is not Thrill Seekers and is not Soulforged
+Warpack "Desperate Pledge" (that row invokes a contract).
+
+#### Heading-only pool suspects (no June Stratagem spend)
+
+| Token ID | App heading | Listing | Fit |
+| --- | --- | --- | --- |
+| `strands_of_fate` | Strands of Fate | [Seer Council](https://www.40k.app/factions/aeldari/detachments/seer-council) (also Harlequins, Ynnari) | unknown; T5-HOLD-STRANDS |
+| `combat_drugs` | Combat Drugs | [Spectacle of Spite](https://www.40k.app/factions/drukhari/detachments/spectacle-of-spite) | unknown; not `pain` |
+| `sacred_rites` | Sacred Rites | [Army of Faith](https://www.40k.app/factions/adepta-sororitas/detachments/army-of-faith) | unknown; not `miracle_dice` |
+
+#### Not a pool
+
+These headings matched a loose name scan. They are not new
+`ResourceLedger` kinds.
+
+| Heading | Listing examples | Why not a ledger |
+| --- | --- | --- |
+| Combat Doctrines / Mastered Doctrines | Gladius Task Force, Blade of Ultramar | T2 `doctrine_mode` |
+| Idols of Khorne | Cult of Blood | mode pick (Brazen Idol) |
+| Synaptic Imperatives / Higher Imperatives | Synaptic Nexus, Talons of the Norn Queen | mode pick |
+| Mission Tactics / Deathwatch Mission Tactics | Black Spear; Ordo Xenos | mode pick |
+| Marks of Chaos | Pactbound Zealots | keyword / mark select |
+| Focus of Hatred | Veterans of the Long War | T3 contextual token |
+| Vowed Target / Oath of Reclamation | Inner Circle; Reclamation Force | designated target; not army `oath_of_moment` |
+| Command / Annihilation / Hypermotility Protocols | Awakened Dynasty and other Necron listings | protocol or mode names; not Reanimation |
+| Power Matrix | Canoptek Court | no June spend; spatial until S3a |
+| Loci of Power | Lords of the Warp | no June spend; mode until S3a |
+| Soul Forge Boons / Debt to the Soul Forge | Cult of the Arkifane; Soulforged Warpack | no integer spend; contract invoke is not `slaanesh_pledge` |
+| Infernal Pacts / Warpmeld Sacrifice | Changehost of Deceit; Warpmeld Pact | T4-adjacent or sacrifice; not a point pool |
+| Valour’s Reward | Questoris Companions | no June spend; reward table until S3a |
+| Red Thirst | Liberator Assault Group | status, not a counter |
+| Creeping Dread (Aura) | Null Maiden Vigil | aura |
+| Contracted Harvest | Kabalite Agonysts | contract status |
+| Malefic Surge | Infernal Lance | T2 `persisting_status` |
+| THE STAR CHILDREN’S BLESSINGS | Final Day | not Blessings of Khorne |
+| Angelic Judgement | Chorus of Condemnation | not a Judgement-token ledger |
+| Order | Armoured Infantry | army `orders` token, not a new kind |
+| Powers of da Waaagh! | Wurrband | not the army `waaagh` pulse |
+| A Perfect Ambush | Host of Ascension | not Cult Ambush Resurgence points |
+| War-form Mantles / Hyper-adaptations | Lords of the Forge; Invasion Fleet | mode picks |
+| Boons of the Brood | Serpent’s Brood | not a ledger |
+| Shadow Masters / Interlocking Tactics | shared Space Marine listings | not pools |
+
+No other June abbreviation (`BTP`, `YP`, Flux token, Pain token, Miracle
+dice, Aspect Shrine token, pledge increment) names a fourth new pool. `YP`
+is `yield`. Pain, Miracle dice, and Aspect Shrine tokens are already in
+§4.
 
 ## 5. Named-handler budget versus this split
 
@@ -265,6 +352,9 @@ exist. Unused-by-June-Stratagem is not `gap_no_kind`.
 - Cabal ritual machine; mint a Cabal integer kind only if S3a retains a pool
 - Miracle-dice face operations (discard, set, substitute) on the existing pool
 - Overlay chapter machines, if S3a shows a distinct runtime token
+- Blood Tithe, Flux tokens, and the Slaanesh pledge counter (kinds do not exist)
+- Seer Council Strands of Fate, Combat Drugs, and Sacred Rites, only after S3a retains a pool shape
+- Pledge thresholds versus the integer increment (T5-HOLD-PLEDGE-SHAPE)
 
 ### 7.3 Families T5 must not steal
 
@@ -279,8 +369,10 @@ exist. Unused-by-June-Stratagem is not `gap_no_kind`.
 | ID | Hold | Unblocks |
 | --- | --- | --- |
 | T5-HOLD-APP-ARMY-RULE | App 946 army-rule operative text is not retained for every heading | S3a, then FM0 |
-| T5-HOLD-STRANDS | Strands of Fate is not a current Aeldari heading | S3a |
+| T5-HOLD-STRANDS | Strands of Fate is a Seer Council heading; pool shape is not retained | S3a |
 | T5-HOLD-CABAL-SHAPE | Current handler is ritual attempts; June/T2 wording still says Cabal spend | S3a |
+| T5-HOLD-PLEDGE-SHAPE | Unbound Arrogance increments an integer; thresholds or picks may also be a mode | S3a / T6 |
+| T5-HOLD-DETACHMENT-OPERATIVE | App 946 detachment rule bodies are not retained; this inventory is headings plus June Stratagem text | S3a, then FM0 |
 | T5-HOLD-BATTLE-FOCUS-SPLIT | Token ledger versus manoeuvre pick | Track G / T6 |
 | T5-HOLD-CULT-AMBUSH-SPLIT | Markers versus Resurgence points | Track G |
 | T2-HOLD-RESOURCE-SPLIT | Answered here for the ledger question; T2 EFFECT counts stay T2 | this survey |
@@ -296,7 +388,10 @@ Track G's shared-ledger work may be designed. It has:
 - the hold that Miracle dice, Cabal rituals, pulses, modes, auras,
   placement, protocols and composition stay off integer ledgers;
 - T3 contextual tokens classified as not sharing those ledgers;
-- the hold that per-entity App 946 counts wait on S3a.
+- the hold that per-entity App 946 counts wait on S3a;
+- the detachment inventory: 506 listing headings, three new integer
+  pools (`blood_tithe`, `flux_token`, `slaanesh_pledge`), and the
+  heading-only suspects that are not extra ledgers.
 
 T5 does not add kinds, change named-handler approvals, or emit
 `semantic_demand_matrix.json`. FM0 regenerates that matrix from retained
