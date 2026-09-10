@@ -1,0 +1,391 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "T1",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/taxonomy/T1_STRATAGEM_WHEN_TAXONOMY.md",
+  "delivered_to": "Track G timing-window family",
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "engine": {
+    "timing_trigger_kind_count": 27,
+    "roadmap_previous_count": 26,
+    "roadmap_previous_count_stale": true,
+    "enum_module": "warhammer40k_core.engine.timing_windows.TimingTriggerKind",
+    "kinds": [
+      "any_phase",
+      "passive_query",
+      "start_phase",
+      "during_phase",
+      "end_phase",
+      "start_turn",
+      "end_turn",
+      "start_battle_round",
+      "end_battle_round",
+      "before_battle",
+      "after_battle",
+      "after_unit_selected_as_target",
+      "just_after_friendly_unit_selected_to_move",
+      "just_after_enemy_unit_selected_to_fall_back",
+      "just_after_friendly_unit_falls_back",
+      "just_after_friendly_unit_selected_to_shoot",
+      "just_after_friendly_unit_has_shot",
+      "just_after_enemy_unit_has_shot",
+      "after_enemy_unit_ends_move",
+      "after_unit_ends_charge_move",
+      "after_model_destroyed",
+      "after_unit_destroyed",
+      "model_placed_on_battlefield",
+      "just_after_enemy_unit_has_fought",
+      "just_after_friendly_unit_selected_to_fight",
+      "after_unit_attacks_resolved",
+      "after_dice_roll"
+    ],
+    "envelopes": [
+      "use_stratagem",
+      "reaction_window",
+      "opportunity_window",
+      "out_of_phase_action_context"
+    ],
+    "stratagem_decision_type": "use_stratagem",
+    "note": "ReactionWindow and OpportunityWindow wrap use_stratagem; they are not extra TimingTriggerKind values."
+  },
+  "corpus_listing_counts": {
+    "stratagem_audit_table_rows": 2520,
+    "expected_distinct_after_s2": "about 1400",
+    "note": "September audits have no WHEN column. Distinct-rule identity is S2."
+  },
+  "activation_profiles": {
+    "source_package_id": "gw-11e-phase17s-faction-stratagem-activation-2026-27",
+    "source_date": "2026-06-21",
+    "profile_rows": 1025,
+    "unique_names": 1002,
+    "unique_when_descriptor": 236,
+    "factions": 23,
+    "detachments": 173,
+    "observed_phase_clause_event_tuples": 107,
+    "mixed_owner_union_rows": 159,
+    "mixed_owner_unique_when_descriptor": 25,
+    "same_owner_union_rows": 17,
+    "heuristic_default": "start_phase",
+    "stored_trigger_kind": {
+      "start_phase": 660,
+      "after_unit_selected_as_target": 178,
+      "end_phase": 77,
+      "after_enemy_unit_ends_move": 38,
+      "just_after_enemy_unit_has_shot": 27,
+      "after_unit_ends_charge_move": 15,
+      "just_after_friendly_unit_has_shot": 10,
+      "just_after_enemy_unit_selected_to_fall_back": 7,
+      "just_after_enemy_unit_has_fought": 4,
+      "just_after_friendly_unit_falls_back": 4,
+      "just_after_friendly_unit_selected_to_fight": 3,
+      "just_after_friendly_unit_selected_to_shoot": 1,
+      "after_dice_roll": 1
+    },
+    "start_phase_eventish_rows": 133,
+    "destruction_rows_stored_as_start_phase": 32,
+    "phase_token_combos": {
+      "any": 68,
+      "charge": 65,
+      "charge_fight": 1,
+      "command": 84,
+      "fight": 217,
+      "movement": 175,
+      "movement_charge": 14,
+      "shooting": 242,
+      "shooting_charge": 3,
+      "shooting_fight": 156
+    }
+  },
+  "closed_axes": {
+    "phase_clause_fields": ["turn_owner", "phase", "boundary"],
+    "unions_are_clause_lists": true,
+    "do_not_lift_single_turn_owner": true,
+    "turn_owner": ["your", "opponent", "either", "any", "unspecified"],
+    "phase_tokens": [
+      "command",
+      "movement",
+      "shooting",
+      "charge",
+      "fight",
+      "any",
+      "turn",
+      "reinforcements_step"
+    ],
+    "boundaries": [
+      "during_phase",
+      "start_phase",
+      "end_phase",
+      "event_in_phase",
+      "end_turn",
+      "command_battleshock_step",
+      "fight_step",
+      "before_reinforcements_step",
+      "start_reinforcements_step",
+      "during_reinforcements_step",
+      "end_reinforcements_step"
+    ],
+    "event_set_not_exploded_kind": true
+  },
+  "mixed_owner_unions": {
+    "profile_rows": 159,
+    "unique_when_descriptor": 25,
+    "note": "Owner is per clause. Lifting one turn_owner over a phase_set is invalid (T1-001).",
+    "patterns": [
+      {
+        "clauses": [
+          {"turn_owner": "opponent", "phase": "shooting"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 85,
+        "example": "Your opponent's Shooting phase or the Fight phase"
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "shooting"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 71,
+        "example": "Your Shooting phase or the Fight phase"
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "movement"},
+          {"turn_owner": "unspecified", "phase": "charge"}
+        ],
+        "profile_count": 2
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "charge"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 1
+      }
+    ]
+  },
+  "same_owner_unions": {
+    "profile_rows": 17,
+    "patterns": [
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "movement"},
+          {"turn_owner": "your", "phase": "charge"}
+        ],
+        "profile_count": 12
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "shooting"},
+          {"turn_owner": "your", "phase": "charge"}
+        ],
+        "profile_count": 3
+      },
+      {
+        "clauses": [
+          {"turn_owner": "unspecified", "phase": "shooting"},
+          {"turn_owner": "unspecified", "phase": "fight"}
+        ],
+        "profile_count": 1
+      },
+      {
+        "clauses": [
+          {"turn_owner": "your", "phase": "shooting"},
+          {"turn_owner": "your", "phase": "fight"}
+        ],
+        "profile_count": 1
+      }
+    ]
+  },
+  "events": [
+    {"event_id": "none", "engine_trigger_kind": null, "uses_boundary": true, "profile_count": 616, "coverage": "boundary_only"},
+    {"event_id": "selected_as_target", "engine_trigger_kind": "after_unit_selected_as_target", "profile_count": 179, "coverage": "covered"},
+    {"event_id": "ends_fall_back_move", "engine_trigger_kind": "just_after_friendly_unit_falls_back", "alt_engine_trigger_kind": "after_enemy_unit_ends_move", "profile_count": 39, "coverage": "covered"},
+    {"event_id": "has_shot", "engine_trigger_kind": "just_after_friendly_unit_has_shot", "alt_engine_trigger_kind": "just_after_enemy_unit_has_shot", "profile_count": 35, "coverage": "covered"},
+    {"event_id": "ends_normal_advance_or_fall_back", "engine_trigger_kind": "after_enemy_unit_ends_move", "profile_count": 32, "coverage": "covered"},
+    {"event_id": "unit_destroyed", "engine_trigger_kind": "after_unit_destroyed", "profile_count": 23, "coverage": "mis_mapped_to_start_phase"},
+    {"event_id": "ends_charge_move", "engine_trigger_kind": "after_unit_ends_charge_move", "profile_count": 16, "coverage": "covered"},
+    {"event_id": "declares_charge", "engine_trigger_kind": null, "profile_count": 10, "coverage": "gap_no_kind"},
+    {"event_id": "mortal_wound", "engine_trigger_kind": null, "profile_count": 9, "coverage": "gap_no_kind", "note": "Suffers or is allocated a mortal wound without naming an attack."},
+    {"event_id": "selected_to_fall_back", "engine_trigger_kind": "just_after_enemy_unit_selected_to_fall_back", "profile_count": 6, "coverage": "covered"},
+    {"event_id": "model_destroyed_deadly_demise", "engine_trigger_kind": "after_model_destroyed", "profile_count": 6, "coverage": "mis_mapped_to_start_phase"},
+    {"event_id": "just_before_consolidate", "engine_trigger_kind": null, "profile_count": 5, "coverage": "gap_no_kind"},
+    {"event_id": "has_shot_or_fought", "engine_trigger_kind": null, "uses_event_set": true, "profile_count": 4, "coverage": "gap_event_set"},
+    {"event_id": "attacks_resolved", "engine_trigger_kind": "after_unit_attacks_resolved", "profile_count": 4, "coverage": "mis_mapped_to_has_fought"},
+    {"event_id": "has_fought", "engine_trigger_kind": "just_after_enemy_unit_has_fought", "friendly_kind": null, "profile_count": 3, "coverage": "partial_friendly_gap"},
+    {"event_id": "just_after_advance", "engine_trigger_kind": null, "profile_count": 3, "coverage": "gap_no_kind"},
+    {"event_id": "attack_allocated", "engine_trigger_kind": null, "uses_event_set": true, "event_set_with": ["mortal_wound"], "profile_count": 2, "coverage": "gap_no_kind", "examples": ["THIEVES OF PAIN", "PROTECTION OF THE DARK PRINCE"], "note": "WHEN fires just after an attack or a mortal wound is allocated. Distinct from selected_as_target effects that mention allocation."},
+    {"event_id": "finished_making_attacks", "engine_trigger_kind": "after_unit_attacks_resolved", "profile_count": 2, "coverage": "profile_nearest_kind", "examples": ["GUIDED DISRUPTION", "SHOCK BOMBARDMENT"]},
+    {"event_id": "selected_to_shoot", "engine_trigger_kind": "just_after_friendly_unit_selected_to_shoot", "profile_count": 2, "coverage": "covered"},
+    {"event_id": "selected_to_fight", "engine_trigger_kind": "just_after_friendly_unit_selected_to_fight", "profile_count": 2, "coverage": "covered"},
+    {"event_id": "selected_to_advance", "engine_trigger_kind": null, "not_the_same_as": "selected_to_move", "profile_count": 2, "coverage": "gap_no_kind"},
+    {"event_id": "just_before_advance", "engine_trigger_kind": null, "profile_count": 2, "coverage": "gap_no_kind"},
+    {"event_id": "unit_destroyed_before_remove", "engine_trigger_kind": "after_unit_destroyed", "ordering": "before_remove_and_deadly_demise", "profile_count": 2, "coverage": "mis_mapped_to_start_phase"},
+    {"event_id": "battle_shock_test_failed", "engine_trigger_kind": null, "profile_count": 2, "coverage": "gap_no_kind"},
+    {"event_id": "once_per_battle_ability_used", "engine_trigger_kind": null, "profile_count": 2, "coverage": "gap_no_kind"},
+    {"event_id": "cult_ambush_marker_move", "engine_trigger_kind": null, "profile_count": 2, "coverage": "gap_no_kind"},
+    {"event_id": "dice_roll", "engine_trigger_kind": "after_dice_roll", "profile_count": 1, "coverage": "covered"},
+    {"event_id": "starts_charge_move", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind", "examples": ["SINGLE-MINDED STRIKE"]},
+    {"event_id": "just_before_surge_move", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind", "examples": ["SYNAPTIC GOADING"]},
+    {"event_id": "psychic_test_before_ritual", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind", "examples": ["ARCANE FOCUS"]},
+    {"event_id": "charge_targets_before_move", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "unit_set_up", "engine_trigger_kind": "model_placed_on_battlefield", "profile_count": 1, "coverage": "mis_mapped_to_start_phase"},
+    {"event_id": "ends_normal_move", "engine_trigger_kind": null, "enemy_alt": "after_enemy_unit_ends_move", "profile_count": 1, "coverage": "gap_friendly"},
+    {"event_id": "disembark", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "psychic_finished", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "just_before_pile_in", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "just_before_bondsman", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "malefic_surge", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "contract_complete", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "before_detachment_rule_targets", "engine_trigger_kind": null, "profile_count": 1, "coverage": "gap_no_kind"},
+    {"event_id": "enemy_ends_move_generic", "engine_trigger_kind": "after_enemy_unit_ends_move", "profile_count": 1, "coverage": "covered_if_battlefield_move"},
+    {"event_id": "selected_to_move", "engine_trigger_kind": "just_after_friendly_unit_selected_to_move", "profile_count": 0, "coverage": "live_app_946_and_engine_kind_unused_by_profiles"},
+    {"event_id": "becomes_battle_shocked", "engine_trigger_kind": null, "profile_count": 0, "coverage": "live_app_946_gap_no_kind"},
+    {"event_id": "before_battle_shock_roll", "engine_trigger_kind": null, "profile_count": 0, "coverage": "core_15_gap_no_kind"}
+  ],
+  "kinds_needed_but_unused_by_profiles": [
+    "during_phase",
+    "any_phase",
+    "end_turn",
+    "after_unit_destroyed",
+    "after_model_destroyed",
+    "model_placed_on_battlefield",
+    "after_unit_attacks_resolved",
+    "just_after_friendly_unit_selected_to_move"
+  ],
+  "kinds_with_no_stratagem_demand_in_retained_when": [
+    "passive_query",
+    "before_battle",
+    "after_battle",
+    "start_turn",
+    "start_battle_round",
+    "end_battle_round"
+  ],
+  "core_stratagems": [
+    {
+      "title": "Command Re-roll",
+      "section": "15.02",
+      "when_shape": "Any phase, just after a listed roll",
+      "event_id": "dice_roll",
+      "engine_trigger_kind": "after_dice_roll"
+    },
+    {
+      "title": "Epic Challenge",
+      "section": "15.03",
+      "when_shape": "Fight phase, just after a friendly CHARACTER unit is selected to fight",
+      "event_id": "selected_to_fight",
+      "engine_trigger_kind": "just_after_friendly_unit_selected_to_fight"
+    },
+    {
+      "title": "Insane Bravery",
+      "section": "15.04",
+      "when_shape": "Battle-shock step of your Command phase, just before a Battle-shock roll",
+      "event_id": "before_battle_shock_roll",
+      "boundary": "command_battleshock_step",
+      "engine_trigger_kind": null,
+      "shipped_as": "start_phase"
+    },
+    {
+      "title": "Crushing Impact",
+      "section": "15.05",
+      "when_shape": "Your Charge phase, just after a friendly MONSTER/VEHICLE ends a charge move",
+      "event_id": "ends_charge_move",
+      "engine_trigger_kind": "after_unit_ends_charge_move"
+    },
+    {
+      "title": "Explosives",
+      "section": "15.06",
+      "when_shape": "Your Shooting phase",
+      "event_id": "none",
+      "boundary": "during_phase",
+      "engine_trigger_kind": "during_phase"
+    },
+    {
+      "title": "Rapid Ingress",
+      "section": "15.07",
+      "when_shape": "End of your opponent's Movement phase",
+      "event_id": "none",
+      "boundary": "end_phase",
+      "engine_trigger_kind": "end_phase",
+      "envelope": "reaction_window"
+    },
+    {
+      "title": "Fire Overwatch",
+      "section": "15.08",
+      "when_shape": "End of your opponent's Movement phase",
+      "event_id": "none",
+      "boundary": "end_phase",
+      "engine_trigger_kind": "end_phase",
+      "envelope": "reaction_window",
+      "follow_on": "out_of_phase_action_context"
+    },
+    {
+      "title": "Snap Shooting",
+      "section": "15.09",
+      "not_a_stratagem": true
+    },
+    {
+      "title": "Smokescreen",
+      "section": "15.10",
+      "when_shape": "Start of your opponent's Shooting phase",
+      "event_id": "none",
+      "boundary": "start_phase",
+      "engine_trigger_kind": "start_phase",
+      "envelope": "reaction_window"
+    },
+    {
+      "title": "Heroic Intervention",
+      "section": "15.11",
+      "when_shape": "End of your opponent's Charge phase",
+      "event_id": "none",
+      "boundary": "end_phase",
+      "engine_trigger_kind": "end_phase",
+      "envelope": "reaction_window"
+    },
+    {
+      "title": "Counter-offensive",
+      "section": "15.12",
+      "when_shape": "Fight step of your opponent's Fight phase, just after an enemy unit has resolved its attacks",
+      "event_id": "attacks_resolved",
+      "boundary": "fight_step",
+      "engine_trigger_kind": "after_unit_attacks_resolved"
+    }
+  ],
+  "live_samples": [
+    {
+      "name": "Shadow Legion",
+      "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "note": "WHEN shapes match the 2026-06-21 extract, including destruction before last-model removal and Deadly Demise."
+    },
+    {
+      "name": "War Horde",
+      "url": "https://www.40k.app/factions/orks/detachments/war-horde",
+      "note": "Orks v946 rewrite. Adds selected-to-move, selected-to-shoot, selected-to-fight, becomes Battle-shocked, and enemy-targets as selected_as_target."
+    },
+    {
+      "name": "Core 15",
+      "url": "https://www.40k.app/rules/15-stratagems",
+      "note": "Authoritative Core Stratagem WHEN for this survey. Packaged when_text is incomplete."
+    }
+  ],
+  "holds": [
+    "T1-HOLD-APP-WHEN",
+    "T1-HOLD-PROFILE-STALENESS",
+    "T1-HOLD-SUBSTEP-VS-KIND",
+    "T1-HOLD-UNION-PHASE",
+    "T1-HOLD-INSANE-BRAVERY-STEP",
+    "F-ORK-01"
+  ],
+  "not_in_this_pr": [
+    "src changes",
+    "TimingTriggerKind additions",
+    "activation-profile remap",
+    "semantic_demand_matrix.json"
+  ]
+}
