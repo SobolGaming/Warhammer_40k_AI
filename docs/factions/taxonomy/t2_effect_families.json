@@ -1,0 +1,206 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "T2",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/taxonomy/T2_EFFECT_TAXONOMY.md",
+  "delivered_to": "Track G generic effect families",
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "corpus_listing_counts": {
+    "enhancement_upgrade_audit_table_rows": 1756,
+    "stratagem_audit_table_rows": 2520,
+    "note": "September audits have no EFFECT column. Distinct-rule identity is S2."
+  },
+  "activation_profiles": {
+    "source_package_id": "gw-11e-phase17s-faction-stratagem-activation-2026-27",
+    "source_date": "2026-06-21",
+    "profile_rows": 1025,
+    "stored_rule_ir_template_id": "phase17s:stratagem-activation-target-binding",
+    "stored_template_is_not_effect_family": true,
+    "assigned_effect_rows": 1025,
+    "unassigned_effect_rows": 0,
+    "single_family_rows": 555,
+    "multi_family_rows": 470,
+    "families_per_row": {"1": 555, "2": 332, "3": 107, "4": 25, "5": 6}
+  },
+  "closed_axes": {
+    "effect_is_family_set": true,
+    "do_not_lift_single_family": true,
+    "note": "One EFFECT clause may bind several families. A single template_id must not flatten the set."
+  },
+  "classification_rules": [
+    {
+      "id": "no_eligible_as_charge_now",
+      "flattened_token": "eligible to shoot and declare a charge",
+      "family_id": "movement_permission",
+      "not_family_id": "out_of_phase_charge"
+    },
+    {
+      "id": "no_keyword_gate_as_grant",
+      "flattened_token": "if your unit has the X keyword",
+      "owner": "T3",
+      "not_family_id": "keyword_grant"
+    },
+    {
+      "id": "leadership_test_is_not_characteristic",
+      "flattened_token": "Leadership test",
+      "family_id": "leadership_test",
+      "not_family_id": "leadership_modifier"
+    },
+    {
+      "id": "stratagem_frequency_is_not_reuse",
+      "flattened_token": "once per battle restriction",
+      "not_family_id": "once_per_battle_reuse"
+    },
+    {
+      "id": "leadership_substring_is_not_attachment",
+      "flattened_token": "leader inside Leadership",
+      "not_family_id": "attachment_change"
+    }
+  ],
+  "families": [
+    {"family_id": "weapon_profile_grant", "profile_count": 135, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "partial"},
+    {"family_id": "weapon_ability_grant", "profile_count": 126, "existing_template_id": "phase17c:weapon-ability-grant", "coverage": "covered"},
+    {"family_id": "movement_permission", "profile_count": 92, "existing_template_id": "phase17c:grant-ability", "coverage": "partial"},
+    {"family_id": "reroll", "profile_count": 83, "existing_template_id": "phase17c:reroll-permission", "coverage": "covered"},
+    {"family_id": "mortal_wounds", "profile_count": 72, "existing_template_id": null, "runtime": "generic Stratagem mortal-wound resolver", "coverage": "runtime_without_template"},
+    {"family_id": "save_modifier", "profile_count": 71, "existing_template_id": "phase17c:dice-roll-modifier", "coverage": "covered"},
+    {"family_id": "battle_shock", "profile_count": 68, "existing_template_id": null, "runtime": "generic Stratagem Battle-shock resolver", "coverage": "runtime_without_template"},
+    {"family_id": "extra_move", "profile_count": 68, "existing_template_id": "phase17c:out-of-phase-action", "coverage": "nearest"},
+    {"family_id": "reserves_change", "profile_count": 64, "existing_template_id": "phase17c:placement-permission-restriction", "coverage": "partial"},
+    {"family_id": "resource_gain_spend", "profile_count": 60, "existing_template_id": "phase17c:resource-modifier", "coverage": "partial", "owner_split": "T5"},
+    {"family_id": "wound_modifier", "profile_count": 55, "existing_template_id": "phase17c:dice-roll-modifier", "coverage": "covered"},
+    {"family_id": "target_restriction", "profile_count": 48, "existing_template_id": "phase17c:selected-target-constraint", "coverage": "partial"},
+    {"family_id": "hit_modifier", "profile_count": 45, "existing_template_id": "phase17c:dice-roll-modifier", "coverage": "covered"},
+    {"family_id": "redeploy_teleport", "profile_count": 41, "existing_template_id": "phase17c:placement-permission-restriction", "coverage": "partial"},
+    {"family_id": "transport", "profile_count": 40, "existing_template_id": null, "coverage": "gap_no_generic_effect_template"},
+    {"family_id": "strength_modifier", "profile_count": 33, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered"},
+    {"family_id": "revival_return", "profile_count": 32, "existing_template_id": "phase17c:first-death-return", "coverage": "partial_first_death_only", "note": "Includes set-back-up and add-a-unit wording, not only the word return."},
+    {"family_id": "placement_setup", "profile_count": 30, "existing_template_id": "phase17c:placement-permission-restriction", "coverage": "partial"},
+    {"family_id": "feel_no_pain", "profile_count": 28, "existing_template_id": "phase17c:grant-ability", "coverage": "covered"},
+    {"family_id": "fight_on_death", "profile_count": 28, "existing_template_id": "phase17c:conditional-model-fight-on-death", "coverage": "datasheet_only"},
+    {"family_id": "sticky_objective", "profile_count": 28, "existing_template_id": "phase17n:command-end-sticky-objective-control", "coverage": "datasheet_only"},
+    {"family_id": "charge_roll_modifier", "profile_count": 28, "existing_template_id": "phase17c:dice-roll-modifier", "coverage": "covered"},
+    {"family_id": "movement_distance", "profile_count": 26, "existing_template_id": "phase17c:movement-distance-modifier", "coverage": "covered"},
+    {"family_id": "ignore_cover", "profile_count": 26, "existing_template_id": "phase17c:weapon-ability-grant", "coverage": "partial"},
+    {"family_id": "critical_hit_threshold", "profile_count": 23, "existing_template_id": "phase17c:dice-roll-override", "coverage": "nearest"},
+    {"family_id": "ignore_terrain", "profile_count": 21, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "ws_bs_modifier", "profile_count": 19, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered"},
+    {"family_id": "advance_roll_modifier", "profile_count": 18, "existing_template_id": "phase17c:dice-roll-modifier", "coverage": "covered"},
+    {"family_id": "pile_in_consolidate", "profile_count": 17, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "toughness_modifier", "profile_count": 17, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered"},
+    {"family_id": "ignore_modifiers", "profile_count": 16, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "out_of_phase_shoot", "profile_count": 16, "existing_template_id": "phase17c:out-of-phase-action", "coverage": "covered"},
+    {"family_id": "invulnerable_save_grant", "profile_count": 16, "existing_template_id": "phase17c:grant-ability", "coverage": "partial"},
+    {"family_id": "healing", "profile_count": 15, "existing_template_id": null, "runtime": "generic Stratagem restore-lost-wounds resolver", "coverage": "runtime_without_template"},
+    {"family_id": "ability_grant", "profile_count": 14, "existing_template_id": "phase17c:grant-ability", "coverage": "covered"},
+    {"family_id": "damage_reduction", "profile_count": 14, "existing_template_id": "phase17c:allocated-attack-damage-characteristic-modifier", "coverage": "covered"},
+    {"family_id": "scout_infiltrate_deep_strike", "profile_count": 14, "existing_template_id": "phase17c:grant-ability", "coverage": "covered"},
+    {"family_id": "cover_grant", "profile_count": 13, "existing_template_id": "phase17c:grant-ability", "coverage": "nearest"},
+    {"family_id": "desperate_escape", "profile_count": 12, "existing_template_id": "phase17c:desperate-escape-requirement", "coverage": "covered"},
+    {"family_id": "lone_operative_range", "profile_count": 10, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "attacks_characteristic", "profile_count": 9, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered"},
+    {"family_id": "leadership_test", "profile_count": 8, "existing_template_id": null, "coverage": "gap_no_kind", "note": "Leadership tests. Distinct from Battle-shock tests and from the Leadership characteristic."},
+    {"family_id": "oc_change", "profile_count": 8, "existing_template_id": null, "coverage": "runtime_oc_authority"},
+    {"family_id": "aura_range", "profile_count": 8, "existing_template_id": "phase17c:aura", "coverage": "partial"},
+    {"family_id": "persisting_status", "profile_count": 8, "existing_template_id": "phase17c:contextual-status", "coverage": "partial"},
+    {"family_id": "doctrine_mode", "profile_count": 7, "existing_template_id": "phase17k:command-phase-self-ability-choice", "coverage": "nearest"},
+    {"family_id": "damage_modifier", "profile_count": 6, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered"},
+    {"family_id": "order_issue", "profile_count": 6, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "engagement_override", "profile_count": 5, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "out_of_phase_charge", "profile_count": 5, "existing_template_id": "phase17c:out-of-phase-action", "coverage": "covered", "examples": ["FOOLS' FLIGHT", "MERCILESS PURSUIT", "ECSTATIC SLAUGHTER", "CUT DOWN THE WEAK", "ENSNARING TRAP"], "note": "Resolves a Charge now. Excludes eligible-to-declare and cannot-declare rows. Core Heroic Intervention is the same family."},
+    {"family_id": "keyword_grant", "profile_count": 2, "existing_template_id": "phase17c:keyword-gate", "coverage": "gap_gate_is_not_grant", "examples": ["DAEMONIC POSSESION", "SYNERGISTIC EMPOWERMENT"]},
+    {"family_id": "once_per_battle_reuse", "profile_count": 2, "existing_template_id": null, "coverage": "gap_generalize_p22b", "examples": ["SUPERHUMAN RESERVES", "GILDED CHAMPION"]},
+    {"family_id": "attachment_change", "profile_count": 2, "existing_template_id": null, "coverage": "gap_no_kind", "examples": ["SHOULDER THE MANTLE", "SELFLESS BODYGUARD"]},
+    {"family_id": "wounds_modifier", "profile_count": 2, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered"},
+    {"family_id": "fight_order", "profile_count": 2, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "fight_eligibility_range", "profile_count": 2, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "leadership_modifier", "profile_count": 2, "existing_template_id": "phase17c:characteristic-modifier", "coverage": "covered", "examples": ["HUGE SHOW-OFFS", "ANCIENT FURY"]},
+    {"family_id": "cp_gain_refund", "profile_count": 1, "existing_template_id": "phase17c:resource-modifier", "coverage": "covered", "examples": ["SLAYER OF CHAMPIONS"]},
+    {"family_id": "unit_split", "profile_count": 1, "existing_template_id": null, "coverage": "gap_no_kind"},
+    {"family_id": "save_characteristic_set", "profile_count": 1, "existing_template_id": "phase17c:characteristic-set", "coverage": "covered"},
+    {"family_id": "weapon_grant", "profile_count": 0, "existing_template_id": null, "coverage": "june_stratagem_zero_enhancement_demand", "note": "Roadmap family. No June Stratagem effect_descriptor matches. Enhancements and datasheet wargear still demand it."},
+    {"family_id": "stratagem_cost", "profile_count": 0, "existing_template_id": null, "coverage": "june_stratagem_zero_core_demand", "note": "Core 15.01.01 and army rules modify Stratagem CP cost."},
+    {"family_id": "action", "profile_count": 0, "existing_template_id": null, "coverage": "june_stratagem_zero_core_demand", "note": "Core Snap Shooting after-shooting Action lock."}
+  ],
+  "june_stratagem_true_zeros": ["weapon_grant", "stratagem_cost", "action"],
+  "rule_template_families": [
+    "aura",
+    "characteristic_modification",
+    "characteristic_set",
+    "conditional_weapon_ability_grant",
+    "contextual_status",
+    "desperate_escape_requirement",
+    "dice_roll_modification",
+    "dice_roll_override",
+    "distance_predicate",
+    "grant_ability",
+    "keyword_gate",
+    "movement_distance_modification",
+    "out_of_phase_action",
+    "placement_permission_restriction",
+    "reroll_permission",
+    "resource_modification",
+    "return_on_death",
+    "selected_target_constraint",
+    "tracked_target_selection",
+    "timing_window"
+  ],
+  "condition_not_effect_families": [
+    "timing_window",
+    "distance_predicate",
+    "keyword_gate",
+    "selected_target_constraint",
+    "tracked_target_selection"
+  ],
+  "core_stratagems": [
+    {"title": "Command Re-roll", "section": "15.02", "families": ["reroll"]},
+    {"title": "Epic Challenge", "section": "15.03", "families": ["weapon_ability_grant"]},
+    {"title": "Insane Bravery", "section": "15.04", "families": ["battle_shock"]},
+    {"title": "Crushing Impact", "section": "15.05", "families": ["mortal_wounds"]},
+    {"title": "Explosives", "section": "15.06", "families": ["mortal_wounds"]},
+    {"title": "Rapid Ingress", "section": "15.07", "families": ["reserves_change"]},
+    {"title": "Fire Overwatch", "section": "15.08", "families": ["out_of_phase_shoot"]},
+    {"title": "Snap Shooting", "section": "15.09", "not_a_stratagem": true, "families": ["action"]},
+    {"title": "Smokescreen", "section": "15.10", "families": ["cover_grant"]},
+    {"title": "Heroic Intervention", "section": "15.11", "families": ["out_of_phase_charge"]},
+    {"title": "Counter-offensive", "section": "15.12", "families": ["fight_order"]}
+  ],
+  "live_samples": [
+    {
+      "name": "War Horde",
+      "url": "https://www.40k.app/factions/orks/detachments/war-horde",
+      "note": "Detachment Sustained Hits 1 is weapon_ability_grant. Enhancements use extra_move, movement_distance, save_modifier, movement_permission."
+    },
+    {
+      "name": "Shadow Legion",
+      "url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "note": "Detachment clauses use keyword_grant, ability_grant, movement_permission, hit/wound modifiers, resource_gain_spend. Enhancements use redeploy_teleport, scout_infiltrate_deep_strike, mortal_wounds, oc_change."
+    },
+    {
+      "name": "Core 15",
+      "url": "https://www.40k.app/rules/15-stratagems",
+      "note": "Authoritative Core Stratagem EFFECT for this survey."
+    }
+  ],
+  "holds": [
+    "T2-HOLD-APP-EFFECT",
+    "T2-HOLD-PROFILE-STALENESS",
+    "T2-HOLD-MULTI-FAMILY",
+    "T2-HOLD-TOKEN-FLATTENING",
+    "T2-HOLD-RESOURCE-SPLIT",
+    "F-ORK-01"
+  ],
+  "not_in_this_pr": [
+    "src changes",
+    "RuleIR template additions",
+    "activation-profile remap",
+    "semantic_demand_matrix.json"
+  ]
+}
