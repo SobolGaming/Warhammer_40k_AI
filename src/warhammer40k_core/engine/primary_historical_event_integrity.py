@@ -13,6 +13,7 @@ from warhammer40k_core.engine.emergency_disembark import (
     destroyed_transport_hazard_destroyed_model_ids_from_completion_event,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.model_ownership_history import historical_model_ids_by_physical_unit
 from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement_model import (
@@ -33,8 +34,10 @@ from warhammer40k_core.engine.primary_destruction_timeline_integrity import (
 )
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT,
-    PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT,
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+)
+from warhammer40k_core.engine.primary_turn_start_event_integrity import (
+    validate_turn_start_recorded_events,
 )
 from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
@@ -116,11 +119,7 @@ def validate_primary_historical_event_integrity(
     if len(events_by_id) != len(event_records):
         raise GameLifecycleError("Primary historical event IDs must be unique.")
     event_index_by_id = {record.event_id: index for index, record in enumerate(event_records)}
-    model_ids_by_unit_id = {
-        unit.unit_instance_id: tuple(sorted(unit.own_model_ids()))
-        for army in state.army_definitions
-        for unit in army.units
-    }
+    model_ids_by_unit_id = historical_model_ids_by_physical_unit(state)
     rules_unit_components_by_id = _rules_unit_components_by_id(state=state)
     identities_by_id = _scoring_identities_by_id(
         state=state,
@@ -133,7 +132,9 @@ def validate_primary_historical_event_integrity(
             state=state,
             event_records=event_records,
         )
-    _validate_turn_start_recorded_events(state=state, event_records=event_records)
+    validate_turn_start_recorded_events(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
     _validate_departure_recorded_events(
         departures=departures,
         event_records=event_records,
@@ -1261,71 +1262,6 @@ def _event_id_from_departure_source(
     if departure.source_id != f"{prefix}{event_id}{suffix}":
         return None
     return event_id or None
-
-
-def _validate_turn_start_recorded_events(
-    *,
-    state: GameState,
-    event_records: tuple[EventRecord, ...],
-) -> None:
-    objective_states_by_occurrence = {
-        (value.game_id, value.active_player_id, value.battle_round): value
-        for value in state.primary_objective_turn_start_states
-    }
-    snapshots_by_occurrence = {
-        (value.game_id, value.active_player_id, value.battle_round): value
-        for value in state.primary_rules_unit_turn_start_snapshots
-    }
-    if len(objective_states_by_occurrence) != len(state.primary_objective_turn_start_states) or len(
-        snapshots_by_occurrence
-    ) != len(state.primary_rules_unit_turn_start_snapshots):
-        raise GameLifecycleError("Primary turn-start evidence occurrence is duplicated.")
-    if set(objective_states_by_occurrence) != set(snapshots_by_occurrence):
-        raise GameLifecycleError(
-            "Primary turn-start objective and position evidence occurrences are unpaired."
-        )
-    events_by_occurrence: dict[tuple[str, str, int], list[EventRecord]] = {}
-    for record in event_records:
-        if record.event_type != PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT:
-            continue
-        payload = _event_payload(record, event_name="primary turn-start evidence")
-        game_id = payload.get("game_id")
-        active_player_id = payload.get("active_player_id")
-        battle_round = payload.get("battle_round")
-        if (
-            type(game_id) is not str
-            or type(active_player_id) is not str
-            or type(battle_round) is not int
-        ):
-            raise GameLifecycleError(
-                "Primary turn-start recorded event occurrence identity is malformed."
-            )
-        occurrence = (game_id, active_player_id, battle_round)
-        events_by_occurrence.setdefault(occurrence, []).append(record)
-    if set(events_by_occurrence) != set(objective_states_by_occurrence):
-        raise GameLifecycleError(
-            "Primary turn-start evidence requires one authoritative recorded event."
-        )
-    for occurrence, objective_state in objective_states_by_occurrence.items():
-        matching = events_by_occurrence[occurrence]
-        if len(matching) != 1:
-            raise GameLifecycleError(
-                "Primary turn-start evidence requires exactly one recorded event."
-            )
-        snapshot = snapshots_by_occurrence[occurrence]
-        expected_payload: dict[str, JsonValue] = {
-            "game_id": objective_state.game_id,
-            "battle_round": objective_state.battle_round,
-            "active_player_id": objective_state.active_player_id,
-            "primary_objective_turn_start_state": cast(
-                dict[str, JsonValue], objective_state.to_payload()
-            ),
-            "primary_rules_unit_turn_start_snapshot": cast(
-                dict[str, JsonValue], snapshot.to_payload()
-            ),
-        }
-        if matching[0].payload != expected_payload:
-            raise GameLifecycleError("Primary turn-start recorded-event payload drift.")
 
 
 def _validate_starting_attached_unit_muster_events(

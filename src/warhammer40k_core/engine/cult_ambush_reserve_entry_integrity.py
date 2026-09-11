@@ -172,6 +172,7 @@ def validated_primary_reserve_entry_occurrences(
                 event_order=event_index_by_id[spent_event.event_id],
                 historical_unit_instance_id=replacement_unit_id,
                 reserve_entry_state=reserve_entry_evidence_payload(reserve_state),
+                creates_unit=True,
             )
         )
     return tuple(occurrences)
@@ -417,7 +418,12 @@ def _validate_decision_and_events(
         if event.event_id == model_destroyed_event_id
         and event.event_type == "model_destroyed"
         and isinstance(event.payload, dict)
-        and event.payload.get("target_unit_instance_id") == destroyed_unit_id
+        and _completes_destroyed_unit(
+            state=state,
+            event_records=event_records,
+            event_id=event.event_id,
+            destroyed_unit_id=destroyed_unit_id,
+        )
         and event.payload.get("game_id") == state.game_id
         and event.payload.get("battle_round") == battle_round
         and event.payload.get("active_player_id") == active_player_id
@@ -431,14 +437,47 @@ def _validate_decision_and_events(
         raise GameLifecycleError("Cult Ambush reserve entry decision/event closure drift.")
     ordered = (
         event_index_by_id[destruction_events[0].event_id],
-        event_index_by_id[requested_events[0].event_id],
         event_index_by_id[source_requested_events[0].event_id],
+        event_index_by_id[requested_events[0].event_id],
         event_index_by_id[recorded_events[0].event_id],
         event_index_by_id[spent_event.event_id],
     )
     if tuple(sorted(ordered)) != ordered or len(set(ordered)) != len(ordered):
         raise GameLifecycleError("Cult Ambush reserve entry event ordering drift.")
     return current_points
+
+
+def _completes_destroyed_unit(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    event_id: str,
+    destroyed_unit_id: str,
+) -> bool:
+    from warhammer40k_core.engine.event_log import EventLog
+    from warhammer40k_core.engine.unit_destroyed_hooks import (
+        model_restoration_events_for_event_log_interval,
+        unit_destruction_completion_events_from_starting_presence,
+    )
+
+    log = EventLog.from_payload([event.to_payload() for event in event_records])
+    completions = unit_destruction_completion_events_from_starting_presence(
+        state=state,
+        model_destroyed_events=tuple(
+            (index, event.event_id, event.payload)
+            for index, event in enumerate(event_records)
+            if event.event_type == "model_destroyed" and isinstance(event.payload, dict)
+        ),
+        model_restoration_events=model_restoration_events_for_event_log_interval(
+            state=state,
+            event_log=log,
+            start_order_exclusive=-1,
+        ),
+    )
+    return any(
+        identifier == event_id and payload["target_unit_instance_id"] == destroyed_unit_id
+        for _index, identifier, payload in completions
+    )
 
 
 def _validate_resource_spend(

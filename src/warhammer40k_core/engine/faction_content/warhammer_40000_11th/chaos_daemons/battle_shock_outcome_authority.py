@@ -20,6 +20,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockPendingOutcomeAuthority,
     BattleShockPendingOutcomeAuthorityContext,
 )
+from warhammer40k_core.engine.battle_shock_outcome_history import outcome_activation_index
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     parse_battle_shock_resolution_authority,
 )
@@ -193,9 +194,17 @@ def validate_daemonic_terror_pending_outcome(
         )
     ):
         raise GameLifecycleError("Daemonic Terror outcome predicate drifted.")
+    activation_index = outcome_activation_index(
+        events=events,
+        result_id=result.result_id,
+        source_rule_id=source_rule_id,
+        owner_player_id=daemon_player_id,
+        resolved_index=resolved_index,
+        boundary_index=request_event_index,
+    )
     d3_result = _exact_daemonic_terror_d3(
         events=events,
-        resolved_index=resolved_index,
+        resolved_index=activation_index,
         request_event_index=request_event_index,
         unit_instance_id=target.unit_instance_id,
     )
@@ -403,9 +412,17 @@ def validate_july_daemonic_manifestation_pending_outcome(
     )
     if not destroyed_ids:
         raise GameLifecycleError("Daemonic Manifestation revival lacks destroyed models.")
+    activation_index = outcome_activation_index(
+        events=events,
+        result_id=result.result_id,
+        source_rule_id=source_rule_id,
+        owner_player_id=daemon_army.player_id,
+        resolved_index=resolved_index,
+        boundary_index=request_event_index,
+    )
     d3_result = _exact_manifestation_d3(
         events=events,
-        resolved_index=resolved_index,
+        resolved_index=activation_index,
         request_event_index=request_event_index,
         unit_instance_id=target.unit_instance_id,
     )

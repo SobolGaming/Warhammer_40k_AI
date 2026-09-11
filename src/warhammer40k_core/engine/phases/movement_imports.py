@@ -293,7 +293,7 @@ from warhammer40k_core.engine.unit_coherency import (
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedMortalWoundHookRegistry,
-    resolve_unit_move_completed_mortal_wound_hooks,
+    resolve_unit_move_completed_hooks,
 )
 from warhammer40k_core.engine.unit_rule_effects import movement_bonus_inches_from_effects
 from warhammer40k_core.geometry.pathing import (
@@ -541,7 +541,7 @@ __all__ = (
     "resolve_embark",
     "resolve_reserve_arrival",
     "reserve_arrival_restriction_violations",
-    "resolve_unit_move_completed_mortal_wound_hooks",
+    "resolve_unit_move_completed_hooks",
     "resolve_unit_movement_endpoint_coherency",
     "source_backed_reroll_permission_for_unit",
     "stratagem_decline_option",

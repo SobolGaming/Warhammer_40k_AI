@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from warhammer40k_core.core.ruleset_descriptor import MovementMode
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -25,6 +26,18 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+
+
+def core_movement_handler(
+    *, state: GameState, ruleset_descriptor: RulesetDescriptor
+) -> MovementPhaseHandler:
+    """Core-only fixtures declare each army's real, empty ability catalog explicitly."""
+    return MovementPhaseHandler(
+        ruleset_descriptor=ruleset_descriptor,
+        ability_indexes_by_player_id={
+            army.player_id: AbilityCatalogIndex.from_records(()) for army in state.army_definitions
+        },
+    )
 
 
 def straight_line_witness_for_unit(
@@ -350,3 +363,52 @@ def _optional_proposal_context_string(
     if type(value) is not str:
         raise GameLifecycleError(f"Movement proposal context {key} must be a string.")
     return value
+
+
+def resolve_ordering_for_fixture(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    source_unit_instance_id: str | None = None,
+) -> LifecycleStatus:
+    """Submit only timing-order choices before a focused movement assertion."""
+    from typing import cast
+
+    from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
+
+    for _ in range(32):
+        request = status.decision_request
+        if request is None or request.decision_type != SEQUENCING_DECISION_TYPE:
+            return status
+        option = request.options[0]
+        if source_unit_instance_id is not None:
+            assert isinstance(request.payload, dict)
+            participants = cast(list[dict[str, JsonValue]], request.payload["participants"])
+            matching = [
+                row
+                for row in participants
+                if isinstance(row["payload"], dict)
+                and (
+                    row["payload"].get("source_unit_instance_id") == source_unit_instance_id
+                    or (
+                        isinstance(row["payload"].get("group"), list)
+                        and source_unit_instance_id
+                        in cast(list[JsonValue], row["payload"]["group"])
+                    )
+                )
+            ]
+            assert len(matching) == 1
+            option = next(
+                option
+                for option in request.options
+                if isinstance(option.payload, dict)
+                and option.payload["selected_participant_id"] == matching[0]["participant_id"]
+            )
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"fixture-order:{request.request_id}",
+                request=request,
+                selected_option_id=option.option_id,
+            )
+        )
+    raise AssertionError("Timing-order fixture did not reach its rule request")

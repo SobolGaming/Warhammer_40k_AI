@@ -185,6 +185,13 @@ def completed_historical_leadership_session(
             break
         request = status.decision_request
         assert request is not None
+        if request.decision_type == "resolve_sequencing_order":
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id=request.options[0].option_id,
+                result_id=f"historical-leadership-order-{index}",
+            )
+            continue
         if (
             request.options
             and isinstance(request.options[0].payload, dict)

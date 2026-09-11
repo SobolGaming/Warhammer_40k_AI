@@ -18,6 +18,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.battle_shock_historical_authority import (
@@ -495,7 +496,11 @@ class BattleShockHookBinding:
     modifier_application_validator: BattleShockModifierApplicationValidator | None = None
     modifier_source_effect_evidence: bool = False
     reroll_permission_handler: BattleShockRerollPermissionHandler | None = None
+    outcome_state_handler: Callable[[BattleShockOutcomeContext], None] | None = None
     outcome_handler: BattleShockOutcomeHandler | None = None
+    outcome_candidate_handler: (
+        Callable[[BattleShockOutcomeContext], tuple[TimingRuleCandidate, ...]] | None
+    ) = None
     pending_outcome_authority_validator: BattleShockPendingOutcomeAuthorityValidator | None = None
     completed_outcome_authority_validator: BattleShockCompletedOutcomeAuthorityValidator | None = (
         None
@@ -511,6 +516,7 @@ class BattleShockHookBinding:
             and self.modifier_handler is None
             and self.reroll_permission_handler is None
             and self.outcome_handler is None
+            and self.outcome_state_handler is None
         ):
             raise GameLifecycleError("BattleShockHookBinding requires at least one handler.")
         if self.forced_test_handler is not None and not callable(self.forced_test_handler):
@@ -763,40 +769,11 @@ class BattleShockHookRegistry:
     ) -> LifecycleStatus | None:
         if type(context) is not BattleShockOutcomeContext:
             raise GameLifecycleError("Battle-shock outcome hooks require a context.")
-        queue_before = context.decisions.queue.pending_requests
-        if queue_before:
-            raise GameLifecycleError("Battle-shock outcome hooks require an empty decision queue.")
-        pending_status: LifecycleStatus | None = None
-        for binding in self.bindings:
-            if binding.outcome_handler is None:
-                continue
-            status = binding.outcome_handler(context)
-            if status is not None and type(status) is not LifecycleStatus:
-                raise GameLifecycleError(
-                    "Battle-shock outcome hooks must return LifecycleStatus or None."
-                )
-            if status is not None:
-                if pending_status is not None:
-                    raise GameLifecycleError(
-                        "Battle-shock outcome hooks returned multiple pending decisions."
-                    )
-                pending_status = status
-        queue_after = context.decisions.queue.pending_requests
-        if pending_status is None:
-            if queue_after != queue_before:
-                raise GameLifecycleError(
-                    "Battle-shock outcome hook queued a decision without returning its status."
-                )
-            return None
-        if (
-            len(queue_after) != 1
-            or pending_status.decision_request is None
-            or queue_after[0] != pending_status.decision_request
-        ):
-            raise GameLifecycleError(
-                "Battle-shock outcome status must identify the actual decision queue head."
-            )
-        return pending_status
+        from warhammer40k_core.engine.battle_shock_outcome_triggers import (
+            observe_battle_shock_outcome,
+        )
+
+        return observe_battle_shock_outcome(context, self)
 
     def pending_outcome_authority_for(
         self,

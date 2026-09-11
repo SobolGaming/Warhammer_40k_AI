@@ -7,11 +7,16 @@ from warhammer40k_core.engine.cult_ambush import (
     TURN_END_HOOK_ID,
     UNIT_DESTROYED_HOOK_ID,
     apply_cult_ambush_marker_ingress_selection,
-    cult_ambush_marker_ingress_request,
     grant_initial_resurgence_points,
-    request_cult_ambush_resurgence,
+)
+from warhammer40k_core.engine.cult_ambush_destruction_candidates import (
+    candidates as destruction_candidates,
+)
+from warhammer40k_core.engine.cult_ambush_timing_candidates import (
+    candidates as cult_ambush_candidates,
 )
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import TurnEndHookBinding
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookBinding
 
@@ -32,14 +37,15 @@ def runtime_contribution() -> RuntimeContentContribution:
             UnitDestroyedHookBinding(
                 hook_id=UNIT_DESTROYED_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                handler=request_cult_ambush_resurgence,
+                candidate_handler=destruction_candidates,
             ),
         ),
         turn_end_hook_bindings=(
             TurnEndHookBinding(
                 hook_id=TURN_END_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                request_handler=cult_ambush_marker_ingress_request,
+                candidate_handler=cult_ambush_candidates,
+                trigger_kind=TimingTriggerKind.END_PHASE,
                 result_handler=apply_cult_ambush_marker_ingress_selection,
             ),
         ),

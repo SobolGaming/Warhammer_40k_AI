@@ -64,6 +64,9 @@ from warhammer40k_core.engine.rule_model_destruction import (
     destroy_model_with_rule_reactions,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
 
 if TYPE_CHECKING:
@@ -117,24 +120,39 @@ class CatalogSelectedToFightRiskRuntime:
             FightPhaseEndHookBinding(
                 hook_id=CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
                 source_id=CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
-                request_handler=self.next_fight_phase_end_request,
+                candidate_handler=self.fight_phase_end_candidates,
                 result_handler=self.apply_fight_phase_end_result,
             ),
         )
 
-    def next_fight_phase_end_request(
+    def fight_phase_end_candidates(
         self,
         context: FightPhaseEndRequestContext,
-    ) -> DecisionRequest | None:
-        if type(context) is not FightPhaseEndRequestContext:
-            raise GameLifecycleError("Selected-to-fight risk requires Fight-end request context.")
-        candidates = self._failed_candidates(
+    ) -> tuple[TimingRuleCandidate, ...]:
+        candidates: list[TimingRuleCandidate] = []
+        for candidate in self._failed_candidates(
             state=context.state,
             records=context.decisions.event_log.records,
-        )
-        if not candidates:
-            return None
-        candidate = candidates[0]
+        ):
+            template = self._fight_end_template(context, candidate)
+            if template is None:
+                continue
+            candidates.append(
+                timing_candidate_for_request(
+                    template=template,
+                    participant_id=f"{candidate.rule_ir.source_id}:{candidate.destruction_clause.clause_id}:{candidate.rules_unit_instance_id}",
+                    source_rule_id=candidate.rule_ir.source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    next_request_id=context.state.next_decision_request_id,
+                )
+            )
+        return tuple(candidates)
+
+    def _fight_end_template(
+        self,
+        context: FightPhaseEndRequestContext,
+        candidate: _FightEndCandidate,
+    ) -> DecisionRequest | None:
         alive_model_ids = tuple(
             sorted(
                 model.model_instance_id
@@ -163,7 +181,7 @@ class CatalogSelectedToFightRiskRuntime:
             "rules_unit_instance_id": candidate.rules_unit_instance_id,
         }
         return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
+            request_id=f"template:{candidate.rule_ir.source_id}:{candidate.rules_unit_instance_id}",
             decision_type=SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
             actor_id=candidate.owner_player_id,
             payload=validate_json_value(

@@ -1485,6 +1485,7 @@ def _assert_condemned_boundary_path(
         row
         for row in restored.primary_scoring_state_evidence_records
         if row.objective_control_record_id == record.record_id
+        and row.scoring_player_id == owner_player_id
     )
     reevaluated = policies.primary_awards_from_state_evidence(
         record=record,

@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
+from warhammer40k_core.engine.active_player_scopes import begin_reactive_move, end_reactive_move
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -122,6 +123,8 @@ def apply_decision(
     result: DecisionResult,
     decisions: DecisionController,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     _validate_triggered_movement_state_ready(state)
     if result.decision_type != SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE:
         raise GameLifecycleError("TriggeredMovementHandler received unsupported decision_type.")
@@ -215,6 +218,13 @@ def apply_decision(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Triggered movement requires battlefield_state.")
+    begin_reactive_move(
+        state=state,
+        decisions=decisions,
+        result=result,
+        unit_instance_id=unit_instance_id,
+        source_rule_id=descriptor.source_rule_id,
+    )
     state.replace_battlefield_state(
         battlefield_state.with_unit_placement(resolution.attempted_placement)
     )
@@ -235,9 +245,11 @@ def apply_decision(
                 result_id=result.result_id,
             )
         )
-    decisions.event_log.append(
-        "triggered_movement_resolved",
-        _triggered_movement_resolved_payload(
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="triggered_movement_resolved",
+        payload=_triggered_movement_resolved_payload(
             state=state,
             result=result,
             unit_instance_id=unit_instance_id,
@@ -245,6 +257,15 @@ def apply_decision(
             resolution=resolution,
             transition_batch=transition_batch,
         ),
+    )
+    end_reactive_move(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=unit_instance_id,
+        selection_request_id=result.request_id,
+        selection_result_id=result.result_id,
+        source_rule_id=descriptor.source_rule_id,
+        result=result,
     )
     return None
 
@@ -257,9 +278,13 @@ def apply_proposal_decision(
     result: DecisionResult,
     decisions: DecisionController,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     _validate_triggered_movement_state_ready(state)
     ruleset_descriptor = _ruleset_descriptor_for_handler(handler)
     proposal_request = _triggered_movement_proposal_request_from_request(request)
+    if proposal_request.context is None:
+        raise GameLifecycleError("Triggered movement proposal requires selection context.")
     submission = MovementProposalPayload.from_payload(
         cast(MovementProposalPayloadPayload, result.payload)
     )
@@ -340,9 +365,11 @@ def apply_proposal_decision(
                 result_id=result.result_id,
             )
         )
-    decisions.event_log.append(
-        "triggered_movement_resolved",
-        _triggered_movement_resolved_payload(
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="triggered_movement_resolved",
+        payload=_triggered_movement_resolved_payload(
             state=state,
             result=result,
             unit_instance_id=proposal_request.unit_instance_id,
@@ -350,5 +377,14 @@ def apply_proposal_decision(
             resolution=resolution,
             transition_batch=transition_batch,
         ),
+    )
+    end_reactive_move(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=proposal_request.unit_instance_id,
+        selection_request_id=_payload_string(proposal_request.context, "selection_request_id"),
+        selection_result_id=_payload_string(proposal_request.context, "selection_result_id"),
+        source_rule_id=descriptor.source_rule_id,
+        result=result,
     )
     return None

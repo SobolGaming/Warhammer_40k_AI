@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from functools import partial
+
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_hooks import (
@@ -19,6 +21,7 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
 )
 from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
@@ -46,15 +49,18 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedGrant,
     ShootingUnitSelectedGrantBinding,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_destroyed_hooks import (
-    UnitDestroyedContext,
     UnitDestroyedHookBinding,
 )
+
+from .destruction_sequencing import resolve_enemy_unit_destroyed as resolve_enemy_unit_destroyed
 
 CONTRIBUTION_ID = "warhammer_40000_11th:drukhari:army_rule:scaffold"
 HOOK_ID = "warhammer_40000_11th:drukhari:army_rule:power_from_pain"
@@ -65,6 +71,10 @@ HATRED_ETERNAL_FIGHT_HOOK_ID = f"{HOOK_ID}:hatred-eternal-fight"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
+    from .destruction_sequencing import (
+        candidates as destruction_candidates,
+    )
+
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
         advance_move_hook_bindings=(
@@ -100,6 +110,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=f"{HOOK_ID}:command-phase-start",
                 source_id=SOURCE_RULE_ID,
                 handler=resolve_command_phase_start,
+                candidate_handler=command_sequencing_candidates,
             ),
         ),
         battle_shock_hook_bindings=(
@@ -107,13 +118,14 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=f"{HOOK_ID}:battle-shock-failed",
                 source_id=SOURCE_RULE_ID,
                 outcome_handler=resolve_battle_shock_outcome,
+                outcome_candidate_handler=battle_shock_outcome_candidates,
             ),
         ),
         unit_destroyed_hook_bindings=(
             UnitDestroyedHookBinding(
                 hook_id=f"{HOOK_ID}:enemy-unit-destroyed",
                 source_id=SOURCE_RULE_ID,
-                handler=resolve_enemy_unit_destroyed,
+                candidate_handler=destruction_candidates,
             ),
         ),
     )
@@ -344,7 +356,7 @@ def resolve_command_phase_start(context: CommandPhaseStartContext) -> None:
     if type(context) is not CommandPhaseStartContext:
         raise GameLifecycleError("Power from Pain command hook requires context.")
     active_player_id = context.active_player_id
-    army = _drukhari_army_for_player(context.state.army_definitions, player_id=active_player_id)
+    army = drukhari_army_for_player(context.state.army_definitions, player_id=active_player_id)
     if army is None:
         return
     gain = context.state.gain_faction_resource(
@@ -373,6 +385,28 @@ def resolve_command_phase_start(context: CommandPhaseStartContext) -> None:
     )
 
 
+def battle_shock_outcome_candidates(
+    context: BattleShockOutcomeContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from functools import partial
+
+    from warhammer40k_core.engine.battle_shock_outcome_sequencing import outcome_candidate
+
+    if context.result.passed:
+        return ()
+    return tuple(
+        outcome_candidate(
+            context,
+            source_rule_id=SOURCE_RULE_ID,
+            owner_player_id=army.player_id,
+            occurrence_id=HOOK_ID,
+            activate=partial(resolve_battle_shock_outcome, context),
+        )
+        for army in _drukhari_armies(context.state.army_definitions)
+        if army.player_id != context.result.request.player_id
+    )
+
+
 def resolve_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
     if type(context) is not BattleShockOutcomeContext:
         raise GameLifecycleError("Power from Pain Battle-shock hook requires context.")
@@ -386,7 +420,7 @@ def resolve_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
             f"{SOURCE_RULE_ID}:enemy-battle-shock-failed:"
             f"{context.result.result_id}:player-{army.player_id}"
         )
-        if _pain_token_gain_event_exists(context.decisions.event_log.records, source_id=source_id):
+        if pain_token_gain_event_exists(context.decisions.event_log.records, source_id=source_id):
             continue
         gain = context.state.gain_faction_resource(
             player_id=army.player_id,
@@ -414,54 +448,13 @@ def resolve_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
         )
 
 
-def resolve_enemy_unit_destroyed(context: UnitDestroyedContext) -> None:
-    if type(context) is not UnitDestroyedContext:
-        raise GameLifecycleError("Power from Pain unit-destroyed hook requires context.")
-    army = _drukhari_army_for_player(
-        context.state.army_definitions,
-        player_id=context.destroying_player_id,
-    )
-    if army is None:
-        return
-    source_id = (
-        f"{SOURCE_RULE_ID}:enemy-unit-destroyed:"
-        f"{context.model_destroyed_event_id}:player-{army.player_id}"
-    )
-    if _pain_token_gain_event_exists(context.decisions.event_log.records, source_id=source_id):
-        return
-    gain = context.state.gain_faction_resource(
-        player_id=army.player_id,
-        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
-        amount=1,
-        source_id=source_id,
-    )
-    if gain.status is not FactionResourceStatus.APPLIED:
-        raise GameLifecycleError("Power from Pain enemy-unit-destroyed token gain failed.")
-    context.decisions.event_log.append(
-        "drukhari_pain_token_gained",
-        {
-            "game_id": context.state.game_id,
-            "battle_round": context.state.battle_round,
-            "phase": context.completed_phase.value,
-            "player_id": army.player_id,
-            "source_rule_id": SOURCE_RULE_ID,
-            "hook_id": f"{HOOK_ID}:enemy-unit-destroyed",
-            "trigger": "enemy_unit_destroyed",
-            "enemy_player_id": context.destroyed_player_id,
-            "enemy_unit_instance_id": context.destroyed_unit_instance_id,
-            "model_destroyed_event_id": context.model_destroyed_event_id,
-            "faction_resource_result": validate_json_value(gain.to_payload()),
-        },
-    )
-
-
 def _drukhari_armies(armies: list[ArmyDefinition]) -> tuple[ArmyDefinition, ...]:
     return tuple(
         army for army in armies if army.detachment_selection.faction_id == DRUKHARI_FACTION_ID
     )
 
 
-def _drukhari_army_for_player(
+def drukhari_army_for_player(
     armies: list[ArmyDefinition],
     *,
     player_id: str,
@@ -473,7 +466,7 @@ def _drukhari_army_for_player(
     return None
 
 
-def _pain_token_gain_event_exists(records: tuple[EventRecord, ...], *, source_id: str) -> bool:
+def pain_token_gain_event_exists(records: tuple[EventRecord, ...], *, source_id: str) -> bool:
     requested_source_id = _validate_identifier("source_id", source_id)
     for record in records:
         if type(record) is not EventRecord:
@@ -492,3 +485,31 @@ def _pain_token_gain_event_exists(records: tuple[EventRecord, ...], *, source_id
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    army = drukhari_army_for_player(
+        context.state.army_definitions, player_id=context.active_player_id
+    )
+    if army is None:
+        return ()
+    return (
+        TimingRuleCandidate(
+            participant=SequencingParticipant(
+                participant_id=f"{HOOK_ID}:command-phase-start:{army.player_id}",
+                player_id=army.player_id,
+                source_rule_id=SOURCE_RULE_ID,
+                requirement=SequencingRequirement.MANDATORY,
+            ),
+            activate=partial(
+                resolve_command_phase_start,
+                CommandPhaseStartContext(
+                    state=context.state,
+                    decisions=context.decisions,
+                    active_player_id=context.active_player_id,
+                ),
+            ),
+        ),
+    )

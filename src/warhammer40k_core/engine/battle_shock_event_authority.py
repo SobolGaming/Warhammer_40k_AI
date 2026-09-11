@@ -982,6 +982,7 @@ def validate_unit_move_completed_battle_shock_request_authority(
         raise GameLifecycleError("Battle-shock move-completed hook lacks loaded authority.")
     binding = bindings[0]
     effect = UnitMoveCompletedBattleShockEffect(
+        source_player_id=triggering_player_id,
         hook_id=hook,
         source_id=binding.source_id,
         source_rule_id=source_rule,

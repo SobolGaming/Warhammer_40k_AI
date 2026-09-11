@@ -1274,14 +1274,20 @@ def _resolve_grouped_current_pool(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
     )
-    if allocation_target_state is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS:
+    if allocation_target_state in (
+        DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS,
+        DamageAllocationTargetState.DESTROYED_AND_REMOVED,
+    ):
         decisions.event_log.append(
             "attack_pool_not_allocated",
             {
                 "sequence_id": attack_sequence.sequence_id,
                 "pool_index": attack_sequence.pool_index,
                 "target_unit_instance_id": pool.target_unit_instance_id,
-                "reason": "target_present_without_living_models",
+                "reason": "target_present_without_living_models"
+                if allocation_target_state
+                is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
+                else "target_destroyed_and_removed",
             },
         )
         if attack_sequence.post_roll_attack_pools is not None:

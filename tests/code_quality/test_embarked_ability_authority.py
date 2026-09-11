@@ -65,8 +65,9 @@ def test_live_and_historical_spatial_consumers_share_self_and_off_battlefield_po
 
 def test_command_point_consumers_enforce_battlefield_conditions_after_source_availability() -> None:
     module = "catalog_command_point_runtime.py"
-    for function in ("_phase_gain_handler", "_cost_source_is_eligible"):
+    for function in ("_phase_gain_targets", "_cost_source_is_eligible"):
         assert "ability_battlefield_conditions_apply" in _calls(module, function=function)
+    assert "_phase_gain_targets" in _calls(module, function="_phase_gain_handler")
     for function in (
         "_stratagem_cost_modifier_handler",
         "stratagem_cost_choice_request",

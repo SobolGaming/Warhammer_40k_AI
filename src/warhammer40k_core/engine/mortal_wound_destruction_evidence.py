@@ -398,6 +398,9 @@ def record_finalized_mortal_wound_model_destructions(
             cause_id=destruction_cause.cause_id,
             model_destroyed_event=destroyed_event,
         )
+        from warhammer40k_core.engine.model_destruction_triggers import observe_model_destruction
+
+        observe_model_destruction(state=state, decisions=decisions, event=destroyed_event)
         canonical_model_destroyed_event_ids.append(destroyed_event.event_id)
     transition_batch = BattlefieldTransitionBatch(removals=tuple(removals))
     decisions.event_log.append(

@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_end_fixture_helpers import single_fight_end_request
 from tests.setup_completion_helpers import enter_battle_for_fixture
 from tests.support.catalog_package_fixtures import undivided_daemon_package
 from tests.support.selected_target_charge_fixtures import (
@@ -15,7 +16,6 @@ from tests.support.selected_to_fight_risk_fixtures import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
 from warhammer40k_core.core.ruleset_descriptor import (
     FightEligibilityKind,
     FightOrderingBandKind,
@@ -60,7 +60,6 @@ from warhammer40k_core.engine.decision_controller import (
     DecisionControllerPayload,
 )
 from warhammer40k_core.engine.decision_request import (
-    DecisionError,
     DecisionOption,
     DecisionRequest,
     DecisionRequestPayload,
@@ -86,6 +85,7 @@ from warhammer40k_core.engine.fight_activation_units import (
 )
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_end_hooks import (
+    FightPhaseEndHookRegistry,
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
 )
@@ -158,10 +158,8 @@ from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     SequencingConflictContext,
     SequencingDecision,
-    SequencingNextParticipantDecision,
-    SequencingNextParticipantDecisionPayload,
     SequencingParticipant,
-    apply_select_next_sequencing_participant_from_request,
+    SequencingRequirement,
     apply_sequencing_decision,
     create_select_next_sequencing_participant_request,
     create_sequencing_decision_request,
@@ -535,11 +533,10 @@ def test_active_player_chooses_order_for_simultaneous_during_battle_rules() -> N
     assert request.actor_id == "player-a"
     assert decision.deciding_player_id == "player-a"
     assert decision.ordered_participant_ids == ("rule-beta", "rule-alpha")
-    assert decision.roll_off_result is None
     assert SequencingDecision.from_payload(decision.to_payload()) == decision
 
 
-def test_lifecycle_submit_decision_resolves_sequencing_decision() -> None:
+def test_lifecycle_rejects_orphan_permutation_sequencing_decision() -> None:
     lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
     state = lifecycle.state
     assert state is not None
@@ -563,26 +560,18 @@ def test_lifecycle_submit_decision_resolves_sequencing_decision() -> None:
         decisions=lifecycle.decision_controller,
         request_id=state.next_decision_request_id(),
     )
-    waiting = lifecycle.advance_until_decision_or_terminal()
-    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert waiting.decision_request == request
+    before = lifecycle.to_payload()
     result = DecisionResult.for_request(
-        result_id="phase12a-lifecycle-sequencing-result",
+        result_id="phase12a-orphan-order",
         request=request,
         selected_option_id="order:rule-beta,rule-alpha",
     )
-
-    status = lifecycle.submit_decision(result)
-    payload = _last_event_payload(lifecycle.decision_controller, "sequencing_order_resolved")
-
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert payload["ordered_participant_ids"] == ["rule-beta", "rule-alpha"]
-    assert lifecycle.decision_controller.records[-1].request.decision_type == (
-        SEQUENCING_DECISION_TYPE
-    )
+    with pytest.raises(GameLifecycleError, match="differs from its current timing batch"):
+        lifecycle.submit_decision(result)
+    assert lifecycle.to_payload() == before
 
 
-def test_lifecycle_submit_decision_resolves_bounded_select_next_sequencing() -> None:
+def test_lifecycle_rejects_orphan_bounded_sequencing_decision() -> None:
     lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
     state = lifecycle.state
     assert state is not None
@@ -605,6 +594,7 @@ def test_lifecycle_submit_decision_resolves_bounded_select_next_sequencing() -> 
             participant_id="rule-gamma",
             player_id="player-a",
             source_rule_id="rule-gamma",
+            requirement=SequencingRequirement.MANDATORY,
         ),
     )
     request = create_select_next_sequencing_participant_request(
@@ -622,47 +612,16 @@ def test_lifecycle_submit_decision_resolves_bounded_select_next_sequencing() -> 
         == request
     )
 
-    invalid = DecisionResult(
-        result_id="phase12a-lifecycle-bounded-invalid",
-        request_id=request.request_id,
-        decision_type=request.decision_type,
-        actor_id=request.actor_id,
-        selected_option_id="next:missing-participant",
-        payload={"selected_participant_id": "missing-participant"},
-    )
-    with pytest.raises(DecisionError, match="not in the finite action space"):
-        lifecycle.submit_decision(invalid)
-    assert lifecycle.decision_controller.queue.pending_requests == (request,)
-    assert lifecycle.decision_controller.records == ()
-
+    before = lifecycle.to_payload()
     result = DecisionResult.for_request(
-        result_id="phase12a-lifecycle-bounded-result",
-        request=request,
-        selected_option_id="next:rule-beta",
+        result_id="phase12a-orphan-order", request=request, selected_option_id="next:rule-beta"
     )
-    status = lifecycle.submit_decision(result)
-    payload = _last_event_payload(
-        lifecycle.decision_controller,
-        "sequencing_next_participant_selected",
-    )
-    decision = SequencingNextParticipantDecision.from_payload(
-        cast(SequencingNextParticipantDecisionPayload, payload)
-    )
-
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert decision == apply_select_next_sequencing_participant_from_request(
-        request=request,
-        result=result,
-    )
-    assert decision.selected_participant_id == "rule-beta"
-    assert decision.remaining_participant_ids == ("rule-alpha", "rule-beta", "rule-gamma")
-    restored = GameLifecycle.from_payload(
-        cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
-    )
-    assert restored.to_payload() == lifecycle.to_payload()
+    with pytest.raises(GameLifecycleError, match="differs from its current timing batch"):
+        lifecycle.submit_decision(result)
+    assert lifecycle.to_payload() == before
 
 
-def test_roll_off_decides_simultaneous_start_or_end_battle_round_rules() -> None:
+def test_round_boundary_requires_first_turn_player_authority() -> None:
     state = _battle_state(unit_selection_ids=("intercessor-unit-1",))
     context = SequencingConflictContext(
         conflict_id="phase12a-battle-round-conflict",
@@ -674,80 +633,25 @@ def test_roll_off_decides_simultaneous_start_or_end_battle_round_rules() -> None
             window_id="phase12a-battle-round-window",
         ),
         player_ids=state.player_ids,
-        active_player_id=None,
-    )
-    request_id = "phase12a-sequencing-round"
-    roll_off_request = RollOffRequest(
-        request_id=f"{request_id}:roll-off",
-        purpose="sequencing_conflict",
-        player_ids=state.player_ids,
-        resolving_decision_id=request_id,
-    )
-    injected = (
-        DiceRollResult.from_values(
-            roll_id="roll-000001",
-            spec=DiceRollManager.roll_off_spec(
-                roll_off_request,
-                round_number=1,
-                player_id="player-a",
-            ),
-            values=[2],
-            source="rng",
-        ),
-        DiceRollResult.from_values(
-            roll_id="roll-000002",
-            spec=DiceRollManager.roll_off_spec(
-                roll_off_request,
-                round_number=1,
-                player_id="player-b",
-            ),
-            values=[6],
-            source="rng",
-        ),
-    )
-    decisions = DecisionController()
-    manager = DiceRollManager(
-        state.game_id,
-        event_log=decisions.event_log,
-        injected_results=injected,
+        active_player_id=state.turn_order[0],
     )
     participants = _sequencing_participants()
-
     request = create_sequencing_decision_request(
-        request_id=request_id,
+        request_id="phase12a-sequencing-round",
         context=context,
         participants=participants,
-        dice_manager=manager,
     )
-    roll_payload = cast(dict[str, object], request.payload)["roll_off_result"]
-    assert request.actor_id == "player-b"
-    assert roll_payload is not None
-    assert decisions.event_log.records[-1].event_type == "roll_off_resolved"
-
-    drifted_request = replace(
-        request,
-        actor_id="player-a",
-        options=tuple(
-            replace(
-                option,
-                payload={
-                    **cast(dict[str, JsonValue], option.payload),
-                    "deciding_player_id": "player-a",
-                },
-            )
-            for option in request.options
-        ),
+    assert request.actor_id == state.turn_order[0]
+    drifted = replace(request, actor_id="player-b")
+    result = DecisionResult.for_request(
+        result_id="phase12a-drifted-round-owner",
+        request=drifted,
+        selected_option_id=drifted.options[0].option_id,
     )
-    drifted_result = DecisionResult.for_request(
-        result_id="phase12a-sequencing-drifted-winner",
-        request=drifted_request,
-        selected_option_id=drifted_request.options[0].option_id,
-    )
-
     with pytest.raises(GameLifecycleError, match="authoritative context"):
         apply_sequencing_decision(
-            request=drifted_request,
-            result=drifted_result,
+            request=drifted,
+            result=result,
             context=context,
             participants=participants,
         )
@@ -896,8 +800,9 @@ def _resolve_failed_risk_model_destruction(
     model_instance_id: str,
     result_id: str,
 ) -> None:
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
     if request is None:
         raise AssertionError("Expected selected-to-fight risk request.")
@@ -959,8 +864,9 @@ def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_u
             bodyguard_model_count=2,
         )
     )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
     assert request is not None
     target_model_id = bodyguard.own_models[0].model_instance_id
@@ -1019,8 +925,9 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
             ),
         ),
     )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
     assert request is not None
     option = next(
@@ -1152,6 +1059,22 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
         for event in decisions.event_log.records
     )
 
+    from warhammer40k_core.engine.retained_phase_end_sequencing import retained_phase_end_candidates
+    from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext
+
+    before_discovery = (state.to_payload(), decisions.to_payload())
+    cleanup_candidates = retained_phase_end_candidates(
+        TurnEndRequestContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+        )
+    )
+    assert (state.to_payload(), decisions.to_payload()) == before_discovery
+    assert len(cleanup_candidates) == 1
+    assert cleanup_candidates[0].participant.player_id == "player-source"
+    assert cleanup_candidates[0].participant.requirement is SequencingRequirement.MANDATORY
     assert (
         begin_retained_destruction_cleanup(state=state, decisions=decisions, reason="phase_end")
         is None
@@ -1211,8 +1134,9 @@ def test_fight_end_fight_on_death_does_not_grant_second_activation() -> None:
             ),
         ),
     )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
     assert request is not None
     option = next(
@@ -2464,8 +2388,9 @@ def test_selected_to_fight_risk_preserves_attached_attack_lineage() -> None:
             "model_instance_id": enemy.own_models[0].model_instance_id,
         },
     )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
     assert request is None
 
@@ -2665,7 +2590,7 @@ def test_reaction_queue_rejects_wrong_phase_and_ineligible_actor_before_request(
     assert decisions.queue.pending_requests == ()
 
 
-def test_sequencing_helpers_enqueue_and_reject_missing_rolloff_manager() -> None:
+def test_sequencing_helpers_enqueue_and_reject_missing_active_player() -> None:
     state = _battle_state(unit_selection_ids=("intercessor-unit-1",))
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     context = SequencingConflictContext(
@@ -2696,24 +2621,8 @@ def test_sequencing_helpers_enqueue_and_reject_missing_rolloff_manager() -> None
     assert decisions.queue.pending_requests == (request,)
     assert request.decision_type == SEQUENCING_DECISION_TYPE
 
-    rolloff_context = SequencingConflictContext(
-        conflict_id="phase12a-helper-rolloff-conflict",
-        game_id=state.game_id,
-        timing_window=_timing_window(
-            state=state,
-            trigger_kind=TimingTriggerKind.START_BATTLE_ROUND,
-            phase=None,
-            window_id="phase12a-helper-rolloff-window",
-        ),
-        player_ids=state.player_ids,
-        active_player_id=None,
-    )
-    with pytest.raises(GameLifecycleError, match="roll-off requires a DiceRollManager"):
-        create_sequencing_decision_request(
-            request_id="phase12a-helper-rolloff",
-            context=rolloff_context,
-            participants=participants,
-        )
+    with pytest.raises(GameLifecycleError, match="requires an active player"):
+        replace(context, active_player_id=None)
 
 
 def test_effect_and_timing_fail_fast_validation_branches() -> None:
@@ -2850,18 +2759,18 @@ def test_phase12a_collection_validators_reject_malformed_payloads() -> None:
             timing_window=window,
             eligible_player_ids=cast(tuple[str, ...], ["player-a"]),
         )
-    with pytest.raises(GameLifecycleError, match="requires at least two participants"):
-        create_sequencing_decision_request(
-            request_id="phase12a-single-participant",
-            context=SequencingConflictContext(
-                conflict_id="phase12a-single-participant-conflict",
-                game_id=state.game_id,
-                timing_window=window,
-                player_ids=state.player_ids,
-                active_player_id=state.active_player_id,
-            ),
-            participants=(_sequencing_participants()[0],),
-        )
+    request = create_sequencing_decision_request(
+        request_id="phase12a-single-participant",
+        context=SequencingConflictContext(
+            conflict_id="phase12a-single-participant-conflict",
+            game_id=state.game_id,
+            timing_window=window,
+            player_ids=state.player_ids,
+            active_player_id=state.active_player_id,
+        ),
+        participants=(_sequencing_participants()[0],),
+    )
+    assert len(request.options) == 1
 
 
 def _timing_window(
@@ -2894,12 +2803,14 @@ def _sequencing_participants() -> tuple[SequencingParticipant, ...]:
             participant_id="rule-alpha",
             player_id="player-a",
             source_rule_id="alpha_rule",
+            requirement=SequencingRequirement.MANDATORY,
             payload={"priority": 1},
         ),
         SequencingParticipant(
             participant_id="rule-beta",
-            player_id="player-b",
+            player_id="player-a",
             source_rule_id="beta_rule",
+            requirement=SequencingRequirement.MANDATORY,
             payload={"priority": 2},
         ),
     )

@@ -20,7 +20,6 @@ from warhammer40k_core.engine.mortal_wound_application_authority import (
     mortal_wound_application_authority_inventory,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.retained_shooting import retained_shooting_executions
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -29,29 +28,15 @@ if TYPE_CHECKING:
 def pending_hazardous_logical_deaths(
     *, state: GameState, event_records: tuple[EventRecord, ...]
 ) -> tuple[EventRecord, ...]:
+    from warhammer40k_core.engine.attack_completion_authority import completed_attack_sequence
     from warhammer40k_core.engine.attack_sequence_hazardous import (
         validate_hazardous_mortal_wound_source_context,
     )
-    from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
 
     claimed = {
         authority.logical_death_event.event_id
         for authority in state.model_destruction_cause_authorities
     }
-    hosts = (
-        state.shooting_phase_state,
-        state.fight_phase_state,
-        state.out_of_phase_shooting_state,
-        *(execution.suspended_shooting for execution in retained_shooting_executions(state=state)),
-    )
-    sequences = {
-        host.attack_sequence.sequence_id: host.attack_sequence
-        for host in hosts
-        if host is not None and host.attack_sequence is not None
-    }
-    active = active_attack_sequence_for_state(state)
-    if active is not None:
-        sequences[active.sequence_id] = active
     applications = mortal_wound_application_authority_inventory(
         event_records=event_records, game_id=state.game_id
     )
@@ -85,9 +70,9 @@ def pending_hazardous_logical_deaths(
         if not logical_events:
             continue
         sequence_id = context.get("sequence_id")
-        if type(sequence_id) is not str or sequence_id not in sequences:
+        if type(sequence_id) is not str:
             raise GameLifecycleError("Retained Hazardous casualties lost their attack host.")
-        sequence = sequences[sequence_id]
+        sequence = completed_attack_sequence(event_records=event_records, sequence_id=sequence_id)
         if not sequence.is_complete:
             raise GameLifecycleError("Retained Hazardous casualties precede completed attacks.")
         validate_hazardous_mortal_wound_source_context(

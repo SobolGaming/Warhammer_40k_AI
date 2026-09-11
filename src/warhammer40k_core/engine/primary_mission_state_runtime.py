@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from functools import partial
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
 from warhammer40k_core.engine.fight_rules_unit_movement_types import (
     fight_rules_unit_movement_endpoint_from_completed_event,
     rules_unit_views_for_completed_move_event,
@@ -12,6 +14,7 @@ from warhammer40k_core.engine.mission_action_policies import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_destruction_evidence import (
+    RulesUnitObjectiveProximityWitness,
     rules_unit_objective_proximity_witness,
     rules_unit_objective_proximity_witness_from_placements,
 )
@@ -34,6 +37,12 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
+from warhammer40k_core.engine.sequencing import (
+    SequencingParticipant,
+    SequencingRequirement,
+    SequencingRuleOrigin,
+)
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -115,29 +124,32 @@ def record_consecration_designation_for_destruction(
     return designation
 
 
-def resolve_surveil_marker_removal_for_completed_moves(
+def surveil_move_marker_candidates(
     *,
     state: GameState,
     decisions: DecisionController,
     completed_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry,
-) -> None:
+    trigger_event_id: str,
+) -> tuple[TimingRuleCandidate, ...]:
     mission_setup = state.mission_setup
     if mission_setup is None or state.battlefield_state is None:
-        return
+        return ()
     if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
         raise GameLifecycleError("Surveil marker removal requires RuntimeModifierRegistry.")
     trigger_records = tuple(
         record
         for record in decisions.event_log.records
-        if record.event_type in SURVEIL_MOVE_COMPLETION_EVENT_TYPES
+        if record.event_id == trigger_event_id
+        and record.event_type in SURVEIL_MOVE_COMPLETION_EVENT_TYPES
         and not _surveil_move_already_processed(
             decisions=decisions,
             trigger_event_id=record.event_id,
         )
     )
     if not trigger_records:
-        return
+        return ()
+    candidates: list[TimingRuleCandidate] = []
     descriptor = primary_mission_state_rule_for_id(_SURVEIL_STATE_RULE_ID)
     for trigger in trigger_records:
         payload = trigger.payload
@@ -206,45 +218,175 @@ def resolve_surveil_marker_removal_for_completed_moves(
             )
         )
         objective_ids = objective_proximity_witness.objective_marker_ids
-        removed: list[PrimaryMissionMarkerState] = []
-        for marker in state.primary_mission_progress_state.markers:
-            if (
-                marker.status is not PrimaryMissionMarkerStatus.ACTIVE
-                or marker.owner_player_id == mover_owner_id
-                or marker.marker_kind != "operation"
-                or marker.objective_marker_id not in objective_ids
-            ):
-                continue
-            removed_marker = marker.removed(
-                battle_round=state.battle_round,
-                phase=completed_phase.value,
-                active_player_id=_active_player_id(state),
-                source_id=descriptor.source_id,
-                event_id=trigger.event_id,
-            )
-            state.replace_primary_mission_progress_state(
-                state.primary_mission_progress_state.replace_marker(removed_marker)
-            )
-            removed.append(removed_marker)
-        decisions.event_log.append(
-            SURVEIL_MOVE_PROCESSED_EVENT,
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": _active_player_id(state),
-                "phase": completed_phase.value,
-                "player_id": mover_owner_id,
-                "moving_rules_unit_instance_id": mover_id,
-                "moving_rules_unit_objective_proximity_witness": (
-                    objective_proximity_witness.to_payload()
-                ),
-                "objective_marker_ids": list(objective_ids),
-                "removed_primary_mission_markers": [marker.to_payload() for marker in removed],
-                "trigger_event_id": trigger.event_id,
-                "trigger_event_type": trigger.event_type,
-                "source_id": descriptor.source_id,
-            },
+        marker_ids = tuple(
+            marker.marker_id
+            for marker in state.primary_mission_progress_state.markers
+            if marker.status is PrimaryMissionMarkerStatus.ACTIVE
+            and marker.owner_player_id != mover_owner_id
+            and marker.marker_kind == "operation"
+            and marker.objective_marker_id in objective_ids
         )
+        if not marker_ids:
+            continue
+        candidate_payload = {
+            "trigger_event_id": trigger.event_id,
+            "moving_rules_unit_instance_id": mover_id,
+            "objective_marker_ids": list(objective_ids),
+            "objective_proximity_witness": objective_proximity_witness.to_payload(),
+            "marker_ids": list(marker_ids),
+        }
+        candidates.append(
+            TimingRuleCandidate(
+                participant=SequencingParticipant(
+                    participant_id=f"surveil-marker-removal:{trigger.event_id}:{mover_id}",
+                    player_id=mover_owner_id,
+                    source_rule_id=descriptor.source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    origin=SequencingRuleOrigin.MISSION,
+                    payload=validate_json_value(candidate_payload),
+                ),
+                activate=partial(
+                    _remove_surveil_markers,
+                    state=state,
+                    decisions=decisions,
+                    completed_phase=completed_phase,
+                    trigger=trigger,
+                    mover_id=mover_id,
+                    mover_owner_id=mover_owner_id,
+                    objective_proximity_witness=objective_proximity_witness,
+                    marker_ids=marker_ids,
+                ),
+            )
+        )
+    return tuple(candidates)
+
+
+def resume_surveil_marker_candidate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_phase: BattlePhase,
+    trigger_event_id: str,
+    participant: SequencingParticipant,
+) -> TimingRuleCandidate | None:
+    descriptor = primary_mission_state_rule_for_id(_SURVEIL_STATE_RULE_ID)
+    payload = participant.payload
+    if (
+        not isinstance(payload, dict)
+        or set(payload)
+        != {
+            "trigger_event_id",
+            "moving_rules_unit_instance_id",
+            "objective_marker_ids",
+            "objective_proximity_witness",
+            "marker_ids",
+        }
+        or payload["trigger_event_id"] != trigger_event_id
+        or type(payload["moving_rules_unit_instance_id"]) is not str
+        or not isinstance(payload["marker_ids"], list)
+        or not payload["marker_ids"]
+        or any(type(identifier) is not str for identifier in payload["marker_ids"])
+        or participant.source_rule_id != descriptor.source_id
+        or participant.requirement is not SequencingRequirement.MANDATORY
+        or participant.origin is not SequencingRuleOrigin.MISSION
+        or participant.player_id not in state.player_ids
+        or participant.participant_id
+        != f"surveil-marker-removal:{trigger_event_id}:{payload['moving_rules_unit_instance_id']}"
+    ):
+        raise GameLifecycleError("Captured Surveil marker rule source identity drift.")
+    if participant != SequencingParticipant(
+        participant_id=participant.participant_id,
+        player_id=participant.player_id,
+        source_rule_id=descriptor.source_id,
+        requirement=SequencingRequirement.MANDATORY,
+        origin=SequencingRuleOrigin.MISSION,
+        payload=payload,
+    ):
+        raise GameLifecycleError("Captured Surveil participant classification drift.")
+    witness = RulesUnitObjectiveProximityWitness.from_payload(
+        payload["objective_proximity_witness"]
+    )
+    if (
+        witness.rules_unit_instance_id != payload["moving_rules_unit_instance_id"]
+        or list(witness.objective_marker_ids) != payload["objective_marker_ids"]
+    ):
+        raise GameLifecycleError("Captured Surveil mover witness drift.")
+    events = tuple(
+        event for event in decisions.event_log.records if event.event_id == trigger_event_id
+    )
+    if len(events) != 1 or events[0].event_type not in SURVEIL_MOVE_COMPLETION_EVENT_TYPES:
+        raise GameLifecycleError("Captured Surveil rule lacks its source move.")
+    if _surveil_move_already_processed(decisions=decisions, trigger_event_id=trigger_event_id):
+        return None
+    return TimingRuleCandidate(
+        participant=participant,
+        activate=partial(
+            _remove_surveil_markers,
+            state=state,
+            decisions=decisions,
+            completed_phase=completed_phase,
+            trigger=events[0],
+            mover_id=payload["moving_rules_unit_instance_id"],
+            mover_owner_id=participant.player_id,
+            objective_proximity_witness=witness,
+            marker_ids=tuple(cast(list[str], payload["marker_ids"])),
+        ),
+    )
+
+
+def _remove_surveil_markers(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_phase: BattlePhase,
+    trigger: EventRecord,
+    mover_id: str,
+    mover_owner_id: str,
+    objective_proximity_witness: RulesUnitObjectiveProximityWitness,
+    marker_ids: tuple[str, ...],
+) -> None:
+    descriptor = primary_mission_state_rule_for_id(_SURVEIL_STATE_RULE_ID)
+    objective_ids = objective_proximity_witness.objective_marker_ids
+    removed: list[PrimaryMissionMarkerState] = []
+    for marker in state.primary_mission_progress_state.markers:
+        if (
+            marker.marker_id not in marker_ids
+            or marker.status is not PrimaryMissionMarkerStatus.ACTIVE
+            or marker.owner_player_id == mover_owner_id
+            or marker.marker_kind != "operation"
+            or marker.objective_marker_id not in objective_ids
+        ):
+            continue
+        removed_marker = marker.removed(
+            battle_round=state.battle_round,
+            phase=completed_phase.value,
+            active_player_id=_active_player_id(state),
+            source_id=descriptor.source_id,
+            event_id=trigger.event_id,
+        )
+        state.replace_primary_mission_progress_state(
+            state.primary_mission_progress_state.replace_marker(removed_marker)
+        )
+        removed.append(removed_marker)
+    decisions.event_log.append(
+        SURVEIL_MOVE_PROCESSED_EVENT,
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "phase": completed_phase.value,
+            "player_id": mover_owner_id,
+            "moving_rules_unit_instance_id": mover_id,
+            "moving_rules_unit_objective_proximity_witness": (
+                objective_proximity_witness.to_payload()
+            ),
+            "objective_marker_ids": list(objective_ids),
+            "removed_primary_mission_markers": [marker.to_payload() for marker in removed],
+            "trigger_event_id": trigger.event_id,
+            "trigger_event_type": trigger.event_type,
+            "source_id": descriptor.source_id,
+        },
+    )
 
 
 def _surveil_move_already_processed(
@@ -277,5 +419,5 @@ def _active_player_id(state: GameState) -> str:
 
 __all__ = (
     "record_consecration_designation_for_destruction",
-    "resolve_surveil_marker_removal_for_completed_moves",
+    "surveil_move_marker_candidates",
 )

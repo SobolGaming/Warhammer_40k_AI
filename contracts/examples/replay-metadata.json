@@ -6699,7 +6699,7 @@
       "battle_shock_hook_ids": [
         "catalog-ir:selected-target-test-roll-modifier"
       ],
-      "bundle_summary_hash": "2d1b0d99d39e6096d25f90650f90b0625fb5044508737e65cbc50688c0e38d9c",
+      "bundle_summary_hash": "cfeee38c8c9231d3201f7544dfffd27042d571fd4e9dab564b91a09a45625e0d",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -6719,6 +6719,10 @@
       "hit_roll_modifier_ids": [],
       "mortal_wound_feel_no_pain_hook_ids": [
         "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+      ],
+      "move_completion_rule_hook_ids": [
+        "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
+        "primary:surveil:move-marker-removal"
       ],
       "movement_budget_modifier_ids": [],
       "movement_end_surge_hook_ids": [],
@@ -6750,7 +6754,10 @@
         "player-a": [],
         "player-b": []
       },
-      "turn_end_hook_ids": [],
+      "turn_end_hook_ids": [
+        "core-rules:fight-end-boundary-providers",
+        "core-rules:movement-end-providers"
+      ],
       "unit_characteristic_modifier_ids": [],
       "unit_destroyed_hook_ids": [],
       "unit_move_completed_battle_shock_hook_ids": [],
@@ -6762,6 +6769,7 @@
     },
     "state": {
       "active_player_id": null,
+      "active_player_scopes": [],
       "advanced_unit_states": [],
       "army_definitions": [
         {
@@ -15913,7 +15921,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v8-phase17n-step5a",
+  "schema_version": "replay-artifact-v9-sequencing",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",

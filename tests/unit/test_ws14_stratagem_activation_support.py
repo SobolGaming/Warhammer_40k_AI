@@ -558,9 +558,13 @@ def test_ws14_armour_of_contempt_fight_window_applies_and_expires_with_attack_se
     assert modified_options[0].armor_penetration == -1
     assert modified_options[0].target_number == 5
 
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {"sequence_id": attack_sequence.sequence_id},
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    attack_sequence = attack_sequence.advanced_after_attack()
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=attack_sequence,
     )
     assert (
         AttackSequenceCompletedHookRegistry.empty().resolve_completed_sequence(

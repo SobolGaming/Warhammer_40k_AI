@@ -20,6 +20,7 @@ class DamageKind(StrEnum):
 class DamageAllocationTargetState(StrEnum):
     ALLOCATABLE = "allocatable"
     PRESENT_WITHOUT_LIVING_MODELS = "present_without_living_models"
+    DESTROYED_AND_REMOVED = "destroyed_and_removed"
     ABSENT = "absent"
 
 
@@ -46,6 +47,11 @@ def damage_allocation_target_state(
         for model in rules_unit.own_models
     ):
         return DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
+    if rules_unit.own_models and all(
+        not model.is_alive and model.model_instance_id in battlefield.removed_model_ids
+        for model in rules_unit.own_models
+    ):
+        return DamageAllocationTargetState.DESTROYED_AND_REMOVED
     return DamageAllocationTargetState.ABSENT
 
 
@@ -62,6 +68,8 @@ def assert_damage_allocation_target_is_allocatable(
         raise GameLifecycleError("Damage allocation target is present but has no living models.")
     if target_state is DamageAllocationTargetState.ABSENT:
         raise GameLifecycleError("Damage allocation target is absent from the battlefield.")
+    if target_state is DamageAllocationTargetState.DESTROYED_AND_REMOVED:
+        raise GameLifecycleError("Damage allocation target has been destroyed and removed.")
 
 
 def allocatable_rules_unit(*, state: GameState, unit_id: str) -> RulesUnitView:

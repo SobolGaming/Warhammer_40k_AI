@@ -11,6 +11,7 @@ from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.engine.active_player_scope_history import validate_active_player_history
 from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
@@ -26,7 +27,7 @@ from warhammer40k_core.engine.damage_allocation_targets import DamageKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -34,6 +35,10 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalPayload,
+    MovementProposalRequest,
+)
 from warhammer40k_core.engine.normal_move_history import (
     NormalMoveSourceKind,
     NormalMoveState,
@@ -51,6 +56,7 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
 )
+from warhammer40k_core.engine.phases.shooting_model import OutOfPhaseShootingState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -86,6 +92,145 @@ from warhammer40k_core.geometry.pathing import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+
+
+def test_reactive_unit_selection_changes_active_authority_through_pending_move() -> None:
+    state = _battle_ready_state()
+    assert state.active_player_id == "player-a"
+    assert state.battlefield_state is not None
+    reacting_unit = next(
+        unit
+        for army in state.battlefield_state.placed_armies
+        if army.player_id == "player-b"
+        for unit in army.unit_placements
+    )
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
+    decisions = DecisionController()
+    request = triggered_movement_unit_selection_request(
+        state=state,
+        player_id="player-b",
+        descriptor=descriptor,
+        eligible_units=(
+            TriggeredMovementEligibleUnit(
+                unit_instance_id=reacting_unit.unit_instance_id,
+                hook_id="order36-reactive-move",
+                source_id=descriptor.source_rule_id,
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        request=request,
+        result_id="order36-reactive-unit-selected",
+        selected_option_id=f"{descriptor.movement_kind.value}:{reacting_unit.unit_instance_id}",
+    )
+    decisions.submit_result(result)
+    status = TriggeredMovementHandler(ruleset_descriptor=_ruleset()).apply_decision(
+        state=state,
+        decisions=decisions,
+        result=result,
+    )
+    assert status is not None
+    assert state.active_player_id == "player-a"
+    assert state.effective_active_player_id() == "player-b"
+    restored = GameState.from_payload(state.to_payload())
+    assert restored.effective_active_player_id() == "player-b"
+    assert restored.to_payload() == state.to_payload()
+    validate_active_player_history(state=state, decisions=decisions)
+    forged = GameState.from_payload(state.to_payload())
+    forged.active_player_scopes = ()
+    with pytest.raises(GameLifecycleError, match="differs from recorded history"):
+        validate_active_player_history(state=forged, decisions=decisions)
+    own_unit = _unit_placement(state)
+    state.replace_out_of_phase_shooting_state(
+        OutOfPhaseShootingState(
+            battle_round=state.battle_round,
+            player_id="player-a",
+            parent_phase=BattlePhase.MOVEMENT,
+            source_rule_id="order36-nested-shooting",
+            source_decision_request_id=result.request_id,
+            source_decision_result_id=result.result_id,
+            source_context={"source": "nested-action"},
+            selected_unit_instance_id=own_unit.unit_instance_id,
+        )
+    )
+    assert state.effective_active_player_id() == "player-a"
+    nested = GameState.from_payload(state.to_payload())
+    assert nested.effective_active_player_id() == "player-a"
+    state.replace_out_of_phase_shooting_state(None)
+    assert state.effective_active_player_id() == "player-b"
+    with pytest.raises(GameLifecycleError, match="cannot end during a selected unit action"):
+        state.advance_to_next_battle_phase()
+    for attempt, dx in enumerate((4.0, 0.0)):
+        pending = decisions.queue.pending_requests[0]
+        proposal = MovementProposalRequest.from_decision_request_payload(pending.payload)
+        assert proposal.movement_phase_action is not None
+        move = DecisionResult(
+            result_id=f"order36-reactive-path-{attempt}",
+            request_id=pending.request_id,
+            decision_type=pending.decision_type,
+            actor_id=pending.actor_id,
+            selected_option_id=pending.options[0].option_id,
+            payload=validate_json_value(
+                MovementProposalPayload(
+                    proposal_request_id=proposal.request_id,
+                    proposal_kind=proposal.proposal_kind,
+                    unit_instance_id=reacting_unit.unit_instance_id,
+                    movement_phase_action=proposal.movement_phase_action,
+                    witness=_shift_witness(reacting_unit, dx=dx),
+                ).to_payload()
+            ),
+        )
+        decisions.submit_result(move)
+        move_status = TriggeredMovementHandler(
+            ruleset_descriptor=_ruleset()
+        ).apply_proposal_decision(
+            state=state,
+            request=pending,
+            result=move,
+            decisions=decisions,
+        )
+        if attempt == 0:
+            assert move_status is not None
+            assert move_status.status_kind is LifecycleStatusKind.INVALID
+            assert state.effective_active_player_id() == "player-b"
+        else:
+            assert move_status is None
+            assert state.effective_active_player_id() == "player-a"
+            assert state.active_player_scopes == ()
+        validate_active_player_history(state=state, decisions=decisions)
+
+    from warhammer40k_core.engine.move_completion_triggers import move_context_for_trigger
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+
+    triggers = rule_trigger_history(decisions).ready()
+    assert len(triggers) == 1
+    trigger = triggers[0]
+    assert trigger.kind is RuleTriggerKind.MOVE_COMPLETION
+    move_context = move_context_for_trigger(
+        state=state,
+        decisions=decisions,
+        trigger=trigger,
+        runtime_modifiers=RuntimeModifierRegistry.empty(),
+        ability_indexes={},
+    )
+    assert move_context.triggering_player_id == "player-b"
+    assert move_context.movement_action == "normal_move"
+    assert isinstance(trigger.context, dict)
+    forged_trigger = replace(
+        trigger, context={**trigger.context, "triggering_player_id": "player-a"}
+    )
+    before = (state.to_payload(), decisions.to_payload())
+    with pytest.raises(GameLifecycleError, match="source authority drift"):
+        move_context_for_trigger(
+            state=state,
+            decisions=decisions,
+            trigger=forged_trigger,
+            runtime_modifiers=RuntimeModifierRegistry.empty(),
+            ability_indexes={},
+        )
+    assert (state.to_payload(), decisions.to_payload()) == before
 
 
 def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() -> None:
@@ -2450,3 +2595,114 @@ def _last_event_payload(
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"Missing event type: {event_type}")
+
+
+@pytest.mark.parametrize(
+    ("tamper", "message"),
+    [
+        ("unrelated_kind", "unrelated action"),
+        ("unknown_kind", "Unknown active-player scope kind"),
+        ("missing_field", "scope payload schema drift"),
+        ("malformed_start", "scope event requires an object"),
+        ("unaccepted_selection", "requires an accepted selection"),
+        ("wrong_player", "selection authority drift"),
+        ("wrong_source", "source authority drift"),
+        ("duplicate_start", "selection was reopened"),
+        ("missing_path", "lacks a resolved path"),
+        ("missing_completion", "differs from recorded history"),
+        ("malformed_completion", "completion requires an object"),
+        ("completion_order", "completion order drift"),
+    ],
+)
+def test_reactive_active_player_history_rejects_forged_source_authority(
+    tamper: str, message: str
+) -> None:
+    from typing import Any
+
+    from warhammer40k_core.engine.decision_controller import DecisionControllerPayload
+
+    state = _battle_ready_state()
+    unit = _unit_placement(state)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
+    decisions = DecisionController()
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    request = triggered_movement_unit_selection_request(
+        state=state,
+        player_id="player-a",
+        descriptor=descriptor,
+        eligible_units=(
+            TriggeredMovementEligibleUnit(
+                unit_instance_id=unit.unit_instance_id,
+                hook_id="order36-history",
+                source_id=descriptor.source_rule_id,
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    selected = DecisionResult.for_request(
+        request=request,
+        result_id="order36-history-selection",
+        selected_option_id=f"{descriptor.movement_kind.value}:{unit.unit_instance_id}",
+    )
+    decisions.submit_result(selected)
+    assert handler.apply_decision(state=state, decisions=decisions, result=selected) is not None
+    pending = decisions.queue.pending_requests[0]
+    proposal = MovementProposalRequest.from_decision_request_payload(pending.payload)
+    assert proposal.movement_phase_action is not None
+    move = DecisionResult(
+        result_id="order36-history-path",
+        request_id=pending.request_id,
+        decision_type=pending.decision_type,
+        actor_id=pending.actor_id,
+        selected_option_id=pending.options[0].option_id,
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=unit.unit_instance_id,
+                movement_phase_action=proposal.movement_phase_action,
+                witness=_shift_witness(unit, dx=0.0),
+            ).to_payload()
+        ),
+    )
+    decisions.submit_result(move)
+    assert (
+        handler.apply_proposal_decision(
+            state=state, request=pending, result=move, decisions=decisions
+        )
+        is None
+    )
+    validate_active_player_history(state=state, decisions=decisions)
+    payload = cast(dict[str, Any], decisions.to_payload())
+    events = payload["event_log"]
+    start = next(row for row in events if row["event_type"] == "active_player_scope_started")
+    completed = next(row for row in events if row["event_type"] == "active_player_scope_completed")
+    if tamper == "unrelated_kind":
+        start["payload"]["kind"] = "fight"
+    elif tamper == "unknown_kind":
+        start["payload"]["kind"] = "unrecognized"
+    elif tamper == "missing_field":
+        del start["payload"]["source_rule_id"]
+    elif tamper == "malformed_start":
+        start["payload"] = []
+    elif tamper == "unaccepted_selection":
+        start["payload"]["selection_request_id"] = "unaccepted-selection"
+    elif tamper == "wrong_player":
+        start["payload"]["player_id"] = "player-b"
+    elif tamper == "wrong_source":
+        start["payload"]["source_rule_id"] = "wrong-source"
+    elif tamper == "duplicate_start":
+        events.append({**start, "event_id": f"event-{len(events) + 1:06d}"})
+    elif tamper == "missing_path":
+        for row in events:
+            if row["event_type"] == "triggered_movement_resolved":
+                row["event_type"] = "unrelated_event"
+    elif tamper == "missing_completion":
+        completed["event_type"] = "unrelated_event"
+    elif tamper == "malformed_completion":
+        completed["payload"] = []
+    else:
+        completed["payload"]["scope"]["selection_result_id"] = "other-selection"
+    decisions = DecisionController.from_payload(cast(DecisionControllerPayload, payload))
+    with pytest.raises(GameLifecycleError, match=message):
+        validate_active_player_history(state=state, decisions=decisions)

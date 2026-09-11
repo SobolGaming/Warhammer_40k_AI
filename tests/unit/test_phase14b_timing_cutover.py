@@ -3,22 +3,23 @@ from __future__ import annotations
 import json
 from typing import TypedDict, cast
 
+import pytest
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
-    PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
 )
-from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_order import FightPhaseState
+from warhammer40k_core.engine.fights_first import FightsFirstRegistry
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -26,6 +27,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, PlaceholderPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
@@ -43,6 +45,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
 )
+from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     stratagem_decline_payload,
@@ -86,6 +89,18 @@ def test_phase14b_end_window_order_is_deterministic_non_mission_before_mission()
     flow = _placeholder_flow()
 
     for _index in range(10):
+        if state.current_battle_phase is BattlePhase.FIGHT:
+            assert state.active_player_id is not None
+            policy = state.runtime_ruleset_descriptor().fight_policy
+            state.replace_fight_phase_state(
+                FightPhaseState.start(
+                    battle_round=state.battle_round,
+                    active_player_id=state.active_player_id,
+                    policy=policy,
+                    engaged_at_fight_step_start_unit_ids=(),
+                    fights_first_registry=FightsFirstRegistry.from_state(state),
+                ).with_current_step(current_step=FightPhaseStepKind.END, policy=policy)
+            )
         flow.advance(state=state, decisions=decisions)
 
     resolved = _resolved_timing_windows(decisions)
@@ -186,27 +201,28 @@ def test_phase14b_effective_active_player_scope_restores_after_selected_unit_con
     )
 
     state.active_player_id = "player-b"
-    state.out_of_phase_shooting_state = OutOfPhaseShootingState(
-        battle_round=1,
-        player_id="player-a",
-        parent_phase=BattlePhase.MOVEMENT,
-        source_rule_id="core:fire-overwatch",
-        source_decision_request_id="phase14b-overwatch-request",
-        source_decision_result_id="phase14b-overwatch-result",
-        source_context={"source_kind": "fire_overwatch"},
-        selected_unit_instance_id="army-alpha:intercessor-unit-1",
+    state.replace_out_of_phase_shooting_state(
+        OutOfPhaseShootingState(
+            battle_round=1,
+            player_id="player-a",
+            parent_phase=BattlePhase.MOVEMENT,
+            source_rule_id="core:fire-overwatch",
+            source_decision_request_id="phase14b-overwatch-request",
+            source_decision_result_id="phase14b-overwatch-result",
+            source_context={"source_kind": "fire_overwatch"},
+            selected_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
     )
     assert state.effective_active_player_id() == "player-a"
     assert state.effective_opposing_player_ids() == ("player-b",)
 
-    state.out_of_phase_shooting_state = None
+    state.replace_out_of_phase_shooting_state(None)
     assert state.effective_active_player_id() == "player-b"
     assert state.effective_opposing_player_ids() == ("player-a",)
 
 
-def test_phase14b_end_opponent_movement_reactions_emit_fire_overwatch_before_rapid_ingress() -> (
-    None
-):
+@pytest.mark.parametrize("first_rule", ["fire-overwatch", "rapid-ingress"])
+def test_phase14b_opponent_orders_end_movement_reactions(first_rule: str) -> None:
     lifecycle = _battle_lifecycle(beta_unit_selection_ids=("enemy-unit", "reserve-unit"))
     state = _require_state(lifecycle)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
@@ -230,9 +246,11 @@ def test_phase14b_end_opponent_movement_reactions_emit_fire_overwatch_before_rap
         selected_unit_ids=("army-alpha:intercessor-unit-1",),
         moved_unit_ids=("army-alpha:intercessor-unit-1",),
     )
-    lifecycle.decision_controller.event_log.append(
-        "movement_activation_completed",
-        {
+    record_move_completion_event(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        event_type="movement_activation_completed",
+        payload={
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": "player-a",
@@ -243,52 +261,49 @@ def test_phase14b_end_opponent_movement_reactions_emit_fire_overwatch_before_rap
         },
     )
 
-    fire_status = lifecycle.advance_until_decision_or_terminal()
-    fire_request = _decision_request(fire_status.decision_request)
-    fire_context = _stratagem_context(fire_request)
-    fire_payload = _event_payload_object(fire_request.payload)
-    fire_proposal_request = _json_object(fire_payload["proposal_request"])
-    view = LocalGameSession(lifecycle=lifecycle).view(viewer_player_id="player-a")
-    pending_decision = view["pending_decision"]
-    pending_proposal = cast(dict[str, object], view["pending_proposal"])
-
-    assert fire_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
-    assert pending_decision is not None
-    assert pending_decision["request_id"] == fire_request.request_id
-    assert fire_proposal_request["request_id"] == fire_request.request_id
-    assert fire_proposal_request["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
-    assert fire_proposal_request["actor_id"] == "player-b"
-    assert pending_proposal["request_id"] == pending_decision["request_id"]
-    assert pending_proposal["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
-    assert pending_proposal["actor_id"] == "player-b"
-    assert pending_proposal["proposal_kind"] == "stratagem_target_binding"
-    assert fire_context["trigger_kind"] == TimingTriggerKind.END_PHASE.value
-    assert fire_context["timing_window_id"] == (
-        "fire-overwatch-end-movement-round-02-unit-army-alpha:intercessor-unit-1-player-player-b"
+    session = LocalGameSession(lifecycle=lifecycle)
+    order_request = _decision_request(session.advance_until_decision_or_terminal().decision_request)
+    assert order_request.decision_type == SEQUENCING_DECISION_TYPE
+    assert order_request.actor_id == "player-b"
+    assert len(order_request.options) == 2
+    option = next(option for option in order_request.options if first_rule in option.option_id)
+    status = session.submit_option(
+        request_id=order_request.request_id,
+        option_id=option.option_id,
+        result_id="phase14b-select-first-reaction",
     )
-    assert _active_reaction_window_trigger(lifecycle) == TimingTriggerKind.END_PHASE.value
-
-    rapid_status = lifecycle.submit_decision(
-        DecisionResult(
-            result_id="phase14b-decline-fire-overwatch",
-            request_id=fire_request.request_id,
-            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-            actor_id=fire_request.actor_id,
-            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-            payload=stratagem_decline_payload(),
-        )
-    )
-    rapid_request = _decision_request(rapid_status.decision_request)
-    rapid_context = _stratagem_context(rapid_request)
-
-    assert rapid_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
-    assert rapid_context["trigger_kind"] == TimingTriggerKind.END_PHASE.value
-    assert rapid_context["timing_window_id"] == (
-        "rapid-ingress-end-movement-round-02-player-player-b"
-    )
+    second_rule = "rapid-ingress" if first_rule == "fire-overwatch" else "fire-overwatch"
+    expected_windows = {
+        "fire-overwatch": (
+            "fire-overwatch-end-movement-round-02-unit-army-alpha:intercessor-unit-1-player-player-b"
+        ),
+        "rapid-ingress": "rapid-ingress-end-movement-round-02-player-player-b",
+    }
+    for rule in (first_rule, second_rule):
+        request = _decision_request(status.decision_request)
+        context = _stratagem_context(request)
+        assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+        assert request.actor_id == "player-b"
+        assert context["trigger_kind"] == TimingTriggerKind.END_PHASE.value
+        assert context["timing_window_id"] == expected_windows[rule]
+        assert _active_reaction_window_trigger(lifecycle) == TimingTriggerKind.END_PHASE.value
+        for viewer in state.player_ids:
+            view = session.view(viewer_player_id=viewer)
+            pending = view["pending_decision"]
+            proposal = cast(dict[str, object], view["pending_proposal"])
+            assert pending is not None
+            assert pending["request_id"] == request.request_id
+            assert proposal["request_id"] == request.request_id
+            assert proposal["actor_id"] == "player-b"
+        if rule == first_rule:
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                payload=stratagem_decline_payload(),
+                result_id=f"phase14b-decline-{rule}",
+            )
     assert _reaction_window_ids(lifecycle.decision_controller)[:2] == (
-        "fire-overwatch-end-movement-round-02-unit-army-alpha:intercessor-unit-1-player-player-b",
-        "rapid-ingress-end-movement-round-02-player-player-b",
+        expected_windows[first_rule],
+        expected_windows[second_rule],
     )
 
 

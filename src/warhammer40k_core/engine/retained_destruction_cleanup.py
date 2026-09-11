@@ -71,22 +71,39 @@ def begin_retained_destruction_cleanup(
             raise GameLifecycleError(
                 "Retained destruction shooting completion has no shooting grant."
             )
-        updated = replace(record, stage=RetainedDestructionStage.READY, completion_reason=reason)
-        replace_retained_destruction(state=state, original=record, updated=updated)
-        decisions.event_log.append(
-            "fight_on_death_destruction_ready",
-            {
-                "cause_id": record.cause_id,
-                "model_instance_id": record.model_instance_id,
-                "reason": reason,
-                "unit_instance_id": unit_instance_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": None
-                if state.current_battle_phase is None
-                else state.current_battle_phase.value,
-            },
+        _mark_retained_cleanup_ready(
+            state=state,
+            decisions=decisions,
+            record=record,
+            reason=reason,
+            unit_instance_id=unit_instance_id,
         )
+    return continue_retained_destruction_cleanup(state=state, decisions=decisions)
+
+
+def start_retained_cleanup(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    record: RetainedModelDestruction,
+) -> LifecycleStatus | None:
+    """Resolve the selected source occurrence after its retained interval expires."""
+    current = retained_destruction_for_model(
+        state=state, model_instance_id=record.model_instance_id
+    )
+    if current != record or record.stage is not RetainedDestructionStage.WAITING:
+        raise GameLifecycleError("Retained phase-end source occurrence drift.")
+    if any(
+        item.stage is RetainedDestructionStage.READY for item in retained_destructions(state=state)
+    ):
+        raise GameLifecycleError("Retained cleanup cannot preempt another ready continuation.")
+    _mark_retained_cleanup_ready(
+        state=state,
+        decisions=decisions,
+        record=record,
+        reason="phase_end",
+        unit_instance_id=None,
+    )
     return continue_retained_destruction_cleanup(state=state, decisions=decisions)
 
 
@@ -325,3 +342,29 @@ def destruction_waits_for_retained_casualty(*, state: GameState, model_instance_
                 return True
             ancestors.extend(causes[ancestor_id].parent_cause_ids)
     return False
+
+
+def _mark_retained_cleanup_ready(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    record: RetainedModelDestruction,
+    reason: str,
+    unit_instance_id: str | None,
+) -> None:
+    updated = replace(record, stage=RetainedDestructionStage.READY, completion_reason=reason)
+    replace_retained_destruction(state=state, original=record, updated=updated)
+    decisions.event_log.append(
+        "fight_on_death_destruction_ready",
+        {
+            "cause_id": record.cause_id,
+            "model_instance_id": record.model_instance_id,
+            "reason": reason,
+            "unit_instance_id": unit_instance_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": None
+            if state.current_battle_phase is None
+            else state.current_battle_phase.value,
+        },
+    )

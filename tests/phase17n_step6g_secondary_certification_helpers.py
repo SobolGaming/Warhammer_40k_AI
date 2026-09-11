@@ -21,6 +21,7 @@ from tests.phase17n_secondary_mission_helpers import resolved_secondary_mission_
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
@@ -67,6 +68,7 @@ from warhammer40k_core.engine.secondary_scoring_inventory import (
     SecondaryMissionLifecycleCertificationRow,
     secondary_mission_lifecycle_certification_rows,
 )
+from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 
 STEP6G_SCORING_PLAYER_IDS = ("player-a", "player-b")
 _EVENT_COMPANION_FORCE_DISPOSITION_IDS = (
@@ -86,6 +88,7 @@ STEP6G_TACTICAL_CERTIFICATION_ROWS = tuple(
 _ALLOWED_SCORING_DECISION_TYPES = frozenset(
     {
         SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+        SEQUENCING_DECISION_TYPE,
         TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
     }
 )
@@ -182,7 +185,7 @@ def assert_secondary_scores_through_lifecycle_restore_and_views(
     state = session.lifecycle.state
     assert state is not None
     _assert_positive_secondary_outcome(state, row=row, expectation=expectation, scored=True)
-    _assert_primary_commit_precedes_secondary(session, row=row)
+    _assert_selected_primary_commit_precedes_secondary(session, row=row)
     _assert_secondary_boundary_is_idempotent(state, row=row)
 
     restored_initial = GameLifecycle.from_payload(initial_payload)
@@ -257,8 +260,10 @@ def assert_tactical_retain_leaves_card_active_without_transaction(
 
 def secondary_certification_session(
     row: SecondaryMissionLifecycleCertificationRow,
+    *,
+    mission_setup: MissionSetup | None = None,
 ) -> tuple[LocalGameSession, GameLifecyclePayload, SecondaryPositiveExpectation]:
-    setup = setup_for_layout()
+    setup = setup_for_layout() if mission_setup is None else mission_setup
     active_player_id = active_player_id_for_row(row)
     player_a_units = certification_unit_selections_for_row(row, player_id="player-a")
     player_b_units = certification_unit_selections_for_row(row, player_id="player-b")
@@ -287,6 +292,7 @@ def secondary_certification_session(
         record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     config = _secondary_certification_config_for_units(
         setup_game_id=state.game_id,
+        mission_setup=setup,
         player_a_units=player_a_units,
         player_b_units=player_b_units,
     )
@@ -366,6 +372,16 @@ def _drive_secondary_scoring_through_facade(
             if not pending.options:
                 raise AssertionError("Step 6G secondary certification requires a finite option.")
             option_id = pending.options[0].option_id
+            if pending.decision_type == SEQUENCING_DECISION_TYPE:
+                # This certification policy chooses Primary first when both are legal.
+                option_id = next(
+                    (
+                        option.option_id
+                        for option in pending.options
+                        if option.option_id.startswith("next:primary-scoring:")
+                    ),
+                    option_id,
+                )
             if pending.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
                 prefix = "score:" if score_tactical else "retain:"
                 option_id = next(
@@ -449,8 +465,9 @@ def _secondary_certification_config_for_units(
     setup_game_id: str,
     player_a_units: tuple[UnitMusterSelection, ...],
     player_b_units: tuple[UnitMusterSelection, ...],
+    mission_setup: MissionSetup | None = None,
 ) -> GameConfig:
-    setup = setup_for_layout()
+    setup = setup_for_layout() if mission_setup is None else mission_setup
     base = phase11c_config()
     catalog = replace(
         base.army_catalog,
@@ -484,7 +501,9 @@ def _secondary_certification_config_for_units(
                     army_id="army-alpha",
                     unit_selections=player_a_units,
                 ),
-                force_disposition_id=STEP6G_LAYOUT_ROW.attacker_force_disposition_id,
+                force_disposition_id=setup.primary_mission_assignment_for_player(
+                    "player-a"
+                ).force_disposition_id,
             ),
             replace(
                 army_muster_request(
@@ -493,7 +512,9 @@ def _secondary_certification_config_for_units(
                     army_id="army-beta",
                     unit_selections=player_b_units,
                 ),
-                force_disposition_id=STEP6G_LAYOUT_ROW.defender_force_disposition_id,
+                force_disposition_id=setup.primary_mission_assignment_for_player(
+                    "player-b"
+                ).force_disposition_id,
             ),
         ),
     )
@@ -508,6 +529,7 @@ def setup_for_layout() -> MissionSetup:
 
 
 def seed_completed_fight_phase(state: GameState) -> None:
+    """Finish the Fight body; the lifecycle still owns its end-rule boundary."""
     if state.active_player_id is None:
         raise AssertionError("Step 6G secondary fixture requires an active player.")
     fight_state = FightPhaseState.start(
@@ -516,8 +538,13 @@ def seed_completed_fight_phase(state: GameState) -> None:
         policy=state.ruleset_descriptor_for_runtime_policy().fight_policy,
         engaged_at_fight_step_start_unit_ids=(),
         fights_first_registry=FightsFirstRegistry.from_state(state),
-    ).with_phase_complete()
-    state.replace_fight_phase_state(fight_state)
+    )
+    state.replace_fight_phase_state(
+        fight_state.with_current_step(
+            current_step=FightPhaseStepKind.END,
+            policy=state.ruleset_descriptor_for_runtime_policy().fight_policy,
+        )
+    )
     state.stage = GameLifecycleStage.BATTLE
 
 
@@ -669,7 +696,7 @@ def _assert_positive_secondary_outcome(
     assert not state.tactical_secondary_achievement_contexts
 
 
-def _assert_primary_commit_precedes_secondary(
+def _assert_selected_primary_commit_precedes_secondary(
     session: LocalGameSession,
     *,
     row: SecondaryMissionLifecycleCertificationRow,

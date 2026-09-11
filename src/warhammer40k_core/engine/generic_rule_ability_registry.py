@@ -12,6 +12,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityGrant,
 )
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedCandidateHandler,
     AttackSequenceCompletedHandler,
 )
 from warhammer40k_core.engine.battle_formation_hooks import (
@@ -67,6 +68,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     TargetRestriction,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.rules.rule_ir import RuleIR
@@ -220,11 +222,18 @@ type SaveOptionModifierBuilder = Callable[
 type UnitDestroyedBuilder = Callable[
     [UnitDestroyedContext, GenericRuleAbilitySource], object | None
 ]
+type TurnEndCandidateBuilder = Callable[
+    [TurnEndRequestContext, GenericRuleAbilitySource], tuple[TimingRuleCandidate, ...]
+]
 type TurnEndRequestBuilder = Callable[
     [TurnEndRequestContext, GenericRuleAbilitySource],
     DecisionRequest | None,
 ]
 type TurnEndResultBuilder = Callable[[TurnEndResultContext, GenericRuleAbilitySource], bool]
+
+type FightPhaseStartCandidateBuilder = Callable[
+    [FightPhaseStartRequestContext, GenericRuleAbilitySource], tuple[TimingRuleCandidate, ...]
+]
 type FightPhaseStartRequestBuilder = Callable[
     [FightPhaseStartRequestContext, GenericRuleAbilitySource],
     DecisionRequest | None,
@@ -486,6 +495,7 @@ class GenericRuleAttackSequenceCompletedAbility:
     source_rule_id: str
     hook_id_builder: GenericRuleHookIdBuilder
     handler: AttackSequenceCompletedHandler
+    candidate_handler: AttackSequenceCompletedCandidateHandler
 
     @property
     def hook_family(self) -> GenericRuleAbilityHookFamily:
@@ -503,6 +513,7 @@ class GenericRuleAttackSequenceCompletedAbility:
             self.hook_id_builder,
         )
         _validate_callable("Generic attack sequence completed handler", self.handler)
+        _validate_callable("Generic attack completion candidate handler", self.candidate_handler)
 
     def _set_validated_identity(
         self,
@@ -1069,7 +1080,7 @@ class GenericRuleTurnEndAbility:
     coverage_descriptor_id: str
     source_rule_id: str
     hook_id_builder: GenericRuleHookIdBuilder
-    request_builder: TurnEndRequestBuilder
+    candidate_builder: TurnEndCandidateBuilder
     result_builder: TurnEndResultBuilder
 
     @property
@@ -1084,7 +1095,7 @@ class GenericRuleTurnEndAbility:
             set_validated_values=self._set_validated_identity,
         )
         _validate_callable("Generic turn-end ability hook_id_builder", self.hook_id_builder)
-        _validate_callable("Generic turn-end ability request_builder", self.request_builder)
+        _validate_callable("Generic turn-end ability candidate_builder", self.candidate_builder)
         _validate_callable("Generic turn-end ability result_builder", self.result_builder)
 
     def _set_validated_identity(
@@ -1111,7 +1122,7 @@ class GenericRuleFightPhaseStartAbility:
     coverage_descriptor_id: str
     source_rule_id: str
     hook_id_builder: GenericRuleHookIdBuilder
-    request_builder: FightPhaseStartRequestBuilder
+    candidate_builder: FightPhaseStartCandidateBuilder
     result_builder: FightPhaseStartResultBuilder
 
     @property
@@ -1130,8 +1141,8 @@ class GenericRuleFightPhaseStartAbility:
             self.hook_id_builder,
         )
         _validate_callable(
-            "Generic fight-phase-start ability request_builder",
-            self.request_builder,
+            "Generic fight-phase-start ability candidate_builder",
+            self.candidate_builder,
         )
         _validate_callable(
             "Generic fight-phase-start ability result_builder",

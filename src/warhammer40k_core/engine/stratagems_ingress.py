@@ -2,6 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
@@ -49,6 +50,8 @@ def _apply_rapid_ingress_placement(
     ruleset_descriptor: RulesetDescriptor,
     reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     reserve_state = state.reserve_state_for_unit(submitted.unit_instance_id)
     if reserve_state is None:
         raise GameLifecycleError("Rapid Ingress placement requires ReserveState.")
@@ -169,7 +172,12 @@ def _apply_rapid_ingress_placement(
         ],
         "stratagem_use": stratagem_use.to_payload(),
     }
-    decisions.event_log.append("reinforcement_unit_arrived", validate_json_value(event_payload))
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="reinforcement_unit_arrived",
+        payload=validate_json_value(event_payload),
+    )
     decisions.event_log.append("rapid_ingress_resolved", validate_json_value(event_payload))
     return None
 

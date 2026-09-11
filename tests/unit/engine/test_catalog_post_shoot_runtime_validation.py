@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
 from tests.support.catalog_package_fixtures import (
     flesh_hounds_army,
     named_weapon_choice_unit,
@@ -33,7 +34,6 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CatalogPostShootHitTargetStatusRuntime,
-    _available_catalog_post_shoot_hit_target_status_groups,
     _catalog_post_shoot_hit_target_status_groups_from_clause,
     _clause_is_supported_post_shoot_hit_target_status_denial,
     _effect_is_supported_status_denial,
@@ -43,6 +43,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     _post_shoot_status_source_model_ids,
     _validate_non_empty_text,
     _validate_post_shoot_hit_target_status_option,
+    available_catalog_post_shoot_hit_target_status_groups,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -114,13 +115,8 @@ def test_phase17k_post_shoot_hit_target_status_fail_fast_validation_paths() -> N
         attacker=unit,
         target=target_unit,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     context = AttackSequenceCompletedContext(
         state=state,
@@ -155,7 +151,7 @@ def test_phase17k_post_shoot_hit_target_status_fail_fast_validation_paths() -> N
         == ()
     )
     assert (
-        _available_catalog_post_shoot_hit_target_status_groups(
+        available_catalog_post_shoot_hit_target_status_groups(
             ability_indexes_by_player_id={army.player_id: player_index},
             armies=(army, enemy_army),
             context=context,
@@ -163,13 +159,13 @@ def test_phase17k_post_shoot_hit_target_status_fail_fast_validation_paths() -> N
         == ()
     )
     with pytest.raises(GameLifecycleError, match="requires context"):
-        _available_catalog_post_shoot_hit_target_status_groups(
+        available_catalog_post_shoot_hit_target_status_groups(
             ability_indexes_by_player_id={army.player_id: player_index},
             armies=(army, enemy_army),
             context=cast(Any, object()),
         )
     with pytest.raises(GameLifecycleError, match="index is missing player"):
-        _available_catalog_post_shoot_hit_target_status_groups(
+        available_catalog_post_shoot_hit_target_status_groups(
             ability_indexes_by_player_id={},
             armies=(army, enemy_army),
             context=context,

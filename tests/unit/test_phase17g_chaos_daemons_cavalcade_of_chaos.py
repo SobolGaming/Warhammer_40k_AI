@@ -59,7 +59,6 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
     BattleShockModifierContext,
-    BattleShockOutcomeContext,
     BattleShockRerollPermissionContext,
 )
 from warhammer40k_core.engine.battlefield_state import (
@@ -649,6 +648,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
         GameLifecycle.from_payload(forged_payload)
 
 
+@pytest.mark.stubbed  # Only pure modifier and reroll-permission functions are substituted.
 def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> None:
     config = _cavalcade_config(turn_order=("player-b", "player-a"))
     lifecycle, movement_status = advance_to_movement_unit_selection(config)
@@ -682,6 +682,37 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
         stratagem_request,
         stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
     )
+
+    from warhammer40k_core.engine.stratagem_timing_candidates import (
+        validate_pending_timing_stratagem_request,
+    )
+
+    original = deepcopy(lifecycle.decision_controller.to_payload())
+    validate_pending_timing_stratagem_request(
+        decisions=lifecycle.decision_controller, request=stratagem_request
+    )
+    for tamper in ("missing", "wrong_identity", "malformed"):
+        controller_payload = deepcopy(lifecycle.decision_controller.to_payload())
+        forged_request_payload = cast(dict[str, JsonValue], deepcopy(stratagem_request.payload))
+        if tamper == "missing":
+            del forged_request_payload["timing_participant_id"]
+        else:
+            forged_request_payload["timing_participant_id"] = (
+                "unrelated-rule" if tamper == "wrong_identity" else 17
+            )
+        forged_request = replace(stratagem_request, payload=forged_request_payload)
+        for event in controller_payload["event_log"]:
+            if (
+                event["event_type"] == "decision_requested"
+                and event["payload"] == stratagem_request.to_payload()
+            ):
+                event["payload"] = validate_json_value(forged_request.to_payload())
+        forged_decisions = DecisionController.from_payload(controller_payload)
+        with pytest.raises(GameLifecycleError, match="Stratagem timing"):
+            validate_pending_timing_stratagem_request(
+                decisions=forged_decisions, request=forged_request
+            )
+    assert lifecycle.decision_controller.to_payload() == original
 
     proposal_status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -751,15 +782,6 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
         )
 
-    def record_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
-        context.decisions.event_log.append(
-            "phase17g_inescapable_battle_shock_outcome_hook_resolved",
-            {
-                "result_id": context.result.result_id,
-                "unit_instance_id": context.result.request.unit_instance_id,
-            },
-        )
-
     battle_shock_hooks = BattleShockHookRegistry.from_bindings(
         (
             BattleShockHookBinding(
@@ -767,7 +789,6 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
                 source_id=stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID,
                 modifier_handler=battle_shock_modifier,
                 reroll_permission_handler=battle_shock_reroll,
-                outcome_handler=record_battle_shock_outcome,
             ),
         )
     )
@@ -860,13 +881,18 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
     roll_state = cast(dict[str, JsonValue], battle_shock_result["roll_state"])
     assert modified_roll["applied_modifier_ids"] == [battle_shock_modifier_id]
     assert len(cast(list[JsonValue], roll_state["rerolls"])) == 1
-    assert (
-        _event_payload(
-            lifecycle,
-            "phase17g_inescapable_battle_shock_outcome_hook_resolved",
-        )["unit_instance_id"]
-        == _ENEMY_UNIT_ID
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+
+    history = rule_trigger_history(lifecycle.decision_controller)
+    outcomes = tuple(
+        trigger
+        for trigger in history.observed
+        if trigger.kind is RuleTriggerKind.BATTLE_SHOCK_OUTCOME
     )
+    assert len(outcomes) == 1
+    assert isinstance(outcomes[0].context, dict)
+    assert outcomes[0].context["battle_shock_result"] == battle_shock_result
+    assert outcomes[0].trigger_id in history.completed
 
 
 def _move_enemy_unit_into_coherent_side_engagement(lifecycle: GameLifecycle) -> None:

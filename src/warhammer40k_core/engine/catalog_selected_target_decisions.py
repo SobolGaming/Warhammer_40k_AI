@@ -135,6 +135,7 @@ def selected_target_request(
     state: GameState,
     group: SelectedTargetGroup,
     decision_type: str,
+    request_id: str | None = None,
 ) -> DecisionRequest:
     common_payload = selected_target_base_payload(state=state, group=group)
     target_options = tuple(
@@ -171,7 +172,7 @@ def selected_target_request(
             ),
         )
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=state.next_decision_request_id() if request_id is None else request_id,
         decision_type=decision_type,
         actor_id=group.player_id,
         payload=validate_json_value(
@@ -394,10 +395,12 @@ def resolved_post_shoot_target_effect_group_keys(
 def resolved_shooting_start_group_keys(
     decisions: DecisionController,
     *,
+    state: GameState,
     event_type: str,
 ) -> frozenset[tuple[str, str, str, str, str]]:
     return resolved_phase_selected_target_group_keys(
         decisions,
+        state=state,
         event_type=event_type,
     )
 
@@ -405,6 +408,7 @@ def resolved_shooting_start_group_keys(
 def resolved_phase_selected_target_group_keys(
     decisions: DecisionController,
     *,
+    state: GameState,
     event_type: str,
 ) -> frozenset[tuple[str, str, str, str, str]]:
     requested_event_type = _validate_identifier("event_type", event_type)
@@ -415,6 +419,15 @@ def resolved_phase_selected_target_group_keys(
         payload = event.payload
         if not isinstance(payload, dict):
             raise GameLifecycleError("Catalog phase selected-target event payload is malformed.")
+        if state.current_battle_phase is None:
+            raise GameLifecycleError("Phase rule history requires a current phase.")
+        if (
+            payload.get("game_id") != state.game_id
+            or payload.get("battle_round") != state.battle_round
+            or payload.get("active_player_id") != state.active_player_id
+            or payload.get("phase") != state.current_battle_phase.value
+        ):
+            continue
         payload_value = cast(dict[str, object], payload)
         source_model_id = payload_value.get("source_model_instance_id")
         if source_model_id is not None and type(source_model_id) is not str:

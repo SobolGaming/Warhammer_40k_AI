@@ -202,38 +202,34 @@ def request_catalog_setup_reactive_shoot_charge_if_available(
         raise GameLifecycleError(
             "Setup-reactive catalog reaction requires charge target restrictions."
         )
-    active_player_id = _active_player_id(state)
-    reacting_player_ids = tuple(
-        sorted(player for player in state.player_ids if player != active_player_id)
+    from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+    from warhammer40k_core.engine.catalog_setup_reactive_sequencing import (
+        setup_reactive_end_candidates,
     )
-    for trigger_event in _setup_trigger_events(
+    from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext
+
+    outcome = resolve_boundary_candidates(
         state=state,
         decisions=decisions,
-        active_player_id=active_player_id,
-    ):
-        for player_id in reacting_player_ids:
-            index = ability_indexes_by_player_id.get(player_id)
-            if index is None:
-                continue
-            candidate = _first_candidate_for_player_and_trigger(
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        discover=lambda: setup_reactive_end_candidates(
+            TurnEndRequestContext(
                 state=state,
                 decisions=decisions,
-                player_id=player_id,
-                active_player_id=active_player_id,
-                trigger_event=trigger_event,
-                ability_index=index,
+                completed_phase=BattlePhase.MOVEMENT,
+                trigger_kind=TimingTriggerKind.END_PHASE,
+                reaction_queue=reaction_queue,
                 ruleset_descriptor=ruleset_descriptor,
                 army_catalog=army_catalog,
-            )
-            if candidate is None:
-                continue
-            return _emit_setup_reactive_request(
-                state=state,
-                decisions=decisions,
-                reaction_queue=reaction_queue,
-                candidate=candidate,
-            )
-    return None
+                runtime_modifier_registry=runtime_modifier_registry,
+            ),
+            ability_indexes=ability_indexes_by_player_id,
+        ),
+    )
+    if isinstance(outcome, DecisionRequest):
+        decisions.request_decision(outcome)
+        return LifecycleStatus.waiting_for_decision(stage=state.stage, decision_request=outcome)
+    return outcome
 
 
 def invalid_catalog_setup_reactive_shoot_charge_status(
@@ -336,7 +332,7 @@ def apply_catalog_setup_reactive_shoot_charge_result(
     raise GameLifecycleError("Setup-reactive action is unsupported.")
 
 
-def _emit_setup_reactive_request(
+def emit_setup_reactive_request(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -428,127 +424,6 @@ def _setup_reactive_options(candidate: _SetupReactiveCandidate) -> tuple[Decisio
             )
         )
     return tuple(options)
-
-
-def _first_candidate_for_player_and_trigger(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    player_id: str,
-    active_player_id: str,
-    trigger_event: EventRecord,
-    ability_index: AbilityCatalogIndex,
-    ruleset_descriptor: RulesetDescriptor,
-    army_catalog: ArmyCatalog,
-) -> _SetupReactiveCandidate | None:
-    target_component_unit_id = _trigger_event_unit_id(trigger_event)
-    target_rules_unit_id = rules_unit_id_for_unit_id(
-        armies=tuple(state.army_definitions),
-        unit_instance_id=target_component_unit_id,
-    )
-    if target_rules_unit_id != target_component_unit_id:
-        return None
-    for record in ability_index.records_for(TimingTriggerKind.END_PHASE):
-        rule_ir = _setup_reactive_rule_ir_or_none(record)
-        if rule_ir is None:
-            continue
-        clause = rule_ir.clauses[0]
-        range_limit = _range_limit_inches(clause)
-        for source_rules_unit in _player_rules_units(state=state, player_id=player_id):
-            if _setup_reactive_event_already_recorded(
-                decisions=decisions,
-                trigger_event_id=trigger_event.event_id,
-                catalog_record_id=record.record_id,
-                source_unit_instance_id=source_rules_unit.unit_instance_id,
-                target_unit_instance_id=target_rules_unit_id,
-            ):
-                continue
-            if not _record_applies_to_rules_unit(record=record, rules_unit=source_rules_unit):
-                continue
-            source_context = _single_placed_alive_source_model(
-                state=state,
-                rules_unit=source_rules_unit,
-            )
-            if source_context is None:
-                _record_unsupported_source_shape(
-                    state=state,
-                    decisions=decisions,
-                    record=record,
-                    rule_ir=rule_ir,
-                    clause=clause,
-                    source_rules_unit=source_rules_unit,
-                    target_unit_instance_id=target_rules_unit_id,
-                    trigger_event_id=trigger_event.event_id,
-                )
-                continue
-            source_component_unit, source_model, source_model_placement = source_context
-            if source_component_unit.unit_instance_id != source_rules_unit.unit_instance_id:
-                _record_unsupported_source_shape(
-                    state=state,
-                    decisions=decisions,
-                    record=record,
-                    rule_ir=rule_ir,
-                    clause=clause,
-                    source_rules_unit=source_rules_unit,
-                    target_unit_instance_id=target_rules_unit_id,
-                    trigger_event_id=trigger_event.event_id,
-                )
-                continue
-            target_player_id = _target_player_id_from_event(
-                trigger_event=trigger_event,
-                active_player_id=active_player_id,
-            )
-            distance = _distance_from_model_to_rules_unit(
-                state=state,
-                source_model=source_model,
-                source_model_placement=source_model_placement,
-                target_rules_unit_id=target_rules_unit_id,
-            )
-            if distance > float(range_limit):
-                continue
-            can_shoot = _clause_has_action(
-                clause=clause,
-                action=CATALOG_SETUP_REACTIVE_SHOOT_OPTION_ID,
-            )
-            if can_shoot:
-                can_shoot = shooting_rules_unit_has_legal_declaration_against_targets(
-                    state=state,
-                    rules_unit=source_rules_unit,
-                    ruleset_descriptor=ruleset_descriptor,
-                    army_catalog=army_catalog,
-                    player_id=player_id,
-                    target_unit_ids=(target_rules_unit_id,),
-                )
-            can_charge = _clause_has_action(
-                clause=clause,
-                action=CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID,
-            )
-            can_charge = can_charge and not rules_unit_started_mission_action_this_turn(
-                state=state,
-                player_id=player_id,
-                unit_instance_id=source_rules_unit.unit_instance_id,
-            )
-            if not can_shoot and not can_charge:
-                continue
-            return _SetupReactiveCandidate(
-                player_id=player_id,
-                record=record,
-                rule_ir=rule_ir,
-                clause=clause,
-                source_rules_unit=source_rules_unit,
-                source_component_unit=source_component_unit,
-                source_model=source_model,
-                source_model_placement=source_model_placement,
-                target_rules_unit_id=target_rules_unit_id,
-                target_component_unit_id=target_component_unit_id,
-                target_player_id=target_player_id,
-                trigger_event_id=trigger_event.event_id,
-                distance_inches=distance,
-                range_limit_inches=range_limit,
-                can_shoot=can_shoot,
-                can_charge=can_charge,
-            )
-    return None
 
 
 def _apply_setup_reactive_shoot(
@@ -808,7 +683,7 @@ def _effect_action(effect: RuleEffectSpec) -> str | None:
     return None
 
 
-def _range_limit_inches(clause: RuleClause) -> int:
+def setup_reactive_range_limit_inches(clause: RuleClause) -> int:
     for condition in clause.conditions:
         if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
             continue
@@ -825,7 +700,7 @@ def _range_limit_inches(clause: RuleClause) -> int:
     raise GameLifecycleError("Setup-reactive clause requires selected-unit distance.")
 
 
-def _record_applies_to_rules_unit(
+def record_applies_to_rules_unit(
     *,
     record: AbilityCatalogRecord,
     rules_unit: RulesUnitView,
@@ -862,7 +737,7 @@ def _single_placed_alive_source_model(
     return None
 
 
-def _record_unsupported_source_shape(
+def record_unsupported_source_shape(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -947,7 +822,7 @@ def _geometry_models_for_rules_unit(
     return tuple(models)
 
 
-def _setup_trigger_events(
+def setup_trigger_events(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -1217,7 +1092,7 @@ def _current_model_instance_ids_for_unit(
     return tuple(sorted(current_ids))
 
 
-def _player_rules_units(*, state: GameState, player_id: str) -> tuple[RulesUnitView, ...]:
+def player_rules_units(*, state: GameState, player_id: str) -> tuple[RulesUnitView, ...]:
     army = _army_for_player(state=state, player_id=player_id)
     return rules_unit_views_from_armies(armies=(army,))
 
@@ -1229,7 +1104,7 @@ def _setup_reactive_timing_window_id(candidate: _SetupReactiveCandidate) -> str:
     )
 
 
-def _trigger_event_unit_id(trigger_event: EventRecord) -> str:
+def trigger_event_unit_id(trigger_event: EventRecord) -> str:
     if not isinstance(trigger_event.payload, dict):
         raise GameLifecycleError("Setup-reactive trigger event payload must be an object.")
     return _payload_string(
@@ -1238,7 +1113,7 @@ def _trigger_event_unit_id(trigger_event: EventRecord) -> str:
     )
 
 
-def _target_player_id_from_event(*, trigger_event: EventRecord, active_player_id: str) -> str:
+def target_player_id_from_event(*, trigger_event: EventRecord, active_player_id: str) -> str:
     if not isinstance(trigger_event.payload, dict):
         raise GameLifecycleError("Setup-reactive trigger event payload must be an object.")
     value = trigger_event.payload.get("active_player_id")

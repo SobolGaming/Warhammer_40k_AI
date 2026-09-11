@@ -7,6 +7,11 @@ from dataclasses import replace
 from typing import TypedDict, cast
 
 import pytest
+from tests.phase11c_command_phase_helpers import (
+    automatic_command_contract_candidate,
+    command_contract_candidate,
+    command_request_contract_candidate,
+)
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 from tests.unit_keyword_helpers import with_unit_keywords
 
@@ -35,20 +40,21 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.command_phase_start_authority import (
     COMMAND_START_BOUNDARY_COMPLETED_EVENT,
-    COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
+    COMMAND_START_DISCOVERED_EVENT,
     COMMAND_START_FINITE_REQUESTED_EVENT,
     COMMAND_START_FINITE_RESULT_EVENT,
-    COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
     resolve_command_phase_start_boundary,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
+from warhammer40k_core.engine.command_phase_start_sequencing import resolve_command_start_candidates
 from warhammer40k_core.engine.command_points import CommandStepState
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -114,7 +120,7 @@ def _command_phase_start_test_request(
     context: CommandPhaseStartRequestContext,
 ) -> DecisionRequest:
     return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
+        request_id=context.issue_request_id(),
         decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
         actor_id=context.active_player_id,
         payload={
@@ -167,7 +173,7 @@ def test_lifecycle_requests_oath_target_and_records_effects() -> None:
     assert state.command_point_total("player-a") == 0
     assert state.command_point_total("player-b") == 0
     assert state.command_step_state is not None
-    assert state.command_step_state.command_phase_start_synchronous_hooks_resolved
+    assert not state.command_step_state.command_phase_start_synchronous_hooks_resolved
     assert not state.command_step_state.command_phase_start_boundary_resolved
     assert not state.command_step_state.command_points_granted
     event_types = tuple(
@@ -292,7 +298,7 @@ def test_command_start_restore_rejects_pending_authority_tamper(
     assert command_state is not None
 
     if tamper_kind == "synchronous_event_deleted":
-        events.pop(_event_payload_index(events, COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT))
+        events.pop(_event_payload_index(events, COMMAND_START_DISCOVERED_EVENT))
     elif tamper_kind == "boundary_flag_forged":
         command_state["command_phase_start_boundary_resolved"] = True
     elif tamper_kind == "finite_request_deleted":
@@ -308,13 +314,11 @@ def test_command_start_restore_rejects_pending_authority_tamper(
         request_event = events.pop(request_index)
         effect_pass_index = _event_payload_index(
             events,
-            COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
+            COMMAND_START_DISCOVERED_EVENT,
         )
         events.insert(effect_pass_index, request_event)
     elif tamper_kind == "synchronous_inventory_deleted":
-        payload = events[_event_payload_index(events, COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT)][
-            "payload"
-        ]
+        payload = events[_event_payload_index(events, COMMAND_START_DISCOVERED_EVENT)]["payload"]
         assert isinstance(payload, dict)
         del payload["provider_binding_inventory"]
     else:
@@ -406,15 +410,13 @@ def test_command_start_restore_rejects_completed_authority_tamper(
         events.insert(recorded_index, result_authority)
     elif tamper_kind == "effect_passes_deleted":
         events[:] = [
-            event
-            for event in events
-            if event["event_type"] != COMMAND_START_EFFECT_PASS_COMPLETED_EVENT
+            event for event in events if event["event_type"] != COMMAND_START_DISCOVERED_EVENT
         ]
     elif tamper_kind == "extra_effect_pass":
         pass_indexes = tuple(
             index
             for index, event in enumerate(events)
-            if event["event_type"] == COMMAND_START_EFFECT_PASS_COMPLETED_EVENT
+            if event["event_type"] == COMMAND_START_DISCOVERED_EVENT
         )
         duplicate = deepcopy(events[pass_indexes[-1]])
         duplicate_payload = duplicate["payload"]
@@ -451,10 +453,10 @@ def test_command_start_restore_rejects_completed_authority_tamper(
     else:
         command_authority_types = {
             COMMAND_START_BOUNDARY_COMPLETED_EVENT,
-            COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
+            COMMAND_START_DISCOVERED_EVENT,
             COMMAND_START_FINITE_REQUESTED_EVENT,
             COMMAND_START_FINITE_RESULT_EVENT,
-            COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
+            COMMAND_START_DISCOVERED_EVENT,
         }
         events[:] = [
             event for event in events if event["event_type"] not in command_authority_types
@@ -465,65 +467,26 @@ def test_command_start_restore_rejects_completed_authority_tamper(
         GameLifecycle.from_payload(forged)
 
 
-def test_command_phase_start_hook_registry_routes_requests_and_results() -> None:
+def test_command_phase_start_hook_registry_discovers_source_templates_without_mutation() -> None:
     lifecycle = _battle_ready_lifecycle()
     state = _require_state(lifecycle)
-    decisions = DecisionController()
-    handled_active_players: list[str] = []
-
-    def handler(context: CommandPhaseStartContext) -> None:
-        handled_active_players.append(context.active_player_id)
-
-    def request_handler(context: CommandPhaseStartRequestContext) -> DecisionRequest:
-        return _command_phase_start_test_request(context)
-
-    def result_handler(context: CommandPhaseStartResultContext) -> bool:
-        return context.result.selected_option_id == "phase17g:command-start:test"
-
+    decisions = lifecycle.decision_controller
     registry = CommandPhaseStartHookRegistry.from_bindings(
-        (
-            CommandPhaseStartHookBinding(
-                hook_id="phase17g:command-start:hook",
-                source_id="phase17g:command-start:source",
-                handler=handler,
-                request_handler=request_handler,
-                result_handler=result_handler,
-            ),
+        army_rule.runtime_contribution().command_phase_start_hook_bindings
+    )
+    before = (state.to_payload(), decisions.to_payload())
+    entries = registry.candidate_entries_for(
+        CommandPhaseStartEffectContext(
+            state=state, decisions=decisions, active_player_id="player-a"
         )
     )
-
-    registry.resolve(
-        CommandPhaseStartContext(
-            state=state,
-            decisions=decisions,
-            active_player_id="player-a",
-        )
-    )
-    request = registry.next_request_for(
-        CommandPhaseStartRequestContext(
-            state=state,
-            decisions=decisions,
-            active_player_id="player-a",
-        )
-    )
-    assert request is not None
-    result = DecisionResult.for_request(
-        result_id="phase17g-command-start-result",
-        request=request,
-        selected_option_id="phase17g:command-start:test",
-    )
-    handled = registry.apply_result(
-        CommandPhaseStartResultContext(
-            state=state,
-            decisions=decisions,
-            request=request,
-            result=result,
-            active_player_id="player-a",
-        )
-    )
-
-    assert handled_active_players == ["player-a"]
-    assert handled
+    assert len(entries) == 1
+    candidate, binding = entries[0]
+    assert candidate.participant.player_id == "player-a"
+    assert candidate.participant.source_rule_id == binding.source_id
+    assert candidate.request_template is not None
+    assert candidate.request_template.actor_id == "player-a"
+    assert before == (state.to_payload(), decisions.to_payload())
 
 
 def test_command_phase_start_hook_registry_rejects_ambiguous_hooks() -> None:
@@ -550,7 +513,10 @@ def test_command_phase_start_hook_registry_rejects_ambiguous_hooks() -> None:
     )
 
     empty_registry = CommandPhaseStartHookRegistry.empty()
-    assert empty_registry.next_request_for(context) is None
+    effect_context = CommandPhaseStartEffectContext(
+        state=state, decisions=decisions, active_player_id="player-a"
+    )
+    assert empty_registry.candidate_entries_for(effect_context) == ()
     assert not empty_registry.apply_result(result_context)
     with pytest.raises(GameLifecycleError, match="requires a handler"):
         CommandPhaseStartHookBinding(
@@ -589,8 +555,8 @@ def test_command_phase_start_hook_registry_rejects_ambiguous_hooks() -> None:
             ),
         )
     )
-    with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
-        duplicate_request_registry.next_request_for(context)
+    with pytest.raises(GameLifecycleError, match="pure candidate discovery"):
+        duplicate_request_registry.candidate_entries_for(effect_context)
 
     duplicate_result_registry = CommandPhaseStartHookRegistry.from_bindings(
         (
@@ -794,10 +760,8 @@ def test_command_phase_start_hook_contract_rejects_malformed_inputs() -> None:
         CommandPhaseStartHookRegistry(
             bindings=cast(tuple[CommandPhaseStartHookBinding, ...], (object(),))
         )
-    with pytest.raises(GameLifecycleError, match="require context"):
-        valid_registry.resolve(cast(CommandPhaseStartContext, object()))
-    with pytest.raises(GameLifecycleError, match="request hooks require context"):
-        valid_registry.next_request_for(cast(CommandPhaseStartRequestContext, object()))
+    with pytest.raises(GameLifecycleError, match="require effect context"):
+        valid_registry.candidate_entries_for(cast(CommandPhaseStartEffectContext, object()))
     with pytest.raises(GameLifecycleError, match="result hooks require context"):
         valid_registry.apply_result(cast(CommandPhaseStartResultContext, object()))
 
@@ -820,8 +784,11 @@ def test_command_phase_start_hook_contract_rejects_malformed_inputs() -> None:
             ),
         )
     )
-    with pytest.raises(GameLifecycleError, match="require a result handler"):
-        none_request_registry.next_request_for(request_context)
+    effect_context = CommandPhaseStartEffectContext(
+        state=state, decisions=decisions, active_player_id="player-a"
+    )
+    with pytest.raises(GameLifecycleError, match="pure candidate discovery"):
+        none_request_registry.candidate_entries_for(effect_context)
     malformed_request_registry = CommandPhaseStartHookRegistry.from_bindings(
         (
             CommandPhaseStartHookBinding(
@@ -834,8 +801,8 @@ def test_command_phase_start_hook_contract_rejects_malformed_inputs() -> None:
             ),
         )
     )
-    with pytest.raises(GameLifecycleError, match="must return DecisionRequest or None"):
-        malformed_request_registry.next_request_for(request_context)
+    with pytest.raises(GameLifecycleError, match="pure candidate discovery"):
+        malformed_request_registry.candidate_entries_for(effect_context)
 
     result_request = _command_phase_start_test_request(request_context)
     malformed_result_registry = CommandPhaseStartHookRegistry.from_bindings(
@@ -893,11 +860,16 @@ def test_command_start_boundary_rejects_synchronous_provider_queue_mutation() ->
                 hook_id="phase17g:command-start:sync-queue-mutation",
                 source_id="phase17g:command-start:sync-queue-source",
                 handler=enqueue_from_synchronous_handler,
+                candidate_handler=lambda context: automatic_command_contract_candidate(
+                    context, enqueue_from_synchronous_handler
+                ),
             ),
         )
     )
 
-    with pytest.raises(GameLifecycleError, match="synchronous hooks cannot enqueue decisions"):
+    with pytest.raises(
+        GameLifecycleError, match="Completed Command-start rule retained a pending decision"
+    ):
         resolve_command_phase_start_boundary(
             state=state,
             decisions=lifecycle.decision_controller,
@@ -940,6 +912,9 @@ def test_command_start_boundary_rejects_provider_internal_decision_resolution() 
                 hook_id="phase17g:command-start:internal-decision",
                 source_id="phase17g:command-start:internal-decision-source",
                 handler=resolve_internal_decision,
+                candidate_handler=lambda context: automatic_command_contract_candidate(
+                    context, resolve_internal_decision
+                ),
             ),
         )
     )
@@ -970,6 +945,10 @@ def test_command_start_boundary_rejects_non_waiting_effect_status() -> None:
                 effect_handler=lambda _context: LifecycleStatus.advanced(
                     stage=GameLifecycleStage.BATTLE
                 ),
+                candidate_handler=lambda context: command_contract_candidate(
+                    context,
+                    lambda: LifecycleStatus.advanced(stage=GameLifecycleStage.BATTLE),
+                ),
             ),
         )
     )
@@ -983,41 +962,41 @@ def test_command_start_boundary_rejects_non_waiting_effect_status() -> None:
         )
 
 
-def test_command_start_registry_rejects_wrong_finite_type_and_missing_applier() -> None:
+@pytest.mark.parametrize("wrong_type", [True, False])
+def test_command_start_registry_rejects_wrong_finite_type_and_missing_applier(
+    wrong_type: bool,
+) -> None:
     lifecycle = _battle_ready_lifecycle()
     state = _require_state(lifecycle)
-    context = CommandPhaseStartRequestContext(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        active_player_id="player-a",
+    context = CommandPhaseStartEffectContext(
+        state=state, decisions=lifecycle.decision_controller, active_player_id="player-a"
     )
-    wrong_type_registry = CommandPhaseStartHookRegistry.from_bindings(
+    template = _command_phase_start_test_request(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            active_player_id="player-a",
+            authoritative_request_id="command-contract-template",
+        )
+    )
+    if wrong_type:
+        template = replace(template, decision_type="phase17g_wrong_command_start_type")
+    registry = CommandPhaseStartHookRegistry.from_bindings(
         (
             CommandPhaseStartHookBinding(
-                hook_id="phase17g:command-start:wrong-finite-type",
-                source_id="phase17g:command-start:wrong-finite-source",
-                request_handler=lambda request_context: replace(
-                    _command_phase_start_test_request(request_context),
-                    decision_type="phase17g_wrong_command_start_type",
+                hook_id="phase17g:command-start:source-contract",
+                source_id="phase17g:command-start:source-contract",
+                candidate_handler=lambda context: command_request_contract_candidate(
+                    context, template
                 ),
-                result_handler=lambda _context: True,
+                result_handler=(lambda _context: True) if wrong_type else None,
             ),
         )
     )
-    with pytest.raises(GameLifecycleError, match="must use the finite decision type"):
-        wrong_type_registry.next_request_for(context)
-
-    missing_applier_registry = CommandPhaseStartHookRegistry.from_bindings(
-        (
-            CommandPhaseStartHookBinding(
-                hook_id="phase17g:command-start:missing-applier",
-                source_id="phase17g:command-start:missing-applier-source",
-                request_handler=_command_phase_start_test_request,
-            ),
-        )
-    )
-    with pytest.raises(GameLifecycleError, match="require a result handler"):
-        missing_applier_registry.next_request_for(context)
+    expected = "must use the finite decision type" if wrong_type else "lacks its source provider"
+    with pytest.raises(GameLifecycleError, match=expected):
+        resolve_command_start_candidates(context, registry)
+    assert lifecycle.decision_controller.queue.pending_requests == ()
 
 
 def test_oath_target_drift_rejects_before_queue_pop() -> None:
@@ -1047,7 +1026,7 @@ def test_oath_target_drift_rejects_before_queue_pop() -> None:
 
     assert rejected.status_kind is LifecycleStatusKind.INVALID
     assert isinstance(rejected.payload, dict)
-    assert rejected.payload["invalid_reason"] == "target_unit_missing"
+    assert rejected.payload["invalid_reason"] == "command_start_source_request_drift"
     assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
     assert state.command_point_total("player-a") == 0
     assert state.command_point_total("player-b") == 0

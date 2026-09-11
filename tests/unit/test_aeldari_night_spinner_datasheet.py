@@ -258,6 +258,12 @@ def test_monofilament_web_pins_only_doomweaver_hit_target_until_next_turn() -> N
             },
         )
 
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    sequence = replace(sequence, pool_index=len(sequence.attack_pools))
+    completion = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=sequence
+    )
     status = CatalogSelectedTargetEffectRuntime(indexes, armies).post_shoot_hit_target_request(
         AttackSequenceCompletedContext(
             state=state,
@@ -266,7 +272,7 @@ def test_monofilament_web_pins_only_doomweaver_hit_target_until_next_turn() -> N
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:monofilament-web",
+            attack_sequence_completed_event_id=completion.event_id,
         )
     )
 
@@ -294,13 +300,16 @@ def test_monofilament_web_pins_only_doomweaver_hit_target_until_next_turn() -> N
         is None
     )
 
-    assert len(state.persisting_effects) == 2
     source_id = next(
         ability.source_id
         for ability in _package().army_catalog.datasheet_by_id(NIGHT_SPINNER_ID).abilities
         if ability.name == "Monofilament Web"
     )
-    for effect in state.persisting_effects:
+    effects = tuple(
+        effect for effect in state.persisting_effects if effect.source_rule_id == source_id
+    )
+    assert len(effects) == 2
+    for effect in effects:
         assert effect.source_rule_id == source_id
         assert effect.target_unit_instance_ids == (enemy_one.unit_instance_id,)
         assert effect.expiration.expiration_kind is EffectExpirationKind.START_TURN
@@ -339,9 +348,12 @@ def test_monofilament_web_pins_only_doomweaver_hit_target_until_next_turn() -> N
         == ()
     )
 
-    for effect in tuple(state.persisting_effects):
+    for effect in effects:
         state.record_persisting_effect(replace(effect, effect_id=f"{effect.effect_id}:reapplied"))
-    assert len(state.persisting_effects) == 4
+    assert (
+        len([effect for effect in state.persisting_effects if effect.source_rule_id == source_id])
+        == 4
+    )
     assert registry.modified_movement_inches(_movement_context(state, enemy_one)) == 12.0
     assert tuple(
         modifier.operand

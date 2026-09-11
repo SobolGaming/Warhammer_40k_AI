@@ -718,6 +718,8 @@ def _assert_payload_context_matches(
 ) -> None:
     for key in (
         "submission_kind",
+        "destroyed_trigger_event_id",
+        "expired_tracked_target_record_id",
         "source_rule_id",
         "source_ability_id",
         "source_clause_id",

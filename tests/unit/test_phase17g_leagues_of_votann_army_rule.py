@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from tests.phase11c_command_phase_helpers import (
+    automatic_command_contract_candidate,
     battle_state,
     battle_state_with_center_objective_positions,
 )
@@ -32,9 +33,11 @@ from warhammer40k_core.engine.command_phase_start_authority import (
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
 )
+from warhammer40k_core.engine.command_phase_start_sequencing import resolve_command_start_candidates
 from warhammer40k_core.engine.command_points import CommandStepState
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -120,12 +123,13 @@ def test_command_start_gains_yield_points_from_objective_control() -> None:
     )
     assert summary.yield_points == 2
 
-    registry.resolve(
-        CommandPhaseStartContext(
+    resolve_command_start_candidates(
+        CommandPhaseStartEffectContext(
             state=state,
             decisions=decisions,
             active_player_id="player-a",
-        )
+        ),
+        registry,
     )
 
     assert army_rule.yield_points_available(state, player_id="player-a") == 2
@@ -157,12 +161,13 @@ def test_command_start_records_zero_yield_without_resource_gain() -> None:
         army_rule.runtime_contribution().command_phase_start_hook_bindings
     )
 
-    registry.resolve(
-        CommandPhaseStartContext(
+    resolve_command_start_candidates(
+        CommandPhaseStartEffectContext(
             state=state,
             decisions=decisions,
             active_player_id="player-a",
-        )
+        ),
+        registry,
     )
 
     assert army_rule.yield_points_available(state, player_id="player-a") == 0
@@ -357,7 +362,7 @@ def test_command_start_restore_rejects_pending_before_synchronous_progress() -> 
         )
     )
 
-    with pytest.raises(GameLifecycleError, match="before synchronous progress"):
+    with pytest.raises(GameLifecycleError, match="candidate discovery authority"):
         validate_command_phase_start_restore_authority(
             state=state,
             decisions=decisions,
@@ -402,6 +407,9 @@ def test_command_start_synchronous_provider_cannot_enqueue_then_pop_request() ->
                 hook_id="phase17g:votann:orphaned-command-start",
                 source_id="phase17g:votann:orphaned-command-start-source",
                 handler=enqueue_then_pop,
+                candidate_handler=lambda context: automatic_command_contract_candidate(
+                    context, enqueue_then_pop
+                ),
             ),
         )
     )
@@ -451,12 +459,13 @@ def test_non_votann_detachment_with_votann_keyword_unit_does_not_gain_yield_poin
         army_rule.runtime_contribution().command_phase_start_hook_bindings
     )
 
-    registry.resolve(
-        CommandPhaseStartContext(
+    resolve_command_start_candidates(
+        CommandPhaseStartEffectContext(
             state=state,
             decisions=decisions,
             active_player_id="player-a",
-        )
+        ),
+        registry,
     )
 
     assert army_rule.yield_points_available(state, player_id="player-a") == 0

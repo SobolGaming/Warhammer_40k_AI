@@ -18,7 +18,7 @@ from warhammer40k_core.engine.primary_scoring_boundary import (
     score_primary_objective_control_boundary,
 )
 from warhammer40k_core.engine.primary_scoring_boundary_inventory import (
-    required_primary_scoring_boundary_kinds,
+    required_primary_scoring_boundaries,
 )
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
     PrimaryScoringBoundaryStatus,
@@ -29,7 +29,6 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
-    VictoryPointAward,
     VictoryPointSourceKind,
     secondary_mission_card_mode_from_token,
 )
@@ -127,7 +126,7 @@ def score_secondary_mission_from_state(
         policies=policy,
     ):
         return card_state
-    snapshot = _capture_aggregate(state=state, event_log=event_log)
+    snapshot = capture_mission_scoring_aggregate(state=state, event_log=event_log)
     try:
         commit_canonical_objective_control_proposal(
             state=state,
@@ -143,11 +142,6 @@ def score_secondary_mission_from_state(
             policies=policy,
         ):
             return card_state
-        from warhammer40k_core.engine.secondary_scoring_context import (
-            secondary_mission_selection_for_card,
-            secondary_scoring_condition_context_from_state,
-        )
-
         score_primary_objective_control_boundary(
             state=state,
             record=record,
@@ -155,29 +149,46 @@ def score_secondary_mission_from_state(
             event_log=event_log,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        condition_context = secondary_scoring_condition_context_from_state(
+        result = score_selected_secondary_mission_at_boundary(
+            state=state,
+            event_log=event_log,
+            card_state=card_state,
+            record=record,
+        )
+    except GameLifecycleError:
+        restore_mission_scoring_aggregate(state=state, event_log=event_log, snapshot=snapshot)
+        raise
+    else:
+        return result
+
+
+def score_selected_secondary_mission_at_boundary(
+    *,
+    state: GameState,
+    event_log: EventLog,
+    card_state: SecondaryMissionCardState,
+    record: ObjectiveControlRecord,
+) -> SecondaryMissionCardState:
+    """Commit exactly the selected card; other mission owners retain their turn."""
+    from warhammer40k_core.engine.secondary_scoring_boundary import secondary_card_boundary_award
+
+    if (
+        _card_for_state_backed_scoring(
             state=state,
             player_id=card_state.player_id,
-            record=record,
-            selection=secondary_mission_selection_for_card(card_state),
-        )
-        award = policy.secondary_award_from_mission_state(
-            player_id=card_state.player_id,
-            battle_round=state.battle_round,
-            phase=phase.value,
             secondary_mission_id=card_state.secondary_mission_id,
-            source_kind=source_kind,
-            hidden=False,
-            record=record,
-            mission_setup=state.mission_setup,
-            unit_destruction_states=tuple(state.secondary_unit_destruction_states),
-            objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
-            terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
-            enemy_unit_ids_in_player_deployment_zone=condition_context.enemy_unit_ids_in_player_deployment_zone,
-            starting_strength_records=tuple(state.starting_strength_records),
-            condition_context=condition_context,
+            mode=card_state.mode,
         )
-        required_award = _require_state_backed_secondary_award(award)
+        != card_state
+        or record not in state.objective_control_records
+    ):
+        raise GameLifecycleError("Selected Secondary scoring boundary or card drifted.")
+    discovered = secondary_card_boundary_award(state=state, record=record, card=card_state)
+    if discovered is None:
+        raise GameLifecycleError("State-backed secondary mission requirements are not met.")
+    condition_context, required_award = discovered
+    snapshot = capture_mission_scoring_aggregate(state=state, event_log=event_log)
+    try:
         evidence = capture_secondary_scoring_state_evidence(
             state=state,
             card=card_state,
@@ -191,7 +202,7 @@ def score_secondary_mission_from_state(
             record=record,
         )
         transaction = state.award_victory_points(award)
-        if requested_mode is SecondaryMissionCardMode.FIXED:
+        if card_state.mode is SecondaryMissionCardMode.FIXED:
             result = card_state
         else:
             require_positive_tactical_secondary_score_transaction(transaction)
@@ -200,16 +211,10 @@ def score_secondary_mission_from_state(
             result = scored
             _consume_tactical_achievements_for_card(state=state, card_state=card_state)
     except GameLifecycleError:
-        _restore_aggregate(state=state, event_log=event_log, snapshot=snapshot)
+        restore_mission_scoring_aggregate(state=state, event_log=event_log, snapshot=snapshot)
         raise
     else:
         return result
-
-
-def _require_state_backed_secondary_award(award: VictoryPointAward | None) -> VictoryPointAward:
-    if award is None:
-        raise GameLifecycleError("State-backed secondary mission requirements are not met.")
-    return award
 
 
 def _consume_tactical_achievements_for_card(
@@ -315,38 +320,40 @@ def _validate_secondary_primary_closure(
 
     if type(policies) is not MissionScoringPolicies:
         raise GameLifecycleError("Secondary scoring Primary closure requires scoring policies.")
-    required = required_primary_scoring_boundary_kinds(
+    required = required_primary_scoring_boundaries(
         policies=policies,
         record=record,
         turn_order=state.turn_order,
     )
-    ordinary_required = PrimaryScoringBoundaryKind.ORDINARY in required
+    required_players = {
+        player_id for kind, player_id in required if kind is PrimaryScoringBoundaryKind.ORDINARY
+    }
     ordinary_evidence = tuple(
         evidence
         for evidence in state.primary_scoring_state_evidence_records
         if evidence.objective_control_record_id == record.record_id
         and evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
     )
-    if not ordinary_required:
+    if not required_players:
         if ordinary_evidence:
             raise GameLifecycleError(
                 "State-backed secondary scoring found unexpected Primary evidence."
             )
         return
-    if len(ordinary_evidence) != 1:
+    if {evidence.scoring_player_id for evidence in ordinary_evidence} != required_players:
         raise GameLifecycleError(
             "State-backed secondary scoring found a Secondary award without Primary evidence."
         )
-    evidence = ordinary_evidence[0]
+    evidence_ids = {evidence.evidence_id for evidence in ordinary_evidence}
     resolved = tuple(
         row
         for row in state.primary_scoring_boundary_lifecycles
         if row.objective_control_record_id == record.record_id
         and row.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
         and row.status is PrimaryScoringBoundaryStatus.RESOLVED
-        and row.evidence_id == evidence.evidence_id
+        and row.evidence_id in evidence_ids
     )
-    if len(resolved) != 1:
+    if len(resolved) != len(required_players):
         raise GameLifecycleError(
             "State-backed secondary scoring found a Secondary award without "
             "a resolved Primary lifecycle."
@@ -377,10 +384,10 @@ def _emit_objective_control_boundary_event_if_missing(
     )
 
 
-def _capture_aggregate(
+def capture_mission_scoring_aggregate(
     *,
     state: GameState,
-    event_log: EventLog,
+    event_log: EventLog | None,
 ) -> MissionScoringAggregateSnapshot:
     return MissionScoringAggregateSnapshot(
         objective_control_records=tuple(state.objective_control_records),
@@ -393,18 +400,24 @@ def _capture_aggregate(
         victory_point_ledgers=tuple(state.victory_point_ledgers),
         secondary_mission_card_states=tuple(state.secondary_mission_card_states),
         primary_scoring_boundary_lifecycles=tuple(state.primary_scoring_boundary_lifecycles),
-        event_records=event_log.records,
+        event_records=() if event_log is None else event_log.records,
     )
 
 
-def _restore_aggregate(
+def restore_mission_scoring_aggregate(
     *,
     state: GameState,
-    event_log: EventLog,
+    event_log: EventLog | None,
     snapshot: MissionScoringAggregateSnapshot,
 ) -> None:
     state.restore_mission_scoring_aggregate(snapshot)
-    event_log.replace_records(snapshot.event_records)
+    if event_log is not None:
+        event_log.replace_records(snapshot.event_records)
 
 
-__all__ = ("MissionScoringAggregateSnapshot", "score_secondary_mission_from_state")
+__all__ = (
+    "MissionScoringAggregateSnapshot",
+    "capture_mission_scoring_aggregate",
+    "restore_mission_scoring_aggregate",
+    "score_secondary_mission_from_state",
+)

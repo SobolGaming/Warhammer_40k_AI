@@ -96,12 +96,14 @@ def scoring_position_lifecycle_payload() -> GameLifecyclePayload:
         },
     )
     scoring_commit_checkpoint = bound_primary_scoring_commit_checkpoint(
+        scoring_player_id=scoring_record.active_player_id,
         state=state,
         record=scoring_record,
         scoring_commit_checkpoint=None,
         runtime_modifier_registry=None,
     )
     evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=scoring_record.active_player_id,
         state=state,
         record=scoring_record,
         end_of_battle=False,
@@ -109,6 +111,7 @@ def scoring_position_lifecycle_payload() -> GameLifecyclePayload:
     )
     emit_primary_scoring_commit_checkpoint(
         event_log=decisions.event_log,
+        scoring_player_id=evidence.scoring_player_id,
         objective_control_record_id=scoring_record.record_id,
         scoring_boundary_kind=evidence.scoring_boundary_kind.value,
         checkpoint=scoring_commit_checkpoint,
@@ -125,6 +128,7 @@ def scoring_position_lifecycle_payload() -> GameLifecyclePayload:
     for award in awards:
         state.award_victory_points(award)
     resolve_primary_scoring_boundary_lifecycle(
+        scoring_player_id=scoring_record.active_player_id,
         state=state,
         record=scoring_record,
         scoring_boundary_kind=evidence.scoring_boundary_kind,

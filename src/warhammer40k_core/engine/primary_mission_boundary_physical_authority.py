@@ -368,6 +368,9 @@ def _authenticated_scoring_commit_checkpoint(
         raise GameLifecycleError("Primary scoring-commit physical anchor payload is invalid.")
     raw_record_id = event.payload.get("objective_control_record_id")
     raw_boundary_kind = event.payload.get("scoring_boundary_kind")
+    scoring_player_id = event.payload.get("scoring_player_id")
+    if type(scoring_player_id) is not str or scoring_player_id not in state.player_ids:
+        raise GameLifecycleError("Primary scoring-commit physical anchor player drifted.")
     if type(raw_record_id) is not str or not raw_record_id:
         raise GameLifecycleError(
             "Primary scoring-commit physical anchor record identity is invalid."
@@ -382,6 +385,7 @@ def _authenticated_scoring_commit_checkpoint(
         event_records=event_records,
         objective_control_record_id=raw_record_id,
         scoring_boundary_kind=boundary_kind.value,
+        scoring_player_id=scoring_player_id,
     )
     if bound_index != anchor_index:
         raise GameLifecycleError("Primary scoring-commit physical anchor occurrence drifted.")
@@ -398,12 +402,14 @@ def _authenticated_scoring_commit_checkpoint(
         for evidence in state.primary_scoring_state_evidence_records
         if evidence.objective_control_record_id == raw_record_id
         and evidence.scoring_boundary_kind is boundary_kind
+        and evidence.scoring_player_id == scoring_player_id
     )
     lifecycles = tuple(
         lifecycle
         for lifecycle in state.primary_scoring_boundary_lifecycles
         if lifecycle.objective_control_record_id == raw_record_id
         and lifecycle.scoring_boundary_kind is boundary_kind
+        and lifecycle.scoring_player_id == scoring_player_id
     )
     if len(evidences) != 1 or len(lifecycles) != 1:
         raise GameLifecycleError(

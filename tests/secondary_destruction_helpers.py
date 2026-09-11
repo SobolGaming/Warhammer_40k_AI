@@ -1,15 +1,11 @@
 from __future__ import annotations
 
-from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
-from warhammer40k_core.engine.primary_destruction_evidence import (
-    rules_unit_objective_proximity_witness,
-)
 from warhammer40k_core.engine.primary_historical_events import (
     record_new_primary_turn_start_evidence_events,
     record_new_primary_unit_destruction_events,
@@ -44,7 +40,7 @@ def record_secondary_destruction_for_fixture(
 ) -> SecondaryUnitDestructionState:
     """Destroy one real rules unit and return its authenticated Secondary projection."""
     authoritative_events = EventLog() if event_log is None else event_log
-    _record_current_turn_start_evidence_if_missing(
+    record_current_turn_start_evidence_for_fixture(
         state=state,
         event_log=authoritative_events,
     )
@@ -60,10 +56,6 @@ def record_secondary_destruction_for_fixture(
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise AssertionError("Secondary destruction fixture requires an active battle phase.")
-    destroyed_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=destroyed_view.unit_instance_id,
-    )
     resolved_destroying_player_id = (
         destroyed_view.owner_player_id if destroying_player_id is None else destroying_player_id
     )
@@ -76,26 +68,21 @@ def record_secondary_destruction_for_fixture(
     departure_ids: list[str] = []
     last_model_destroyed_event_id: str | None = None
     for model_id in destroyed_model_ids:
-        event = authoritative_events.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": current_phase.value,
-                "model_instance_id": model_id,
-                "target_unit_instance_id": destroyed_view.unit_instance_id,
-                "source_id": source_id,
-                "source_rules_unit_objective_proximity_witness": None,
-                "destroyed_rules_unit_objective_proximity_witness": (
-                    destroyed_witness.to_payload()
-                ),
-                **attribution.to_payload(),
-            },
+        from tests.destruction_occurrence_fixture_helpers import (
+            destroy_rule_model_for_fixture,
+            destruction_decisions_for_fixture,
+        )
+
+        event = destroy_rule_model_for_fixture(
+            state=state,
+            decisions=destruction_decisions_for_fixture(authoritative_events),
+            model_id=model_id,
+            destroying_player_id=resolved_destroying_player_id,
+            source_unit_id=None,
+            source_model_id=None,
         )
         occurrence_id = event.event_id
         last_model_destroyed_event_id = event.event_id
-        destroy_model_by_rule(state=state, model_instance_id=model_id)
         departures = record_primary_destroyed_model_departures(
             state=state,
             destroyed_model_instance_ids=(model_id,),
@@ -305,7 +292,7 @@ def _secondary_destroyed_models_for_primary_payload(
     ]
 
 
-def _record_current_turn_start_evidence_if_missing(
+def record_current_turn_start_evidence_for_fixture(
     *,
     state: GameState,
     event_log: EventLog,

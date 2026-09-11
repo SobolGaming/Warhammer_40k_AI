@@ -619,6 +619,12 @@ def test_crystalline_targeting_uses_hit_target_choice_and_scopes_ap_modifier() -
         },
     )
 
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    sequence = replace(sequence, pool_index=len(sequence.attack_pools))
+    completion = record_attack_completion_for_executor_fixture(
+        state=fixture.state, decisions=decisions, sequence=sequence
+    )
     status = CatalogSelectedTargetEffectRuntime(
         fixture.indexes,
         fixture.armies,
@@ -630,7 +636,7 @@ def test_crystalline_targeting_uses_hit_target_choice_and_scopes_ap_modifier() -
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:crystalline-targeting",
+            attack_sequence_completed_event_id=completion.event_id,
         )
     )
 
@@ -693,6 +699,10 @@ def test_crystalline_targeting_uses_hit_target_choice_and_scopes_ap_modifier() -
             "payload": {"successful": True},
         },
     )
+    repeat_sequence = replace(repeat_sequence, pool_index=len(repeat_sequence.attack_pools))
+    repeat_completion = record_attack_completion_for_executor_fixture(
+        state=fixture.state, decisions=decisions, sequence=repeat_sequence
+    )
     assert (
         CatalogSelectedTargetEffectRuntime(
             fixture.indexes,
@@ -708,7 +718,7 @@ def test_crystalline_targeting_uses_hit_target_choice_and_scopes_ap_modifier() -
                 runtime_modifier_registry=RuntimeModifierRegistry.empty(),
                 source_phase=BattlePhase.SHOOTING,
                 attack_sequence=repeat_sequence,
-                attack_sequence_completed_event_id="event:crystalline-targeting-repeat",
+                attack_sequence_completed_event_id=repeat_completion.event_id,
             )
         )
         is None

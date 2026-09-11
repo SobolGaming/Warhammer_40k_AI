@@ -1,0 +1,39 @@
+{
+  "action": {
+    "base_mean_seconds": 0.11341759532557003,
+    "head_mean_seconds": 0.11240398813970387,
+    "head_maximum_seconds": 0.1140122499782592,
+    "mean_ratio": 0.9910630516988431,
+    "timing_passed": true,
+    "work_violations": {}
+  },
+  "unrestricted": {
+    "base_mean_seconds": 0.06525585130189679,
+    "head_mean_seconds": 0.059730482138028104,
+    "head_maximum_seconds": 0.06955366593319923,
+    "mean_ratio": 0.9153276058217927,
+    "timing_passed": true,
+    "work_violations": {}
+  },
+  "attached_selection": {
+    "base_mean_seconds": 0.0037557618592732717,
+    "head_mean_seconds": 0.0037859522604516576,
+    "head_maximum_seconds": 0.0047195409424602985,
+    "mean_ratio": 1.0080384226448873,
+    "timing_passed": true,
+    "work_violations": {}
+  },
+  "retained": {
+    "base_mean_seconds": 0.19151520832175656,
+    "head_mean_seconds": 0.22088418455262268,
+    "head_maximum_seconds": 0.2520109999459237,
+    "mean_ratio": 1.1533506215418912,
+    "timing_passed": true,
+    "work_violations": {
+      "rules_unit_identity_ids": {
+        "actual": 31,
+        "limit": 26
+      }
+    }
+  }
+}

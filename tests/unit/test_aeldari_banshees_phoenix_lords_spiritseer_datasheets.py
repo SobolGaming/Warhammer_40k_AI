@@ -14,6 +14,7 @@ from tools.generate_aeldari_banshees_phoenix_lords_spiritseer_rule_ir import (
     generated_artifact_payload,
 )
 
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
@@ -113,7 +114,7 @@ from warhammer40k_core.engine.transport_disembark_state import (
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedMortalWoundHookRegistry,
-    resolve_unit_move_completed_mortal_wound_hooks,
+    resolve_unit_move_completed_hooks,
 )
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.geometry.pose import Pose
@@ -374,11 +375,22 @@ def test_disabled_datasheet_rule_does_not_create_non_static_bindings() -> None:
 
 
 def test_spirit_mark_uses_finite_decision_current_state_validation_and_target_gate() -> None:
+    from warhammer40k_core.engine.sequencing import SequencingRequirement
+
     fixture = _fixture(phase=BattlePhase.MOVEMENT)
     runtime = CatalogMovementTargetPairRuntime(fixture.indexes, fixture.armies)
     decisions = DecisionController()
     pending = _pending_movement_action(fixture.spiritseer.unit_instance_id)
     fixture.state.replace_movement_phase_state(_movement_state(pending))
+
+    before = (fixture.state.to_payload(), decisions.to_payload())
+    candidates = runtime.start_move_candidates(
+        state=fixture.state, decisions=decisions, pending_action=pending
+    )
+    assert (fixture.state.to_payload(), decisions.to_payload()) == before
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == pending.player_id
+    assert candidates[0].participant.requirement is SequencingRequirement.OPTIONAL
 
     status = runtime.start_move_request(
         state=fixture.state,
@@ -414,6 +426,10 @@ def test_spirit_mark_uses_finite_decision_current_state_validation_and_target_ga
         decisions=decisions,
         request=request,
         result=result,
+    )
+    assert (
+        runtime.start_move_request(state=fixture.state, decisions=decisions, pending_action=pending)
+        is None
     )
     assert DecisionController.from_payload(decisions.to_payload()).to_payload() == (
         decisions.to_payload()
@@ -512,6 +528,118 @@ def test_spirit_mark_uses_finite_decision_current_state_validation_and_target_ga
 
 
 @pytest.mark.parametrize(
+    "movement_action",
+    [
+        MovementPhaseActionKind.NORMAL_MOVE,
+        MovementPhaseActionKind.ADVANCE,
+        MovementPhaseActionKind.FALL_BACK,
+    ],
+)
+def test_spirit_mark_selected_action_reaches_start_batch_before_move_proposal(
+    movement_action: MovementPhaseActionKind,
+) -> None:
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session, unit_id = _spirit_mark_session(
+        engaged=movement_action is MovementPhaseActionKind.FALL_BACK
+    )
+    status = session.advance_until_decision_or_terminal()
+    assert status.decision_request is not None
+    request = status.decision_request
+    option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict) and option.payload.get("unit_instance_id") == unit_id
+    )
+    status = session.submit_option(
+        request_id=request.request_id, option_id=option.option_id, result_id="spirit-select-unit"
+    )
+    assert status.decision_request is not None
+    request = status.decision_request
+    option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("movement_phase_action") == movement_action.value
+        and option.payload.get("movement_mode")
+        == (
+            MovementMode.NORMAL.value
+            if movement_action is MovementPhaseActionKind.NORMAL_MOVE
+            else MovementMode.ADVANCE.value
+            if movement_action is MovementPhaseActionKind.ADVANCE
+            else MovementMode.FALL_BACK.value
+        )
+    )
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id=f"start-consumer:{movement_action.value}",
+    )
+    assert status.decision_request is not None
+    assert (
+        status.decision_request.decision_type == SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE
+    )
+    decisions = session.lifecycle.decision_controller
+    assert not any(
+        event.event_type == "movement_proposal_requested" for event in decisions.event_log.records
+    )
+    mark_request = status.decision_request
+    for player_id in ("player-a", "player-b"):
+        pending_view = session.view(viewer_player_id=player_id)["pending_decision"]
+        assert pending_view is not None
+        assert pending_view["request_id"] == mark_request.request_id
+        delta = session.events_since(EventStreamCursor(), viewer_player_id=player_id)
+        assert "timing_batch_transition" not in json.dumps(delta)
+    session = session.fork()
+    assert session.lifecycle.pending_decision_request() == mark_request
+    decisions = session.lifecycle.decision_controller
+    mark_option = next(
+        option
+        for option in mark_request.options
+        if isinstance(option.payload, dict) and option.payload["use_ability"]
+    )
+    resumed = session.submit_option(
+        request_id=mark_request.request_id,
+        option_id=mark_option.option_id,
+        result_id=f"start-consumer-mark:{movement_action.value}",
+    )
+    assert resumed.decision_request is not None
+    assert (
+        resumed.decision_request.decision_type != SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE
+    )
+    if movement_action is MovementPhaseActionKind.FALL_BACK:
+        from warhammer40k_core.engine.stratagems import DECLINE_STRATAGEM_WINDOW_OPTION_ID
+
+        selected_request = resumed.decision_request
+        assert selected_request is not None
+        assert selected_request.actor_id == "player-b"
+        assert selected_request.decision_type == "use_stratagem"
+        session = session.fork()
+        resumed = session.submit_option(
+            request_id=selected_request.request_id,
+            option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+            result_id="spirit-selected-fall-back-decline",
+        )
+        assert resumed.decision_request is not None
+        assert resumed.decision_request.decision_type == "submit_movement_proposal"
+    assert (
+        len(
+            [
+                event
+                for event in decisions.event_log.records
+                if event.event_type == CATALOG_MOVEMENT_TARGET_PAIR_SELECTED_EVENT
+            ]
+        )
+        == 1
+    )
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id=f"spirit-start:{movement_action.value}")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.parametrize(
     ("movement_action", "expected_request"),
     [
         (MovementPhaseActionKind.NORMAL_MOVE, True),
@@ -573,7 +701,7 @@ def test_spirit_mark_move_completion_registry_rejects_stationary_and_setup_event
         runtime.move_completed_bindings()
     )
 
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=fixture.state,
         decisions=decisions,
         registry=registry,
@@ -1185,6 +1313,139 @@ def _model_from_state(state: GameState, model_instance_id: str) -> Any:
     )
 
 
+def _spirit_mark_session(*, engaged: bool = False) -> tuple[LocalGameSession, str]:
+    from collections import Counter
+
+    from tests.phase11c_command_phase_helpers import secondary_choice
+    from tests.setup_completion_helpers import (
+        record_primary_turn_start_evidence_for_fixture,
+    )
+
+    from warhammer40k_core.core.detachment import DetachmentDefinition
+    from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+    from warhammer40k_core.engine.faction_content.runtime import (
+        build_runtime_content_bundle_for_armies,
+    )
+    from warhammer40k_core.engine.game_state import GameConfig, SecondaryMissionMode
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+
+    fixture = _fixture(phase=BattlePhase.MOVEMENT)
+    armies: tuple[ArmyDefinition, ...] = (
+        replace(
+            fixture.armies[0],
+            units=(fixture.spiritseer, fixture.wraith_construct),
+            attached_units=(),
+        ),
+        replace(fixture.armies[1], units=(fixture.other_enemy,), attached_units=()),
+    )
+    state = _state(armies, phase=BattlePhase.COMMAND, custom_layoutless=False)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            secondary_choice(player_id=player_id, mode=SecondaryMissionMode.FIXED)
+        )
+    for unit, x in (
+        (fixture.spiritseer, 10.0),
+        (fixture.wraith_construct, 13.0),
+        (fixture.other_enemy, 11.2 if engaged else 15.0),
+    ):
+        _move_unit(state, unit.unit_instance_id, x=x, y=10.0)
+    package = _package()
+    catalog = replace(
+        package.army_catalog,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="aspect-host",
+                name="Spirit Mark test detachment",
+                faction_id="AE",
+                detachment_point_cost=1,
+                unit_datasheet_ids=tuple(
+                    unit.datasheet_id for army in armies for unit in army.units
+                ),
+                force_disposition_ids=("take-and-hold", "purge-the-foe"),
+                source_ids=("fixture:spirit-mark-detachment",),
+            ),
+        ),
+    )
+    config = GameConfig(
+        game_id=state.game_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=tuple(
+            ArmyMusterRequest(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                catalog_id=army.catalog_id,
+                source_package_id=army.source_package_id,
+                ruleset_id=army.ruleset_id,
+                detachment_selection=army.detachment_selection,
+                force_disposition_id=army.force_disposition_id,
+                unit_selections=tuple(
+                    UnitMusterSelection(
+                        unit_selection_id=unit.unit_instance_id.removeprefix(f"{army.army_id}:"),
+                        datasheet_id=unit.datasheet_id,
+                        model_profile_selections=tuple(
+                            ModelProfileSelection(profile_id, count)
+                            for profile_id, count in sorted(
+                                Counter(model.model_profile_id for model in unit.own_models).items()
+                            )
+                        ),
+                        wargear_selections=unit.wargear_selections,
+                    )
+                    for unit in army.units
+                ),
+            )
+            for army in armies
+        ),
+        player_ids=state.player_ids,
+        turn_order=state.turn_order,
+        fixed_secondary_mission_ids=("assassination", "bring-it-down"),
+        mission_setup=state.mission_setup,
+        allow_legacy_non_strict_rosters=True,
+        model_geometries=package.model_geometries,
+    )
+    armies = tuple(
+        muster_army(catalog=catalog, request=request, model_geometries=package.model_geometries)
+        for request in config.army_muster_requests
+    )
+    state.replace_army_definitions(list(armies))
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
+    session = LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(
+            GameLifecycle(
+                state=state,
+                decision_controller=decisions,
+                _config=config,
+                _runtime_content_bundle=build_runtime_content_bundle_for_armies(
+                    config=config, armies=armies
+                ),
+            ).to_payload()
+        )
+    )
+    assert session.lifecycle.state is not None
+    state = session.lifecycle.state
+    status = session.advance_until_decision_or_terminal()
+    for index in range(20):
+        if state.current_battle_phase is BattlePhase.MOVEMENT:
+            break
+        assert state.current_battle_phase is BattlePhase.COMMAND
+        assert status.decision_request is not None, json.dumps(status.to_payload())
+        request = status.decision_request
+        declines = tuple(
+            option
+            for option in request.options
+            if isinstance(option.payload, dict) and option.payload.get("use_ability") is False
+        )
+        selected = declines[0] if declines else request.options[0]
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=selected.option_id,
+            result_id=f"spirit-command-fixture:{index}",
+        )
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    return session, fixture.spiritseer.unit_instance_id
+
+
 def _pending_movement_action(
     unit_instance_id: str,
     *,
@@ -1263,6 +1524,8 @@ def _record_move_completed_event(
                 "disembarked_unit_state": cast(JsonValue, disembarked_state.to_payload()),
             }
         )
+    elif event_type == "reinforcement_unit_arrived":
+        payload["player_id"] = "player-a"
     decisions.event_log.append(
         event_type,
         payload,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from functools import partial
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
@@ -51,6 +52,9 @@ from warhammer40k_core.engine.rule_execution import (
     generic_rule_effect_payload,
     rule_ir_from_execution_payload,
 )
+from warhammer40k_core.engine.runtime_event_candidates import runtime_event_candidate
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -138,6 +142,7 @@ class CatalogConditionalLeaderAbilityRuntime:
             RuntimeContentEventHandlerBinding(
                 handler_id=source.event_handler_id,
                 handler=self._not_leading_fight_phase_start_handler(source),
+                candidate_handler=partial(self._event_candidates, source),
             )
             for source in self._not_leading_sources()
         )
@@ -151,6 +156,26 @@ class CatalogConditionalLeaderAbilityRuntime:
             for source in self._sources()
             if source.descriptor_id == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
         )
+
+    def _event_candidates(
+        self,
+        source: _ConditionalLeaderRuleSource,
+        context: RuntimeContentEventContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        if not conditional_not_leading_source_applies(
+            state=context.state,
+            source_unit_instance_id=source.unit.unit_instance_id,
+        ):
+            return ()
+        candidate = runtime_event_candidate(
+            context,
+            source.event_subscription(),
+            occurrence_id=source.unit.unit_instance_id,
+            requirement=SequencingRequirement.MANDATORY,
+            handler=self._not_leading_fight_phase_start_handler(source),
+            source_payload={"source_unit_id": source.unit.unit_instance_id},
+        )
+        return () if candidate is None else (candidate,)
 
     def _not_leading_fight_phase_start_handler(
         self,

@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 from typing import Any, cast
 
 import pytest
+from tests.horror_destruction_helpers import resolve_horror_completion
 from tests.support.catalog_package_fixtures import horrors_package
 from tests.support.catalog_runtime_fixtures import (
     battle_state_with_armies,
@@ -43,12 +44,10 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
-    BattlefieldRemovalKind,
     BattlefieldRuntimeState,
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
     ModelPlacement,
-    ModelRemovalRecord,
     PlacedArmy,
     UnitPlacement,
 )
@@ -104,10 +103,6 @@ from warhammer40k_core.engine.fight_order import (
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
-from warhammer40k_core.engine.model_attack_history import (
-    record_attack_sequence_completed,
-    record_models_attacked,
-)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
 )
@@ -190,7 +185,7 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
         scenario.attached_unit_instance_id
     )
 
-    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+    status = resolve_horror_completion(scenario.runtime, scenario.context)
 
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -269,7 +264,7 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
     }
     assert {placement.source_phase for placement in placements} == {source_phase.value}
 
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is None
     reconcile_after_attack_sequence(
         scenario.state,
         scenario.attack_sequence,
@@ -320,6 +315,20 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
     )
     assert {placement.source_phase for placement in transition.placements} == {source_phase.value}
     restored = GameState.from_payload(scenario.state.to_payload())
+    from warhammer40k_core.engine.model_ownership_history import historical_physical_unit_id
+
+    assert (
+        scenario.destroyed_model_instance_id
+        not in _unit_by_id(restored, scenario.bodyguard.unit_instance_id).own_model_ids()
+    )
+    assert (
+        historical_physical_unit_id(
+            state=restored, model_instance_id=scenario.destroyed_model_instance_id
+        )
+        == scenario.bodyguard.unit_instance_id
+    )
+    with pytest.raises(GameLifecycleError, match="Historical model ownership requires one"):
+        historical_physical_unit_id(state=restored, model_instance_id="unobserved-model")
     assert _unit_by_id(restored, scenario.bodyguard.unit_instance_id).datasheet_id == (
         blue_datasheet_id
     )
@@ -374,7 +383,7 @@ def test_split_complete_standalone_wipe_skips_empty_datasheet_handoff() -> None:
         attached=False,
     )
 
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is None
 
     unit = _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id)
     assert unit.datasheet_id == "000002584"
@@ -503,7 +512,10 @@ def test_real_attack_pipeline_hands_off_attached_horror_component(
         attack_sequence_completed_event_id=completed_event.event_id,
         source_phase=source_phase,
     )
-    assert scenario.runtime.resolve_completed_attack_sequence(context) is not None
+    from tests.horror_destruction_helpers import finish_prior_horror_destruction_triggers
+
+    finish_prior_horror_destruction_triggers(state=scenario.state, decisions=scenario.decisions)
+    assert resolve_horror_completion(scenario.runtime, context) is not None
     request = scenario.decisions.queue.peek_next()
     result = _parameterized_result(
         request=request,
@@ -525,7 +537,7 @@ def test_real_attack_pipeline_hands_off_attached_horror_component(
         army_catalog=scenario.package.army_catalog,
     )
 
-    assert scenario.runtime.resolve_completed_attack_sequence(context) is None
+    assert resolve_horror_completion(scenario.runtime, context) is None
     assert _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id).datasheet_id == (
         "000002583"
     )
@@ -588,23 +600,38 @@ def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() ->
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         attack_sequence=attack_sequence,
         already_allocated_model_ids=(),
-        dice_manager=DiceRollManager(
-            scenario.state.game_id,
-            event_log=scenario.decisions.event_log,
-            injected_results=(
-                DiceRollResult.from_values(
-                    roll_id="roll:real-hazardous:horror-split:wound",
-                    spec=wound_spec,
-                    values=(1,),
-                    source="fixed",
+        dice_manager=(
+            manager := DiceRollManager(
+                scenario.state.game_id,
+                event_log=scenario.decisions.event_log,
+                injected_results=(
+                    DiceRollResult.from_values(
+                        roll_id="roll:real-hazardous:horror-split:wound",
+                        spec=wound_spec,
+                        values=(1,),
+                        source="fixed",
+                    ),
+                    DiceRollResult.from_values(
+                        roll_id="roll:real-hazardous:horror-split:test",
+                        spec=hazardous_spec,
+                        values=(1,),
+                        source="fixed",
+                    ),
+                    DiceRollResult.from_values(
+                        roll_id="roll:real-hazardous:horror-split:split",
+                        spec=DiceRollSpec(
+                            expression=DiceExpression(quantity=1, sides=6),
+                            reason=(
+                                f"Model materialization for {scenario.destroyed_model_instance_id}"
+                            ),
+                            roll_type="catalog.model_materialization.trigger",
+                            actor_id=scenario.source_army.player_id,
+                        ),
+                        values=(6,),
+                        source="fixed",
+                    ),
                 ),
-                DiceRollResult.from_values(
-                    roll_id="roll:real-hazardous:horror-split:test",
-                    spec=hazardous_spec,
-                    values=(1,),
-                    source="fixed",
-                ),
-            ),
+            )
         ),
     )
 
@@ -620,11 +647,12 @@ def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() ->
     completed_sequence = replace(attack_sequence, used_pool_indices=(0,), pool_index=1)
     context = replace(
         scenario.context,
+        dice_manager=manager,
         attack_sequence=completed_sequence,
         attack_sequence_completed_event_id=completed_event.event_id,
     )
 
-    status = scenario.runtime.resolve_completed_attack_sequence(context)
+    status = resolve_horror_completion(scenario.runtime, context)
 
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -670,7 +698,7 @@ def test_split_failed_attached_wipe_skips_handoff_and_retains_attachment() -> No
         roll_values=(1,),
     )
 
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is None
     assert all(
         record.event_type != CATALOG_UNIT_DATASHEET_REPLACED_EVENT
         for record in scenario.decisions.event_log.records
@@ -719,7 +747,7 @@ def test_split_multiple_failed_rolls_do_not_construct_empty_replacement_unit() -
         roll_values=(1, 2, 3),
     )
 
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is None
 
     roll_events = tuple(
         record
@@ -748,7 +776,7 @@ def test_split_mixed_rolls_materialize_only_successes_before_handoff() -> None:
         roll_values=(6, 1),
     )
 
-    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+    status = resolve_horror_completion(scenario.runtime, scenario.context)
     assert status is not None
     request = scenario.decisions.queue.peek_next()
     result = _parameterized_result(
@@ -771,7 +799,7 @@ def test_split_mixed_rolls_materialize_only_successes_before_handoff() -> None:
         army_catalog=scenario.package.army_catalog,
     )
 
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is None
 
     updated = _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id)
     assert updated.datasheet_id == "000002583"
@@ -799,7 +827,7 @@ def test_matching_attack_sequence_id_does_not_override_destruction_provenance(
         retained_horror_kinds=("blue",),
     )
 
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is None
     assert scenario.decisions.queue.pending_requests == ()
     assert all(
         record.event_type != CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT
@@ -820,23 +848,13 @@ def test_matching_sequence_model_destroyed_event_requires_typed_attribution() ->
         blue_datasheet_id="000002583",
         destruction_kind=DestructionSourceKind.ATTACK.value,
     )
-    malformed_decisions = DecisionController()
+    payload = copy.deepcopy(scenario.decisions.to_payload())
     source_event = next(
-        record
-        for record in scenario.decisions.event_log.records
-        if record.event_type == "model_destroyed"
+        record for record in payload["event_log"] if record["event_type"] == "model_destroyed"
     )
-    malformed_payload = cast(dict[str, JsonValue], source_event.payload).copy()
-    del malformed_payload["destruction_provenance"]
-    malformed_decisions.event_log.append("model_destroyed", malformed_payload)
-    completed_event = malformed_decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": scenario.attack_sequence.sequence_id,
-            "attacker_player_id": scenario.attack_sequence.attacker_player_id,
-            "attacking_unit_instance_id": scenario.attack_sequence.attacking_unit_instance_id,
-        },
-    )
+    destruction = cast(dict[str, JsonValue], source_event["payload"])
+    del destruction["destruction_provenance"]
+    malformed_decisions = DecisionController.from_payload(payload)
     malformed_context = replace(
         scenario.context,
         decisions=malformed_decisions,
@@ -844,14 +862,13 @@ def test_matching_sequence_model_destroyed_event_requires_typed_attribution() ->
             scenario.state.game_id,
             event_log=malformed_decisions.event_log,
         ),
-        attack_sequence_completed_event_id=completed_event.event_id,
     )
 
     with pytest.raises(
         GameLifecycleError,
         match="model_destroyed attribution payload is missing required fields",
     ):
-        scenario.runtime.resolve_completed_attack_sequence(malformed_context)
+        resolve_horror_completion(scenario.runtime, malformed_context)
 
 
 @pytest.mark.parametrize(
@@ -1471,7 +1488,7 @@ def test_split_triggers_for_hazardous_but_not_non_attack_destruction() -> None:
         blue_datasheet_id="000002583",
         destruction_kind="hazardous",
     )
-    status = hazardous.runtime.resolve_completed_attack_sequence(hazardous.context)
+    status = resolve_horror_completion(hazardous.runtime, hazardous.context)
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
 
@@ -1480,7 +1497,7 @@ def test_split_triggers_for_hazardous_but_not_non_attack_destruction() -> None:
         blue_datasheet_id="000002583",
         destruction_kind=DestructionSourceKind.ABILITY.value,
     )
-    assert non_attack.runtime.resolve_completed_attack_sequence(non_attack.context) is None
+    assert resolve_horror_completion(non_attack.runtime, non_attack.context) is None
     assert non_attack.decisions.queue.pending_requests == ()
     assert all(
         record.event_type != CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT
@@ -1498,7 +1515,7 @@ def test_adapter_submission_dispatches_model_placed_runtime_events(
         destruction_kind="attack",
         parent_battle_phase=parent_battle_phase,
     )
-    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+    status = resolve_horror_completion(scenario.runtime, scenario.context)
     assert status is not None
     request = scenario.decisions.queue.peek_next()
     payload = _placement_payload(
@@ -1538,12 +1555,6 @@ def test_adapter_submission_dispatches_model_placed_runtime_events(
                 cast(str, event_payload["source_phase"]),
                 cast(str, event_payload["action_phase"]),
                 cast(str, event_payload["parent_battle_phase"]),
-            )
-        )
-        lifecycle._runtime_content_activation_input_hash = (
-            lifecycle_module._runtime_content_activation_input_hash(
-                config=config,
-                armies=tuple(context.state.army_definitions),
             )
         )
         return RuntimeContentEventResult.applied(
@@ -1638,7 +1649,7 @@ def test_out_of_phase_split_restores_and_preserves_action_and_parent_phase_evide
         parent_battle_phase=parent_battle_phase,
     )
 
-    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+    status = resolve_horror_completion(scenario.runtime, scenario.context)
 
     assert status is not None
     request = scenario.decisions.queue.peek_next()
@@ -1990,7 +2001,7 @@ def test_restored_split_request_revalidates_authoritative_catalog_and_roll_evide
         blue_datasheet_id="000002583",
         destruction_kind="attack",
     )
-    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is not None
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is not None
     lifecycle_payload = copy.deepcopy(
         GameLifecycle(
             state=scenario.state,
@@ -2402,10 +2413,7 @@ def _split_scenario(
         if destroyed_horror_kinds
         else bodyguard.own_models
     )
-    destroyed_models = tuple(
-        replace(model, wounds_remaining=0) if models_start_destroyed else model
-        for model in models_to_destroy
-    )
+    destroyed_models = tuple(model for model in models_to_destroy)
     retained_models = tuple(
         _retained_horror_model(
             package=package,
@@ -2526,6 +2534,24 @@ def _split_scenario(
         ),
         source_phase=source_phase,
     )
+    if destruction_kind == "hazardous" and emit_destruction_events:
+        base_pool = attack_sequence.attack_pools[0]
+        profile = replace(
+            base_pool.weapon_profile,
+            keywords=tuple(
+                sorted(
+                    {*base_pool.weapon_profile.keywords, WeaponKeyword.HAZARDOUS},
+                    key=lambda keyword: keyword.value,
+                )
+            ),
+        )
+        attack_sequence = replace(
+            attack_sequence,
+            attacking_unit_instance_id=(
+                attached_unit_id if attached else bodyguard.unit_instance_id
+            ),
+            attack_pools=(replace(base_pool, weapon_profile=profile),),
+        )
     resolved_parent_battle_phase = (
         source_phase if parent_battle_phase is None else parent_battle_phase
     )
@@ -2572,89 +2598,64 @@ def _split_scenario(
         record_melee_declaration_for_executor_fixture(
             state=state, decisions=decisions, sequence=attack_sequence, result_id=result_id
         )
-    if destruction_kind == "hazardous" and emit_destruction_events:
-        decisions.event_log.append(
-            "hazardous_mortal_wounds_applied",
-            {
-                "sequence_id": attack_sequence.sequence_id,
-                "mortal_wound_application": {
-                    "applications": [
-                        {
-                            "model_instance_id": model.model_instance_id,
-                            "destroyed": True,
-                        }
-                        for model in destroyed_models
-                    ]
-                },
-            },
+    if emit_destruction_events and destruction_kind != "hazardous":
+        assert models_start_destroyed
+        from tests.horror_destruction_helpers import (
+            destroy_horror_models_for_completion_fixture,
+            finish_prior_horror_destruction_triggers,
         )
-    elif emit_destruction_events:
-        for model in destroyed_models:
-            source_kind = DestructionSourceKind(destruction_kind)
-            attribution = (
-                ModelDestructionAttribution.for_attack(
-                    destroying_player_id=enemy_army.player_id,
-                    attacking_unit_instance_id=attacker.unit_instance_id,
-                    attacking_model_instance_id=attacker.own_models[0].model_instance_id,
-                    weapon_profile=attack_sequence.attack_pools[0].weapon_profile,
-                    attack_context_id=f"{attack_sequence.sequence_id}:pool-001:attack-001",
-                )
-                if source_kind is DestructionSourceKind.ATTACK
-                else ModelDestructionAttribution.for_non_attack(
-                    destroying_player_id=enemy_army.player_id,
-                    source_kind=source_kind,
-                    source_rules_unit_instance_id=attacker.unit_instance_id,
-                    source_model_instance_id=None,
-                )
-            )
-            removal_record = ModelRemovalRecord(
-                model_instance_id=model.model_instance_id,
-                removal_kind=BattlefieldRemovalKind.DESTROYED,
-                source_phase=source_phase.value,
-                source_step=(
-                    "damage"
-                    if source_kind is DestructionSourceKind.ATTACK
-                    else non_attack_source_step
+
+        destroy_horror_models_for_completion_fixture(
+            state=state,
+            decisions=decisions,
+            sequence=attack_sequence,
+            target_unit_id=(attached_unit_id if attached else bodyguard.unit_instance_id),
+            model_ids=tuple(model.model_instance_id for model in destroyed_models),
+            source_kind=DestructionSourceKind(destruction_kind),
+            source_step=("damage" if destruction_kind == "attack" else non_attack_source_step),
+            event_sequence_matches=event_sequence_matches,
+        )
+        finish_prior_horror_destruction_triggers(state=state, decisions=decisions)
+        source_army = next(
+            army for army in state.army_definitions if army.player_id == source_army.player_id
+        )
+        bodyguard = next(
+            unit
+            for unit in source_army.units
+            if unit.unit_instance_id == bodyguard.unit_instance_id
+        )
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=attack_sequence,
+    )
+    hazard_rolls = (
+        (
+            DiceRollResult.from_values(
+                roll_id="roll:horror-fixture:hazardous",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Hazardous tests for {attack_sequence.attacking_unit_instance_id} "
+                        f"after {source_phase.value}"
+                    ),
+                    roll_type="hazardous_test",
+                    actor_id=attack_sequence.attacking_unit_instance_id,
                 ),
-                source_rule_id="test:horrors:destruction",
-                source_event_id=f"test:horrors:destruction:{model.model_instance_id}",
-            )
-            destroyed_event = decisions.event_log.append(
-                "model_destroyed",
-                validate_json_value(
-                    {
-                        "phase": source_phase.value,
-                        **attribution.to_payload(),
-                        "sequence_id": (
-                            attack_sequence.sequence_id
-                            if source_kind is DestructionSourceKind.ATTACK or event_sequence_matches
-                            else None
-                        ),
-                        "target_unit_instance_id": (
-                            attached_unit_id
-                            if source_kind is DestructionSourceKind.ATTACK and attached
-                            else bodyguard.unit_instance_id
-                        ),
-                        "model_instance_id": model.model_instance_id,
-                        "removal_record": removal_record.to_payload(),
-                    }
-                ),
-            )
-            if source_kind is not DestructionSourceKind.ATTACK:
-                decisions.event_log.append(
-                    RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
-                    {
-                        "model_destroyed_event_id": destroyed_event.event_id,
-                        "model_instance_id": model.model_instance_id,
-                    },
-                )
-    record_models_attacked(state=state, decisions=decisions, sequence=attack_sequence)
-    record_attack_sequence_completed(state=state, decisions=decisions, sequence=attack_sequence)
-    completed_event = decisions.event_log.records[-1]
+                values=(1,),
+                source="fixed",
+            ),
+        )
+        if destruction_kind == "hazardous" and emit_destruction_events
+        else ()
+    )
     dice_manager = DiceRollManager(
         state.game_id,
         event_log=decisions.event_log,
-        injected_results=tuple(
+        injected_results=hazard_rolls
+        + tuple(
             DiceRollResult.from_values(
                 roll_id=f"roll:split:{pink_datasheet_id}:{destruction_kind}:{index}",
                 spec=DiceRollSpec(
@@ -2802,7 +2803,7 @@ def _army(
         ruleset_id=package.army_catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id=package.army_catalog.factions[0].faction_id,
-            detachment_ids=("test:horrors:detachment",),
+            detachment_ids=("daemonic-incursion",),
         ),
         force_disposition_id=force_disposition_id,
         units=units,
@@ -2955,7 +2956,7 @@ def _authenticated_materialization_evidence(
         destruction_kind=destruction_kind,
         destroyed_horror_kinds=destroyed_horror_kinds,
     )
-    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+    status = resolve_horror_completion(scenario.runtime, scenario.context)
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     request = scenario.decisions.queue.peek_next()
@@ -3274,42 +3275,12 @@ def _configure_phase_lifecycle(
     state = lifecycle.state
     assert state is not None
     config = _game_config(scenario)
-    fixture_subscription = RuntimeContentEventSubscription(
-        subscription_id="test:phase-owned-split:placement",
-        source_rule_id="test:phase-owned-split:placement-rule",
-        trigger_kind=TimingTriggerKind.MODEL_PLACED_ON_BATTLEFIELD,
-        handler_id="test:phase-owned-split:placement-handler",
-        filters={"player_id": scenario.source_army.player_id},
+    from warhammer40k_core.engine.faction_content.runtime import (
+        build_runtime_content_bundle_for_armies,
     )
 
-    def detach_fixture_bundle(
-        context: RuntimeContentEventContext,
-    ) -> RuntimeContentEventResult:
-        del context
-        lifecycle._runtime_content_bundle = None
-        return RuntimeContentEventResult.applied(fixture_subscription)
-
-    armies = tuple(state.army_definitions)
-    bundle = RuntimeContentBundle.from_contributions(
-        activation=RuntimeContentActivation.from_armies(
-            armies=armies,
-            catalog=config.army_catalog,
-        ),
-        armies=armies,
-        catalog=config.army_catalog,
-        contributions=(
-            RuntimeContentContribution(
-                contribution_id="test:phase-owned-split:placement-contribution",
-                event_subscriptions=(fixture_subscription,),
-                event_handler_bindings=(
-                    RuntimeContentEventHandlerBinding(
-                        handler_id=fixture_subscription.handler_id,
-                        handler=detach_fixture_bundle,
-                    ),
-                ),
-            ),
-        ),
-        base_ability_records=catalog_ability_records_from_catalog(config.army_catalog),
+    bundle = build_runtime_content_bundle_for_armies(
+        config=config, armies=tuple(state.army_definitions)
     )
     lifecycle._config = config
     lifecycle._runtime_content_bundle = bundle

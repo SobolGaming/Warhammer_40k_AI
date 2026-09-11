@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
 from typing import cast
 
@@ -28,8 +28,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_record_source_matches_unit,
 )
+from warhammer40k_core.engine.command_phase_start_candidates import command_request_context
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
@@ -54,6 +56,9 @@ from warhammer40k_core.engine.rules_unit_geometry import (
     present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_for_state
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
 
@@ -111,17 +116,44 @@ class CatalogCommandRestorationRuntime:
                 hook_id=CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
                 source_id=CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
                 request_handler=self.request,
+                candidate_handler=self.command_candidates,
                 result_handler=self.apply_result,
             ),
         )
 
     def request(self, context: CommandPhaseStartRequestContext) -> DecisionRequest | None:
+        requests = self.request_templates(context)
+        if not requests:
+            return None
+        return replace(requests[0], request_id=context.issue_request_id())
+
+    def command_candidates(
+        self, context: CommandPhaseStartEffectContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        candidates: list[TimingRuleCandidate] = []
+        for request in self.request_templates(command_request_context(context)):
+            payload = _payload_object(request.payload)
+            source_id = _payload_string(payload, "source_rule_id")
+            model_id = _payload_string(payload, "source_model_instance_id")
+            clause_id = _payload_string(payload, "clause_id")
+            candidates.append(
+                timing_candidate_for_request(
+                    template=request,
+                    participant_id=f"{source_id}:{model_id}:{clause_id}",
+                    source_rule_id=source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    next_request_id=context.state.next_decision_request_id,
+                )
+            )
+        return tuple(candidates)
+
+    def request_templates(
+        self, context: CommandPhaseStartRequestContext
+    ) -> tuple[DecisionRequest, ...]:
+        requests: list[DecisionRequest] = []
         if type(context) is not CommandPhaseStartRequestContext:
             raise GameLifecycleError("Catalog command restoration requires request context.")
-        sources = self._sources_for_player(
-            state=context.state,
-            player_id=context.active_player_id,
-        )
+        sources = self._sources_for_player(state=context.state, player_id=context.active_player_id)
         selected_target_ids = _selected_target_ids_this_turn(
             records=context.decisions.event_log.records,
             state=context.state,
@@ -129,9 +161,7 @@ class CatalogCommandRestorationRuntime:
         )
         for source in sources:
             if _source_resolved_this_turn(
-                records=context.decisions.event_log.records,
-                state=context.state,
-                source=source,
+                records=context.decisions.event_log.records, state=context.state, source=source
             ):
                 continue
             targets = tuple(
@@ -142,33 +172,35 @@ class CatalogCommandRestorationRuntime:
             if not targets:
                 continue
             common = _common_payload(state=context.state, source=source)
-            return DecisionRequest(
-                request_id=context.state.next_decision_request_id(),
-                decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-                actor_id=context.active_player_id,
-                payload=validate_json_value(common),
-                options=tuple(
-                    DecisionOption(
-                        option_id=_option_id(
-                            source_model_instance_id=source.source_model_instance_id,
-                            target_unit_instance_id=target.unit_instance_id,
-                        ),
-                        label=f"Tears of Isha: {_rules_unit_label(target)}",
-                        payload=validate_json_value(
-                            {
-                                **common,
-                                "target_unit_instance_id": target.unit_instance_id,
-                                "target_unit_name": _rules_unit_label(target),
-                                "target_component_unit_instance_ids": list(
-                                    target.component_unit_instance_ids
-                                ),
-                            }
-                        ),
-                    )
-                    for target in targets
-                ),
+            requests.append(
+                DecisionRequest(
+                    request_id="timing-request-template",
+                    decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+                    actor_id=context.active_player_id,
+                    payload=validate_json_value(common),
+                    options=tuple(
+                        DecisionOption(
+                            option_id=_option_id(
+                                source_model_instance_id=source.source_model_instance_id,
+                                target_unit_instance_id=target.unit_instance_id,
+                            ),
+                            label=f"Tears of Isha: {_rules_unit_label(target)}",
+                            payload=validate_json_value(
+                                {
+                                    **common,
+                                    "target_unit_instance_id": target.unit_instance_id,
+                                    "target_unit_name": _rules_unit_label(target),
+                                    "target_component_unit_instance_ids": list(
+                                        target.component_unit_instance_ids
+                                    ),
+                                }
+                            ),
+                        )
+                        for target in targets
+                    ),
+                )
             )
-        return None
+        return tuple(requests)
 
     def apply_result(self, context: CommandPhaseStartResultContext) -> bool:
         if type(context) is not CommandPhaseStartResultContext:

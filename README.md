@@ -2,6 +2,15 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 36 implements source-backed Rules Sequencing: each player orders their
+mandatory and optional rules in the applicable tier, while new triggers wait for
+the original timing batch. Movement, attacks and mission scoring share that
+authority with replay and viewer redaction. See the
+[scope and validation record](docs/ORDER_36_SCOPE_PLAN.md) and the
+[Contract 15 migration](contracts/migrations/14-to-15.md). Regenerate its reviewed
+source package with `uv run python tools/build_core_sequencing_source.py`, then
+the engine identity and external contract as described below.
+
 Order 32 replaces sampled visibility with continuous predicates over analytic
 circles, ellipses and oriented rectangles, using the shared 1mm corridor authority.
 Its source evidence, acceptance matrix, correctness argument and consumer audit
@@ -149,7 +158,7 @@ authority, complete battlefield geometry, executable Primary scoring for all 25
 Event Companion missions, and Step 5G lifecycle, restore, viewer-redaction, and
 replay certification of both players' ordinary Primary scoring boundaries on all
 45 A/B/C layouts. The 90 layout/direction cases begin at an engine-owned fight
-activation decision boundary, round-trip `replay-artifact-v8-phase17n-step5a`,
+activation decision boundary, round-trip `replay-artifact-v9-sequencing`,
 and require exact `ReplayRunner` reproduction. All 18 Secondary Mission cards
 are source-backed and executable through turn-end scoring with lifecycle restore
 evidence; their lifecycle certification remains Layout-A-only. The broader

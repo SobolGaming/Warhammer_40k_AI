@@ -2236,6 +2236,7 @@ def _test_primary_state_evidence(
     end_of_battle: bool,
 ) -> PrimaryScoringStateEvidence:
     return PrimaryScoringStateEvidence.create(
+        scoring_player_id=record.active_player_id,
         game_id=record.game_id,
         battlefield_id=record.battlefield_id,
         battle_round=record.battle_round,

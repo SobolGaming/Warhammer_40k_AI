@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -602,6 +603,26 @@ def test_local_session_accepts_no_move_fight_proposal_and_replays_continuation()
     assert session.decision_record_count() == 1
     state = session.lifecycle.state
     assert state is not None
+    assert next_request.actor_id == "player-b"
+    assert state.active_player_id == "player-a"
+    assert state.effective_active_player_id() == "player-b"
+    checkpoint = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(checkpoint))
+    assert restored.state is not None
+    assert restored.state.effective_active_player_id() == "player-b"
+    corrupted = deepcopy(checkpoint)
+    scopes = corrupted["state"]["active_player_scopes"]
+    scopes[-1]["source_rule_id"] = "forged-fight-movement-source"
+    for event in corrupted["decisions"]["event_log"]:
+        payload = event["payload"]
+        if (
+            event["event_type"] == "active_player_scope_started"
+            and isinstance(payload, dict)
+            and payload.get("selection_request_id") == next_request.request_id
+        ):
+            payload["source_rule_id"] = "forged-fight-movement-source"
+    with pytest.raises(GameLifecycleError, match="Fight movement scope lost its source proposal"):
+        GameLifecycle.from_payload(corrupted)
     assert state.battlefield_state is not None
     assert state.battlefield_state.unit_placement_by_id(attacker_id)
     _assert_event_types(
@@ -1616,7 +1637,7 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         result_id="ws13-fight-mortal-wound-activation-result",
         interrupt_id="ws13-fight-mortal-wound-interrupt",
     )
-    state.fight_phase_state = (
+    state.replace_fight_phase_state(
         fight_state.with_activation(activation)
         .with_active_activation(activation)
         .with_attack_sequence_update(

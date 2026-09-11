@@ -10,13 +10,13 @@ from tests.fight_movement_event_helpers import (
     grouped_fight_movement_resolution_payload,
     standalone_fight_movement_event_evidence,
 )
+from tests.move_marker_fixture_helpers import resolve_surveil_markers_for_fixture
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     default_unit_selection,
     phase11c_config,
     with_model_offsets,
 )
-from tests.phase15a_charge_declaration_helpers import charge_lifecycle
 from tests.phase17n_primary_mission_helpers import (
     append_authenticated_normal_move,
 )
@@ -104,12 +104,10 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
     PrimaryUnattributedDestructionCause,
     RulesUnitObjectiveProximityWitness,
     primary_unattributed_destruction_cause_from_token,
-    rules_unit_objective_proximity_witness,
 )
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT,
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
-    record_new_primary_unit_destruction_events,
     record_primary_battlefield_departure_event,
     record_primary_turn_start_evidence_event,
     record_primary_unit_destruction_event,
@@ -139,6 +137,7 @@ from warhammer40k_core.engine.primary_mission_choice_payloads import PrimaryMiss
 from warhammer40k_core.engine.primary_mission_choices import (
     PRIMARY_MISSION_CHOICE_RESOLVED_EVENT,
     PRIMARY_OPERATION_MARKER_KIND,
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
     SENSOR_SWEEP_EXTRACT_ACTION_ID,
     SENSOR_SWEEP_LOCATE_ACTION_ID,
     apply_primary_mission_choice,
@@ -163,9 +162,6 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionProgressState,
     primary_condemned_selection_id,
     primary_mission_marker_id,
-)
-from warhammer40k_core.engine.primary_mission_state_runtime import (
-    resolve_surveil_marker_removal_for_completed_moves,
 )
 from warhammer40k_core.engine.primary_mission_state_validation import (
     validate_primary_mission_progress_state,
@@ -2467,6 +2463,7 @@ def _primary_scoring_state_evidence(
         )
     state.record_objective_control_record(authoritative_record)
     evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=authoritative_record.active_player_id,
         state=state,
         record=authoritative_record,
         end_of_battle=False,
@@ -2704,6 +2701,34 @@ def test_phase17n_locate_restore_rejects_consistently_omitted_required_marker() 
         )
 
 
+def test_phase17n_punishment_uses_the_shared_turn_start_batch() -> None:
+    from warhammer40k_core.engine.boundary_sequencing import start_turn_context
+    from warhammer40k_core.engine.phases.command import CommandPhaseHandler
+    from warhammer40k_core.engine.sequencing import SequencingRequirement, SequencingRuleOrigin
+    from warhammer40k_core.engine.timing_batch_runtime import timing_batches_for_context
+
+    state, decisions, _enemy_ids = _phase17n_punishment_choice_state()
+    status = BattleRoundFlow(phase_handlers={BattlePhase.COMMAND: CommandPhaseHandler()}).advance(
+        state=state, decisions=decisions
+    )
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE
+    batches = timing_batches_for_context(decisions, start_turn_context(state))
+    assert len(batches) == 1
+    batch = batches[0]
+    assert len(batch.participants) == 1
+    participant = batch.participants[0]
+    assert batch.selected_participant_id == participant.participant_id
+    assert participant.player_id == state.active_player_id
+    assert participant.origin is SequencingRuleOrigin.MISSION
+    assert participant.requirement is SequencingRequirement.MANDATORY
+    assert (
+        participant.source_rule_id
+        == primary_mission_choice_rule_for_id("punishment-condemn-enemy-units").source_id
+    )
+    assert not state.primary_mission_progress_state.condemned_selections
+
+
 def test_phase17n_punishment_choice_supports_preferred_fallback_and_empty_candidates() -> None:
     state, decisions, enemy_ids = _phase17n_punishment_choice_state()
     fallback_state = deepcopy(state)
@@ -2737,6 +2762,20 @@ def test_phase17n_punishment_choice_supports_preferred_fallback_and_empty_candid
     empty_state.battlefield_state = battlefield
     _phase17n_refresh_turn_start_snapshot(empty_state)
     empty_decisions = DecisionController()
+    from warhammer40k_core.engine.primary_mission_choices import punishment_timing_candidates
+    from warhammer40k_core.engine.sequencing import SequencingRequirement, SequencingRuleOrigin
+
+    before = empty_state.to_payload()
+    empty_candidates = punishment_timing_candidates(state=empty_state, decisions=empty_decisions)
+    assert len(empty_candidates) == 1
+    assert empty_candidates[0].participant.player_id == empty_state.active_player_id
+    assert empty_candidates[0].participant.requirement is SequencingRequirement.MANDATORY
+    assert empty_candidates[0].participant.origin is SequencingRuleOrigin.MISSION
+    assert empty_candidates[0].request_template is None
+    assert empty_state.to_payload() == before
+    events_before_activation = empty_decisions.event_log.records
+    assert events_before_activation == ()
+    assert empty_candidates[0].activate() is None
     assert (
         punishment_choice_request(
             state=empty_state,
@@ -3380,7 +3419,7 @@ def test_phase17n_consecrate_restore_rejects_wrong_subject_pending_choice() -> N
 
     with pytest.raises(
         GameLifecycleError,
-        match="Consecrate choice identity or battle context drifted",
+        match="Pending Consecrate designation authority drifted",
     ):
         validate_primary_mission_progress_state(
             state,
@@ -3500,6 +3539,11 @@ def test_phase17n_sensor_sweep_removes_policy_scoped_marker_and_tombstones_actio
 
 
 def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_move() -> None:
+    from warhammer40k_core.engine.primary_mission_state_runtime import (
+        surveil_move_marker_candidates,
+    )
+    from warhammer40k_core.engine.sequencing import SequencingRequirement, SequencingRuleOrigin
+
     state, moving_unit_id, _objective_id = _phase17n_surveil_move_marker_state()
     decisions = DecisionController()
     trigger = decisions.event_log.append(
@@ -3513,7 +3557,21 @@ def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_mov
         },
     )
 
-    resolve_surveil_marker_removal_for_completed_moves(
+    before = (state.to_payload(), decisions.to_payload())
+    candidates = surveil_move_marker_candidates(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.CHARGE,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        trigger_event_id=trigger.event_id,
+    )
+    assert (state.to_payload(), decisions.to_payload()) == before
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == "player-b"
+    assert candidates[0].participant.origin is SequencingRuleOrigin.MISSION
+    assert candidates[0].participant.requirement is SequencingRequirement.MANDATORY
+
+    resolve_surveil_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.CHARGE,
@@ -3529,9 +3587,13 @@ def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_mov
             "surveil-remove-operation-markers-after-move"
         ).source_id
     )
-    processed = cast(dict[str, JsonValue], decisions.event_log.records[-1].payload)
-    assert decisions.event_log.records[-1].event_type == (
-        "primary_surveil_move_marker_removal_resolved"
+    processed = cast(
+        dict[str, JsonValue],
+        next(
+            event.payload
+            for event in reversed(decisions.event_log.records)
+            if event.event_type == "primary_surveil_move_marker_removal_resolved"
+        ),
     )
     assert processed["moving_rules_unit_instance_id"] == moving_unit_id
     assert processed["removed_primary_mission_markers"] == [removed.to_payload()]
@@ -3567,7 +3629,7 @@ def test_phase17n_surveil_normal_move_accepts_attached_component_event_identity(
         ),
     )
 
-    resolve_surveil_marker_removal_for_completed_moves(
+    resolve_surveil_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -3578,7 +3640,14 @@ def test_phase17n_surveil_normal_move_accepts_attached_component_event_identity(
     assert removed.status is PrimaryMissionMarkerStatus.REMOVED
     assert removed.objective_marker_id == objective_id
     assert removed.removal_event_id == trigger.event_id
-    processed = cast(dict[str, JsonValue], decisions.event_log.records[-1].payload)
+    processed = cast(
+        dict[str, JsonValue],
+        next(
+            event.payload
+            for event in reversed(decisions.event_log.records)
+            if event.event_type == "primary_surveil_move_marker_removal_resolved"
+        ),
+    )
     assert processed["moving_rules_unit_instance_id"] == attached_id
     witness = cast(
         dict[str, JsonValue],
@@ -3643,7 +3712,7 @@ def test_phase17n_surveil_uses_standalone_fight_event_time_endpoint() -> None:
         )
     )
 
-    resolve_surveil_marker_removal_for_completed_moves(
+    resolve_surveil_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
@@ -3695,7 +3764,7 @@ def test_phase17n_surveil_uses_attached_fight_endpoint_after_component_movement(
         component_ids=component_ids,
     )
 
-    resolve_surveil_marker_removal_for_completed_moves(
+    resolve_surveil_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
@@ -3706,7 +3775,14 @@ def test_phase17n_surveil_uses_attached_fight_endpoint_after_component_movement(
     assert removed.status is PrimaryMissionMarkerStatus.REMOVED
     assert removed.objective_marker_id == objective_id
     assert removed.removal_event_id == trigger.event_id
-    processed = cast(dict[str, JsonValue], decisions.event_log.records[-1].payload)
+    processed = cast(
+        dict[str, JsonValue],
+        next(
+            event.payload
+            for event in reversed(decisions.event_log.records)
+            if event.event_type == "primary_surveil_move_marker_removal_resolved"
+        ),
+    )
     assert processed["moving_rules_unit_instance_id"] == attached_id
     witness = cast(
         dict[str, JsonValue],
@@ -3737,10 +3813,159 @@ def test_phase17n_restore_authenticates_surveil_move_marker_removal() -> None:
     )
 
 
+def test_deferred_marker_removal_keeps_marker_active_until_mutation() -> None:
+    from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
+        active_primary_mission_marker_ids_at_event,
+    )
+
+    state, decisions = _phase17n_surveil_integrity_fixture()
+    records = decisions.event_log.records
+    observed = next(
+        event for event in records if event.event_type == "move_rule_candidates_observed"
+    )
+    processed = next(
+        event
+        for event in records
+        if event.event_type == "primary_surveil_move_marker_removal_resolved"
+    )
+    indices = {event.event_id: index for index, event in enumerate(records)}
+    assert active_primary_mission_marker_ids_at_event(
+        state=state, event=observed, event_index_by_id=indices, event_records=records
+    ) == (state.primary_mission_progress_state.markers[0].marker_id,)
+    assert (
+        active_primary_mission_marker_ids_at_event(
+            state=state, event=processed, event_index_by_id=indices, event_records=records
+        )
+        == ()
+    )
+
+
+def test_surveil_captured_move_rule_uses_trigger_geometry_and_mutates_live_state() -> None:
+    from warhammer40k_core.engine.faction_content.unit_move_completed import (
+        move_completion_rule_registry,
+    )
+    from warhammer40k_core.engine.move_completion_triggers import (
+        move_context_for_trigger,
+        resolve_move_trigger,
+    )
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+    from warhammer40k_core.engine.unit_move_completed_hooks import (
+        UnitMoveCompletedMortalWoundHookRegistry,
+    )
+
+    state, decisions = _phase17n_surveil_integrity_fixture(resolve_marker_rules=False)
+    trigger = next(
+        item
+        for item in rule_trigger_history(decisions).ready()
+        if item.kind is RuleTriggerKind.MOVE_COMPLETION
+    )
+    context = move_context_for_trigger(
+        state=state,
+        decisions=decisions,
+        trigger=trigger,
+        runtime_modifiers=RuntimeModifierRegistry.empty(),
+        ability_indexes={},
+    )
+    registry = move_completion_rule_registry()
+    original = registry.candidates_for(context)
+    assert len(original) == 1
+    payload = original[0].participant.payload
+    assert isinstance(payload, dict)
+    witness = RulesUnitObjectiveProximityWitness.from_payload(
+        payload["objective_proximity_witness"]
+    )
+    _phase17n_move_attached_components_away(
+        state=state, component_ids=witness.component_unit_instance_ids
+    )
+    assert registry.candidates_for(context)[0].participant == original[0].participant
+    assert registry.discover_for(context) == ()
+    assert (
+        resolve_move_trigger(
+            context=context,
+            trigger=trigger,
+            mortal_wound_hooks=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=None,
+            battle_shock_hooks=None,
+            additional_candidates=registry.candidates_for,
+        )
+        is None
+    )
+    assert (
+        state.primary_mission_progress_state.markers[0].status is PrimaryMissionMarkerStatus.REMOVED
+    )
+    assert not rule_trigger_history(decisions).ready()
+
+
+@pytest.mark.parametrize(
+    "tamper",
+    ["owner", "requirement", "source", "providers", "duplicate", "omitted", "markers", "geometry"],
+)
+def test_captured_move_rule_rejects_source_authority_drift(tamper: str) -> None:
+    from warhammer40k_core.engine.faction_content.unit_move_completed import (
+        move_completion_rule_registry,
+    )
+    from warhammer40k_core.engine.move_completion_triggers import move_context_for_trigger
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+
+    state, decisions = _phase17n_surveil_integrity_fixture(resolve_marker_rules=False)
+    serialized = deepcopy(decisions.to_payload())
+    event = next(
+        row
+        for row in serialized["event_log"]
+        if row["event_type"] == "move_rule_candidates_observed"
+    )
+    payload = cast(dict[str, Any], event["payload"])
+    participant = cast(dict[str, Any], payload["participants"][0])
+    if tamper == "owner":
+        participant["player_id"] = "player-a"
+    elif tamper == "requirement":
+        participant["requirement"] = "optional"
+    elif tamper == "source":
+        participant["source_rule_id"] = "unknown-move-rule"
+    elif tamper == "providers":
+        payload["hook_ids"] = []
+    elif tamper == "duplicate":
+        payload["participants"].append(deepcopy(participant))
+    elif tamper == "omitted":
+        payload["participants"] = []
+    elif tamper == "markers":
+        participant["payload"]["marker_ids"] = ["invented-operation-marker"]
+    elif tamper == "geometry":
+        witness = participant["payload"]["objective_proximity_witness"]
+        witness["objective_marker_witnesses"] = []
+        participant["payload"]["objective_marker_ids"] = []
+    restored = DecisionController.from_payload(serialized)
+    trigger = next(
+        item
+        for item in rule_trigger_history(restored).ready()
+        if item.kind is RuleTriggerKind.MOVE_COMPLETION
+    )
+    context = move_context_for_trigger(
+        state=state,
+        decisions=restored,
+        trigger=trigger,
+        runtime_modifiers=RuntimeModifierRegistry.empty(),
+        ability_indexes={},
+    )
+    before = (state.to_payload(), restored.to_payload())
+    with pytest.raises(GameLifecycleError):
+        move_completion_rule_registry().candidates_for(context)
+    from warhammer40k_core.engine.rule_trigger_runtime import validate_rule_trigger_history
+
+    with pytest.raises(GameLifecycleError):
+        validate_rule_trigger_history(state=state, decisions=restored)
+    assert (state.to_payload(), restored.to_payload()) == before
+
+
 def test_phase17n_restore_rejects_arbitrary_surveil_removal_trigger() -> None:
     state, decisions = _phase17n_surveil_integrity_fixture()
     records = list(decisions.event_log.records)
-    processed = records[-1]
+    processed_index = next(
+        index
+        for index, event in enumerate(records)
+        if event.event_type == "primary_surveil_move_marker_removal_resolved"
+    )
+    processed = records[processed_index]
     processed_payload = dict(cast(dict[str, JsonValue], processed.payload))
     trigger_id = cast(str, processed_payload["trigger_event_id"])
     trigger_index = next(
@@ -3751,7 +3976,7 @@ def test_phase17n_restore_rejects_arbitrary_surveil_removal_trigger() -> None:
         event_type="phase17n_forged_non_move_event",
     )
     processed_payload["trigger_event_type"] = "phase17n_forged_non_move_event"
-    records[-1] = replace(processed, payload=validate_json_value(processed_payload))
+    records[processed_index] = replace(processed, payload=validate_json_value(processed_payload))
 
     with pytest.raises(GameLifecycleError, match="trigger type is invalid"):
         validate_primary_mission_progress_state(
@@ -3796,12 +4021,17 @@ def test_phase17n_restore_rejects_surveil_removal_of_own_operation_marker() -> N
         markers=(own_marker,),
     )
     records = list(decisions.event_log.records)
-    processed = records[-1]
+    processed_index = next(
+        index
+        for index, event in enumerate(records)
+        if event.event_type == "primary_surveil_move_marker_removal_resolved"
+    )
+    processed = records[processed_index]
     processed_payload = dict(cast(dict[str, JsonValue], processed.payload))
     processed_payload["removed_primary_mission_markers"] = validate_json_value(
         [own_marker.to_payload()]
     )
-    records[-1] = replace(processed, payload=validate_json_value(processed_payload))
+    records[processed_index] = replace(processed, payload=validate_json_value(processed_payload))
 
     with pytest.raises(GameLifecycleError, match="marker-removal set drifted"):
         validate_surveil_marker_removal_events(
@@ -3814,7 +4044,12 @@ def test_phase17n_restore_rejects_surveil_removal_of_own_operation_marker() -> N
 def test_phase17n_restore_rejects_consistent_surveil_witness_row_omission() -> None:
     state, decisions = _phase17n_surveil_integrity_fixture()
     records = list(decisions.event_log.records)
-    processed = records[-1]
+    processed_index = next(
+        index
+        for index, event in enumerate(records)
+        if event.event_type == "primary_surveil_move_marker_removal_resolved"
+    )
+    processed = records[processed_index]
     payload = dict(cast(dict[str, JsonValue], processed.payload))
     witness = dict(
         cast(
@@ -3827,10 +4062,10 @@ def test_phase17n_restore_rejects_consistent_surveil_witness_row_omission() -> N
     payload["objective_marker_ids"] = []
     payload["removed_primary_mission_markers"] = []
     forged = replace(processed, payload=validate_json_value(payload))
-    records[-1] = forged
+    records[processed_index] = forged
     assert forged.history_token() != processed.history_token()
 
-    with pytest.raises(GameLifecycleError, match="requires one processed event"):
+    with pytest.raises(GameLifecycleError, match="unique removal mutation event"):
         validate_primary_mission_progress_state(
             state,
             event_records=tuple(records),
@@ -3842,7 +4077,12 @@ def test_phase17n_restore_rejects_consistent_surveil_witness_row_omission() -> N
 def test_phase17n_restore_rejects_surveil_mover_or_context_drift(tamper: str) -> None:
     state, decisions = _phase17n_surveil_integrity_fixture()
     records = list(decisions.event_log.records)
-    processed = records[-1]
+    processed_index = next(
+        index
+        for index, event in enumerate(records)
+        if event.event_type == "primary_surveil_move_marker_removal_resolved"
+    )
+    processed = records[processed_index]
     payload = dict(cast(dict[str, JsonValue], processed.payload))
     if tamper == "mover":
         payload["moving_rules_unit_instance_id"] = next(
@@ -3855,7 +4095,7 @@ def test_phase17n_restore_rejects_surveil_mover_or_context_drift(tamper: str) ->
     else:
         payload["phase"] = BattlePhase.SHOOTING.value
         expected = "battle context drifted"
-    records[-1] = replace(processed, payload=validate_json_value(payload))
+    records[processed_index] = replace(processed, payload=validate_json_value(payload))
 
     with pytest.raises(GameLifecycleError, match=expected):
         validate_primary_mission_progress_state(
@@ -3869,11 +4109,16 @@ def test_phase17n_restore_rejects_surveil_mover_or_context_drift(tamper: str) ->
 def test_phase17n_restore_rejects_inexact_surveil_removal_set(tamper: str) -> None:
     state, decisions = _phase17n_surveil_integrity_fixture()
     records = list(decisions.event_log.records)
-    processed = records[-1]
+    processed_index = next(
+        index
+        for index, event in enumerate(records)
+        if event.event_type == "primary_surveil_move_marker_removal_resolved"
+    )
+    processed = records[processed_index]
     payload = dict(cast(dict[str, JsonValue], processed.payload))
     removed = cast(list[JsonValue], payload["removed_primary_mission_markers"])
     payload["removed_primary_mission_markers"] = [] if tamper == "partial" else [*removed, *removed]
-    records[-1] = replace(processed, payload=validate_json_value(payload))
+    records[processed_index] = replace(processed, payload=validate_json_value(payload))
 
     with pytest.raises(GameLifecycleError, match="marker-removal set drifted"):
         validate_primary_mission_progress_state(
@@ -4153,17 +4398,17 @@ def _phase17n_resolved_sensor_choice_fixture() -> tuple[
 
 def _phase17n_punishment_choice_state() -> tuple[GameState, DecisionController, tuple[str, ...]]:
     enemy_keys = ("enemy-1", "enemy-2", "enemy-3")
-    lifecycle, units = charge_lifecycle(
-        alpha_unit_ids=("alpha",),
-        enemy_model_poses=tuple(Pose.at(50.0 + index, 30.0) for index in range(5)),
+    state = battle_state(
         game_id="phase17n-punishment-choice-game",
-        enemy_unit_ids=enemy_keys,
-        enemy_origins={
-            key: Pose.at(45.0 + (index * 8.0), 20.0) for index, key in enumerate(enemy_keys)
-        },
+        player_a_units=(default_unit_selection("alpha"),),
+        player_b_units=tuple(default_unit_selection(key) for key in enemy_keys),
     )
-    state = lifecycle.state
-    assert state is not None
+    decisions = DecisionController()
+    units = {
+        unit.unit_instance_id.split(":", maxsplit=1)[1]: unit
+        for army in state.army_definitions
+        for unit in army.units
+    }
     state.mission_setup = _phase17n_event_setup(
         layout_id="purge-the-foe-vs-disruption-layout-1",
         attacker_force_disposition_id="purge-the-foe",
@@ -4215,13 +4460,13 @@ def _phase17n_punishment_choice_state() -> tuple[GameState, DecisionController, 
     ]
     _phase17n_refresh_turn_start_snapshot(state)
     record_primary_turn_start_evidence_event(
-        event_log=lifecycle.decision_controller.event_log,
+        event_log=decisions.event_log,
         objective_state=state.primary_objective_turn_start_states[0],
         position_snapshot=state.primary_rules_unit_turn_start_snapshots[0],
     )
     return (
         state,
-        lifecycle.decision_controller,
+        decisions,
         tuple(units[key].unit_instance_id for key in enemy_keys),
     )
 
@@ -4378,64 +4623,37 @@ def _phase17n_consecrate_choice_state() -> tuple[GameState, DecisionController, 
         if army.player_id == "player-b"
         for enemy in army.units
     )
-    source_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=unit.unit_instance_id,
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+    from tests.setup_completion_helpers import (
+        record_existing_primary_turn_start_evidence_events_for_fixture,
     )
-    destroyed_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=destroyed_unit.unit_instance_id,
+
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        advance_model_destruction_triggers,
     )
-    attribution = ModelDestructionAttribution.for_non_attack(
-        destroying_player_id="player-a",
-        source_kind=DestructionSourceKind.ABILITY,
-        source_rules_unit_instance_id=unit.unit_instance_id,
-        source_model_instance_id=unit.own_models[0].model_instance_id,
-    )
-    destroyed_model_ids = destroyed_unit.own_model_ids()
-    model_event = decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "model_instance_id": destroyed_model_ids[-1],
-            "target_unit_instance_id": destroyed_unit.unit_instance_id,
-            "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-            "destroyed_rules_unit_objective_proximity_witness": destroyed_witness.to_payload(),
-            **attribution.to_payload(),
-        },
-    )
-    state.battlefield_state = state.battlefield_state.with_removed_models(destroyed_model_ids)
-    source_base = f"core-rules:primary-unit-destruction-tracking:{model_event.event_id}"
-    departures = record_primary_destroyed_model_departures(
-        state=state,
-        destroyed_model_instance_ids=destroyed_model_ids,
-        source_id=source_base,
-    )
-    for departure in departures:
-        record_primary_battlefield_departure_event(
-            event_log=decisions.event_log,
-            departure=departure,
+    from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+    _phase17n_refresh_turn_start_snapshot(state)
+    record_existing_primary_turn_start_evidence_events_for_fixture(state, decisions=decisions)
+    for model_id in destroyed_unit.own_model_ids():
+        destroy_rule_model_for_fixture(
+            state=state,
+            decisions=decisions,
+            model_id=model_id,
+            destroying_player_id="player-a",
+            source_unit_id=unit.unit_instance_id,
+            source_model_id=unit.own_models[0].model_instance_id,
         )
-    destruction_ids_before = tuple(
-        destruction.destruction_id for destruction in state.primary_unit_destruction_states
+    assert (
+        advance_model_destruction_triggers(
+            state=state, decisions=decisions, registry=UnitDestroyedHookRegistry.empty()
+        )
+        is None
     )
-    destruction = state.record_primary_unit_destruction(
-        destruction_attribution=attribution,
-        source_model_destroyed_event_id=model_event.event_id,
-        source_rules_unit_objective_proximity_witness=source_witness,
-        source_battlefield_departure_ids=tuple(departure.departure_id for departure in departures),
-        unattributed_cause=None,
-        source_mutation_id=None,
-        destroyed_unit_instance_id=destroyed_unit.unit_instance_id,
-        source_id=f"{source_base}:{destroyed_unit.unit_instance_id}",
-    )
-    record_new_primary_unit_destruction_events(
-        state=state,
-        event_log=decisions.event_log,
-        destruction_ids_before=destruction_ids_before,
+    destruction = next(
+        value
+        for value in state.primary_unit_destruction_states
+        if value.destroyed_unit_instance_id == destroyed_unit.unit_instance_id
     )
     designation = next(
         value
@@ -5721,6 +5939,8 @@ def test_phase17n_restore_requires_action_start_before_objective_boundary() -> N
         index
         for index, event in enumerate(records)
         if event.event_type == "end_boundary_objective_control_determined"
+        and isinstance(event.payload, dict)
+        and event.payload.get("record_ids") == [record.record_id]
     )
     boundary = records.pop(boundary_index)
     start_index = next(
@@ -6806,7 +7026,9 @@ def _phase17n_move_attached_components_away(
         )
 
 
-def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController]:
+def _phase17n_surveil_integrity_fixture(
+    *, resolve_marker_rules: bool = True
+) -> tuple[GameState, DecisionController]:
     state, decisions, action, target_id = _phase17n_started_primary_action_fixture(
         layout_id="disruption-vs-reconnaissance-layout-1",
         attacker_force_disposition_id="disruption",
@@ -6859,7 +7081,9 @@ def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController
             facing_degrees=pose.facing.degrees,
         ),
     )
-    resolve_surveil_marker_removal_for_completed_moves(
+    if not resolve_marker_rules:
+        return state, decisions
+    resolve_surveil_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -6868,7 +7092,8 @@ def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController
     assert state.primary_mission_progress_state.markers[0].status is (
         PrimaryMissionMarkerStatus.REMOVED
     )
-    assert decisions.event_log.records[-1].event_type == (
-        "primary_surveil_move_marker_removal_resolved"
+    assert any(
+        event.event_type == "primary_surveil_move_marker_removal_resolved"
+        for event in decisions.event_log.records
     )
     return state, decisions

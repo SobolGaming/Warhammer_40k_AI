@@ -10,6 +10,7 @@ import pytest
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 from tests.unit_keyword_helpers import with_unit_keywords
 
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine import healing_geometry
@@ -62,6 +63,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
@@ -85,14 +87,22 @@ def test_lifecycle_reanimation_heals_wounded_unit_then_requests_next_activation(
         wounds_remaining=wounded.starting_wounds - 1,
     )
 
-    status = lifecycle.advance_until_decision_or_terminal()
-
+    session = LocalGameSession(lifecycle=lifecycle)
+    order = _require_request(session.advance_until_decision_or_terminal().decision_request)
+    assert order.decision_type == SEQUENCING_DECISION_TYPE
+    assert order.actor_id == "player-a"
+    assert len(order.options) == 2
+    selected = next(option for option in order.options if NECRON_UNIT_1_ID in option.option_id)
+    status = session.submit_option(
+        request_id=order.request_id,
+        option_id=selected.option_id,
+        result_id="phase17g-necrons-first-occurrence",
+    )
     request = _require_request(status.decision_request)
     assert request.actor_id == "player-a"
-    assert {option.option_id for option in request.options} == {
+    assert tuple(option.option_id for option in request.options) == (
         f"necrons:reanimation_protocols:{NECRON_UNIT_1_ID}",
-        f"necrons:reanimation_protocols:{NECRON_UNIT_2_ID}",
-    }
+    )
     follow_up_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-necrons-heal-unit-1",
@@ -192,6 +202,42 @@ def test_reanimation_revive_choice_uses_necron_player_and_json_safe_records() ->
     assert "<" not in json.dumps(lifecycle.decision_controller.to_payload(), sort_keys=True)
 
 
+@pytest.mark.parametrize("drift", ["source", "owner", "requirement", "missing"])
+def test_command_order_rejects_loaded_source_population_drift(drift: str) -> None:
+    from warhammer40k_core.engine.boundary_rule_authority import validate_boundary_order_candidates
+    from warhammer40k_core.engine.command_phase_start_sequencing import command_start_timing_context
+    from warhammer40k_core.engine.sequencing import SequencingRequirement
+    from warhammer40k_core.engine.timing_batch_runtime import timing_batches_for_context
+
+    lifecycle = _battle_ready_lifecycle(alpha_unit_ids=("necron-warriors-1", "necron-warriors-2"))
+    state = _require_state(lifecycle)
+    request = _require_request(lifecycle.advance_until_decision_or_terminal().decision_request)
+    assert request.decision_type == SEQUENCING_DECISION_TYPE
+    context = command_start_timing_context(
+        state, battle_round=state.battle_round, active_player_id="player-a"
+    )
+    batch = timing_batches_for_context(lifecycle.decision_controller, context)[-1]
+    first, second = batch.participants
+    if drift == "source":
+        first = replace(first, source_rule_id="forged-rule")
+    elif drift == "owner":
+        first = replace(first, player_id="player-b")
+    elif drift == "requirement":
+        first = replace(first, requirement=SequencingRequirement.OPTIONAL)
+    forged = replace(batch, participants=(first,) if drift == "missing" else (first, second))
+    before = lifecycle.to_payload()
+    with pytest.raises(GameLifecycleError, match=r"Boundary sequencing .*source"):
+        validate_boundary_order_candidates(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            batch=forged,
+            bundle=_runtime_content_bundle(lifecycle),
+            config=lifecycle.config,
+            reaction_queue=lifecycle.reaction_queue,
+        )
+    assert lifecycle.to_payload() == before
+
+
 def test_reanimation_uses_attached_rules_unit_identity() -> None:
     lifecycle = _battle_ready_lifecycle(attached_alpha=True)
     state = _require_state(lifecycle)
@@ -247,7 +293,7 @@ def test_reanimation_stale_rules_unit_rejects_before_queue_pop() -> None:
 
     assert status.status_kind is LifecycleStatusKind.INVALID
     invalid_payload = cast(dict[str, JsonValue], status.payload)
-    assert invalid_payload["invalid_reason"] == "rules_unit_destroyed"
+    assert invalid_payload["invalid_reason"] == "command_start_source_request_drift"
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
     assert lifecycle.decision_controller.records == ()
 
@@ -468,14 +514,14 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
         raise AssertionError("current_battle_phase is required")
 
     with pytest.raises(GameLifecycleError, match="lookup requires GameState"):
-        army_rule._eligible_reanimation_rules_units(cast(GameState, object()), army=army)
+        army_rule.eligible_reanimation_rules_units(cast(GameState, object()), army=army)
     with pytest.raises(GameLifecycleError, match="lookup requires ArmyDefinition"):
-        army_rule._eligible_reanimation_rules_units(
+        army_rule.eligible_reanimation_rules_units(
             state,
             army=cast(ArmyDefinition, object()),
         )
     with pytest.raises(GameLifecycleError, match="owner drift"):
-        army_rule._eligible_reanimation_rules_units(
+        army_rule.eligible_reanimation_rules_units(
             state,
             army=replace(army, player_id="player-b"),
         )
@@ -534,18 +580,18 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
         unit_instance_id=NECRON_UNIT_1_ID,
         update=_unit_with_necrons_keyword,
     )
-    assert army_rule._necrons_army_for_player(keyword_state, player_id="player-a") is not None
+    assert army_rule.necrons_army_for_player(keyword_state, player_id="player-a") is not None
     with pytest.raises(GameLifecycleError, match="army lookup requires GameState"):
-        army_rule._necrons_army_for_player(cast(GameState, object()), player_id="player-a")
+        army_rule.necrons_army_for_player(cast(GameState, object()), player_id="player-a")
     keyword_state.player_ids = ("player-a", "player-b", "player-c")
-    assert army_rule._necrons_army_for_player(keyword_state, player_id="player-c") is None
+    assert army_rule.necrons_army_for_player(keyword_state, player_id="player-c") is None
 
     with pytest.raises(GameLifecycleError, match="keyword lookup requires rules unit"):
         army_rule._rules_unit_has_necrons_keyword(cast(RulesUnitView, object()))
     with pytest.raises(GameLifecycleError, match="keyword lookup requires UnitInstance"):
         army_rule._unit_has_necrons_keyword(cast(UnitInstance, object()))
     with pytest.raises(GameLifecycleError, match="label requires rules unit"):
-        army_rule._rules_unit_label(cast(RulesUnitView, object()))
+        army_rule.rules_unit_label(cast(RulesUnitView, object()))
     state.player_ids = ("player-a", "player-b", "player-c")
     with pytest.raises(GameLifecycleError, match="requires one opposing player"):
         healing_geometry.healing_opposing_player_id(state=state, player_id="player-a")

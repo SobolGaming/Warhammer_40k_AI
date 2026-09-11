@@ -56,6 +56,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
     army_rule,
+    command_sequencing,
 )
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -178,12 +179,13 @@ def test_non_astra_selected_detachment_with_astra_keyword_units_gets_no_request(
     assert army.detachment_selection.faction_id == NON_ASTRA_FACTION_ID
     assert any("ASTRA MILITARUM" in unit.faction_keywords for unit in army.units)
 
-    request = army_rule.voice_of_command_request(
+    request = command_sequencing.request_for(
         CommandPhaseStartRequestContext(
             state=state,
             decisions=lifecycle.decision_controller,
             active_player_id="player-a",
-        )
+        ),
+        officer_unit_instance_id=OFFICER_UNIT_ID,
     )
 
     assert request is None
@@ -291,25 +293,75 @@ def test_voice_of_command_done_suppresses_current_command_phase_request() -> Non
         state_kind=army_rule.VOICE_OF_COMMAND_DONE_STATE_KIND,
     )
     assert (
-        army_rule.voice_of_command_request(
+        command_sequencing.request_for(
             CommandPhaseStartRequestContext(
                 state=state,
                 decisions=lifecycle.decision_controller,
                 active_player_id="player-a",
-            )
+            ),
+            officer_unit_instance_id=OFFICER_UNIT_ID,
         )
         is None
     )
 
     state.battle_round = 2
-    later_request = army_rule.voice_of_command_request(
+    later_request = command_sequencing.request_for(
         CommandPhaseStartRequestContext(
             state=state,
             decisions=lifecycle.decision_controller,
             active_player_id="player-a",
-        )
+        ),
+        officer_unit_instance_id=OFFICER_UNIT_ID,
     )
     assert later_request is not None
+
+
+def test_command_start_sequences_officers_and_decline_finishes_only_selected_officer() -> None:
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
+
+    config = _astra_config(
+        orders_per_battle_round=2,
+        officer_orders_payload=_DEFAULT_OFFICER_ORDERS_PAYLOAD,
+    )
+    alpha, beta = config.army_muster_requests
+    alpha = replace(
+        alpha,
+        unit_selections=(
+            *alpha.unit_selections,
+            _unit_selection("second-officer", OFFICER_DATASHEET_ID),
+        ),
+    )
+    lifecycle = _battle_ready_lifecycle_from_config(
+        replace(config, army_muster_requests=(alpha, beta))
+    )
+    state = _require_state(lifecycle)
+    second_id = "army-alpha:second-officer"
+    _place_unit(state, unit_instance_id=second_id, x=10.0, y=12.0)
+    session = LocalGameSession(lifecycle=lifecycle)
+    order = session.advance_until_decision_or_terminal().decision_request
+    assert order is not None
+    assert order.decision_type == SEQUENCING_DECISION_TYPE
+    assert order.actor_id == "player-a"
+    assert len(order.options) == 2
+    option = next(option for option in order.options if OFFICER_UNIT_ID in option.option_id)
+    request = session.submit_option(
+        request_id=order.request_id,
+        option_id=option.option_id,
+        result_id="order36-select-first-officer",
+    ).decision_request
+    assert request is not None
+    assert isinstance(request.payload, dict)
+    assert request.payload["issuing_officer_unit_instance_id"] == OFFICER_UNIT_ID
+    next_request = session.submit_option(
+        request_id=request.request_id,
+        option_id=army_rule.VOICE_OF_COMMAND_DONE_OPTION_ID,
+        result_id="order36-decline-first-officer-orders",
+    ).decision_request
+    assert next_request is not None
+    assert isinstance(next_request.payload, dict)
+    assert next_request.payload["issuing_officer_unit_instance_id"] == second_id
+    assert next_request.actor_id == "player-a"
 
 
 def test_voice_of_command_replaces_prior_order_and_battle_shock_clears_order() -> None:
@@ -654,12 +706,13 @@ def test_voice_of_command_noops_and_result_drift_are_fail_fast() -> None:
     no_astra_state = _require_state(no_astra_lifecycle)
     no_astra_state.active_player_id = "player-b"
     assert (
-        army_rule.voice_of_command_request(
+        command_sequencing.request_for(
             CommandPhaseStartRequestContext(
                 state=no_astra_state,
                 decisions=no_astra_lifecycle.decision_controller,
                 active_player_id="player-b",
-            )
+            ),
+            officer_unit_instance_id=OFFICER_UNIT_ID,
         )
         is None
     )
@@ -868,12 +921,13 @@ def test_voice_of_command_noops_and_result_drift_are_fail_fast() -> None:
         )
     )
     assert (
-        army_rule.voice_of_command_request(
+        command_sequencing.request_for(
             CommandPhaseStartRequestContext(
                 state=_require_state(exhausted),
                 decisions=exhausted.decision_controller,
                 active_player_id="player-a",
-            )
+            ),
+            officer_unit_instance_id=OFFICER_UNIT_ID,
         )
         is None
     )
@@ -1049,7 +1103,10 @@ def test_voice_of_command_non_applicable_modifiers_and_battle_shock_noops() -> N
 
 def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
     with pytest.raises(GameLifecycleError, match="requires request context"):
-        army_rule.voice_of_command_request(cast(CommandPhaseStartRequestContext, object()))
+        command_sequencing.request_for(
+            cast(CommandPhaseStartRequestContext, object()),
+            officer_unit_instance_id=OFFICER_UNIT_ID,
+        )
     with pytest.raises(GameLifecycleError, match="requires result context"):
         army_rule.apply_voice_of_command_result(cast(CommandPhaseStartResultContext, object()))
     with pytest.raises(GameLifecycleError, match="Battle-shock outcome requires context"):
@@ -1174,12 +1231,13 @@ def _next_voice_request(lifecycle: GameLifecycle) -> DecisionRequest:
 
 def _direct_voice_request(lifecycle: GameLifecycle) -> DecisionRequest:
     state = _require_state(lifecycle)
-    request = army_rule.voice_of_command_request(
+    request = command_sequencing.request_for(
         CommandPhaseStartRequestContext(
             state=state,
             decisions=lifecycle.decision_controller,
             active_player_id="player-a",
-        )
+        ),
+        officer_unit_instance_id=OFFICER_UNIT_ID,
     )
     assert request is not None
     return request

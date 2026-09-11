@@ -21,6 +21,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockPendingOutcomeAuthority,
     BattleShockPendingOutcomeAuthorityContext,
 )
+from warhammer40k_core.engine.battle_shock_outcome_history import outcome_activation_index
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     parse_battle_shock_resolution_authority,
 )
@@ -377,9 +378,17 @@ def _validate_delirium_occurrence(
         )
     ):
         raise GameLifecycleError("Delirium outcome predicate drifted.")
+    activation_index = outcome_activation_index(
+        events=events,
+        result_id=result.result_id,
+        source_rule_id=army_rule.SOURCE_RULE_ID,
+        owner_player_id=chaos_knights_player_id,
+        resolved_index=resolved_index,
+        boundary_index=boundary_event_index,
+    )
     d3_result = _exact_delirium_d3(
         events=events,
-        resolved_index=resolved_index,
+        resolved_index=activation_index,
         request_event_index=boundary_event_index,
         target_unit_instance_id=target.unit_instance_id,
     )

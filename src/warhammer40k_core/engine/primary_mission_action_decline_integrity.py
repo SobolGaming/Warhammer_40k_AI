@@ -717,6 +717,7 @@ def _validate_evidence_at_request(
         state=state,
         event=request_event,
         event_index_by_id=event_index_by_id,
+        event_records=event_records,
     ):
         raise GameLifecycleError("Mission Action decline marker inventory drifted.")
     prior_actions = tuple(

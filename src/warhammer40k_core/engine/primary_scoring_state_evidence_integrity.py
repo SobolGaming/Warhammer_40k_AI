@@ -139,7 +139,7 @@ def validate_primary_scoring_action_boundary(
         turn_order=turn_order,
         battle_phase_sequence=battle_phase_sequence,
     )
-    if record_key >= expiry_key:
+    if record_key > expiry_key:
         raise GameLifecycleError("Primary scoring state cannot retain an expired started Action.")
 
 
@@ -442,6 +442,7 @@ def validate_primary_scoring_position_event_authority(
             event_records=event_records,
             objective_control_record_id=evidence.objective_control_record_id,
             scoring_boundary_kind=evidence.scoring_boundary_kind.value,
+            scoring_player_id=evidence.scoring_player_id,
         )
         oc_event_index = event_records.index(event)
         if commit_event_index <= oc_event_index:
@@ -463,6 +464,7 @@ def validate_primary_scoring_position_event_authority(
             commit_checkpoint.checkpoint_id != evidence.scoring_commit_checkpoint_id
             or commit_checkpoint.checkpoint_hash != evidence.scoring_commit_checkpoint_hash
             or commit_checkpoint.boundary_kind != PRIMARY_SCORING_COMMIT_BOUNDARY_KIND
+            or commit_checkpoint.player_id != evidence.active_player_id
             or commit_checkpoint.game_id != evidence.game_id
             or commit_checkpoint.battlefield_id != evidence.battlefield_id
             or commit_checkpoint.active_player_id != evidence.active_player_id
@@ -472,6 +474,16 @@ def validate_primary_scoring_position_event_authority(
             raise GameLifecycleError(
                 "Primary scoring position evidence scoring-commit checkpoint drifted."
             )
+        from warhammer40k_core.engine.primary_scoring_mission_history import (
+            validate_primary_mission_history_at_commit,
+        )
+
+        validate_primary_mission_history_at_commit(
+            state=state,
+            evidence=evidence,
+            events=event_records,
+            commit_index=commit_event_index,
+        )
         model_placements = placements_by_record_id.get(evidence.scoring_commit_checkpoint_id)
         if model_placements is None:
             model_placements = primary_mission_model_placements_from_checkpoint(
@@ -574,9 +586,17 @@ def _validate_authoritative_actions(
                 turn_order=state.turn_order,
                 battle_phase_sequence=battle_phase_sequence,
             )
-            if completion_key <= record_key and frozen != current:
+            if completion_key < record_key and frozen != current:
                 raise GameLifecycleError(
                     "Primary scoring state completed Action is missing authoritative state."
+                )
+            if (
+                completion_key == record_key
+                and frozen != current
+                and frozen.status is not MissionActionStatus.STARTED
+            ):
+                raise GameLifecycleError(
+                    "Primary scoring Action terminal status drifted at its boundary."
                 )
             if completion_key > record_key and frozen.status is not MissionActionStatus.STARTED:
                 raise GameLifecycleError(
@@ -656,7 +676,16 @@ def _validate_authoritative_progress(
             turn_order=state.turn_order,
             battle_phase_sequence=phase_sequence,
         )
-        if created_key is not None and created_key > record_key:
+        if created_key is not None and (
+            created_key > record_key
+            or (
+                created_key[:3] == record_key[:3]
+                and marker.marker_id
+                not in {
+                    value.marker_id for value in evidence.primary_mission_progress_state.markers
+                }
+            )
+        ):
             continue
         removed_key = _optional_event_boundary_key(
             label="Primary scoring authoritative marker removal",
@@ -666,7 +695,17 @@ def _validate_authoritative_progress(
             turn_order=state.turn_order,
             battle_phase_sequence=phase_sequence,
         )
-        if removed_key is not None and removed_key > record_key:
+        if removed_key is not None and (
+            removed_key > record_key
+            or (
+                removed_key[:3] == record_key[:3]
+                and any(
+                    value.marker_id == marker.marker_id
+                    and value.status is PrimaryMissionMarkerStatus.ACTIVE
+                    for value in evidence.primary_mission_progress_state.markers
+                )
+            )
+        ):
             marker = replace(
                 marker,
                 status=PrimaryMissionMarkerStatus.ACTIVE,
@@ -723,9 +762,19 @@ def _validate_authoritative_progress(
                 turn_order=state.turn_order,
                 battle_phase_sequence=phase_sequence,
             )
-            > record_key
+            >= record_key
         )
-        if consumed_key is not None and consumed_key > record_key:
+        if consumed_key is not None and (
+            consumed_key > record_key
+            or (
+                consumed_key[:3] == record_key[:3]
+                and any(
+                    value.designation_id == designation.designation_id
+                    and value.status is PrimaryConsecrationStatus.ACTIVE
+                    for value in evidence.primary_mission_progress_state.consecration_designations
+                )
+            )
+        ):
             designation = replace(
                 designation,
                 status=PrimaryConsecrationStatus.ACTIVE,

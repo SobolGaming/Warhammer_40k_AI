@@ -143,7 +143,7 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT,
     UnitMoveCompletedMortalWoundHookRegistry,
     apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
-    resolve_unit_move_completed_mortal_wound_hooks,
+    resolve_unit_move_completed_hooks,
 )
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection, WargearSelection
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
@@ -655,7 +655,7 @@ def test_grenade_pack_requests_optional_visible_target_for_move_and_setup(
         movement_action=movement_action,
     )
 
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=fixture.state,
         decisions=decisions,
         registry=registry,
@@ -701,7 +701,7 @@ def test_grenade_pack_rolls_only_for_surviving_keyworded_models_in_attached_unit
         unit_instance_id=fixture.swooping_hawks_rules_unit_id,
     )
 
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=fixture.state,
         decisions=decisions,
         registry=registry,
@@ -769,7 +769,7 @@ def test_grenade_pack_uses_passenger_owner_for_opponent_turn_emergency_disembark
         triggering_player_id="player-a",
     )
 
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=fixture.state,
         decisions=decisions,
         registry=registry,
@@ -838,7 +838,7 @@ def test_grenade_pack_rejects_disembark_turn_and_passenger_context_drift(
         disembarked_state_payload[drifted_field] = drifted_value
 
     with pytest.raises(GameLifecycleError, match=expected_error):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=fixture.state,
             decisions=decisions,
             registry=registry,
@@ -866,7 +866,7 @@ def test_grenade_pack_exact_disembark_trigger_uses_passenger_owner() -> None:
     )
     trigger_event_id = decisions.event_log.records[0].event_id
 
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=fixture.state,
         decisions=decisions,
         registry=registry,
@@ -923,7 +923,7 @@ def test_grenade_pack_exact_disembark_trigger_rejects_identity_and_envelope_drif
         GameLifecycleError,
         match="Move-completed hook trigger occurrence is missing or has drifted context",
     ):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=fixture.state,
             decisions=decisions,
             registry=registry,
@@ -947,7 +947,7 @@ def test_grenade_pack_exact_disembark_trigger_requires_complete_identity() -> No
         GameLifecycleError,
         match="Expected move-completed trigger identity requires an exact trigger event",
     ):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=fixture.state,
             decisions=decisions,
             registry=registry,
@@ -964,7 +964,7 @@ def test_grenade_pack_exact_disembark_trigger_requires_complete_identity() -> No
         GameLifecycleError,
         match="Exact move-completed trigger event requires expected unit and player identities",
     ):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=fixture.state,
             decisions=decisions,
             registry=registry,
@@ -1098,7 +1098,7 @@ def test_tactical_disembark_closes_actual_grenade_pack_boundary_before_follow_up
         movement_action=None,
         transport_movement_status="not_moved",
     )
-    hypothetical_status = resolve_unit_move_completed_mortal_wound_hooks(
+    hypothetical_status = resolve_unit_move_completed_hooks(
         state=hypothetical_state,
         decisions=hypothetical_decisions,
         registry=registry,
@@ -1292,7 +1292,7 @@ def test_grenade_pack_resolves_per_hawk_caps_damage_restricts_grenades_and_is_on
         event_type="movement_activation_completed",
         movement_action="advance",
     )
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=fixture.state,
         decisions=decisions,
         registry=registry,
@@ -1323,7 +1323,7 @@ def test_grenade_pack_resolves_per_hawk_caps_damage_restricts_grenades_and_is_on
         is None
     )
     assert (
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=fixture.state,
             decisions=decisions,
             registry=registry,
@@ -1368,7 +1368,7 @@ def test_grenade_pack_resolves_per_hawk_caps_damage_restricts_grenades_and_is_on
         movement_action="fall_back",
     )
     assert (
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=fixture.state,
             decisions=decisions,
             registry=registry,
@@ -1385,6 +1385,11 @@ def test_grenade_pack_resolves_per_hawk_caps_damage_restricts_grenades_and_is_on
 
 
 def test_flickerjump_grant_sets_move_forbids_charge_and_resolves_phase_end_self_damage() -> None:
+    from warhammer40k_core.engine.movement_phase_end_mortal_wounds import (
+        movement_phase_end_candidates,
+    )
+    from warhammer40k_core.engine.sequencing import SequencingRequirement
+
     fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
     runtime = CatalogDatasheetRuleRuntime(fixture.indexes, fixture.armies)
     registry = AdvanceMoveHookRegistry.from_bindings(runtime.advance_move_hook_bindings())
@@ -1442,6 +1447,13 @@ def test_flickerjump_grant_sets_move_forbids_charge_and_resolves_phase_end_self_
     )
 
     decisions = DecisionController()
+    before = fixture.state.to_payload(), decisions.to_payload()
+    candidates = movement_phase_end_candidates(state=fixture.state, decisions=decisions)
+    assert (fixture.state.to_payload(), decisions.to_payload()) == before
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == "player-a"
+    assert candidates[0].participant.requirement is SequencingRequirement.MANDATORY
+    assert candidates[0].participant.source_rule_id == grant.source_id
     assert (
         resolve_movement_phase_end_mortal_wounds(state=fixture.state, decisions=decisions) is None
     )
@@ -1917,6 +1929,7 @@ def _record_move_completed_event(
         "battle_round": state.battle_round,
         "phase": BattlePhase.MOVEMENT.value,
         "active_player_id": active_player_id,
+        "player_id": triggering_player_id,
         "unit_instance_id": unit_instance_id,
     }
     if movement_action is not None:

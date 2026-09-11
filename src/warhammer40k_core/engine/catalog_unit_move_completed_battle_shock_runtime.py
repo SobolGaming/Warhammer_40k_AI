@@ -322,6 +322,7 @@ def _effects_from_clause(
     effect_index, _effect = supported_effects[0]
     return tuple(
         UnitMoveCompletedBattleShockEffect(
+            source_player_id=triggering_player_id,
             hook_id=CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
             source_id=CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
             source_rule_id=record.definition.source_id,

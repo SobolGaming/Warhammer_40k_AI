@@ -70,8 +70,8 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_effect_payload,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_destroyed_hooks import (
-    UnitDestroyedContext,
     UnitDestroyedHookBinding,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -79,6 +79,10 @@ from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     adepta_sororitas_triumph_sources_2026_27 as _triumph_sources,
+)
+
+from .destruction_sequencing import (
+    resolve_adepta_sororitas_unit_destroyed as resolve_adepta_sororitas_unit_destroyed,
 )
 
 if TYPE_CHECKING:
@@ -257,6 +261,10 @@ class MiracleDie:
 
 
 def runtime_contribution() -> RuntimeContentContribution:
+    from .destruction_sequencing import (
+        candidates as destruction_candidates,
+    )
+
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
         battle_round_start_hook_bindings=(
@@ -264,11 +272,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=BATTLE_ROUND_START_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=resolve_battle_round_start,
+                candidate_handler=miracle_sequencing_candidates,
             ),
             BattleRoundStartHookBinding(
                 hook_id=TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
                 source_id=TRIUMPH_RELICS_SOURCE_RULE_ID,
                 request_handler=triumph_relics_selection_request,
+                candidate_handler=relic_sequencing_candidates,
                 result_handler=apply_triumph_relics_selection_result,
             ),
         ),
@@ -276,7 +286,7 @@ def runtime_contribution() -> RuntimeContentContribution:
             UnitDestroyedHookBinding(
                 hook_id=UNIT_DESTROYED_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                handler=resolve_adepta_sororitas_unit_destroyed,
+                candidate_handler=destruction_candidates,
             ),
         ),
         movement_budget_modifier_bindings=(
@@ -324,7 +334,7 @@ def resolve_battle_round_start(
             context.decisions,
             player_id=army.player_id,
             trigger=BATTLE_ROUND_START_TRIGGER,
-            source_id=_battle_round_start_source_id(
+            source_id=battle_round_start_source_id(
                 player_id=army.player_id,
                 battle_round=context.state.battle_round,
             ),
@@ -339,32 +349,9 @@ def resolve_battle_round_start(
 def triumph_relics_selection_request(
     context: BattleRoundStartRequestContext,
 ) -> DecisionRequest | None:
-    if type(context) is not BattleRoundStartRequestContext:
-        raise GameLifecycleError("Relics of the Matriarchs requires request context.")
-    for source in _eligible_triumph_relic_sources(context.state):
-        if (
-            _triumph_relic_selection_state_for_unit(
-                context.state,
-                player_id=source.army.player_id,
-                unit_instance_id=source.unit.unit_instance_id,
-                battle_round=context.state.battle_round,
-            )
-            is not None
-        ):
-            continue
-        common_payload = _triumph_relics_common_payload(context=context, source=source)
-        options = _triumph_relics_selection_options(
-            common_payload=common_payload,
-            max_selections=source.selection_limit.max_selections,
-        )
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-            actor_id=source.army.player_id,
-            payload=validate_json_value(common_payload),
-            options=options,
-        )
-    return None
+    from .round_sequencing import relic_request_for
+
+    return relic_request_for(context)
 
 
 def apply_triumph_relics_selection_result(context: BattleRoundStartResultContext) -> bool:
@@ -402,7 +389,7 @@ def apply_triumph_relics_selection_result(context: BattleRoundStartResultContext
         raise GameLifecycleError("Relics of the Matriarchs source unit is no longer eligible.")
     _validate_triumph_relics_request_matches_current_state(context=context, source=source)
     if (
-        _triumph_relic_selection_state_for_unit(
+        triumph_relic_selection_state_for_unit(
             context.state,
             player_id=player_id,
             unit_instance_id=source_unit_id,
@@ -471,7 +458,7 @@ def active_triumph_relics_for_unit(
     _validate_state(state)
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    state_record = _triumph_relic_selection_state_for_unit(
+    state_record = triumph_relic_selection_state_for_unit(
         state,
         player_id=requested_player_id,
         unit_instance_id=requested_unit_id,
@@ -497,7 +484,7 @@ def acts_of_faith_phase_limit_for_unit(
         raise GameLifecycleError("Acts of Faith phase limit player drift.")
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         raise GameLifecycleError("Acts of Faith phase limit requires Adepta Sororitas.")
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         raise GameLifecycleError("Acts of Faith phase limit requires an Adepta Sororitas unit.")
     if _unit_has_active_triumph_relic_aura(
         state,
@@ -517,7 +504,7 @@ def triumph_fiery_heart_movement_modifier(
     unit, army = _unit_and_army_by_id(context.state, unit_instance_id=context.unit_instance_id)
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         return ()
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         return ()
     if _unit_has_active_triumph_relic_aura(
         context.state,
@@ -537,7 +524,7 @@ def triumph_fiery_heart_advance_modifier(
     unit, army = _unit_and_army_by_id(context.state, unit_instance_id=context.unit_instance_id)
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         return context.current_roll_modifiers
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         return context.current_roll_modifiers
     if not _unit_has_active_triumph_relic_aura(
         context.state,
@@ -565,7 +552,7 @@ def triumph_fiery_heart_charge_modifier(
     unit, army = _unit_and_army_by_id(context.state, unit_instance_id=context.unit_instance_id)
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         return context.current_roll_modifiers
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         return context.current_roll_modifiers
     if not _unit_has_active_triumph_relic_aura(
         context.state,
@@ -600,7 +587,7 @@ def triumph_bloody_rose_weapon_profile_modifier(
     )
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         return context.weapon_profile
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         return context.weapon_profile
     if not _unit_has_active_triumph_relic_aura(
         context.state,
@@ -641,7 +628,7 @@ def triumph_argent_shroud_wound_reroll_values(
         raise GameLifecycleError("Argent Shroud wound reroll player drift.")
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         return ()
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         return ()
     if not _unit_has_active_triumph_relic_aura(
         state,
@@ -656,11 +643,11 @@ def triumph_argent_shroud_wound_reroll_values(
 def sync_triumph_relic_feel_no_pain_sources(state: GameState, *, player_id: str) -> None:
     _validate_state(state)
     requested_player_id = _validate_identifier("player_id", player_id)
-    army = _adepta_sororitas_army_for_player(state, player_id=requested_player_id)
+    army = adepta_sororitas_army_for_player(state, player_id=requested_player_id)
     if army is None:
         raise GameLifecycleError("Triumph Relics Feel No Pain sync requires Adepta Sororitas.")
     for unit in army.units:
-        if not _is_adepta_sororitas_unit(unit):
+        if not is_adepta_sororitas_unit(unit):
             continue
         active = _unit_has_active_triumph_relic_aura(
             state,
@@ -705,37 +692,6 @@ def sync_triumph_relic_feel_no_pain_sources(state: GameState, *, player_id: str)
                 )
 
 
-def resolve_adepta_sororitas_unit_destroyed(context: UnitDestroyedContext) -> None:
-    if type(context) is not UnitDestroyedContext:
-        raise GameLifecycleError("Acts of Faith unit-destroyed hook requires context.")
-    army = _adepta_sororitas_army_for_player(context.state, player_id=context.destroyed_player_id)
-    if army is None:
-        return
-    destroyed_unit = _unit_by_id(army, unit_instance_id=context.destroyed_unit_instance_id)
-    if destroyed_unit is None:
-        raise GameLifecycleError("Destroyed Adepta Sororitas unit was not found in its army.")
-    if not _is_adepta_sororitas_unit(destroyed_unit):
-        return
-    gain_miracle_die(
-        context.state,
-        context.decisions,
-        player_id=context.destroyed_player_id,
-        trigger=UNIT_DESTROYED_TRIGGER,
-        source_id=_unit_destroyed_source_id(
-            player_id=context.destroyed_player_id,
-            model_destroyed_event_id=context.model_destroyed_event_id,
-        ),
-        source_context={
-            "completed_phase": context.completed_phase.value,
-            "destroying_player_id": context.destroying_player_id,
-            "destroyed_player_id": context.destroyed_player_id,
-            "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
-            "model_destroyed_event_id": context.model_destroyed_event_id,
-            "model_destroyed_payload": validate_json_value(context.model_destroyed_payload),
-        },
-    )
-
-
 def gain_miracle_die(
     state: GameState,
     decisions: DecisionController,
@@ -752,9 +708,9 @@ def gain_miracle_die(
     requested_source_id = _validate_identifier("source_id", source_id)
     requested_trigger = _validate_gain_trigger(trigger)
     validated_source_context = _payload_object(source_context, field_name="source_context")
-    if _adepta_sororitas_army_for_player(state, player_id=requested_player_id) is None:
+    if adepta_sororitas_army_for_player(state, player_id=requested_player_id) is None:
         raise GameLifecycleError("Acts of Faith can gain Miracle dice only for Adepta Sororitas.")
-    if _gain_source_exists(state, player_id=requested_player_id, source_id=requested_source_id):
+    if gain_source_exists(state, player_id=requested_player_id, source_id=requested_source_id):
         return None
     current_phase = state.current_battle_phase
     if current_phase is None:
@@ -847,7 +803,7 @@ def spend_miracle_die(
         raise GameLifecycleError("Acts of Faith Miracle dice spend player drift.")
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         raise GameLifecycleError("Acts of Faith can spend Miracle dice only for Adepta Sororitas.")
-    if not _is_adepta_sororitas_unit(unit):
+    if not is_adepta_sororitas_unit(unit):
         raise GameLifecycleError("Acts of Faith spend requires an Adepta Sororitas unit.")
     phase_limit = acts_of_faith_phase_limit_for_unit(
         state,
@@ -932,7 +888,7 @@ def miracle_dice_values(state: GameState, *, player_id: str) -> tuple[int, ...]:
     return tuple(die.value for die in miracle_dice_pool(state, player_id=player_id))
 
 
-def _eligible_triumph_relic_sources(state: GameState) -> tuple[_TriumphRelicsEligibleSource, ...]:
+def eligible_triumph_relic_sources(state: GameState) -> tuple[_TriumphRelicsEligibleSource, ...]:
     _validate_state(state)
     sources: list[_TriumphRelicsEligibleSource] = []
     for army in sorted(state.army_definitions, key=lambda item: item.player_id):
@@ -977,7 +933,7 @@ def _eligible_triumph_relic_source_by_unit_id(
 ) -> _TriumphRelicsEligibleSource | None:
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_unit_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
-    for source in _eligible_triumph_relic_sources(state):
+    for source in eligible_triumph_relic_sources(state):
         if source.army.player_id == requested_player_id and source.unit.unit_instance_id == (
             requested_unit_id
         ):
@@ -985,7 +941,7 @@ def _eligible_triumph_relic_source_by_unit_id(
     return None
 
 
-def _triumph_relics_common_payload(
+def triumph_relics_common_payload(
     *,
     context: BattleRoundStartRequestContext,
     source: _TriumphRelicsEligibleSource,
@@ -1015,7 +971,7 @@ def _triumph_relics_common_payload(
     }
 
 
-def _triumph_relics_selection_options(
+def triumph_relics_selection_options(
     *,
     common_payload: dict[str, JsonValue],
     max_selections: int,
@@ -1169,7 +1125,7 @@ def _triumph_relic_selection_state(
     )
 
 
-def _triumph_relic_selection_state_for_unit(
+def triumph_relic_selection_state_for_unit(
     state: GameState,
     *,
     player_id: str,
@@ -1371,7 +1327,7 @@ def _unit_has_active_triumph_relic_aura(
         raise GameLifecycleError("Triumph Relics aura target player drift.")
     if target_army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
         return False
-    if not _is_adepta_sororitas_unit(target_unit):
+    if not is_adepta_sororitas_unit(target_unit):
         return False
     for state_record in _triumph_relic_selection_states_for_player_round(
         state,
@@ -1405,7 +1361,7 @@ def _unit_has_active_triumph_relic_aura(
 def _friendly_adepta_unit_ids(army: ArmyDefinition) -> tuple[str, ...]:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Triumph Relics friendly unit lookup requires ArmyDefinition.")
-    return tuple(unit.unit_instance_id for unit in army.units if _is_adepta_sororitas_unit(unit))
+    return tuple(unit.unit_instance_id for unit in army.units if is_adepta_sororitas_unit(unit))
 
 
 def _unit_within_range_of_source_unit(
@@ -1562,16 +1518,16 @@ def _source_ids_with_triumph_relic(
     return tuple(sorted((*source_ids, source_id)))
 
 
-def _battle_round_start_source_id(*, player_id: str, battle_round: int) -> str:
+def battle_round_start_source_id(*, player_id: str, battle_round: int) -> str:
     return f"{SOURCE_RULE_ID}:battle-round-start:round-{battle_round:02d}:player-{player_id}"
 
 
-def _unit_destroyed_source_id(*, player_id: str, model_destroyed_event_id: str) -> str:
+def unit_destroyed_source_id(*, player_id: str, model_destroyed_event_id: str) -> str:
     requested_event_id = _validate_identifier("model_destroyed_event_id", model_destroyed_event_id)
     return f"{SOURCE_RULE_ID}:unit-destroyed:{requested_event_id}:player-{player_id}"
 
 
-def _adepta_sororitas_army_for_player(
+def adepta_sororitas_army_for_player(
     state: GameState,
     *,
     player_id: str,
@@ -1585,7 +1541,7 @@ def _adepta_sororitas_army_for_player(
     return army
 
 
-def _unit_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance | None:
+def unit_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance | None:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for unit in army.units:
         if unit.unit_instance_id == requested_unit_id:
@@ -1593,7 +1549,7 @@ def _unit_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance 
     return None
 
 
-def _is_adepta_sororitas_unit(unit: UnitInstance) -> bool:
+def is_adepta_sororitas_unit(unit: UnitInstance) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Acts of Faith unit lookup requires UnitInstance.")
     return any(
@@ -1634,7 +1590,7 @@ def _spent_miracle_die_ids(state: GameState, *, player_id: str) -> frozenset[str
     return frozenset(spent_ids)
 
 
-def _gain_source_exists(state: GameState, *, player_id: str, source_id: str) -> bool:
+def gain_source_exists(state: GameState, *, player_id: str, source_id: str) -> bool:
     requested_source_id = _validate_identifier("source_id", source_id)
     for gain_state in _miracle_die_gain_states(state, player_id=player_id):
         payload = _payload_object(gain_state.payload, field_name="Miracle die gain payload")
@@ -1701,3 +1657,19 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Acts of Faith phase: {token}.") from exc
+
+
+def miracle_sequencing_candidates(
+    context: BattleRoundStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .round_sequencing import miracle_candidates
+
+    return miracle_candidates(context)
+
+
+def relic_sequencing_candidates(
+    context: BattleRoundStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .round_sequencing import relic_candidates
+
+    return relic_candidates(context)

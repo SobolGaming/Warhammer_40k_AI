@@ -307,70 +307,66 @@ class PendingReturnOnDeath:
         )
 
 
-def resolve_pending_return_on_death_phase_end(
+def resolve_return_on_death_occurrence(
     *,
     state: GameState,
     decisions: DecisionController,
+    pending: PendingReturnOnDeath,
     dice_manager: DiceRollManager | None = None,
 ) -> DecisionRequest | None:
+    if state.pending_return_on_death_by_id(pending.pending_id) != pending or pending.resolved:
+        raise GameLifecycleError("Return-on-death source occurrence drift.")
+    if (
+        pending.trigger_battle_round != state.battle_round
+        or state.current_battle_phase is None
+        or pending.trigger_phase != state.current_battle_phase.value
+        or pending.resolution_timing != "phase_end"
+    ):
+        raise GameLifecycleError("Return-on-death occurrence escaped its source boundary.")
     manager = (
         DiceRollManager(state.game_id, event_log=decisions.event_log)
         if dice_manager is None
         else dice_manager
     )
-    for pending in tuple(state.pending_return_on_death):
-        if pending.resolved:
-            continue
-        if pending.resolution_timing != "phase_end":
-            continue
-        if pending.trigger_battle_round != state.battle_round:
-            continue
-        if (
-            state.current_battle_phase is None
-            or pending.trigger_phase != state.current_battle_phase.value
-        ):
-            continue
-        roll_state = manager.roll(_return_on_death_roll_spec(state=state, pending=pending))
-        success = roll_state.current_total >= pending.success_threshold
+    roll_state = manager.roll(_return_on_death_roll_spec(state=state, pending=pending))
+    success = roll_state.current_total >= pending.success_threshold
+    decisions.event_log.append(
+        RETURN_ON_DEATH_ROLL_RESOLVED_EVENT_TYPE,
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": pending.trigger_phase,
+            "pending_id": pending.pending_id,
+            "roll_state": roll_state.to_payload(),
+            "success_threshold": pending.success_threshold,
+            "success": success,
+        },
+    )
+    if not success:
+        state.resolve_pending_return_on_death(pending.pending_id)
         decisions.event_log.append(
-            RETURN_ON_DEATH_ROLL_RESOLVED_EVENT_TYPE,
+            RETURN_ON_DEATH_FAILED_ROLL_EVENT_TYPE,
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "phase": pending.trigger_phase,
                 "pending_id": pending.pending_id,
                 "roll_state": roll_state.to_payload(),
-                "success_threshold": pending.success_threshold,
-                "success": success,
             },
         )
-        if not success:
-            state.resolve_pending_return_on_death(pending.pending_id)
-            decisions.event_log.append(
-                RETURN_ON_DEATH_FAILED_ROLL_EVENT_TYPE,
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": pending.trigger_phase,
-                    "pending_id": pending.pending_id,
-                    "roll_state": roll_state.to_payload(),
-                },
-            )
-            continue
-        request = build_return_on_death_placement_request(state=state, pending=pending)
-        decisions.request_decision(request)
-        decisions.event_log.append(
-            RETURN_ON_DEATH_SET_BACK_UP_REQUESTED_EVENT_TYPE,
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": pending.trigger_phase,
-                "pending_id": pending.pending_id,
-                "request_id": request.request_id,
-            },
-        )
-        return request
-    return None
+        return None
+    request = build_return_on_death_placement_request(state=state, pending=pending)
+    decisions.event_log.append(
+        RETURN_ON_DEATH_SET_BACK_UP_REQUESTED_EVENT_TYPE,
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": pending.trigger_phase,
+            "pending_id": pending.pending_id,
+            "request_id": request.request_id,
+        },
+    )
+    return request
 
 
 def build_return_on_death_placement_request(

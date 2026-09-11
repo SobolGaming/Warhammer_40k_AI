@@ -11,6 +11,7 @@ import pytest
 from tests.completed_attack_fixture_helpers import (
     record_shooting_declaration_for_executor_fixture,
 )
+from tests.fight_end_fixture_helpers import advance_completed_phase_fixture
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -26,6 +27,7 @@ from tests.phase17n_secondary_mission_helpers import (
     resolved_secondary_mission_selection_for_card,
     seed_resolved_secondary_mission_selections,
 )
+from tests.phase17n_step6g_secondary_certification_helpers import seed_completed_fight_phase
 from tests.secondary_destruction_helpers import (
     record_secondary_destruction_for_fixture,
     synchronize_secondary_destruction_projection_payload,
@@ -374,6 +376,7 @@ def test_immovable_object_scores_central_and_non_home_objectives_by_round() -> N
     turn_end_state.battle_phase_index = turn_end_state.battle_phase_sequence.index(
         BattlePhase.FIGHT
     )
+    seed_completed_fight_phase(turn_end_state)
 
     turn_end_state.advance_to_next_battle_phase()
 
@@ -411,6 +414,7 @@ def test_immovable_object_scores_central_and_non_home_objectives_by_round() -> N
     fifth_round_state.battle_phase_index = fifth_round_state.battle_phase_sequence.index(
         BattlePhase.FIGHT
     )
+    seed_completed_fight_phase(fifth_round_state)
 
     fifth_round_state.advance_to_next_battle_phase()
 
@@ -444,6 +448,7 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
         source_id="phase16:unstoppable-force:enemy-destroyed",
     )
     turn_state.battle_phase_index = turn_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(turn_state)
 
     turn_state.advance_to_next_battle_phase()
 
@@ -484,6 +489,7 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
         target_suffix="center",
     )
     end_state.battle_phase_index = end_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(end_state)
 
     end_state.advance_to_next_battle_phase()
 
@@ -886,7 +892,9 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     attacker_anchor = attacker_placement.model_placements[0].pose
     attacker_dx = defender_home.x_inches + 2.0 - attacker_anchor.position.x
     attacker_dy = defender_home.y_inches - attacker_anchor.position.y
-    movement_status = flow.advance(
+    movement_status = advance_completed_phase_fixture(
+        flow=flow,
+        config=config,
         state=state,
         decisions=lifecycle.decision_controller,
     )
@@ -912,7 +920,9 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
             and state.current_battle_phase is BattlePhase.SHOOTING
         ):
             break
-        phase_status = flow.advance(
+        phase_status = advance_completed_phase_fixture(
+            flow=flow,
+            config=config,
             state=state,
             decisions=lifecycle.decision_controller,
         )
@@ -998,7 +1008,9 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     )
     assert remaining is None
     assert attack_status is None
-    flow.advance(state=state, decisions=lifecycle.decision_controller)
+    advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
     (destruction,) = state.primary_unit_destruction_states
     assert destruction.destroyed_unit_instance_id == defender.unit_instance_id
     assert destruction.started_turn_terrain_feature_ids == ()
@@ -1009,18 +1021,25 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     )
     assert len(capture_events) == 1
 
-    charge_status = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    charge_status = advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
     assert charge_status.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert state.current_battle_phase is not None
     assert state.current_battle_phase.value == BattlePhase.FIGHT.value
-    flow.advance(state=state, decisions=lifecycle.decision_controller)
+    status = advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    resolve_ordering_for_fixture(lifecycle, status)
 
     all_transactions = state.victory_point_ledger_for_player("player-a").transactions
     new_transactions = all_transactions[len(preexisting_transactions) :]
     transactions = tuple(
         transaction
         for transaction in new_transactions
-        if transaction.source_id == "primary-meatgrinder"
+        if transaction.source_id == "primary-meatgrinder" and transaction.battle_round == 2
     )
     current_turn_destruction_metadata = _transaction_metadata(transactions[0])
     comparison_metadata = _transaction_metadata(transactions[1])
@@ -2769,13 +2788,21 @@ def test_purge_and_secure_real_attack_from_objective_scores_through_lifecycle() 
             BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
         }
     )
-    flow.advance(state=state, decisions=lifecycle.decision_controller)
+    advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
     (destruction,) = state.primary_unit_destruction_states
     assert destruction.source_rules_unit_objective_proximity_witness == source_witness
     assert destruction.started_turn_objective_marker_ids == ()
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
 
-    flow.advance(state=state, decisions=lifecycle.decision_controller)
+    status = advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    resolve_ordering_for_fixture(lifecycle, status)
 
     transaction = next(
         transaction
@@ -2875,7 +2902,9 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
             and state.current_battle_phase is BattlePhase.MOVEMENT
         ):
             break
-        phase_status = flow.advance(
+        phase_status = advance_completed_phase_fixture(
+            flow=flow,
+            config=config,
             state=state,
             decisions=lifecycle.decision_controller,
         )
@@ -3014,7 +3043,9 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
             "pending": pending.to_payload(),
         },
     )
-    waiting = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    waiting = advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
 
     assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     request = waiting.decision_request
@@ -3057,7 +3088,9 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
         original_placement
     )
 
-    advanced = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    advanced = advance_completed_phase_fixture(
+        flow=flow, config=config, state=state, decisions=lifecycle.decision_controller
+    )
     assert advanced.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert state.battle_phase_index == state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     assert len(state.primary_unit_destruction_states) == 1
@@ -3099,6 +3132,7 @@ def test_meatgrinder_round_five_objective_control_scores_only_at_turn_end() -> N
     assert state.victory_point_total("player-a") == 0
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.advance_to_next_battle_phase()
 
     transactions = state.victory_point_ledger_for_player("player-a").transactions
@@ -3114,8 +3148,10 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
     )
     state = _battle_state_from_config(config)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.advance_to_next_battle_phase()
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.advance_to_next_battle_phase()
     assert state.battle_round == 2
     assert state.active_player_id == "player-a"
@@ -3241,6 +3277,7 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
     assert restored_state.secondary_unit_destruction_states == list(secondary_occurrences)
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.advance_to_next_battle_phase()
 
     transactions = state.victory_point_ledger_for_player("player-a").transactions
@@ -3266,6 +3303,7 @@ def test_primary_destruction_capture_does_not_complete_attached_unit_for_bodygua
     state = _battle_state_from_config(config)
     lifecycle.state = state
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.advance_to_next_battle_phase()
     assert state.active_player_id == "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -3984,6 +4022,7 @@ def test_primary_destruction_tracking_counts_transition_only_enemy_loss() -> Non
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.advance_to_next_battle_phase()
 
     transactions = state.victory_point_ledger_for_player("player-a").transactions
@@ -4776,9 +4815,12 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
         BattlePhase.SHOOTING,
         BattlePhase.CHARGE,
     ):
+        if state.current_battle_phase is BattlePhase.FIGHT:
+            seed_completed_fight_phase(state)
         status = flow.advance(state=state, decisions=lifecycle.decision_controller)
         assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert state.current_battle_phase is BattlePhase.FIGHT
+    seed_completed_fight_phase(state)
     evidence_before = tuple(state.primary_scoring_state_evidence_records)
 
     state.score_secondary_mission_from_state(
@@ -4856,21 +4898,24 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
 
 
 def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> None:
+    events = EventLog()
     fixed_state = _battle_state_from_config(
         _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4"))
     )
     fixed_state.battle_phase_index = fixed_state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    _record_secondary_vehicle_destruction(fixed_state, "army-beta:vehicle-unit-3")
-    _record_secondary_vehicle_destruction(fixed_state, "army-beta:vehicle-unit-4")
+    seed_completed_fight_phase(fixed_state)
+    _record_secondary_vehicle_destruction(fixed_state, "army-beta:vehicle-unit-3", event_log=events)
+    _record_secondary_vehicle_destruction(fixed_state, "army-beta:vehicle-unit-4", event_log=events)
 
     fixed_state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.FIXED,
         phase=BattlePhase.FIGHT,
-        event_log=EventLog(),
+        event_log=events,
     )
 
+    events = EventLog()
     tactical_state = _battle_state_from_config(
         _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4")),
         player_a_secondary=SecondaryMissionMode.TACTICAL,
@@ -4878,6 +4923,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
     tactical_state.battle_phase_index = tactical_state.battle_phase_sequence.index(
         BattlePhase.FIGHT
     )
+    seed_completed_fight_phase(tactical_state)
     tactical_state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -4886,15 +4932,19 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
             source_result_id="phase16-bring-it-down-draw",
         )
     )
-    _record_secondary_vehicle_destruction(tactical_state, "army-beta:vehicle-unit-3")
-    _record_secondary_vehicle_destruction(tactical_state, "army-beta:vehicle-unit-4")
+    _record_secondary_vehicle_destruction(
+        tactical_state, "army-beta:vehicle-unit-3", event_log=events
+    )
+    _record_secondary_vehicle_destruction(
+        tactical_state, "army-beta:vehicle-unit-4", event_log=events
+    )
 
     tactical_state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
-        event_log=EventLog(),
+        event_log=events,
     )
 
     fixed_transaction = next(
@@ -4918,6 +4968,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
 
 
 def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_with_cap() -> None:
+    events = EventLog()
     mission_setup = _mission_setup()
     center_marker = next(
         marker
@@ -4949,6 +5000,7 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
         ),
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -4961,11 +5013,13 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
         state,
         "army-beta:vehicle-unit-3",
         started_turn_objective_marker_ids=(center_marker.objective_marker_id,),
+        event_log=events,
     )
     _record_secondary_vehicle_destruction(
         state,
         "army-beta:vehicle-unit-4",
         started_turn_objective_marker_ids=(upper_marker.objective_marker_id,),
+        event_log=events,
     )
 
     state.score_secondary_mission_from_state(
@@ -4973,7 +5027,7 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
         secondary_mission_id="overwhelming-force",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
-        event_log=EventLog(),
+        event_log=events,
     )
 
     transaction = next(
@@ -4988,11 +5042,13 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
 
 
 def test_no_prisoners_scores_each_destroyed_enemy_unit_with_cap() -> None:
+    events = EventLog()
     state = _battle_state_from_config(
         _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4", "vehicle-unit-5")),
         player_a_secondary=SecondaryMissionMode.TACTICAL,
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -5001,16 +5057,16 @@ def test_no_prisoners_scores_each_destroyed_enemy_unit_with_cap() -> None:
             source_result_id="phase17-secondary-no-prisoners-draw",
         )
     )
-    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
-    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-4")
-    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-5")
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3", event_log=events)
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-4", event_log=events)
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-5", event_log=events)
 
     state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="no-prisoners",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
-        event_log=EventLog(),
+        event_log=events,
     )
 
     transaction = next(
@@ -5025,11 +5081,13 @@ def test_no_prisoners_scores_each_destroyed_enemy_unit_with_cap() -> None:
 
 
 def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> None:
+    events = EventLog()
     state = _battle_state_from_config(
         _config_with_player_b_horde_units(("horde-unit-3", "horde-unit-4")),
         player_a_secondary=SecondaryMissionMode.TACTICAL,
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -5038,15 +5096,15 @@ def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> 
             source_result_id="phase17-secondary-grievous-blow-draw",
         )
     )
-    _record_secondary_unit_destruction(state, "army-beta:horde-unit-3")
-    _record_secondary_unit_destruction(state, "army-beta:horde-unit-4")
+    _record_secondary_unit_destruction(state, "army-beta:horde-unit-3", event_log=events)
+    _record_secondary_unit_destruction(state, "army-beta:horde-unit-4", event_log=events)
 
     state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="a-grievous-blow",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
-        event_log=EventLog(),
+        event_log=events,
     )
 
     transaction = next(
@@ -5279,6 +5337,7 @@ def test_secure_no_mans_land_requires_no_mans_land_region() -> None:
 def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
     cleanse_state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
     cleanse_state.battle_phase_index = cleanse_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(cleanse_state)
     cleanse_state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -5329,6 +5388,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         mission_setup=_event_companion_mission_setup_with_scoring_terrain_feature(),
     )
     plunder_state.battle_phase_index = plunder_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(plunder_state)
     plunder_state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -5384,6 +5444,7 @@ def test_defend_stronghold_scores_at_opponent_turn_end_with_deployment_zone_bonu
     state.battle_round = 2
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
             player_id="player-a",
@@ -5563,6 +5624,7 @@ def test_secondary_scoring_evidence_payloads_round_trip_and_fail_fast() -> None:
 def test_state_backed_secondary_scoring_rejects_invalid_contexts_and_zero_evidence() -> None:
     state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     assert state.mission_setup is not None
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
@@ -5712,6 +5774,7 @@ def test_game_state_secondary_scoring_evidence_round_trips_and_rejects_duplicate
         player_a_secondary=SecondaryMissionMode.TACTICAL,
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     assert state.mission_setup is not None
     center_objective_id = _center_marker_definition_for_setup(
         state.mission_setup
@@ -7838,6 +7901,8 @@ def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() ->
     )
 
     for _phase in state.battle_phase_sequence:
+        if state.current_battle_phase is BattlePhase.FIGHT:
+            seed_completed_fight_phase(state)
         status = flow.advance(state=state, decisions=lifecycle.decision_controller)
         assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
 
@@ -7982,32 +8047,17 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         unit_instance_id=bodyguard_id,
     )
     bodyguard_model_ids = state.army_definitions[0].unit_by_id(bodyguard_id).own_model_ids()
-    witness = rules_unit_objective_proximity_witness(
-        state=state, rules_unit_instance_id=attached_id
-    )
-    attribution = ModelDestructionAttribution.for_non_attack(
-        destroying_player_id="player-b",
-        source_kind=DestructionSourceKind.ABILITY,
-        source_rules_unit_instance_id=None,
-        source_model_instance_id=None,
-    )
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
     for model_instance_id in bodyguard_model_ids:
-        event = lifecycle.decision_controller.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": "shooting",
-                "model_instance_id": model_instance_id,
-                "target_unit_instance_id": attached_id,
-                "source_id": "phase11e-component-loss",
-                "source_rules_unit_objective_proximity_witness": None,
-                "destroyed_rules_unit_objective_proximity_witness": witness.to_payload(),
-                **attribution.to_payload(),
-            },
+        event = destroy_rule_model_for_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            model_id=model_instance_id,
+            destroying_player_id="player-b",
+            source_unit_id=None,
+            source_model_id=None,
         )
-        destroy_model_by_rule(state=state, model_instance_id=model_instance_id)
         for departure in record_primary_destroyed_model_departures(
             state=state,
             destroyed_model_instance_ids=(model_instance_id,),
@@ -8017,6 +8067,27 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
             record_primary_battlefield_departure_event(
                 event_log=lifecycle.decision_controller.event_log, departure=departure
             )
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        record_model_destruction_occurrences,
+        resolve_model_destruction_trigger,
+    )
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+    from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+    registry = UnitDestroyedHookRegistry.empty()
+    record_model_destruction_occurrences(
+        state=state, decisions=lifecycle.decision_controller, registry=registry
+    )
+    for trigger in rule_trigger_history(lifecycle.decision_controller).ready():
+        assert (
+            resolve_model_destruction_trigger(
+                state=state,
+                decisions=lifecycle.decision_controller,
+                trigger=trigger,
+                registry=registry,
+            )
+            is None
+        )
     source_session = LocalGameSession(lifecycle=lifecycle)
     event_cursor = EventStreamCursor(source_session.event_record_count())
 
@@ -8084,6 +8155,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
     state.battle_round = 5
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     terminal_status = source_session.advance_until_decision_or_terminal()
     assert terminal_status.status_kind is LifecycleStatusKind.TERMINAL
     assert state.stage is GameLifecycleStage.COMPLETE
@@ -8099,7 +8171,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         initial_lifecycle_payload=terminal_payload,
         final_lifecycle=terminal_lifecycle,
     )
-    assert terminal_artifact.schema_version == "replay-artifact-v8-phase17n-step5a"
+    assert terminal_artifact.schema_version == "replay-artifact-v9-sequencing"
     replay_snapshot = GameLifecycle.from_payload(terminal_artifact.initial_lifecycle_payload)
     replay_snapshot_state = replay_snapshot.state
     assert replay_snapshot_state is not None
@@ -8161,6 +8233,7 @@ def test_order34_action_titanic_exception_uses_current_retained_component_keywor
         unit_instance_id="army-alpha:bodyguard-unit",
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     leader = state.army_definitions[0].unit_by_id("army-alpha:leader-unit")
     model_id = leader.own_models[0].model_instance_id
     placement = state.battlefield_state.model_placement_by_id(model_id)
@@ -8956,6 +9029,7 @@ def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
         choice for choice in state.secondary_mission_choices if choice.player_id == "player-a"
     ]
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
     assert state.mission_setup is not None
     cleanse_target_id = _center_marker_definition_for_setup(state.mission_setup).objective_marker_id
@@ -9372,6 +9446,7 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
     removed_model_id = broken.model_placements[-1].model_instance_id
     state.battlefield_state = state.battlefield_state.with_unit_placement(broken)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
 
     status = lifecycle.advance_until_decision_or_terminal()
     status = _decline_stratagem_window_if_pending(
@@ -9469,6 +9544,7 @@ def test_turn_end_control_and_primary_scoring_use_post_cleanup_battlefield() -> 
     isolated_objective_model_id = broken.model_placements[-1].model_instance_id
     state.battlefield_state = state.battlefield_state.with_unit_placement(broken)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
 
     state.advance_to_next_battle_phase()
 
@@ -9543,6 +9619,7 @@ def test_game_ends_after_configured_battle_rounds_with_draw_result() -> None:
     state.battle_round = 5
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
 
     completed_phase = state.advance_to_next_battle_phase()
     result = state.game_result_payload()
@@ -9645,6 +9722,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     assert scoring_state.mission_setup is not None
     assert scoring_state.battlefield_state is not None
     scoring_state.battle_phase_index = scoring_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(scoring_state)
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             scoring_state,
@@ -9654,6 +9732,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     )
     scoring_state.record_objective_control_record(record)
     state_evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
         state=scoring_state,
         record=record,
         end_of_battle=False,
@@ -10476,6 +10555,7 @@ def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[Game
     state.battle_round = 3
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     record_primary_turn_start_evidence(state=state)
     return state, reserve_unit.unit_instance_id
 
@@ -11053,6 +11133,7 @@ def _resolve_transport_reserve_at_round_boundary(lifecycle: GameLifecycle) -> No
     state.battle_round = 3
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     record_primary_turn_start_evidence(state=state)
     BattleRoundFlow(
         phase_handlers={BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT)}
@@ -11095,6 +11176,7 @@ def _authentic_reserve_deadline_lifecycle_payload() -> GameLifecyclePayload:
     state.battle_round = 3
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     record_primary_turn_start_evidence(state=state)
     BattleRoundFlow(
         phase_handlers={BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT)}
@@ -11556,11 +11638,15 @@ def _battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
     assert state is not None
     _seed_player_a_tactical_secondary_cards(state)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    seed_completed_fight_phase(state)
     _record_secondary_vehicle_destruction(
         state,
         "army-beta:vehicle-unit-3",
         event_log=lifecycle.decision_controller.event_log,
     )
+    from tests.destruction_occurrence_fixture_helpers import finish_core_destructions_for_fixture
+
+    finish_core_destructions_for_fixture(state=state, decisions=lifecycle.decision_controller)
     record = state.record_objective_control_boundary(
         completed_phase=BattlePhase.FIGHT,
         timing=ObjectiveControlTiming.TURN_END,

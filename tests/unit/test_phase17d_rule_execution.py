@@ -265,8 +265,7 @@ def test_psychic_level_use_is_shared_by_attached_components() -> None:
 
 def test_psychic_catalog_activation_uses_one_model_per_unit_and_restores() -> None:
     session = _psychic_level_session()
-    status = session.advance_until_decision_or_terminal()
-    request = status.decision_request
+    request = _next_psychic_request(session)
     assert request is not None
     assert request.actor_id == "player-a"
     use = next(option for option in request.options if _json_object(option.payload)["activate"])
@@ -357,7 +356,7 @@ def test_psychic_facade_preserves_historical_uses_after_phase_and_round_transiti
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
             continue
-        elif request.decision_type == "select_movement_unit":
+        elif request.decision_type in {"select_movement_unit", "resolve_sequencing_order"}:
             option = request.options[0]
         else:
             options = tuple(
@@ -410,6 +409,32 @@ def test_psychic_facade_preserves_historical_uses_after_phase_and_round_transiti
         restored.replay_artifact(artifact_id="replay:psychic:historical-phases")
     ).run()
     assert replay.reproduced_exactly, replay.to_payload()
+
+
+def _next_psychic_request(session: LocalGameSession) -> DecisionRequest:
+    for index in range(8):
+        status = session.advance_until_decision_or_terminal()
+        request = status.decision_request
+        assert request is not None, status.payload
+        if request.decision_type != "resolve_sequencing_order":
+            return request
+        participants = _json_object(request.payload)["participants"]
+        assert isinstance(participants, list)
+        selected = min(
+            (_json_object(participant) for participant in participants),
+            key=lambda participant: str(participant["payload"]),
+        )
+        option = next(
+            option
+            for option in request.options
+            if _json_object(option.payload)["selected_participant_id"] == selected["participant_id"]
+        )
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=option.option_id,
+            result_id=f"psychic-order:{request.request_id}:{index}",
+        )
+    raise AssertionError("Psychic timing order did not reach its selected rule")
 
 
 def _psychic_level_session(
@@ -512,22 +537,23 @@ def _psychic_level_session(
     )
 
 
-def test_psychic_queued_duplicate_is_rejected_before_recording_and_can_be_declined() -> None:
+def test_psychic_used_source_is_not_requeued_and_stale_use_is_rejected() -> None:
     session = _psychic_level_session(any_phase=True)
-    first = session.advance_until_decision_or_terminal().decision_request
+    first = _next_psychic_request(session)
     assert first is not None
     use = next(option for option in first.options if _json_object(option.payload)["activate"])
     second = session.submit_option(
         request_id=first.request_id, option_id=use.option_id, result_id="psychic:queued:first"
     ).decision_request
-    assert second is not None
-    use = next(option for option in second.options if _json_object(option.payload)["activate"])
+    second = _next_psychic_request(session)
+    assert second.actor_id != first.actor_id
     before = session.lifecycle.to_payload()
-    rejected = session.submit_option(
-        request_id=second.request_id, option_id=use.option_id, result_id="psychic:queued:repeat"
+    rejected = session.lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="psychic:stale-repeat", request=first, selected_option_id=use.option_id
+        )
     )
     assert rejected.status_kind is LifecycleStatusKind.INVALID
-    assert _json_object(rejected.payload)["invalid_reason"] == "psychic_ability_used_this_phase"
     assert session.lifecycle.to_payload() == before
     decline = next(
         option for option in second.options if not _json_object(option.payload)["activate"]
@@ -553,7 +579,7 @@ def test_psychic_attached_use_survives_bodyguard_and_source_model_loss() -> None
     from warhammer40k_core.engine.rule_model_destruction import destroy_model_with_rule_reactions
 
     session = _psychic_level_session(attached=True)
-    first = session.advance_until_decision_or_terminal().decision_request
+    first = _next_psychic_request(session)
     assert first is not None
     use = next(option for option in first.options if _json_object(option.payload)["activate"])
     session.submit_option(
@@ -607,7 +633,7 @@ def test_psychic_attached_use_survives_bodyguard_and_source_model_loss() -> None
 
 def test_psychic_restore_rejects_missing_duplicate_and_invented_use_records() -> None:
     session = _psychic_level_session()
-    first = session.advance_until_decision_or_terminal().decision_request
+    first = _next_psychic_request(session)
     assert first is not None
     use = next(option for option in first.options if _json_object(option.payload)["activate"])
     session.submit_option(
@@ -1196,6 +1222,7 @@ def test_phase17d_catalog_setup_reactive_shoot_charge_requests_finite_actions_an
     setup_event = decisions.event_log.append(
         "reinforcement_unit_arrived",
         {
+            "player_id": "player-a",
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": "player-a",
@@ -1272,6 +1299,7 @@ def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus() -> Non
     decisions.event_log.append(
         "reinforcement_unit_arrived",
         {
+            "player_id": "player-a",
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": "player-a",
@@ -1386,6 +1414,7 @@ def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> N
     lifecycle.decision_controller.event_log.append(
         "reinforcement_unit_arrived",
         {
+            "player_id": "player-a",
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": "player-a",
@@ -1662,6 +1691,11 @@ def test_phase17d_reaction_queue_consistency_rejects_drift(
 
 
 def test_phase17d_catalog_setup_reactive_records_unsupported_multi_model_source_once() -> None:
+    from warhammer40k_core.engine.catalog_setup_reactive_sequencing import (
+        setup_reactive_end_candidates,
+    )
+    from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext
+
     state, catalog, player_b_index = _setup_reactive_single_model_state(
         target_pose=Pose.at(6.5, 10.0),
         source_pose=Pose.at(16.0, 10.0),
@@ -1675,7 +1709,21 @@ def test_phase17d_catalog_setup_reactive_records_unsupported_multi_model_source_
         target_unit_id="army-alpha:intercessor-unit-1",
     )
 
-    for _attempt in range(2):
+    before = state.to_payload(), decisions.to_payload(), reaction_queue.to_payload()
+    candidates = setup_reactive_end_candidates(
+        TurnEndRequestContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.MOVEMENT,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            reaction_queue=reaction_queue,
+        ),
+        ability_indexes={"player-b": player_b_index},
+    )
+    assert len(candidates) == 1
+    assert (state.to_payload(), decisions.to_payload(), reaction_queue.to_payload()) == before
+    for attempt in range(2):
         status = request_catalog_setup_reactive_shoot_charge_if_available(
             state=state,
             decisions=decisions,
@@ -1686,7 +1734,11 @@ def test_phase17d_catalog_setup_reactive_records_unsupported_multi_model_source_
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
         )
-        assert status is None
+        if attempt == 0:
+            assert status is not None
+            assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+        else:
+            assert status is None
 
     unsupported_payloads = _event_payloads(
         decisions,
@@ -1939,7 +1991,9 @@ def test_phase17d_catalog_setup_reactive_request_validates_dependencies() -> Non
             charge_target_restriction_hooks=cast(ChargeTargetRestrictionHookRegistry, object()),
         )
     state.active_player_id = None
-    with pytest.raises(GameLifecycleError, match="requires an active player"):
+    with pytest.raises(
+        GameLifecycleError, match="End rules require a current phase and player turn"
+    ):
         request_catalog_setup_reactive_shoot_charge_if_available(
             state=state,
             decisions=decisions,
@@ -2106,6 +2160,7 @@ def _append_setup_reactive_arrival_event(
     decisions.event_log.append(
         "reinforcement_unit_arrived",
         {
+            "player_id": "player-a",
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": "player-a",
@@ -2504,9 +2559,7 @@ def test_phase17d_once_per_battle_activation_submits_through_local_session_and_r
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     session = LocalGameSession(lifecycle=_setup_reactive_lifecycle(state=state, catalog=catalog))
 
-    status = session.advance_until_decision_or_terminal()
-    request = status.decision_request
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = _next_psychic_request(session)
     assert request is not None
     assert request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
     use_option = next(
@@ -2533,7 +2586,7 @@ def test_phase17d_once_per_battle_activation_submits_through_local_session_and_r
     )
 
     assert submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    second_request = submitted.decision_request
+    second_request = _next_psychic_request(session)
     assert second_request is not None
     second_use_option = next(
         option

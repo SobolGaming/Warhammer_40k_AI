@@ -97,7 +97,6 @@ from warhammer40k_core.engine.prebattle_records import (
 )
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
-from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.transport_disembark_state import DisembarkModeKind
 from warhammer40k_core.engine.transports import (
@@ -219,236 +218,67 @@ def test_phase16b_redeploy_records_removal_and_placement_batches() -> None:
     assert "object at 0x" not in payload_blob
 
 
-def test_phase16b_simultaneous_redeploys_use_phase12a_sequencing_order() -> None:
+def test_phase16b_redeploys_use_first_turn_authority_without_rolloff() -> None:
     catalog = _catalog_with_datasheet_keywords(
         {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
     )
     lifecycle, status = _advance_after_deployments(_config(catalog=catalog))
-    sequencing_request = _decision_request(status)
-
-    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
-    assert isinstance(sequencing_request.payload, dict)
-    assert sequencing_request.payload["requires_roll_off"] is True
-    assert sequencing_request.payload["roll_off_result"] is not None
-    assert {
-        "prebattle:redeploy_units:player-a",
-        "prebattle:redeploy_units:player-b",
-    } == set(_sequencing_participant_ids(sequencing_request))
-
-    follow_up = _submit_option(
-        lifecycle,
-        request=sequencing_request,
-        option_id=("order:prebattle:redeploy_units:player-b,prebattle:redeploy_units:player-a"),
-        result_id="phase16b-redeploy-sequencing",
-    )
-    request = _decision_request(follow_up)
-
-    assert request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE
-    assert request.actor_id == "player-b"
-    assert _event_types(lifecycle).count("sequencing_order_resolved") == 1
-
-
-@pytest.fixture(scope="module")
-def pending_redeploy_sequencing_lifecycle_payload() -> dict[str, Any]:
-    catalog = _catalog_with_datasheet_keywords(
-        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
-    )
-    lifecycle, status = _advance_after_deployments(_config(catalog=catalog))
-    assert _decision_request(status).decision_type == SEQUENCING_DECISION_TYPE
-    return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
-
-
-@pytest.fixture(scope="module")
-def pending_multiround_redeploy_sequencing_lifecycle_payload() -> dict[str, Any]:
-    catalog = _catalog_with_datasheet_keywords(
-        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
-    )
-    config = replace(_config(catalog=catalog), game_id="phase16b-multiround-step3-1")
-    lifecycle, status = _advance_after_deployments(config)
     request = _decision_request(status)
-    assert request.decision_type == SEQUENCING_DECISION_TYPE
-    assert isinstance(request.payload, dict)
-    roll_off = request.payload["roll_off_result"]
-    assert isinstance(roll_off, dict)
-    rounds = roll_off["rounds"]
-    assert isinstance(rounds, list)
-    assert len(rounds) == 2
-    assert isinstance(rounds[0], dict)
-    assert rounds[0]["is_tie"] is True
-    return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+    assert lifecycle.state is not None
+    assert request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE
+    assert request.actor_id == lifecycle.state.turn_order[0]
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type != "roll_off_resolved":
+            continue
+        assert isinstance(event.payload, dict)
+        roll_request = event.payload["request"]
+        assert isinstance(roll_request, dict)
+        assert roll_request.get("purpose") != "sequencing_conflict"
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    result = DecisionResult.for_request(
+        result_id="order36-redeploy-owner-completes",
+        request=request,
+        selected_option_id="complete_redeploys",
+    )
+    after = lifecycle.submit_decision(result)
+    replayed = restored.submit_decision(result)
+    assert replayed.to_payload() == after.to_payload()
+    next_request = _decision_request(after)
+    assert next_request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE
+    assert next_request.actor_id == lifecycle.state.turn_order[1]
+    assert restored.to_payload() == lifecycle.to_payload()
 
 
 @pytest.mark.parametrize(
-    "drift_kind",
-    ["actor", "option_label", "option_payload", "participant_payload"],
+    "drift_kind", ["actor", "option_label", "option_payload", "option_inventory"]
 )
-def test_phase16b_setup_sequencing_replay_rejects_issued_event_only_drift_without_mutation(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-    drift_kind: str,
-) -> None:
-    payload = _clone_payload(pending_redeploy_sequencing_lifecycle_payload)
-    _, issued = _pending_and_issued_sequencing_requests(payload)
-    if drift_kind == "actor":
-        roll_off = cast(dict[str, Any], issued["payload"]["roll_off_result"])
-        issued["actor_id"] = _other_roll_off_player_id(roll_off)
-    elif drift_kind == "option_label":
-        issued["options"][0]["label"] = "Replay-authored ordering label"
-    elif drift_kind == "option_payload":
-        issued["options"][0]["payload"]["sequencing_conflict_id"] = "replay-drift"
-    else:
-        issued["payload"]["participants"][0]["payload"] = {"replay_drift": True}
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
-        payload,
-        result_id=f"phase16b-sequencing-issued-event-{drift_kind}-drift",
+def test_phase16b_redeploy_authority_rejects_drift_without_mutation(drift_kind: str) -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
     )
-
-
-@pytest.mark.parametrize("drift_kind", ["roll_source", "dice_specification"])
-def test_phase16b_setup_sequencing_replay_rejects_dice_suffix_only_drift_without_mutation(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-    drift_kind: str,
-) -> None:
-    payload = _clone_payload(pending_redeploy_sequencing_lifecycle_payload)
-    dice_events, roll_off = _historical_sequencing_roll_off_suffix(payload)
-    roll_results = tuple(
-        player_roll["roll_result"]
-        for round_result in roll_off["rounds"]
-        for player_roll in round_result["player_rolls"]
+    lifecycle, status = _advance_after_deployments(_config(catalog=catalog))
+    request = _decision_request(status)
+    payload = _clone_payload(cast(dict[str, Any], lifecycle.to_payload()))
+    pending = payload["decisions"]["queue"]["pending_requests"][0]
+    issued = next(
+        event["payload"]
+        for event in reversed(payload["decisions"]["event_log"])
+        if event["event_type"] == "decision_requested"
+        and event["payload"]["request_id"] == request.request_id
     )
-    assert len(dice_events) == len(roll_results)
-    for dice_event, roll_result in zip(dice_events, roll_results, strict=True):
-        if drift_kind == "roll_source":
-            dice_event["payload"]["source"] = "fixed"
-            roll_result["source"] = "fixed"
+    for changed in (pending, issued):
+        if drift_kind == "actor":
+            changed["actor_id"] = "player-b" if request.actor_id == "player-a" else "player-a"
+        elif drift_kind == "option_label":
+            changed["options"][0]["label"] = "Forged redeploy label"
+        elif drift_kind == "option_payload":
+            changed["options"][0]["payload"]["source_rule_id"] = "forged-redeploy"
         else:
-            drifted_reason = f"{roll_result['spec']['reason']} replay-drift"
-            dice_event["payload"]["spec"]["reason"] = drifted_reason
-            roll_result["spec"]["reason"] = drifted_reason
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
+            changed["options"].pop()
+    _assert_redeploy_replay_rejected_without_mutation(
         payload,
-        result_id=f"phase16b-sequencing-dice-suffix-{drift_kind}-drift",
+        result_id=f"order36-redeploy-{drift_kind}",
     )
-
-
-def test_phase16b_setup_sequencing_replay_rejects_roll_off_event_only_drift_without_mutation(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-) -> None:
-    payload = _clone_payload(pending_redeploy_sequencing_lifecycle_payload)
-    _, roll_off = _historical_sequencing_roll_off_suffix(payload)
-    drifted_winner_player_id = _other_roll_off_player_id(roll_off)
-    _replace_historical_roll_off_event(
-        payload,
-        _roll_off_with_winner(roll_off, drifted_winner_player_id),
-    )
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
-        payload,
-        result_id="phase16b-sequencing-roll-off-event-only-drift",
-    )
-
-
-def test_phase16b_setup_sequencing_replay_rejects_omitted_initial_tie_round_without_mutation(
-    pending_multiround_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-) -> None:
-    payload = _clone_payload(pending_multiround_redeploy_sequencing_lifecycle_payload)
-    _, roll_off = _historical_sequencing_roll_off_suffix(payload)
-    assert len(roll_off["rounds"]) == 2
-    roll_off["rounds"] = [roll_off["rounds"][-1]]
-    roll_off["rounds"][0]["round_number"] = 1
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
-        payload,
-        result_id="phase16b-sequencing-omitted-initial-tie-round",
-    )
-
-
-def test_phase16b_setup_sequencing_replay_rejects_actor_winner_drift_without_mutation(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-) -> None:
-    payload = _clone_payload(pending_redeploy_sequencing_lifecycle_payload)
-    requests = _pending_and_issued_sequencing_requests(payload)
-    roll_off = cast(dict[str, Any], requests[0]["payload"]["roll_off_result"])
-    losing_player_id = _other_roll_off_player_id(roll_off)
-    for request_payload in requests:
-        request_payload["actor_id"] = losing_player_id
-        for option in request_payload["options"]:
-            option["payload"]["deciding_player_id"] = losing_player_id
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
-        payload,
-        result_id="phase16b-sequencing-actor-winner-drift",
-    )
-
-
-def test_phase16b_setup_sequencing_replay_rejects_roll_off_drift_without_mutation(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-) -> None:
-    payload = _clone_payload(pending_redeploy_sequencing_lifecycle_payload)
-    requests = _pending_and_issued_sequencing_requests(payload)
-    roll_off = cast(dict[str, Any], requests[0]["payload"]["roll_off_result"])
-    drifted_winner_player_id = _other_roll_off_player_id(roll_off)
-    drifted_roll_off = _roll_off_with_winner(roll_off, drifted_winner_player_id)
-    for request_payload in requests:
-        request_payload["actor_id"] = drifted_winner_player_id
-        request_payload["payload"]["roll_off_result"] = _clone_payload(drifted_roll_off)
-        for option in request_payload["options"]:
-            option["payload"]["deciding_player_id"] = drifted_winner_player_id
-            option["payload"]["roll_off_result"] = _clone_payload(drifted_roll_off)
-    _replace_historical_roll_off_suffix(payload, drifted_roll_off)
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
-        payload,
-        result_id="phase16b-sequencing-roll-off-drift",
-    )
-
-
-@pytest.mark.parametrize("drift_kind", ["participant_source", "option_inventory"])
-def test_phase16b_setup_sequencing_replay_rejects_participant_or_option_drift_without_mutation(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-    drift_kind: str,
-) -> None:
-    payload = _clone_payload(pending_redeploy_sequencing_lifecycle_payload)
-    requests = _pending_and_issued_sequencing_requests(payload)
-    for request_payload in requests:
-        if drift_kind == "participant_source":
-            participant = request_payload["payload"]["participants"][0]
-            participant["source_rule_id"] = f"{participant['source_rule_id']}:drifted"
-        else:
-            request_payload["options"].pop()
-
-    _assert_setup_sequencing_replay_rejected_without_mutation(
-        payload,
-        result_id=f"phase16b-sequencing-{drift_kind}-drift",
-    )
-
-
-def test_phase16b_setup_sequencing_replay_accepts_unchanged_round_trip(
-    pending_redeploy_sequencing_lifecycle_payload: dict[str, Any],
-) -> None:
-    lifecycle = GameLifecycle.from_payload(
-        cast(GameLifecyclePayload, _clone_payload(pending_redeploy_sequencing_lifecycle_payload))
-    )
-    request = lifecycle.decision_controller.queue.peek_next()
-    assert isinstance(request.payload, dict)
-    roll_off = request.payload["roll_off_result"]
-    assert isinstance(roll_off, dict)
-    assert request.actor_id == roll_off["winner_player_id"]
-    before_record_count = len(lifecycle.decision_controller.records)
-    before_resolved_count = _event_types(lifecycle).count("sequencing_order_resolved")
-
-    status = lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase16b-sequencing-unchanged-round-trip",
-            request=request,
-            selected_option_id=request.options[0].option_id,
-        )
-    )
-
-    assert status.status_kind is not LifecycleStatusKind.INVALID
-    assert len(lifecycle.decision_controller.records) == before_record_count + 1
-    assert _event_types(lifecycle).count("sequencing_order_resolved") == (before_resolved_count + 1)
 
 
 def test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit() -> None:
@@ -2404,113 +2234,7 @@ def _clone_payload(payload: dict[str, Any]) -> dict[str, Any]:
     return cast(dict[str, Any], json.loads(json.dumps(payload)))
 
 
-def _pending_and_issued_sequencing_requests(
-    lifecycle_payload: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    decisions = lifecycle_payload["decisions"]
-    pending = decisions["queue"]["pending_requests"][0]
-    issued_event = next(
-        event
-        for event in reversed(decisions["event_log"])
-        if event["event_type"] == "decision_requested"
-    )
-    issued = issued_event["payload"]
-    assert pending["request_id"] == issued["request_id"]
-    assert pending["decision_type"] == SEQUENCING_DECISION_TYPE
-    assert issued["decision_type"] == SEQUENCING_DECISION_TYPE
-    return pending, issued
-
-
-def _other_roll_off_player_id(roll_off: dict[str, Any]) -> str:
-    winner_player_id = roll_off["winner_player_id"]
-    player_ids = roll_off["request"]["player_ids"]
-    assert len(player_ids) == 2
-    other_player_id = next(player_id for player_id in player_ids if player_id != winner_player_id)
-    assert type(other_player_id) is str
-    return other_player_id
-
-
-def _roll_off_with_winner(
-    roll_off: dict[str, Any],
-    winner_player_id: str,
-) -> dict[str, Any]:
-    drifted = _clone_payload(roll_off)
-    current_winner_player_id = drifted["winner_player_id"]
-    final_player_rolls = drifted["rounds"][-1]["player_rolls"]
-    current_winner_roll = next(
-        roll for roll in final_player_rolls if roll["player_id"] == current_winner_player_id
-    )
-    drifted_winner_roll = next(
-        roll for roll in final_player_rolls if roll["player_id"] == winner_player_id
-    )
-    current_winner_value = current_winner_roll["value"]
-    drifted_winner_value = drifted_winner_roll["value"]
-    current_winner_roll["value"] = drifted_winner_value
-    current_winner_roll["roll_result"]["values"] = [drifted_winner_value]
-    current_winner_roll["roll_result"]["total"] = drifted_winner_value
-    drifted_winner_roll["value"] = current_winner_value
-    drifted_winner_roll["roll_result"]["values"] = [current_winner_value]
-    drifted_winner_roll["roll_result"]["total"] = current_winner_value
-    drifted["winner_player_id"] = winner_player_id
-    return drifted
-
-
-def _replace_historical_roll_off_suffix(
-    lifecycle_payload: dict[str, Any],
-    roll_off: dict[str, Any],
-) -> None:
-    dice_events, _ = _historical_sequencing_roll_off_suffix(lifecycle_payload)
-    _replace_historical_roll_off_event(lifecycle_payload, roll_off)
-    roll_results_by_id = {
-        player_roll["roll_result"]["roll_id"]: player_roll["roll_result"]
-        for round_result in roll_off["rounds"]
-        for player_roll in round_result["player_rolls"]
-    }
-    replaced_roll_ids: set[str] = set()
-    for event in dice_events:
-        roll_id = event["payload"]["roll_id"]
-        if roll_id not in roll_results_by_id:
-            continue
-        event["payload"] = _clone_payload(roll_results_by_id[roll_id])
-        replaced_roll_ids.add(roll_id)
-    assert replaced_roll_ids == set(roll_results_by_id)
-
-
-def _historical_sequencing_roll_off_suffix(
-    lifecycle_payload: dict[str, Any],
-) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    events = lifecycle_payload["decisions"]["event_log"]
-    roll_off_index = next(
-        index
-        for index in range(len(events) - 1, -1, -1)
-        if events[index]["event_type"] == "roll_off_resolved"
-    )
-    roll_off = events[roll_off_index]["payload"]
-    roll_ids = {
-        player_roll["roll_result"]["roll_id"]
-        for round_result in roll_off["rounds"]
-        for player_roll in round_result["player_rolls"]
-    }
-    dice_events = [
-        event
-        for event in events[:roll_off_index]
-        if event["event_type"] == "dice_rolled" and event["payload"]["roll_id"] in roll_ids
-    ]
-    return dice_events, roll_off
-
-
-def _replace_historical_roll_off_event(
-    lifecycle_payload: dict[str, Any],
-    roll_off: dict[str, Any],
-) -> None:
-    events = lifecycle_payload["decisions"]["event_log"]
-    roll_off_event = next(
-        event for event in reversed(events) if event["event_type"] == "roll_off_resolved"
-    )
-    roll_off_event["payload"] = _clone_payload(roll_off)
-
-
-def _assert_setup_sequencing_replay_rejected_without_mutation(
+def _assert_redeploy_replay_rejected_without_mutation(
     lifecycle_payload: dict[str, Any],
     *,
     result_id: str,
@@ -2606,19 +2330,6 @@ def _option_for_prefix(request: DecisionRequest, prefix: str) -> DecisionOption:
 
 def _event_types(lifecycle: GameLifecycle) -> list[str]:
     return [event.event_type for event in lifecycle.decision_controller.event_log.records]
-
-
-def _sequencing_participant_ids(request: DecisionRequest) -> tuple[str, ...]:
-    assert isinstance(request.payload, dict)
-    participants = request.payload["participants"]
-    assert isinstance(participants, list)
-    participant_ids: list[str] = []
-    for participant in participants:
-        assert isinstance(participant, dict)
-        participant_id = participant["participant_id"]
-        assert type(participant_id) is str
-        participant_ids.append(participant_id)
-    return tuple(participant_ids)
 
 
 def _scouts_config() -> GameConfig:

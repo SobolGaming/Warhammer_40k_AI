@@ -68,11 +68,6 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
 from warhammer40k_core.engine.mortal_wound_model_allocation import (
     resolve_mortal_wound_decision,
 )
-from warhammer40k_core.engine.movement_proposals import (
-    MOVEMENT_PROPOSAL_DECISION_TYPE,
-    MovementProposalRequest,
-    ProposalKind,
-)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -108,11 +103,13 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_effect_payload,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.triggered_movement import (
-    TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
-    TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
+    SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     TriggeredMovementDescriptor,
+    TriggeredMovementEligibleUnit,
     TriggeredMovementKind,
+    triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
@@ -235,6 +232,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=cabal_of_sorcerers_request,
+                candidate_handler=shooting_candidates,
                 result_handler=apply_cabal_of_sorcerers_result,
             ),
         ),
@@ -256,6 +254,14 @@ def runtime_contribution() -> RuntimeContentContribution:
     )
 
 
+def shooting_candidates(
+    context: ShootingPhaseStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .shooting_sequencing import candidates
+
+    return candidates(context)
+
+
 def cabal_of_sorcerers_request(
     context: ShootingPhaseStartRequestContext,
 ) -> DecisionRequest | None:
@@ -275,7 +281,7 @@ def cabal_of_sorcerers_request(
     common_payload = _common_request_payload(context.state, player_id=army.player_id)
     decision_options = tuple(_ritual_decision_option(option, common_payload) for option in options)
     return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
+        request_id=context.issue_request_id(),
         decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
         actor_id=army.player_id,
         payload=validate_json_value(
@@ -909,42 +915,36 @@ def _resolve_temporal_surge(
         ),
     )
     state.record_persisting_effect(charge_effect)
-    request = MovementProposalRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
-        actor_id=player_id,
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        phase=BattlePhase.SHOOTING.value,
-        unit_instance_id=target_id,
-        proposal_kind=ProposalKind.SURGE_MOVE,
-        source_decision_request_id=_payload_string(resolution_payload, key="request_id"),
-        source_decision_result_id=_payload_string(resolution_payload, key="result_id"),
-        spatial_context_hash=state.physical_proposal_context_hash(),
-        movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
-        context={
-            "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
-            "descriptor": validate_json_value(
-                TriggeredMovementDescriptor(
-                    movement_kind=TriggeredMovementKind.TRIGGERED,
-                    source_rule_id=SOURCE_RULE_ID,
-                    trigger_timing=ReactionWindow(
-                        phase=BattlePhaseKind.SHOOTING,
-                        window_kind=ReactionWindowKind.RULE_TRIGGER,
-                        source_step="cabal_of_sorcerers_temporal_surge",
-                    ),
-                    max_distance_inches=max_distance,
-                    movement_mode=MovementMode.NORMAL,
-                    allow_battle_shocked=True,
-                    allow_within_engagement_range=False,
-                    one_per_phase=False,
-                    optional=True,
-                ).to_payload()
+    request = triggered_movement_unit_selection_request(
+        state=state,
+        player_id=player_id,
+        descriptor=TriggeredMovementDescriptor(
+            movement_kind=TriggeredMovementKind.TRIGGERED,
+            source_rule_id=SOURCE_RULE_ID,
+            trigger_timing=ReactionWindow(
+                phase=BattlePhaseKind.SHOOTING,
+                window_kind=ReactionWindowKind.RULE_TRIGGER,
+                source_step="cabal_of_sorcerers_temporal_surge",
             ),
-            "ritual_resolution": validate_json_value(resolution_payload),
-            "charge_forbidden_effect_id": charge_effect.effect_id,
-        },
-    ).to_decision_request()
+            max_distance_inches=max_distance,
+            movement_mode=MovementMode.NORMAL,
+            allow_battle_shocked=True,
+            allow_within_engagement_range=False,
+            one_per_phase=False,
+            optional=True,
+        ),
+        eligible_units=(
+            TriggeredMovementEligibleUnit(
+                unit_instance_id=target_id,
+                hook_id=HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                replay_payload={
+                    "ritual_resolution": validate_json_value(resolution_payload),
+                    "charge_forbidden_effect_id": charge_effect.effect_id,
+                },
+            ),
+        ),
+    )
     decisions.request_decision(request)
     decisions.event_log.append(
         "thousand_sons_temporal_surge_manifested",
@@ -954,7 +954,7 @@ def _resolve_temporal_surge(
                 "max_distance_inches": max_distance,
                 "temporal_surge_distance_roll": distance_roll_payload,
                 "charge_forbidden_effect": charge_effect.to_payload(),
-                "proposal_request_id": request.request_id,
+                "selection_request_id": request.request_id,
             }
         ),
     )
@@ -968,8 +968,8 @@ def _resolve_temporal_surge(
                 "active_player_id": state.active_player_id,
                 "player_id": player_id,
                 "unit_instance_id": target_id,
-                "decision_type": MOVEMENT_PROPOSAL_DECISION_TYPE,
-                "phase_body_status": "thousand_sons_temporal_surge_proposal_pending",
+                "decision_type": SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+                "phase_body_status": "thousand_sons_temporal_surge_selection_pending",
                 "pending_request_id": request.request_id,
             }
         ),

@@ -212,9 +212,13 @@ def apply_catalog_setup_reactive_charge_move(
     state.replace_battlefield_state(
         battlefield_state.with_unit_placement(resolution.attempted_placement)
     )
-    decisions.event_log.append(
-        CATALOG_SETUP_REACTIVE_CHARGE_MOVE_EVENT,
-        validate_json_value(
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type=CATALOG_SETUP_REACTIVE_CHARGE_MOVE_EVENT,
+        payload=validate_json_value(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,

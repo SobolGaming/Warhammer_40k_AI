@@ -19,6 +19,7 @@ PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT = "primary_scoring_commit_checkpoint_rec
 _SCORING_COMMIT_EVENT_KEYS = (
     "objective_control_record_id",
     "scoring_boundary_kind",
+    "scoring_player_id",
     "checkpoint",
 )
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -28,6 +29,7 @@ def bound_primary_scoring_commit_checkpoint(
     *,
     state: GameState,
     record: ObjectiveControlRecord,
+    scoring_player_id: str,
     scoring_commit_checkpoint: PrimaryMissionBoundaryCheckpoint | None,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> PrimaryMissionBoundaryCheckpoint:
@@ -44,6 +46,8 @@ def bound_primary_scoring_commit_checkpoint(
         raise GameLifecycleError(
             "Primary scoring-commit checkpoint requires an ObjectiveControlRecord."
         )
+    if scoring_player_id not in state.player_ids:
+        raise GameLifecycleError("Primary scoring-commit player is not part of this game.")
     registry = (
         RuntimeModifierRegistry.empty()
         if runtime_modifier_registry is None
@@ -56,6 +60,8 @@ def bound_primary_scoring_commit_checkpoint(
     captured = capture_primary_mission_boundary_checkpoint(
         state=state,
         boundary_kind=PRIMARY_SCORING_COMMIT_BOUNDARY_KIND,
+        # The checkpoint reconstructs the player turn's physical state. Its owning
+        # scoring rule is bound separately by the commit event and state evidence.
         player_id=record.active_player_id,
         runtime_modifier_registry=registry,
     )
@@ -75,6 +81,7 @@ def emit_primary_scoring_commit_checkpoint(
     event_log: EventLog,
     objective_control_record_id: str,
     scoring_boundary_kind: str,
+    scoring_player_id: str,
     checkpoint: PrimaryMissionBoundaryCheckpoint,
 ) -> None:
     from warhammer40k_core.engine.event_log import EventLog
@@ -91,6 +98,7 @@ def emit_primary_scoring_commit_checkpoint(
     )
     if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
         raise GameLifecycleError("Primary scoring-commit event requires a typed checkpoint.")
+    scoring_player_id = _validate_identifier("Primary scoring player", scoring_player_id)
     if checkpoint.boundary_kind != PRIMARY_SCORING_COMMIT_BOUNDARY_KIND:
         raise GameLifecycleError("Primary scoring-commit event kind drifted.")
     matches = tuple(
@@ -99,11 +107,12 @@ def emit_primary_scoring_commit_checkpoint(
         if event.event_type == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT
         and _scoring_commit_binding(event)[0] == record_id
         and _scoring_commit_binding(event)[1] == kind
+        and _scoring_commit_binding(event)[2] == scoring_player_id
     )
     if len(matches) > 1:
         raise GameLifecycleError("Primary scoring-commit checkpoint event is duplicated.")
     if matches:
-        if matches[0][2] != checkpoint:
+        if matches[0][3] != checkpoint:
             raise GameLifecycleError("Primary scoring-commit checkpoint event drifted.")
         return
     event_log.append(
@@ -111,6 +120,7 @@ def emit_primary_scoring_commit_checkpoint(
         {
             "objective_control_record_id": record_id,
             "scoring_boundary_kind": kind,
+            "scoring_player_id": scoring_player_id,
             "checkpoint": checkpoint.to_payload(),
         },
     )
@@ -121,6 +131,7 @@ def primary_scoring_commit_checkpoint_from_events(
     event_records: tuple[EventRecord, ...],
     objective_control_record_id: str,
     scoring_boundary_kind: str,
+    scoring_player_id: str,
 ) -> tuple[int, PrimaryMissionBoundaryCheckpoint]:
     record_id = _validate_identifier(
         "Primary scoring-commit objective_control_record_id",
@@ -134,8 +145,12 @@ def primary_scoring_commit_checkpoint_from_events(
     for index, event in enumerate(event_records):
         if event.event_type != PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
             continue
-        bound_record_id, bound_kind, checkpoint = _scoring_commit_binding(event)
-        if bound_record_id == record_id and bound_kind == kind:
+        bound_record_id, bound_kind, bound_player_id, checkpoint = _scoring_commit_binding(event)
+        if (
+            bound_record_id == record_id
+            and bound_kind == kind
+            and bound_player_id == scoring_player_id
+        ):
             matches.append((index, checkpoint))
     if len(matches) != 1:
         raise GameLifecycleError(
@@ -146,7 +161,7 @@ def primary_scoring_commit_checkpoint_from_events(
 
 def _scoring_commit_binding(
     event: EventRecord,
-) -> tuple[str, str, PrimaryMissionBoundaryCheckpoint]:
+) -> tuple[str, str, str, PrimaryMissionBoundaryCheckpoint]:
     from warhammer40k_core.engine.event_log import EventRecord
 
     if type(event) is not EventRecord:
@@ -175,6 +190,7 @@ def _scoring_commit_binding(
     return (
         record_id,
         kind,
+        _validate_identifier("Primary scoring player", raw["scoring_player_id"]),
         PrimaryMissionBoundaryCheckpoint.from_payload(raw["checkpoint"]),
     )
 

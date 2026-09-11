@@ -10,7 +10,6 @@ from warhammer40k_core.engine import (
     catalog_conditional_charge_runtime as _conditional_charge,
 )
 from warhammer40k_core.engine import (
-    catalog_turn_end_reserves,
     generic_detachment_rule_effects,
     generic_rule_lifecycle_hooks,
     generic_target_restriction_effects,
@@ -155,6 +154,7 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
+from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookBinding,
     MovementEndSurgeHookRegistry,
@@ -1109,6 +1109,7 @@ class RuntimeContentBundle:
     reserve_arrival_restriction_hook_registry: ReserveArrivalRestrictionHookRegistry
     unit_move_completed_mortal_wound_hook_registry: UnitMoveCompletedMortalWoundHookRegistry
     unit_move_completed_battle_shock_hook_registry: UnitMoveCompletedBattleShockHookRegistry
+    move_completion_rule_registry: MoveCompletionRuleRegistry
     mortal_wound_feel_no_pain_hook_registry: MortalWoundFeelNoPainContinuationHookRegistry
     charge_declaration_hook_registry: ChargeDeclarationHookRegistry
     shooting_target_restriction_hook_registry: ShootingTargetRestrictionHookRegistry
@@ -1193,6 +1194,8 @@ class RuntimeContentBundle:
             )
         if type(self.movement_end_surge_hook_registry) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
+        if type(self.move_completion_rule_registry) is not MoveCompletionRuleRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires MoveCompletionRuleRegistry.")
         _bundle_validation.validate_reserve_arrival_hook_registries(
             self.reserve_arrival_distance_hook_registry,
             self.reserve_arrival_restriction_hook_registry,
@@ -1470,49 +1473,33 @@ class RuntimeContentBundle:
                 ),
             )
         )
-        turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
-            (
-                *catalog_turn_end_reserves.catalog_turn_end_reserve_hook_bindings(
-                    ability_indexes_by_player_id=ability_indexes_by_player_id,
-                    armies=validated_armies,
-                ),
-                *generic_rule_lifecycle_hooks.turn_end_hook_bindings(
-                    activation=activation,
-                    execution_records=records,
-                ),
-                *_contribution_values(
-                    validated_contributions,
-                    lambda contribution: contribution.turn_end_hook_bindings,
-                ),
-            )
+        from warhammer40k_core.engine.faction_content.phase_end_hook_registries import (
+            phase_end_registry,
         )
-        command_phase_start_hook_registry = CommandPhaseStartHookRegistry.from_bindings(
-            (
-                *catalog_generic_hooks.command_start(
-                    ability_indexes_by_player_id, validated_armies
-                ),
-                *_contribution_values(
-                    validated_contributions,
-                    lambda contribution: contribution.command_phase_start_hook_bindings,
-                ),
-            )
+
+        turn_end_hook_registry = phase_end_registry(
+            activation=activation,
+            records=records,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            validated_armies=validated_armies,
+            validated_contributions=validated_contributions,
+            event_index=event_index,
         )
-        fight_phase_start_hook_registry = FightPhaseStartHookRegistry.from_bindings(
-            (
-                *catalog_runtime_hooks.fight_phase_start_hook_bindings(
-                    ability_indexes_by_player_id=ability_indexes_by_player_id,
-                    armies=validated_armies,
-                ),
-                *generic_rule_lifecycle_hooks.fight_phase_start_hook_bindings(
-                    activation=activation,
-                    execution_records=records,
-                ),
-                *_contribution_values(
-                    validated_contributions,
-                    lambda contribution: contribution.fight_phase_start_hook_bindings,
-                ),
-            )
+        from warhammer40k_core.engine.faction_content.timing_hook_registries import (
+            phase_start_registries,
         )
+
+        phase_starts = phase_start_registries(
+            activation=activation,
+            records=records,
+            event_index=event_index,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            validated_armies=validated_armies,
+            validated_contributions=validated_contributions,
+        )
+        command_phase_start_hook_registry = phase_starts.command
+        fight_phase_start_hook_registry = phase_starts.fight
+        shooting_phase_start_hook_registry = phase_starts.shooting
         fight_phase_end_hook_registry = FightPhaseEndHookRegistry.from_bindings(
             catalog_runtime_hooks.fight_end_hooks(ability_indexes_by_player_id, validated_armies)
             + _contribution_values(
@@ -1520,16 +1507,12 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.fight_phase_end_hook_bindings,
             )
         )
-        shooting_phase_start_hook_registry = ShootingPhaseStartHookRegistry.from_bindings(
+        from warhammer40k_core.engine.fight_phase_end_sequencing import fight_end_boundary_binding
+
+        turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
             (
-                *catalog_runtime_hooks.shooting_phase_start_hook_bindings(
-                    ability_indexes_by_player_id=ability_indexes_by_player_id,
-                    armies=validated_armies,
-                ),
-                *_contribution_values(
-                    validated_contributions,
-                    lambda contribution: contribution.shooting_phase_start_hook_bindings,
-                ),
+                *turn_end_hook_registry.bindings,
+                fight_end_boundary_binding(fight_phase_end_hook_registry),
             )
         )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
@@ -1931,14 +1914,23 @@ class RuntimeContentBundle:
                 catalog_rules.failed_save_damage_replacement_bindings()
             ),
         )
+        from warhammer40k_core.engine.movement_phase_end_sequencing import with_movement_end_rules
+
+        stratagem_indexes = _catalog_indexes.stratagem_indexes_by_player_id(
+            armies=validated_armies,
+            catalog=catalog,
+            records=stratagem_records,
+        )
+        turn_end_hook_registry = with_movement_end_rules(
+            turn_end_hook_registry,
+            abilities=ability_indexes_by_player_id,
+            stratagems=stratagem_indexes,
+            costs=stratagem_cost_modifier_registry,
+        )
         return cls(
             activation=activation,
             ability_indexes_by_player_id=ability_indexes_by_player_id,
-            stratagem_indexes_by_player_id=_catalog_indexes.stratagem_indexes_by_player_id(
-                armies=validated_armies,
-                catalog=catalog,
-                records=stratagem_records,
-            ),
+            stratagem_indexes_by_player_id=stratagem_indexes,
             ability_handler_registry=ability_registry,
             stratagem_handler_registry=stratagem_registry,
             rule_execution_registry=rule_registry,
@@ -1966,6 +1958,7 @@ class RuntimeContentBundle:
             unit_move_completed_battle_shock_hook_registry=(
                 unit_move_completed_battle_shock_hook_registry
             ),
+            move_completion_rule_registry=_unit_move_completed.move_completion_rule_registry(),
             mortal_wound_feel_no_pain_hook_registry=mortal_wound_feel_no_pain_hook_registry,
             charge_declaration_hook_registry=charge_declaration_hook_registry,
             shooting_target_restriction_hook_registry=shooting_target_restriction_hook_registry,

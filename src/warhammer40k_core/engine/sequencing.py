@@ -1,30 +1,18 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import StrEnum
 from itertools import permutations
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.dice import (
-    DiceRollResult,
-    DiceRollResultPayload,
-    DiceRollSpecError,
-    RollOffRequest,
-    RollOffResult,
-    RollOffResultPayload,
-)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
-    DecisionError,
     DecisionOption,
     DecisionRequest,
-    DecisionRequestPayload,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import (
-    EventLogError,
-    EventRecord,
     JsonValue,
     validate_json_value,
 )
@@ -34,14 +22,33 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindow,
     TimingWindowPayload,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_sequencing_2026_09 import (
+    END_ROUND_MISSION_ORDER_SOURCE_ID,
+    END_TURN_MISSION_ORDER_SOURCE_ID,
+    RULES_SEQUENCING_SOURCE_ID,
+)
 
 SEQUENCING_DECISION_TYPE = "resolve_sequencing_order"
 
 
+class SequencingRequirement(StrEnum):
+    MANDATORY = "mandatory"
+    OPTIONAL = "optional"
+
+
+class SequencingRuleOrigin(StrEnum):
+    PLAYER = "player"
+    MISSION = "mission"
+
+
 class SequencingParticipantPayload(TypedDict):
     participant_id: str
-    player_id: str
+    player_id: str | None
     source_rule_id: str
+    requirement: str
+    origin: str
+    label: str | None
+    secret: bool
     payload: JsonValue
 
 
@@ -51,6 +58,7 @@ class SequencingConflictContextPayload(TypedDict):
     timing_window: TimingWindowPayload
     player_ids: list[str]
     active_player_id: str | None
+    sequence_exception_source_id: str | None
 
 
 class SequencingDecisionPayload(TypedDict):
@@ -61,7 +69,6 @@ class SequencingDecisionPayload(TypedDict):
     request_id: str
     result_id: str
     timing_window: TimingWindowPayload
-    roll_off_result: RollOffResultPayload | None
 
 
 class SequencingNextParticipantDecisionPayload(TypedDict):
@@ -76,24 +83,27 @@ class SequencingNextParticipantDecisionPayload(TypedDict):
     timing_window: TimingWindowPayload
 
 
-_ROLL_OFF_TIMING_KINDS = frozenset(
-    (
-        TimingTriggerKind.BEFORE_BATTLE,
-        TimingTriggerKind.AFTER_BATTLE,
-        TimingTriggerKind.START_BATTLE_ROUND,
-        TimingTriggerKind.END_BATTLE_ROUND,
-    )
-)
-
-
 @dataclass(frozen=True, slots=True)
 class SequencingParticipant:
     participant_id: str
-    player_id: str
+    player_id: str | None
     source_rule_id: str
+    requirement: SequencingRequirement
+    origin: SequencingRuleOrigin = SequencingRuleOrigin.PLAYER
     payload: JsonValue = None
+    label: str | None = field(default=None, compare=False)
+    secret: bool = False
 
     def __post_init__(self) -> None:
+        if type(self.requirement) is not SequencingRequirement:
+            raise GameLifecycleError("Sequencing participant requires a typed requirement.")
+        if type(self.origin) is not SequencingRuleOrigin:
+            raise GameLifecycleError("Sequencing participant requires a typed rule origin.")
+        if self.player_id is None and (
+            self.origin is not SequencingRuleOrigin.MISSION
+            or self.requirement is not SequencingRequirement.MANDATORY
+        ):
+            raise GameLifecycleError("Only automatic mandatory mission rules may have no owner.")
         object.__setattr__(
             self,
             "participant_id",
@@ -102,7 +112,7 @@ class SequencingParticipant:
         object.__setattr__(
             self,
             "player_id",
-            _validate_identifier("SequencingParticipant player_id", self.player_id),
+            _validate_optional_identifier("SequencingParticipant player_id", self.player_id),
         )
         object.__setattr__(
             self,
@@ -110,12 +120,20 @@ class SequencingParticipant:
             _validate_identifier("SequencingParticipant source_rule_id", self.source_rule_id),
         )
         object.__setattr__(self, "payload", validate_json_value(self.payload))
+        if self.label is not None:
+            _validate_identifier("SequencingParticipant label", self.label)
+        if type(self.secret) is not bool:
+            raise GameLifecycleError("Sequencing participant secrecy must be a bool.")
 
     def to_payload(self) -> SequencingParticipantPayload:
         return {
             "participant_id": self.participant_id,
             "player_id": self.player_id,
             "source_rule_id": self.source_rule_id,
+            "requirement": self.requirement.value,
+            "origin": self.origin.value,
+            "label": self.label,
+            "secret": self.secret,
             "payload": self.payload,
         }
 
@@ -125,6 +143,10 @@ class SequencingParticipant:
             participant_id=payload["participant_id"],
             player_id=payload["player_id"],
             source_rule_id=payload["source_rule_id"],
+            requirement=sequencing_requirement_from_token(payload["requirement"]),
+            origin=sequencing_origin_from_token(payload["origin"]),
+            label=payload["label"],
+            secret=payload["secret"],
             payload=payload["payload"],
         )
 
@@ -136,6 +158,15 @@ class SequencingConflictContext:
     timing_window: TimingWindow
     player_ids: tuple[str, ...]
     active_player_id: str | None
+
+    @property
+    def sequence_exception_source_id(self) -> str | None:
+        trigger = self.timing_window.descriptor.trigger_kind
+        if trigger is TimingTriggerKind.END_TURN:
+            return END_TURN_MISSION_ORDER_SOURCE_ID
+        if trigger is TimingTriggerKind.END_BATTLE_ROUND:
+            return END_ROUND_MISSION_ORDER_SOURCE_ID
+        return None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -172,11 +203,8 @@ class SequencingConflictContext:
         )
         if self.active_player_id is not None and self.active_player_id not in self.player_ids:
             raise GameLifecycleError("Sequencing active_player_id must be in player_ids.")
-        if not self.requires_roll_off() and self.active_player_id is None:
-            raise GameLifecycleError("During-battle sequencing requires an active player.")
-
-    def requires_roll_off(self) -> bool:
-        return self.timing_window.descriptor.trigger_kind in _ROLL_OFF_TIMING_KINDS
+        if self.active_player_id is None:
+            raise GameLifecycleError("Sequencing requires an active player.")
 
     def to_payload(self) -> SequencingConflictContextPayload:
         return {
@@ -185,17 +213,21 @@ class SequencingConflictContext:
             "timing_window": self.timing_window.to_payload(),
             "player_ids": list(self.player_ids),
             "active_player_id": self.active_player_id,
+            "sequence_exception_source_id": self.sequence_exception_source_id,
         }
 
     @classmethod
     def from_payload(cls, payload: SequencingConflictContextPayload) -> Self:
-        return cls(
+        context = cls(
             conflict_id=payload["conflict_id"],
             game_id=payload["game_id"],
             timing_window=TimingWindow.from_payload(payload["timing_window"]),
             player_ids=tuple(payload["player_ids"]),
             active_player_id=payload["active_player_id"],
         )
+        if payload["sequence_exception_source_id"] != context.sequence_exception_source_id:
+            raise GameLifecycleError("Sequencing source exception authority drift.")
+        return context
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,7 +239,6 @@ class SequencingDecision:
     request_id: str
     result_id: str
     timing_window: TimingWindow
-    roll_off_result: RollOffResult | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -234,7 +265,7 @@ class SequencingDecision:
             _validate_identifier_tuple(
                 "SequencingDecision ordered_participant_ids",
                 self.ordered_participant_ids,
-                min_length=2,
+                min_length=1,
                 sort_values=False,
             ),
         )
@@ -250,8 +281,6 @@ class SequencingDecision:
         )
         if type(self.timing_window) is not TimingWindow:
             raise GameLifecycleError("SequencingDecision timing_window must be a TimingWindow.")
-        if self.roll_off_result is not None and type(self.roll_off_result) is not RollOffResult:
-            raise GameLifecycleError("SequencingDecision roll_off_result must be RollOffResult.")
 
     def to_payload(self) -> SequencingDecisionPayload:
         return {
@@ -262,14 +291,10 @@ class SequencingDecision:
             "request_id": self.request_id,
             "result_id": self.result_id,
             "timing_window": self.timing_window.to_payload(),
-            "roll_off_result": (
-                None if self.roll_off_result is None else self.roll_off_result.to_payload()
-            ),
         }
 
     @classmethod
     def from_payload(cls, payload: SequencingDecisionPayload) -> Self:
-        roll_off_payload = payload["roll_off_result"]
         return cls(
             decision_id=payload["decision_id"],
             conflict_id=payload["conflict_id"],
@@ -278,9 +303,6 @@ class SequencingDecision:
             request_id=payload["request_id"],
             result_id=payload["result_id"],
             timing_window=TimingWindow.from_payload(payload["timing_window"]),
-            roll_off_result=(
-                None if roll_off_payload is None else RollOffResult.from_payload(roll_off_payload)
-            ),
         )
 
 
@@ -324,7 +346,7 @@ class SequencingNextParticipantDecision:
         remaining = _validate_identifier_tuple(
             "Sequencing remaining participant IDs",
             self.remaining_participant_ids,
-            min_length=2,
+            min_length=1,
             sort_values=True,
         )
         selected = _validate_identifier(
@@ -385,31 +407,18 @@ class SequencingNextParticipantDecision:
         )
 
 
-@dataclass(frozen=True, slots=True)
-class SequencingRollOffRewind:
-    decisions: DecisionController
-    removed_events: tuple[EventRecord, ...]
-
-
 def create_sequencing_decision_request(
     *,
     request_id: str,
     context: SequencingConflictContext,
     participants: tuple[SequencingParticipant, ...],
-    dice_manager: DiceRollManager | None = None,
 ) -> DecisionRequest:
     request_identifier = _validate_identifier("request_id", request_id)
     participant_values = _validate_participants(participants, player_ids=context.player_ids)
-    roll_off_result = _roll_off_result_for_context(
-        request_id=request_identifier,
-        context=context,
-        dice_manager=dice_manager,
-    )
     return _sequencing_decision_request(
         request_id=request_identifier,
         context=context,
         participants=participant_values,
-        roll_off_result=roll_off_result,
     )
 
 
@@ -423,10 +432,6 @@ def create_select_next_sequencing_participant_request(
     """Create a linear-size request selecting only the next participant."""
 
     request_identifier = _validate_identifier("request_id", request_id)
-    if context.requires_roll_off():
-        raise GameLifecycleError(
-            "Select-next sequencing supports only active-player during-battle conflicts."
-        )
     previous = _validate_identifier_tuple(
         "previously_selected_participant_ids",
         previously_selected_participant_ids,
@@ -442,7 +447,9 @@ def create_select_next_sequencing_participant_request(
         raise GameLifecycleError(
             "Select-next sequencing previous and remaining participants overlap."
         )
-    deciding_player_id = _require_active_player(context)
+    eligible = eligible_sequencing_participants(context=context, participants=participants)
+    participant_ids = tuple(participant.participant_id for participant in eligible)
+    deciding_player_id = sequencing_owner(eligible[0], context=context)
     return DecisionRequest(
         request_id=request_identifier,
         decision_type=SEQUENCING_DECISION_TYPE,
@@ -450,17 +457,18 @@ def create_select_next_sequencing_participant_request(
         payload=validate_json_value(
             {
                 "sequencing_model": "select_next_participant",
+                "secret": any(participant.secret for participant in eligible),
+                "sequencing_source_rule_id": RULES_SEQUENCING_SOURCE_ID,
+                "eligible_tier": sequencing_tier(eligible[0], context=context),
                 "sequencing_conflict": context.to_payload(),
                 "previously_selected_participant_ids": list(previous),
-                "participants": [participant.to_payload() for participant in participants],
-                "requires_roll_off": False,
-                "roll_off_result": None,
+                "participants": [participant.to_payload() for participant in eligible],
             }
         ),
         options=tuple(
             DecisionOption(
                 option_id=f"next:{participant.participant_id}",
-                label=participant.participant_id,
+                label=participant.label or participant.participant_id,
                 payload=validate_json_value(
                     {
                         "sequencing_conflict_id": context.conflict_id,
@@ -472,7 +480,7 @@ def create_select_next_sequencing_participant_request(
                     }
                 ),
             )
-            for participant in participants
+            for participant in eligible
         ),
     )
 
@@ -580,120 +588,14 @@ def sequencing_decision_event_from_request(
     return "sequencing_order_resolved", validate_json_value(decision.to_payload())
 
 
-def decision_controller_before_pending_sequencing_roll_off(
-    *,
-    decisions: DecisionController,
-    request: DecisionRequest,
-) -> SequencingRollOffRewind | None:
-    if type(decisions) is not DecisionController:
-        raise GameLifecycleError("Sequencing roll-off rewind requires a DecisionController.")
-    if type(request) is not DecisionRequest:
-        raise GameLifecycleError("Sequencing roll-off rewind requires a DecisionRequest.")
-    events = decisions.event_log.records
-    if len(events) < 2:
-        return None
-    issued_event = events[-1]
-    roll_off_event = events[-2]
-    if (
-        issued_event.event_type != "decision_requested"
-        or roll_off_event.event_type != "roll_off_resolved"
-    ):
-        return None
-    if not isinstance(issued_event.payload, dict):
-        raise GameLifecycleError("Sequencing decision_requested payload must be an object.")
-    try:
-        issued_request = DecisionRequest.from_payload(
-            cast(DecisionRequestPayload, issued_event.payload)
-        )
-    except (KeyError, TypeError, DecisionError) as exc:
-        raise GameLifecycleError("Sequencing decision_requested payload is invalid.") from exc
-    if issued_request != request:
-        raise GameLifecycleError("Sequencing decision_requested event drifted from the queue.")
-    if not isinstance(roll_off_event.payload, dict):
-        raise GameLifecycleError("Sequencing roll_off_resolved payload must be an object.")
-    try:
-        roll_off_result = RollOffResult.from_payload(
-            cast(RollOffResultPayload, roll_off_event.payload)
-        )
-    except (KeyError, TypeError, DiceRollSpecError) as exc:
-        raise GameLifecycleError("Sequencing roll_off_resolved payload is invalid.") from exc
-    expected_roll_off_request = RollOffRequest(
-        request_id=f"{request.request_id}:roll-off",
-        purpose="sequencing_conflict",
-        player_ids=roll_off_result.request.player_ids,
-        resolving_decision_id=request.request_id,
-    )
-    if roll_off_result.request != expected_roll_off_request:
-        raise GameLifecycleError("Sequencing roll-off request provenance drifted.")
-    suffix_start = _contiguous_roll_off_suffix_start(events, roll_off_index=len(events) - 2)
-    dice_events = events[suffix_start:-2]
-    historical_rolls = _historical_rolls_for_roll_off(roll_off_result)
-    if len(dice_events) != len(historical_rolls):
-        raise GameLifecycleError("Sequencing roll-off dice event count drifted.")
-    for event, historical_roll in zip(dice_events, historical_rolls, strict=True):
-        if event.event_type != "dice_rolled" or event.payload != historical_roll.to_payload():
-            raise GameLifecycleError("Sequencing roll-off dice event provenance drifted.")
-    payload = decisions.to_payload()
-    payload["event_log"] = payload["event_log"][:suffix_start]
-    try:
-        prefix_decisions = DecisionController.from_payload(payload)
-    except (KeyError, TypeError, DecisionError, EventLogError) as exc:
-        raise GameLifecycleError("Sequencing roll-off event prefix is invalid.") from exc
-    return SequencingRollOffRewind(
-        decisions=prefix_decisions,
-        removed_events=events[suffix_start:],
-    )
-
-
-def _contiguous_roll_off_suffix_start(
-    events: tuple[EventRecord, ...],
-    *,
-    roll_off_index: int,
-) -> int:
-    suffix_start = roll_off_index
-    while suffix_start > 0:
-        candidate = events[suffix_start - 1]
-        if candidate.event_type != "dice_rolled":
-            break
-        if not isinstance(candidate.payload, dict):
-            raise GameLifecycleError("Sequencing dice_rolled payload must be an object.")
-        try:
-            roll = DiceRollResult.from_payload(cast(DiceRollResultPayload, candidate.payload))
-        except (KeyError, TypeError, DiceRollSpecError) as exc:
-            raise GameLifecycleError("Sequencing dice_rolled payload is invalid.") from exc
-        if roll.spec.roll_type != "roll_off":
-            break
-        suffix_start -= 1
-    if suffix_start == roll_off_index:
-        raise GameLifecycleError("Sequencing roll-off event suffix has no dice events.")
-    return suffix_start
-
-
-def _historical_rolls_for_roll_off(
-    roll_off_result: RollOffResult,
-) -> tuple[DiceRollResult, ...]:
-    historical_rolls: list[DiceRollResult] = []
-    for round_result in roll_off_result.rounds:
-        if tuple(roll.player_id for roll in round_result.player_rolls) != (
-            roll_off_result.request.player_ids
-        ):
-            raise GameLifecycleError("Sequencing roll-off player order drifted.")
-        historical_rolls.extend(roll.roll_result for roll in round_result.player_rolls)
-    return tuple(historical_rolls)
-
-
 def _sequencing_decision_request(
     *,
     request_id: str,
     context: SequencingConflictContext,
     participants: tuple[SequencingParticipant, ...],
-    roll_off_result: RollOffResult | None,
 ) -> DecisionRequest:
-    deciding_player_id = (
-        roll_off_result.winner_player_id
-        if roll_off_result is not None
-        else _require_active_player(context)
-    )
+    eligible = eligible_sequencing_participants(context=context, participants=participants)
+    deciding_player_id = sequencing_owner(eligible[0], context=context)
     options = tuple(
         DecisionOption(
             option_id=_order_option_id(ordered),
@@ -704,15 +606,10 @@ def _sequencing_decision_request(
                     "deciding_player_id": deciding_player_id,
                     "ordered_participant_ids": list(ordered),
                     "timing_window": context.timing_window.to_payload(),
-                    "roll_off_result": (
-                        None if roll_off_result is None else roll_off_result.to_payload()
-                    ),
                 }
             ),
         )
-        for ordered in permutations(
-            tuple(participant.participant_id for participant in participants)
-        )
+        for ordered in permutations(tuple(participant.participant_id for participant in eligible))
     )
     return DecisionRequest(
         request_id=request_id,
@@ -721,11 +618,9 @@ def _sequencing_decision_request(
         payload=validate_json_value(
             {
                 "sequencing_conflict": context.to_payload(),
-                "participants": [participant.to_payload() for participant in participants],
-                "requires_roll_off": context.requires_roll_off(),
-                "roll_off_result": (
-                    None if roll_off_result is None else roll_off_result.to_payload()
-                ),
+                "sequencing_source_rule_id": RULES_SEQUENCING_SOURCE_ID,
+                "secret": any(participant.secret for participant in eligible),
+                "participants": [participant.to_payload() for participant in eligible],
             }
         ),
         options=options,
@@ -738,7 +633,6 @@ def request_sequencing_decision(
     context: SequencingConflictContext,
     participants: tuple[SequencingParticipant, ...],
     decisions: DecisionController,
-    dice_manager: DiceRollManager | None = None,
 ) -> DecisionRequest:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Sequencing decisions require a DecisionController.")
@@ -746,7 +640,6 @@ def request_sequencing_decision(
         request_id=request_id,
         context=context,
         participants=participants,
-        dice_manager=dice_manager,
     )
     return decisions.request_decision(request)
 
@@ -771,7 +664,8 @@ def apply_sequencing_decision(
     )
     result.validate_for_request(request)
     participant_values = _validate_participants(participants, player_ids=context.player_ids)
-    participant_ids = {participant.participant_id for participant in participant_values}
+    eligible = eligible_sequencing_participants(context=context, participants=participant_values)
+    participant_ids = {participant.participant_id for participant in eligible}
     payload = result.payload
     if not isinstance(payload, dict):
         raise GameLifecycleError("Sequencing result payload must be an object.")
@@ -782,13 +676,11 @@ def apply_sequencing_decision(
         _validate_identifier("ordered_participant_id", value) for value in ordered_values
     )
     if set(ordered) != participant_ids or len(ordered) != len(participant_ids):
-        raise GameLifecycleError("Sequencing result must order every participant exactly once.")
+        raise GameLifecycleError("Sequencing result must order every eligible participant once.")
     deciding_player_id = _validate_identifier(
         "deciding_player_id",
         payload.get("deciding_player_id"),
     )
-    roll_off_payload = payload.get("roll_off_result")
-    roll_off_result = _roll_off_from_payload(roll_off_payload)
     return SequencingDecision(
         decision_id=f"sequencing-decision:{context.conflict_id}:{result.result_id}",
         conflict_id=context.conflict_id,
@@ -797,7 +689,6 @@ def apply_sequencing_decision(
         request_id=request.request_id,
         result_id=result.result_id,
         timing_window=context.timing_window,
-        roll_off_result=roll_off_result,
     )
 
 
@@ -848,58 +739,13 @@ def _validate_sequencing_decision_request(
     payload = request.payload
     if not isinstance(payload, dict):
         raise GameLifecycleError("Sequencing request payload must be an object.")
-    roll_off_result = _roll_off_from_payload(payload.get("roll_off_result"))
-    if context.requires_roll_off():
-        if roll_off_result is None:
-            raise GameLifecycleError("Sequencing request requires an engine roll-off result.")
-        expected_roll_off_request = RollOffRequest(
-            request_id=f"{request.request_id}:roll-off",
-            purpose="sequencing_conflict",
-            player_ids=context.player_ids,
-            resolving_decision_id=request.request_id,
-        )
-        if roll_off_result.request != expected_roll_off_request:
-            raise GameLifecycleError("Sequencing request roll-off provenance drifted.")
-    elif roll_off_result is not None:
-        raise GameLifecycleError("Sequencing request has an unexpected roll-off result.")
     expected_request = _sequencing_decision_request(
         request_id=request.request_id,
         context=context,
         participants=participant_values,
-        roll_off_result=roll_off_result,
     )
     if request != expected_request:
         raise GameLifecycleError("Sequencing request does not match its authoritative context.")
-
-
-def _roll_off_result_for_context(
-    *,
-    request_id: str,
-    context: SequencingConflictContext,
-    dice_manager: DiceRollManager | None,
-) -> RollOffResult | None:
-    if not context.requires_roll_off():
-        return None
-    if dice_manager is None:
-        raise GameLifecycleError("Sequencing roll-off requires a DiceRollManager.")
-    if type(dice_manager) is not DiceRollManager:
-        raise GameLifecycleError("Sequencing roll-off requires a DiceRollManager.")
-    return dice_manager.roll_off(
-        RollOffRequest(
-            request_id=f"{request_id}:roll-off",
-            purpose="sequencing_conflict",
-            player_ids=context.player_ids,
-            resolving_decision_id=request_id,
-        )
-    )
-
-
-def _roll_off_from_payload(payload: object) -> RollOffResult | None:
-    if payload is None:
-        return None
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Sequencing roll_off_result must be an object or null.")
-    return RollOffResult.from_payload(cast(RollOffResultPayload, payload))
 
 
 def _require_active_player(context: SequencingConflictContext) -> str:
@@ -916,8 +762,8 @@ def _validate_participants(
     if type(participants) is not tuple:
         raise GameLifecycleError("Sequencing participants must be a tuple.")
     raw_values = cast(tuple[object, ...], participants)
-    if len(raw_values) < 2:
-        raise GameLifecycleError("Sequencing conflict requires at least two participants.")
+    if not raw_values:
+        raise GameLifecycleError("Sequencing conflict requires at least one participant.")
     seen: set[str] = set()
     validated: list[SequencingParticipant] = []
     for value in raw_values:
@@ -925,7 +771,7 @@ def _validate_participants(
             raise GameLifecycleError(
                 "Sequencing participants must contain SequencingParticipant values."
             )
-        if value.player_id not in player_ids:
+        if value.player_id is not None and value.player_id not in player_ids:
             raise GameLifecycleError("Sequencing participant player_id is not in player_ids.")
         if value.participant_id in seen:
             raise GameLifecycleError("Sequencing participants must not contain duplicates.")
@@ -936,6 +782,66 @@ def _validate_participants(
 
 def _order_option_id(ordered_participant_ids: tuple[str, ...]) -> str:
     return "order:" + ",".join(ordered_participant_ids)
+
+
+def sequencing_requirement_from_token(value: object) -> SequencingRequirement:
+    if type(value) is not str:
+        raise GameLifecycleError("Sequencing requirement token must be a string.")
+    try:
+        return SequencingRequirement(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Unknown sequencing requirement.") from exc
+
+
+def sequencing_origin_from_token(value: object) -> SequencingRuleOrigin:
+    if type(value) is not str:
+        raise GameLifecycleError("Sequencing origin token must be a string.")
+    try:
+        return SequencingRuleOrigin(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Unknown sequencing rule origin.") from exc
+
+
+def sequencing_owner(
+    participant: SequencingParticipant, *, context: SequencingConflictContext
+) -> str:
+    return (
+        _require_active_player(context) if participant.player_id is None else participant.player_id
+    )
+
+
+def sequencing_tier(
+    participant: SequencingParticipant, *, context: SequencingConflictContext
+) -> int:
+    """01.03.02 authority; display labels and traversal order never decide priority."""
+    if type(participant) is not SequencingParticipant:
+        raise GameLifecycleError("Sequencing tier requires a participant.")
+    if participant.player_id is not None and participant.player_id not in context.player_ids:
+        raise GameLifecycleError("Sequencing participant owner is outside this conflict.")
+    mission_after_players = (
+        participant.origin is SequencingRuleOrigin.MISSION
+        and context.sequence_exception_source_id is not None
+    )
+    if participant.player_id is None:
+        return 4 if mission_after_players else -1
+    owner_tier = 0 if participant.player_id == _require_active_player(context) else 2
+    return (
+        (5 if mission_after_players else 0)
+        + owner_tier
+        + (participant.requirement is SequencingRequirement.OPTIONAL)
+    )
+
+
+def eligible_sequencing_participants(
+    *, context: SequencingConflictContext, participants: tuple[SequencingParticipant, ...]
+) -> tuple[SequencingParticipant, ...]:
+    values = _validate_participants(participants, player_ids=context.player_ids)
+    tier = min(sequencing_tier(participant, context=context) for participant in values)
+    return tuple(
+        participant
+        for participant in values
+        if sequencing_tier(participant, context=context) == tier
+    )
 
 
 def _order_option_label(ordered_participant_ids: tuple[str, ...]) -> str:

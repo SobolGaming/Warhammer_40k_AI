@@ -39,6 +39,11 @@ def record_attack_sequence_completed(
 
     record_completed_shooting_restriction(state=state, sequence=sequence)
     decisions.event_log.append("attack_sequence_completed", payload)
+    from warhammer40k_core.engine.attack_completion_authority import ATTACK_COMPLETION_STATE_EVENT
+
+    decisions.event_log.append(
+        ATTACK_COMPLETION_STATE_EVENT, validate_json_value(sequence.to_payload())
+    )
 
 
 def record_models_attacked(

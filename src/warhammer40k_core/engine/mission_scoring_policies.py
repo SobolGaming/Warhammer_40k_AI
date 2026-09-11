@@ -164,15 +164,23 @@ class MissionScoringPolicies:
         if type(authoritative_setup) is not MissionSetup:
             raise GameLifecycleError("Primary scoring authority requires MissionSetup.")
         self.validate_mission_setup(authoritative_setup)
-        state_evidence = build_primary_scoring_state_evidence(
-            state=authoritative_state,
-            record=record,
-            end_of_battle=end_of_battle,
-        )
-        return self.primary_awards_from_state_evidence(
-            record=record,
-            authoritative_state=authoritative_state,
-            state_evidence=state_evidence,
+        return tuple(
+            award
+            for player_id in self.scoring_player_ids_for_record(
+                record=record,
+                turn_order=authoritative_state.turn_order,
+                end_of_battle=end_of_battle,
+            )
+            for award in self.primary_awards_from_state_evidence(
+                record=record,
+                authoritative_state=authoritative_state,
+                state_evidence=build_primary_scoring_state_evidence(
+                    state=authoritative_state,
+                    record=record,
+                    end_of_battle=end_of_battle,
+                    scoring_player_id=player_id,
+                ),
+            )
         )
 
     def primary_awards_from_state_evidence(
@@ -202,6 +210,11 @@ class MissionScoringPolicies:
             record=record,
             turn_order=tuple(authoritative_state.turn_order),
             end_of_battle=end_of_battle,
+        )
+        if state_evidence.scoring_player_id not in authoritative_state.player_ids:
+            raise GameLifecycleError("Primary scoring player is not part of this game.")
+        player_ids = tuple(
+            player_id for player_id in player_ids if player_id == state_evidence.scoring_player_id
         )
         turn_start_states = tuple(
             value

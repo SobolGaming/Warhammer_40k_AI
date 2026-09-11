@@ -43,6 +43,7 @@ from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_
 from warhammer40k_core.engine.shooting_terrain_visibility import (
     shooting_terrain_areas_for_state,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
@@ -100,6 +101,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=for_the_greater_good_request,
+                candidate_handler=shooting_candidates,
                 result_handler=apply_for_the_greater_good_result,
             ),
         ),
@@ -111,6 +113,14 @@ def runtime_contribution() -> RuntimeContentContribution:
             ),
         ),
     )
+
+
+def shooting_candidates(
+    context: ShootingPhaseStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .shooting_sequencing import candidates
+
+    return candidates(context)
 
 
 def for_the_greater_good_request(
@@ -163,7 +173,7 @@ def for_the_greater_good_request(
     )
     options = tuple(_mark_decision_option(mark, common_payload) for mark in marks)
     return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
+        request_id=context.issue_request_id(),
         decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
         actor_id=army.player_id,
         payload=validate_json_value(common_payload),

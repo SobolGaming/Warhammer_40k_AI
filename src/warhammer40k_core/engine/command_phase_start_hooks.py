@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Self, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
@@ -20,6 +22,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
@@ -99,6 +102,7 @@ class CommandPhaseStartRequestContext:
     state: GameState
     decisions: DecisionController
     active_player_id: str
+    authoritative_request_id: str | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -116,6 +120,11 @@ class CommandPhaseStartRequestContext:
         )
         _validate_command_phase_start_state(self.state, active_player_id=self.active_player_id)
 
+    def issue_request_id(self) -> str:
+        if self.authoritative_request_id is not None:
+            return _validate_identifier("authoritative_request_id", self.authoritative_request_id)
+        return self.state.next_decision_request_id()
+
 
 @dataclass(frozen=True, slots=True)
 class CommandPhaseStartEffectContext:
@@ -125,6 +134,8 @@ class CommandPhaseStartEffectContext:
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
+    ruleset_descriptor: RulesetDescriptor | None = None
+    army_catalog: ArmyCatalog | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -309,6 +320,9 @@ class CommandPhaseStartHookBinding:
     handler: CommandPhaseStartHandler | None = None
     effect_handler: CommandPhaseStartEffectHandler | None = None
     request_handler: CommandPhaseStartRequestHandler | None = None
+    candidate_handler: (
+        Callable[[CommandPhaseStartEffectContext], tuple[TimingRuleCandidate, ...]] | None
+    ) = None
     result_handler: CommandPhaseStartResultHandler | None = None
     nested_result_handler: CommandPhaseStartNestedResultHandler | None = None
     nested_pending_authority_validator: CommandPhaseStartNestedPendingAuthorityValidator | None = (
@@ -325,6 +339,7 @@ class CommandPhaseStartHookBinding:
             self.handler is None
             and self.effect_handler is None
             and self.request_handler is None
+            and self.candidate_handler is None
             and self.result_handler is None
             and self.nested_result_handler is None
             and self.nested_pending_authority_validator is None
@@ -341,6 +356,8 @@ class CommandPhaseStartHookBinding:
             raise GameLifecycleError(
                 "CommandPhaseStartHookBinding request_handler must be callable."
             )
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError("Command-start candidate handler must be callable.")
         if self.result_handler is not None and not callable(self.result_handler):
             raise GameLifecycleError(
                 "CommandPhaseStartHookBinding result_handler must be callable."
@@ -411,139 +428,38 @@ class CommandPhaseStartHookRegistry:
     def all_bindings(self) -> tuple[CommandPhaseStartHookBinding, ...]:
         return self.bindings
 
-    def resolve(self, context: CommandPhaseStartContext) -> None:
-        self.resolve_with_provider_dispositions(context)
-
-    def resolve_with_provider_dispositions(
+    def candidate_entries_for(
         self,
-        context: CommandPhaseStartContext,
-    ) -> tuple[CommandPhaseStartProviderDisposition, ...]:
-        if type(context) is not CommandPhaseStartContext:
-            raise GameLifecycleError("Command-phase start hooks require context.")
-        dispositions: list[CommandPhaseStartProviderDisposition] = []
+        context: CommandPhaseStartEffectContext,
+    ) -> tuple[tuple[TimingRuleCandidate, CommandPhaseStartHookBinding], ...]:
+        if type(context) is not CommandPhaseStartEffectContext:
+            raise GameLifecycleError("Command-start candidate hooks require effect context.")
+        entries: list[tuple[TimingRuleCandidate, CommandPhaseStartHookBinding]] = []
         for binding in self.bindings:
-            if binding.handler is not None:
-                before = _provider_snapshot(context)
-                binding.handler(context)
-                dispositions.append(
-                    _provider_disposition(
-                        context=context,
-                        binding=binding,
-                        before=before,
-                    )
-                )
-        return tuple(dispositions)
-
-    def next_request_for(
-        self,
-        context: CommandPhaseStartRequestContext,
-    ) -> DecisionRequest | None:
-        emission = self.next_request_with_provider(context)
-        return None if emission is None else emission[0]
-
-    def next_request_with_provider(
-        self,
-        context: CommandPhaseStartRequestContext,
-    ) -> tuple[DecisionRequest, CommandPhaseStartHookBinding] | None:
-        if type(context) is not CommandPhaseStartRequestContext:
-            raise GameLifecycleError("Command-phase start request hooks require context.")
-        emissions: list[tuple[DecisionRequest, CommandPhaseStartHookBinding]] = []
-        for binding in self.bindings:
-            if binding.request_handler is None:
+            if (
+                binding.handler is None
+                and binding.effect_handler is None
+                and binding.request_handler is None
+                and binding.candidate_handler is None
+            ):
                 continue
-            before = _provider_snapshot(context)
-            request = binding.request_handler(context)
-            _require_request_provider_side_effects(
+            if binding.candidate_handler is None:
+                raise GameLifecycleError(
+                    "Command-start providers require pure candidate discovery."
+                )
+            before = provider_snapshot(context)
+            candidates = binding.candidate_handler(context)
+            _require_provider_side_effect_free(
                 context=context,
                 before=before,
-                request=request,
+                error_message="Command-start candidate discovery mutated engine state.",
             )
-            if request is None:
-                continue
-            if type(request) is not DecisionRequest:
-                raise GameLifecycleError(
-                    "Command-phase start request handlers must return DecisionRequest or None."
-                )
-            if (
-                request.decision_type
-                != SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE
+            if type(candidates) is not tuple or any(
+                type(candidate) is not TimingRuleCandidate for candidate in candidates
             ):
-                raise GameLifecycleError(
-                    "Command-phase start request handlers must use the finite decision type."
-                )
-            if binding.result_handler is None:
-                raise GameLifecycleError(
-                    "Command-phase start request providers require a result handler."
-                )
-            emissions.append((request, binding))
-        if len(emissions) > 1:
-            sequenced_emission = _sequenced_command_phase_start_emission(
-                context=context,
-                emissions=tuple(emissions),
-            )
-            if sequenced_emission is None:
-                raise GameLifecycleError(
-                    "Command-phase start hooks produced multiple simultaneous requests."
-                )
-            return sequenced_emission
-        if not emissions:
-            return None
-        return emissions[0]
-
-    def resolve_effects(
-        self,
-        context: CommandPhaseStartEffectContext,
-    ) -> LifecycleStatus | None:
-        status, _binding, _dispositions = self.resolve_effects_with_provider_dispositions(context)
-        return status
-
-    def resolve_effects_with_provider(
-        self,
-        context: CommandPhaseStartEffectContext,
-    ) -> tuple[LifecycleStatus | None, CommandPhaseStartHookBinding | None]:
-        status, binding, _dispositions = self.resolve_effects_with_provider_dispositions(context)
-        return status, binding
-
-    def resolve_effects_with_provider_dispositions(
-        self,
-        context: CommandPhaseStartEffectContext,
-    ) -> tuple[
-        LifecycleStatus | None,
-        CommandPhaseStartHookBinding | None,
-        tuple[CommandPhaseStartProviderDisposition, ...],
-    ]:
-        from warhammer40k_core.engine.phase import LifecycleStatus
-
-        if type(context) is not CommandPhaseStartEffectContext:
-            raise GameLifecycleError("Command-phase start effect hooks require context.")
-        dispositions: list[CommandPhaseStartProviderDisposition] = []
-        for binding in self.bindings:
-            if binding.effect_handler is None:
-                continue
-            before = _provider_snapshot(context)
-            status = binding.effect_handler(context)
-            if status is None:
-                dispositions.append(
-                    _provider_disposition(
-                        context=context,
-                        binding=binding,
-                        before=before,
-                    )
-                )
-                continue
-            if type(status) is not LifecycleStatus:
-                raise GameLifecycleError(
-                    "Command-phase start effect handlers must return LifecycleStatus or None."
-                )
-            dispositions.append(
-                _provider_disposition(
-                    context=context,
-                    binding=binding,
-                    before=before,
-                )
-            )
-            return status, binding, tuple(dispositions)
-        return None, None, tuple(dispositions)
+                raise GameLifecycleError("Command-start discovery requires typed rule candidates.")
+            entries.extend((candidate, binding) for candidate in candidates)
+        return tuple(entries)
 
     def apply_result(
         self,
@@ -560,13 +476,13 @@ class CommandPhaseStartHookRegistry:
         for binding in self.bindings:
             if binding.result_handler is None:
                 continue
-            before = _provider_snapshot(context)
+            before = provider_snapshot(context)
             handled = binding.result_handler(context)
             if type(handled) is not bool:
                 raise GameLifecycleError("Command-phase start result handlers must return bool.")
             if handled:
                 handled_dispositions.append(
-                    _provider_disposition(
+                    provider_disposition(
                         context=context,
                         binding=binding,
                         before=before,
@@ -606,7 +522,7 @@ class CommandPhaseStartHookRegistry:
         for binding in self.bindings:
             if binding.nested_result_handler is None:
                 continue
-            before = _provider_snapshot(context)
+            before = provider_snapshot(context)
             handled = binding.nested_result_handler(context)
             if type(handled) is not bool:
                 raise GameLifecycleError(
@@ -614,7 +530,7 @@ class CommandPhaseStartHookRegistry:
                 )
             if handled:
                 handled_dispositions.append(
-                    _provider_disposition(
+                    provider_disposition(
                         context=context,
                         binding=binding,
                         before=before,
@@ -646,7 +562,7 @@ class CommandPhaseStartHookRegistry:
             validator = binding.nested_pending_authority_validator
             if validator is None:
                 continue
-            before = _provider_snapshot(context)
+            before = provider_snapshot(context)
             claimed = validator(context)
             if type(claimed) is not bool:
                 raise GameLifecycleError(
@@ -715,7 +631,7 @@ type _ProviderContext = (
 type _ProviderSnapshot = tuple[object, tuple[DecisionRequest, ...], int, int]
 
 
-def _provider_snapshot(context: _ProviderContext) -> _ProviderSnapshot:
+def provider_snapshot(context: _ProviderContext) -> _ProviderSnapshot:
     return (
         context.state.to_payload(),
         context.decisions.queue.pending_requests,
@@ -724,7 +640,7 @@ def _provider_snapshot(context: _ProviderContext) -> _ProviderSnapshot:
     )
 
 
-def _provider_disposition(
+def provider_disposition(
     *,
     context: _ProviderContext,
     binding: CommandPhaseStartHookBinding,
@@ -790,7 +706,7 @@ def _require_provider_side_effect_free(
         raise GameLifecycleError(error_message)
 
 
-def _require_request_provider_side_effects(
+def require_request_provider_side_effects(
     *,
     context: CommandPhaseStartRequestContext,
     before: _ProviderSnapshot,
@@ -838,36 +754,6 @@ def _validate_bindings(value: object) -> tuple[CommandPhaseStartHookBinding, ...
             "CommandPhaseStartHookRegistry bindings must contain hook bindings."
         ),
     )
-
-
-def _sequenced_command_phase_start_emission(
-    *,
-    context: CommandPhaseStartRequestContext,
-    emissions: tuple[tuple[DecisionRequest, CommandPhaseStartHookBinding], ...],
-) -> tuple[DecisionRequest, CommandPhaseStartHookBinding] | None:
-    active_actor_requests = tuple(
-        emission for emission in emissions if emission[0].actor_id == context.active_player_id
-    )
-    non_active_actor_requests = tuple(
-        emission for emission in emissions if emission[0].actor_id != context.active_player_id
-    )
-    if len(active_actor_requests) > 1:
-        return None
-    for request, _binding in non_active_actor_requests:
-        if not _request_allows_non_active_actor(request):
-            return None
-    if active_actor_requests:
-        return active_actor_requests[0]
-    if non_active_actor_requests:
-        return non_active_actor_requests[0]
-    return None
-
-
-def _request_allows_non_active_actor(request: DecisionRequest) -> bool:
-    payload = request.payload
-    if not isinstance(payload, Mapping):
-        return False
-    return payload.get("actor_may_be_non_active") is True
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

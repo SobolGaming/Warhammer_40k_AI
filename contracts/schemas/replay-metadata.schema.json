@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v8/replay-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v9/replay-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -22,7 +22,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v8-phase17n-step5a", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v9-sequencing", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [
@@ -284,8 +284,9 @@
       "additionalProperties": false,
       "description": "One content-addressed state snapshot required for every ordinary or end-of-battle boundary with an applicable assigned-Primary rule, including zero-award evaluations.",
       "properties": {
+        "scoring_player_id": {"minLength": 1, "type": "string"},
         "schema_version": {
-          "const": "primary-scoring-state-evidence-v1",
+          "const": "primary-scoring-state-evidence-v2",
           "type": "string"
         },
         "game_id": {"minLength": 1, "type": "string"},
@@ -349,6 +350,7 @@
         "evidence_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
       },
       "required": [
+        "scoring_player_id",
         "schema_version",
         "game_id",
         "battlefield_id",
@@ -376,8 +378,9 @@
       "additionalProperties": false,
       "description": "Typed Objective Control capture to Primary scoring-commit lifecycle for one required boundary.",
       "properties": {
+        "scoring_player_id": {"minLength": 1, "type": "string"},
         "schema_version": {
-          "const": "primary-scoring-boundary-lifecycle-v1",
+          "const": "primary-scoring-boundary-lifecycle-v2",
           "type": "string"
         },
         "objective_control_record_id": {"minLength": 1, "type": "string"},
@@ -415,6 +418,7 @@
         "lifecycle_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
       },
       "required": [
+        "scoring_player_id",
         "schema_version",
         "objective_control_record_id",
         "objective_control_record_hash",

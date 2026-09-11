@@ -94,7 +94,7 @@ from warhammer40k_core.engine.damage_allocation import (
     feel_no_pain_attack_condition_from_token,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -128,12 +128,12 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
-    SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
     ShootingPhaseStartHookBinding,
     ShootingPhaseStartRequestContext,
     ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_abilities import (
     DeadlyDemiseAbilityProfile,
@@ -982,48 +982,29 @@ class CatalogNamedWeaponAbilityChoiceRuntime:
             ShootingPhaseStartHookBinding(
                 hook_id=CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
                 source_id=CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
-                request_handler=self.request_handler,
+                candidate_handler=self.candidates,
                 result_handler=self.result_handler,
             ),
         )
 
-    def request_handler(self, context: ShootingPhaseStartRequestContext) -> DecisionRequest | None:
+    def candidates(
+        self, context: ShootingPhaseStartRequestContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_named_weapon_sequencing import candidates
+
+        return candidates(self, context)
+
+    def request_handler(
+        self, context: ShootingPhaseStartRequestContext
+    ) -> DecisionRequest | LifecycleStatus | None:
+        from warhammer40k_core.engine.phase_start_sequencing import resolve_phase_start_candidates
+
         if type(context) is not ShootingPhaseStartRequestContext:
             raise GameLifecycleError("Catalog named weapon ability choice requires context.")
-        groups = _available_catalog_named_weapon_ability_choice_groups(
-            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
-            armies=self.armies,
-            context=context,
-        )
-        if not groups:
-            return None
-        group = groups[0]
-        common_payload = _named_weapon_ability_choice_request_payload(
+        return resolve_phase_start_candidates(
             state=context.state,
-            group=group,
-        )
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
-            actor_id=context.state.active_player_id,
-            payload=validate_json_value(common_payload),
-            options=tuple(
-                DecisionOption(
-                    option_id=option.option_id,
-                    label=_named_weapon_ability_choice_option_label(
-                        group=group,
-                        option=option,
-                    ),
-                    payload=validate_json_value(
-                        _named_weapon_ability_choice_option_payload(
-                            state=context.state,
-                            group=group,
-                            option=option,
-                        )
-                    ),
-                )
-                for option in group.options
-            ),
+            decisions=context.decisions,
+            discover=lambda: self.candidates(context),
         )
 
     def result_handler(
@@ -1056,13 +1037,23 @@ class CatalogNamedWeaponAbilityChoiceRuntime:
                 shooting_target_restriction_hooks=context.shooting_target_restriction_hooks,
             ),
         )
-        if not groups:
+        matching_groups = tuple(
+            group
+            for group in groups
+            if validate_json_value(
+                _named_weapon_ability_choice_request_payload(state=context.state, group=group)
+            )
+            == context.request.payload
+        )
+        if not matching_groups:
             return _catalog_named_weapon_ability_choice_invalid_status(
                 state=context.state,
                 actor_id=context.result.actor_id,
                 invalid_reason="catalog_named_weapon_ability_choice_unavailable",
             )
-        group = groups[0]
+        if len(matching_groups) != 1:
+            raise GameLifecycleError("Named weapon choice source identity is ambiguous.")
+        group = matching_groups[0]
         option_by_id = {option.option_id: option for option in group.options}
         option = option_by_id.get(context.result.selected_option_id)
         if option is None:
@@ -1136,97 +1127,21 @@ class CatalogPostShootHitTargetStatusRuntime:
                 hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
                 source_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
                 handler=self.request_handler,
+                candidate_handler=self.candidates,
             ),
         )
 
     def request_handler(self, context: AttackSequenceCompletedContext) -> LifecycleStatus | None:
-        if type(context) is not AttackSequenceCompletedContext:
-            raise GameLifecycleError("Catalog post-shoot status requires context.")
-        groups = _available_catalog_post_shoot_hit_target_status_groups(
-            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
-            armies=self.armies,
-            context=context,
-        )
-        if not groups:
-            return None
-        resolved_group_keys = _resolved_post_shoot_hit_target_status_group_keys(context.decisions)
-        unresolved_groups = tuple(
-            group
-            for group in groups
-            if _post_shoot_hit_target_status_group_key(group) not in resolved_group_keys
-        )
-        if not unresolved_groups:
-            return None
-        group = unresolved_groups[0]
-        common_payload = _post_shoot_hit_target_status_request_payload(
-            state=context.state,
-            group=group,
-        )
-        request = DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
-            actor_id=context.attack_sequence.attacker_player_id,
-            payload=validate_json_value(common_payload),
-            options=tuple(
-                DecisionOption(
-                    option_id=option.option_id,
-                    label=_post_shoot_hit_target_status_option_label(
-                        group=group,
-                        option=option,
-                    ),
-                    payload=validate_json_value(
-                        _post_shoot_hit_target_status_option_payload(
-                            state=context.state,
-                            group=group,
-                            option=option,
-                        )
-                    ),
-                )
-                for option in group.options
-            ),
-        )
-        context.decisions.request_decision(request)
-        context.decisions.event_log.append(
-            "catalog_post_shoot_hit_target_status_requested",
-            validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "phase": BattlePhase.SHOOTING.value,
-                    "active_player_id": context.state.active_player_id,
-                    "player_id": context.attack_sequence.attacker_player_id,
-                    "hook_id": CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
-                    "request_id": request.request_id,
-                    "catalog_record_id": group.record.record_id,
-                    "source_rule_id": group.record.definition.source_id,
-                    "clause_id": group.clause.clause_id,
-                    "status": group.status,
-                    "source_model_instance_id": group.source_model_instance_id,
-                    "attack_sequence_id": group.attack_sequence.sequence_id,
-                    "attack_sequence_completed_event_id": (
-                        group.attack_sequence_completed_event_id
-                    ),
-                    "available_target_unit_instance_ids": [
-                        option.target_unit_instance_id for option in group.options
-                    ],
-                    "phase_body_status": "catalog_post_shoot_hit_target_status_pending",
-                }
-            ),
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=request,
-            payload=validate_json_value(
-                {
-                    "phase": BattlePhase.SHOOTING.value,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": context.state.active_player_id,
-                    "player_id": context.attack_sequence.attacker_player_id,
-                    "pending_request_id": request.request_id,
-                    "phase_body_status": "catalog_post_shoot_hit_target_status_pending",
-                }
-            ),
-        )
+        from warhammer40k_core.engine.catalog_post_shoot_status_candidates import resolve
+
+        return resolve(self, context)
+
+    def candidates(
+        self, context: AttackSequenceCompletedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_post_shoot_status_candidates import candidates
+
+        return candidates(self, context)
 
 
 def catalog_advance_eligibility_hook_bindings(
@@ -1709,7 +1624,7 @@ def _catalog_named_weapon_ability_choice_group_from_clause(
     )
 
 
-def _available_catalog_post_shoot_hit_target_status_groups(
+def available_catalog_post_shoot_hit_target_status_groups(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
@@ -2572,7 +2487,7 @@ def _named_weapon_ability_choice_base_payload(
     }
 
 
-def _post_shoot_hit_target_status_request_payload(
+def post_shoot_hit_target_status_request_payload(
     *,
     state: GameState,
     group: CatalogPostShootHitTargetStatusGroup,
@@ -2588,7 +2503,7 @@ def _post_shoot_hit_target_status_request_payload(
     }
 
 
-def _post_shoot_hit_target_status_option_payload(
+def post_shoot_hit_target_status_option_payload(
     *,
     state: GameState,
     group: CatalogPostShootHitTargetStatusGroup,
@@ -2643,7 +2558,7 @@ def _post_shoot_hit_target_status_selection_payload(
     }
 
 
-def _post_shoot_hit_target_status_option_label(
+def post_shoot_hit_target_status_option_label(
     *,
     group: CatalogPostShootHitTargetStatusGroup,
     option: CatalogPostShootHitTargetStatusOption,
@@ -2802,7 +2717,7 @@ type _PostShootHitTargetStatusGroupKey = tuple[str, str, str, str, int, str, str
 type _UnitMoveCompletedMortalWoundsGroupKey = tuple[str, str, str, str, int, str]
 
 
-def _post_shoot_hit_target_status_group_key(
+def post_shoot_hit_target_status_group_key(
     group: CatalogPostShootHitTargetStatusGroup,
 ) -> _PostShootHitTargetStatusGroupKey:
     if type(group) is not CatalogPostShootHitTargetStatusGroup:
@@ -2819,7 +2734,7 @@ def _post_shoot_hit_target_status_group_key(
     )
 
 
-def _resolved_post_shoot_hit_target_status_group_keys(
+def resolved_post_shoot_hit_target_status_group_keys(
     decisions: DecisionController,
 ) -> frozenset[_PostShootHitTargetStatusGroupKey]:
     if type(decisions) is not DecisionController:
@@ -2989,7 +2904,7 @@ def _named_weapon_ability_choice_selection_payload(
     return payload
 
 
-def _named_weapon_ability_choice_option_label(
+def named_weapon_ability_choice_option_label(
     *,
     group: CatalogNamedWeaponAbilityChoiceGroup,
     option: CatalogNamedWeaponAbilityChoiceOption,

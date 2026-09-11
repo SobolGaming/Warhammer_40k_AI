@@ -4,6 +4,9 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import (
+    record_completed_shooting_for_executor_fixture,
+)
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -29,7 +32,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     muster_army,
 )
-from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -92,8 +95,9 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedBattleShockHookBinding,
     UnitMoveCompletedBattleShockHookRegistry,
     UnitMoveCompletedContext,
+    UnitMoveCompletedMortalWoundHookRegistry,
     apply_unit_move_completed_battle_shock_reroll_decision,
-    resolve_unit_move_completed_battle_shock_hooks,
+    resolve_unit_move_completed_hooks,
 )
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
@@ -158,14 +162,11 @@ def test_post_shoot_forced_battle_shock_reroll_pauses_and_resumes() -> None:
         target_unit=target_unit,
     )
     decisions = DecisionController()
-    decisions.event_log.append(
-        "attack_sequence_step",
-        {
-            "sequence_id": sequence.sequence_id,
-            "step": AttackSequenceStep.HIT.value,
-            "pool_index": 0,
-            "payload": {"successful": True},
-        },
+    completion_event_id = record_completed_shooting_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
+        successful_hit_pool_indices=(0,),
     )
     status = runtime.attack_sequence_completed_bindings()[0].handler(
         AttackSequenceCompletedContext(
@@ -175,7 +176,7 @@ def test_post_shoot_forced_battle_shock_reroll_pauses_and_resumes() -> None:
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:post-shoot-battle-shock-reroll:completed",
+            attack_sequence_completed_event_id=completion_event_id,
         )
     )
     assert status is not None
@@ -947,6 +948,7 @@ def test_charge_end_forced_battle_shock_reroll_pauses_and_resumes() -> None:
     ) -> tuple[UnitMoveCompletedBattleShockEffect, ...]:
         return (
             UnitMoveCompletedBattleShockEffect(
+                source_player_id=source_army.player_id,
                 hook_id="test:charge-end:battle-shock",
                 source_id="test:charge-end:battle-shock",
                 source_rule_id="source:test:charge-end:battle-shock",
@@ -979,10 +981,11 @@ def test_charge_end_forced_battle_shock_reroll_pauses_and_resumes() -> None:
             ),
         )
     )
-    status = resolve_unit_move_completed_battle_shock_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
-        registry=UnitMoveCompletedBattleShockHookRegistry.from_bindings(
+        registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+        battle_shock_move_hooks=UnitMoveCompletedBattleShockHookRegistry.from_bindings(
             (
                 UnitMoveCompletedBattleShockHookBinding(
                     hook_id="test:charge-end:battle-shock",
@@ -1250,7 +1253,7 @@ def _successful_shooting_sequence(
                 target_in_range_model_ids=target_unit.own_model_ids(),
             ),
         ),
-    )
+    ).advanced_after_attack()
 
 
 def _basic_battle_shock_resolution_inputs() -> tuple[

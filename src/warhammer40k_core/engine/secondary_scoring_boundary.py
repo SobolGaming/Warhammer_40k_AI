@@ -18,6 +18,7 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
     TacticalSecondaryAchievementContext,
+    VictoryPointAward,
     VictoryPointSourceKind,
 )
 from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
@@ -27,6 +28,7 @@ from warhammer40k_core.engine.secondary_mission_selection import (
     SecondaryMissionSelection,
     secondary_mission_selection_from_json,
 )
+from warhammer40k_core.engine.secondary_scoring_conditions import SecondaryScoringConditionContext
 from warhammer40k_core.engine.secondary_scoring_context import (
     secondary_scoring_condition_context_from_state,
 )
@@ -104,7 +106,6 @@ def _score_secondary_objective_control_boundary(
 ) -> None:
     if state.mission_setup is None:
         raise GameLifecycleError("Secondary boundary scoring requires MissionSetup.")
-    policies = mission_scoring_policies_from_setup(state.mission_setup)
     active_player_id = record.active_player_id
     ordered_players = (
         active_player_id,
@@ -117,78 +118,29 @@ def _score_secondary_objective_control_boundary(
             if card.player_id == player_id and card.status is SecondaryMissionCardStatus.ACTIVE
         )
         for card in cards:
-            _score_or_record_secondary_card(
+            score_or_record_secondary_card(
                 state=state,
                 record=record,
                 card=card,
-                policies=policies,
             )
 
 
-def _score_or_record_secondary_card(
+def score_or_record_secondary_card(
     *,
     state: GameState,
     record: ObjectiveControlRecord,
     card: SecondaryMissionCardState,
-    policies: object,
 ) -> None:
-    from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPolicies
-
-    if type(policies) is not MissionScoringPolicies:
-        raise GameLifecycleError("Secondary boundary scoring requires MissionScoringPolicies.")
-    selection = _selection_for_card(card)
+    discovered = secondary_card_boundary_award(state=state, record=record, card=card)
+    if discovered is None:
+        return
+    context, award = discovered
     pending_achievement = any(
         stored.player_id == card.player_id
         and stored.secondary_mission_id == card.secondary_mission_id
         and stored.card_battle_round == card.battle_round
         for stored in state.tactical_secondary_achievement_contexts
     )
-    if (
-        selection is not None
-        and record.record_id in selection.resolved_objective_control_record_ids
-        and not pending_achievement
-    ):
-        return
-    source_kind = (
-        VictoryPointSourceKind.FIXED_SECONDARY
-        if card.mode is SecondaryMissionCardMode.FIXED
-        else VictoryPointSourceKind.TACTICAL_SECONDARY
-    )
-    if _already_awarded_at_record(
-        state=state,
-        card=card,
-        record=record,
-        source_kind=source_kind,
-    ):
-        _mark_card_record_resolved(state=state, card=card, record=record)
-        return
-    mission_setup = state.mission_setup
-    if mission_setup is None:
-        raise GameLifecycleError("Secondary boundary scoring requires MissionSetup.")
-    context = secondary_scoring_condition_context_from_state(
-        state=state,
-        player_id=card.player_id,
-        record=record,
-        selection=selection,
-    )
-    award = policies.secondary_award_from_mission_state(
-        player_id=card.player_id,
-        battle_round=record.battle_round,
-        phase=record.phase,
-        secondary_mission_id=card.secondary_mission_id,
-        source_kind=source_kind,
-        hidden=False,
-        record=record,
-        mission_setup=mission_setup,
-        unit_destruction_states=tuple(state.secondary_unit_destruction_states),
-        objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
-        terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
-        enemy_unit_ids_in_player_deployment_zone=context.enemy_unit_ids_in_player_deployment_zone,
-        starting_strength_records=tuple(state.starting_strength_records),
-        condition_context=context,
-    )
-    if award is None:
-        return
     evidence = capture_secondary_scoring_state_evidence(
         state=state,
         card=card,
@@ -215,6 +167,69 @@ def _score_or_record_secondary_card(
     )
     state.record_tactical_secondary_achievement_context(achievement)
     _mark_card_record_resolved(state=state, card=card, record=record)
+
+
+def secondary_card_boundary_award(
+    *,
+    state: GameState,
+    record: ObjectiveControlRecord,
+    card: SecondaryMissionCardState,
+) -> tuple[SecondaryScoringConditionContext, VictoryPointAward] | None:
+    """Qualify an achieved card without recording evidence, points or a choice."""
+    if state.mission_setup is None:
+        raise GameLifecycleError("Secondary boundary scoring requires MissionSetup.")
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    selection = _selection_for_card(card)
+    pending_achievement = any(
+        stored.player_id == card.player_id
+        and stored.secondary_mission_id == card.secondary_mission_id
+        and stored.card_battle_round == card.battle_round
+        for stored in state.tactical_secondary_achievement_contexts
+    )
+    if (
+        selection is not None
+        and record.record_id in selection.resolved_objective_control_record_ids
+        and not pending_achievement
+    ):
+        return None
+    source_kind = (
+        VictoryPointSourceKind.FIXED_SECONDARY
+        if card.mode is SecondaryMissionCardMode.FIXED
+        else VictoryPointSourceKind.TACTICAL_SECONDARY
+    )
+    if _already_awarded_at_record(
+        state=state,
+        card=card,
+        record=record,
+        source_kind=source_kind,
+    ):
+        return None
+    mission_setup = state.mission_setup
+    context = secondary_scoring_condition_context_from_state(
+        state=state,
+        player_id=card.player_id,
+        record=record,
+        selection=selection,
+    )
+    award = policies.secondary_award_from_mission_state(
+        player_id=card.player_id,
+        battle_round=record.battle_round,
+        phase=record.phase,
+        secondary_mission_id=card.secondary_mission_id,
+        source_kind=source_kind,
+        hidden=False,
+        record=record,
+        mission_setup=mission_setup,
+        unit_destruction_states=tuple(state.secondary_unit_destruction_states),
+        objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
+        terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
+        enemy_unit_ids_in_player_deployment_zone=context.enemy_unit_ids_in_player_deployment_zone,
+        starting_strength_records=tuple(state.starting_strength_records),
+        condition_context=context,
+    )
+    if award is None:
+        return None
+    return context, award
 
 
 def _already_awarded_at_record(
@@ -261,5 +276,7 @@ def _mark_card_record_resolved(
 
 __all__ = (
     "next_pending_tactical_secondary_achievement",
+    "score_or_record_secondary_card",
     "score_turn_end_mission_scoring_boundary",
+    "secondary_card_boundary_award",
 )

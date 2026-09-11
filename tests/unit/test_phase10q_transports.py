@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+from tests.movement_submission_helpers import core_movement_handler
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import ViewerContext
@@ -685,7 +686,7 @@ def test_embarked_units_are_available_for_unified_movement_selection() -> None:
     )
     decisions = DecisionController()
 
-    status = MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+    status = core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
         state=state,
         decisions=decisions,
     )
@@ -714,7 +715,7 @@ def test_attached_rules_unit_is_one_complete_unified_movement_candidate() -> Non
     decisions = DecisionController()
 
     request = _decision_request(
-        MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+        core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
             state=state,
             decisions=decisions,
         )
@@ -962,7 +963,7 @@ def test_attached_rules_unit_partial_cargo_location_fails_closed() -> None:
         GameLifecycleError,
         match="exactly one authoritative movement location",
     ):
-        MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+        core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
             state=state,
             decisions=DecisionController(),
         )
@@ -1587,6 +1588,22 @@ def test_attached_rules_unit_embark_then_unified_disembark_is_atomic_and_resumab
 
     attached_id = "attached-unit:army-alpha:attached-transport-passengers"
     component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    from warhammer40k_core.engine.unit_move_completed_hooks import resolve_unit_move_completed_hooks
+
+    assert (
+        resolve_unit_move_completed_hooks(
+            state=state,
+            decisions=decisions,
+            registry=handler.unit_move_completed_mortal_wound_hooks,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=handler.runtime_modifier_registry,
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="movement_activation_completed",
+            movement_actions=("normal_move",),
+            ability_indexes_by_player_id=handler.ability_indexes_by_player_id,
+        )
+        is None
+    )
     state.battle_round = 2
     state.replace_movement_phase_state(
         MovementPhaseState(battle_round=2, active_player_id="player-a")
@@ -2451,7 +2468,7 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
         battle_round=1,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     decisions = DecisionController()
 
     unit_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
@@ -2563,7 +2580,7 @@ def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence()
         battle_round=1,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     decisions = DecisionController()
 
     handler, decisions, disembark_request = _movement_action_request_for_unit(
@@ -8294,7 +8311,7 @@ def test_disembarked_units_use_shared_movement_decision_path_restrictions() -> N
         ),
     )
 
-    status = MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+    status = core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
         state=state,
         decisions=DecisionController(),
     )
@@ -8572,8 +8589,9 @@ def _movement_action_request_for_unit(
         battle_round=state.battle_round,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(
-        ruleset_descriptor=_ruleset() if ruleset_descriptor is None else ruleset_descriptor
+    handler = core_movement_handler(
+        state=state,
+        ruleset_descriptor=_ruleset() if ruleset_descriptor is None else ruleset_descriptor,
     )
     decisions = DecisionController()
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
@@ -8772,7 +8790,7 @@ def _rapid_disembark_request_after_transport_normal_move(
         battle_round=state.battle_round,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     movement_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE

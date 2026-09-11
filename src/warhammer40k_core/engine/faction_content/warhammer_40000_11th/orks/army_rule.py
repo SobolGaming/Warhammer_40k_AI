@@ -16,11 +16,12 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -43,6 +44,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
@@ -75,6 +77,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=waaagh_call_request,
+                candidate_handler=command_sequencing_candidates,
                 result_handler=apply_waaagh_call_result,
             ),
         ),
@@ -103,64 +106,9 @@ def runtime_contribution() -> RuntimeContentContribution:
 
 
 def waaagh_call_request(context: CommandPhaseStartRequestContext) -> DecisionRequest | None:
-    if type(context) is not CommandPhaseStartRequestContext:
-        raise GameLifecycleError("Waaagh! call requires request context.")
-    army = _orks_army_for_player(context.state, player_id=context.active_player_id)
-    if army is None:
-        return None
-    if waaagh_called_for_player(context.state, player_id=army.player_id):
-        return None
-    if _waaagh_declined_this_command_phase(context.state, player_id=army.player_id):
-        return None
-    target_unit_ids = _eligible_waaagh_unit_ids_for_army(army)
-    if not target_unit_ids:
-        return None
+    from .command_sequencing import request_for
 
-    common_payload = {
-        "game_id": context.state.game_id,
-        "battle_round": context.state.battle_round,
-        "phase": BattlePhase.COMMAND.value,
-        "active_player_id": army.player_id,
-        "player_id": army.player_id,
-        "faction_id": ORKS_FACTION_ID,
-        "source_rule_id": SOURCE_RULE_ID,
-        "hook_id": HOOK_ID,
-        "effect_kind": WAAAGH_EFFECT_KIND,
-        "selection_kind": WAAAGH_SELECTION_KIND,
-        "eligible_target_unit_instance_ids": list(target_unit_ids),
-        "expires_at_battle_round": _next_own_turn_battle_round(context.state),
-        "rules_update_source": WAAAGH_RULE_UPDATE_SOURCE,
-    }
-    return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
-        decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-        actor_id=army.player_id,
-        payload=validate_json_value(common_payload),
-        options=(
-            DecisionOption(
-                option_id=WAAAGH_CALL_OPTION_ID,
-                label="Call Waaagh!",
-                payload=validate_json_value(
-                    {
-                        **common_payload,
-                        "submission_kind": WAAAGH_SELECTION_KIND,
-                        "selected_waaagh_option": "call",
-                    }
-                ),
-            ),
-            DecisionOption(
-                option_id=WAAAGH_DECLINE_OPTION_ID,
-                label="Do not call Waaagh!",
-                payload=validate_json_value(
-                    {
-                        **common_payload,
-                        "submission_kind": WAAAGH_SELECTION_KIND,
-                        "selected_waaagh_option": "decline",
-                    }
-                ),
-            ),
-        ),
-    )
+    return request_for(context)
 
 
 def apply_waaagh_call_result(context: CommandPhaseStartResultContext) -> bool:
@@ -179,17 +127,17 @@ def apply_waaagh_call_result(context: CommandPhaseStartResultContext) -> bool:
     if result.actor_id is None:
         raise GameLifecycleError("Waaagh! call requires an actor.")
     player_id = result.actor_id
-    army = _orks_army_for_player(context.state, player_id=player_id)
+    army = orks_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Waaagh! actor does not own Orks.")
     if waaagh_called_for_player(context.state, player_id=player_id):
         raise GameLifecycleError("Waaagh! has already been called this battle.")
-    if _waaagh_declined_this_command_phase(context.state, player_id=player_id):
+    if waaagh_declined_this_command_phase(context.state, player_id=player_id):
         raise GameLifecycleError("Waaagh! has already been declined this Command phase.")
 
     payload = _payload_object(result.payload)
     selection = _payload_string(payload, key="selected_waaagh_option")
-    target_unit_ids = _eligible_waaagh_unit_ids_for_army(army)
+    target_unit_ids = eligible_waaagh_unit_ids_for_army(army)
     if not target_unit_ids:
         raise GameLifecycleError("Waaagh! call has no eligible units.")
     if selection == "decline":
@@ -446,7 +394,7 @@ def _waaagh_active_effect(
     target_unit_ids: tuple[str, ...],
 ) -> PersistingEffect:
     expiration = EffectExpiration.start_turn(
-        battle_round=_next_own_turn_battle_round(context.state),
+        battle_round=next_own_turn_battle_round(context.state),
         player_id=player_id,
     )
     return PersistingEffect(
@@ -539,7 +487,7 @@ def _generic_status_parameter(effect_payload: dict[str, JsonValue]) -> str | Non
     return status
 
 
-def _waaagh_declined_this_command_phase(state: GameState, *, player_id: str) -> bool:
+def waaagh_declined_this_command_phase(state: GameState, *, player_id: str) -> bool:
     requested_player_id = _validate_identifier("player_id", player_id)
     states = tuple(
         state_record
@@ -567,7 +515,7 @@ def _decline_state_matches_current_command_phase(
     )
 
 
-def _eligible_waaagh_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
+def eligible_waaagh_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Waaagh! requires an ArmyDefinition.")
     return tuple(unit.unit_instance_id for unit in army.units if _unit_has_waaagh(unit))
@@ -590,7 +538,7 @@ def _orks_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
     )
 
 
-def _orks_army_for_player(state: GameState, *, player_id: str) -> ArmyDefinition | None:
+def orks_army_for_player(state: GameState, *, player_id: str) -> ArmyDefinition | None:
     requested_player_id = _validate_identifier("player_id", player_id)
     for army in _orks_armies(state):
         if army.player_id == requested_player_id:
@@ -652,7 +600,7 @@ def _unit_has_keyword_token(values: tuple[str, ...], expected: str) -> bool:
     return _validate_identifier("keyword", expected) in values
 
 
-def _next_own_turn_battle_round(state: GameState) -> int:
+def next_own_turn_battle_round(state: GameState) -> int:
     _validate_game_state(state)
     return state.battle_round + 1
 
@@ -665,3 +613,11 @@ def _validate_game_state(state: object) -> None:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .command_sequencing import candidates
+
+    return candidates(context)

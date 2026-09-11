@@ -399,6 +399,10 @@ class ShootingPhaseHandler:
             raise GameLifecycleError("Out-of-phase shooting completion requires state.")
         if out_of_phase_state.pending_completed_attack_sequence != completed_sequence:
             raise GameLifecycleError("Out-of-phase completed attack sequence continuation drift.")
+        from warhammer40k_core.engine.phases.shooting_completion_candidates import (
+            shooting_completion_candidates,
+        )
+
         completion_hook_status = self.attack_sequence_completed_hooks.resolve_completed_sequence(
             AttackSequenceCompletedContext(
                 state=state,
@@ -411,7 +415,17 @@ class ShootingPhaseHandler:
                     decisions=decisions,
                     attack_sequence=completed_sequence,
                 ),
-            )
+            ),
+            additional_candidates=lambda: shooting_completion_candidates(
+                handler=self,
+                state=state,
+                decisions=decisions,
+                sequence=completed_sequence,
+                completed_event_id=attack_sequence_completed_event_id(
+                    decisions=decisions,
+                    attack_sequence=completed_sequence,
+                ),
+            ),
         )
         if completion_hook_status is not None:
             return completion_hook_status
@@ -751,42 +765,22 @@ class ShootingPhaseHandler:
         )
         if invalid_status is not None:
             return invalid_status
-        request_payload = _decision_payload_object(request.payload)
-        result_payload = _decision_payload_object(result.payload)
-        if (
-            "available_target_unit_instance_ids" not in request_payload
-            or result_payload.get("use_ability") is False
-        ):
-            return None
-        current_request = self.shooting_phase_start_hooks.next_request_for(
-            ShootingPhaseStartRequestContext(
-                state=state,
-                decisions=decisions,
-                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-                army_catalog=_army_catalog_for_handler(self),
-                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
-            )
-        )
-        expected_option = (
-            None
-            if current_request is None
-            else next(
-                (
-                    option
-                    for option in current_request.options
-                    if option.option_id == result.selected_option_id
-                ),
-                None,
-            )
-        )
-        current_request_payload = (
-            None if current_request is None else _decision_payload_object(current_request.payload)
-        )
-        if (
-            current_request_payload is not None
-            and current_request_payload.get("hook_id") == request_payload.get("hook_id")
-            and expected_option is not None
-            and expected_option.payload == result.payload
+        from warhammer40k_core.engine.phase_start_sequencing import selected_request_is_current
+
+        if selected_request_is_current(
+            state=state,
+            decisions=decisions,
+            request=request,
+            candidates=self.shooting_phase_start_hooks.candidates_for(
+                ShootingPhaseStartRequestContext(
+                    state=state,
+                    decisions=decisions,
+                    ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                    army_catalog=_army_catalog_for_handler(self),
+                    shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                )
+            ),
         ):
             return None
         return LifecycleStatus.invalid(
@@ -1074,8 +1068,11 @@ def _request_shooting_phase_start_rule_if_available(
             ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
             army_catalog=_army_catalog_for_handler(handler),
             shooting_target_restriction_hooks=handler.shooting_target_restriction_hooks,
+            runtime_modifier_registry=handler.runtime_modifier_registry,
         )
     )
+    if isinstance(request, LifecycleStatus):
+        return request
     if request is None:
         return None
     decisions.request_decision(request)

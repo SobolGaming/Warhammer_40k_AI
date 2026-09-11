@@ -495,6 +495,7 @@ def _validate_primary_victory_point_record(
     state_evidence = state_evidence_matches[0]
     if (
         state_evidence.evidence_hash != state_evidence_hash
+        or state_evidence.scoring_player_id != policy.player_id
         or state_evidence.objective_control_record_id != boundary.record_id
         or state_evidence.objective_control_record_hash != objective_control_record_hash(boundary)
         or state_evidence.scoring_boundary_kind is not expected_boundary_kind

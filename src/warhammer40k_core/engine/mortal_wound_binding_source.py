@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.model_destruction_cause_authority import ModelDestructionCauseKind
 from warhammer40k_core.engine.mortal_wound_logical_death import MortalWoundLogicalDeathCauseBinding
 from warhammer40k_core.engine.mortal_wound_target_lineage import (
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 def validate_initial_binding_source(
     *,
     state: GameState,
+    event_records: tuple[EventRecord, ...],
     progress: MortalWoundApplicationProgress,
     binding: MortalWoundLogicalDeathCauseBinding,
 ) -> None:
@@ -37,7 +39,9 @@ def validate_initial_binding_source(
             validate_retained_hazardous_progress,
         )
 
-        validate_retained_hazardous_progress(state=state, progress=progress)
+        validate_retained_hazardous_progress(
+            state=state, event_records=event_records, progress=progress
+        )
         return
     from warhammer40k_core.engine.attack_sequence_model import DEADLY_DEMISE_SOURCE_KIND
     from warhammer40k_core.engine.fight_unit_selected_grant_resolution import (

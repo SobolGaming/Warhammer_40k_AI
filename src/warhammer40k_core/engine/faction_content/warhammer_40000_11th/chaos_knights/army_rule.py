@@ -88,6 +88,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierBinding,
     WoundRollModifierContext,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.geometry import shapely_backend
@@ -221,6 +222,8 @@ _DREAD_BY_ROLL = {
 
 
 def runtime_contribution() -> RuntimeContentContribution:
+    from .outcome_sequencing import candidates as outcome_candidates
+
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
         battle_round_start_hook_bindings=(
@@ -228,6 +231,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=harbingers_selection_request,
+                candidate_handler=round_sequencing_candidates,
                 result_handler=apply_harbingers_selection_result,
             ),
         ),
@@ -237,6 +241,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=SOURCE_RULE_ID,
                 forced_test_handler=harbingers_forced_battle_shock_unit_ids,
                 outcome_handler=resolve_harbingers_battle_shock_outcome,
+                outcome_candidate_handler=outcome_candidates,
                 pending_outcome_authority_validator=(
                     battle_shock_outcome_authority.validate_delirium_pending_outcome_authority
                 ),
@@ -278,45 +283,10 @@ def runtime_contribution() -> RuntimeContentContribution:
     )
 
 
-def harbingers_selection_request(
-    context: BattleRoundStartRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not BattleRoundStartRequestContext:
-        raise GameLifecycleError("Harbingers of Dread requires request context.")
-    if context.state.battle_round not in DREAD_SELECTION_BATTLE_ROUNDS:
-        return None
-    for army in _chaos_knights_armies(context.state):
-        if _selection_recorded_for_round(
-            context.state,
-            player_id=army.player_id,
-            battle_round=context.state.battle_round,
-        ):
-            continue
-        target_unit_ids = _eligible_harbingers_unit_ids_for_army(army)
-        if not target_unit_ids:
-            continue
-        active = active_dread_abilities_for_player(context.state, player_id=army.player_id)
-        available = _available_dread_abilities(active)
-        if not available:
-            continue
-        common_payload = _selection_common_payload(
-            state=context.state,
-            player_id=army.player_id,
-            target_unit_ids=target_unit_ids,
-            active=active,
-            available=available,
-        )
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-            actor_id=army.player_id,
-            payload=validate_json_value(common_payload),
-            options=harbingers_selection_options(
-                common_payload=common_payload,
-                available=available,
-            ),
-        )
-    return None
+def harbingers_selection_request(context: BattleRoundStartRequestContext) -> DecisionRequest | None:
+    from .round_sequencing import request_for
+
+    return request_for(context)
 
 
 def apply_harbingers_selection_result(context: BattleRoundStartResultContext) -> bool:
@@ -335,7 +305,7 @@ def apply_harbingers_selection_result(context: BattleRoundStartResultContext) ->
         raise GameLifecycleError("Harbingers of Dread actor does not own Chaos Knights.")
     if context.state.battle_round not in DREAD_SELECTION_BATTLE_ROUNDS:
         raise GameLifecycleError("Harbingers of Dread selection is not available this round.")
-    if _selection_recorded_for_round(
+    if selection_recorded_for_round(
         context.state,
         player_id=player_id,
         battle_round=context.state.battle_round,
@@ -506,7 +476,7 @@ def harbingers_leadership_modifier(
         unit_instance_id=context.unit_instance_id,
     )
     modifier = 0
-    for chaos_knights_army in _chaos_knights_armies(context.state):
+    for chaos_knights_army in chaos_knights_armies(context.state):
         if chaos_knights_army.player_id == target_army.player_id:
             continue
         active = active_dread_abilities_for_player(
@@ -657,7 +627,7 @@ def harbingers_forced_battle_shock_unit_ids(
     if active_army is None:
         raise GameLifecycleError("Harbingers of Dread forced tests require active army.")
     forced_ids: set[str] = set()
-    for chaos_knights_army in _chaos_knights_armies(context.state):
+    for chaos_knights_army in chaos_knights_armies(context.state):
         if chaos_knights_army.player_id == context.active_player_id:
             continue
         if DreadAbility.DISMAY not in active_dread_abilities_for_player(
@@ -691,7 +661,7 @@ def resolve_harbingers_battle_shock_outcome(
     )
     if target_rules_unit.owner_player_id != result.request.player_id:
         raise GameLifecycleError("Harbingers of Dread Battle-shock target owner drift.")
-    for chaos_knights_army in _chaos_knights_armies(context.state):
+    for chaos_knights_army in chaos_knights_armies(context.state):
         if chaos_knights_army.player_id == result.request.player_id:
             continue
         if DreadAbility.DELIRIUM not in active_dread_abilities_for_player(
@@ -886,7 +856,7 @@ def historical_unit_within_dread_aura(
     )
 
 
-def _selection_common_payload(
+def selection_common_payload(
     *,
     state: GameState,
     player_id: str,
@@ -925,7 +895,7 @@ def _validate_request_matches_current_state(
     if _payload_string(request_payload, key="player_id") != army.player_id:
         raise GameLifecycleError("Harbingers of Dread request player drift.")
     current_active = active_dread_abilities_for_player(context.state, player_id=army.player_id)
-    current_available = _available_dread_abilities(current_active)
+    current_available = available_dread_abilities(current_active)
     if _payload_string_list(request_payload, key="active_dread_ability_ids") != tuple(
         ability.value for ability in current_active
     ):
@@ -934,7 +904,7 @@ def _validate_request_matches_current_state(
         ability.value for ability in current_available
     ):
         raise GameLifecycleError("Harbingers of Dread request available ability drift.")
-    current_targets = _eligible_harbingers_unit_ids_for_army(army)
+    current_targets = eligible_harbingers_unit_ids_for_army(army)
     if _payload_string_list(request_payload, key="target_unit_instance_ids") != current_targets:
         raise GameLifecycleError("Harbingers of Dread request target unit drift.")
 
@@ -1030,7 +1000,7 @@ def _dread_selection_states_for_player(
     )
 
 
-def _selection_recorded_for_round(
+def selection_recorded_for_round(
     state: GameState,
     *,
     player_id: str,
@@ -1043,7 +1013,7 @@ def _selection_recorded_for_round(
     )
 
 
-def _available_dread_abilities(active: tuple[DreadAbility, ...]) -> tuple[DreadAbility, ...]:
+def available_dread_abilities(active: tuple[DreadAbility, ...]) -> tuple[DreadAbility, ...]:
     active_set = {_dread_from_token(ability) for ability in active}
     return tuple(ability for ability in ROLLABLE_DREAD_ABILITIES if ability not in active_set)
 
@@ -1191,7 +1161,7 @@ def _roll_d3(
     return D3RollResult.from_source_d6_result(roll_state.original_result)
 
 
-def _eligible_harbingers_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
+def eligible_harbingers_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Harbingers of Dread requires an ArmyDefinition.")
     return tuple(unit.unit_instance_id for unit in army.units if _unit_has_harbingers(unit))
@@ -1219,7 +1189,7 @@ def _unit_and_army_by_id(
     raise GameLifecycleError("Harbingers of Dread unit_instance_id was not found.")
 
 
-def _chaos_knights_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
+def chaos_knights_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
     _validate_game_state(state)
     return tuple(
         army
@@ -1234,7 +1204,7 @@ def _chaos_knights_army_for_player(
     player_id: str,
 ) -> ArmyDefinition | None:
     requested_player_id = _validate_identifier("player_id", player_id)
-    for army in _chaos_knights_armies(state):
+    for army in chaos_knights_armies(state):
         if army.player_id == requested_player_id:
             return army
     return None
@@ -1277,3 +1247,11 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"Harbingers of Dread {field_name} must be positive.")
     return value
+
+
+def round_sequencing_candidates(
+    context: BattleRoundStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .round_sequencing import candidates
+
+    return candidates(context)

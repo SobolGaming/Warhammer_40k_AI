@@ -152,6 +152,18 @@ def validate_finite_stratagem_use_history(
         used_index=used_index,
     )
     context, catalog_record, target_binding, effect_selection = _finite_selection(decision_record)
+    from warhammer40k_core.engine.stratagem_timing_candidates import (
+        validate_timing_stratagem_source,
+    )
+
+    validate_timing_stratagem_source(
+        request=decision_record.request,
+        record=catalog_record,
+        context=context,
+        events=event_records,
+        decisions=decision_records,
+        requested_index=requested_index,
+    )
     _validate_finite_use_binding(
         use_record=use_record,
         decision_record=decision_record,
@@ -334,6 +346,9 @@ def _finite_selection(
     }
     if frozenset(request_payload) == frozenset(direct_payload):
         pass
+    elif frozenset(request_payload) == frozenset({*direct_payload, "timing_participant_id"}):
+        if type(request_payload["timing_participant_id"]) is not str:
+            raise GameLifecycleError("Finite Stratagem-use timing participant is malformed.")
     elif frozenset(request_payload) == frozenset(
         {
             *direct_payload,

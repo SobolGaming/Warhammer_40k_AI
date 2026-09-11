@@ -140,9 +140,12 @@ def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_bound
         in hazardous_source
     )
     assert "sorted({pool.weapon_profile_id" not in hazardous_source
-    completion_index = dispatch_source.index("record_attack_sequence_completed(")
-    hazardous_index = dispatch_source.index("hazardous_status = _resolve_hazardous_tests(")
-    assert completion_index < hazardous_index
+    assert "record_attack_sequence_completed(" in dispatch_source
+    assert "_resolve_hazardous_tests(" not in dispatch_source
+    completion_source = source_for(SRC_ROOT / "engine" / "hazardous_completion.py")
+    assert "SequencingRequirement.MANDATORY" in completion_source
+    assert "player_id=sequence.attacker_player_id" in completion_source
+    assert "_resolve_hazardous_tests(" in completion_source
 
 
 def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registered() -> None:

@@ -23,7 +23,6 @@ from tests.support.catalog_runtime_fixtures import (
     flesh_hounds_battlefield_state,
     player_ability_index,
     record_by_runtime_clause_suffix,
-    set_current_model_wounds,
     single_model_unit_placement,
 )
 from tests.support.catalog_runtime_fixtures import (
@@ -80,6 +79,7 @@ from warhammer40k_core.engine.decision_controller import (
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
@@ -244,28 +244,15 @@ def _record_surviving_rules_unit_model_destruction(
         source_rules_unit_instance_id=source_unit_instance_id,
         source_model_instance_id=source_model_instance_id,
     )
-    set_current_model_wounds(
-        state,
-        model_instance_id=destroyed_model_instance_id,
-        wounds_remaining=0,
-    )
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.with_removed_models(
-        (destroyed_model_instance_id,)
-    )
-    destroyed_event = decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": active_player_id,
-            "phase": phase.value,
-            **attribution.to_payload(),
-            "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-            "destroyed_rules_unit_objective_proximity_witness": destroyed_witness.to_payload(),
-            "target_unit_instance_id": destroyed_unit_instance_id,
-            "model_instance_id": destroyed_model_instance_id,
-        },
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+    destroyed_event = destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=destroyed_model_instance_id,
+        destroying_player_id=destroying_player_id,
+        source_unit_id=source_unit_instance_id,
+        source_model_id=source_model_instance_id,
     )
     departure_ids_before = tuple(
         departure.departure_id for departure in state.primary_battlefield_departure_states
@@ -453,7 +440,7 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     decisions.request_decision(request)
     use_option = next(option for option in request.options if option.option_id.endswith(":use"))
     result = DecisionResult.for_request(
@@ -631,7 +618,7 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert second_request is not None
+    assert isinstance(second_request, DecisionRequest)
     decisions.request_decision(second_request)
     second_use_option = next(
         option for option in second_request.options if option.option_id.endswith(":use")
@@ -922,7 +909,7 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
     cloned_events.append(cloned_derived_event)
     with pytest.raises(
         GameLifecycleError,
-        match=r"authoritative .* mutation event",
+        match="Primary destroyed departure mutation source identity drift",
     ):
         restore(cloned_departure_payload)
 
@@ -1594,7 +1581,7 @@ def test_phase17n_hunters_provider_source_and_state_integrity_fail_closed() -> N
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     decisions.request_decision(request)
     use_option = next(option for option in request.options if option.option_id.endswith(":use"))
     result = DecisionResult.for_request(
@@ -1695,8 +1682,16 @@ def test_phase17n_hunters_provider_source_and_state_integrity_fail_closed() -> N
         )
 
     reordered_payload: DecisionControllerPayload = deepcopy(decisions.to_payload())
-    first_event = reordered_payload["event_log"][0]
-    second_event = reordered_payload["event_log"][1]
+    first_event = next(
+        event
+        for event in reordered_payload["event_log"]
+        if event["event_type"] == "decision_requested"
+    )
+    second_event = next(
+        event
+        for event in reordered_payload["event_log"]
+        if event["event_type"] == "decision_recorded"
+    )
     first_event["event_type"], second_event["event_type"] = (
         second_event["event_type"],
         first_event["event_type"],
@@ -2038,25 +2033,15 @@ def test_phase17n_real_destroy_restore_hunters_entry_orders_before_deadline_time
         source_rules_unit_instance_id=enemy_unit.unit_instance_id,
         source_model_instance_id=enemy_unit.own_models[0].model_instance_id,
     )
-    set_current_model_wounds(
-        state,
-        model_instance_id=destroyed_model_id,
-        wounds_remaining=0,
-    )
-    state.battlefield_state = state.battlefield_state.with_removed_models((destroyed_model_id,))
-    destroyed_event = decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.FIGHT.value,
-            **attribution.to_payload(),
-            "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-            "destroyed_rules_unit_objective_proximity_witness": destroyed_witness.to_payload(),
-            "target_unit_instance_id": unit.unit_instance_id,
-            "model_instance_id": destroyed_model_id,
-        },
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+    destroyed_event = destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=destroyed_model_id,
+        destroying_player_id=enemy_army.player_id,
+        source_unit_id=enemy_unit.unit_instance_id,
+        source_model_id=enemy_unit.own_models[0].model_instance_id,
     )
     departure_ids_before = tuple(
         departure.departure_id for departure in state.primary_battlefield_departure_states
@@ -2144,7 +2129,7 @@ def test_phase17n_real_destroy_restore_hunters_entry_orders_before_deadline_time
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert hunters_request is not None
+    assert isinstance(hunters_request, DecisionRequest)
     decisions.request_decision(hunters_request)
     hunters_result = DecisionResult.for_request(
         result_id="phase17n-hunters-timeline-entry-result",

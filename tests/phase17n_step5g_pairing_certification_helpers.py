@@ -26,6 +26,7 @@ from warhammer40k_core.engine.fight_order import (
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.mission_decisions import TACTICAL_SECONDARY_SCORE_DECISION_TYPE
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
@@ -315,6 +316,8 @@ def pairing_certification_config(
     *,
     row: EventCompanionPairingLifecycleCertificationRow,
     setup_game_id: str,
+    player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_units: tuple[UnitMusterSelection, ...] | None = None,
 ) -> GameConfig:
     setup = setup_for_lifecycle_row(row)
     base = phase11c_config()
@@ -348,7 +351,9 @@ def pairing_certification_config(
                     catalog=catalog,
                     player_id="player-a",
                     army_id="army-alpha",
-                    unit_selections=(default_unit_selection("intercessor-unit-1"),),
+                    unit_selections=(default_unit_selection("intercessor-unit-1"),)
+                    if player_a_units is None
+                    else player_a_units,
                 ),
                 force_disposition_id=row.attacker_force_disposition_id,
             ),
@@ -357,7 +362,9 @@ def pairing_certification_config(
                     catalog=catalog,
                     player_id="player-b",
                     army_id="army-beta",
-                    unit_selections=(default_unit_selection("intercessor-unit-3"),),
+                    unit_selections=(default_unit_selection("intercessor-unit-3"),)
+                    if player_b_units is None
+                    else player_b_units,
                 ),
                 force_disposition_id=row.defender_force_disposition_id,
             ),
@@ -405,6 +412,7 @@ def ordinary_turn_end_evidence_for_player_or_none(
         evidence
         for evidence in state.primary_scoring_state_evidence_records
         if evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
+        and evidence.scoring_player_id == scoring_player_id
         and evidence.active_player_id == scoring_player_id
         and evidence.timing is ObjectiveControlTiming.TURN_END
     ]

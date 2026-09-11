@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import partial
 from types import MappingProxyType
 from typing import cast
 
@@ -36,6 +37,8 @@ from warhammer40k_core.engine.fight_phase_end_hooks import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id, rules_unit_views_from_armies
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
@@ -80,23 +83,34 @@ class CatalogFightEndTriggeredMovementRuntime:
             FightPhaseEndHookBinding(
                 hook_id=CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID,
                 source_id=CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID,
-                request_handler=self.next_request,
+                candidate_handler=self.candidates_for,
             ),
         )
 
-    def next_request(self, context: FightPhaseEndRequestContext) -> DecisionRequest | None:
+    def candidates_for(
+        self, context: FightPhaseEndRequestContext
+    ) -> tuple[TimingRuleCandidate, ...]:
         if type(context) is not FightPhaseEndRequestContext:
             raise GameLifecycleError("Catalog Fight-end movement requires request context.")
+        return tuple(
+            TimingRuleCandidate(
+                participant=SequencingParticipant(
+                    participant_id=f"{candidate.record.definition.source_id}:{candidate.clause.clause_id}:{candidate.rules_unit_instance_id}",
+                    player_id=candidate.owner_player_id,
+                    source_rule_id=candidate.record.definition.source_id,
+                    requirement=SequencingRequirement.OPTIONAL,
+                ),
+                activate=partial(self.activate_candidate, context, candidate),
+            )
+            for candidate in self._candidates(context)
+        )
+
+    def activate_candidate(
+        self,
+        context: FightPhaseEndRequestContext,
+        candidate: _CatalogFightEndMovementCandidate,
+    ) -> DecisionRequest:
         state = context.state
-        if state.current_battle_phase is not BattlePhase.FIGHT:
-            raise GameLifecycleError("Catalog Fight-end movement requires the Fight phase.")
-        fight_state = state.fight_phase_state
-        if fight_state is None:
-            raise GameLifecycleError("Catalog Fight-end movement requires fight phase state.")
-        candidates = self._candidates(context)
-        if not candidates:
-            return None
-        candidate = candidates[0]
         semantic = fight_end_triggered_movement_descriptor(candidate.clause)
         d3_result = DiceRollManager(
             state.game_id,

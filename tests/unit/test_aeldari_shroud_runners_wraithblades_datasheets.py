@@ -662,6 +662,23 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
             break
         if not replayed.decision_controller.queue.pending_requests:
             handler.begin_phase(state=replayed_state, decisions=replayed.decision_controller)
+            pending_fight = replayed_state.fight_phase_state
+            assert pending_fight is not None
+            if pending_fight.pending_completed_attack_sequence is not None:
+                from tests.completed_attack_fixture_helpers import (
+                    resolve_core_attack_completion_for_executor_fixture,
+                )
+
+                completion_status = resolve_core_attack_completion_for_executor_fixture(
+                    state=replayed_state,
+                    decisions=replayed.decision_controller,
+                    sequence_id=pending_fight.pending_completed_attack_sequence.sequence_id,
+                    dice_manager=DiceRollManager(
+                        replayed_state.game_id, event_log=replayed.decision_controller.event_log
+                    ),
+                )
+                assert completion_status is None
+                handler.begin_phase(state=replayed_state, decisions=replayed.decision_controller)
             current = replayed_state.fight_phase_state
             assert current is not None
             if current.active_activation is None:
@@ -1151,6 +1168,12 @@ def test_target_acquisition_only_enumerates_units_hit_by_long_rifles_and_applies
             },
         )
 
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    sequence = replace(sequence, pool_index=len(sequence.attack_pools))
+    completion = record_attack_completion_for_executor_fixture(
+        state=fixture.state, decisions=decisions, sequence=sequence
+    )
     status = CatalogPostShootHitTargetStatusRuntime(
         fixture.indexes,
         fixture.armies,
@@ -1162,7 +1185,7 @@ def test_target_acquisition_only_enumerates_units_hit_by_long_rifles_and_applies
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:shroud-target-acquisition",
+            attack_sequence_completed_event_id=completion.event_id,
         )
     )
 

@@ -273,12 +273,35 @@ def apply_tactical_secondary_score_result(
         raise GameLifecycleError("Tactical secondary achievement context is missing.")
     achievement_payload = validate_json_value(achievement_context.to_payload())
     if _payload_bool(payload, key="score"):
-        scored = state.score_secondary_mission_from_state(
+        from warhammer40k_core.engine.mission_scoring_transaction import (
+            score_selected_secondary_mission_at_boundary,
+        )
+
+        card = state.secondary_mission_card_state(
             player_id=player_id,
             secondary_mission_id=secondary_mission_id,
             mode=SecondaryMissionCardMode.TACTICAL,
-            phase=_current_phase(state),
+        )
+        if card is None:
+            raise GameLifecycleError("Selected Tactical secondary card is missing.")
+        record = next(
+            (
+                record
+                for record in state.objective_control_records
+                if record.record_id
+                == _payload_string(
+                    _payload_object(achievement_context.evidence), key="objective_control_record_id"
+                )
+            ),
+            None,
+        )
+        if record is None:
+            raise GameLifecycleError("Selected Tactical secondary boundary is missing.")
+        scored = score_selected_secondary_mission_at_boundary(
+            state=state,
             event_log=decisions.event_log,
+            card_state=card,
+            record=record,
         )
         if scored.scored_transaction_id is None:
             raise GameLifecycleError("Scored Tactical secondary requires a transaction ID.")

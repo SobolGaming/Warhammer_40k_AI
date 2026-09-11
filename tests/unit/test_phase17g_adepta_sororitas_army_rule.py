@@ -103,6 +103,44 @@ def test_battle_round_start_gains_miracle_die_once_for_adepta_army() -> None:
     assert _dice_roll_count(decisions) == 1
 
 
+def test_round_start_active_optional_precedes_opponent_mandatory_rule() -> None:
+    state = battle_state()
+    for player_id in state.player_ids:
+        _mark_player_as_adepta_sororitas(state, player_id=player_id)
+        _make_first_unit_triumph(state, player_id=player_id, wounds_remaining=6)
+    decisions = DecisionController()
+    registry = BattleRoundStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().battle_round_start_hook_bindings
+    )
+    context = BattleRoundStartRequestContext(state=state, decisions=decisions)
+    before = (state.to_payload(), decisions.to_payload())
+    candidates = registry.candidates_for(context)
+    assert len(candidates) == 4
+    assert (state.to_payload(), decisions.to_payload()) == before
+    request = registry.next_request_for(context)
+    assert request is not None
+    assert request.actor_id == state.turn_order[0]
+    assert len(army_rule.miracle_dice_pool(state, player_id="player-a")) == 1
+    assert army_rule.miracle_dice_pool(state, player_id="player-b") == ()
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(),
+    )
+    request = registry.next_request_for(context)
+    assert request is not None
+    assert request.actor_id == "player-b"
+    assert len(army_rule.miracle_dice_pool(state, player_id="player-b")) == 1
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(),
+    )
+    assert registry.next_request_for(context) is None
+
+
 def test_battle_round_start_ignores_non_adepta_armies() -> None:
     state = battle_state()
     decisions = DecisionController()
@@ -131,6 +169,7 @@ def test_destroyed_adepta_sororitas_unit_gains_miracle_die_for_owner() -> None:
         target_unit=target_unit,
     )
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.SHOOTING,
@@ -141,7 +180,18 @@ def test_destroyed_adepta_sororitas_unit_gains_miracle_die_for_owner() -> None:
         destroyed_player_id="player-b",
     )
 
-    army_rule.resolve_adepta_sororitas_unit_destroyed(context)
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
+        destruction_sequencing,
+    )
+    from warhammer40k_core.engine.sequencing import SequencingRequirement
+
+    before = state.to_payload(), decisions.event_log.records
+    eligible = destruction_sequencing.candidates(context)
+    assert (state.to_payload(), decisions.event_log.records) == before
+    assert len(eligible) == 1
+    assert eligible[0].participant.player_id == "player-b"
+    assert eligible[0].participant.requirement is SequencingRequirement.MANDATORY
+    assert eligible[0].activate() is None
 
     pool = army_rule.miracle_dice_pool(state, player_id="player-b")
     assert len(pool) == 1
@@ -176,6 +226,7 @@ def test_destroyed_non_adepta_unit_in_adepta_army_does_not_gain_miracle_die() ->
 
     army_rule.resolve_adepta_sororitas_unit_destroyed(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.SHOOTING,

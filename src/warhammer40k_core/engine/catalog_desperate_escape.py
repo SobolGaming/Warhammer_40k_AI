@@ -59,11 +59,10 @@ def catalog_forced_desperate_escape_sources_for_unit(
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     if state.battlefield_state is None:
         return ()
-    target_placement = state.battlefield_state.unit_placement_by_id(requested_unit_id)
-    target_unit = _unit_by_id(armies, unit_instance_id=requested_unit_id)
+    target_unit = rules_unit_view_by_id(state=state, unit_instance_id=requested_unit_id)
     sources: list[dict[str, JsonValue]] = []
     for army in sorted(armies, key=lambda item: item.player_id):
-        if army.player_id == target_placement.player_id:
+        if army.player_id == target_unit.owner_player_id:
             continue
         index = ability_indexes_by_player_id.get(army.player_id)
         if index is None:
@@ -83,7 +82,10 @@ def catalog_forced_desperate_escape_sources_for_unit(
                 force_clause = force_desperate_escape_clause(record)
                 if force_clause is None:
                     continue
-                if not falling_back_unit_allowed(clause=force_clause, unit=target_unit):
+                if not all(
+                    falling_back_unit_allowed(clause=force_clause, unit=component.unit)
+                    for component in target_unit.components
+                ):
                     continue
                 if not _target_within_source_engagement(
                     state=state,
@@ -300,16 +302,3 @@ def _catalog_desperate_escape_source_payload(
         "phase": None if state.current_battle_phase is None else state.current_battle_phase.value,
     }
     return cast(dict[str, JsonValue], validate_json_value(payload))
-
-
-def _unit_by_id(
-    armies: tuple[ArmyDefinition, ...],
-    *,
-    unit_instance_id: str,
-) -> UnitInstance:
-    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in armies:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_id:
-                return unit
-    raise GameLifecycleError("Catalog Desperate Escape target unit is unknown.")

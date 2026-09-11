@@ -1574,6 +1574,7 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
     current_phase = state.current_battle_phase
     assert current_phase is not None
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=DecisionController(),
         completed_phase=current_phase,
@@ -1698,6 +1699,7 @@ def test_tracked_target_destroyed_target_expires_and_requests_reselection() -> N
 
     runtime.unit_destroyed_handler(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=current_phase,
@@ -1799,6 +1801,7 @@ def test_tracked_target_expiration_does_not_depend_on_reselection_records(
     current_phase = state.current_battle_phase
     assert current_phase is not None
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=decisions,
         completed_phase=current_phase,
@@ -1892,7 +1895,11 @@ def test_tracked_target_shared_target_expires_all_records_before_reselection(
     runtime.unit_destroyed_handler(context)
 
     assert all(not record.active for record in state.tracked_target_records)
-    assert tuple(record.event_type for record in decisions.event_log.records) == (
+    assert tuple(
+        record.event_type
+        for record in decisions.event_log.records
+        if record.event_type != "timing_batch_transition"
+    ) == (
         TRACKED_TARGET_EXPIRED_EVENT_TYPE,
         TRACKED_TARGET_EXPIRED_EVENT_TYPE,
         "decision_requested",
@@ -1903,8 +1910,12 @@ def test_tracked_target_shared_target_expires_all_records_before_reselection(
     assert request.payload["source_rule_id"] == reselect_record.definition.source_id
     assert request.payload["source_unit_instance_id"] == source_units[0].unit_instance_id
 
-    runtime.unit_destroyed_handler(context)
-    assert tuple(record.event_type for record in decisions.event_log.records) == (
+    runtime.record_unit_destroyed(context)
+    assert tuple(
+        record.event_type
+        for record in decisions.event_log.records
+        if record.event_type != "timing_batch_transition"
+    ) == (
         TRACKED_TARGET_EXPIRED_EVENT_TYPE,
         TRACKED_TARGET_EXPIRED_EVENT_TYPE,
         "decision_requested",
@@ -1947,29 +1958,68 @@ def test_tracked_target_shared_target_preserves_all_reselection_requests() -> No
     )
     decisions = DecisionController()
 
-    runtime.unit_destroyed_handler(
-        _tracked_target_destroyed_context(
-            state=state,
-            decisions=decisions,
-            destroyed_unit_instance_id=destroyed_target.unit_instance_id,
-            destroyed_model_instance_id=destroyed_target.own_models[0].model_instance_id,
-        )
+    context = _tracked_target_destroyed_context(
+        state=state,
+        decisions=decisions,
+        destroyed_unit_instance_id=destroyed_target.unit_instance_id,
+        destroyed_model_instance_id=destroyed_target.own_models[0].model_instance_id,
+    )
+    runtime.record_unit_destroyed(context)
+    before = state.to_payload(), decisions.to_payload()
+    candidates = runtime.unit_destroyed_candidates(context)
+    assert (state.to_payload(), decisions.to_payload()) == before
+    assert len(candidates) == 2
+    from warhammer40k_core.engine.sequencing import (
+        SequencingRequirement,
+        sequencing_decision_event_from_request,
     )
 
-    assert all(not record.active for record in state.tracked_target_records)
-    assert tuple(record.event_type for record in decisions.event_log.records) == (
-        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
-        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
-        "decision_requested",
-        "decision_requested",
+    assert all(
+        candidate.participant.requirement is SequencingRequirement.MANDATORY
+        for candidate in candidates
     )
-    assert [
-        cast(dict[str, JsonValue], request.payload)["source_unit_instance_id"]
-        for request in decisions.queue.pending_requests
-    ] == [
-        source_units[1].unit_instance_id,
-        source_units[0].unit_instance_id,
-    ]
+    runtime.unit_destroyed_handler(context)
+    assert all(not record.active for record in state.tracked_target_records)
+    assert len(decisions.queue.pending_requests) == 1
+    order = decisions.queue.pending_requests[0]
+    assert order.actor_id == "player-a"
+    assert len(order.options) == 2
+    first = next(
+        candidate
+        for candidate in candidates
+        if "tracked:999-source-one" in candidate.participant.participant_id
+    )
+    ordering = DecisionResult.for_request(
+        request=order,
+        result_id="shared-tracked-target-order",
+        selected_option_id=f"next:{first.participant.participant_id}",
+    )
+    decisions.submit_result(ordering)
+    event_type, payload = sequencing_decision_event_from_request(request=order, result=ordering)
+    decisions.event_log.append(event_type, payload)
+    for index, source_unit in enumerate(source_units):
+        runtime.unit_destroyed_handler(context)
+        assert len(decisions.queue.pending_requests) == 1
+        request = decisions.queue.pending_requests[0]
+        assert request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE
+        assert isinstance(request.payload, dict)
+        assert request.payload["source_unit_instance_id"] == source_unit.unit_instance_id
+        assert request.payload["destroyed_trigger_event_id"] == context.model_destroyed_event_id
+        result = DecisionResult.for_request(
+            request=request,
+            result_id=f"shared-tracked-target-{index}",
+            selected_option_id=request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        apply_select_tracked_target_decision(
+            state=state,
+            request=request,
+            result=result,
+            decisions_event_log=decisions.event_log,
+        )
+    assert runtime.unit_destroyed_handler(context) is None
+    assert decisions.queue.to_payload()["pending_requests"] == []
+    assert len(tuple(record for record in state.tracked_target_records if record.active)) == 2
 
 
 def _record_selection(
@@ -2119,6 +2169,7 @@ def _tracked_target_destroyed_context(
     current_phase = state.current_battle_phase
     assert current_phase is not None
     return UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=decisions,
         completed_phase=current_phase,

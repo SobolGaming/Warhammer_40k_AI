@@ -1,0 +1,52 @@
+{
+  "workload_id": "order34-live-retained-v1",
+  "commit": "05ca3d8506a695d2a1e0b36ccb5b828dfb7f505a",
+  "runtime_diff_sha256": "2263604804d0074e56cbd07029ed12a61544115f302b5e4155bd504dd629d6f8",
+  "engine_manifest_sha256": "2dcb120d8282e219eb65a8cd736f4938222eaaa3f01ac635bba860c16c22c482",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "hardware_status": "provisional local host; execution evidence records workload scheduling",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "work_counts_instrumented_not_timing_evidence",
+  "query_repetitions": null,
+  "samples": [
+    {
+      "case": "retained",
+      "setup_seconds": 2.276358374976553,
+      "slice_seconds": 0.5694095001090318,
+      "inventory_size": 32,
+      "work_counts": {
+        "rules_unit_view_by_id": 252,
+        "applies_to_unit": 4948,
+        "resolve_line_of_sight": 48,
+        "resolve_visibility_pair": 6,
+        "_legal_charging_unit_ids": 1,
+        "_legal_shooting_unit_ids": 3,
+        "expire_persisting_effects_at_boundary": 10,
+        "rules_unit_identity_ids": 31,
+        "resolve_visibility_pair_uncached": 6,
+        "persisting_effects_for_lineage": 139,
+        "invalid_shooting_unit_selection_status": 1
+      },
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    }
+  ],
+  "mean_seconds": 0.5694095001090318,
+  "median_seconds": 0.5694095001090318,
+  "p95_seconds": 0.5694095001090318,
+  "maximum_seconds": 0.5694095001090318,
+  "completion_rate": 1.0,
+  "slices_per_second": 1.7562053316787265,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_action_restrictions.py": "537cd664ed3386e977d6b33ae9810e4861440018928426b246ca017a89fbab80",
+    "scripts/measure_action_restriction_live.py": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/phase17n_primary_mission_helpers.py": "008bd172b8631f4ca260c874dc9aa6ed26f1d47c3e6a1511b5d5252762b16e69"
+  },
+  "full_game_certified": false
+}

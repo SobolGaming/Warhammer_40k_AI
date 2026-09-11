@@ -31,6 +31,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    SequencingParticipant,
+    SequencingRequirement,
+)
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 
 def test_fight_phase_start_hook_registry_routes_one_request_and_one_result() -> None:
@@ -42,13 +48,13 @@ def test_fight_phase_start_hook_registry_routes_one_request_and_one_result() -> 
             FightPhaseStartHookBinding(
                 hook_id="hook-b",
                 source_id="source-b",
-                request_handler=lambda _context: None,
+                candidate_handler=lambda _context: (),
                 result_handler=lambda _context: False,
             ),
             FightPhaseStartHookBinding(
                 hook_id="hook-a",
                 source_id="source-a",
-                request_handler=lambda _context: request,
+                candidate_handler=lambda _context: (_candidate(request, "hook-a"),),
                 result_handler=lambda context: context.request.request_id == request.request_id,
             ),
         )
@@ -270,7 +276,7 @@ def test_fight_phase_start_hook_registry_rejects_bad_handler_outputs_and_ambigui
         FightPhaseStartHookRegistry.empty().apply_result(
             cast(FightPhaseStartResultContext, object())
         )
-    with pytest.raises(GameLifecycleError, match=r"must return DecisionRequest or None"):
+    with pytest.raises(GameLifecycleError, match=r"pure candidate discovery"):
         FightPhaseStartHookRegistry.from_bindings(
             (
                 FightPhaseStartHookBinding(
@@ -280,21 +286,26 @@ def test_fight_phase_start_hook_registry_rejects_bad_handler_outputs_and_ambigui
                 ),
             )
         ).next_request_for(request_context)
-    with pytest.raises(GameLifecycleError, match=r"multiple simultaneous requests"):
-        FightPhaseStartHookRegistry.from_bindings(
-            (
-                FightPhaseStartHookBinding(
-                    hook_id="hook-a",
-                    source_id="source-a",
-                    request_handler=lambda _context: request,
+    simultaneous = FightPhaseStartHookRegistry.from_bindings(
+        (
+            FightPhaseStartHookBinding(
+                hook_id="hook-a",
+                source_id="source-a",
+                candidate_handler=lambda _context: (_candidate(request, "hook-a"),),
+            ),
+            FightPhaseStartHookBinding(
+                hook_id="hook-b",
+                source_id="source-b",
+                candidate_handler=lambda _context: (
+                    _candidate(_fight_start_request("hook-b"), "hook-b"),
                 ),
-                FightPhaseStartHookBinding(
-                    hook_id="hook-b",
-                    source_id="source-b",
-                    request_handler=lambda _context: _fight_start_request("hook-b"),
-                ),
-            )
-        ).next_request_for(request_context)
+            ),
+        )
+    ).next_request_for(request_context)
+    assert type(simultaneous) is DecisionRequest
+    assert simultaneous.decision_type == SEQUENCING_DECISION_TYPE
+    assert simultaneous.actor_id == "player-a"
+    assert len(simultaneous.options) == 2
     with pytest.raises(GameLifecycleError, match=r"must return bool or status"):
         FightPhaseStartHookRegistry.from_bindings(
             (
@@ -401,4 +412,16 @@ def _fight_start_request(hook_id: str) -> DecisionRequest:
                 payload={"hook_id": hook_id, "use": True},
             ),
         ),
+    )
+
+
+def _candidate(request: DecisionRequest, identifier: str) -> TimingRuleCandidate:
+    return TimingRuleCandidate(
+        participant=SequencingParticipant(
+            participant_id=identifier,
+            player_id="player-a",
+            source_rule_id=f"source:{identifier}",
+            requirement=SequencingRequirement.MANDATORY,
+        ),
+        activate=lambda: request,
     )

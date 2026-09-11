@@ -502,6 +502,21 @@ def _event_record_hidden_from_context(
         "fight_on_death_destruction_progressed",
         "retained_shooting_started",
         "hazardous_destruction_routing_started",
+        "timing_batch_transition",
+        "rule_trigger_observed",
+        "attack_sequence_completion_state_recorded",
+        "move_rule_candidates_observed",
+        "rule_trigger_released",
+        "rule_trigger_completed",
+        "model_destruction_occurrence_recorded",
+        "active_player_scope_started",
+        "active_player_scope_completed",
+        "attack_sequence_completion_order_requested",
+        "command_phase_start_rules_discovered",
+        "command_phase_start_rule_completed",
+        "command_phase_start_order_requested",
+        "sequencing_next_participant_selected",
+        "sequencing_order_resolved",
     }:
         return True
     if _player_owned_secret_event_hidden_from_context(payload=payload, viewer=viewer):

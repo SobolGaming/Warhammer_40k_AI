@@ -1,0 +1,26 @@
+{
+  "workload_id": "order36-existing-consumers-v1",
+  "base_commit": "05ca3d8506a695d2a1e0b36ccb5b828dfb7f505a",
+  "candidate_branch": "codex/order-36-rules-sequencing",
+  "workloads": [
+    "order34-action-restriction-slice-v1",
+    "order34-live-unrestricted-v1",
+    "order34-live-attached_selection-v1",
+    "order34-live-retained-v1"
+  ],
+  "samples_per_revision_per_case": 7,
+  "separate_work_profile_samples": 1,
+  "budget_source": "docs/performance/order34/budgets.json",
+  "timing": {
+    "setup_separate": true,
+    "coverage": false,
+    "profiling": false,
+    "parallel_workloads": false,
+    "competing_task_validation_workers": false,
+    "cpu_affinity": "not pinned"
+  },
+  "fixture_policy": "Same workload drivers and dependency lock. Each runtime uses its canonical fixtures because P01D types are unavailable on main. Per-file base/head hashes are retained; this is a cost comparison, not a semantic equivalence claim.",
+  "prior_incomplete_diagnostic": "Full attached declaration remains the previously deferred exact-solver diagnostic; attached_selection does not replace it.",
+  "full_game_certified": false,
+  "scope": "Component and gameplay-slice evidence only; no new game driver or optimization."
+}

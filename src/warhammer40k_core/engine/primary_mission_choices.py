@@ -57,11 +57,17 @@ from warhammer40k_core.engine.primary_mission_state import (
     primary_mission_marker_id,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.sequencing import (
+    SequencingParticipant,
+    SequencingRequirement,
+    SequencingRuleOrigin,
+)
 from warhammer40k_core.engine.start_battle_hooks import (
     StartBattleHookBinding,
     StartBattleRequestContext,
     StartBattleResultContext,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -174,10 +180,93 @@ def punishment_choice_request(
     )
 
 
+def punishment_timing_candidates(
+    *, state: GameState, decisions: DecisionController
+) -> tuple[TimingRuleCandidate, ...]:
+    """Discover the source-owned turn-start rule without resolving an empty choice."""
+    descriptor = _punishment_descriptor()
+    active = state.active_player_id
+    if (
+        active is None
+        or _mission_setup(state).primary_mission_id_for_player(active)
+        != descriptor.primary_mission_id
+        or _condemned_selection_for_current_turn(state=state, descriptor=descriptor) is not None
+    ):
+        return ()
+    choice = _punishment_choice_data(state=state, player_id=active, descriptor=descriptor)
+    identifier = f"{descriptor.choice_rule_id}:{state.battle_round}:{active}"
+    template = (
+        punishment_choice_request(state=state, decisions=decisions, request_id=identifier)
+        if choice.legal_target_ids
+        else None
+    )
+    return (
+        TimingRuleCandidate(
+            participant=SequencingParticipant(
+                participant_id=identifier,
+                player_id=active,
+                source_rule_id=descriptor.source_id,
+                requirement=SequencingRequirement.MANDATORY,
+                origin=SequencingRuleOrigin.MISSION,
+            ),
+            activate=lambda: _activate_punishment_timing_rule(state=state, decisions=decisions),
+            request_template=template,
+        ),
+    )
+
+
+def _activate_punishment_timing_rule(
+    *, state: GameState, decisions: DecisionController
+) -> LifecycleStatus | None:
+    request = punishment_choice_request(state=state, decisions=decisions)
+    if request is None:
+        return None
+    phase = state.current_battle_phase
+    if phase is None:
+        raise GameLifecycleError("Punishment turn-start rule requires a battle phase.")
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "primary_mission_choice_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": phase.value,
+            "request_id": request.request_id,
+            "decision_type": request.decision_type,
+            "actor_id": request.actor_id,
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={"phase_body_status": "primary_mission_turn_start_choice_required"},
+    )
+
+
 def consecrate_choice_request(
     *,
     state: GameState,
     decisions: DecisionController,
+    request_id: str | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> DecisionRequest | None:
+    designations = pending_consecration_designations(state=state)
+    if not designations:
+        return None
+    return consecrate_choice_request_for_designation(
+        state=state,
+        decisions=decisions,
+        designation_id=designations[0].designation_id,
+        request_id=request_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+
+
+def consecrate_choice_request_for_designation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    designation_id: str,
     request_id: str | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> DecisionRequest | None:
@@ -189,13 +278,16 @@ def consecrate_choice_request(
     ):
         return None
     player_id = _active_assigned_player(state, descriptor)
-    designation = _next_consecration_designation(
-        state=state,
-        player_id=player_id,
-        descriptor=descriptor,
+    designation = next(
+        (
+            value
+            for value in pending_consecration_designations(state=state)
+            if value.designation_id == designation_id
+        ),
+        None,
     )
     if designation is None:
-        return None
+        raise GameLifecycleError("Selected Consecration designation is no longer pending.")
     record = _current_objective_control_record(
         state=state,
         timing=ObjectiveControlTiming.TURN_END,
@@ -532,7 +624,10 @@ def _authoritative_choice_request(
                     selected_target_sets=subsets,
                 )
     elif choice.choice_kind == CONSECRATE_CHOICE_KIND:
-        authoritative = consecrate_choice_request(
+        if choice.subject_id is None:
+            raise GameLifecycleError("Consecration request is missing its designation.")
+        authoritative = consecrate_choice_request_for_designation(
+            designation_id=choice.subject_id,
             state=state,
             decisions=decisions,
             request_id=request.request_id,
@@ -987,24 +1082,33 @@ def _choice_option_label(
     return f"Select {', '.join(selected_ids)}"
 
 
-def _next_consecration_designation(
+def pending_consecration_designations(
     *,
     state: GameState,
-    player_id: str,
-    descriptor: PrimaryMissionChoiceRuleDescriptor,
-) -> PrimaryConsecrationDesignationState | None:
-    candidates = tuple(
-        designation
-        for designation in state.primary_mission_progress_state.consecration_designations
-        if designation.owner_player_id == player_id
-        and designation.mission_id == descriptor.primary_mission_id
-        and designation.status is PrimaryConsecrationStatus.ACTIVE
-        and not designation.was_resolved_for_turn(
-            battle_round=state.battle_round,
-            active_player_id=player_id,
+) -> tuple[PrimaryConsecrationDesignationState, ...]:
+    descriptor = _consecrate_descriptor()
+    player_id = state.active_player_id
+    if player_id is None or (
+        _mission_setup(state).primary_mission_id_for_player(player_id)
+        != descriptor.primary_mission_id
+    ):
+        return ()
+    return tuple(
+        sorted(
+            (
+                designation
+                for designation in state.primary_mission_progress_state.consecration_designations
+                if designation.owner_player_id == player_id
+                and designation.mission_id == descriptor.primary_mission_id
+                and designation.status is PrimaryConsecrationStatus.ACTIVE
+                and not designation.was_resolved_for_turn(
+                    battle_round=state.battle_round,
+                    active_player_id=player_id,
+                )
+            ),
+            key=lambda value: value.designation_id,
         )
     )
-    return None if not candidates else min(candidates, key=lambda value: value.designation_id)
 
 
 def _current_objective_control_record(
@@ -1330,6 +1434,7 @@ __all__ = (
     "locate_and_deny_start_battle_binding",
     "primary_mission_choice_option_id",
     "punishment_choice_request",
+    "punishment_timing_candidates",
     "sensor_sweep_marker_removal_choice_request",
     "sensor_sweep_markers_for_policy",
 )

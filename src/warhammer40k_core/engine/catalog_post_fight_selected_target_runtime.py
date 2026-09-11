@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from functools import partial
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex, AbilityCatalogRecord
 from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_completion_sequencing import (
+    resolve_attack_completion_candidates,
+)
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     successful_hit_target_unit_ids_for_sequence,
 )
+from warhammer40k_core.engine.catalog_rule_group_sequencing import selected_target_group_participant
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
 )
@@ -45,6 +50,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
@@ -63,29 +69,51 @@ CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_SELECTED_EVENT = (
 )
 
 
+def post_fight_candidates(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: AttackSequenceCompletedContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    groups = _post_fight_hit_target_effect_groups(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+        context=context,
+    )
+    resolved = resolved_post_shoot_target_effect_group_keys(
+        context.decisions,
+        event_type=CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+    )
+    return tuple(
+        TimingRuleCandidate(
+            participant=selected_target_group_participant(group),
+            activate=partial(_activate_post_fight, context, group),
+        )
+        for group in groups
+        if post_shoot_group_key(group) not in resolved
+    )
+
+
 def post_fight_hit_target_request(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
     context: AttackSequenceCompletedContext,
 ) -> LifecycleStatus | None:
-    if type(context) is not AttackSequenceCompletedContext:
-        raise GameLifecycleError("Catalog post-fight target effect requires context.")
-    groups = _post_fight_hit_target_effect_groups(
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
-        armies=armies,
-        context=context,
+    return resolve_attack_completion_candidates(
+        context,
+        partial(
+            post_fight_candidates,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+            context=context,
+        ),
     )
-    if not groups:
-        return None
-    resolved = resolved_post_shoot_target_effect_group_keys(
-        context.decisions,
-        event_type=CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-    )
-    unresolved = tuple(group for group in groups if post_shoot_group_key(group) not in resolved)
-    if not unresolved:
-        return None
-    group = unresolved[0]
+
+
+def _activate_post_fight(
+    context: AttackSequenceCompletedContext, group: SelectedTargetGroup
+) -> LifecycleStatus:
     request = selected_target_request(
         state=context.state,
         group=group,
@@ -108,9 +136,9 @@ def post_fight_hit_target_request(
                 "unit_instance_id": group.unit.unit_instance_id,
                 "source_model_instance_id": group.source_model_instance_id,
                 "selection_clause_id": group.selection_clause.clause_id,
-                "attack_sequence_id": (
-                    None if group.attack_sequence is None else group.attack_sequence.sequence_id
-                ),
+                "attack_sequence_id": None
+                if group.attack_sequence is None
+                else group.attack_sequence.sequence_id,
                 "attack_sequence_completed_event_id": group.attack_sequence_completed_event_id,
                 "available_target_unit_instance_ids": [
                     option.target_unit_instance_id for option in group.options

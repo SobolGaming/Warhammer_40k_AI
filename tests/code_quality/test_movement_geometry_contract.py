@@ -11,6 +11,7 @@ MOVEMENT_PHASE_FILES = (
 )
 CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 FIGHT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
+FIGHT_PHASE_FILES = (FIGHT_PHASE, *sorted(FIGHT_PHASE.parent.glob("fight_*.py")))
 FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
 LIFECYCLE = ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle.py"
 STRATAGEMS = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
@@ -26,7 +27,7 @@ LIVE_MOVEMENT_CALLS = (
     (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_advance_move"),
     (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_fall_back_move"),
     (CHARGE_PHASE, "_apply_charge_move_proposal_decision", "resolve_charge_move"),
-    (FIGHT_PHASE, "_apply_fight_movement_proposal", "resolve_fight_movement"),
+    (FIGHT_PHASE, "apply_fight_movement_proposal", "resolve_rules_unit_fight_movement"),
     (STRATAGEMS, "apply_heroic_intervention_charge_move", "resolve_charge_move"),
     (TRIGGERED_MOVEMENT, "request_from_state", "resolve_triggered_movement"),
     (TRIGGERED_MOVEMENT, "apply_decision", "resolve_triggered_movement"),
@@ -149,9 +150,16 @@ def test_desperate_escape_battle_shock_preserves_nested_outcome_status() -> None
         "resolve_outcomes",
     )
     registry_source = ast.unparse(registry_function)
-    assert "pending_status = status" in registry_source
-    assert "queue_after[0] != pending_status.decision_request" in registry_source
-    assert "return pending_status" in registry_source
+    assert "return observe_battle_shock_outcome(context, self)" in registry_source
+    _source_path, candidate_function = _function_by_name(
+        BATTLE_SHOCK_HOOKS.parent / "battle_shock_outcome_sequencing.py",
+        "resolve_outcome_candidates",
+    )
+    candidate_source = ast.unparse(candidate_function)
+    assert "resolve_timing_rule_candidates" in candidate_source
+    exact_pending = "outcome.decision_request != context.decisions.queue.pending_requests[0]"
+    assert exact_pending in candidate_source
+    assert "return outcome" in candidate_source
 
     _source_path, resolution_function = _function_by_name(
         BATTLE_SHOCK_RESOLUTION,
@@ -246,6 +254,8 @@ def _source_paths(path: Path) -> tuple[Path, ...]:
         return MOVEMENT_PHASE_FILES
     if path == STRATAGEMS:
         return STRATAGEM_FILES
+    if path == FIGHT_PHASE:
+        return FIGHT_PHASE_FILES
     return (path,)
 
 

@@ -168,6 +168,7 @@ class PrimaryReserveEntryLifecycleOccurrence:
     event_order: int
     historical_unit_instance_id: str
     reserve_entry_state: dict[str, JsonValue]
+    creates_unit: bool = False
 
 
 class PrimaryReserveEntryOccurrenceValidator(Protocol):

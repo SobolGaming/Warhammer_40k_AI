@@ -296,6 +296,10 @@ def _resolve_completed_shooting_attack_sequence_continuation(
         raise GameLifecycleError("Completed shooting continuation requires a handler.")
     if type(completed_sequence) is not AttackSequence:
         raise GameLifecycleError("Completed shooting continuation requires an AttackSequence.")
+    from warhammer40k_core.engine.phases.shooting_completion_candidates import (
+        shooting_completion_candidates,
+    )
+
     completed_event_id = attack_sequence_completed_event_id(
         decisions=decisions,
         attack_sequence=completed_sequence,
@@ -309,35 +313,19 @@ def _resolve_completed_shooting_attack_sequence_continuation(
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=completed_sequence,
             attack_sequence_completed_event_id=completed_event_id,
-        )
+        ),
+        additional_candidates=lambda: shooting_completion_candidates(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            sequence=completed_sequence,
+            completed_event_id=completed_event_id,
+        ),
     )
     if completion_hook_status is not None:
         return completion_hook_status
     _aur.reconcile_after_attack_sequence(state, completed_sequence)
-    stratagem_status = _request_friendly_unit_has_shot_stratagem_if_available(
-        state=state,
-        decisions=decisions,
-        stratagem_index=handler.stratagem_index,
-        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
-        completed_sequence=completed_sequence,
-    )
-    if stratagem_status is not None:
-        return stratagem_status
-    enemy_stratagem_status = _request_enemy_unit_has_shot_stratagem_if_available(
-        state=state,
-        decisions=decisions,
-        stratagem_index=handler.stratagem_index,
-        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
-        completed_sequence=completed_sequence,
-    )
-    if enemy_stratagem_status is not None:
-        return enemy_stratagem_status
-    return _request_shooting_end_surge_if_available(
-        state=state,
-        decisions=decisions,
-        registry=handler.shooting_end_surge_hooks,
-        completed_sequence=completed_sequence,
-    )
+    return None
 
 
 def _request_friendly_unit_has_shot_stratagem_if_available(

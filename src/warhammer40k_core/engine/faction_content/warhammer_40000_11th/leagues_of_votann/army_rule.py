@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from functools import partial
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -29,6 +31,8 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierBinding,
     WoundRollModifierContext,
 )
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
@@ -69,6 +73,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=COMMAND_PHASE_START_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=resolve_command_phase_start,
+                candidate_handler=command_sequencing_candidates,
             ),
         ),
         hit_roll_modifier_bindings=(
@@ -551,3 +556,29 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     if value < 0:
         raise GameLifecycleError(f"Prioritised Efficiency {field_name} must be non-negative.")
     return value
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    army = _leagues_of_votann_army_for_player(context.state, player_id=context.active_player_id)
+    if army is None:
+        return ()
+    return (
+        TimingRuleCandidate(
+            participant=SequencingParticipant(
+                participant_id=f"{COMMAND_PHASE_START_HOOK_ID}:{army.player_id}",
+                player_id=army.player_id,
+                source_rule_id=SOURCE_RULE_ID,
+                requirement=SequencingRequirement.MANDATORY,
+            ),
+            activate=partial(
+                resolve_command_phase_start,
+                CommandPhaseStartContext(
+                    state=context.state,
+                    decisions=context.decisions,
+                    active_player_id=context.active_player_id,
+                ),
+            ),
+        ),
+    )

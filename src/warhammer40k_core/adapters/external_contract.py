@@ -12,7 +12,7 @@ from referencing.jsonschema import Schema
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
-EXTERNAL_CONTRACT_VERSION = "14.0.0"
+EXTERNAL_CONTRACT_VERSION = "15.0.0"
 
 CREATE_SESSION_SCHEMA_VERSION = "create-session-v3"
 DECISION_FAMILY_COVERAGE_SCHEMA_VERSION = "decision-family-coverage-v2-interactions"
@@ -22,13 +22,13 @@ EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v5-phase17n-step4"
 FINITE_SUBMISSION_SCHEMA_VERSION = "finite-submission-v1"
 LIFECYCLE_STATUS_SCHEMA_VERSION = "lifecycle-status-v4-phase17n-step4"
 PARAMETERIZED_SUBMISSION_SCHEMA_VERSION = "parameterized-submission-v2-weapon-instances"
-SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v14-contract"
+SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v15-contract"
 SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION = "session-command-envelope-v2-weapon-instances"
-SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v14-contract"
+SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v15-contract"
 SESSION_CREATE_SCHEMA_VERSION = "session-create-v4"
-SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v14-contract"
-SESSION_PERSISTENCE_CONTRACT_VERSION = "14.0.0"
-SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v6-continuous-visibility"
+SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v15-contract"
+SESSION_PERSISTENCE_CONTRACT_VERSION = "15.0.0"
+SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v7-sequencing"
 SESSION_PROJECTION_SCHEMA_VERSION = "session-projection-v8-model-keywords"
 
 CREATE_SESSION_SCHEMA_NAME = "create-session.schema.json"

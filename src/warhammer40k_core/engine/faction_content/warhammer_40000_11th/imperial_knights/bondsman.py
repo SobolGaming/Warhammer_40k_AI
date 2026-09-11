@@ -13,8 +13,10 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.command_phase_start_candidates import command_army_rule_candidate
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
@@ -23,6 +25,8 @@ from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 if TYPE_CHECKING:
@@ -105,7 +109,7 @@ def bondsman_request(
         )
     )
     return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
+        request_id=context.issue_request_id(),
         decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
         actor_id=army.player_id,
         payload=validate_json_value(common_payload),
@@ -816,3 +820,15 @@ def _validate_game_state(state: object) -> GameState:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def bondsman_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    return command_army_rule_candidate(
+        context,
+        request_handler=bondsman_request,
+        source_rule_id=BONDSMAN_SOURCE_RULE_ID,
+        hook_id=BONDSMAN_HOOK_ID,
+        requirement=SequencingRequirement.OPTIONAL,
+    )

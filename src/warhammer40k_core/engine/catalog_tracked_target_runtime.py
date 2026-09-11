@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from typing import cast
 
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -30,17 +32,22 @@ from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors impor
     tracked_target_selection_descriptor_for_clause,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id, rules_unit_view_from_armies
+from warhammer40k_core.engine.sequencing import SequencingRequirement
 from warhammer40k_core.engine.start_battle_hooks import (
     StartBattleHookBinding,
     StartBattleRequestContext,
 )
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.tracked_targets import (
     TRACKED_TARGET_EXPIRED_EVENT_TYPE,
     TrackedTargetOwnerScope,
     TrackedTargetRecord,
+    TrackedTargetRecordPayload,
     TrackedTargetRole,
     build_select_tracked_target_request,
 )
@@ -86,6 +93,7 @@ class CatalogTrackedTargetRuntime:
                 hook_id=CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
                 source_id=CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
                 request_handler=self.battle_round_start_request,
+                candidate_handler=self.battle_round_start_candidates,
             ),
         )
 
@@ -98,9 +106,48 @@ class CatalogTrackedTargetRuntime:
             UnitDestroyedHookBinding(
                 hook_id=CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
                 source_id=CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
-                handler=self.unit_destroyed_handler,
+                maintenance_handler=self.record_unit_destroyed,
+                candidate_handler=self.unit_destroyed_candidates,
             ),
         )
+
+    def battle_round_start_candidates(
+        self,
+        context: BattleRoundStartRequestContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        requests = _tracked_target_initial_selection_requests(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=replace(context, authoritative_request_id="timing-request-template"),
+        )
+        candidates: list[TimingRuleCandidate] = []
+        for request in requests:
+            payload = request.payload
+            if not isinstance(payload, dict):
+                raise GameLifecycleError("Tracked-target request requires source context.")
+            source_id = payload["source_rule_id"]
+            if type(source_id) is not str:
+                raise GameLifecycleError("Tracked-target source ID must be a string.")
+            identity = {
+                key: payload[key]
+                for key in (
+                    "source_rule_id",
+                    "source_clause_id",
+                    "source_effect_index",
+                    "source_unit_instance_id",
+                    "source_model_instance_id",
+                )
+            }
+            candidates.append(
+                timing_candidate_for_request(
+                    template=request,
+                    participant_id=f"tracked-target:{canonical_payload_sha256(identity)}",
+                    source_rule_id=source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    next_request_id=context.state.next_decision_request_id,
+                )
+            )
+        return tuple(candidates)
 
     def battle_round_start_request(
         self,
@@ -126,9 +173,7 @@ class CatalogTrackedTargetRuntime:
             return request
         return None
 
-    def unit_destroyed_handler(self, context: UnitDestroyedContext) -> None:
-        if context.decisions.queue.pending_requests:
-            return
+    def record_unit_destroyed(self, context: UnitDestroyedContext) -> None:
         matching_records = context.state.tracked_targets_for_destroyed_unit(
             destroyed_unit_instance_id=context.destroyed_unit_instance_id
         )
@@ -147,15 +192,76 @@ class CatalogTrackedTargetRuntime:
                     "tracked_target_record": expired_record.to_payload(),
                 },
             )
-        for expired_record in expired_records:
-            request = _tracked_target_reselection_request(
+
+    def unit_destroyed_candidates(
+        self, context: UnitDestroyedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        expired = tuple(
+            TrackedTargetRecord.from_payload(
+                cast(TrackedTargetRecordPayload, event.payload["tracked_target_record"])
+            )
+            for event in context.decisions.event_log.records
+            if event.event_type == TRACKED_TARGET_EXPIRED_EVENT_TYPE
+            and isinstance(event.payload, dict)
+            and event.payload.get("model_destroyed_event_id") == context.model_destroyed_event_id
+        )
+        candidates: list[TimingRuleCandidate] = []
+        for record in expired:
+            if any(
+                isinstance(decision.request.payload, dict)
+                and decision.request.payload.get("destroyed_trigger_event_id")
+                == context.model_destroyed_event_id
+                and decision.request.payload.get("expired_tracked_target_record_id")
+                == record.record_id
+                for decision in context.decisions.records
+            ):
+                continue
+            template = _tracked_target_reselection_request(
                 ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 armies=self.armies,
-                context=context,
-                expired_record=expired_record,
+                context=replace(context, authoritative_request_id="timing-request-template"),
+                expired_record=record,
             )
-            if request is not None:
-                context.decisions.request_decision(request)
+            if template is not None:
+                source_context = {
+                    "destroyed_trigger_event_id": context.model_destroyed_event_id,
+                    "expired_tracked_target_record_id": record.record_id,
+                }
+                if not isinstance(template.payload, dict) or any(
+                    not isinstance(option.payload, dict) for option in template.options
+                ):
+                    raise GameLifecycleError("Tracked reselection requires object payloads.")
+                template = replace(
+                    template,
+                    payload={**template.payload, **source_context},
+                    options=tuple(
+                        replace(
+                            option,
+                            payload={
+                                **cast(dict[str, JsonValue], option.payload),
+                                **source_context,
+                            },
+                        )
+                        for option in template.options
+                    ),
+                )
+                candidates.append(
+                    timing_candidate_for_request(
+                        template=template,
+                        participant_id=f"tracked-target-reselection:{context.model_destroyed_event_id}:{record.record_id}",
+                        source_rule_id=record.source_rule_id,
+                        requirement=SequencingRequirement.MANDATORY,
+                        next_request_id=context.state.next_decision_request_id,
+                    )
+                )
+        return tuple(candidates)
+
+    def unit_destroyed_handler(self, context: UnitDestroyedContext) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+        return UnitDestroyedHookRegistry.from_bindings(self.unit_destroyed_bindings()).resolve(
+            context
+        )
 
 
 def catalog_tracked_target_battle_round_start_hook_bindings(
@@ -430,9 +536,7 @@ def _build_request_from_effect(
         return None
     return build_select_tracked_target_request(
         state=context.state,
-        request_id=(
-            context.issue_request_id() if type(context) is StartBattleRequestContext else None
-        ),
+        request_id=context.issue_request_id(),
         actor_player_id=actor_player_id,
         source_rule_id=record.definition.source_id,
         source_ability_id=record.definition.ability_id,

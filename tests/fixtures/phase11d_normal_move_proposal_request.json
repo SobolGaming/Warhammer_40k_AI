@@ -1,19 +1,21 @@
 {
-  "request_id": "decision-request-000011",
-  "decision_type": "submit_movement_proposal",
   "actor_id": "player-a",
-  "game_id": "phase11d-game",
   "battle_round": 1,
+  "context": {
+    "movement_mode": "normal",
+    "selected_movement_action_grant_hook_ids": [],
+    "selected_movement_action_grants": [],
+    "source_selected_option_id": "normal_move"
+  },
+  "decision_type": "submit_movement_proposal",
+  "game_id": "phase11d-game",
+  "movement_phase_action": "normal_move",
   "phase": "movement",
-  "unit_instance_id": "army-alpha:intercessor-unit-1",
+  "placement_kinds": [],
   "proposal_kind": "normal_move",
+  "request_id": "decision-request-000011",
   "source_decision_request_id": "decision-request-000010",
   "source_decision_result_id": "phase11d-golden-normal-action",
   "spatial_context_hash": "2b5948f61fbfe144841634755da75fb0e064eca2f9efa01b13b6c3c68085d204",
-  "movement_phase_action": "normal_move",
-  "placement_kinds": [],
-  "context": {
-    "source_selected_option_id": "normal_move",
-    "movement_mode": "normal"
-  }
+  "unit_instance_id": "army-alpha:intercessor-unit-1"
 }

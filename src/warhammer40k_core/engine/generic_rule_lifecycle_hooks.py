@@ -20,7 +20,6 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationHookBinding,
 )
-from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.enhancement_bearers import runtime_assignment_for_current_bearer
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
@@ -49,7 +48,6 @@ from warhammer40k_core.engine.fight_order import CHARGE_FIGHTS_FIRST_EFFECT_KIND
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartHookBinding,
     FightPhaseStartRequestContext,
-    FightPhaseStartRequestHandler,
     FightPhaseStartResultContext,
     FightPhaseStartResultHandler,
 )
@@ -151,10 +149,10 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookBinding,
     TargetRestriction,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.turn_end_hooks import (
     TurnEndHookBinding,
     TurnEndRequestContext,
-    TurnEndRequestHandler,
     TurnEndResultContext,
     TurnEndResultHandler,
 )
@@ -667,7 +665,7 @@ def unit_destroyed_hook_bindings(
                 UnitDestroyedHookBinding(
                     hook_id=descriptor.hook_id(source),
                     source_id=descriptor.source_rule_id,
-                    handler=_unit_destroyed_handler_for_descriptor(source, descriptor),
+                    maintenance_handler=_unit_destroyed_handler_for_descriptor(source, descriptor),
                 )
             )
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
@@ -690,7 +688,7 @@ def turn_end_hook_bindings(
                 TurnEndHookBinding(
                     hook_id=descriptor.hook_id(source),
                     source_id=descriptor.source_rule_id,
-                    request_handler=_turn_end_request_handler_for_descriptor(
+                    candidate_handler=_turn_end_candidate_handler_for_descriptor(
                         source,
                         descriptor,
                     ),
@@ -720,9 +718,8 @@ def fight_phase_start_hook_bindings(
                 FightPhaseStartHookBinding(
                     hook_id=descriptor.hook_id(source),
                     source_id=descriptor.source_rule_id,
-                    request_handler=_fight_phase_start_request_handler_for_descriptor(
-                        source,
-                        descriptor,
+                    candidate_handler=_fight_phase_start_candidate_handler_for_descriptor(
+                        source, descriptor
                     ),
                     result_handler=_fight_phase_start_result_handler_for_descriptor(
                         source,
@@ -760,6 +757,7 @@ def attack_sequence_completed_hook_bindings(
                     hook_id=descriptor.hook_id(source),
                     source_id=descriptor.source_rule_id,
                     handler=descriptor.handler,
+                    candidate_handler=descriptor.candidate_handler,
                 )
             )
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
@@ -1025,19 +1023,14 @@ def _unit_destroyed_handler_for_descriptor(
     return handler
 
 
-def _turn_end_request_handler_for_descriptor(
+def _turn_end_candidate_handler_for_descriptor(
     source: GenericRuleAbilitySource,
     descriptor: GenericRuleTurnEndAbility,
-) -> TurnEndRequestHandler:
-    def handler(context: TurnEndRequestContext) -> DecisionRequest | None:
+) -> Callable[[TurnEndRequestContext], tuple[TimingRuleCandidate, ...]]:
+    def handler(context: TurnEndRequestContext) -> tuple[TimingRuleCandidate, ...]:
         if type(context) is not TurnEndRequestContext:
-            raise GameLifecycleError("Generic RuleIR turn-end request requires context.")
-        request = descriptor.request_builder(context, source)
-        if request is not None and type(request) is not DecisionRequest:
-            raise GameLifecycleError(
-                "Generic RuleIR turn-end request builder must return DecisionRequest or None."
-            )
-        return request
+            raise GameLifecycleError("Generic RuleIR turn-end discovery requires context.")
+        return descriptor.candidate_builder(context, source)
 
     return handler
 
@@ -1057,19 +1050,14 @@ def _turn_end_result_handler_for_descriptor(
     return handler
 
 
-def _fight_phase_start_request_handler_for_descriptor(
+def _fight_phase_start_candidate_handler_for_descriptor(
     source: GenericRuleAbilitySource,
     descriptor: GenericRuleFightPhaseStartAbility,
-) -> FightPhaseStartRequestHandler:
-    def handler(context: FightPhaseStartRequestContext) -> DecisionRequest | None:
+) -> Callable[[FightPhaseStartRequestContext], tuple[TimingRuleCandidate, ...]]:
+    def handler(context: FightPhaseStartRequestContext) -> tuple[TimingRuleCandidate, ...]:
         if type(context) is not FightPhaseStartRequestContext:
-            raise GameLifecycleError("Generic RuleIR fight-start request requires context.")
-        request = descriptor.request_builder(context, source)
-        if request is not None and type(request) is not DecisionRequest:
-            raise GameLifecycleError(
-                "Generic RuleIR fight-start request builder must return DecisionRequest or None."
-            )
-        return request
+            raise GameLifecycleError("Generic RuleIR fight-start discovery requires context.")
+        return descriptor.candidate_builder(context, source)
 
     return handler
 

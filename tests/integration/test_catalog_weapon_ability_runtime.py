@@ -45,6 +45,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_weapon_profile_modifier_bindings,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import (
@@ -97,7 +98,7 @@ def test_phase17k_named_weapon_ability_choice_records_and_modifies_profile() -> 
     )
     request = registry.next_request_for(request_context)
 
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -258,7 +259,7 @@ def test_phase17k_named_weapon_choice_uses_runtime_clause_scoped_records() -> No
     assert len(groups) == 1
     assert groups[0].record.record_id == clause_002_record.record_id
     assert groups[0].clause.clause_id == rule_ir.clauses[1].clause_id
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     request_payload = cast(dict[str, JsonValue], request.payload)
     assert request_payload["catalog_record_id"] == clause_002_record.record_id
     assert len(request.options) == 2
@@ -286,7 +287,7 @@ def test_phase17k_named_weapon_ability_choice_rejects_availability_drift() -> No
             army_catalog=package.army_catalog,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     result = DecisionResult.for_request(
         result_id="phase17k-named-weapon-choice-drift",
         request=request,
@@ -340,7 +341,7 @@ def test_phase17k_named_weapon_ability_choice_rejects_submission_drifts() -> Non
             army_catalog=package.army_catalog,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     selected_option = request.options[0]
 
     def apply(payload: JsonValue, selected_option_id: str = selected_option.option_id) -> object:

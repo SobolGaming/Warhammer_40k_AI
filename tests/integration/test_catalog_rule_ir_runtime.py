@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.fight_end_fixture_helpers import single_fight_end_request
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from tests.support.catalog_package_fixtures import (
     daemon_prince_unit,
@@ -84,6 +85,7 @@ from warhammer40k_core.engine.damage_allocation import (
     model_by_id,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -505,7 +507,7 @@ def test_phase17k_malefic_destruction_persists_generic_scoped_attacks_modifier()
     request = registry.next_request_for(
         FightPhaseStartRequestContext(state=state, decisions=decisions)
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     use_option = next(
         option
         for option in request.options
@@ -941,7 +943,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
     status = session.advance_until_decision_or_terminal()
     request = status.decision_request
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert request.decision_type == SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE
     assert request.actor_id == source_army.player_id
     actor_view = session.view(viewer_player_id=source_army.player_id)
@@ -1163,10 +1165,11 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
     )
 
     decisions = DecisionController()
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert request.actor_id == "player-source"
     assert len(request.options) == 1
     assert cast(dict[str, JsonValue], request.payload)["persisting_effect_ids"] == [
@@ -1260,10 +1263,10 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
         ),
     )
     assert (
-        runtime.next_fight_phase_end_request(
+        runtime.fight_phase_end_candidates(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
-        is not None
+        != ()
     )
     decisions.event_log.append(
         "model_destroyed",
@@ -1277,10 +1280,10 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
         ),
     )
     assert (
-        runtime.next_fight_phase_end_request(
+        runtime.fight_phase_end_candidates(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
-        is not None
+        != ()
     )
     decisions.event_log.append(
         "model_destroyed",
@@ -1293,10 +1296,10 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
         ),
     )
     assert (
-        runtime.next_fight_phase_end_request(
+        runtime.fight_phase_end_candidates(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
-        is None
+        == ()
     )
 
 
@@ -1314,10 +1317,11 @@ def test_daemonic_patrons_destruction_routes_optional_reactions_and_physical_uni
     state.record_model_destruction_reaction_sources(
         model_instance_id=model_id, sources=(reaction_source,)
     )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     decisions.request_decision(request)
     record = decisions.submit_result(
         DecisionResult.for_request(
@@ -1391,10 +1395,11 @@ def test_daemonic_patrons_deadly_demise_routes_mortal_wound_fnp_before_removal()
         sources=(FeelNoPainSource(source_id="test:deadly-demise:fnp-five", threshold=5),),
         decline_allowed=True,
     )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     decisions.request_decision(request)
     destruction_record = decisions.submit_result(
         DecisionResult.for_request(
@@ -1566,6 +1571,10 @@ def _pending_daemonic_patrons_fight_on_death_fixture(
     str,
 ]:
     state, _runtime, source, enemy, _profile = _daemonic_patrons_runtime_fixture(enemy_x=30.0)
+    # The first mandatory liability belongs to the active player under 01.03.
+    state.active_player_id = "player-enemy"
+    assert state.fight_phase_state is not None
+    state.fight_phase_state = replace(state.fight_phase_state, active_player_id="player-enemy")
     runtime = CatalogSelectedToFightRiskRuntime(
         {
             "player-source": AbilityCatalogIndex.from_records(
@@ -1632,10 +1641,11 @@ def _pending_daemonic_patrons_fight_on_death_fixture(
             decline_allowed=True,
             sources=(FeelNoPainSource(source_id="order-30-rule-fnp", threshold=6),),
         )
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.fight_phase_end_hook_bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert request.actor_id == "player-enemy"
     decisions.request_decision(request)
     destruction_record = decisions.submit_result(
@@ -1825,8 +1835,14 @@ def _install_daemonic_patrons_resume_runtime(
     session.lifecycle._charge_phase_handler = ChargePhaseHandler(
         ruleset_descriptor=config.ruleset_descriptor,
     )
+    from warhammer40k_core.engine.fight_phase_end_sequencing import fight_end_boundary_binding
+    from warhammer40k_core.engine.turn_end_hooks import TurnEndHookRegistry
+
     session.lifecycle._battle_round_flow = BattleRoundFlow(
         phase_handlers=session.lifecycle._phase_handlers(),
+        turn_end_hooks=TurnEndHookRegistry.from_bindings(
+            (fight_end_boundary_binding(fight_handler.fight_phase_end_hooks),)
+        ),
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
     )

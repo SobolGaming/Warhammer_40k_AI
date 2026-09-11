@@ -539,6 +539,9 @@ def _emit_damage_event(
         cause_id=destruction_cause.cause_id,
         model_destroyed_event=destroyed_event,
     )
+    from warhammer40k_core.engine.model_destruction_triggers import observe_model_destruction
+
+    observe_model_destruction(state=state, decisions=decisions, event=destroyed_event)
     return DestroyedModelEmission(
         damage_event_id=damage_event.event_id,
         model_destroyed_event_id=destroyed_event.event_id,

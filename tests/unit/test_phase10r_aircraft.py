@@ -8,6 +8,7 @@ from typing import cast
 
 import pytest
 from tests.movement_submission_helpers import (
+    core_movement_handler,
     submit_default_handler_movement_proposal_if_pending,
     submit_handler_movement_proposal,
 )
@@ -1150,7 +1151,7 @@ def test_aircraft_transition_reserve_state_is_required_next_controller_turn_only
     )
     reinforcement_decisions = DecisionController()
     reinforcement_request = _decision_request(
-        MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+        core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
             state=state,
             decisions=reinforcement_decisions,
         )
@@ -1510,7 +1511,7 @@ def _movement_action_request_for_unit(
         battle_round=state.battle_round,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE

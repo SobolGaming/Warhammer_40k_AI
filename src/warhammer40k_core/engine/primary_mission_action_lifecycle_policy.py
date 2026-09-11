@@ -812,20 +812,19 @@ def active_primary_mission_marker_ids_at_event(
     state: GameState,
     event: EventRecord,
     event_index_by_id: dict[str, int],
+    event_records: tuple[EventRecord, ...],
 ) -> tuple[str, ...]:
+    from warhammer40k_core.engine.primary_marker_history import primary_marker_removal_event_index
+
     event_order = event_index_by_id[event.event_id]
     active: list[str] = []
     for marker in state.primary_mission_progress_state.markers:
         creation_order = event_index_by_id.get(marker.source_event_id)
         if creation_order is None:
             raise GameLifecycleError("Primary Mission Action marker creation event is unknown.")
-        removal_order = (
-            None
-            if marker.removal_event_id is None
-            else event_index_by_id.get(marker.removal_event_id)
+        removal_order = primary_marker_removal_event_index(
+            marker=marker, event_records=event_records
         )
-        if marker.removal_event_id is not None and removal_order is None:
-            raise GameLifecycleError("Primary Mission Action marker removal event is unknown.")
         if creation_order >= event_order or (
             removal_order is not None and removal_order <= event_order
         ):

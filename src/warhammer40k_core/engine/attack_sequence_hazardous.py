@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.event_log import EventRecord
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -458,7 +460,7 @@ def _hazardous_roll_spec(
 def validate_pending_hazardous_mortal_wound_requests(
     *,
     state: GameState,
-    attack_sequence: AttackSequence | None,
+    event_records: tuple[EventRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
     for request in pending_decision_requests:
@@ -470,16 +472,9 @@ def validate_pending_hazardous_mortal_wound_requests(
             source_context.get("source_kind") != HAZARDOUS_SOURCE_KIND
         ):
             continue
-        if attack_sequence is None:
-            raise GameLifecycleError(
-                "Pending Hazardous mortal wounds require an active attack sequence."
-            )
-        validate_hazardous_mortal_wound_source_context(
-            state=state,
-            attack_sequence=attack_sequence,
-            source_context_payload=progress.source_context,
-            mortal_wounds=progress.mortal_wounds,
-        )
+        from warhammer40k_core.engine.hazardous_completion import hazardous_sequence_for_progress
+
+        hazardous_sequence_for_progress(state=state, event_records=event_records, progress=progress)
 
 
 def _hazardous_mortal_wounds_for_attacker(

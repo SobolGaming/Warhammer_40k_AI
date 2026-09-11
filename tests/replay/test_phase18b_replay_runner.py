@@ -210,7 +210,7 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v8-phase17n-step5a"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v9-sequencing"
 
 
 def test_replay_v8_round_trips_objective_control_record_boundary_authority() -> None:
@@ -755,7 +755,7 @@ def test_replay_v6_rejects_duplicate_destruction_completion_without_restore() ->
         ReplayArtifact.from_payload(payload)
 
     assert isinstance(exc_info.value.__cause__, GameLifecycleError)
-    assert "requires a living model transition" in str(exc_info.value.__cause__)
+    assert "must consume exactly one cause authority" in str(exc_info.value.__cause__)
 
 
 def test_replay_v6_rejects_unbacked_destroyed_departure_for_already_dead_model() -> None:
@@ -1108,7 +1108,7 @@ def test_replay_v6_accepts_attached_target_historical_rules_unit_destruction() -
     final_event_payload = cast(dict[str, JsonValue], model_destroyed_events[-1]["payload"])
 
     assert destruction["destroyed_unit_instance_id"] == "attached-unit:army-beta:target"
-    assert final_event_payload["target_unit_instance_id"] == ("attached-unit:army-beta:target")
+    assert final_event_payload["target_unit_instance_id"] == "army-beta:target-leader"
     assert len(cast(list[JsonValue], destruction["source_battlefield_departure_ids"])) == 6
     assert ReplayArtifact.from_payload(payload).to_payload() == payload
 
@@ -1288,7 +1288,7 @@ def test_replay_v6_rejects_destroyed_rules_unit_witness_identity_drift() -> None
         ReplayArtifact.from_payload(payload)
 
     assert isinstance(exc_info.value.__cause__, GameLifecycleError)
-    assert "destroyed witness component identity drift" in str(exc_info.value.__cause__)
+    assert "Model destruction cause consumed event drift" in str(exc_info.value.__cause__)
 
 
 def test_replay_v6_accepts_reserve_deadline_destruction_without_departure() -> None:
@@ -2397,7 +2397,24 @@ def _populated_primary_destruction_lifecycle(
                 )
             )
         )
-        lifecycle.decision_controller.event_log.append(
+        from warhammer40k_core.engine.battlefield_state import (
+            BattlefieldPlacementKind,
+            BattlefieldTransitionBatch,
+            ModelPlacementRecord,
+        )
+
+        transition = BattlefieldTransitionBatch(
+            placements=(
+                ModelPlacementRecord(
+                    model_instance_id=added_model_id,
+                    placement_kind=BattlefieldPlacementKind.SPLIT_UNIT,
+                    pose=Pose.at(24.0, 20.0, facing_degrees=180.0),
+                    source_phase=BattlePhase.MOVEMENT.value,
+                    source_rule_id="test:phase18b:materialization",
+                ),
+            )
+        )
+        materialization = lifecycle.decision_controller.event_log.append(
             CATALOG_MODELS_MATERIALIZED_EVENT,
             {
                 "game_id": state.game_id,
@@ -2412,7 +2429,17 @@ def _populated_primary_destruction_lifecycle(
                 "result_id": "phase18b-materialization-result",
                 "model_instance_ids": [added_model.model_instance_id],
                 "models": [added_model.to_payload()],
-                "transition_batch": {"placements": [], "removals": []},
+                "transition_batch": validate_json_value(transition.to_payload()),
+            },
+        )
+        lifecycle.decision_controller.event_log.append(
+            "battlefield_models_placed",
+            {
+                "game_id": state.game_id,
+                "source_event_id": materialization.event_id,
+                "source_unit_instance_id": leader.unit_instance_id,
+                "model_instance_ids": [added_model_id],
+                "transition_batch": validate_json_value(transition.to_payload()),
             },
         )
         units["target-leader"] = replacement_leader
@@ -2508,30 +2535,15 @@ def _record_primary_destruction_test_step(
             state=state,
             rules_unit_instance_id=target_rules_unit_id,
         )
-        battlefield = state.battlefield_state
-        assert battlefield is not None
-        _set_test_model_wounds_remaining(
+        from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+        model_destroyed_event = destroy_rule_model_for_fixture(
             state=state,
-            unit_instance_id=unit.unit_instance_id,
-            model_instance_ids=(model_id,),
-            wounds_remaining=0,
-        )
-        state.battlefield_state = battlefield.with_removed_models((model_id,))
-        model_destroyed_event = lifecycle.decision_controller.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": BattlePhase.MOVEMENT.value,
-                **attribution.to_payload(),
-                "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-                "destroyed_rules_unit_objective_proximity_witness": (
-                    destroyed_witness.to_payload()
-                ),
-                "target_unit_instance_id": target_rules_unit_id,
-                "model_instance_id": model_id,
-            },
+            decisions=lifecycle.decision_controller,
+            model_id=model_id,
+            destroying_player_id=attribution.destroying_player_id,
+            source_unit_id=attribution.source_rules_unit_instance_id,
+            source_model_id=attribution.source_model_instance_id,
         )
         departure_ids_before = tuple(
             value.departure_id for value in state.primary_battlefield_departure_states
@@ -2562,34 +2574,6 @@ def _record_primary_destruction_test_step(
         destructions.extend(occurrence_destructions)
     assert all(type(destruction) is PrimaryUnitDestructionState for destruction in destructions)
     return tuple(destructions)
-
-
-def _set_test_model_wounds_remaining(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-    model_instance_ids: tuple[str, ...],
-    wounds_remaining: int,
-) -> None:
-    requested_model_ids = set(model_instance_ids)
-    unit = next(
-        candidate
-        for army in state.army_definitions
-        for candidate in army.units
-        if candidate.unit_instance_id == unit_instance_id
-    )
-    _replace_test_unit(
-        state=state,
-        replacement=replace(
-            unit,
-            own_models=tuple(
-                replace(model, wounds_remaining=wounds_remaining)
-                if model.model_instance_id in requested_model_ids
-                else model
-                for model in unit.own_models
-            ),
-        ),
-    )
 
 
 def _replace_test_unit(*, state: GameState, replacement: UnitInstance) -> None:

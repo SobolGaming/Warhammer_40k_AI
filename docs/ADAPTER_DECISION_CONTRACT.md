@@ -154,7 +154,7 @@ Phase 17N Step 5B adds no new adapter-facing decision types, finite option
 families, proposal kinds, or payload shapes. Marker scoring consumes the
 Step 5A `PrimaryScoringStateEvidence` registry; public VP rows still expose
 only opaque evidence ID/hash commitments. Replay remains
-`replay-artifact-v8-phase17n-step5a`.
+`replay-artifact-v9-sequencing`.
 
 Phase 17N Step 5C adds no new adapter-facing decision types, finite option
 families, proposal kinds, or payload shapes. Completed-action scoring consumes
@@ -181,7 +181,7 @@ existing Step 4 choice family and Step 5A evidence registry through
 directions, for 90 independent cases. Public VP rows still expose only opaque
 evidence ID/hash commitments. Each case starts at an engine-owned
 fight-activation decision boundary, round-trips the existing
-`replay-artifact-v8-phase17n-step5a` payload, and requires exact `ReplayRunner`
+`replay-artifact-v9-sequencing` payload, and requires exact `ReplayRunner`
 reproduction of its decision and event histories through the ordinary scoring
 boundary. No replay schema or adapter submission contract changes.
 
@@ -192,7 +192,7 @@ turn-end awards and adds four finite Command-phase setup decisions:
 and Burden of Trust requests are owner-secret. Tempting Target is a public
 opponent choice. Tactical score/retain still uses
 `score_tactical_secondary_mission`. Replay remains
-`replay-artifact-v8-phase17n-step5a`. This does not claim Phase 17N overall
+`replay-artifact-v9-sequencing`. This does not claim Phase 17N overall
 complete or Phase 20A.
 
 The short rule:
@@ -669,7 +669,7 @@ reference server currently requires:
   `support-profile-v4-directed-primary` for viewer-scoped capability evidence
   whose public mission identity includes both assignments;
 - `physical-proposal-context-v2` for engine-owned physical proposal context;
-- `replay-artifact-v8-phase17n-step5a` for replay artifacts whose required source
+- `replay-artifact-v9-sequencing` for replay artifacts whose required source
   identity includes `ruleset_descriptor_hash`, `rules_overlay_ids`, and the
   atomic `mission_pack_id` / `mission_source_package_hash` pair, while the
   embedded mission setup includes both directed Primary Mission assignments,
@@ -679,6 +679,25 @@ reference server currently requires:
   destruction-history membership, and explicit
   logical terrain-area identities;
 - `error-envelope-v1` for typed transport errors.
+
+Order 36 makes the engine-private Primary commit identity
+`(objective_control_record_id, scoring_boundary_kind, scoring_player_id)`.
+`primary-scoring-state-evidence-v2` and `primary-scoring-boundary-lifecycle-v2`
+require `scoring_player_id`; their content hashes include it. A selected player's
+mission commits only that player's awards. The `primary_scoring_commit_checkpoint_recorded`
+event carries the same scoring-player ID. Its physical checkpoint retains the
+player turn's `player_id` and `active_player_id`; the commit event and evidence
+bind that physical snapshot to the scoring owner.
+Restore authenticates each owner's checkpoint and exact transaction inventory
+separately, including pending owners at a partially resolved boundary. Loaders
+reject the previous private schemas rather than inferring an owner. These
+records retain their existing replay-only visibility.
+The commit event also fixes the exact mission-history boundary. An Action may
+still be started when its owner chooses Primary scoring first; a later completion
+or Consecration choice does not rewrite that evidence. Restore authenticates
+those snapshots against the real mission events before the selected commit.
+Contract 15, replay v9 and operator persistence v7 reject older artifacts that
+cannot supply this authority; see `contracts/migrations/14-to-15.md`.
 
 Phase 18L adds no player-facing decision type, finite-option family, proposal
 kind, public response field, or visibility exception. It advances the additive
@@ -691,7 +710,7 @@ because `weapon_instance_id` is now required, and advances the persistence
 artifact because stored command envelopes and outcomes carry those new family
 identities. No Contract 10 shooting or persistence payload is reinterpreted.
 
-The Contract 11 replay loader accepts only `replay-artifact-v8-phase17n-step5a`;
+The Contract 11 replay loader accepts only `replay-artifact-v9-sequencing`;
 v7 artifacts require the retained 9.x deployment. It never infers directed
 Primary Mission assignments, grouped position history, destruction sources,
 battlefield departures, persistent markers, condemned selections,
@@ -947,22 +966,17 @@ before resumption. Once the outcome closes, the engine validates the retained ru
 a surviving placed Attached Unit may receive the ordinary Embark choice, while a destroyed or
 otherwise absent unit completes its activation without a stale Embark request.
 
-The same ordering applies when an immediate catalog selected-target effect resolves a
-Battle-shock test and opens a provider-owned decision. Post-shoot, Shooting-start, and Fight-start
-selections serialize `pending_catalog_selected_target_battle_shock_continuation` in authoritative
-`GameState`. It retains the exact original selection request/result, phase-specific final event,
-catalog/source/clause/target/effect identity, resolved prefix and remaining effects,
-Battle-shock/reroll identity, and provider queue-head claim. Adapters continue to answer only the
-existing provider decision: they must not reselect the target, execute later effects, or infer
-completion. After the provider chain closes, the engine authenticates history, records the
-resolved Battle-shock effect once, resumes the remainder, and emits one final selected-target
-event. If that retained remainder reaches another immediate Battle-shock effect with an available
-reroll, the parent enters `awaiting_remaining_battle_shock_reroll` and authenticates the existing
-`select_dice_reroll` request against the exact retained selection, resolved prefix, current effect,
-remaining suffix, and starting index. Reroll resolution either continues the suffix or replaces the
-parent with the later provider-owned outcome before any following effect executes. This adds no
-decision type, proposal kind, payload family, hidden-information branch, or adapter mutation path;
-it is persisted engine-owned continuation state within Contract 11.1.0.
+Catalog selected-target Battle-shock tests use the Order 36 batch contract. Post-shoot,
+Shooting-start, and Fight-start selections finish their own remaining clauses before newly
+triggered Battle-shock outcome rules are released. Internal rerolls retain the original selection,
+resolved prefix, current effect, remaining suffix and starting index in the existing
+`select_dice_reroll` source context. Internal mortal-wound allocation retains the same parent
+selection and prior effects through its allocation occurrence. These choices are validated before
+queue removal and survive checkpoint restore and exact replay. The original selected-target rule
+emits its final event once; subsequent outcome choices never reselect or reapply it. The shared
+trigger record binds each delayed occurrence to that source rule and its original timing batch.
+Outcome dice authority begins at the outcome rule's selected activation, so multiple deferred
+tests against one unit retain separate dice occurrences.
 
 Fall Back resolution and completion payloads now carry the stable source IDs
 `gw-11e-core-rules:movement-phase:selecting-modes` and
@@ -1022,6 +1036,11 @@ source-backed spend and unit effects before the follow-up movement resolution
 and carry the selected grant payload into the later `submit_movement_proposal`
 request when that action uses one. The engine still validates the movement
 proposal, mutates battlefield state, and consumes structured grant effects.
+The proposal context preserves `selected_movement_action_grant_hook_ids` and
+`selected_movement_action_grants`, including empty arrays when no grant was used.
+These are engine-owned source inventories, not adapter instructions to apply
+effects. The minimal live Normal Move contract example certifies the empty case;
+the general proposal context carries the selected source-linked grant payloads.
 Stale, malformed, wrong-context, or unavailable grant submissions are rejected
 before grant/spend mutation. Drukhari `Power from Pain: Lithe Agility` uses this
 same grant surface for Advance moves: accepting the engine-emitted option spends
@@ -1499,11 +1518,16 @@ adapter-visible projections or event deltas.
 Turn ordering is engine-owned and blocking. Locate and Deny drains before
 battle entry. Punishment drains after battle-round-start hooks and before the
 ordinary Command phase start windows/body. At a player-turn end, the engine
-records the authoritative turn-end objective-control boundary and resolves
-started Primary Actions before emitting a Step 4 turn-end request; completed
-Sensor Sweep removals have priority over Consecrate designations. Only one
-request is pending at a time, and the engine recomputes the next opportunity
-after each accepted result before it advances the turn. Surveil the Foe's
+records the authoritative turn-end objective-control boundary. Under Order 36,
+mission operations use the existing finite sequencing decision: each owner orders
+their eligible mandatory rules, then their optional rules, before the opponent's
+tiers. Started Actions complete through their selected source operation, including
+any Sensor Sweep choice required to finish that Action. Primary and Fixed
+Secondary scoring are mandatory; Consecrate and Tactical score/retain choices
+are optional. Source-defined grammar within one scoring rule remains intact.
+Only one request is pending at a time. The private pending Primary boundary
+window `mission_turn_end_rule_required` binds the exact sequencing, mission-choice
+or Tactical-score request through its `decision_requested` event. Surveil the Foe's
 move-triggered removal of opponent operation markers is automatic at the
 shared phase-flow boundary for each unprocessed completed-move event and is
 not an adapter submission.
@@ -1531,17 +1555,98 @@ Reaction windows that require a player choice emit an interrupt-style finite `De
 
 Adapters answer only by selecting one of the emitted option IDs. The reaction queue is lifecycle-persisted state and blocks parent phase execution until the engine records the `DecisionResult` through `GameLifecycle.submit_decision(...)` and emits `reaction_parent_resumed`. Adapters must not resume or mutate the parent phase themselves.
 
-Sequencing conflicts use the finite decision type `resolve_sequencing_order`. During battle, the acting player is the active player. Before or after the battle, or at the start or end of a battle round, the engine first resolves a Phase 10J roll-off and makes the roll-off winner the request actor. The default request shape enumerates deterministic complete participant orderings. A during-battle conflict may instead use `payload.sequencing_model: "select_next_participant"`; that bounded shape carries the immutable previously selected prefix and only the remaining participants, with one `next:<participant_id>` option per remaining participant. Adapters must select one emitted option and must not invent participant IDs, alter either prefix, or sort rule effects locally.
+Sequencing conflicts use the finite decision type `resolve_sequencing_order`.
+The 01.03–01.03.02 authority orders active mandatory, active optional, opposing
+mandatory and opposing optional rules. Each owner chooses inside their own tier.
+Participant records bind stable participant/source/owner IDs and an explicit
+`requirement` (`mandatory` or `optional`) and `origin` (`player` or `mission`).
+Unowned automatic mission participants use `player_id: null`, `origin: "mission"`
+and `requirement: "mandatory"`; the active player orders them before player rules.
+The pinned 07.02/07.03 exceptions put non-mission rules before mission rules at
+end of turn and end of battle round. The conflict payload's required
+`sequence_exception_source_id` is null for ordinary timing and the exact pinned
+exception ID at either exceptional boundary. `label` is presentation only; `secret`
+is an explicit visibility flag. Optional use/decline remains the selected rule's
+own finite choice and follows the same lifecycle submission path.
+
+Persisted timing batches use `payload.sequencing_model: "select_next_participant"`.
+Each `next:<participant_id>` option selects one eligible rule. Requests expose
+only the current tier and its previously completed prefix. The engine retains
+the complete original population, completed rules, selected continuation and
+newly triggered population internally. New rules enter a subsequent generation
+only after the original batch completes. Automatic single-candidate progress
+and rules made ineligible by earlier resolution retain internal transition
+records. A batch's selected rule must finish its nested resolution decisions
+before the next rule can be chosen.
+
+Cross-window trigger records retain typed source context and the exact parent
+batch and selected participant identities. Battle-shock outcomes, move completion
+and attack completion rules use this queue. Their source result or completion event
+must precede observation, and release requires completion of every original
+parent participant. Re-entry and checkpoint restore preserve that boundary.
+The source rule's remaining clauses finish before a newly triggered outcome
+begins; outcome Feel No Pain and healing decisions belong to that later rule.
+Runtime candidate discovery is rebuilt from the loaded source providers before
+an emitted outcome or move/attack-completion order is accepted. These records do not
+expose a new adapter submission or permit clients to release triggers.
+
+Move-completion batches combine source-owned mortal-wound rules, forced
+Battle-shock rules, eligible fall-back Stratagems and movement-end reactive moves.
+An optional rule's target choice and all its per-model rolls and damage allocation
+belong to one participant. Ordinary and reactive move events, Charge completion,
+reserve arrival and Disembark setup retain their exact source event and parent
+batch. A newly triggered move-completion rule waits for the original batch.
+The internal `after_unit_ends_move` timing kind is neutral with respect to rule
+ownership; existing Charge and setup trigger kinds remain source-specific.
+Reactive source authority is validated against the recorded finite decision or
+movement proposal. Stratagem requests within a sequencing batch additionally
+carry `timing_participant_id`; clients echo the selected pending option unchanged.
+
+Adapters must select one emitted option. They cannot edit a prefix, change an
+owner or requirement, supply new source IDs, choose a later tier, or reorder
+callbacks locally. Ordering history requires the original request, accepted
+DecisionRecord and matching selection event. Presentation changes do not change
+source identity; target availability is revalidated by the rule that owns it.
+The first-turn player is active between turns, including round boundaries;
+round boundaries do not imply a roll-off. A source-specific exception must be
+represented by its own pinned authority. Generic sequencing has no roll-off
+fields or dice-manager dependency. Redeploy follows first-turn authority; Scout
+alternation retains its separate source-authorized cursor.
+
+The engine captures a selected rule's pure finite request template. Discovery
+must not allocate request IDs, roll dice, emit events or mutate game state.
+Only activation materializes a request ID. Source, owner, tier, original
+population and trigger authority are revalidated before an order is accepted.
+Fight- and Shooting-start finite choices recheck the selected source's current
+options without activating another rule. Runtime phase subscriptions and native
+providers share their timing batch. End-of-round processing follows completion
+of turn-end rules and mission choices.
+
+`GameState.active_player_scopes` stores typed nested reactive-move, out-of-phase
+shooting and Fight selections with source rule, unit, player and accepted
+request/result IDs. Completing the selected move or attacks restores parent
+authority. Invalid movement retries retain the selected mover's authority.
+These are internal engine records, with shared viewer redaction for their
+authority events. They do not change the player whose turn it is.
+
+Secret sequencing requests and their DecisionRecords use the shared
+owner-scoped adapter redaction. Other tiers and their counts are not included
+in the chooser's request. `timing_batch_transition`,
+`sequencing_next_participant_selected`, `sequencing_order_resolved`,
+`rule_trigger_observed`, `rule_trigger_released` and `rule_trigger_completed`
+are internal authority events excluded from viewer event streams. Public accepted
+choices remain visible through their appropriately scoped DecisionRecords.
 
 Persisting effects are authoritative engine state, not adapter state. Effects target stable canonical unit IDs, remain associated with the original Attached Unit through component loss and while units Embark/Disembark, and expire at deterministic lifecycle boundaries. Adapter projections may display public effect payloads, but clients must not apply, transfer, or expire effects directly.
 
 Required Phase 12A adapter-contract tests:
 
 - reaction-window finite option round-trip and parent resume event;
-- sequencing finite option round-trip for active-player ordering;
-- sequencing roll-off ownership for start/end battle-round conflicts;
+- sequencing finite option round-trip for each owner and mandatory/optional tier;
+- first-turn active-player authority at start/end battle-round conflicts;
 - deterministic JSON-safe payload round-trip for reaction windows, sequencing decisions, and persisting effects;
-- viewer-scoped redaction tests for any future hidden reaction, sequencing, or persisting-effect payload.
+- viewer-scoped sequencing requests, DecisionRecords and internal batch events;
+- deferred generation, checkpoint continuation and forged ordering-history rejection.
 
 ## Phase 12 Stratagem Decisions
 
@@ -2496,7 +2601,7 @@ Phase 16B exposes these finite setup decisions:
 - `select_redeploy_unit`: finite player choice during setup step `redeploy_units`. The engine emits one deterministic `redeploy:<rules_unit_id>` option for each currently legal redeploy candidate and always includes `complete_redeploys`. A source-backed generic RuleIR permission may also emit `redeploy_to_strategic_reserves:<rules_unit_id>` for a permitted rules unit. Option payloads include submission kind, game ID, player ID, setup step, selected rules-unit ID when applicable, component/model IDs, owning deployment-zone IDs, source rule ID, action kind, proposal kind, Scout metadata when present, mission/deployment/terrain source IDs, ruleset descriptor hash, and `ignore_strategic_reserves_limit: true` only for an explicit cap-exempt RuleIR option. Adapters must select one pending option ID and must not synthesize redeploy targets, source permissions, or Strategic Reserves exemptions from visible battlefield state or rule display text.
 - `select_prebattle_action`: finite player choice during setup step `resolve_prebattle_actions`. The engine emits deterministic `scout_reserve_setup:<rules_unit_id>`, `scout_move:<rules_unit_id>`, and `dedicated_transport_scout_move:<transport_unit_id>` options when those branches are legal, plus `complete_prebattle_actions`. Adapters must not invent Scout options, promote an embarked unit outside the Dedicated Transport branch, or mutate cargo/reserve/battlefield state from option payloads.
 
-When both players have unresolved redeploy effects, the engine emits the Phase 12A finite `resolve_sequencing_order` request before `select_redeploy_unit`. That request uses a before-battle timing window and a deterministic roll-off to choose the deciding player. Scout and other `resolve_prebattle_actions` rules do not emit that generic sequencing request. The engine instead persists a `PreBattleAlternationCursor`, begins with the player who will take the first turn, advances after each resolved unit action, and skips only a player with no unresolved pre-battle rule. Lifecycle status exposes it at `prebattle_timing_state.alternation_cursor`, and serialized `GameState` exposes the same JSON-safe value at `prebattle_alternation_cursor`; adapters render the pending request for its engine-selected actor and must not sort, advance, reconstruct, or bypass the cursor locally.
+When both players have unresolved redeploy effects, the engine emits the Phase 12A finite `resolve_sequencing_order` request before `select_redeploy_unit`. That request uses the before-battle source timing window and first-turn authority, with each owner choosing within their current tier. It has no roll-off. Scout and other `resolve_prebattle_actions` rules do not emit that generic sequencing request. The engine instead persists a `PreBattleAlternationCursor`, begins with the player who will take the first turn, advances after each resolved unit action, and skips only a player with no unresolved pre-battle rule. Lifecycle status exposes it at `prebattle_timing_state.alternation_cursor`, and serialized `GameState` exposes the same JSON-safe value at `prebattle_alternation_cursor`; adapters render the pending request for its engine-selected actor and must not sort, advance, reconstruct, or bypass the cursor locally.
 
 Selecting a redeploy or Scout action records the finite `DecisionRecord`, emits the corresponding selection event, and emits one of these parameterized requests:
 
@@ -2747,6 +2852,19 @@ battle-use exhaustion, and both-player projection behavior.
 
 Phase 17G adds Fight-end decisions for faction and catalog runtime content. These decisions are emitted only when the current battle phase is Fight, the normal `FightPhaseState` is at the `end` step, and a registered Fight-end hook has at least one legal source-backed option. Current implemented hooks include Chaos Daemons Bloodthirster Relentless Carnage and Emperor's Children Flawless Blades Daemonic Patrons.
 
+Order 36 routes Fight-end sources through the shared `END_PHASE` timing batch,
+after the engine records phase-end objective control. The active and opposing
+players each order their mandatory and optional tiers through the common finite
+sequencing decision. Source discovery allocates no request IDs and rolls no dice.
+Relentless Carnage and catalog Fight-end movement are optional; accepted-grant
+liabilities, sticky objective effects and retained-model cleanup are mandatory.
+Retained cleanup belongs to the model's accepted source and uses the existing
+destruction continuation. A cleanup first triggered during another rule waits
+for that rule's original batch. Fight body completion leaves the end window open;
+`fight_phase_completed` is emitted once after the end rules finish. A finite
+Fight-end submission must match the selected batch participant and its current
+source request template before the queue is popped.
+
 Phase 17G exposes the finite decision type `select_faction_rule_fight_phase_end_option`. The pending request payload contains game ID, battle round, phase `fight`, active player ID, player ID, source rule ID, hook ID, source unit ID, source rules-unit ID, eligible enemy rules-unit IDs, and the decline option ID. Current Relentless Carnage options use the forms `chaos-daemons:bloodthirster:relentless-carnage:<source_rules_unit_instance_id>:decline` and `chaos-daemons:bloodthirster:relentless-carnage:<source_rules_unit_instance_id>:target:<target_enemy_unit_instance_id>`.
 
 Relentless Carnage accepts living or retained authority in its exact
@@ -2790,7 +2908,7 @@ Catalog Shooting-start selected-target requests reuse `select_faction_rule_shoot
 
 Accepted catalog Shooting-start selected-target choices persist engine-owned generic RuleIR effects with the source catalog/rule/clause identity and canonical selected rules-unit gate. The current generic grant-ability consumer can grant `stealth` through the end of the Shooting phase; the shared ranged hit-roll path resolves the attack target to its canonical rules-unit ID and consumes that one rules-unit effect as the ordinary Stealth hit modifier. Decline records resolution without creating an effect. Adapters must not grant Stealth or mutate hit rolls locally.
 
-Accepted Cabal attempts record the model and ritual attempt before the Psychic test, roll 2D6 or 3D6 when `channel_the_warp` is true, route Channel doubles/triples through the standard mortal-wound Feel No Pain continuation path, and resolve the ritual only if the manifesting model is not destroyed and the test meets the ritual warp charge. Destiny's Ruin records source-backed hit rerolls against the target, restricted to Hit rolls of 1 unless the Psychic test result reaches 10+. Twist of Fate records a phase-scoped weapon profile AP modifier of 1, or 2 on a 12+. Doombolt routes D3 mortal wounds, or D3+3 on an 11+, while excluding non-attached Lone Operative units more than 12" from the manifesting model. Temporal Surge records a turn-scoped charge-forbidden effect and emits a `submit_movement_proposal` request with proposal kind `surge_move`; the request carries the engine-rolled maximum move distance and adapters must answer with a `PathWitness`.
+Accepted Cabal attempts record the model and ritual attempt before the Psychic test, roll 2D6 or 3D6 when `channel_the_warp` is true, route Channel doubles/triples through the standard mortal-wound Feel No Pain continuation path, and resolve the ritual only if the manifesting model is not destroyed and the test meets the ritual warp charge. Destiny's Ruin records source-backed hit rerolls against the target, restricted to Hit rolls of 1 unless the Psychic test result reaches 10+. Twist of Fate records a phase-scoped weapon profile AP modifier of 1, or 2 on a 12+. Doombolt routes D3 mortal wounds, or D3+3 on an 11+, while excluding non-attached Lone Operative units more than 12" from the manifesting model. Temporal Surge records a turn-scoped charge-forbidden effect and uses the shared `select_triggered_movement` request for its selected ritual target. Choosing to move establishes active-player authority and emits `submit_movement_proposal` with proposal kind `surge_move`; choosing to decline ends the movement opportunity. The request carries the engine-rolled maximum move distance, and adapters must answer the proposal with a `PathWitness`. The charge restriction remains in either case.
 
 Malformed, stale, wrong-actor, wrong-game, wrong-round, wrong-phase, wrong-active-player, wrong-hook, unsupported-option, option-payload drift, already-marked Spotted target, already-used Observer, Battle-shocked Observer, FORTIFICATION Observer, ineligible-to-shoot Observer, duplicate Cabal model attempt, duplicate Cabal ritual attempt, destroyed or unplaced manifesting model, ineligible Temporal target in Engagement Range, Doombolt Lone Operative exclusion, non-visible target, catalog named-weapon target-model or weapon-profile availability drift, selected-target source/complete-rules-unit death or placement drift, keyword/range/visibility drift, and closed Shooting-start window submissions reject before mutation. Selected-target stale validation reconstructs the committed `selection_clause` and re-evaluates the canonical rules unit. Movement, placement changes, or destruction of one attached component do not invalidate a choice while another living component keeps the same rules unit legal; the choice becomes invalid when the complete rules unit is no longer eligible.
 
@@ -2814,7 +2932,7 @@ Required Phase 17G Shooting-start faction-rule tests:
 
 Phase 17K adds post-attack catalog RuleIR decisions for abilities that trigger in the Shooting phase after a model or unit has shot, enumerate enemy units hit by one or more of those attacks, and apply a phase-scoped status denial or generic source-backed RuleIR effect to the selected unit. The status-denial semantic IR shape is status-generic: parser output uses `SET_CONTEXTUAL_STATUS` with `operation: "deny"`, `status`, `status_label`, `target_scope`, and `rules_context: "status_denial"`. Runtime status consumers must be effect-specific until engine semantics exist for a status. Current runtime status support consumes only `status: "benefit_of_cover"` by denying Benefit of Cover.
 
-The finite decision type is `select_catalog_post_shoot_hit_target_status`. It is emitted from the attack-sequence-completed hook after a Shooting attack sequence, before the Shooting phase continues. If one completed attack sequence yields multiple mandatory source groups, the Shooting lifecycle keeps a deterministic pending completed-sequence continuation and emits one request per unresolved group until all groups for that completed attack-sequence event are resolved; only then may friendly/enemy "unit has shot" Stratagem windows and Shooting-end surge hooks proceed. The pending request actor is the attacking player. Request payloads include `submission_kind: "select_catalog_post_shoot_hit_target_status"`, `hook_id: "catalog-ir:post-shoot-hit-target-status"`, game ID, battle round, phase `shooting`, active player ID, player ID, catalog record ID, ability ID/name, source rule ID, RuleIR hash, source unit ID, source model ID when the source is model-scoped, clause ID, effect index, `status`, `status_label`, `operation: "deny"`, target scope, attack sequence ID, attack-sequence-completed event ID, a replay-safe attack-sequence payload, `available_target_unit_instance_ids`, and `available_post_shoot_hit_target_status_options`.
+The finite decision type is `select_catalog_post_shoot_hit_target_status`. It is emitted from the attack-sequence-completed hook after a Shooting attack sequence, before the Shooting phase continues. If one completed attack sequence yields multiple mandatory source groups, the Shooting lifecycle keeps a deterministic pending completed-sequence continuation and emits one request per unresolved group until all groups for that completed attack-sequence event are resolved; these groups share the same batch with friendly/enemy "unit has shot" Stratagems and Shooting-end surge rules, ordered by requirement tier and owner. The pending request actor is the attacking player. Request payloads include `submission_kind: "select_catalog_post_shoot_hit_target_status"`, `hook_id: "catalog-ir:post-shoot-hit-target-status"`, game ID, battle round, phase `shooting`, active player ID, player ID, catalog record ID, ability ID/name, source rule ID, RuleIR hash, source unit ID, source model ID when the source is model-scoped, clause ID, effect index, `status`, `status_label`, `operation: "deny"`, target scope, attack sequence ID, attack-sequence-completed event ID, a replay-safe attack-sequence payload, `available_target_unit_instance_ids`, and `available_post_shoot_hit_target_status_options`.
 
 Option payloads repeat the request context and include `selected_post_shoot_hit_target_status` with the selected option ID and target unit ID. Option IDs are deterministic over the catalog record, source unit/model, clause, effect index, selected target, and status. Hit-target discovery is based on successful hit events from the just-completed attack sequence; all misses produce no request, and a successful hit remains eligible even if the attack later fails to wound. Adapters must select one emitted option ID and must not infer hit targets from display text, event-log inspection, local attack simulation, wound success, damage, destruction, or target visibility.
 
@@ -2826,11 +2944,12 @@ When one completed attack sequence produces multiple generic post-shoot source
 groups, the engine first emits the existing finite `resolve_sequencing_order`
 decision. Its participants carry the complete attack-completion, attack-
 sequence, catalog-record, source-unit/model, selection-clause, effect-clause,
-and target-option identity. The active player selects one engine-emitted full
-ordering. The resulting `sequencing_order_resolved` event fixes that order for
-the completed-sequence continuation, including across nested Feel No Pain or
-Battle-shock reroll requests; only the next group in that persisted order may
-emit `select_catalog_post_shoot_hit_target_effect`.
+and target-option identity. Each owner selects one next rule from their eligible
+tier through `payload.sequencing_model: "select_next_participant"`. The selected
+rule finishes its own damage, Feel No Pain and Battle-shock reroll decisions
+before another original participant resolves. A new rule triggered by that
+resolution waits for the whole original batch. The engine persists these as
+separate source occurrences; completing one participant does not release them.
 
 Generic option payloads repeat the request context and include `selected_catalog_target_effect` with the selected option ID and canonical target rules-unit ID, plus `generic_rule_effect_records` containing the engine-prepared immediate or persisting `generic_rule_execution` effect payloads. Option IDs are deterministic over the catalog record, source unit/model, selection clause, canonical selected target, and attack-sequence-completed event. Hit-target discovery is based on successful hit events from the just-completed attack sequence. A model-scoped source may explicitly select from hits made by that model's complete attached rules unit; that scope is source-backed RuleIR and remains engine-enumerated. Adapters must select one emitted option ID and must not infer eligible targets from display text, event-log inspection, local attack simulation, wound success, damage, destruction, or target visibility.
 
@@ -3090,15 +3209,15 @@ Phase 17G also adds opt-in Command phase start decisions for faction runtime con
 
 On first entry to the later 08.03 Battle-shock step, the engine enumerates every living canonical rules unit owned by the active player, including units with no battlefield placement, and snapshots eligibility rather than future rolls. Each candidate row pins the canonical rules-unit ID, component unit IDs, whether the unit was Battle-shocked at the boundary, its exact eligibility reasons, forced-test provider rows, and its step-start strength context. A unit that satisfies more than one predicate still receives one required test, with a forced-below-Starting-Strength reason taking precedence when applicable. The public `battle_shock_step_snapshot_created` event pins the game, round, active player, Command phase, phase-start Battle-shocked canonical unit IDs, and that complete candidate inventory; it contains no precomputed `BattleShockTestRequest`. Order 23 (P01) applies the same required-test predicate to embarked and Strategic Reserve units: currently Battle-shocked or at/below Half-strength. Before the first test, the shared model-presence authority checks every required candidate; re-entry checks only the in-flight and remaining candidates. It accepts a whole living rules unit on the battlefield, wholly embarked, or wholly in reserves, using engine-owned cargo/reserve records and exact attached component membership. Unexplained absence or conflicting presence returns typed `unsupported` with source rule `gw-11e-core-rules:command-phase:battle-shock`, section `08.03`, canonical/component IDs, candidate reasons, and `unsupported_scope: "battle_shock_model_presence"`; the step remains unresolved. Immediately before rolling and before accepting a pending reroll, the same authority recomputes living model counts and Leadership. Historical validation uses authenticated physical rows at the request event, so later arrival, disembarkation or destruction cannot substitute current placement for prior strength. Off-battlefield Battle-shock never creates geometry or changes embarkation/reserve membership. Existing finite sequencing, reroll submissions, public Battle-shock event payloads and viewer rules apply unchanged; no new decision or proposal family is added.
 
-When two or more candidates require tests, 08.03 reuses finite decision type `resolve_sequencing_order` with `payload.sequencing_model: "select_next_participant"`. The request actor is the active player. Each participant ID is `command-battle-shock-test:<canonical_rules_unit_id>`, its public payload is the exact candidate snapshot row, and each request emits exactly one `next:<participant_id>` option per remaining candidate. The payload pins `previously_selected_participant_ids`; every option pins that same prefix, the complete current `remaining_participant_ids`, and one selected participant. The timing descriptor is `command-battle-shock-test-order`, source rule `gw-11e-core-rules:command-phase:battle-shock`, phase `command`, source step `battle_shock`, and metadata `candidate_scope: "required_command_battle_shock_tests"`. After the selected candidate's complete result and any nested outcome continuation, the engine emits the next bounded request from current authority. The final sole remaining candidate is deterministic and needs no choice. Thus `N` candidates expose at most `N` options in one request and require `N-1` selections, never `N!` permutation options. Adapters submit one emitted next-participant option through `GameLifecycle.submit_decision(...)`; they must not sort unit IDs locally, invent an order, alter either participant prefix, or begin rolling an unselected candidate. Zero- and one-candidate cases require no sequencing choice.
+When two or more candidates require tests, 08.03 reuses finite decision type `resolve_sequencing_order` with `payload.sequencing_model: "select_next_participant"`. The request actor is the active player. Each participant ID is `command-battle-shock-test:<canonical_rules_unit_id>`, its public payload is the exact candidate snapshot row, and each request emits exactly one `next:<participant_id>` option per remaining candidate. The payload pins `previously_selected_participant_ids`; every option pins that same prefix, the complete current `remaining_participant_ids`, and one selected participant. The timing descriptor is `command-battle-shock-test-order`, source rule `gw-11e-core-rules:command-phase:battle-shock`, phase `command`, source step `battle_shock`, and metadata `candidate_scope: "required_command_battle_shock_tests"`. All required candidates form one immutable mandatory timing batch. After the selected candidate's complete result and internal reroll continuation, the engine emits the next bounded request from current authority. The conflict ID uses the shared `timing-batch:<command-battle-shock-order-id>:generation-0:tier-0` identity. The final sole remaining candidate is deterministic and needs no choice. Thus `N` candidates expose at most `N` options in one request and require `N-1` selections, never `N!` permutation options. Adapters submit one emitted next-participant option through `GameLifecycle.submit_decision(...)`; they must not sort unit IDs locally, invent an order, alter either participant prefix, or begin rolling an unselected candidate. Zero- and one-candidate cases require no sequencing choice.
 
-After each next-participant selection, the engine materializes that candidate's `BattleShockTestRequest` from current authoritative state immediately before rolling. Dice expression, Leadership, alive model composition, attached-unit identity, and strength context are therefore recomputed after every earlier result and outcome continuation. Only that current request is stored as `battle_shock_in_flight_test_request`, including across optional reroll or nested-decision pauses; future requests are not serialized. Completion clears the in-flight request and appends its deterministic request ID to the completed prefix before another candidate can be selected. A successful required test clears carried phase-start Battle-shock; a failed test preserves or applies it through the shared Battle-shock outcome path. Public event `battle_shock_modifier_applications_recorded` pins the same source-context fields and exact live request plus an ordered `battle_shock_modifier_applications` list. Each row contains the loaded producer `hook_id`, actual modifier `source_id`, and exact ordered serialized modifiers attributed to that producer/source pair; rows sort by `(hook_id, source_id)`, and modifier IDs are globally unique for the test. Each public `battle_shock_test_resolved` payload carries `state_update` plus `cleared_battle_shocked_unit_ids`; the public `battle_shock_step_completed` event pins the exact ordered completed request IDs and results. Restore validates every bounded selection request/event/record, selected and remaining prefixes, current in-flight request, completed prefix, dice, optional reroll, modifier source, resolved result, auto-pass, state update, and Command-step anchor. Adapters must not construct or alter the snapshot, accumulated sequencing prefix, live request, Attached Unit identity, dice, result, or Battle-shock mutation.
+After each next-participant selection, the engine materializes that candidate's `BattleShockTestRequest` from current authoritative state immediately before rolling. Dice expression, Leadership, alive model composition, attached-unit identity, and strength context are therefore recomputed after every earlier result and internal test continuation. Only that current request is stored as `battle_shock_in_flight_test_request`, including across optional reroll or nested-decision pauses; future requests are not serialized. Completion clears the in-flight request and appends its deterministic request ID to the completed prefix before another candidate can be selected. A successful required test clears carried phase-start Battle-shock; a failed test preserves or applies it through the shared Battle-shock outcome path. Public event `battle_shock_modifier_applications_recorded` pins the same source-context fields and exact live request plus an ordered `battle_shock_modifier_applications` list. Each row contains the loaded producer `hook_id`, actual modifier `source_id`, and exact ordered serialized modifiers attributed to that producer/source pair; rows sort by `(hook_id, source_id)`, and modifier IDs are globally unique for the test. Each public `battle_shock_test_resolved` payload carries `state_update` plus `cleared_battle_shocked_unit_ids`; the public `battle_shock_step_completed` event pins the exact ordered completed request IDs and results. Restore validates every bounded selection request/event/record, selected and remaining prefixes, current in-flight request, completed prefix, dice, optional reroll, modifier source, resolved result, auto-pass, state update, and Command-step anchor. Adapters must not construct or alter the snapshot, accumulated sequencing prefix, live request, Attached Unit identity, dice, result, or Battle-shock mutation.
 
 P19 preserves the original Attached Unit ID, `StartingStrengthRecord`, `StartingAttachedUnitRecord`, Battle-shock row, ReserveState, persisting effects, Action history, and adapter-visible identity until the last model that started in that rules unit is destroyed. Dead components remain in explicit immutable component lineage but contribute no living models, keywords, abilities, or battlefield placement. The obsolete `attached_rules_unit_split_reconciled`, `battle_shock_state_transferred_after_attached_unit_split`, and `reserve_state_transferred_after_attached_unit_split` events are not emitted and are rejected by restore paths that own those histories. Adapters must not derive component survivors, invent component state rows, rewrite the canonical ID, or locally transfer state. This changes no player-facing decision type, option family, proposal kind, payload visibility rule, or replay schema.
 
 An optional Battle-shock reroll continues to use finite decision type `select_dice_reroll` and its existing option IDs, but P08B extends `payload.battle_shock_context` with required fields `passed_state_policy` and `additional_modifier_applications`. The only policy tokens are `preserve` for forced tests whose success must not clear an existing status and `clear_if_step_start_shocked` for the required 08.03 Command-step test. `additional_modifier_applications` is a canonical sorted array of source-producer rows; each row contains exact `hook_id`, `source_id`, and a non-empty canonical `modifiers` array using the existing `RollModifier` payload. An empty array is required when the source producer contributes no modifier outside the loaded Battle-shock hook registry. The context also carries the source kind, game/round/phase/active-player identity, exact Battle-shock request and initial roll state, phase-start Battle-shocked unit IDs, resolved-event types, and base result payload. Adapters must submit one emitted reroll option without changing any context field or nested application/modifier row. Before queue pop or `DecisionRecord` creation, lifecycle validation requires the exact source occurrence, loaded provider and permission, request semantics, initial roll, base payload, resolved-event inventory, and complete modifier applications. Command additionally requires the Battle-shock step, exact persisted in-flight request, ordered candidate identity, and exact completed-result prefix. Malformed, stale, reordered, omitted, inserted, or drifted context returns a typed invalid status without consuming the pending request or mutating Battle-shock.
 
-After a required test resolves, an outcome hook may enqueue an existing nested decision such as Healing Wounds model selection or revival placement. That queue head preempts the next ordered candidate: Command records the completed-test prefix, returns the exact nested pending request, and does not materialize or roll the next required test until the nested path finishes through its own lifecycle contract. Adapters must answer the pending queue head and must not reorder a Battle-shock reroll behind it or locally resume the Command loop.
+After a required test resolves, its newly triggered outcome rules are observed with the selected test and original required-test batch as parent authority. They release only after every original required test, including any internal reroll, has completed. Outcome choices such as Healing Wounds model selection or revival placement then use their existing lifecycle contract before the phase can advance. Adapters must answer the pending queue head and cannot release deferred rules or locally resume the Command loop.
 
 The existing `select_faction_rule_command_phase_start_option` decision type, option IDs, payload shapes, validation path, and viewer-visibility behavior are unchanged. The current implemented hooks include Space Marines Oath of Moment, Necrons Reanimation Protocols, Orks Waaagh!, Astra Militarum Voice of Command, Imperial Knights Bondsman, Tyranids Shadow in the Warp, and the generic `catalog-ir:command-phase-ability-mode` consumer.
 
@@ -3318,7 +3437,10 @@ IDs, destroyed-position event payload, phase, roll gate, placement anchor and
 preference, restore mode, and consumed key. The engine does not set the model or
 unit back up when the destruction event occurs.
 
-At the end of the same phase, the engine rolls the configured D6 gate. Failed
+At the end of the same phase, the source joins its owner's mandatory tier in the
+shared `END_PHASE` batch. Catalog capture discovery is pure; the selected rule
+records its pending occurrence and rolls the configured D6 gate. The pending
+record and placement continuation retain the same participant identity. Failed
 rolls resolve the pending record without restoring anything. Successful rolls
 emit the parameterized decision type `submit_return_on_death_placement` with one
 fixed `submit_parameterized_payload` option. The request payload contains
@@ -4388,7 +4510,7 @@ agreement before the transport registers the recovered session. The transport
 must not deserialize `GameLifecycle` directly or partially continue after a
 failed check.
 
-Contract 10 replay uses `replay-artifact-v8-phase17n-step5a`. It preserves a
+Contract 10 replay uses `replay-artifact-v9-sequencing`. It preserves a
 pending `select_primary_mission_choice` request, deterministic finite option
 IDs/payloads, the complete `primary_mission_progress_state`, the mandatory
 `primary_scoring_state_evidence_records`, and the linked decision, Action,
@@ -5213,3 +5335,134 @@ proposal kind, or mutation bypass is added. Existing casualty, retained-destruct
 healing and split submissions still use the common lifecycle decision path.
 See [Contract 12 to 13](../contracts/migrations/12-to-13.md) for family versions and
 checkpoint compatibility.
+
+Order 36 records each actual model destruction beside its consumed destruction-cause
+source event. These internal `model_destruction` triggers retain their source phase,
+turn player, active-player observation and selected parent timing participant.
+Unit-destruction abilities use the shared owner/tier batch; a child occurrence
+waits for the entire original parent batch. Internal attack allocation and retained
+physical destruction continuations keep their existing decision owners.
+
+Primary departure/destruction evidence, tracked-target expiration, first-death
+return capture and existing source condition records are occurrence bookkeeping.
+They cannot queue player choices. Miracle dice, Pain tokens, catalog CP gains,
+Cult Ambush use/decline, and tracked-target reselection are separate source-owned
+rules. Reselection is mandatory for the currently supported source grammar; each
+request and option retains `destroyed_trigger_event_id` and
+`expired_tracked_target_record_id`. Only one selected rule's choice is pending at
+a time. Discovery allocates no request IDs, rolls no dice and mutates no state.
+First-death return rolls and placement remain in the later shared `END_PHASE`
+batch. Trigger and bookkeeping records use the existing shared internal-event
+redaction and do not perturb the deterministic dice seed stream.
+
+Order 36 also records selected-unit active-player scopes for engine-enumerated
+Pile-in and Consolidate proposals, including Overrun Pile-ins. The scope retains
+the proposal owner's existing phase-step or activation source IDs, survives
+rejected-path retries, and ends only after the accepted movement completion.
+The player whose turn it is remains unchanged. Internal scope events remain
+redacted by the shared adapter module. Restores rebuild movement scope authority
+from the original proposal and completion event; attack scopes must agree with
+the current Fight/out-of-phase shooting continuation.
+
+Movement phase-end liabilities, selected-target abilities, setup responses and
+Core reactions share the phase-end batch. An owner's sequencing options can
+therefore include both Overwatch and Rapid Ingress; selecting an occurrence
+opens its existing parameterized proposal. Unsupported source shapes produce
+their typed diagnostic only when selected, without discovery-time mutation.
+
+Reanimation Protocols exposes one mandatory timing participant per eligible
+rules unit. Its finite activation request binds only that unit; model revival
+and placement remain internal choices within the selected activation. Voice of
+Command exposes one optional participant per issuing Officer. Request and option
+payloads bind `issuing_officer_unit_instance_id`, and declining further Orders
+records completion for that Officer only. Other Officers remain eligible for
+ordering alongside other Command-start rules. These choices use the existing
+finite decision families and engine-owned validation and mutation path.
+
+Order 36 move-completion sequencing also admits the source-owned Cult Ambush
+marker-removal occurrence and the moving player's Surveil mission-rule
+occurrence. Their existing removal event payloads remain engine-owned. Fight
+movement, Heroic Intervention and catalog reactive Charge record internal
+trigger observations at completion, so newly triggered rules can wait for their
+parent batch. The runtime bundle summary includes `move_completion_rule_hook_ids`
+for these loaded source bindings. Sequencing submission and restoration rebuild
+pending boundary candidates from the loaded bundle before accepting their
+source, owner, requirement tier and initial population.
+
+Move-start target-pair rules use the existing finite sequencing and catalog
+movement-target-pair submissions. The typed timing trigger
+`before_unit_starts_move` binds a batch to the selected movement action result;
+its descriptor metadata carries the complete `PendingMovementActionSelection`.
+Discovery does not allocate requests or change game state. A chosen source's
+existing use/decline and target-pair decision completes before another source
+is selected. Loaded order validation reconstructs the selected action and
+source candidates before submission or checkpoint restoration. This changes
+orchestration and timing metadata; it adds no separate adapter submission kind.
+
+Move-rule qualification emits internal `move_rule_candidates_observed` evidence
+immediately after the source move's `rule_trigger_observed` event. The record
+binds the source event, loaded hook identities, and source-owned participant
+payloads. Cult marker payloads retain exact marker objects and mover identity;
+Surveil payloads retain the objective-proximity witness and eligible marker IDs.
+Continuation providers bind this data to live engine mutation services. These
+records are hidden by the shared adapter redaction owner and are neutral to dice
+history; adapters never submit or execute their payloads.
+
+Captured move populations are reconstructed from source move endpoints and marker
+creation/removal history during continuation and checkpoint validation. Omitted or
+invented participants, altered marker sets, source/owner/tier drift, and changed
+proximity evidence reject. The marker's removal trigger remains provenance;
+historical eligibility uses the later removal mutation event when resolution was
+deferred. Move trigger context carries `triggering_player_id` independently of
+`turn_player_id`, including an opposing player's reserves arrival.
+
+Normal Move, Advance and Fall Back action submissions enter the start-rule batch
+before their movement roll or proposal. Catalog target-pair rules and movement
+grants share this batch. Each mandatory grant hook is a participant; alternative
+optional grants from one source remain that source's internal finite choice.
+The existing pending action retains the accepted action identity until all start
+rules complete, including across restoration. Grant requests and completion events
+bind `timing_participant_id` to the source action result and grant group. A stale
+grant template returns `movement_grant_source_request_drift` before recording a
+decision or spending resources. Selected grants accumulate across source rules and
+feed the existing movement proposal and mutation owner exactly once.
+
+Punishment's mandatory turn-start choice is a player-owned mission participant in
+the shared START_TURN batch. Discovery does not record an empty selection; a source
+with no legal candidates records its automatic empty result only when activated.
+
+Command-start finite choices are checked against the selected
+provider's current request template; friendly and enemy target semantics remain
+with that provider. A stale source request returns
+`command_start_source_request_drift` before recording a decision or changing state.
+These paths reuse existing finite and parameterized submission kinds.
+
+Hazardous is one mandatory participant owned by the attacking unit's player in
+the after-attacks batch. Its physical weapon rolls remain one rule resolution;
+the owner can order it with other mandatory rules such as Dark Pacts. Existing
+mortal-wound model and Feel No Pain choices continue the selected participant.
+Their source is the completed executor state and selected batch participant;
+`hazardous_authority_drift` rejects a stale source before recording the decision.
+The internal `attack_sequence_completion_state_recorded` event preserves the
+executor's final state, is excluded from viewer projections and event deltas by
+the shared redaction owner, and does not advance deterministic RNG history.
+Terminal damage decisions preserve pending completion work in ordinary Shooting,
+Fight and out-of-phase Shooting, just as uninterrupted executor completion does.
+
+Fall Back declaration retains the selected movement action while its start rules
+resolve. Source-owned Leadership denial tests are opposing mandatory participants;
+movement grants and each eligible Fall Back Stratagem use the same batch. A denied
+move completes its existing activation only after the batch finishes. Denial events
+bind the source effect, `movement_action_result_id` and `timing_participant_id`.
+Finite Stratagem requests from timing batches carry `timing_participant_id` alongside
+their existing `stratagem_context` and `finite` fields. Both use and decline validate
+the selected batch against loaded source candidates before recording a decision;
+drift returns `stratagem_timing_authority_drift`. Historical finite uses authenticate
+the same source, owner, context and selected participant through the original batch.
+
+
+Order 36 ordering choices for repeated once-per-battle abilities identify the
+source unit in their label and carry `source_unit_instance_id`,
+`source_rules_unit_instance_id`, and nullable `source_model_instance_id` in the
+participant payload. These fields distinguish copies of the same source rule;
+they use the existing JSON-safe participant payload and shared secrecy policy.

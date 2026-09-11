@@ -131,6 +131,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     TargetRestriction,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
@@ -655,6 +656,16 @@ def _shadow_legion_fight_dark_pact_abilities() -> tuple[
     )
 
 
+def _shadow_legion_dark_pact_completion_candidates(
+    context: AttackSequenceCompletedContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
+        completion_sequencing,
+    )
+
+    return completion_sequencing.candidates(context)
+
+
 def _resolve_shadow_legion_dark_pact_attack_sequence_completion(
     context: AttackSequenceCompletedContext,
 ) -> LifecycleStatus | None:
@@ -770,13 +781,17 @@ def _shadow_legion_fade_to_darkness_turn_end_hook_id(
     return _shadow_legion_enhancements().TURN_END_HOOK_ID
 
 
-def _shadow_legion_fade_to_darkness_turn_end_request(
+def _shadow_legion_fade_to_darkness_turn_end_candidates(
     context: TurnEndRequestContext,
     source: GenericRuleAbilitySource,
-) -> DecisionRequest | None:
+) -> tuple[TimingRuleCandidate, ...]:
+    from .faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (
+        turn_sequencing,
+    )
+
     if type(source) is not GenericRuleAbilitySource:
-        raise GameLifecycleError("Fade to Darkness turn-end request requires source.")
-    return _shadow_legion_enhancements().fade_to_darkness_turn_end_request(context)
+        raise GameLifecycleError("Turn-end candidates require source.")
+    return turn_sequencing.candidates(context)
 
 
 def _shadow_legion_fade_to_darkness_turn_end_result(
@@ -794,13 +809,17 @@ def _shadow_legion_malice_made_manifest_hook_id(source: GenericRuleAbilitySource
     return _shadow_legion_enhancements().MALICE_MADE_MANIFEST_HOOK_ID
 
 
-def _shadow_legion_malice_made_manifest_request(
+def _shadow_legion_malice_made_manifest_candidates(
     context: FightPhaseStartRequestContext,
     source: GenericRuleAbilitySource,
-) -> DecisionRequest | None:
+) -> tuple[TimingRuleCandidate, ...]:
+    from .faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (
+        fight_sequencing,
+    )
+
     if type(source) is not GenericRuleAbilitySource:
-        raise GameLifecycleError("Malice Made Manifest request requires source.")
-    return _shadow_legion_enhancements().malice_made_manifest_fight_phase_start_request(context)
+        raise GameLifecycleError("Malice Made Manifest candidates require source.")
+    return fight_sequencing.malice_made_manifest_candidates(context)
 
 
 def _shadow_legion_malice_made_manifest_result(
@@ -1334,6 +1353,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             source_rule_id=_SHADOW_LEGION_SOURCE_RULE_ID,
             hook_id_builder=_shadow_legion_dark_pact_completion_hook_id,
             handler=_resolve_shadow_legion_dark_pact_attack_sequence_completion,
+            candidate_handler=_shadow_legion_dark_pact_completion_candidates,
         ),
         *daemonic_incursion_attack_sequence_completed_abilities(),
     ),
@@ -1437,7 +1457,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             coverage_descriptor_id=shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID,
             source_rule_id=shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID,
             hook_id_builder=_shadow_legion_fade_to_darkness_turn_end_hook_id,
-            request_builder=_shadow_legion_fade_to_darkness_turn_end_request,
+            candidate_builder=_shadow_legion_fade_to_darkness_turn_end_candidates,
             result_builder=_shadow_legion_fade_to_darkness_turn_end_result,
         ),
         *aeldari_corsair_coterie_turn_end_abilities(),
@@ -1450,7 +1470,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             ),
             source_rule_id=shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
             hook_id_builder=_shadow_legion_malice_made_manifest_hook_id,
-            request_builder=_shadow_legion_malice_made_manifest_request,
+            candidate_builder=_shadow_legion_malice_made_manifest_candidates,
             result_builder=_shadow_legion_malice_made_manifest_result,
         ),
     ),

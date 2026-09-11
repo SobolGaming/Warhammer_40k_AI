@@ -52,7 +52,6 @@ from warhammer40k_core.engine.faction_content.common import (
     payload_object as _payload_object,
 )
 from warhammer40k_core.engine.fight_phase_start_hooks import (
-    SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
 )
@@ -93,8 +92,8 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
-    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndRequestContext,
     TurnEndResultContext,
 )
@@ -261,67 +260,18 @@ def mantle_of_gloom_objective_control_modifier(
 
 def malice_made_manifest_fight_phase_start_request(
     context: FightPhaseStartRequestContext,
-) -> DecisionRequest | None:
+) -> DecisionRequest | LifecycleStatus | None:
+    from warhammer40k_core.engine.phase_start_sequencing import resolve_phase_start_candidates
+
+    from .fight_sequencing import malice_made_manifest_candidates
+
     if type(context) is not FightPhaseStartRequestContext:
         raise GameLifecycleError("Malice Made Manifest requires a Fight-start context.")
-    if context.state.current_battle_phase is not BattlePhase.FIGHT:
-        return None
-    active_player_id = _active_player_id(context.state)
-    for army in _shadow_legion_armies(context.state):
-        for _assignment, unit in _assigned_units(
-            army,
-            enhancement_id=MALICE_MADE_MANIFEST_ENHANCEMENT_ID,
-        ):
-            if not _unit_has_keyword(unit, SHADOW_LEGION_KEYWORD):
-                raise GameLifecycleError("Malice Made Manifest requires a Shadow Legion model.")
-            bearer_rules_unit = rules_unit_view_by_id(
-                state=context.state,
-                unit_instance_id=unit.unit_instance_id,
-            )
-            if bearer_rules_unit.owner_player_id != army.player_id:
-                raise GameLifecycleError("Malice Made Manifest rules unit owner drift.")
-            if _malice_made_manifest_recorded_this_fight_start(
-                context=context,
-                bearer_rules_unit_instance_id=bearer_rules_unit.unit_instance_id,
-            ):
-                continue
-            eligible_enemy_unit_ids = _enemy_rules_unit_ids_within_engagement_range(
-                state=context.state,
-                bearer_unit_instance_id=unit.unit_instance_id,
-            )
-            if not eligible_enemy_unit_ids:
-                continue
-            return DecisionRequest(
-                request_id=context.state.next_decision_request_id(),
-                decision_type=SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
-                actor_id=army.player_id,
-                payload={
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": active_player_id,
-                    "phase": BattlePhase.FIGHT.value,
-                    "player_id": army.player_id,
-                    "source_rule_id": MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
-                    "hook_id": MALICE_MADE_MANIFEST_HOOK_ID,
-                    "enhancement_id": MALICE_MADE_MANIFEST_ENHANCEMENT_ID,
-                    "bearer_unit_instance_id": unit.unit_instance_id,
-                    "bearer_rules_unit_instance_id": bearer_rules_unit.unit_instance_id,
-                    "eligible_enemy_unit_instance_ids": list(eligible_enemy_unit_ids),
-                },
-                options=tuple(
-                    _malice_made_manifest_target_option(
-                        game_id=context.state.game_id,
-                        battle_round=context.state.battle_round,
-                        active_player_id=active_player_id,
-                        player_id=army.player_id,
-                        bearer_unit_instance_id=unit.unit_instance_id,
-                        bearer_rules_unit_instance_id=bearer_rules_unit.unit_instance_id,
-                        target_enemy_unit_instance_id=enemy_unit_id,
-                    )
-                    for enemy_unit_id in eligible_enemy_unit_ids
-                ),
-            )
-    return None
+    return resolve_phase_start_candidates(
+        state=context.state,
+        decisions=context.decisions,
+        discover=lambda: malice_made_manifest_candidates(context),
+    )
 
 
 def apply_malice_made_manifest_fight_phase_start_result(
@@ -522,61 +472,23 @@ def record_fade_to_darkness_destroyed_enemy_unit(context: UnitDestroyedContext) 
         return
 
 
-def fade_to_darkness_turn_end_request(context: TurnEndRequestContext) -> DecisionRequest | None:
+def fade_to_darkness_turn_end_request(
+    context: TurnEndRequestContext,
+) -> DecisionRequest | LifecycleStatus | None:
+    from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+
+    from .turn_sequencing import (
+        candidates,
+    )
+
     if type(context) is not TurnEndRequestContext:
-        raise GameLifecycleError("Fade to Darkness requires a turn-end request context.")
-    if context.completed_phase is not BattlePhase.FIGHT:
-        return None
-    active_player_id = _active_player_id(context.state)
-    for army in _shadow_legion_armies(context.state):
-        for _assignment, unit in _assigned_units(army, enhancement_id=ENHANCEMENT_ID):
-            destroyed_enemy_unit_ids = _destroyed_enemy_unit_ids_for_fade_unit(
-                context,
-                player_id=army.player_id,
-                unit_instance_id=unit.unit_instance_id,
-            )
-            if not destroyed_enemy_unit_ids:
-                continue
-            if _decision_recorded_this_phase(
-                context,
-                unit_instance_id=unit.unit_instance_id,
-            ):
-                continue
-            if not _unit_can_enter_strategic_reserves(
-                context.state,
-                unit_instance_id=unit.unit_instance_id,
-            ):
-                continue
-            return DecisionRequest(
-                request_id=context.state.next_decision_request_id(),
-                decision_type=SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-                actor_id=army.player_id,
-                payload={
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": active_player_id,
-                    "phase": context.completed_phase.value,
-                    "player_id": army.player_id,
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "hook_id": TURN_END_HOOK_ID,
-                    "enhancement_id": ENHANCEMENT_ID,
-                    "target_unit_instance_id": unit.unit_instance_id,
-                    "destroyed_enemy_unit_instance_ids": list(destroyed_enemy_unit_ids),
-                },
-                options=(
-                    _fade_to_darkness_option(
-                        player_id=army.player_id,
-                        unit_instance_id=unit.unit_instance_id,
-                        use_ability=True,
-                    ),
-                    _fade_to_darkness_option(
-                        player_id=army.player_id,
-                        unit_instance_id=unit.unit_instance_id,
-                        use_ability=False,
-                    ),
-                ),
-            )
-    return None
+        raise GameLifecycleError("End-rule request requires a turn-end request context.")
+    return resolve_boundary_candidates(
+        state=context.state,
+        decisions=context.decisions,
+        trigger_kind=TimingTriggerKind.END_TURN,
+        discover=lambda: candidates(context),
+    )
 
 
 def apply_fade_to_darkness_turn_end_result(context: TurnEndResultContext) -> bool:
@@ -659,7 +571,7 @@ def apply_fade_to_darkness_turn_end_result(context: TurnEndResultContext) -> boo
     return True
 
 
-def _fade_to_darkness_option(
+def fade_to_darkness_option(
     *,
     player_id: str,
     unit_instance_id: str,
@@ -681,7 +593,7 @@ def _fade_to_darkness_option(
     )
 
 
-def _malice_made_manifest_target_option(
+def malice_made_manifest_target_option(
     *,
     game_id: str,
     battle_round: int,
@@ -873,7 +785,7 @@ def _assigned_malice_made_manifest_unit_id_matches(
     )
 
 
-def _malice_made_manifest_recorded_this_fight_start(
+def malice_made_manifest_recorded_this_fight_start(
     *,
     context: FightPhaseStartRequestContext,
     bearer_rules_unit_instance_id: str,
@@ -1154,7 +1066,7 @@ def _destroyed_enemy_unit_ids_for_fade_unit(
     return tuple(sorted(destroyed_unit_ids))
 
 
-def _decision_recorded_this_phase(
+def decision_recorded_this_phase(
     context: TurnEndRequestContext,
     *,
     unit_instance_id: str,

@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 from typing import cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
 from tests.phase10p_reserves_helpers import (
     base_radius_inches,
     battle_state_with_reserve,
@@ -494,13 +495,8 @@ def test_soulstealer_heals_bearer_after_destroying_enemy_model_with_melee_attack
             "destroyed_model_rules_triggered": True,
         },
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": "player-a",
-            "attacking_unit_instance_id": bearer.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     roll_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
@@ -1656,7 +1652,7 @@ def test_realm_of_chaos_replay_rejects_arrival_route_contract_tamper(
         ("selection_authority", "reinforcement selection authority drift"),
         ("selection_event", "reinforcement selection event closure drift"),
         ("selection_order", "reinforcement selection ordering drift"),
-        ("arrival_order", "Reserve arrival decision ordering drift"),
+        ("arrival_order", "Move completion has no supported source event"),
     ],
 )
 def test_realm_of_chaos_replay_rejects_arrival_source_and_event_order_tamper(
@@ -1954,7 +1950,7 @@ def test_realm_reentry_rapid_ingress_binds_opponent_active_player() -> None:
         raise AssertionError("test requires one Rapid Ingress arrival/terminal pair")
     for event in matching_events:
         _json_object_for_test(event["payload"])["active_player_id"] = "player-a"
-    with pytest.raises(GameLifecycleError, match="Reserve arrival placement identity drift"):
+    with pytest.raises(GameLifecycleError, match="Move completion trigger source authority drift"):
         GameLifecycle.from_payload(forged_payload)
 
 
@@ -3716,6 +3712,20 @@ def _arrive_realm_target_from_reserves(
         ),
         result_id=f"{result_id_prefix}-place",
     )
+
+    from warhammer40k_core.engine.rule_trigger_runtime import advance_rule_triggers
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+
+    assert (
+        advance_rule_triggers(
+            state=state,
+            decisions=decisions,
+            runtime_bundle_provider=lifecycle._require_runtime_content_bundle,
+            shooting_handler_provider=lambda: lifecycle._shooting_phase_handler,
+        )
+        is None
+    )
+    assert not rule_trigger_history(decisions).ready()
 
 
 def _active_ingress_record(

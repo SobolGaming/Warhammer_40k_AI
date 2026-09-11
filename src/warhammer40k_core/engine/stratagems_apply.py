@@ -689,20 +689,27 @@ def apply_heroic_intervention_charge_move(
         state=state,
         unit_instance_id=resolution.unit_instance_id,
     ).unit_instance_id
-    decisions.event_log.append(
-        "heroic_intervention_charge_move_completed",
-        {
-            "game_id": state.game_id,
-            "player_id": use_record.player_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.CHARGE.value,
-            "unit_instance_id": moving_rules_unit_instance_id,
-            "stratagem_use": use_record.to_payload(),
-            "proposal_request_id": proposal_request.request_id,
-            "transition_batch": transition_batch.to_payload(),
-            "persisting_effect": effect.to_payload(),
-            **resolution.movement_payload,
-        },
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="heroic_intervention_charge_move_completed",
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "player_id": use_record.player_id,
+                "active_player_id": state.active_player_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "unit_instance_id": moving_rules_unit_instance_id,
+                "stratagem_use": use_record.to_payload(),
+                "proposal_request_id": proposal_request.request_id,
+                "transition_batch": transition_batch.to_payload(),
+                "persisting_effect": effect.to_payload(),
+                **resolution.movement_payload,
+            }
+        ),
     )
     return None
 

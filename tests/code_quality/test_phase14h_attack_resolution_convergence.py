@@ -96,7 +96,7 @@ PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS = {
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py",
 }
 PRIMARY_EVENT_DESTRUCTION_SHARED_OWNERS = {
-    "src/warhammer40k_core/engine/battle_round_flow.py",
+    "src/warhammer40k_core/engine/model_destruction_primary_events.py",
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py",
 }
 UNATTRIBUTED_PRIMARY_DESTRUCTION_CAUSES_BY_CALLER = {
@@ -308,6 +308,7 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
     assert {
         "finalize_attack_damage_model_destruction_cause",
         "consume_attack_damage_model_destruction_cause",
+        "observe_model_destruction",
     } <= calls_by_path["src/warhammer40k_core/engine/attack_sequence_hit_wound.py"]
     assert {
         "reserve_destroyed_attack_damage_authority",
@@ -320,6 +321,7 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
     assert {
         "record_mortal_wound_model_destruction_cause",
         "consume_mortal_wound_model_destruction_cause",
+        "observe_model_destruction",
     } <= calls_by_path["src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py"]
     assert {"_reserve_destruction_cause", "_append_model_destroyed"} <= calls_by_path[
         "src/warhammer40k_core/engine/rule_model_destruction.py"
@@ -328,6 +330,7 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
         "record_model_destruction_cause",
         "finalize_model_destruction_cause",
         "consume_model_destruction_cause",
+        "observe_model_destruction",
     } <= calls_by_path[MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH]
 
     attack_source = source_for(ROOT / "src/warhammer40k_core/engine/attack_sequence_hit_wound.py")
@@ -341,6 +344,13 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
     assert "append_rule_effect_model_destroyed_event as _append_model_destroyed" in rule_source
     assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in producer_source
     assert "-> ModelDestructionCauseAuthority" in producer_source
+    flow_source = source_for(ROOT / "src/warhammer40k_core/engine/battle_round_flow.py")
+    assert "_apply_phase_end_unit_destroyed_hooks" not in flow_source
+    assert "advance_model_destruction_triggers" in flow_source
+    registry_source = source_for(ROOT / "src/warhammer40k_core/engine/unit_destroyed_hooks.py")
+    assert "def candidates_for(" in registry_source
+    assert "binding.handler(context)" not in registry_source
+    assert "Occurrence maintenance cannot request player choices" in registry_source
 
 
 def test_primary_unit_destruction_tracking_covers_event_and_transition_owners() -> None:
@@ -545,17 +555,27 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     retention_source = source_for(SRC_ROOT / "engine" / "retained_destruction_cleanup.py")
     removal_source = source_for(SRC_ROOT / "engine" / "destruction_removal.py")
     assert "retained_destructions(state=state)" in fight_on_death_source
-    assert "begin_retained_destruction_cleanup(" in battle_round_source
-    assert battle_round_source.index("retention_status = begin_retained_destruction_cleanup(") < (
-        battle_round_source.index("        _apply_phase_end_objective_control_hooks(")
-    )
+    # Phase-end cleanup is an owned mandatory rule in the shared timing batch.
+    # Its original physical-removal owner still resolves the selected continuation.
+    retained_boundary_source = source_for(SRC_ROOT / "engine" / "retained_phase_end_sequencing.py")
+    boundary_source = source_for(SRC_ROOT / "engine" / "boundary_rule_flow.py")
+    authority_source = source_for(SRC_ROOT / "engine" / "boundary_rule_authority.py")
+    assert "retained_phase_end_binding()" in boundary_source
+    assert "compose_core_end_rule_registry(" in battle_round_source
+    assert "compose_core_end_rule_registry(" in authority_source
+    assert "begin_retained_destruction_cleanup(" not in battle_round_source
+    assert "SequencingRequirement.MANDATORY" in retained_boundary_source
+    assert "player_id=record.placement.player_id" in retained_boundary_source
+    assert "start_retained_cleanup" in retained_boundary_source
+    assert "gw-11e-core-fight-on-death:fight-on-death" in retained_boundary_source
     assert "resolve_pending_attack_destruction_until_blocked(" in retention_source
     assert "resume_retained_rule_destruction(" in retention_source
     assert "battlefield.with_removed_models(" in removal_source
     assert "with_returned_model_placement(" not in fight_on_death_source
     assert "replace_battlefield_state(" not in fight_on_death_source
-    assert "record_primary_destroyed_model_departures(" in battle_round_source
-    assert "record_primary_unit_destruction_for_logical_completion(" in battle_round_source
+    primary_death_source = source_for(SRC_ROOT / "engine" / "model_destruction_primary_events.py")
+    assert "record_primary_destroyed_model_departures(" in primary_death_source
+    assert "record_primary_unit_destruction_for_logical_completion(" in primary_death_source
     assert "record_primary_unit_destructions_for_destroyed_models(" not in battle_round_source
     assert "PrimaryUnattributedDestructionCause.DESPERATE_ESCAPE" in fall_back_source
     assert "apply_reserve_destruction_to_battlefield(" in reserve_source

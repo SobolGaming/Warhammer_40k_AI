@@ -60,6 +60,9 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    consumed_model_destruction_cause_authority_for_event,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
     MortalWoundDestructionEvidence,
@@ -73,7 +76,6 @@ from warhammer40k_core.engine.movement_proposals import (
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
-    GameLifecycleStage,
     LifecycleStatus,
 )
 from warhammer40k_core.engine.return_placement_legality import (
@@ -84,9 +86,9 @@ from warhammer40k_core.engine.rule_model_destruction import (
     RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
 )
 from warhammer40k_core.engine.rules_units import (
-    rules_unit_view_by_id,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyError,
     rules_unit_coherency_result,
@@ -166,6 +168,7 @@ class CatalogModelMaterializationRuntime:
                 hook_id=CATALOG_IR_MODEL_MATERIALIZATION_CONSUMER_ID,
                 source_id=CATALOG_IR_MODEL_MATERIALIZATION_CONSUMER_ID,
                 handler=self.resolve_completed_attack_sequence,
+                candidate_handler=self.completion_candidates,
             ),
         )
 
@@ -208,132 +211,18 @@ class CatalogModelMaterializationRuntime:
         return tuple(sorted(sources, key=lambda source: source.source_key))
 
     def resolve_completed_attack_sequence(
-        self,
-        context: AttackSequenceCompletedContext,
+        self, context: AttackSequenceCompletedContext
     ) -> LifecycleStatus | None:
-        if type(context) is not AttackSequenceCompletedContext:
-            raise GameLifecycleError("Catalog materialization requires completion context.")
-        action_phase = context.source_phase
-        if context.attack_sequence.source_phase is not action_phase:
-            raise GameLifecycleError("Materialization attack action phase drift.")
-        parent_battle_phase = context.state.current_battle_phase
-        if parent_battle_phase is None:
-            raise GameLifecycleError("Materialization requires a current parent battle phase.")
-        sources = self.sources(armies=tuple(context.state.army_definitions))
-        for source in sources:
-            descriptor = source.materialization
-            if descriptor is None:
-                continue
-            destroyed_model_ids = _destroyed_model_ids_for_sequence(
-                context,
-                descriptor=descriptor,
-            )
-            source_destroyed_ids = tuple(
-                model_id
-                for model_id in destroyed_model_ids
-                if _destroyed_model_matches_source(
-                    state=context.state,
-                    source=source,
-                    descriptor=descriptor,
-                    model_instance_id=model_id,
-                )
-            )
-            if not source_destroyed_ids:
-                continue
-            rules_unit = rules_unit_view_by_id(
-                state=context.state,
-                unit_instance_id=source.source_unit_instance_id,
-            )
-            if not rules_unit.alive_models():
-                continue
-            for model_id in source_destroyed_ids:
-                roll_event = _roll_event_for(
-                    decisions=context.decisions,
-                    attack_sequence_id=context.attack_sequence.sequence_id,
-                    source=source,
-                    destroyed_model_instance_id=model_id,
-                )
-                if roll_event is None:
-                    roll = context.dice_manager.roll(
-                        DiceRollSpec(
-                            expression=DiceExpression(quantity=1, sides=6),
-                            reason=f"Model materialization for {model_id}",
-                            roll_type="catalog.model_materialization.trigger",
-                            actor_id=source.player_id,
-                        )
-                    )
-                    roll_event = context.decisions.event_log.append(
-                        CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT,
-                        validate_json_value(
-                            {
-                                "game_id": context.state.game_id,
-                                "battle_round": context.state.battle_round,
-                                "phase": parent_battle_phase.value,
-                                "action_phase": action_phase.value,
-                                "parent_battle_phase": parent_battle_phase.value,
-                                "attack_sequence_id": context.attack_sequence.sequence_id,
-                                "attack_sequence_completed_event_id": (
-                                    context.attack_sequence_completed_event_id
-                                ),
-                                "catalog_record_id": source.record.record_id,
-                                "clause_id": source.clause.clause_id,
-                                "source_rule_id": source.source_rule_id,
-                                "source_unit_instance_id": source.source_unit_instance_id,
-                                "destroyed_model_instance_id": model_id,
-                                "success_threshold": descriptor.success_threshold,
-                                "roll": roll.to_payload(),
-                                "successful": roll.current_total >= descriptor.success_threshold,
-                                "result_count": descriptor.result_count,
-                            }
-                        ),
-                    )
-                payload = _event_payload(roll_event.payload, "materialization roll")
-                if payload.get("successful") is not True:
-                    continue
-                if (
-                    _materialization_event_for_roll(
-                        decisions=context.decisions,
-                        roll_event_id=roll_event.event_id,
-                    )
-                    is not None
-                ):
-                    continue
-                request = _materialization_request(
-                    state=context.state,
-                    decisions=context.decisions,
-                    source=source,
-                    descriptor=descriptor,
-                    attack_sequence_id=context.attack_sequence.sequence_id,
-                    action_phase=action_phase,
-                    parent_battle_phase=parent_battle_phase,
-                    roll_event_id=roll_event.event_id,
-                    army_catalog=self.army_catalog,
-                )
-                return LifecycleStatus.waiting_for_decision(
-                    stage=GameLifecycleStage.BATTLE,
-                    decision_request=request,
-                    payload={
-                        "game_id": context.state.game_id,
-                        "phase": parent_battle_phase.value,
-                        "action_phase": action_phase.value,
-                        "parent_battle_phase": parent_battle_phase.value,
-                        "pending_request_id": request.request_id,
-                        "phase_body_status": "catalog_model_materialization_pending",
-                    },
-                )
-        _apply_available_datasheet_replacements(
-            state=context.state,
-            decisions=context.decisions,
-            army_catalog=self.army_catalog,
-            sources=sources,
-            affected_unit_instance_ids=_model_state_changed_unit_ids_for_sequence(context),
-            attack_sequence_id=context.attack_sequence.sequence_id,
-            action_phase=action_phase,
-            parent_battle_phase=parent_battle_phase,
-            source_step="after_attacking_unit_finished_attacks",
-            source_event_id=context.attack_sequence_completed_event_id,
-        )
-        return None
+        from warhammer40k_core.engine.catalog_materialization_sequencing import resolve
+
+        return resolve(self, context)
+
+    def completion_candidates(
+        self, context: AttackSequenceCompletedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_materialization_sequencing import candidates
+
+        return candidates(self, context)
 
     def reconcile_non_attack_model_destruction_events(
         self,
@@ -353,7 +242,7 @@ class CatalogModelMaterializationRuntime:
         replaced = False
         for record in decisions.event_log.records:
             if record.event_type == MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
-                payload = _event_payload(record.payload, "mortal wound destructions finalized")
+                payload = event_payload(record.payload, "mortal wound destructions finalized")
                 raw_evidence = payload.get("destruction_evidence")
                 if not isinstance(raw_evidence, dict):
                     raise GameLifecycleError("Mortal wound composition evidence is malformed.")
@@ -370,7 +259,7 @@ class CatalogModelMaterializationRuntime:
                     "physical_unit_instance_ids",
                 )
                 replaced = (
-                    _apply_available_datasheet_replacements(
+                    apply_available_datasheet_replacements(
                         state=state,
                         decisions=decisions,
                         army_catalog=self.army_catalog,
@@ -387,7 +276,7 @@ class CatalogModelMaterializationRuntime:
                 continue
             if record.event_type != "model_destroyed":
                 continue
-            payload = _event_payload(record.payload, "model destroyed")
+            payload = event_payload(record.payload, "model destroyed")
             if not _rule_model_destruction_is_finalized(
                 decisions=decisions,
                 model_destroyed_event_id=record.event_id,
@@ -421,15 +310,15 @@ class CatalogModelMaterializationRuntime:
                 )
             source_phase = _battle_phase(removal.source_phase)
             replaced = (
-                _apply_available_datasheet_replacements(
+                apply_available_datasheet_replacements(
                     state=state,
                     decisions=decisions,
                     army_catalog=self.army_catalog,
                     sources=sources,
                     affected_unit_instance_ids=(
-                        state.unit_instance_id_for_model(
-                            _payload_string(payload, "model_instance_id")
-                        ),
+                        consumed_model_destruction_cause_authority_for_event(
+                            state=state, event=record
+                        ).physical_unit_instance_id,
                     ),
                     attack_sequence_id=None,
                     action_phase=source_phase,
@@ -551,7 +440,7 @@ def apply_recorded_catalog_model_materialization_placement(
     return validated.transition_batch.placements
 
 
-def _materialization_request(
+def materialization_request(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -845,7 +734,7 @@ def _validate_authoritative_materialization_roll(
     )
     if len(matches) != 1 or matches[0].event_type != CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT:
         raise GameLifecycleError("Model materialization roll event identity drift.")
-    payload = _event_payload(matches[0].payload, "materialization roll")
+    payload = event_payload(matches[0].payload, "materialization roll")
     exact_fields: tuple[tuple[str, JsonValue], ...] = (
         ("game_id", state.game_id),
         ("battle_round", state.battle_round),
@@ -871,7 +760,7 @@ def _validate_authoritative_materialization_roll(
         "attack_sequence_completed"
     ):
         raise GameLifecycleError("Model materialization completion event identity drift.")
-    completion_payload = _event_payload(completion_matches[0].payload, "attack sequence completed")
+    completion_payload = event_payload(completion_matches[0].payload, "attack sequence completed")
     if completion_payload.get("sequence_id") != attack_sequence_id:
         raise GameLifecycleError("Model materialization completion sequence drift.")
     destroyed_model_instance_id = _payload_string(payload, "destroyed_model_instance_id")
@@ -881,7 +770,7 @@ def _validate_authoritative_materialization_roll(
         descriptor=descriptor,
     ):
         raise GameLifecycleError("Model materialization destruction evidence drift.")
-    if not _destroyed_model_matches_source(
+    if not destroyed_model_matches_source(
         state=state,
         source=source,
         descriptor=descriptor,
@@ -904,7 +793,31 @@ def _validate_authoritative_materialization_roll(
         raise GameLifecycleError("Model materialization successful roll result drift.")
 
 
-def _apply_available_datasheet_replacements(
+def datasheet_replacement_is_eligible(
+    *,
+    state: GameState,
+    source: CatalogMaterializationSource,
+    affected_unit_instance_ids: tuple[str, ...],
+) -> bool:
+    descriptor = source.replacement
+    if descriptor is None or source.source_unit_instance_id not in affected_unit_instance_ids:
+        return False
+    unit, _army = _unit_and_army_for_id(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=source.source_unit_instance_id,
+    )
+    return (
+        unit.datasheet_id != descriptor.replacement_datasheet_id
+        and any(model.is_alive for model in unit.own_models)
+        and not any(
+            model.is_alive
+            and model.model_profile_id in descriptor.required_absent_model_profile_ids
+            for model in unit.own_models
+        )
+    )
+
+
+def apply_available_datasheet_replacements(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -917,24 +830,15 @@ def _apply_available_datasheet_replacements(
     source_step: str,
     source_event_id: str,
 ) -> bool:
-    affected_unit_ids = set(affected_unit_instance_ids)
     replaced = False
     for source in sources:
         descriptor = source.replacement
         if descriptor is None:
             continue
-        unit, _army = _unit_and_army_for_id(
-            armies=tuple(state.army_definitions),
-            unit_instance_id=source.source_unit_instance_id,
-        )
-        if unit.unit_instance_id not in affected_unit_ids:
-            continue
-        if unit.datasheet_id == descriptor.replacement_datasheet_id:
-            continue
-        if any(
-            model.is_alive
-            and model.model_profile_id in descriptor.required_absent_model_profile_ids
-            for model in unit.own_models
+        if not datasheet_replacement_is_eligible(
+            state=state,
+            source=source,
+            affected_unit_instance_ids=affected_unit_instance_ids,
         ):
             continue
         replaced = (
@@ -1052,7 +956,7 @@ def _replace_unit_datasheet(
     return True
 
 
-def _destroyed_model_ids_for_sequence(
+def destroyed_model_ids_for_sequence(
     context: AttackSequenceCompletedContext,
     *,
     descriptor: MaterializeModelsDescriptor,
@@ -1070,6 +974,11 @@ def _destroyed_model_ids_for_sequence_events(
     attack_sequence_id: str,
     descriptor: MaterializeModelsDescriptor,
 ) -> tuple[str, ...]:
+    from warhammer40k_core.engine.catalog_materialization_destruction_history import (
+        validate_materialization_destruction_history,
+    )
+
+    validate_materialization_destruction_history(decisions.event_log.records)
     destroyed_ids: set[str] = set()
     for record in decisions.event_log.records:
         if record.event_type not in {
@@ -1079,7 +988,7 @@ def _destroyed_model_ids_for_sequence_events(
         }:
             continue
         if record.event_type == MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
-            payload = _event_payload(record.payload, record.event_type)
+            payload = event_payload(record.payload, record.event_type)
             raw_evidence = payload.get("destruction_evidence")
             if not isinstance(raw_evidence, dict):
                 raise GameLifecycleError("Mortal wound Split evidence is malformed.")
@@ -1095,7 +1004,7 @@ def _destroyed_model_ids_for_sequence_events(
                 continue
             destroyed_ids.update(_payload_string_tuple(payload, "destroyed_model_instance_ids"))
             continue
-        payload = _event_payload(record.payload, record.event_type)
+        payload = event_payload(record.payload, record.event_type)
         if record.event_type == "model_destroyed":
             if payload.get("sequence_id") != attack_sequence_id:
                 continue
@@ -1129,13 +1038,13 @@ def _destroyed_model_ids_for_sequence_events(
     return tuple(sorted(destroyed_ids))
 
 
-def _model_state_changed_unit_ids_for_sequence(
+def model_state_changed_unit_ids_for_sequence(
     context: AttackSequenceCompletedContext,
 ) -> tuple[str, ...]:
     unit_ids: set[str] = set()
     for record in context.decisions.event_log.records:
         if record.event_type == MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
-            payload = _event_payload(record.payload, "mortal wound destructions finalized")
+            payload = event_payload(record.payload, "mortal wound destructions finalized")
             source_context = payload.get("source_context")
             if not isinstance(source_context, dict):
                 raise GameLifecycleError("Mortal wound composition context is malformed.")
@@ -1144,16 +1053,19 @@ def _model_state_changed_unit_ids_for_sequence(
             unit_ids.update(_payload_string_tuple(payload, "physical_unit_instance_ids"))
             continue
         if record.event_type == "model_destroyed":
-            payload = _event_payload(record.payload, "model destroyed")
+            payload = event_payload(record.payload, "model destroyed")
             if payload.get("sequence_id") != context.attack_sequence.sequence_id:
                 continue
             ModelDestructionAttribution.from_model_destroyed_payload(payload)
-            model_id = _payload_string(payload, "model_instance_id")
-            unit_ids.add(context.state.unit_instance_id_for_model(model_id))
+            unit_ids.add(
+                consumed_model_destruction_cause_authority_for_event(
+                    state=context.state, event=record
+                ).physical_unit_instance_id
+            )
             continue
         if record.event_type != "hazardous_mortal_wounds_applied":
             continue
-        payload = _event_payload(record.payload, "hazardous mortal wounds applied")
+        payload = event_payload(record.payload, "hazardous mortal wounds applied")
         if payload.get("sequence_id") != context.attack_sequence.sequence_id:
             continue
         application = payload.get("mortal_wound_application")
@@ -1168,7 +1080,19 @@ def _model_state_changed_unit_ids_for_sequence(
             if damage.get("destroyed") is not True:
                 continue
             model_id = _payload_string(damage, "model_instance_id")
-            unit_ids.add(context.state.unit_instance_id_for_model(model_id))
+            authorities = {
+                consumed_model_destruction_cause_authority_for_event(
+                    state=context.state, event=event
+                ).physical_unit_instance_id
+                for event in context.decisions.event_log.records
+                if event.event_type == "model_destroyed"
+                and isinstance(event.payload, dict)
+                and event.payload.get("sequence_id") == context.attack_sequence.sequence_id
+                and event.payload.get("model_instance_id") == model_id
+            }
+            if len(authorities) != 1:
+                raise GameLifecycleError("Hazardous composition requires exact casualty ownership.")
+            unit_ids.update(authorities)
     return tuple(sorted(unit_ids))
 
 
@@ -1181,7 +1105,7 @@ def _rule_model_destruction_is_finalized(
     for record in decisions.event_log.records:
         if record.event_type != RULE_MODEL_DESTRUCTION_FINALIZED_EVENT:
             continue
-        payload = _event_payload(record.payload, "rule model destruction finalized")
+        payload = event_payload(record.payload, "rule model destruction finalized")
         if _payload_string(payload, "model_destroyed_event_id") == model_destroyed_event_id:
             matches.append(record)
     if len(matches) > 1:
@@ -1189,7 +1113,7 @@ def _rule_model_destruction_is_finalized(
     return bool(matches)
 
 
-def _destroyed_model_matches_source(
+def destroyed_model_matches_source(
     *,
     state: GameState,
     source: CatalogMaterializationSource,
@@ -1215,7 +1139,7 @@ def _destroyed_model_matches_source(
     )
 
 
-def _roll_event_for(
+def roll_event_for(
     *,
     decisions: DecisionController,
     attack_sequence_id: str,
@@ -1225,7 +1149,7 @@ def _roll_event_for(
     for record in decisions.event_log.records:
         if record.event_type != CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT:
             continue
-        payload = _event_payload(record.payload, "materialization roll")
+        payload = event_payload(record.payload, "materialization roll")
         if (
             payload.get("attack_sequence_id") == attack_sequence_id
             and payload.get("catalog_record_id") == source.record.record_id
@@ -1237,13 +1161,13 @@ def _roll_event_for(
     return None
 
 
-def _materialization_event_for_roll(
+def materialization_event_for_roll(
     *, decisions: DecisionController, roll_event_id: str
 ) -> EventRecord | None:
     for record in decisions.event_log.records:
         if record.event_type != CATALOG_MODELS_MATERIALIZED_EVENT:
             continue
-        payload = _event_payload(record.payload, "models materialized")
+        payload = event_payload(record.payload, "models materialized")
         transition = payload.get("transition_batch")
         if not isinstance(transition, dict):
             raise GameLifecycleError("Materialization transition batch is malformed.")
@@ -1401,7 +1325,7 @@ def _battle_phase(value: object) -> BattlePhase:
         raise GameLifecycleError("Model materialization source phase is unsupported.") from exc
 
 
-def _event_payload(payload: JsonValue, label: str) -> dict[str, JsonValue]:
+def event_payload(payload: JsonValue, label: str) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError(f"Catalog {label} event payload must be an object.")
     return payload

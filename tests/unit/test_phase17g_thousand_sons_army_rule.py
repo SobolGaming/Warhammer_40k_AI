@@ -280,6 +280,22 @@ def test_temporal_surge_requests_triggered_movement_and_forbids_charge() -> None
         )
     )
 
+    selection = status.decision_request
+    assert isinstance(selection, DecisionRequest)
+    assert selection.decision_type == "select_triggered_movement"
+    selected_unit = next(
+        option
+        for option in selection.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("unit_instance_id") == FRIENDLY_TARGET_ID
+    )
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-thousand-sons-temporal-select-move",
+            request=selection,
+            selected_option_id=selected_unit.option_id,
+        )
+    )
     proposal_request = _movement_request_from_status(status)
     proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
     assert proposal.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
