@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:be327324012fd71f514926f025ce746742f5981c475367de371819e96ae355bc",
-  "fingerprint": "be327324012fd71f514926f025ce746742f5981c475367de371819e96ae355bc",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c0beba12ada64bbc210848e9498695969d81b30381781e5ed9338783a92890c2",
+  "fingerprint": "c0beba12ada64bbc210848e9498695969d81b30381781e5ed9338783a92890c2",
   "resource_count": 2747,
   "resources": [
     {
@@ -610,9 +610,9 @@
       "sha256": "2ed18f33b24a78b60ce982535b00c441c601bd46834311e7d234bfb319899477"
     },
     {
-      "byte_length": 8032,
+      "byte_length": 9343,
       "path": "warhammer40k_core/engine/active_player_scope_history.py",
-      "sha256": "1b675119ab4601390b76c3e0e0cbe375562f7111238cf3af38512b8fd9e8a561"
+      "sha256": "25c45478fceef919b22162cd41e3051e23e66983c7c4d61da9a7a128f53c46a9"
     },
     {
       "byte_length": 9290,

@@ -19,9 +19,10 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 
 def validate_active_player_history(*, state: GameState, decisions: DecisionController) -> None:
-    """Prove suspended movement authority from accepted selection and completion records."""
+    """Prove the complete scope stack from accepted actions and movement history."""
     validate_scopes(state)
     active: list[ActivePlayerScope] = []
+    movement_start_indices: dict[ActivePlayerScope, int] = {}
     seen: set[tuple[ActivePlayerScopeKind, str]] = set()
     for index, event in enumerate(decisions.event_log.records):
         if event.event_type == "active_player_scope_started":
@@ -44,6 +45,7 @@ def validate_active_player_history(*, state: GameState, decisions: DecisionContr
                 validate_fight_move_selection(scope, decisions, index)
             seen.add(key)
             active.append(scope)
+            movement_start_indices[scope] = index
         elif event.event_type == "active_player_scope_completed":
             if not isinstance(event.payload, dict):
                 raise GameLifecycleError("Active-player completion requires an object.")
@@ -90,15 +92,19 @@ def validate_active_player_history(*, state: GameState, decisions: DecisionContr
     shooting = state.out_of_phase_shooting_state
     if shooting is not None and shooting.pending_completed_attack_sequence is None:
         expected_attack_scopes.append(shooting_scope(shooting))
-    actual_attack_scopes = tuple(
-        scope
-        for scope in state.active_player_scopes
-        if scope.kind in (ActivePlayerScopeKind.FIGHT, ActivePlayerScopeKind.OUT_OF_PHASE_SHOOT)
-    )
-    if set(expected_attack_scopes) != set(actual_attack_scopes) or len(
-        expected_attack_scopes
-    ) != len(actual_attack_scopes):
-        raise GameLifecycleError("Active-player attack scope differs from its selected action.")
+    # A family-by-family comparison loses movement/attack interleaving. Attack
+    # selections and movement starts share one authoritative event chronology.
+    ordered_scopes = [
+        *((movement_start_indices[scope], scope) for scope in active),
+        *((_attack_selection_index(scope, decisions), scope) for scope in expected_attack_scopes),
+    ]
+    ordered_scopes.sort(key=lambda entry: entry[0])
+    if len({index for index, _scope in ordered_scopes}) != len(ordered_scopes):
+        raise GameLifecycleError("Active-player actions have ambiguous selection order.")
+    if tuple(scope for _index, scope in ordered_scopes) != state.active_player_scopes:
+        raise GameLifecycleError(
+            "Active-player scope stack differs from authoritative action order."
+        )
     for request in decisions.queue.pending_requests:
         payload = request.payload
         if not isinstance(payload, dict):
@@ -178,3 +184,24 @@ def _validate_selection(scope: ActivePlayerScope, decisions: DecisionController)
     descriptor = source.get("descriptor")
     if not isinstance(descriptor, dict) or descriptor.get("source_rule_id") != scope.source_rule_id:
         raise GameLifecycleError("Active-player movement source authority drift.")
+
+
+def _attack_selection_index(scope: ActivePlayerScope, decisions: DecisionController) -> int:
+    records = tuple(
+        record
+        for record in decisions.records
+        if record.request.request_id == scope.selection_request_id
+        and record.result.result_id == scope.selection_result_id
+        and record.result.actor_id == scope.player_id
+    )
+    if len(records) != 1:
+        raise GameLifecycleError("Active-player attack requires its accepted selection.")
+    payload = records[0].to_payload()
+    indices = tuple(
+        index
+        for index, event in enumerate(decisions.event_log.records)
+        if event.event_type == "decision_recorded" and event.payload == payload
+    )
+    if len(indices) != 1:
+        raise GameLifecycleError("Active-player attack selection has no unique event authority.")
+    return indices[0]

@@ -1,6 +1,7 @@
 # Order 36 performance assessment
 
-All final uninstrumented samples and separate work profiles completed. The
+For the initial Order 36 publication (`57957112`), all final uninstrumented
+samples and separate work profiles completed. The
 unchanged Order 34 and Order 35 budgets pass. Initial retained identity-query and
 Rapid Ingress timing failures are preserved under `initial/`.
 
@@ -69,3 +70,35 @@ Full attached-declaration diagnostics remain incomplete as recorded in Order 34;
 attached selection does not replace that diagnostic. Complete-game performance
 is uncertified. No timeout became a rules answer, no budget was raised, and no
 Order 32 deferral was extended to Order 34's required gates.
+
+## R36-001 restoration correction
+
+`r36-001-restoration.json` compares the changed restoration validator with
+`57957112` on identical real retained-shooting state and decision/event history.
+Seven alternating base/head batches of 100 calls measured mean costs of 6.216 µs
+and 8.473 µs per call, respectively (+2.257 µs). Construction is excluded and
+recorded separately; both versions completed every call. The report embeds the
+exact measurement script, source/lock hashes and provisional host metadata.
+This measures only the validator, not complete checkpoint restoration or games.
+The base is a cost comparison, not an ordering-correctness oracle. The earlier
+Order 34/35 reports above remain evidence for their recorded runtime identity.
+
+The additional work is a decision/event scan for each live attack scope (at most
+one Fight and one out-of-phase shooting continuation), followed by sorting the
+small active stack. It adds no per-action mutation, geometry query or cache.
+The ordered-stack regressions and static audit run in the existing CI gates.
+
+To repeat this diagnostic from the repository root with the locked environment:
+
+```bash
+uv run --no-sync python - <<'PY'
+import json
+from pathlib import Path
+report = json.loads(Path("docs/performance/order36/r36-001-restoration.json").read_text())
+Path("/tmp/r36-001-measure.py").write_text(report["measurement_script"])
+PY
+PYTHONPATH=.:src uv run --no-sync python /tmp/r36-001-measure.py
+```
+
+Run without coverage, profiling or competing test workers. The command rewrites
+only its diagnostic report; it does not replace the versioned gameplay budgets.

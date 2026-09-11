@@ -938,3 +938,112 @@ def test_destruction_observation_cannot_be_delayed_or_omitted(case: str, message
     else:
         with pytest.raises(GameLifecycleError, match=message):
             observe_model_destruction(state=state, decisions=decisions, event=event)
+
+
+@pytest.mark.parametrize("move_first", [False, True])
+def test_r36_001_scope_history_preserves_movement_attack_interleaving(move_first: bool) -> None:
+    """Component history accepts either nesting direction but never an unordered union."""
+    from warhammer40k_core.engine.active_player_scope_history import validate_active_player_history
+    from warhammer40k_core.engine.active_player_scopes import begin_reactive_move
+    from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+    from warhammer40k_core.engine.decision_result import DecisionResult
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.phases.shooting_model import OutOfPhaseShootingState
+    from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
+    from warhammer40k_core.engine.triggered_movement import (
+        TriggeredMovementDescriptor,
+        TriggeredMovementEligibleUnit,
+        TriggeredMovementKind,
+        triggered_movement_unit_selection_request,
+    )
+
+    state, _, placements = _move_endpoint_fixture("movement_activation_completed")
+    unit = placements[0]
+    decisions = DecisionController()
+    descriptor = TriggeredMovementDescriptor(
+        movement_kind=TriggeredMovementKind.TRIGGERED,
+        source_rule_id="r36-001-move",
+        trigger_timing=ReactionWindow(
+            phase=BattlePhase.MOVEMENT, window_kind=ReactionWindowKind.RULE_TRIGGER
+        ),
+        max_distance_inches=3.0,
+        optional=True,
+    )
+    move = triggered_movement_unit_selection_request(
+        state=state,
+        player_id=unit.player_id,
+        descriptor=descriptor,
+        eligible_units=(
+            TriggeredMovementEligibleUnit(
+                unit_instance_id=unit.unit_instance_id,
+                hook_id="r36-001-move",
+                source_id=descriptor.source_rule_id,
+            ),
+        ),
+    )
+    attack = DecisionRequest(
+        request_id="r36-001-source-choice",
+        decision_type="r36-001-source-choice",
+        actor_id=unit.player_id,
+        payload={"source_rule_id": "r36-001-shoot"},
+        options=(
+            DecisionOption(
+                option_id="shoot",
+                label="Shoot",
+                payload={"unit_instance_id": unit.unit_instance_id},
+            ),
+        ),
+    )
+    for request in (move, attack) if move_first else (attack, move):
+        decisions.request_decision(request)
+        result = DecisionResult.for_request(
+            request=request,
+            result_id=f"{request.request_id}:result",
+            selected_option_id=f"{descriptor.movement_kind.value}:{unit.unit_instance_id}"
+            if request is move
+            else "shoot",
+        )
+        decisions.submit_result(result)
+        if request is move:
+            begin_reactive_move(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=unit.unit_instance_id,
+                source_rule_id=descriptor.source_rule_id,
+            )
+        else:
+            state.replace_out_of_phase_shooting_state(
+                OutOfPhaseShootingState(
+                    battle_round=state.battle_round,
+                    player_id=unit.player_id,
+                    parent_phase=BattlePhase.MOVEMENT,
+                    source_rule_id="r36-001-shoot",
+                    source_decision_request_id=request.request_id,
+                    source_decision_result_id=result.result_id,
+                    source_context={"source_rule_id": "r36-001-shoot"},
+                    selected_unit_instance_id=unit.unit_instance_id,
+                )
+            )
+    validate_active_player_history(state=state, decisions=decisions)
+    for corruption in ("missing_selection", "missing_event", "duplicate_event"):
+        history = decisions.to_payload()
+        selection = next(
+            row for row in history["records"] if row["request"]["request_id"] == attack.request_id
+        )
+        if corruption == "missing_selection":
+            selection["request"]["request_id"] = "missing-selection"
+            selection["result"]["request_id"] = "missing-selection"
+        elif corruption == "missing_event":
+            event = next(row for row in history["event_log"] if row["payload"] == selection)
+            event["event_type"] = "fixture_missing_selection_event"
+        invalid = DecisionController.from_payload(history)
+        if corruption == "duplicate_event":
+            from warhammer40k_core.engine.event_log import validate_json_value
+
+            invalid.event_log.append("decision_recorded", validate_json_value(selection))
+        with pytest.raises(GameLifecycleError, match=r"accepted selection|unique event authority"):
+            validate_active_player_history(state=state, decisions=invalid)
+    state.replace_active_player_scopes(tuple(reversed(state.active_player_scopes)))
+    with pytest.raises(GameLifecycleError, match=r"scope stack.*action order"):
+        validate_active_player_history(state=state, decisions=decisions)

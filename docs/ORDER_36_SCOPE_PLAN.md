@@ -129,14 +129,14 @@ four-tier/deferred-batch tests plus real movement and post-attack consumers.
 There is no claim that one end-to-end test executes that entire example with a
 newly playable post-shoot movement Stratagem. Load-only content remains load-only.
 
-## Validation record
+## Initial implementation validation record
 
 The focused migration failure list is clear, including retained-casualty owner
 choices, out-of-phase post-roll authority, deferred destruction, Fall Back,
 mission scoring, generated movement reactions, setup UI and replay. Ruff, mypy,
 Pyright and all 11 import-boundary contracts pass. Source and engine identity,
 generated contract and client checks, 342 live conformance assertions, five
-TypeScript unit tests and the installed-wheel smoke pass on the final runtime.
+TypeScript unit tests and the installed-wheel smoke pass on the initial published runtime (`57957112`).
 
 The previous complete behavioral run found two fixture errors (a missing typed
 movement ruleset and incomplete materialization transition evidence) and coverage
@@ -150,7 +150,7 @@ and work stealing. The CI-required serial macOS semantic audit also passed all
 fail-closed inventory check and pre-commit passed. No production code changed
 after the successful aggregate run started.
 
-The final runtime passes unchanged Order 34 and Order 35 component timing and work
+That initial runtime passes unchanged Order 34 and Order 35 component timing and work
 budgets. Initial failed measurements remain in the evidence. No complete-game
 certification is claimed.
 
@@ -159,3 +159,51 @@ refreshes incorporated documentation PRs #443–#450. The latest fetch and merge
 on 2026-09-11 included `f9f33e47`. These Track G surveys do not authorize new P01D
 content work.
 Branch: `codex/order-36-rules-sequencing`.
+
+## Review correction R36-001
+
+Review of `57957112` identified a violated P01D invariant: the persisted
+active-player stack must preserve authoritative nesting order. Comparing attack
+scopes as sets accepted an inverted Fight/shoot-on-death stack and changed the
+effective player before later completion failed. The owning restoration validator
+now merges accepted attack-selection event positions with live movement-start
+positions and compares the complete ordered stack. Missing or ambiguous attack
+selection authority fails closed. A search of the other active-player scope
+validators found no other unordered authority comparison.
+
+The real Unending Fidelity facade test rejects checkpoints with only the scope
+list reversed, for attached and unattached retained shooting, while unchanged
+checkpoints still restore and complete. Component tests cover movement before
+attack and attack before movement; a static audit prohibits unordered scope
+comparisons. Three existing executor fixtures now record their accepted attack
+selections before their declarations and resolutions. This correction changes one production module and
+adds no rules content, decision family, payload field or architecture boundary.
+Generated engine/contract identity artifacts were refreshed. The adapter contract
+clarifies the existing restoration requirement.
+
+The focused timing-authority/static suite passed 130 tests. Retained-shooting,
+adapter-phase and reactive-movement checks passed 132 tests before detecting the
+incomplete executor fixture; its corrected focused check then passed. The first
+complete coverage run passed 7,201 tests and failed three cases in two additional
+fixtures with the same omitted-selection defect (84.98% coverage). Those fixture
+cases and the earlier integration fixture now pass together (four cases), and
+the history component tests also reject missing selections and missing/duplicate
+selection events. The bounded restoration cost comparison is recorded in
+`performance/order36/README.md`. No production change followed the focused fix.
+
+The latest main fetch confirms `9fe32591` (documentation PR #451) is already
+included in the branch.
+
+Final behavioral validation passed all 7,204 tests at 85.01% coverage, using
+18 xdist workers with work stealing. No production code changed during or after
+that successful run. Existing behavioral files were extended; no test file was
+added, removed or renamed, and the exact eight-shard inventory check passes.
+
+The final code-quality suite passed 428 tests without coverage using 18 xdist
+workers and work stealing. The separate CI-required serial macOS semantic audit
+passed all 19 tests. Ruff check/format, mypy (2,941 files), Pyright, all 11 import
+contracts, pre-commit, source/build identity, external-contract compatibility
+against `9fe32591`, generated TypeScript checks, five TypeScript unit tests,
+342 live conformance assertions and the installed-wheel smoke all pass. The wheel
+contains the verified 2,747 runtime resources, 27 schemas and six validated request
+families. No required local gate remains failing.

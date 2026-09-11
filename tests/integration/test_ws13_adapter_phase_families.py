@@ -1593,25 +1593,6 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         pool_index=1,
         deferred_mortal_wounds=(deferred,),
     )
-    record_melee_declaration_for_executor_fixture(
-        state=state, decisions=lifecycle.decision_controller, sequence=sequence, result_id=result_id
-    )
-    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        ruleset_descriptor=_ruleset(),
-        attack_sequence=sequence,
-        already_allocated_model_ids=(),
-        dice_manager=DiceRollManager(
-            state.game_id,
-            event_log=lifecycle.decision_controller.event_log,
-        ),
-    )
-    request = _assert_request(
-        cast(LifecycleStatus, status),
-        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
-    )
-    assert remaining is not None
     policy = lifecycle.config.ruleset_descriptor.fight_policy
     fight_state = FightPhaseState.start(
         battle_round=state.battle_round,
@@ -1637,6 +1618,30 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         result_id="ws13-fight-mortal-wound-activation-result",
         interrupt_id="ws13-fight-mortal-wound-interrupt",
     )
+    from tests.completed_attack_fixture_helpers import record_fight_selection_for_executor_fixture
+
+    record_fight_selection_for_executor_fixture(
+        decisions=lifecycle.decision_controller, selection=activation
+    )
+    record_melee_declaration_for_executor_fixture(
+        state=state, decisions=lifecycle.decision_controller, sequence=sequence, result_id=result_id
+    )
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+    )
+    request = _assert_request(
+        cast(LifecycleStatus, status),
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
+    assert remaining is not None
     state.replace_fight_phase_state(
         fight_state.with_activation(activation)
         .with_active_activation(activation)

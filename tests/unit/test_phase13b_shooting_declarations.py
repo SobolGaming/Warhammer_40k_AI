@@ -2784,6 +2784,27 @@ def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
             ),
         ),
     )
+    source_request = DecisionRequest(
+        request_id="phase13d:out-of-phase-source-request",
+        decision_type="phase13d_fixture_shooting_source",
+        actor_id="player-b",
+        payload={"source_rule_id": "phase13d:out-of-phase-post-roll-pools"},
+        options=(
+            DecisionOption(
+                option_id=attacker.unit_instance_id,
+                label="Select fixture attacker",
+                payload={"unit_instance_id": attacker.unit_instance_id},
+            ),
+        ),
+    )
+    lifecycle.decision_controller.request_decision(source_request)
+    lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            request=source_request,
+            result_id="phase13d:out-of-phase-source-result",
+            selected_option_id=attacker.unit_instance_id,
+        )
+    )
     state.out_of_phase_shooting_state = OutOfPhaseShootingState(
         battle_round=state.battle_round,
         player_id="player-b",

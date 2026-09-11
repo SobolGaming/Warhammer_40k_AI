@@ -5362,7 +5362,11 @@ rejected-path retries, and ends only after the accepted movement completion.
 The player whose turn it is remains unchanged. Internal scope events remain
 redacted by the shared adapter module. Restores rebuild movement scope authority
 from the original proposal and completion event; attack scopes must agree with
-the current Fight/out-of-phase shooting continuation.
+the current Fight/out-of-phase shooting continuation and its accepted selection
+record. Restoration compares the complete ordered stack against their shared event
+chronology, including movement/attack interleaving; matching scope membership alone
+is insufficient (R36-001). This validation correction adds no payload fields or
+player-facing choice.
 
 Movement phase-end liabilities, selected-target abilities, setup responses and
 Core reactions share the phase-end batch. An owner's sequencing options can

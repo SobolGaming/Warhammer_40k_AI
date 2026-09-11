@@ -566,6 +566,7 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         attacks=attacks,
         damage_per_attack=damage_per_attack,
         placed_model_count=5,
+        select_attacker=True,
     )
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -587,22 +588,6 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     )
     assert context["context_kind"] == "fight_on_death_retention"
     assert attack_context["attack_index"] == expected_attack_index
-
-    fight_state = fixture.state.fight_phase_state
-    assert fight_state is not None
-    attacker_activation = FightActivationSelection(
-        player_id="player-b",
-        battle_round=fixture.state.battle_round,
-        unit_instance_id=fixture.enemy_one.unit_instance_id,
-        ordering_band=fight_state.current_ordering_band,
-        fight_type=fixture.state.runtime_ruleset_descriptor().fight_policy.fight_types[0],
-        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
-        request_id="request:malevolent-souls:attacker-activation",
-        result_id="result:malevolent-souls:attacker-activation",
-    )
-    fixture.state.replace_fight_phase_state(
-        fight_state.with_activation(attacker_activation).with_active_activation(attacker_activation)
-    )
 
     replayed = GameLifecycle.from_payload(
         battle_lifecycle_payload(
@@ -1526,6 +1511,7 @@ def _resolve_malevolent_attack(
     damage_per_attack: int | None = None,
     placed_model_count: int = 1,
     sustained_hits: bool = False,
+    select_attacker: bool = False,
 ) -> tuple[
     _RuntimeFixture,
     DecisionController,
@@ -1639,6 +1625,31 @@ def _resolve_malevolent_attack(
             )
         )
     decisions = DecisionController()
+    if select_attacker:
+        from tests.completed_attack_fixture_helpers import (
+            record_fight_selection_for_executor_fixture,
+        )
+
+        fight_state = fixture.state.fight_phase_state
+        assert fight_state is not None
+        attacker_activation = FightActivationSelection(
+            player_id="player-b",
+            battle_round=fixture.state.battle_round,
+            unit_instance_id=fixture.enemy_one.unit_instance_id,
+            ordering_band=fight_state.current_ordering_band,
+            fight_type=fixture.state.runtime_ruleset_descriptor().fight_policy.fight_types[0],
+            eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+            request_id="request:malevolent-souls:attacker-activation",
+            result_id="result:malevolent-souls:attacker-activation",
+        )
+        fixture.state.replace_fight_phase_state(
+            fight_state.with_activation(attacker_activation).with_active_activation(
+                attacker_activation
+            )
+        )
+        record_fight_selection_for_executor_fixture(
+            decisions=decisions, selection=attacker_activation
+        )
     if source_phase is BattlePhase.FIGHT:
         from tests.completed_attack_fixture_helpers import (
             record_melee_declaration_for_executor_fixture,

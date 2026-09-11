@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -639,8 +640,19 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         result_id="choose-fidelity-action",
         option_id=f"{source.source_id}:{action.value}",
     )
+    checked_scope_orders: set[tuple[str, ...]] = set()
     for _ in range(40):
         checkpoint = session.lifecycle.to_payload()
+        assert checkpoint["state"] is not None
+        scopes = checkpoint["state"]["active_player_scopes"]
+        if len(scopes) > 1:
+            # R36-001: restore must preserve the complete nesting order, including moves.
+            checked_scope_orders.add(tuple(scope["kind"] for scope in scopes))
+            forged = deepcopy(checkpoint)
+            assert forged["state"] is not None
+            forged["state"]["active_player_scopes"].reverse()
+            with pytest.raises(GameLifecycleError, match=r"scope stack.*action order"):
+                GameLifecycle.from_payload(forged)
         restored = GameLifecycle.from_payload(checkpoint)
         assert restored.to_payload() == checkpoint
         session = LocalGameSession(lifecycle=restored)
@@ -696,6 +708,8 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
             submit_fixture_request(session, request)
     else:
         raise AssertionError("Unending Fidelity attack did not complete.")
+    if action is RetainedAttackAction.SHOOT:
+        assert ("fight", "out_of_phase_shoot") in checked_scope_orders
     events = session.lifecycle.decision_controller.event_log.records
     participations = [
         event.payload

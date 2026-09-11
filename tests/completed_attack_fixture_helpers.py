@@ -15,12 +15,17 @@ from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionOption,
     DecisionRequest,
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightActivationSelection,
+)
 from warhammer40k_core.engine.game_state import GameState, RangedAttackHistoryRecord
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.weapon_declaration import (
@@ -402,3 +407,30 @@ def resolve_core_attack_completion_for_executor_fixture(
         if status is None or status.status_kind is not LifecycleStatusKind.ADVANCED:
             return status
     raise AssertionError("Core attack completion did not finish its deferred children")
+
+
+def record_fight_selection_for_executor_fixture(
+    *, decisions: DecisionController, selection: FightActivationSelection
+) -> None:
+    """Retain the accepted selection before an isolated melee executor runs."""
+    request = DecisionRequest(
+        request_id=selection.request_id,
+        decision_type=FIGHT_ACTIVATION_DECISION_TYPE,
+        actor_id=selection.player_id,
+        payload=validate_json_value(selection.to_payload()),
+        options=(
+            DecisionOption(
+                option_id=selection.unit_instance_id,
+                label="Select fixture attacker",
+                payload=validate_json_value(selection.to_payload()),
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(
+        DecisionResult.for_request(
+            request=request,
+            result_id=selection.result_id,
+            selected_option_id=selection.unit_instance_id,
+        )
+    )

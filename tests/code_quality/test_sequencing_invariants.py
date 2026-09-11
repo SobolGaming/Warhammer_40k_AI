@@ -99,3 +99,22 @@ def test_marker_history_uses_the_mutation_boundary_instead_of_the_deferred_trigg
             and node.func.id == "primary_marker_removal_event_index"
             for node in ast.walk(tree)
         ), filename
+
+
+def test_r36_001_scope_history_compares_the_complete_ordered_stack() -> None:
+    tree = ast.parse((ENGINE / "active_player_scope_history.py").read_text(encoding="utf-8"))
+    assert not any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in {"set", "frozenset"}
+        and any(isinstance(arg, ast.Name) and arg.id.endswith("scopes") for arg in node.args)
+        for node in ast.walk(tree)
+    ), "Active-player authority must preserve nesting order."
+    assert any(
+        isinstance(node, ast.Compare)
+        and any(
+            isinstance(value, ast.Attribute) and value.attr == "active_player_scopes"
+            for value in (node.left, *node.comparators)
+        )
+        for node in ast.walk(tree)
+    ), "Separate scope-family checks cannot establish movement/attack interleaving."
