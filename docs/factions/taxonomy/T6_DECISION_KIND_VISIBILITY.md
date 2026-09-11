@@ -1,6 +1,6 @@
 # T6 — Decision-kind and viewer-visibility demand
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md) · [Decision submission catalog](../../DECISION_SUBMISSION_CATALOG.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md) · [Decision submission catalog](../../DECISION_SUBMISSION_CATALOG.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [Track U packet schema](../updates/U_PACKET_SCHEMA.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T6. It is planning evidence delivered read-only to
 Track G's decision-kind and viewer-visibility work, and as a list of adapter

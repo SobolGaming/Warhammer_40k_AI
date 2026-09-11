@@ -1,0 +1,446 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "U3-packet-schema",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/updates/U_PACKET_SCHEMA.md",
+  "delivered_to": "FM0 U3 packet generator and Track D agent-contract rewrite (design only)",
+  "draft_of_track_d_item": "D3 packet half of FACTION_AGENT_IMPLEMENTATION_CONTRACT.md",
+  "does_not_edit_adapter_contract": true,
+  "does_not_rewrite_live_agent_contract": true,
+  "does_not_emit_packets": true,
+  "does_not_implement_generator": true,
+  "does_not_change_catalog_ids": true,
+  "owner_d3_retention_is_not_this_document": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "from_app_data_version": "931",
+    "to_app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "closed_axes": {
+    "packet_is_catalog_id_plus_source_entry_binding_plus_field_path": true,
+    "page_url_is_not_a_packet": true,
+    "python_scaffold_directory_is_not_a_packet": true,
+    "github_pr_is_not_a_packet": true,
+    "display_name_is_not_a_join_key": true,
+    "pr_group_does_not_widen_allowed_surfaces": true,
+    "faction_rewrite_does_not_suppress_child_packets": true,
+    "union_demotion_is_not_a_packet_merge": true,
+    "sibling_unclassified_forbids_layer_a_carry_forward": true,
+    "content_packet_must_not_edit_adapter_contract": true,
+    "family_packet_must_not_use_faction_catalog_id_as_identity": true,
+    "bare_clause_is_not_a_field_path": true
+  },
+  "origin_kinds": [
+    "update_classifier",
+    "certification_slice",
+    "generic_family_demand"
+  ],
+  "packet_kinds": [
+    "implementation",
+    "review",
+    "overlay",
+    "family_gap",
+    "observation_repin"
+  ],
+  "python_policies": [
+    "none",
+    "named_handler_justified",
+    "generic_family"
+  ],
+  "packet_identity_fields": [
+    "packet_id",
+    "origin_kind",
+    "packet_kind",
+    "python_policy",
+    "source_diff_row",
+    "layers_demoted",
+    "required_work",
+    "forbidden_work",
+    "allowed_surfaces",
+    "forbidden_surfaces",
+    "blocked_on",
+    "depends_on"
+  ],
+  "packet_id_hash_fields": [
+    "origin_kind",
+    "packet_kind",
+    "from_content_set",
+    "to_content_set",
+    "catalog_id",
+    "source_entry_binding",
+    "field_path",
+    "impact_class"
+  ],
+  "allowed_surfaces": [
+    "content_set_record",
+    "tombstone_record",
+    "observation_pin",
+    "review_record",
+    "status_claim",
+    "focused_test",
+    "named_handler_module",
+    "generic_family_module",
+    "adapter_contract_delta"
+  ],
+  "forbidden_surfaces_every_packet": [
+    "runtime_loader_lifecycle_bundle_manifest",
+    "generic_lifecycle_content_branching",
+    "adapter_contract_except_cited_family_gap",
+    "f00_policy",
+    "catalog_id_mint_from_display_name",
+    "army_list_id_rewrite",
+    "runtime_rule_text_parsing",
+    "live_python_scaffold_allowlist"
+  ],
+  "work_item_ids": [
+    "regenerate_cost_records",
+    "roster_validation",
+    "layer_a_carry_forward_review",
+    "layer_c_reattest",
+    "repin_observation",
+    "recorded_equivalence_review",
+    "remap_envelope",
+    "remap_effect_ir",
+    "recertify_l4_l8",
+    "human_attribution_review",
+    "admit_or_stage_record",
+    "ladder_l0_l8",
+    "write_tombstone",
+    "current_mustering_rejection",
+    "regenerate_attachment_or_keyword",
+    "fieldability_regression",
+    "regenerate_t4_constraints",
+    "mustering_regression",
+    "regenerate_composition_or_options",
+    "u6_rewrite_procedure"
+  ],
+  "named_handler_required_fields": [
+    "bespoke_subsystem_justification",
+    "source_and_execution_ids",
+    "lifecycle_loading_coverage",
+    "replay_audit_coverage",
+    "unsupported_invalid_diagnostics",
+    "handler_identity_drift_coverage",
+    "named_handler_budget_treatment"
+  ],
+  "impact_class_packet_map": [
+    {
+      "impact_class": "points_only",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "regenerate_cost_records",
+        "roster_validation",
+        "layer_a_carry_forward_review",
+        "layer_c_reattest"
+      ],
+      "sibling_unclassified_moves_to_forbidden": [
+        "layer_a_carry_forward_review"
+      ]
+    },
+    {
+      "impact_class": "text_hash_equal",
+      "packet_kind": "observation_repin",
+      "python_policy": "none",
+      "required_work": [
+        "repin_observation"
+      ]
+    },
+    {
+      "impact_class": "editorial_equivalent",
+      "packet_kind": "review",
+      "python_policy": "none",
+      "required_work": [
+        "recorded_equivalence_review",
+        "layer_c_reattest"
+      ]
+    },
+    {
+      "impact_class": "clause_envelope_changed",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "remap_envelope",
+        "recertify_l4_l8"
+      ]
+    },
+    {
+      "impact_class": "effect_ir_changed",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "remap_effect_ir",
+        "recertify_l4_l8"
+      ]
+    },
+    {
+      "impact_class": "unclassified_clause",
+      "packet_kind": "review",
+      "python_policy": "none",
+      "required_work": [
+        "human_attribution_review"
+      ],
+      "forbidden_work": [
+        "layer_a_carry_forward_review",
+        "remap_envelope",
+        "remap_effect_ir"
+      ],
+      "field_path": "clause.unattributed"
+    },
+    {
+      "impact_class": "structural_add",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "admit_or_stage_record",
+        "ladder_l0_l8"
+      ],
+      "blocked_on": [
+        "official_provenance",
+        "catalog_id_allocation"
+      ]
+    },
+    {
+      "impact_class": "structural_remove",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "write_tombstone",
+        "current_mustering_rejection"
+      ]
+    },
+    {
+      "impact_class": "attachment_or_keyword",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "regenerate_attachment_or_keyword",
+        "fieldability_regression",
+        "layer_c_reattest"
+      ]
+    },
+    {
+      "impact_class": "construction_constraint",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "regenerate_t4_constraints",
+        "mustering_regression",
+        "layer_c_reattest"
+      ]
+    },
+    {
+      "impact_class": "composition_or_options",
+      "packet_kind": "implementation",
+      "python_policy": "none",
+      "required_work": [
+        "regenerate_composition_or_options",
+        "fieldability_regression",
+        "layer_c_reattest"
+      ]
+    },
+    {
+      "impact_class": "faction_rewrite",
+      "packet_kind": "overlay",
+      "python_policy": "none",
+      "required_work": [
+        "u6_rewrite_procedure"
+      ],
+      "suppresses_child_packets": false
+    }
+  ],
+  "acceptance_fixtures": [
+    "live_war_horde_python_scaffold_packet_is_invalid",
+    "one_feed_line_emits_many_packets",
+    "bannernob_two_packets_points_cannot_carry_layer_a",
+    "ghazghkull_three_packets_composition_does_not_close_review",
+    "structural_add_does_not_include_siblings",
+    "inherited_listings_add_zero_packets",
+    "acts_of_faith_is_envelope_on_clause_timing",
+    "dakkajet_review_uses_clause_unattributed",
+    "content_packet_must_not_allow_adapter_contract_delta",
+    "family_packet_must_not_use_faction_catalog_id",
+    "named_handler_packet_requires_seven_justification_fields",
+    "faction_rewrite_overlay_plus_remove_plus_add_are_three_identities"
+  ],
+  "mapping_samples": [
+    {
+      "label": "Orks v946 overlay",
+      "packet_kind": "overlay",
+      "impact_class": "faction_rewrite",
+      "field_path": "overlay",
+      "emitted_here": false
+    },
+    {
+      "label": "More Dakka!",
+      "packet_kind": "implementation",
+      "impact_class": "structural_remove",
+      "field_path": "existence",
+      "emitted_here": false
+    },
+    {
+      "label": "Brute Bosses",
+      "packet_kind": "implementation",
+      "impact_class": "structural_add",
+      "field_path": "existence",
+      "blocked_on": [
+        "official_provenance",
+        "catalog_id_allocation"
+      ],
+      "emitted_here": false
+    },
+    {
+      "label": "Blitz Brigade DP 2 to 1",
+      "packet_kind": "implementation",
+      "impact_class": "construction_constraint",
+      "field_path": "army_construction",
+      "emitted_here": false
+    },
+    {
+      "label": "Boss Boomer",
+      "packet_kind": "implementation",
+      "impact_class": "structural_add",
+      "field_path": "existence",
+      "must_not_include": [
+        "Targetin' Gizmos"
+      ],
+      "emitted_here": false
+    },
+    {
+      "label": "Bannernob",
+      "packet_kinds": [
+        "implementation",
+        "review"
+      ],
+      "field_paths": [
+        "cost_rows",
+        "clause.unattributed"
+      ],
+      "impact_classes": [
+        "points_only",
+        "unclassified_clause"
+      ],
+      "points_packet_forbids": [
+        "layer_a_carry_forward_review"
+      ],
+      "emitted_here": false
+    },
+    {
+      "label": "Ghazghkull Thraka",
+      "packet_kinds": [
+        "implementation",
+        "implementation",
+        "review"
+      ],
+      "field_paths": [
+        "cost_rows",
+        "composition",
+        "clause.unattributed"
+      ],
+      "impact_classes": [
+        "points_only",
+        "composition_or_options",
+        "unclassified_clause"
+      ],
+      "note": "Known structural change does not erase the independent Rules Updated signal",
+      "emitted_here": false
+    },
+    {
+      "label": "Dakkajet",
+      "packet_kind": "review",
+      "impact_class": "unclassified_clause",
+      "field_path": "clause.unattributed",
+      "emitted_here": false
+    },
+    {
+      "label": "Eldrad points",
+      "packet_kind": "implementation",
+      "impact_class": "points_only",
+      "field_path": "cost_rows",
+      "emitted_here": false
+    },
+    {
+      "label": "Eldrad Leader list",
+      "packet_kind": "implementation",
+      "impact_class": "attachment_or_keyword",
+      "field_path": "leader_support",
+      "emitted_here": false
+    },
+    {
+      "label": "Acts of Faith trigger",
+      "packet_kind": "implementation",
+      "impact_class": "clause_envelope_changed",
+      "field_path": "clause.timing",
+      "finding_id": "F-ARMY-01",
+      "emitted_here": false
+    },
+    {
+      "label": "Effect RuleIR change with envelope unchanged",
+      "packet_kind": "implementation",
+      "impact_class": "effect_ir_changed",
+      "field_path": "clause.effect_ir",
+      "named_corpus_row": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Live War Horde Python triad",
+      "valid": false,
+      "reason": "Python scaffold allowlist is not a data-first packet"
+    }
+  ],
+  "holds": [
+    {
+      "id": "U-HOLD-ORKS-S4-COUNTS",
+      "hold": "Exact 20 detachment / 73 unit S4 integers, including removals",
+      "unblocks": "S1 versioned-path fixture, then generator golden tests"
+    },
+    {
+      "id": "U-HOLD-RULES-UPDATED",
+      "hold": "App Rules Updated lines have no retained dual-version clauses",
+      "unblocks": "S3a, then review packets can become envelope or effect packets"
+    },
+    {
+      "id": "Packet generator",
+      "hold": "Actual emission",
+      "unblocks": "FM0 U3"
+    },
+    {
+      "id": "Q1 schema",
+      "hold": "Where status_claim and review records persist",
+      "unblocks": "next remaining design after this schema, or with U4 implementation"
+    },
+    {
+      "id": "Live agent contract",
+      "hold": "Rewrite Task Packet Format to this schema",
+      "unblocks": "FM0 Track D D3"
+    }
+  ],
+  "not_in_this_pr": [
+    "src/ packet generator",
+    "emitted packets",
+    "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
+    "ADAPTER_DECISION_CONTRACT.md edits",
+    "Q1 status artifact",
+    "U7 U7a retention",
+    "U8 runbook",
+    "catalog.json rewrites",
+    "army-list ID changes",
+    "F00 policy amendment"
+  ],
+  "reconciliation": {
+    "origin_kind_count": 3,
+    "packet_kind_count": 5,
+    "python_policy_count": 3,
+    "allowed_surface_count": 9,
+    "work_item_count": 20,
+    "impact_class_map_count": 12,
+    "acceptance_fixture_count": 12,
+    "named_handler_required_field_count": 7,
+    "note": "Twelve impact classes map one-to-one onto packet kinds. Sibling unclassified does not merge packets. The live War Horde Python triad is recorded as invalid."
+  }
+}
