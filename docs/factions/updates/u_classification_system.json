@@ -1,0 +1,361 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "U2-U3-U4",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/updates/U_CLASSIFICATION_SYSTEM.md",
+  "delivered_to": "FM0 S4 diff grain, U3 classifier, U4 invalidation (design only)",
+  "does_not_implement_s4": true,
+  "does_not_emit_packets": true,
+  "does_not_change_catalog_ids": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "from_app_data_version": "931",
+    "to_app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202",
+    "orks_audit_current_detachment_update_urls": 15,
+    "orks_audit_current_datasheet_update_urls": 53,
+    "s4_fixture_detachment_changes": 20,
+    "s4_fixture_unit_changes": 73,
+    "s4_counts_not_recounted_here": true
+  },
+  "closed_axes": {
+    "diff_row_is_catalog_id_plus_source_entry_binding_plus_field_path": true,
+    "page_url_is_not_a_diff_row": true,
+    "display_name_is_not_a_join_key": true,
+    "transcription_hash_is_not_layer_a": true,
+    "one_page_may_emit_many_rows": true,
+    "inherited_listings_do_not_emit_extra_rows": true,
+    "faction_rewrite_does_not_suppress_per_entity_rows": true,
+    "do_not_lift_rules_updated": true
+  },
+  "field_paths": [
+    "provenance.transcription_sha256",
+    "cost_rows",
+    "composition",
+    "wargear_options",
+    "keywords",
+    "leader_support",
+    "army_construction",
+    "geometry",
+    "clause.timing",
+    "clause.target",
+    "clause.restriction",
+    "clause.bearer",
+    "clause.effect_ir",
+    "handler_identity",
+    "existence"
+  ],
+  "layers": [
+    {
+      "id": "A",
+      "name": "semantic_execution",
+      "claims": [
+        "L4",
+        "L5"
+      ],
+      "demoted_when": "semantic fingerprint changes, or transcription cannot be classified or carried forward"
+    },
+    {
+      "id": "B",
+      "name": "roster_legality",
+      "claims": [
+        "L6"
+      ],
+      "demoted_when": "any Layer B evidence hash changes"
+    },
+    {
+      "id": "C",
+      "name": "certification",
+      "claims": [
+        "L7",
+        "L8"
+      ],
+      "demoted_when": "contributing Layer A or B change, or content-set/build identity change without re-attestation"
+    }
+  ],
+  "impact_classes": [
+    {
+      "id": "points_only",
+      "roadmap_label": "Points only",
+      "layers_demoted": [
+        "B",
+        "C"
+      ],
+      "layer_a_carry_forward": true,
+      "example": "Eldrad 130 to 120; Bloodcrushers surcharge 20 to 40"
+    },
+    {
+      "id": "text_hash_equal",
+      "roadmap_label": "Text hash equal",
+      "layers_demoted": [],
+      "layer_a_carry_forward": false,
+      "example": "Page re-rendered, same operative text"
+    },
+    {
+      "id": "editorial_equivalent",
+      "roadmap_label": "Editorial equivalent",
+      "layers_demoted": [
+        "C"
+      ],
+      "layer_a_carry_forward": true,
+      "requires_recorded_review": true,
+      "example": "Wording tweak; semantic fingerprint unchanged"
+    },
+    {
+      "id": "clause_envelope_changed",
+      "roadmap_label": "Timing, target, restriction or bearer changed, effect IR equal",
+      "layers_demoted": [
+        "A",
+        "C"
+      ],
+      "layer_a_carry_forward": false,
+      "example": "WHEN clause moves to a different window; bearer widened"
+    },
+    {
+      "id": "effect_ir_changed",
+      "roadmap_label": "Effect IR changed",
+      "layers_demoted": [
+        "A",
+        "C"
+      ],
+      "layer_a_carry_forward": false,
+      "example": "Acts of Faith battle-round to turn start"
+    },
+    {
+      "id": "unclassified_clause",
+      "roadmap_label": "Unclassified clause change",
+      "layers_demoted": [
+        "A",
+        "C"
+      ],
+      "layer_a_carry_forward": false,
+      "example": "Classifier cannot attribute the diff; App Rules Updated without retained clauses"
+    },
+    {
+      "id": "structural_add",
+      "roadmap_label": "Structural add",
+      "layers_demoted": [],
+      "layer_a_carry_forward": false,
+      "example": "Nazdreg; Brute Bosses; a new Enhancement"
+    },
+    {
+      "id": "structural_remove",
+      "roadmap_label": "Structural remove",
+      "layers_demoted": [
+        "C"
+      ],
+      "layer_a_carry_forward": false,
+      "example": "More Dakka!; a removed Stratagem"
+    },
+    {
+      "id": "attachment_or_keyword",
+      "roadmap_label": "Attachment or keyword change",
+      "layers_demoted": [
+        "B",
+        "C"
+      ],
+      "layer_a_carry_forward": true,
+      "example": "Eldrad narrowed Leader list"
+    },
+    {
+      "id": "construction_constraint",
+      "roadmap_label": "Construction constraint (DP, force disposition, T4 caps)",
+      "layers_demoted": [
+        "B",
+        "C"
+      ],
+      "layer_a_carry_forward": true,
+      "example": "Blitz Brigade 2DP to 1DP; Green Tide 3DP to 1DP"
+    },
+    {
+      "id": "composition_or_options",
+      "roadmap_label": "Composition or wargear options",
+      "layers_demoted": [
+        "B",
+        "C"
+      ],
+      "layer_a_carry_forward": true,
+      "example": "Ghazghkull 2-model size removed"
+    },
+    {
+      "id": "faction_rewrite",
+      "roadmap_label": "Faction rewrite",
+      "layers_demoted": [
+        "A",
+        "B",
+        "C"
+      ],
+      "layer_a_carry_forward": false,
+      "suppresses_per_entity_rows": false,
+      "example": "Orks v946"
+    }
+  ],
+  "acceptance_fixtures": [
+    "clause_envelope_changed_timing_unchanged_effect_ir",
+    "editorial_equivalent_recorded_review",
+    "points_only_carry_forward_layer_a",
+    "construction_constraint_dp_does_not_demote_layer_a",
+    "rules_updated_is_unclassified_even_with_points_delta",
+    "structural_add_does_not_demote_siblings",
+    "inherited_listings_do_not_add_rows"
+  ],
+  "orks_931_to_946_mapping": {
+    "source": "docs/factions/audit/orks.md#update-reconciliation",
+    "overlay_class": "faction_rewrite",
+    "not_the_s4_fixture": true,
+    "added_detachments": [
+      "brute-bosses",
+      "flyboyz",
+      "madcap-meks",
+      "runt-swarm",
+      "shoota-boyz",
+      "wreckas",
+      "wurrband"
+    ],
+    "added_detachments_count": 7,
+    "removed_detachments_named": [
+      "More Dakka!"
+    ],
+    "added_datasheets_named": [
+      "Nazdreg",
+      "Runtherd",
+      "Wartrakks",
+      "Gunwagon",
+      "Rukkatrukk Squigbuggies"
+    ],
+    "samples": [
+      {
+        "label": "More Dakka!",
+        "entity_kind": "detachment",
+        "field_path": "existence",
+        "impact_class": "structural_remove",
+        "catalog_id_allocated_here": false
+      },
+      {
+        "label": "Brute Bosses",
+        "entity_kind": "detachment",
+        "field_path": "existence",
+        "impact_class": "structural_add",
+        "catalog_id_allocated_here": false
+      },
+      {
+        "label": "Blitz Brigade DP 2 to 1",
+        "entity_kind": "detachment",
+        "field_path": "army_construction",
+        "impact_class": "construction_constraint",
+        "owning_url": "https://www.40k.app/factions/orks/detachments/blitz-brigade"
+      },
+      {
+        "label": "Boss Boomer",
+        "entity_kind": "enhancement",
+        "field_path": "existence",
+        "impact_class": "structural_add",
+        "parent_url": "https://www.40k.app/factions/orks/detachments/blitz-brigade"
+      },
+      {
+        "label": "Nazdreg",
+        "entity_kind": "datasheet",
+        "field_path": "existence",
+        "impact_class": "structural_add",
+        "catalog_id_allocated_here": false
+      },
+      {
+        "label": "Bannernob",
+        "entity_kind": "datasheet",
+        "field_paths": [
+          "cost_rows",
+          "clause"
+        ],
+        "impact_classes": [
+          "points_only",
+          "unclassified_clause"
+        ],
+        "union_layers_demoted": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "label": "Ghazghkull Thraka",
+        "entity_kind": "datasheet",
+        "field_paths": [
+          "cost_rows",
+          "composition"
+        ],
+        "impact_classes": [
+          "points_only",
+          "composition_or_options"
+        ]
+      },
+      {
+        "label": "Dakkajet",
+        "entity_kind": "datasheet",
+        "field_path": "clause",
+        "impact_class": "unclassified_clause"
+      }
+    ]
+  },
+  "cross_faction_samples": [
+    {
+      "label": "Eldrad points",
+      "impact_class": "points_only"
+    },
+    {
+      "label": "Eldrad Leader list",
+      "impact_class": "attachment_or_keyword"
+    },
+    {
+      "label": "Acts of Faith trigger",
+      "impact_class": "effect_ir_changed"
+    }
+  ],
+  "holds": [
+    {
+      "id": "U-HOLD-ORKS-S4-COUNTS",
+      "hold": "Exact 20 detachment / 73 unit S4 integers, including removals",
+      "unblocks": "S1 versioned-path fixture, then S4"
+    },
+    {
+      "id": "U-HOLD-RULES-UPDATED",
+      "hold": "App Rules Updated lines have no retained dual-version clauses",
+      "unblocks": "S3a, then FM0 classifier"
+    },
+    {
+      "id": "U-HOLD-NAME-PUNCTUATION",
+      "hold": "Feed punctuation twins are not locators",
+      "unblocks": "S2 locators on retained pages"
+    },
+    {
+      "id": "F-ORK-01",
+      "hold": "Waaagh, Da Boss, and riled up may be new tokens as well as a rewrite",
+      "unblocks": "FM0.5 after this classification"
+    }
+  ],
+  "not_in_this_pr": [
+    "src/ S4 tool or classifier",
+    "task packets",
+    "Q1 status artifact",
+    "U1 capture tool",
+    "U5 tombstone loaders",
+    "U6 rewrite procedure",
+    "U7 U7a retention",
+    "catalog.json rewrites",
+    "army-list ID changes",
+    "F00 policy amendment",
+    "Orks catalog_id allocation"
+  ],
+  "reconciliation": {
+    "impact_class_count": 12,
+    "layer_count": 3,
+    "field_path_count": 15,
+    "acceptance_fixture_count": 7,
+    "orks_added_detachments": 7,
+    "s4_counts_published": false,
+    "note": "15 current Orks detachment update URLs are not 20 S4 detachment changes. 53 current datasheet update URLs are not 73 S4 unit changes. Removals such as More Dakka are absent from the current-URL table."
+  }
+}

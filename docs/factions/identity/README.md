@@ -1,6 +1,6 @@
 # Faction identity (Track S2)
 
-[Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Track T taxonomy](../taxonomy/README.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Source policy (F00)](../../FACTION_RULES_SOURCE_POLICY.md)
+[Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Track T taxonomy](../taxonomy/README.md) · [Track U classification](../updates/U_CLASSIFICATION_SYSTEM.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Source policy (F00)](../../FACTION_RULES_SOURCE_POLICY.md)
 
 Pre-gate identity design lives here as planning evidence. It does not admit
 content, change catalogs, or implement registry loaders. FM0 implements the
