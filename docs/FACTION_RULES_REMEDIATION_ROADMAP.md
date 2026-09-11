@@ -159,7 +159,7 @@ evidence. Owning work now references tracks and milestones.
 
 | ID | Priority | Finding and consequence | Owning work |
 | --- | --- | --- | --- |
-| F-ARMY-01 | 1 | Current Acts of Faith grants a Miracle die at each turn start; the Sororitas consumer and regression use battle-round start. | Debt item 9 in FM0; first case for the "IR changed → consumer stale" rule (U4) |
+| F-ARMY-01 | 1 | Current Acts of Faith grants a Miracle die at each turn start; the Sororitas consumer and regression use battle-round start. | Debt item 9 in FM0; first case for U4 Layer A/C demotion via `clause_envelope_changed` on `clause.timing` |
 | F-ORK-01 | 1 | v946 refreshes the Ork army and detachment roster: seven detachments added, More Dakka! removed, DP costs and Enhancement/Stratagem inventories changed, 73 unit changes. Retired scaffold directories remain. | FM0.5 pilot; U5–U6 |
 | F-DATA-01 | 1 | Current costs and attachments differ from older records (Eldrad, Bloodcrushers, Exorcist surcharge). | S3a; impact class "points only" and "attachment change" in U3; FM1 and FM3 |
 | F-EVID-01 | 1 | Module status, source labels, execution classifications and component labels describe different facts with different denominators. | Q1 |
@@ -420,7 +420,8 @@ and extra fixtures are in
 [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md):
 
 1. Changed timing with unchanged effect IR and a new transcription hash
-   invalidates Layer A (and dependent Layer C).
+   invalidates Layer A (and dependent Layer C) (`clause_envelope_changed`
+   on `clause.timing`).
 2. A reviewed editorial-only change uses different old and new transcription
    hashes, carries Layer A forward through the recorded equivalence review,
    and re-attests Layer C to the new content-set/build identity without
@@ -430,8 +431,9 @@ and extra fixtures are in
    claims, and re-attests dependent Layer C only after roster validation.
 4. Detachment DP 2→1 with unchanged clauses demotes Layer B and C, not A
    (`construction_constraint`).
-5. A "Rules Updated" feed line without retained dual-version clauses is
-   `unclassified_clause`, even when the same line lists a points delta.
+5. A "Rules Updated" feed line without retained dual-version clauses uses
+   `clause.unattributed` with class `unclassified_clause`, even when the
+   same line lists a points or composition delta.
 6. Adding a child Enhancement on a detachment page does not demote siblings
    (`structural_add` is per child locator).
 7. Inherited listings of the same `source_entry_binding` do not add rows.
@@ -443,8 +445,8 @@ Impact classes assigned by U3:
 | Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | B (affected rosters); C until re-attested | Regenerate cost records; re-run roster validation; carry Layer A forward with a recorded hash-link review that the semantic fingerprint is unchanged (points live in provenance text, not in the fingerprint); re-attest Layer C to the new content-set/build identity |
 | Text hash equal | Page re-rendered, same operative text | none | Re-pin observation; provenance hash already matches |
 | Editorial equivalent | Wording tweak; semantic fingerprint unchanged | C until re-attested | Record the equivalence review linking old and new transcription hashes; carry Layer A forward; re-attest Layer C to the new content-set/build identity. Named-handler-backed clauses require the review to confirm handler identity |
-| Timing, target, restriction or bearer changed, effect IR equal | WHEN clause moves to a different window; bearer widened | A, C | Demote to `stale`; re-map and re-certify L4–L8 |
-| Effect IR changed | Acts of Faith battle-round → turn start | A, C | Demote to `stale`; re-certify L4–L8 |
+| Timing, target, restriction or bearer changed, effect IR equal | Acts of Faith battle-round → turn start; WHEN clause moves to a different window; bearer widened | A, C | Demote to `stale`; re-map and re-certify L4–L8 |
+| Effect IR changed | Effect RuleIR changes with envelope unchanged (mortal-wound expression, resource-gain amount, or granted-ability identity) | A, C | Demote to `stale`; re-certify L4–L8 |
 | Unclassified clause change | Classifier cannot attribute the diff | A, C | `stale` pending human review; no automatic carry-forward |
 | Structural add | Nazdreg; Brute Bosses; a new Enhancement | n/a | Staging observation until official provenance is registered; then L0–L8 from scratch; no Python unless a new family is needed |
 | Structural remove | More Dakka!; a removed Stratagem | C for rosters using it | Tombstone with `retired_in`; current-version mustering rejection regression; Python removed only when no packaged version references it |

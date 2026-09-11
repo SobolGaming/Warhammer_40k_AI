@@ -82,12 +82,13 @@ Green Tide "Ferocious Show Off" / "Ferocious Show-off") are not identity.
 | Flattened token | Published split |
 | --- | --- |
 | Update-feed URL | Many child entities; page provenance only |
-| `Rules Updated` | Unclassified until retained clauses exist |
+| `Rules Updated` | `clause.unattributed` plus `unclassified_clause` until retained clauses exist |
 | New transcription hash | Provenance pin, not Layer A |
 | Display name | Label only |
 | Faction view | Overlay of `faction_rewrite` plus per-entity rows |
 | DP change | `construction_constraint` on the detachment, not `points_only` |
-| Points plus "Rules Updated" | Two field paths; union demotion; not `points_only` alone |
+| Points plus "Rules Updated" | `cost_rows` and `clause.unattributed`; union demotion; not `points_only` alone |
+| Bare `clause` | Not a field path; use a component or `clause.unattributed` |
 
 ### 3.3 Closed field paths
 
@@ -106,8 +107,17 @@ Green Tide "Ferocious Show Off" / "Ferocious Show-off") are not identity.
 | `clause.restriction` | `clause_envelope_changed` | not Layer B |
 | `clause.bearer` | `clause_envelope_changed` | not Layer B |
 | `clause.effect_ir` | `effect_ir_changed` | not Layer B |
+| `clause.unattributed` | `unclassified_clause` | not Layer B |
 | `handler_identity` | `effect_ir_changed` or `editorial_equivalent` review | not Layer B |
 | `existence` | `structural_add` / `structural_remove` | n/a for add; C for remove |
+
+`clause.unattributed` is the unresolved-semantic path. It means a clause-level
+change is indicated (including an App "Rules Updated" line) but retained
+dual-version text does not attribute that change to timing, target,
+restriction, bearer, or effect IR. Layer A and C are `stale`. It is not a
+parent of the component paths and does not replace them once a component is
+attributable. Bare `clause` is not a field path. Do not assign
+`clause.effect_ir` or another component merely to fit an example.
 
 `army_construction` includes DP, force disposition, Enhancement-count caps,
 duplicate-detachment, and required/prohibited selectors. It does not include
@@ -143,8 +153,9 @@ content-set or build identity. Until Q1 records re-attestation, L7/L8 are
 `stale` even when Layer A remains current.
 
 **Union.** An entity with several field-path classes takes the union of
-demoted layers. `unclassified_clause` on any clause path demotes A and C
-regardless of a sibling `points_only` row.
+demoted layers. `unclassified_clause` on `clause.unattributed` (or on any
+attributed clause path that cannot be carried forward) demotes A and C
+regardless of sibling `points_only` or `composition_or_options` rows.
 
 **`faction_rewrite`** demotes A, B, and C for every owned or inherited
 entity of that faction view. It does not suppress per-entity rows.
@@ -176,9 +187,11 @@ them.
 ### 5.1 Classifier rules
 
 1. Assign one class per field path. Never one class per page.
-2. If the field path cannot be attributed from retained text, use
-   `unclassified_clause` (clause paths) or leave the row unpublished (no
-   invented class).
+2. If retained text does not attribute the semantic impact to timing,
+   target, restriction, bearer, or effect IR, emit `clause.unattributed`
+   with class `unclassified_clause`. Do not guess a component path. Do
+   not drop the semantic-impact row. Leave a row unpublished only when
+   there is no semantic-impact signal (no invented class).
 3. Do not mint a class from a display name or from "Rules Updated".
 4. `text_hash_equal` requires equal retained operative suffixes, not equal
    feed blurbs.
@@ -192,7 +205,7 @@ them.
 Implementation tests when U3/U4 land. This PR only defines them.
 
 1. Changed timing with unchanged effect IR and a new transcription hash
-   demotes A and C (`clause_envelope_changed`).
+   demotes A and C (`clause_envelope_changed` on `clause.timing`).
 2. A reviewed editorial-only change uses different old and new
    transcription hashes, carries Layer A, and re-attests C
    (`editorial_equivalent`).
@@ -201,8 +214,9 @@ Implementation tests when U3/U4 land. This PR only defines them.
    (`points_only`).
 4. Detachment DP 2→1 with unchanged clauses demotes B and C, not A
    (`construction_constraint`).
-5. A "Rules Updated" feed line without retained dual-version clauses is
-   `unclassified_clause`, even when the same line lists a points delta.
+5. A "Rules Updated" feed line without retained dual-version clauses uses
+   `clause.unattributed` with class `unclassified_clause`, even when the
+   same line lists a points or composition delta.
 6. Adding Boss Boomer on Blitz Brigade does not demote Targetin’ Gizmos
    (`structural_add` is per child locator).
 7. Inherited listings of the same `source_entry_binding` do not add rows.
@@ -225,10 +239,10 @@ until re-certified. Per-entity rows below still apply.
 | Nazdreg, Runtherd, Wartrakks, Gunwagon, Rukkatrukk Squigbuggies | `datasheet` / `existence` | `structural_add` | Wartrakks remains in-scope per the observation register |
 | Blitz Brigade 2DP → 1DP; Green Tide 3DP → 1DP | `detachment` / `army_construction` | `construction_constraint` | Not `points_only` |
 | Blitzkaptin removed; Boss Boomer added | `enhancement` / `existence` on the Blitz Brigade page | `structural_remove` / `structural_add` | Siblings; two rows |
-| Glory Hog 30 → 25 pts | `enhancement` / `cost_rows` | `points_only` candidate | Only if retained clauses match; else also `unclassified_clause` |
-| Bannernob 50 → 35 pts plus Rules Updated | `datasheet` / `cost_rows` and clause paths | `points_only` **and** `unclassified_clause` | Union demotes A, B, C |
-| Ghazghkull new 1-model 300 pts; 2-model size removed | `datasheet` / `cost_rows` and `composition` | `points_only` and `composition_or_options` | Not points alone |
-| Dakkajet, Weirdboy, Big’Ed Bossbunka "Rules Updated" | `datasheet` / clause paths | `unclassified_clause` | No points delta in the feed line |
+| Glory Hog 30 → 25 pts | `enhancement` / `cost_rows` | `points_only` candidate | Only if retained clauses match; else also `clause.unattributed` / `unclassified_clause` |
+| Bannernob 50 → 35 pts plus Rules Updated | `datasheet` / `cost_rows` and `clause.unattributed` | `points_only` **and** `unclassified_clause` | Union demotes A, B, C |
+| Ghazghkull new 1-model 300 pts; 2-model size removed; Rules Updated | `datasheet` / `cost_rows`, `composition`, and `clause.unattributed` | `points_only`, `composition_or_options`, and `unclassified_clause` | Known structural change does not erase the unresolved rule-change indication; union demotes A, B, C |
+| Dakkajet, Weirdboy, Big’Ed Bossbunka "Rules Updated" | `datasheet` / `clause.unattributed` | `unclassified_clause` | No points delta in the feed line; do not guess `clause.effect_ir` |
 | Follow Me Ladz 25 → 20 pts | `enhancement` / `cost_rows` | `points_only` candidate | Same name is not proof it is the same locator |
 | Headwoppa's Killchoppa added 15 / removed 20 | two `enhancement` locators or one locator plus cost | `structural_add`/`structural_remove` or `points_only` | Do not name-join; S3a binds locators |
 
@@ -240,7 +254,8 @@ Cross-faction samples (not Orks, prove the class set is not rewrite-only):
 | Bloodcrushers surcharge 20→40 | `points_only` |
 | Exorcist surcharge | `points_only` |
 | Eldrad narrowed Leader list | `attachment_or_keyword` |
-| Acts of Faith battle-round → turn start | `effect_ir_changed` |
+| Acts of Faith battle-round → turn start | `clause_envelope_changed` on `clause.timing` |
+| Effect RuleIR changes with envelope unchanged | `effect_ir_changed` on `clause.effect_ir` |
 
 Do not publish a resolved histogram of all 53 datasheet URLs in this PR.
 
@@ -287,6 +302,8 @@ indexes them.
 FM0 classifier work may be implemented. It has:
 
 - entity-and-field grain on S2 `catalog_id` plus `source_entry_binding`;
+- sixteen closed field paths, including `clause.unattributed` for
+  unresolved semantic impact;
 - twelve closed impact classes and three layers;
 - union demotion and carry-forward rules;
 - the three original U3/U4 fixtures plus DP, Rules Updated, sibling-add,

@@ -30,7 +30,9 @@
     "one_page_may_emit_many_rows": true,
     "inherited_listings_do_not_emit_extra_rows": true,
     "faction_rewrite_does_not_suppress_per_entity_rows": true,
-    "do_not_lift_rules_updated": true
+    "do_not_lift_rules_updated": true,
+    "unresolved_semantic_path_is_clause_unattributed": true,
+    "bare_clause_is_not_a_field_path": true
   },
   "field_paths": [
     "provenance.transcription_sha256",
@@ -46,9 +48,11 @@
     "clause.restriction",
     "clause.bearer",
     "clause.effect_ir",
+    "clause.unattributed",
     "handler_identity",
     "existence"
   ],
+  "unresolved_semantic_field_path": "clause.unattributed",
   "layers": [
     {
       "id": "A",
@@ -113,7 +117,7 @@
         "C"
       ],
       "layer_a_carry_forward": false,
-      "example": "WHEN clause moves to a different window; bearer widened"
+      "example": "Acts of Faith battle-round to turn start; WHEN clause moves to a different window; bearer widened"
     },
     {
       "id": "effect_ir_changed",
@@ -123,7 +127,7 @@
         "C"
       ],
       "layer_a_carry_forward": false,
-      "example": "Acts of Faith battle-round to turn start"
+      "example": "Effect RuleIR changes with envelope unchanged (mortal-wound expression, resource-gain amount, or granted-ability identity)"
     },
     {
       "id": "unclassified_clause",
@@ -133,7 +137,7 @@
         "C"
       ],
       "layer_a_carry_forward": false,
-      "example": "Classifier cannot attribute the diff; App Rules Updated without retained clauses"
+      "example": "Classifier cannot attribute the diff; App Rules Updated uses clause.unattributed without retained clauses"
     },
     {
       "id": "structural_add",
@@ -268,7 +272,7 @@
         "entity_kind": "datasheet",
         "field_paths": [
           "cost_rows",
-          "clause"
+          "clause.unattributed"
         ],
         "impact_classes": [
           "points_only",
@@ -285,18 +289,30 @@
         "entity_kind": "datasheet",
         "field_paths": [
           "cost_rows",
-          "composition"
+          "composition",
+          "clause.unattributed"
         ],
         "impact_classes": [
           "points_only",
-          "composition_or_options"
-        ]
+          "composition_or_options",
+          "unclassified_clause"
+        ],
+        "union_layers_demoted": [
+          "A",
+          "B",
+          "C"
+        ],
+        "note": "Known cost and composition changes do not erase the independent Rules Updated signal"
       },
       {
         "label": "Dakkajet",
         "entity_kind": "datasheet",
-        "field_path": "clause",
-        "impact_class": "unclassified_clause"
+        "field_path": "clause.unattributed",
+        "impact_class": "unclassified_clause",
+        "layers_demoted": [
+          "A",
+          "C"
+        ]
       }
     ]
   },
@@ -311,7 +327,15 @@
     },
     {
       "label": "Acts of Faith trigger",
-      "impact_class": "effect_ir_changed"
+      "field_path": "clause.timing",
+      "impact_class": "clause_envelope_changed",
+      "finding_id": "F-ARMY-01"
+    },
+    {
+      "label": "Effect RuleIR change with envelope unchanged",
+      "field_path": "clause.effect_ir",
+      "impact_class": "effect_ir_changed",
+      "named_corpus_row": false
     }
   ],
   "holds": [
@@ -352,7 +376,7 @@
   "reconciliation": {
     "impact_class_count": 12,
     "layer_count": 3,
-    "field_path_count": 15,
+    "field_path_count": 16,
     "acceptance_fixture_count": 7,
     "orks_added_detachments": 7,
     "s4_counts_published": false,
