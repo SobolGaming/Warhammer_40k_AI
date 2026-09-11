@@ -126,7 +126,7 @@ is the mechanism, not a third class.
 | Class | Who sees the real request | Existing owners |
 | --- | --- | --- |
 | `public` | Every viewer sees the same payload | Matched-play CP, normal Stratagem use, ordinary unit/model choices, Primary progress |
-| `owner_secret` | Actor sees options; opponent sees `hidden_decision` until the contract's reveal point | Secondaries until all players select, unit split during declarations, Beacon, Burden of Trust, Tactical When Drawn |
+| `owner_secret` | Actor sees options; opponent sees `hidden_decision` until the contract's reveal point | Secondaries until all players select; unit split during declarations; Beacon; Burden of Trust; Tactical When Drawn; in-battle Tactical score/retain (`score_tactical_secondary_mission`). Owner-secret finite choices are not restricted to setup or to the initial Secondary reveal |
 
 Redaction lives in **exactly one** shared adapters module. Projection,
 event-stream, HTTP status, and transport metadata consume it. Option
@@ -153,7 +153,7 @@ for the submission catalog's concrete `decision_type` rows.
 | `parameterized_path` | `parameterized_proposal` | Extra move, surge, charge, pile-in, consolidate, scout. Requires `PathWitness`. Finite trigger select may precede it |
 | `parameterized_placement` | `parameterized_proposal` | Reserves, Deep Strike, Cult Ambush marker/ingress, revival, deployment, redeploy, disembark, return-on-death, model materialization |
 | `parameterized_declaration` | `parameterized_proposal` | Shooting and melee declarations |
-| `secret_setup` | `finite_option` + `owner_secret` | Secondaries, unit split, Beacon, Burden of Trust, When Drawn. Already covered |
+| `secret_setup` | `finite_option` + `owner_secret` | Secondaries, unit split, Beacon, Burden of Trust, When Drawn, and Tactical score/retain. Already covered. The family name is not "setup only" |
 | `opponent_reaction` | Same as the wrapped family | T1 owns opponent WHEN. T6 does not add a third submission path |
 | `nested_disambiguation` | Nested finite, not a top-level dispatch entry | The allowlist has **one** entry: `WEAPON_ABILITY_SELECTION_DECISION_TYPE`. Do not add nested types without a contract update |
 
@@ -173,6 +173,7 @@ when the catalog already owns the family.
 | "Spend" | T5 ledger identity **and** T6 enumerated amount versus a quantity contract delta |
 | "Select a unit" | T3 TARGET clause **and** T6 finite candidates once listed |
 | Extra Normal Move | Finite trigger **then** parameterized path |
+| Scout movement | `parameterized_path` **and** `submit_scout_move`; not `submit_movement_proposal` |
 | Command Re-roll | T1 `after_dice_roll` + OpportunityWindow; T3 bearer `player` + `dice_roll`; T6 finite `use_stratagem` |
 | Hidden pending request | `owner_secret` plus `hidden_decision` placeholder; not a third engine path |
 
@@ -197,8 +198,11 @@ binds new consumers to them before minting types.
   override `select_dice_result_override`, Cult Ambush Resurgence).
 - Ordinary play: movement/shooting/charge/fight unit and action selects,
   dice reroll, Feel No Pain, healing model, destruction reaction.
-- Secret setup: `select_secondary_missions`, `select_unit_split_membership`,
-  Beacon, Burden of Trust, When Drawn.
+- Owner-secret finite choices (not setup-only): `select_secondary_missions`,
+  `select_unit_split_membership`, Beacon, Burden of Trust, When Drawn, and
+  `score_tactical_secondary_mission`. Score/retain is an in-battle
+  scoring-window case on the existing redaction path, not a new hidden
+  contract delta.
 
 Waaagh! call/decline, Shadow unleash/decline, Greater Good mark/done,
 Cabal ritual options, Orders, oath target, Nurgle's Gift plague, Templar
@@ -209,7 +213,10 @@ named types for those display names.
 ### 4.2 Parameterized surfaces that already cover T6 families
 
 - Path: `submit_movement_proposal` (`normal_move`, `advance`, `fall_back`,
-  `surge_move`, `charge_move`, `pile_in`, `consolidate`, `scout_move`).
+  `surge_move`, `charge_move`, `pile_in`, `consolidate`). Scout movement
+  stays `parameterized_path` and still requires `PathWitness`, but its
+  catalog row is `submit_scout_move` with proposal kind `scout_move`
+  (pre-battle context). Do not lift `submit_movement_proposal` over Scout.
 - Placement: reinforcement, Deep Strike, Strategic Reserves, Cult Ambush
   marker and `cult_ambush_placement`, healing revival, deployment,
   redeploy, disembark, return-on-death, catalog model materialization.

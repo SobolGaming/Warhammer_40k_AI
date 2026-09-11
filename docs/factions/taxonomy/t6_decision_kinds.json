@@ -124,6 +124,14 @@
       "note": "Finite trigger or unit select may precede PathWitness. Endpoint-only movement is invalid except teleport/set-up placement."
     },
     {
+      "id": "no_scout_submit_movement_lift",
+      "flattened_token": "scout_move as submit_movement_proposal",
+      "demand_families": [
+        "parameterized_path"
+      ],
+      "note": "scout_move remains parameterized_path and requires PathWitness. Its decision_type is submit_scout_move, not submit_movement_proposal."
+    },
+    {
       "id": "no_hidden_third_path",
       "flattened_token": "hidden_decision as an engine type",
       "demand_families": [
@@ -216,7 +224,11 @@
         "consolidate",
         "scout_move"
       ],
-      "note": "Requires PathWitness. Finite trigger select may precede it."
+      "example_decision_types": [
+        "submit_movement_proposal",
+        "submit_scout_move"
+      ],
+      "note": "Requires PathWitness. Finite trigger select may precede it. Do not lift submit_movement_proposal over scout_move; Scout uses submit_scout_move in pre-battle context."
     },
     {
       "id": "parameterized_placement",
@@ -255,9 +267,10 @@
         "select_unit_split_membership",
         "select_beacon_unit",
         "select_burden_of_trust_guard",
-        "resolve_tactical_secondary_when_drawn"
+        "resolve_tactical_secondary_when_drawn",
+        "score_tactical_secondary_mission"
       ],
-      "note": "Non-actor viewers see hidden_decision until the contract reveal point."
+      "note": "Non-actor viewers see hidden_decision until the contract reveal point. Owner-secret finite choices are not restricted to setup; score_tactical_secondary_mission is existing in-battle coverage, not a new hidden-information contract delta."
     },
     {
       "id": "opponent_reaction",
