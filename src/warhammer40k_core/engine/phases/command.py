@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine import command_battle_shock_candidates as _cbsc
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock_hooks import (
@@ -49,7 +51,12 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
     CommandPointSpendStatus,
-    CommandStepState,
+)
+from warhammer40k_core.engine.command_step_authority import (
+    command_step_state as _command_step_state,
+)
+from warhammer40k_core.engine.command_step_authority import (
+    ensure_command_step_state as _ensure_command_step_state,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -75,7 +82,6 @@ from warhammer40k_core.engine.phases.command_battle_shock_rerolls import (
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rules_units import (
     rules_unit_is_battle_shocked,
-    rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -105,7 +111,6 @@ from warhammer40k_core.engine.timing_windows import (
 from warhammer40k_core.engine.turn_start_engagement import (
     record_turn_start_engagement_snapshot,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_command_phase_2026_08,
 )
@@ -126,6 +131,8 @@ def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
 
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
+    ruleset_descriptor: RulesetDescriptor | None = None
+    army_catalog: ArmyCatalog | None = None
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
         default_factory=StratagemCostModifierRegistry.empty
@@ -197,6 +204,8 @@ class CommandPhaseHandler:
                 decisions=decisions,
                 command_phase_start_hooks=self.command_phase_start_hooks,
                 runtime_modifier_registry=self.runtime_modifier_registry,
+                ruleset_descriptor=self.ruleset_descriptor,
+                army_catalog=self.army_catalog,
             )
             if command_start_status is not None:
                 return command_start_status
@@ -279,6 +288,13 @@ class CommandPhaseHandler:
             event_records=decisions.event_log.records,
             decision_records=decisions.records,
         )
+        from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+
+        if rule_trigger_history(decisions).ready():
+            return LifecycleStatus.advanced(
+                stage=GameLifecycleStage.BATTLE,
+                payload={"phase": BattlePhase.COMMAND.value, "deferred_rules_ready": True},
+            )
 
         if not command_state.tactical_secondary_replacement_resolved:
             replacement_status = _request_tactical_secondary_replacement_if_available(
@@ -390,7 +406,6 @@ class CommandPhaseHandler:
         if (
             state.current_battle_phase is not BattlePhase.COMMAND
             or command_state is None
-            or not command_state.command_phase_start_synchronous_hooks_resolved
             or command_state.command_phase_start_boundary_resolved
         ):
             return False
@@ -434,11 +449,17 @@ def invalid_command_phase_decision_status(
             battle_shock_hooks=battle_shock_hooks,
         )
     if request.decision_type == SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE:
-        return _invalid_command_phase_start_faction_rule_status(
+        from warhammer40k_core.engine.command_phase_start_selection import require_selected_request
+
+        invalid = _invalid_command_phase_start_faction_rule_status(
             state=state,
             request=request,
             result=result,
         )
+        if invalid is not None:
+            return invalid
+        require_selected_request(state=state, decisions=decisions, request=request)
+        return None
     if request.decision_type != TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE:
         raise GameLifecycleError("Command phase validator received unsupported decision_type.")
     payload = _decision_payload_object(result.payload)
@@ -694,19 +715,6 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return stripped
 
 
-def _unit_owner_and_instance_by_id(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> tuple[str | None, UnitInstance | None]:
-    requested_unit_id = _validate_player_id("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return army.player_id, unit
-    return None, None
-
-
 def _active_tactical_secondary_cards(
     *,
     state: GameState,
@@ -903,83 +911,13 @@ def _command_phase_start_faction_rule_drift_reason(
         return "command_step_active_player_drift"
     if command_state.battle_round != state.battle_round:
         return "command_step_battle_round_drift"
-    if not command_state.command_phase_start_synchronous_hooks_resolved:
-        return "command_phase_start_synchronous_hooks_not_resolved"
     if (
         command_state.command_phase_start_boundary_resolved
         or command_state.command_points_granted
         or command_state.scoring_hooks_resolved
     ):
         return "command_phase_start_window_closed"
-    target_unit_id = payload.get("target_unit_instance_id")
-    target_owner_id = payload.get("target_owner_player_id")
-    if target_unit_id is not None or target_owner_id is not None:
-        if type(target_unit_id) is not str or not target_unit_id.strip():
-            return "target_unit_instance_id_invalid"
-        if type(target_owner_id) is not str or not target_owner_id.strip():
-            return "target_owner_player_id_invalid"
-        owner_id, target_unit = _unit_owner_and_instance_by_id(
-            state=state,
-            unit_instance_id=target_unit_id,
-        )
-        if owner_id is None or target_unit is None:
-            return "target_unit_missing"
-        if owner_id != target_owner_id:
-            return "target_owner_drift"
-        if owner_id == result.actor_id:
-            return "target_not_opponent"
-        if not target_unit.alive_own_models():
-            return "target_unit_destroyed"
-    rules_unit_id = payload.get("rules_unit_instance_id")
-    rules_unit_owner_id = payload.get("rules_unit_owner_player_id")
-    if rules_unit_id is None and rules_unit_owner_id is None:
-        return None
-    if type(rules_unit_id) is not str or not rules_unit_id.strip():
-        return "rules_unit_instance_id_invalid"
-    if type(rules_unit_owner_id) is not str or not rules_unit_owner_id.strip():
-        return "rules_unit_owner_player_id_invalid"
-    if not _rules_unit_id_exists(state=state, unit_instance_id=rules_unit_id):
-        return "rules_unit_missing"
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_id)
-    if rules_unit.owner_player_id != rules_unit_owner_id:
-        return "rules_unit_owner_drift"
-    if rules_unit.owner_player_id != result.actor_id:
-        return "rules_unit_not_owned_by_actor"
-    if not rules_unit.alive_models():
-        return "rules_unit_destroyed"
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        return "battlefield_state_missing"
-    placed_model_ids = set(battlefield.placed_model_ids())
-    if not any(model.model_instance_id in placed_model_ids for model in rules_unit.alive_models()):
-        return "rules_unit_not_on_battlefield"
     return None
-
-
-def _ensure_command_step_state(
-    state: GameState,
-    *,
-    active_player_id: str,
-) -> CommandStepState:
-    if state.command_step_state is None:
-        command_state = CommandStepState.start(
-            battle_round=state.battle_round,
-            active_player_id=active_player_id,
-        )
-        state.replace_command_step_state(command_state)
-        return command_state
-    command_state = state.command_step_state
-    if command_state.active_player_id != active_player_id:
-        raise GameLifecycleError("CommandStepState active player drift.")
-    if command_state.battle_round != state.battle_round:
-        raise GameLifecycleError("CommandStepState battle round drift.")
-    return command_state
-
-
-def _command_step_state(state: GameState) -> CommandStepState:
-    if state.command_step_state is None:
-        raise GameLifecycleError("Command phase requires CommandStepState.")
-    return state.command_step_state
 
 
 def _resolve_gain_core_command_points_step(
@@ -1017,14 +955,6 @@ def _resolve_gain_core_command_points_step(
             "phase": BattlePhase.COMMAND.value,
             "command_point_gains": gain_payloads,
         },
-    )
-
-
-def _rules_unit_id_exists(*, state: GameState, unit_instance_id: str) -> bool:
-    requested_id = _validate_player_id("rules_unit_instance_id", unit_instance_id)
-    return any(
-        requested_id in (view.unit_instance_id, *view.component_unit_instance_ids)
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     )
 
 
@@ -1468,6 +1398,12 @@ def _resolve_battle_shock_step(
                 },
             )
     command_state = _command_step_state(state)
+    completion_status = _resolve_command_battle_shock_candidate_order(
+        state=state,
+        decisions=decisions,
+    )
+    if completion_status is not None:
+        raise GameLifecycleError("Completed Battle-shock tests retain an ordering request.")
     completed_results = ordered_completed_command_battle_shock_results(
         state=state,
         event_records=decisions.event_log.records,

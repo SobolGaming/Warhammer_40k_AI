@@ -24,6 +24,7 @@ from warhammer40k_core.engine.sequencing import (
     SequencingNextParticipantDecision,
     SequencingNextParticipantDecisionPayload,
     SequencingParticipant,
+    SequencingRequirement,
     apply_select_next_sequencing_participant_from_request,
     create_select_next_sequencing_participant_request,
     is_select_next_sequencing_participant_request,
@@ -129,7 +130,7 @@ def validate_historical_candidate_order(
             continue
         if not isinstance(event.payload, dict):
             raise GameLifecycleError("Historical Battle-shock sequencing payload is malformed.")
-        if event.payload.get("conflict_id") != conflict_id:
+        if event.payload.get("conflict_id") != f"timing-batch:{conflict_id}:generation-0:tier-0":
             continue
         matching_events.append(
             (
@@ -150,6 +151,7 @@ def validate_historical_candidate_order(
             participant_id=f"command-battle-shock-test:{candidate.unit_instance_id}",
             player_id=active_player_id,
             source_rule_id="gw-11e-core-rules:command-phase:battle-shock",
+            requirement=SequencingRequirement.MANDATORY,
             payload=validate_json_value(candidate.to_payload()),
         )
         for candidate in candidates
@@ -286,7 +288,7 @@ def validate_historical_sequencing_request(
     timing_window = payload_object(conflict.get("timing_window"))
     descriptor = payload_object(timing_window.get("descriptor"))
     if (
-        conflict.get("conflict_id") != conflict_id
+        conflict.get("conflict_id") != f"timing-batch:{conflict_id}:generation-0:tier-0"
         or conflict.get("game_id") != state.game_id
         or conflict.get("player_ids") != list(state.player_ids)
         or conflict.get("active_player_id") != active_player_id
@@ -308,6 +310,7 @@ def validate_historical_sequencing_request(
             participant_id=f"command-battle-shock-test:{candidate.unit_instance_id}",
             player_id=active_player_id,
             source_rule_id="gw-11e-core-rules:command-phase:battle-shock",
+            requirement=SequencingRequirement.MANDATORY,
             payload=validate_json_value(candidate.to_payload()),
         )
         for candidate in candidates
@@ -360,7 +363,8 @@ def validate_pending_order_restore_authority(
         request
         for request in pending_decision_requests
         if request.decision_type == SEQUENCING_DECISION_TYPE
-        and sequencing_request_conflict_id(request) == conflict_id
+        and sequencing_request_conflict_id(request)
+        == f"timing-batch:{conflict_id}:generation-0:tier-0"
     )
     completed_count = len(command_state.completed_battle_shock_test_request_ids)
     selected_unit_ids = command_state.battle_shock_candidate_order_unit_ids

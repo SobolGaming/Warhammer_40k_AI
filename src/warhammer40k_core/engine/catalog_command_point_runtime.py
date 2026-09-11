@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import partial
 from types import MappingProxyType
 from typing import cast
 
@@ -65,14 +66,16 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventSubscription,
     RuntimeEventHandler,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import (
     current_rules_unit_views_for_identity,
     rules_unit_id_for_unit_id,
     rules_unit_owner_player_id,
     rules_unit_view_by_id,
 )
+from warhammer40k_core.engine.runtime_event_candidates import runtime_event_candidate
 from warhammer40k_core.engine.runtime_modifiers import UnitCharacteristicModifierContext
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
     StratagemCostChoiceHookBinding,
@@ -85,6 +88,7 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModifierContext,
     StratagemCostModifierHandler,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
@@ -188,7 +192,7 @@ class CatalogCommandPointRuntime:
             UnitDestroyedHookBinding(
                 hook_id=CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
                 source_id=CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
-                handler=self.resolve_unit_destroyed,
+                candidate_handler=self.unit_destroyed_candidates,
             ),
         )
 
@@ -219,6 +223,7 @@ class CatalogCommandPointRuntime:
             RuntimeContentEventHandlerBinding(
                 handler_id=source.handler_id,
                 handler=self._phase_gain_handler(source),
+                candidate_handler=partial(self._phase_gain_candidates, source),
             )
             for source in self._phase_gain_sources()
         )
@@ -240,7 +245,9 @@ class CatalogCommandPointRuntime:
             )
         return tuple(subscriptions)
 
-    def resolve_unit_destroyed(self, context: UnitDestroyedContext) -> None:
+    def unit_destroyed_candidates(
+        self, context: UnitDestroyedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
         if type(context) is not UnitDestroyedContext:
             raise GameLifecycleError("Catalog CP unit-destroyed runtime requires context.")
         attribution = ModelDestructionAttribution.from_model_destroyed_payload(
@@ -249,7 +256,7 @@ class CatalogCommandPointRuntime:
         if attribution.destruction_provenance.destruction_source_kind is not (
             DestructionSourceKind.ATTACK
         ):
-            return
+            return ()
         attacking_model_id = attribution.attacking_model_instance_id
         if attacking_model_id is None:
             raise GameLifecycleError("Attack destruction attribution requires an attacking model.")
@@ -264,6 +271,7 @@ class CatalogCommandPointRuntime:
             unit_instance_id=context.destroyed_unit_instance_id,
         )
         destroyed_keywords = {*destroyed_view.keywords, *destroyed_view.faction_keywords}
+        candidates: list[TimingRuleCandidate] = []
         for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED):
             if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
                 continue
@@ -295,13 +303,32 @@ class CatalogCommandPointRuntime:
                     resolution_id=resolution_id,
                 ):
                     continue
-                self._gain_command_points_from_destroyed_unit(
-                    context=context,
-                    record=record,
-                    clause=clause,
-                    attacking_model_id=attacking_model_id,
-                    resolution_id=resolution_id,
+                candidates.append(
+                    TimingRuleCandidate(
+                        participant=SequencingParticipant(
+                            participant_id=resolution_id,
+                            player_id=context.destroying_player_id,
+                            source_rule_id=record.definition.source_id,
+                            requirement=SequencingRequirement.MANDATORY,
+                        ),
+                        activate=partial(
+                            self._gain_command_points_from_destroyed_unit,
+                            context=context,
+                            record=record,
+                            clause=clause,
+                            attacking_model_id=attacking_model_id,
+                            resolution_id=resolution_id,
+                        ),
+                    )
                 )
+        return tuple(candidates)
+
+    def resolve_unit_destroyed(self, context: UnitDestroyedContext) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+        return UnitDestroyedHookRegistry.from_bindings(self.unit_destroyed_hook_bindings()).resolve(
+            context
+        )
 
     def stratagem_cost_choice_request(
         self,
@@ -443,68 +470,98 @@ class CatalogCommandPointRuntime:
 
         return handler
 
-    def _phase_gain_handler(self, source: _PhaseGainSource) -> RuntimeEventHandler:
-        subscription = RuntimeContentEventSubscription(
-            subscription_id=source.subscription_id,
-            source_rule_id=source.record.definition.source_id,
-            trigger_kind=source.record.definition.timing.trigger_kind,
-            handler_id=source.handler_id,
-            filters=MappingProxyType({}),
-        )
+    def _phase_gain_candidates(
+        self,
+        source: _PhaseGainSource,
+        context: RuntimeContentEventContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        candidates: list[TimingRuleCandidate] = []
+        subscription = _phase_gain_subscription(source)
+        for unit, model_id in self._phase_gain_targets(source, context):
+            candidate = runtime_event_candidate(
+                context,
+                subscription,
+                occurrence_id=model_id,
+                requirement=SequencingRequirement.MANDATORY,
+                handler=self._phase_gain_handler(source, selected_model_id=model_id),
+                source_payload={
+                    "source_unit_id": unit.unit_instance_id,
+                    "source_model_id": model_id,
+                    "clause_id": source.clause.clause_id,
+                },
+            )
+            if candidate is not None:
+                candidates.append(candidate)
+        return tuple(candidates)
 
-        def handler(context: RuntimeContentEventContext) -> RuntimeContentEventResult:
-            if type(context) is not RuntimeContentEventContext:
-                raise GameLifecycleError("Catalog CP phase-end runtime requires context.")
-            if context.event.active_player_id != source.owner_player_id:
-                return RuntimeContentEventResult.applied(
-                    subscription,
-                    replay_payload={"resolutions": []},
-                )
-            resolutions: list[JsonValue] = []
-            army = _army_for_player(self.armies, player_id=source.owner_player_id)
-            for unit in army.units:
-                current_model_ids = active_ability_model_ids_for_unit(
+    def _phase_gain_targets(
+        self,
+        source: _PhaseGainSource,
+        context: RuntimeContentEventContext,
+    ) -> tuple[tuple[UnitInstance, str], ...]:
+        if type(context) is not RuntimeContentEventContext:
+            raise GameLifecycleError("Catalog CP phase runtime requires context.")
+        if context.event.active_player_id != source.owner_player_id:
+            return ()
+        targets: list[tuple[UnitInstance, str]] = []
+        army = _army_for_player(self.armies, player_id=source.owner_player_id)
+        for unit in army.units:
+            current_model_ids = active_ability_model_ids_for_unit(state=context.state, unit=unit)
+            if not current_model_ids or not _record_source_matches_runtime_unit(
+                record=source.record,
+                army=army,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+            ):
+                continue
+            source_model_ids = _source_model_ids_for_record(
+                record=source.record,
+                army=army,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+            )
+            for model_id in source_model_ids:
+                if not ability_battlefield_conditions_apply(
                     state=context.state,
-                    unit=unit,
-                )
-                if not current_model_ids or not _record_source_matches_runtime_unit(
-                    record=source.record,
-                    army=army,
-                    unit=unit,
-                    current_model_instance_ids=current_model_ids,
+                    clause=source.clause,
+                    source_unit_instance_id=unit.unit_instance_id,
+                    source_model_instance_id=model_id,
                 ):
                     continue
-                source_model_ids = _source_model_ids_for_record(
-                    record=source.record,
-                    army=army,
-                    unit=unit,
-                    current_model_instance_ids=current_model_ids,
-                )
-                for model_id in source_model_ids:
-                    if not ability_battlefield_conditions_apply(
-                        state=context.state,
-                        clause=source.clause,
-                        source_unit_instance_id=unit.unit_instance_id,
-                        source_model_instance_id=model_id,
-                    ):
-                        continue
-                    if clause_requires_source_unit_enemy_destruction(
-                        source.clause
-                    ) and not _source_unit_destroyed_enemy_unit_this_phase(
+                if clause_requires_source_unit_enemy_destruction(source.clause) and not (
+                    _source_unit_destroyed_enemy_unit_this_phase(
                         context=context,
                         armies=self.armies,
                         source=source,
                         unit=unit,
-                    ):
-                        continue
-                    resolution = _resolve_phase_command_point_gain(
+                    )
+                ):
+                    continue
+                targets.append((unit, model_id))
+        return tuple(targets)
+
+    def _phase_gain_handler(
+        self,
+        source: _PhaseGainSource,
+        *,
+        selected_model_id: str | None = None,
+    ) -> RuntimeEventHandler:
+        subscription = _phase_gain_subscription(source)
+
+        def handler(context: RuntimeContentEventContext) -> RuntimeContentEventResult:
+            resolutions: list[JsonValue] = []
+            for unit, model_id in self._phase_gain_targets(source, context):
+                if selected_model_id is not None and model_id != selected_model_id:
+                    continue
+                resolutions.append(
+                    _resolve_phase_command_point_gain(
                         context=context,
                         source=source,
                         unit=unit,
                         source_model_instance_id=model_id,
                         ability_index=self.ability_indexes_by_player_id[source.owner_player_id],
                     )
-                    resolutions.append(resolution)
+                )
             return RuntimeContentEventResult.applied(
                 subscription,
                 replay_payload=validate_json_value({"resolutions": resolutions}),
@@ -1181,6 +1238,16 @@ def _resolve_phase_command_point_gain(
         resolution,
     )
     return resolution
+
+
+def _phase_gain_subscription(source: _PhaseGainSource) -> RuntimeContentEventSubscription:
+    return RuntimeContentEventSubscription(
+        subscription_id=source.subscription_id,
+        source_rule_id=source.record.definition.source_id,
+        trigger_kind=source.record.definition.timing.trigger_kind,
+        handler_id=source.handler_id,
+        filters=MappingProxyType({}),
+    )
 
 
 def _phase_gain_dice_gate(clause: RuleClause) -> RuleCondition | None:

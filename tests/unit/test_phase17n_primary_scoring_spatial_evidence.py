@@ -24,10 +24,6 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.destruction_provenance import (
-    DestructionSourceKind,
-    ModelDestructionAttribution,
-)
 from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
@@ -47,15 +43,10 @@ from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
     primary_battlefield_departure_id,
 )
-from warhammer40k_core.engine.primary_destruction_evidence import (
-    rules_unit_objective_proximity_witness,
-)
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT,
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
-    record_new_primary_battlefield_departure_events,
     record_new_primary_turn_start_evidence_events,
-    record_primary_unit_destruction_event,
 )
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION,
@@ -76,10 +67,6 @@ from warhammer40k_core.engine.primary_scoring_state_evidence import (
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     record_primary_turn_start_evidence,
 )
-from warhammer40k_core.engine.primary_unit_destruction_tracking import (
-    record_primary_destroyed_model_departures,
-    record_primary_unit_destructions_for_destroyed_models,
-)
 from warhammer40k_core.engine.primary_victory_point_policy import (
     validate_primary_victory_point_transaction,
     validate_victory_point_ledger_policy,
@@ -91,7 +78,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
 )
-from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState, VictoryPointLedger
+from warhammer40k_core.engine.scoring import VictoryPointLedger
 from warhammer40k_core.engine.starting_attached_units import (
     starting_attached_unit_records_for_army,
 )
@@ -742,6 +729,7 @@ def test_search_and_scour_scores_exact_end_of_battle_territory_evidence() -> Non
         requested_condition_ids=required_conditions,
     )
     state_evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         end_of_battle=True,
@@ -976,46 +964,16 @@ def test_primary_historical_restore_rejects_recorded_event_graph_corruption(
 @pytest.mark.parametrize(
     ("corruption", "expected_error"),
     [
-        (
-            "attribution",
-            "Attributed Primary destruction attribution drifted from model_destroyed evidence",
-        ),
-        (
-            "source_witness_missing",
-            "model_destroyed evidence lacks a source witness",
-        ),
-        (
-            "source_witness_none",
-            "source witness drifted from model_destroyed evidence",
-        ),
-        (
-            "destroyed_witness_missing",
-            "model_destroyed evidence lacks a destroyed witness",
-        ),
-        (
-            "model_malformed",
-            "Primary destroyed departure model event is malformed",
-        ),
-        (
-            "model_outside_starting_unit",
-            "Primary destroyed departure model component drift",
-        ),
-        (
-            "game",
-            "Primary destroyed departure model timing drift",
-        ),
-        (
-            "battle_round",
-            "Primary destroyed departure model timing drift",
-        ),
-        (
-            "active_player",
-            "Primary destroyed departure model timing drift",
-        ),
-        (
-            "target",
-            "Primary destruction target drifted from model_destroyed evidence",
-        ),
+        ("attribution", "Rule destruction cause payload binding drift"),
+        ("source_witness_missing", "Rule destruction cause payload binding drift"),
+        ("source_witness_none", "Rule destruction cause payload binding drift"),
+        ("destroyed_witness_missing", "Rule destruction cause payload binding drift"),
+        ("model_malformed", "Model destruction cause consumption identity drift"),
+        ("model_outside_starting_unit", "Model destruction cause consumption identity drift"),
+        ("game", "Model destruction cause consumption identity drift"),
+        ("battle_round", "Rule destruction cause payload binding drift"),
+        ("active_player", "Rule destruction cause payload binding drift"),
+        ("target", "Rule destruction cause payload binding drift"),
     ],
 )
 def test_primary_historical_restore_rejects_final_model_event_corruption(
@@ -1422,7 +1380,7 @@ def _corrupt_primary_turn_start_evidence(
 
 
 def _primary_historical_destruction_lifecycle_payload() -> GameLifecyclePayload:
-    state = _spatial_evidence_state()
+    state = _spatial_evidence_state(include_preexisting_casualty=False)
     battlefield = state.battlefield_state
     if battlefield is None:
         raise AssertionError("historical evidence test requires battlefield state")
@@ -1456,117 +1414,38 @@ def _primary_historical_destruction_lifecycle_payload() -> GameLifecyclePayload:
 
     attacker = _unit(state, "army-alpha:near")
     target = _unit(state, "army-beta:enemy")
-    source_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=attacker.unit_instance_id,
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        record_model_destruction_occurrences,
+        resolve_model_destruction_trigger,
     )
-    attribution = ModelDestructionAttribution.for_non_attack(
-        destroying_player_id="player-a",
-        source_kind=DestructionSourceKind.ABILITY,
-        source_rules_unit_instance_id=attacker.unit_instance_id,
-        source_model_instance_id=attacker.own_models[0].model_instance_id,
-    )
-    destructions: tuple[PrimaryUnitDestructionState, ...] = ()
-    tracking_rule_id = "core-rules:primary-unit-destruction-tracking"
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+    from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+    registry = UnitDestroyedHookRegistry.empty()
     for model_id in target.own_model_ids():
-        destroyed_witness = rules_unit_objective_proximity_witness(
+        destroy_rule_model_for_fixture(
             state=state,
-            rules_unit_instance_id=target.unit_instance_id,
+            decisions=decisions,
+            model_id=model_id,
+            destroying_player_id="player-a",
+            source_unit_id=attacker.unit_instance_id,
+            source_model_id=attacker.own_models[0].model_instance_id,
         )
-        _set_model_wounds_remaining(
-            state=state,
-            unit_instance_id=target.unit_instance_id,
-            model_instance_id=model_id,
-            wounds_remaining=0,
-        )
-        current_battlefield = state.battlefield_state
-        if current_battlefield is None:
-            raise AssertionError("historical evidence test requires battlefield state")
-        state.replace_battlefield_state(current_battlefield.with_removed_models((model_id,)))
-        model_destroyed_event = decisions.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": BattlePhase.MOVEMENT.value,
-                **attribution.to_payload(),
-                "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-                "destroyed_rules_unit_objective_proximity_witness": (
-                    destroyed_witness.to_payload()
-                ),
-                "target_unit_instance_id": target.unit_instance_id,
-                "model_instance_id": model_id,
-            },
-        )
-        departure_ids_before = tuple(
-            value.departure_id for value in state.primary_battlefield_departure_states
-        )
-        record_primary_destroyed_model_departures(
-            state=state,
-            destroyed_model_instance_ids=(model_id,),
-            source_id=f"{tracking_rule_id}:{model_destroyed_event.event_id}",
-            occurrence_id=model_destroyed_event.event_id,
-        )
-        destructions = record_primary_unit_destructions_for_destroyed_models(
-            state=state,
-            destroyed_model_instance_ids=(model_id,),
-            destruction_attribution=attribution,
-            source_model_destroyed_event_id=model_destroyed_event.event_id,
-            source_rules_unit_objective_proximity_witness=source_witness,
-            destroyed_rules_unit_objective_proximity_witness=destroyed_witness,
-            unattributed_cause=None,
-            source_mutation_id=None,
-            left_battlefield=False,
-            source_id=f"{tracking_rule_id}:{model_destroyed_event.event_id}",
-        )
-        record_new_primary_battlefield_departure_events(
-            state=state,
-            event_log=decisions.event_log,
-            departure_ids_before=departure_ids_before,
-        )
-    if len(destructions) != 1:
-        raise AssertionError("historical evidence test requires one completed destruction")
-    record_primary_unit_destruction_event(
-        event_log=decisions.event_log,
-        destruction=destructions[0],
-    )
+        record_model_destruction_occurrences(state=state, decisions=decisions, registry=registry)
+        for trigger in rule_trigger_history(decisions).ready():
+            assert (
+                resolve_model_destruction_trigger(
+                    state=state, decisions=decisions, trigger=trigger, registry=registry
+                )
+                is None
+            )
+    assert len(state.primary_unit_destruction_states) == 1
     payload = lifecycle.to_payload()
     if GameLifecycle.from_payload(deepcopy(payload)).to_payload() != payload:
         raise AssertionError("historical evidence lifecycle failed exact round trip")
     return payload
-
-
-def _set_model_wounds_remaining(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-    model_instance_id: str,
-    wounds_remaining: int,
-) -> None:
-    unit = _unit(state, unit_instance_id)
-    state.replace_army_definitions(
-        [
-            replace(
-                army,
-                units=tuple(
-                    replace(
-                        candidate,
-                        own_models=tuple(
-                            replace(model, wounds_remaining=wounds_remaining)
-                            if model.model_instance_id == model_instance_id
-                            else model
-                            for model in candidate.own_models
-                        ),
-                    )
-                    if candidate.unit_instance_id == unit.unit_instance_id
-                    else candidate
-                    for candidate in army.units
-                ),
-            )
-            for army in state.army_definitions
-        ]
-    )
 
 
 def _corrupt_primary_recorded_event_graph(
@@ -1756,6 +1635,7 @@ def _spatial_evidence_state(
     player_a_force_disposition_id: str = "purge-the-foe",
     player_b_force_disposition_id: str = "take-and-hold",
     mission_setup: MissionSetup | None = None,
+    include_preexisting_casualty: bool = True,
 ) -> GameState:
     catalog = _catalog()
     player_a = muster_army(
@@ -1774,7 +1654,7 @@ def _spatial_evidence_state(
                 _character_selection("near"),
                 _infantry_selection("reserve"),
                 _infantry_selection("embarked"),
-                _character_selection("destroyed"),
+                *((_character_selection("destroyed"),) if include_preexisting_casualty else ()),
                 _transport_selection("transport"),
             ),
             attachment_declarations=(
@@ -1785,7 +1665,8 @@ def _spatial_evidence_state(
             ),
         ),
     )
-    player_a = _with_destroyed_unit(player_a, unit_instance_id="army-alpha:destroyed")
+    if include_preexisting_casualty:
+        player_a = _with_destroyed_unit(player_a, unit_instance_id="army-alpha:destroyed")
     player_b = muster_army(
         catalog=catalog,
         request=_muster_request(
@@ -1818,11 +1699,10 @@ def _spatial_evidence_state(
                 unit_placements=(_unit_placement(player_b, player_b.units[0], anchor=(8.0, 48.0)),),
             ),
         ),
-        removed_model_ids=tuple(
-            sorted(
-                model.model_instance_id
-                for model in player_a.unit_by_id("army-alpha:destroyed").own_models
-            )
+        removed_model_ids=(
+            tuple(sorted(player_a.unit_by_id("army-alpha:destroyed").own_model_ids()))
+            if include_preexisting_casualty
+            else ()
         ),
     )
     descriptor = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
@@ -2077,6 +1957,7 @@ def _record_primary_scoring_evidence(
     record_primary_scoring_state_evidence(
         state=state,
         evidence=build_primary_scoring_state_evidence(
+            scoring_player_id=record.active_player_id,
             state=state,
             record=record,
             end_of_battle=end_of_battle,

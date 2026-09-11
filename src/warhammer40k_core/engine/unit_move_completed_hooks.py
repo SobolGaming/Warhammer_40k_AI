@@ -49,15 +49,12 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 
 type UnitMoveCompletedMortalWoundHandler = Callable[
     ["UnitMoveCompletedContext"],
     tuple["UnitMoveCompletedMortalWoundEffect", ...],
-]
-type UnitMoveCompletedMortalWoundRequestHandler = Callable[
-    ["UnitMoveCompletedContext"],
-    LifecycleStatus | None,
 ]
 type UnitMoveCompletedBattleShockHandler = Callable[
     ["UnitMoveCompletedContext"],
@@ -244,6 +241,7 @@ class UnitMoveCompletedBattleShockEffect:
     hook_id: str
     source_id: str
     source_rule_id: str
+    source_player_id: str
     target_unit_instance_id: str
     target_player_id: str
     trigger_event_id: str
@@ -253,6 +251,7 @@ class UnitMoveCompletedBattleShockEffect:
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.battle_shock import battle_shock_test_reason_from_token
 
+        _validate_identifier("source_player_id", self.source_player_id)
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         object.__setattr__(
@@ -288,7 +287,9 @@ class UnitMoveCompletedMortalWoundHookBinding:
     hook_id: str
     source_id: str
     handler: UnitMoveCompletedMortalWoundHandler | None = None
-    request_handler: UnitMoveCompletedMortalWoundRequestHandler | None = None
+    candidate_handler: (
+        Callable[[UnitMoveCompletedContext], tuple[TimingRuleCandidate, ...]] | None
+    ) = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -297,13 +298,11 @@ class UnitMoveCompletedMortalWoundHookBinding:
             raise GameLifecycleError(
                 "UnitMoveCompletedMortalWoundHookBinding handler must be callable."
             )
-        if self.request_handler is not None and not callable(self.request_handler):
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError("Move-completion candidate handler must be callable.")
+        if self.handler is None and self.candidate_handler is None:
             raise GameLifecycleError(
-                "UnitMoveCompletedMortalWoundHookBinding request_handler must be callable."
-            )
-        if self.handler is None and self.request_handler is None:
-            raise GameLifecycleError(
-                "UnitMoveCompletedMortalWoundHookBinding requires a handler or request_handler."
+                "UnitMoveCompletedMortalWoundHookBinding requires an effect or candidate handler."
             )
 
 
@@ -386,22 +385,6 @@ class UnitMoveCompletedMortalWoundHookRegistry:
             )
         )
 
-    def request_status_for(self, context: UnitMoveCompletedContext) -> LifecycleStatus | None:
-        if type(context) is not UnitMoveCompletedContext:
-            raise GameLifecycleError("Unit move completed hooks require a context.")
-        for binding in self.bindings:
-            if binding.request_handler is None:
-                continue
-            status = binding.request_handler(context)
-            if status is None:
-                continue
-            if type(status) is not LifecycleStatus:
-                raise GameLifecycleError(
-                    "Unit move completed request handlers must return LifecycleStatus or None."
-                )
-            return status
-        return None
-
 
 @dataclass(frozen=True, slots=True)
 class UnitMoveCompletedBattleShockHookRegistry:
@@ -473,11 +456,15 @@ class UnitMoveCompletedBattleShockHookRegistry:
         )
 
 
-def resolve_unit_move_completed_mortal_wound_hooks(
+def resolve_unit_move_completed_hooks(
     *,
     state: GameState,
     decisions: DecisionController,
     registry: UnitMoveCompletedMortalWoundHookRegistry,
+    battle_shock_move_hooks: UnitMoveCompletedBattleShockHookRegistry | None = None,
+    battle_shock_hooks: BattleShockHookRegistry | None = None,
+    additional_candidates: Callable[[UnitMoveCompletedContext], tuple[TimingRuleCandidate, ...]]
+    | None = None,
     ruleset_descriptor: RulesetDescriptor,
     runtime_modifier_registry: RuntimeModifierRegistry,
     completed_phase: BattlePhase,
@@ -488,6 +475,15 @@ def resolve_unit_move_completed_mortal_wound_hooks(
     expected_triggering_unit_instance_id: str | None = None,
     expected_triggering_player_id: str | None = None,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+
+    if (
+        battle_shock_move_hooks is not None
+        and type(battle_shock_move_hooks) is not UnitMoveCompletedBattleShockHookRegistry
+    ):
+        raise GameLifecycleError("Unit move completed Battle-shock requires a registry.")
+    if battle_shock_hooks is not None and type(battle_shock_hooks) is not BattleShockHookRegistry:
+        raise GameLifecycleError("Unit move completed Battle-shock requires Battle-shock hooks.")
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Unit move completed hooks require a DecisionController.")
     if type(registry) is not UnitMoveCompletedMortalWoundHookRegistry:
@@ -545,9 +541,6 @@ def resolve_unit_move_completed_mortal_wound_hooks(
         expected_triggering_unit_instance_id=requested_triggering_unit_id,
         expected_triggering_player_id=requested_triggering_player_id,
     )
-    if not registry.all_bindings():
-        return None
-    processed_effect_keys = _processed_effect_keys(decisions)
     for event_id, payload in events:
         triggering_unit_id = _payload_string(payload, "unit_instance_id")
         triggering_player_id = _triggering_player_id_from_move_completion_payload(
@@ -571,104 +564,17 @@ def resolve_unit_move_completed_mortal_wound_hooks(
             ability_indexes_by_player_id=ability_indexes,
             decisions=decisions,
         )
-        request_status = registry.request_status_for(context)
-        if request_status is not None:
-            return request_status
-        for effect in registry.effects_for(context):
-            if _effect_key(effect) in processed_effect_keys:
-                continue
-            status = _resolve_mortal_wound_effect(
-                state=state,
-                decisions=decisions,
-                effect=effect,
-                completed_phase=phase,
-                movement_action=movement_action,
-            )
-            if status is not None:
-                return status
-    return None
+        from warhammer40k_core.engine.move_completion_sequencing import resolve_move_completion
 
-
-def resolve_unit_move_completed_battle_shock_hooks(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    registry: UnitMoveCompletedBattleShockHookRegistry,
-    battle_shock_hooks: BattleShockHookRegistry,
-    ruleset_descriptor: RulesetDescriptor,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-    completed_phase: BattlePhase,
-    event_type: str,
-    movement_actions: tuple[str, ...],
-    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
-) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
-
-    if type(decisions) is not DecisionController:
-        raise GameLifecycleError("Unit move completed Battle-shock requires DecisionController.")
-    if type(registry) is not UnitMoveCompletedBattleShockHookRegistry:
-        raise GameLifecycleError("Unit move completed Battle-shock requires a registry.")
-    if type(battle_shock_hooks) is not BattleShockHookRegistry:
-        raise GameLifecycleError("Unit move completed Battle-shock requires Battle-shock hooks.")
-    if type(ruleset_descriptor) is not RulesetDescriptor:
-        raise GameLifecycleError("Unit move completed Battle-shock requires a RulesetDescriptor.")
-    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-
-    if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
-        raise GameLifecycleError(
-            "Unit move completed Battle-shock requires a RuntimeModifierRegistry."
+        status = resolve_move_completion(
+            additional_candidates=additional_candidates,
+            context=context,
+            mortal_wound_hooks=registry,
+            battle_shock_move_hooks=battle_shock_move_hooks,
+            battle_shock_hooks=battle_shock_hooks,
         )
-    phase = _battle_phase_from_token(completed_phase)
-    requested_event_type = _validate_identifier("event_type", event_type)
-    requested_actions = _validate_identifier_tuple("movement_actions", movement_actions)
-    ability_indexes = _validate_ability_index_mapping(ability_indexes_by_player_id)
-    if not registry.all_bindings():
-        return None
-    processed_effect_keys = _processed_battle_shock_effect_keys(decisions)
-    for event_id, payload in _unprocessed_move_completion_events(
-        state=state,
-        decisions=decisions,
-        completed_phase=phase,
-        event_type=requested_event_type,
-        movement_actions=requested_actions,
-    ):
-        triggering_unit_id = _payload_string(payload, "unit_instance_id")
-        triggering_player_id = _triggering_player_id_from_move_completion_payload(
-            payload,
-            event_type=requested_event_type,
-        )
-        movement_action = _movement_action_from_payload(
-            payload,
-            event_type=requested_event_type,
-        )
-        context = UnitMoveCompletedContext(
-            state=state,
-            ruleset_descriptor=ruleset_descriptor,
-            runtime_modifier_registry=runtime_modifier_registry,
-            completed_phase=phase,
-            trigger_event_id=event_id,
-            trigger_event_payload=payload,
-            triggering_unit_instance_id=triggering_unit_id,
-            triggering_player_id=triggering_player_id,
-            movement_action=movement_action,
-            ability_indexes_by_player_id=ability_indexes,
-            decisions=decisions,
-        )
-        for effect in registry.effects_for(context):
-            if unit_move_completed_battle_shock_effect_key(effect) in processed_effect_keys:
-                continue
-            status = _resolve_battle_shock_effect(
-                state=state,
-                decisions=decisions,
-                battle_shock_hooks=battle_shock_hooks,
-                runtime_modifier_registry=runtime_modifier_registry,
-                ability_indexes_by_player_id=ability_indexes,
-                effect=effect,
-                completed_phase=phase,
-                movement_action=movement_action,
-            )
-            if status is not None:
-                return status
+        if status is not None:
+            return status
     return None
 
 
@@ -771,7 +677,7 @@ def is_unit_move_completed_mortal_wound_feel_no_pain_request(
     )
 
 
-def _resolve_mortal_wound_effect(
+def resolve_mortal_wound_effect(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -929,7 +835,7 @@ def _resolve_mortal_wound_effect(
     return None
 
 
-def _resolve_battle_shock_effect(
+def resolve_battle_shock_effect(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -1128,6 +1034,8 @@ def _triggering_player_id_from_move_completion_payload(
     *,
     event_type: str,
 ) -> str:
+    if event_type == "reinforcement_unit_arrived":
+        return _payload_string(payload, "player_id")
     if event_type != "unit_disembarked":
         return _payload_string(payload, "active_player_id")
     disembarked_state = disembarked_unit_state_from_event_payload(payload)
@@ -1141,7 +1049,7 @@ def _triggering_player_id_from_move_completion_payload(
     return disembarked_state.player_id
 
 
-def _processed_effect_keys(decisions: DecisionController) -> set[str]:
+def processed_effect_keys(decisions: DecisionController) -> set[str]:
     processed: set[str] = set()
     for record in decisions.event_log.records:
         if record.event_type not in {
@@ -1187,7 +1095,7 @@ def _mortal_wounds_for_cap_group(
     return sum(mortal_wounds_by_effect_key.values())
 
 
-def _processed_battle_shock_effect_keys(decisions: DecisionController) -> set[str]:
+def processed_battle_shock_effect_keys(decisions: DecisionController) -> set[str]:
     processed: set[str] = set()
     for record in decisions.event_log.records:
         if record.event_type != UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT:
@@ -1225,6 +1133,7 @@ def unit_move_completed_battle_shock_effect_key(
         "hook_id": effect.hook_id,
         "source_id": effect.source_id,
         "source_rule_id": effect.source_rule_id,
+        "source_player_id": effect.source_player_id,
         "target_unit_instance_id": effect.target_unit_instance_id,
         "target_player_id": effect.target_player_id,
         "reason": effect.reason.value,

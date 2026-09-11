@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldTransitionBatch,
@@ -200,6 +201,20 @@ def record_completed_command_occurrences_for_fixture(
         completed = handler.begin_phase(state=state, decisions=decisions)
         if completed.status_kind is not LifecycleStatusKind.ADVANCED:
             raise AssertionError("Command-history fixture unexpectedly requires a player decision.")
+        completed = BattleRoundFlow(
+            phase_handlers={BattlePhase.COMMAND: handler},
+            turn_end_hooks=bundle.turn_end_hook_registry,
+            phase_end_objective_control_hooks=bundle.phase_end_objective_control_hook_registry,
+            unit_destroyed_hooks=bundle.unit_destroyed_hook_registry,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+        ).advance(state=state, decisions=decisions)
+        if (
+            completed.status_kind is not LifecycleStatusKind.ADVANCED
+            or state.current_battle_phase is not BattlePhase.MOVEMENT
+        ):
+            raise AssertionError("Command-history fixture did not complete its phase boundary.")
         state.command_step_state = None
     state.battle_round = original_battle_round
     state.active_player_id = original_active_player_id

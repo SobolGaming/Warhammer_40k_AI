@@ -41,7 +41,6 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
     terrain_endpoint_placement_violation,
@@ -93,16 +92,6 @@ from warhammer40k_core.engine.scout_abilities import (
 from warhammer40k_core.engine.scout_abilities import (
     scout_ability_instances_for_rules_unit as scout_ability_instances_for_rules_unit,
 )
-from warhammer40k_core.engine.sequencing import (
-    SequencingConflictContext,
-    SequencingParticipant,
-    create_sequencing_decision_request,
-)
-from warhammer40k_core.engine.timing_windows import (
-    TimingTriggerKind,
-    TimingWindow,
-    TimingWindowDescriptor,
-)
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
     UnitCoherencyResult,
@@ -127,7 +116,6 @@ SCOUT_RESERVE_SETUP_PROPOSAL_KIND = "scout_reserve_setup"
 
 CORE_REDEPLOY_SOURCE_RULE_ID = "core_rules:redeploy"
 SCOUT_ENEMY_DISTANCE_INCHES = 8.0
-PREBATTLE_SEQUENCING_EVENT_TYPE = "sequencing_order_resolved"
 _EPSILON = 1e-9
 
 
@@ -983,42 +971,6 @@ def prebattle_timing_state_for_state(
     )
 
 
-def prebattle_sequencing_request_for_timing_state(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    timing_state: PreBattleTimingWindowState,
-) -> DecisionRequest | None:
-    if type(decisions) is not DecisionController:
-        raise GameLifecycleError("Pre-battle sequencing requires a DecisionController.")
-    if timing_state.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
-        return None
-    participants = _prebattle_sequencing_participants(timing_state)
-    if len(participants) < 2:
-        return None
-    conflict_id = _prebattle_sequencing_conflict_id(timing_state.setup_step)
-    if (
-        _resolved_prebattle_sequencing_order(
-            decisions=decisions,
-            conflict_id=conflict_id,
-        )
-        is not None
-    ):
-        return None
-    return create_sequencing_decision_request(
-        request_id=state.next_decision_request_id(),
-        context=SequencingConflictContext(
-            conflict_id=conflict_id,
-            game_id=state.game_id,
-            timing_window=_prebattle_timing_window(state=state, setup_step=timing_state.setup_step),
-            player_ids=tuple(participant.player_id for participant in participants),
-            active_player_id=None,
-        ),
-        participants=participants,
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
-    )
-
-
 def prebattle_next_player_id_for_timing_state(
     *,
     decisions: DecisionController,
@@ -1026,29 +978,7 @@ def prebattle_next_player_id_for_timing_state(
 ) -> str | None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Pre-battle sequencing requires a DecisionController.")
-    if timing_state.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
-        return timing_state.next_player_id
-    resolved_order = _resolved_prebattle_sequencing_order(
-        decisions=decisions,
-        conflict_id=_prebattle_sequencing_conflict_id(timing_state.setup_step),
-    )
-    if resolved_order is None:
-        return timing_state.next_player_id
-    participants_by_id = {
-        participant.participant_id: participant
-        for participant in _prebattle_sequencing_participants(timing_state)
-    }
-    if not set(participants_by_id).issubset(set(resolved_order)):
-        raise GameLifecycleError("Pre-battle sequencing order drift.")
-    for participant_id in resolved_order:
-        participant = participants_by_id.get(participant_id)
-        if participant is None:
-            continue
-        if participant.player_id in timing_state.completed_player_ids:
-            continue
-        if timing_state.available_action_count_by_player[participant.player_id] > 0:
-            return participant.player_id
-    return None
+    return timing_state.next_player_id
 
 
 def redeploy_unit_selection_request(
@@ -1822,91 +1752,6 @@ def _timing_state_for_step(
         completed_player_ids=completed,
         alternation_cursor=alternation_cursor,
     )
-
-
-def _prebattle_sequencing_participants(
-    timing_state: PreBattleTimingWindowState,
-) -> tuple[SequencingParticipant, ...]:
-    if timing_state.setup_step is not SetupStep.REDEPLOY_UNITS:
-        raise GameLifecycleError("Generic pre-battle sequencing is limited to redeploys.")
-    participants: list[SequencingParticipant] = []
-    for player_id, action_count in timing_state.available_action_count_by_player.items():
-        if player_id in timing_state.completed_player_ids:
-            continue
-        if action_count <= 0:
-            continue
-        participants.append(
-            SequencingParticipant(
-                participant_id=_prebattle_sequencing_participant_id(
-                    setup_step=timing_state.setup_step,
-                    player_id=player_id,
-                ),
-                player_id=player_id,
-                source_rule_id=CORE_REDEPLOY_SOURCE_RULE_ID,
-                payload={
-                    "setup_step": timing_state.setup_step.value,
-                    "available_action_count": action_count,
-                },
-            )
-        )
-    return tuple(participants)
-
-
-def _prebattle_sequencing_participant_id(
-    *,
-    setup_step: SetupStep,
-    player_id: str,
-) -> str:
-    return f"prebattle:{setup_step.value}:{_validate_identifier('player_id', player_id)}"
-
-
-def _prebattle_sequencing_conflict_id(setup_step: SetupStep) -> str:
-    resolved_step = _setup_step_from_token(setup_step)
-    if resolved_step is not SetupStep.REDEPLOY_UNITS:
-        raise GameLifecycleError("Generic pre-battle sequencing is limited to redeploys.")
-    return f"prebattle-sequencing:{resolved_step.value}"
-
-
-def _prebattle_timing_window(*, state: GameState, setup_step: SetupStep) -> TimingWindow:
-    resolved_step = _setup_step_from_token(setup_step)
-    return TimingWindow(
-        window_id=f"prebattle-window:{state.game_id}:{resolved_step.value}",
-        descriptor=TimingWindowDescriptor(
-            descriptor_id=f"prebattle-window-descriptor:{resolved_step.value}",
-            trigger_kind=TimingTriggerKind.BEFORE_BATTLE,
-            source_rule_id="core_rules:prebattle",
-            source_step=resolved_step.value,
-            metadata={"setup_step": resolved_step.value},
-        ),
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        active_player_id=None,
-        phase=None,
-        trigger_event_id=None,
-    )
-
-
-def _resolved_prebattle_sequencing_order(
-    *,
-    decisions: DecisionController,
-    conflict_id: str,
-) -> tuple[str, ...] | None:
-    requested_conflict_id = _validate_identifier("conflict_id", conflict_id)
-    for event in reversed(decisions.event_log.records):
-        if event.event_type != PREBATTLE_SEQUENCING_EVENT_TYPE:
-            continue
-        if not isinstance(event.payload, dict):
-            raise GameLifecycleError("Sequencing event payload must be an object.")
-        if event.payload.get("conflict_id") != requested_conflict_id:
-            continue
-        raw_order = event.payload.get("ordered_participant_ids")
-        if not isinstance(raw_order, list):
-            raise GameLifecycleError("Sequencing event ordered_participant_ids must be a list.")
-        ordered: list[str] = []
-        for participant_id in raw_order:
-            ordered.append(_validate_identifier("ordered_participant_id", participant_id))
-        return tuple(ordered)
-    return None
 
 
 def _available_action_views_for_step(

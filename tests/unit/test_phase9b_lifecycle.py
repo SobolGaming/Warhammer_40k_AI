@@ -9,6 +9,7 @@ import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.model_geometry_helpers import accepted_model_geometry
 from tests.phase17n_secondary_mission_helpers import drain_pending_secondary_mission_setup
+from tests.phase17n_step6g_secondary_certification_helpers import seed_completed_fight_phase
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -904,6 +905,7 @@ def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -
         "timing_window_opened",
         "timing_window_resolved",
         "timing_window_opened",
+        "command_phase_start_rules_discovered",
         "timing_window_resolved",
         "command_phase_start_synchronous_hooks_completed",
         "command_phase_start_effect_pass_completed",
@@ -934,6 +936,8 @@ def test_phase_wrap_switches_active_player() -> None:
     flow = _battle_flow()
 
     for _ in range(5):
+        if state.current_battle_phase is BattlePhase.FIGHT:
+            seed_completed_fight_phase(state)
         flow.advance(state=state, decisions=GameLifecycle().decision_controller)
 
     assert state.battle_round == 1
@@ -947,6 +951,8 @@ def test_turn_end_objective_control_audit_follows_post_cleanup_capture() -> None
     decisions = DecisionController()
 
     for _ in range(5):
+        if state.current_battle_phase is BattlePhase.FIGHT:
+            seed_completed_fight_phase(state)
         flow.advance(state=state, decisions=decisions)
 
     fight_boundary_events = tuple(
@@ -1000,6 +1006,8 @@ def test_battle_round_increments_after_all_players_complete_fight_phase() -> Non
     flow = _battle_flow()
 
     for _ in range(10):
+        if state.current_battle_phase is BattlePhase.FIGHT:
+            seed_completed_fight_phase(state)
         flow.advance(state=state, decisions=GameLifecycle().decision_controller)
 
     assert state.battle_round == 2

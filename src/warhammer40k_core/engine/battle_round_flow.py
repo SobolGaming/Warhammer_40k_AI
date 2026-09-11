@@ -12,24 +12,23 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartRequestContext,
     BattleRoundStartResultContext,
 )
+from warhammer40k_core.engine.boundary_rule_flow import (
+    prepare_phase_end_boundary,
+    request_end_rules,
+)
+from warhammer40k_core.engine.boundary_sequencing import boundary_context, start_turn_context
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     apply_any_phase_once_per_battle_result,
 )
-from warhammer40k_core.engine.cult_ambush import (
-    resolve_cult_ambush_marker_removal_for_completed_moves,
-)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
-    RuntimeContentEvent,
     RuntimeContentEventIndex,
 )
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.mission_decisions import request_tactical_secondary_score
+from warhammer40k_core.engine.mission_turn_end_sequencing import request_mission_turn_end_rules
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -44,74 +43,38 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     PhaseHandler,
 )
-from warhammer40k_core.engine.primary_destruction_evidence import (
-    RulesUnitObjectiveProximityWitness,
-)
+from warhammer40k_core.engine.phase_start_sequencing import phase_start_context
 from warhammer40k_core.engine.primary_historical_events import (
     record_new_primary_battlefield_departure_events,
     record_new_primary_turn_start_evidence_events,
     record_new_primary_unit_destruction_events,
-    record_primary_unit_destruction_event,
 )
 from warhammer40k_core.engine.primary_mission_action_interruptions import (
     reconcile_primary_mission_action_interruptions,
 )
-from warhammer40k_core.engine.primary_mission_action_resolution import (
-    resolve_primary_mission_actions_at_turn_end,
-)
-from warhammer40k_core.engine.primary_mission_choice_opportunities import (
-    next_primary_mission_turn_end_choice_request,
-)
-from warhammer40k_core.engine.primary_mission_choices import punishment_choice_request
-from warhammer40k_core.engine.primary_mission_state_runtime import (
-    resolve_surveil_marker_removal_for_completed_moves,
-)
-from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
-    PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
-    PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
-    PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
-    PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
-    mark_pending_primary_scoring_boundaries,
-)
-from warhammer40k_core.engine.primary_unit_destruction_tracking import (
-    record_primary_destroyed_model_departures,
-    record_primary_unit_destruction_for_logical_completion,
-)
-from warhammer40k_core.engine.return_on_death import resolve_pending_return_on_death_phase_end
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-from warhammer40k_core.engine.secondary_scoring_boundary import (
-    next_pending_tactical_secondary_achievement,
-    score_turn_end_mission_scoring_boundary,
-)
+from warhammer40k_core.engine.runtime_timing_sequencing import resolve_runtime_timing_window
 from warhammer40k_core.engine.sticky_objective_control import (
-    PhaseEndObjectiveControlContext,
     PhaseEndObjectiveControlHookRegistry,
 )
+from warhammer40k_core.engine.timing_window_events import record_timing_window_boundary
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     TimingWindow,
-    TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookRegistry,
-    TurnEndRequestContext,
     TurnEndResultContext,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import (
-    UnitDestroyedContext,
     UnitDestroyedHookRegistry,
-    model_destroyed_events_for_lifecycle_phase,
-    physical_component_destruction_completion_events_for_phase,
-    unit_destruction_completion_events_for_phase,
 )
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
 
 
-_LIFECYCLE_TIMING_RULE_ID = "core-rules-lifecycle-timing"
-_PRIMARY_UNIT_DESTRUCTION_TRACKING_RULE_ID = "core-rules:primary-unit-destruction-tracking"
 _END_WINDOW_RESOLUTION_ORDER = ("non_mission_rules", "mission_rules")
 
 
@@ -142,6 +105,13 @@ class BattleRoundFlow:
             PhaseEndObjectiveControlHookRegistry.empty()
             if phase_end_objective_control_hooks is None
             else phase_end_objective_control_hooks
+        )
+        from warhammer40k_core.engine.boundary_rule_flow import (
+            compose_core_end_rule_registry,
+        )
+
+        self._turn_end_hooks = compose_core_end_rule_registry(
+            self._turn_end_hooks, self._phase_end_objective_control_hooks
         )
         self._unit_destroyed_hooks = (
             UnitDestroyedHookRegistry.empty()
@@ -195,6 +165,17 @@ class BattleRoundFlow:
         if current_phase is None:
             raise GameLifecycleError("BattleRoundFlow requires a current battle phase.")
 
+        from warhammer40k_core.engine.model_destruction_triggers import (
+            advance_model_destruction_triggers,
+        )
+
+        destruction_status = advance_model_destruction_triggers(
+            state=state,
+            decisions=decisions,
+            registry=self._unit_destroyed_hooks,
+        )
+        if destruction_status is not None:
+            return destruction_status
         handler = self._phase_handlers.get(current_phase)
         if handler is None:
             raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
@@ -226,38 +207,7 @@ class BattleRoundFlow:
                     "request_id": start_request.request_id,
                 },
             )
-        turn_start_request = (
-            punishment_choice_request(
-                state=state,
-                decisions=decisions,
-            )
-            if _is_start_of_player_turn(state)
-            else None
-        )
-        if turn_start_request is not None:
-            decisions.request_decision(turn_start_request)
-            decisions.event_log.append(
-                "primary_mission_choice_requested",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "request_id": turn_start_request.request_id,
-                    "decision_type": turn_start_request.decision_type,
-                    "actor_id": turn_start_request.actor_id,
-                },
-            )
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=turn_start_request,
-                payload={
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "phase_body_status": "primary_mission_turn_start_choice_required",
-                    "request_id": turn_start_request.request_id,
-                },
-            )
-        _emit_start_timing_windows(
+        timing_status = _emit_start_timing_windows(
             state=state,
             decisions=decisions,
             runtime_event_index=self._runtime_event_index,
@@ -265,6 +215,8 @@ class BattleRoundFlow:
             ruleset_descriptor=self._ruleset_descriptor,
             army_catalog=self._army_catalog,
         )
+        if timing_status is not None:
+            return timing_status
         pending_start_request = _pending_decision_request(decisions)
         if pending_start_request is not None:
             return LifecycleStatus.waiting_for_decision(
@@ -292,12 +244,6 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
         )
-        resolve_surveil_marker_removal_for_completed_moves(
-            state=state,
-            decisions=decisions,
-            completed_phase=current_phase,
-            runtime_modifier_registry=self._runtime_modifier_registry,
-        )
         if status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
             return status
         if status.status_kind is LifecycleStatusKind.TERMINAL:
@@ -310,114 +256,61 @@ class BattleRoundFlow:
         ):
             return status
 
-        phase_end_objective_control_record = state.determine_current_phase_end_objective_control(
-            runtime_modifier_registry=self._runtime_modifier_registry,
+        from warhammer40k_core.engine.model_destruction_triggers import (
+            record_model_destruction_occurrences,
         )
-        if not any(
-            event.event_type == "end_boundary_objective_control_determined"
-            and isinstance(event.payload, dict)
-            and event.payload.get("record_ids") == [phase_end_objective_control_record.record_id]
-            for event in decisions.event_log.records
-        ):
-            decisions.event_log.append(
-                "end_boundary_objective_control_determined",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "record_ids": [phase_end_objective_control_record.record_id],
-                    "source_rule_id": (
-                        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
-                        "14.02.01-control-first"
-                    ),
-                },
-            )
-        _emit_end_timing_windows(
-            state=state,
-            decisions=decisions,
-            runtime_event_index=self._runtime_event_index,
-            runtime_modifier_registry=self._runtime_modifier_registry,
-            ruleset_descriptor=self._ruleset_descriptor,
-            army_catalog=self._army_catalog,
+        from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+
+        record_model_destruction_occurrences(
+            state=state, decisions=decisions, registry=self._unit_destroyed_hooks
         )
-        if state.battlefield_state is not None:
-            from warhammer40k_core.engine.retained_destruction_cleanup import (
-                begin_retained_destruction_cleanup,
+        if rule_trigger_history(decisions).ready():
+            return LifecycleStatus.advanced(
+                stage=state.stage,
+                payload={"phase_body_status": "deferred_rules_ready"},
             )
 
-            retention_status = begin_retained_destruction_cleanup(
-                state=state,
-                decisions=decisions,
-                reason="phase_end",
-            )
-            if retention_status is not None:
-                return retention_status
-        _apply_phase_end_objective_control_hooks(
+        prepare_phase_end_boundary(
             state=state,
             decisions=decisions,
-            registry=self._phase_end_objective_control_hooks,
             runtime_modifier_registry=self._runtime_modifier_registry,
         )
-        _apply_phase_end_unit_destroyed_hooks(
+        timing_status = request_end_rules(
             state=state,
             decisions=decisions,
-            registry=self._unit_destroyed_hooks,
+            registry=self._turn_end_hooks,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            ruleset_descriptor=self._ruleset_descriptor,
+            army_catalog=self._army_catalog,
+            runtime_modifier_registry=self._runtime_modifier_registry,
+            reaction_queue=reaction_queue,
         )
-        reconcile_primary_mission_action_interruptions(
-            state=state,
+        if timing_status is not None:
+            return timing_status
+        from warhammer40k_core.engine.fight_phase_end_sequencing import (
+            complete_fight_phase_boundary,
+        )
+
+        complete_fight_phase_boundary(state=state, decisions=decisions)
+        record_timing_window_boundary(
             decisions=decisions,
+            window=boundary_context(state, TimingTriggerKind.END_PHASE).timing_window,
+            completed=True,
+            resolution_order=_END_WINDOW_RESOLUTION_ORDER,
         )
-        pending_request = _pending_decision_request(decisions)
-        if pending_request is not None:
-            return _waiting_for_post_objective_control_decision(
-                state=state,
-                current_phase=current_phase,
-                pending_request=pending_request,
-                pending_window=PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
-            )
-        return_request = resolve_pending_return_on_death_phase_end(
-            state=state,
-            decisions=decisions,
-        )
-        if return_request is not None:
-            return _waiting_for_post_objective_control_decision(
-                state=state,
-                current_phase=current_phase,
-                pending_request=return_request,
-                pending_window=PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
-            )
-        resolve_cult_ambush_marker_removal_for_completed_moves(
-            state=state,
-            decisions=decisions,
-            completed_phase=current_phase,
-        )
-        turn_end_request = self._turn_end_hooks.next_request_for(
-            TurnEndRequestContext(
+        if _is_end_of_player_turn(state):
+            turn_status = request_end_rules(
                 state=state,
                 decisions=decisions,
-                completed_phase=current_phase,
+                registry=self._turn_end_hooks,
+                trigger_kind=TimingTriggerKind.END_TURN,
+                ruleset_descriptor=self._ruleset_descriptor,
+                army_catalog=self._army_catalog,
+                runtime_modifier_registry=self._runtime_modifier_registry,
+                reaction_queue=reaction_queue,
             )
-        )
-        if turn_end_request is not None:
-            decisions.request_decision(turn_end_request)
-            decisions.event_log.append(
-                "turn_end_faction_rule_requested",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": _active_player_id(state),
-                    "phase": current_phase.value,
-                    "request_id": turn_end_request.request_id,
-                    "decision_type": turn_end_request.decision_type,
-                    "actor_id": turn_end_request.actor_id,
-                },
-            )
-            return _waiting_for_post_objective_control_decision(
-                state=state,
-                current_phase=current_phase,
-                pending_request=turn_end_request,
-                pending_window=PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
-            )
+            if turn_status is not None:
+                return turn_status
         objective_control_record_ids_before_advance = {
             record.record_id for record in state.objective_control_records
         }
@@ -462,56 +355,49 @@ class BattleRoundFlow:
             destruction_ids_before_advance = tuple(
                 value.destruction_id for value in state.primary_unit_destruction_states
             )
-            resolve_primary_mission_actions_at_turn_end(
+            mission_status = request_mission_turn_end_rules(
                 state=state,
                 decisions=decisions,
-                completed_phase=current_phase,
-                turn_end_record=turn_end_record,
                 runtime_modifier_registry=self._runtime_modifier_registry,
             )
-            primary_choice_request = next_primary_mission_turn_end_choice_request(
-                state=state,
+            if mission_status is not None:
+                return mission_status
+        round_end_window: TimingWindow | None = None
+        if _is_end_of_player_turn(state):
+            record_timing_window_boundary(
                 decisions=decisions,
-                completed_phase=current_phase,
-                runtime_modifier_registry=self._runtime_modifier_registry,
+                window=boundary_context(state, TimingTriggerKind.END_TURN).timing_window,
+                completed=True,
+                resolution_order=_END_WINDOW_RESOLUTION_ORDER,
             )
-            if primary_choice_request is not None:
-                decisions.request_decision(primary_choice_request)
-                decisions.event_log.append(
-                    "primary_mission_choice_requested",
-                    {
-                        "game_id": state.game_id,
-                        "battle_round": state.battle_round,
-                        "phase": current_phase.value,
-                        "request_id": primary_choice_request.request_id,
-                        "decision_type": primary_choice_request.decision_type,
-                        "actor_id": primary_choice_request.actor_id,
-                    },
-                )
-                return _waiting_for_post_objective_control_decision(
-                    state=state,
-                    current_phase=current_phase,
-                    pending_request=primary_choice_request,
-                    pending_window=PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
-                )
-            score_turn_end_mission_scoring_boundary(
-                state=state,
-                record=turn_end_record,
-                end_of_battle=False,
-                event_log=decisions.event_log,
-                runtime_modifier_registry=self._runtime_modifier_registry,
-            )
-            tactical_achievement = next_pending_tactical_secondary_achievement(state)
-            if tactical_achievement is not None:
-                return request_tactical_secondary_score(
+            if state.active_player_id == state.turn_order[-1]:
+                round_end_window = boundary_context(
+                    state, TimingTriggerKind.END_BATTLE_ROUND
+                ).timing_window
+                round_status = resolve_runtime_timing_window(
                     state=state,
                     decisions=decisions,
-                    achievement_context=tactical_achievement,
+                    window=round_end_window,
+                    index=self._runtime_event_index,
+                    runtime_modifier_registry=self._runtime_modifier_registry,
+                    ruleset_descriptor=self._ruleset_descriptor,
+                    army_catalog=self._army_catalog,
+                    resolution_order=_END_WINDOW_RESOLUTION_ORDER,
+                    complete_window=False,
                 )
+                if round_status is not None:
+                    return round_status
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry,
             event_log=decisions.event_log,
         )
+        if round_end_window is not None:
+            record_timing_window_boundary(
+                decisions=decisions,
+                window=round_end_window,
+                completed=True,
+                resolution_order=_END_WINDOW_RESOLUTION_ORDER,
+            )
         record_new_primary_battlefield_departure_events(
             state=state,
             event_log=decisions.event_log,
@@ -634,30 +520,6 @@ def _current_battle_phase_payload(state: GameState) -> str | None:
     return current_phase.value
 
 
-def _waiting_for_post_objective_control_decision(
-    *,
-    state: GameState,
-    current_phase: BattlePhase,
-    pending_request: DecisionRequest,
-    pending_window: str,
-) -> LifecycleStatus:
-    mark_pending_primary_scoring_boundaries(
-        state=state,
-        pending_window=pending_window,
-        pending_decision_request_id=pending_request.request_id,
-    )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=pending_request,
-        payload={
-            "battle_round": state.battle_round,
-            "phase": current_phase.value,
-            "phase_body_status": pending_window,
-            "request_id": pending_request.request_id,
-        },
-    )
-
-
 def _is_start_of_battle_round(state: GameState) -> bool:
     return (
         state.stage is GameLifecycleStage.BATTLE
@@ -665,15 +527,6 @@ def _is_start_of_battle_round(state: GameState) -> bool:
         and state.battle_phase_index == 0
         and bool(state.turn_order)
         and state.active_player_id == state.turn_order[0]
-    )
-
-
-def _is_start_of_player_turn(state: GameState) -> bool:
-    return (
-        state.stage is GameLifecycleStage.BATTLE
-        and state.current_battle_phase is BattlePhase.COMMAND
-        and state.battle_phase_index == 0
-        and state.active_player_id is not None
     )
 
 
@@ -739,63 +592,39 @@ def _emit_start_timing_windows(
     runtime_modifier_registry: RuntimeModifierRegistry,
     ruleset_descriptor: RulesetDescriptor | None,
     army_catalog: ArmyCatalog | None,
-) -> None:
+) -> LifecycleStatus | None:
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Start timing windows require a current battle phase.")
     battle_phase_index = state.battle_phase_index
     if battle_phase_index is None:
         raise GameLifecycleError("Start timing windows require a battle phase index.")
-    active_player_id = _active_player_id(state)
-    if battle_phase_index == 0 and active_player_id == state.turn_order[0]:
-        _emit_timing_window_if_missing(
-            state=state,
-            decisions=decisions,
-            trigger_kind=TimingTriggerKind.START_BATTLE_ROUND,
-            active_player_id=None,
-            phase=None,
-            source_step="battle_round",
-            window_id=(
-                f"timing-window:{state.game_id}:round-{state.battle_round:02d}:battle-round:start"
-            ),
-            runtime_event_index=runtime_event_index,
-            runtime_modifier_registry=runtime_modifier_registry,
-            ruleset_descriptor=ruleset_descriptor,
-            army_catalog=army_catalog,
-        )
     if battle_phase_index == 0:
-        _emit_timing_window_if_missing(
+        status = resolve_runtime_timing_window(
             state=state,
             decisions=decisions,
-            trigger_kind=TimingTriggerKind.START_TURN,
-            active_player_id=active_player_id,
-            phase=None,
-            source_step="player_turn",
-            window_id=(
-                f"timing-window:{state.game_id}:round-{state.battle_round:02d}:"
-                f"turn:{active_player_id}:start"
-            ),
-            runtime_event_index=runtime_event_index,
+            window=start_turn_context(state).timing_window,
+            index=runtime_event_index,
             runtime_modifier_registry=runtime_modifier_registry,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
         )
-    _emit_timing_window_if_missing(
+        if status is not None:
+            return status
+    if current_phase in (BattlePhase.COMMAND, BattlePhase.FIGHT, BattlePhase.SHOOTING):
+        return None
+    status = resolve_runtime_timing_window(
         state=state,
         decisions=decisions,
-        trigger_kind=TimingTriggerKind.START_PHASE,
-        active_player_id=active_player_id,
-        phase=current_phase,
-        source_step=current_phase.value,
-        window_id=(
-            f"timing-window:{state.game_id}:round-{state.battle_round:02d}:"
-            f"turn:{active_player_id}:phase:{current_phase.value}:start"
-        ),
-        runtime_event_index=runtime_event_index,
+        window=phase_start_context(state).timing_window,
+        index=runtime_event_index,
         runtime_modifier_registry=runtime_modifier_registry,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
+    if status is not None:
+        return status
+    return None
 
 
 def _emit_phase_start_objective_proximity_snapshot_if_available(
@@ -857,423 +686,6 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
             "source_objective_control_record": record.to_payload(),
         },
     )
-
-
-def _emit_end_timing_windows(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    runtime_event_index: RuntimeContentEventIndex,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-    ruleset_descriptor: RulesetDescriptor | None,
-    army_catalog: ArmyCatalog | None,
-) -> None:
-    completed_phase = state.current_battle_phase
-    if completed_phase is None:
-        raise GameLifecycleError("End timing windows require a current battle phase.")
-    battle_phase_index = state.battle_phase_index
-    if battle_phase_index is None:
-        raise GameLifecycleError("End timing windows require a battle phase index.")
-    active_player_id = _active_player_id(state)
-    _emit_timing_window_if_missing(
-        state=state,
-        decisions=decisions,
-        trigger_kind=TimingTriggerKind.END_PHASE,
-        active_player_id=active_player_id,
-        phase=completed_phase,
-        source_step=completed_phase.value,
-        window_id=(
-            f"timing-window:{state.game_id}:round-{state.battle_round:02d}:"
-            f"turn:{active_player_id}:phase:{completed_phase.value}:end"
-        ),
-        resolution_order=_END_WINDOW_RESOLUTION_ORDER,
-        runtime_event_index=runtime_event_index,
-        runtime_modifier_registry=runtime_modifier_registry,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-    )
-    if battle_phase_index + 1 < len(state.battle_phase_sequence):
-        return
-    _emit_timing_window_if_missing(
-        state=state,
-        decisions=decisions,
-        trigger_kind=TimingTriggerKind.END_TURN,
-        active_player_id=active_player_id,
-        phase=None,
-        source_step="player_turn",
-        window_id=(
-            f"timing-window:{state.game_id}:round-{state.battle_round:02d}:"
-            f"turn:{active_player_id}:end"
-        ),
-        resolution_order=_END_WINDOW_RESOLUTION_ORDER,
-        runtime_event_index=runtime_event_index,
-        runtime_modifier_registry=runtime_modifier_registry,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-    )
-    if state.turn_order.index(active_player_id) + 1 < len(state.turn_order):
-        return
-    _emit_timing_window_if_missing(
-        state=state,
-        decisions=decisions,
-        trigger_kind=TimingTriggerKind.END_BATTLE_ROUND,
-        active_player_id=None,
-        phase=None,
-        source_step="battle_round",
-        window_id=(
-            f"timing-window:{state.game_id}:round-{state.battle_round:02d}:battle-round:end"
-        ),
-        resolution_order=_END_WINDOW_RESOLUTION_ORDER,
-        runtime_event_index=runtime_event_index,
-        runtime_modifier_registry=runtime_modifier_registry,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-    )
-
-
-def _apply_phase_end_objective_control_hooks(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    registry: PhaseEndObjectiveControlHookRegistry,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> None:
-    if type(registry) is not PhaseEndObjectiveControlHookRegistry:
-        raise GameLifecycleError("Phase-end objective-control hooks require a registry.")
-    if not registry.all_bindings():
-        return
-    completed_phase = state.current_battle_phase
-    if completed_phase is None:
-        raise GameLifecycleError("Phase-end objective-control hooks require a current phase.")
-    context = PhaseEndObjectiveControlContext(
-        state=state,
-        event_log=decisions.event_log,
-        completed_phase=completed_phase,
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
-    for sticky_state in registry.states_for(context):
-        if _sticky_objective_control_state_exists(state=state, state_id=sticky_state.state_id):
-            continue
-        state.record_sticky_objective_control_state(sticky_state)
-        decisions.event_log.append(
-            "sticky_objective_control_state_recorded",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": _active_player_id(state),
-                "phase": completed_phase.value,
-                "sticky_objective_control_state": sticky_state.to_payload(),
-            },
-        )
-
-
-def _sticky_objective_control_state_exists(*, state: GameState, state_id: str) -> bool:
-    requested_state_id = _validate_identifier("sticky_objective_control_state_id", state_id)
-    return any(
-        sticky_state.state_id == requested_state_id
-        for sticky_state in state.sticky_objective_control_states
-    )
-
-
-def _apply_phase_end_unit_destroyed_hooks(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    registry: UnitDestroyedHookRegistry,
-) -> None:
-    if type(registry) is not UnitDestroyedHookRegistry:
-        raise GameLifecycleError("Unit-destroyed hooks require a registry.")
-    completed_phase = state.current_battle_phase
-    if completed_phase is None:
-        raise GameLifecycleError("Unit-destroyed hooks require a current phase.")
-    completion_events = unit_destruction_completion_events_for_phase(
-        state=state,
-        event_log=decisions.event_log,
-        completed_phase=completed_phase,
-    )
-    _record_phase_end_primary_unit_destructions(
-        state=state,
-        decisions=decisions,
-        model_destroyed_events=model_destroyed_events_for_lifecycle_phase(
-            state=state,
-            event_log=decisions.event_log,
-            completed_phase=completed_phase,
-        ),
-        physical_component_completion_events=(
-            physical_component_destruction_completion_events_for_phase(
-                state=state,
-                event_log=decisions.event_log,
-                completed_phase=completed_phase,
-            )
-        ),
-        completion_events=completion_events,
-    )
-    if not registry.all_bindings():
-        return
-    for event_id, payload in completion_events:
-        destroying_player_id = _payload_string(payload, key="destroying_player_id")
-        destroyed_unit_id = _payload_string(payload, key="target_unit_instance_id")
-        destroyed_player_id = _player_id_for_unit(state=state, unit_instance_id=destroyed_unit_id)
-        if destroying_player_id == destroyed_player_id:
-            continue
-        registry.resolve(
-            UnitDestroyedContext(
-                state=state,
-                decisions=decisions,
-                completed_phase=completed_phase,
-                model_destroyed_event_id=event_id,
-                model_destroyed_payload=payload,
-                destroying_player_id=destroying_player_id,
-                destroyed_unit_instance_id=destroyed_unit_id,
-                destroyed_player_id=destroyed_player_id,
-            )
-        )
-
-
-def _record_phase_end_primary_unit_destructions(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    model_destroyed_events: tuple[tuple[int, str, dict[str, JsonValue]], ...],
-    physical_component_completion_events: tuple[tuple[str, dict[str, JsonValue]], ...],
-    completion_events: tuple[tuple[str, dict[str, JsonValue]], ...],
-) -> None:
-    if state.mission_setup is None:
-        return
-    departure_ids_before = tuple(
-        value.departure_id for value in state.primary_battlefield_departure_states
-    )
-    physical_completion_pairs = {
-        (event_id, _payload_string(payload, key="target_unit_instance_id"))
-        for event_id, payload in physical_component_completion_events
-    }
-    component_by_model_id = {
-        model.model_instance_id: unit.unit_instance_id
-        for army in state.army_definitions
-        for unit in army.units
-        for model in unit.own_models
-    }
-    for _event_order, event_id, payload in model_destroyed_events:
-        model_id = _payload_string(payload, key="model_instance_id")
-        component_unit_id = component_by_model_id.get(model_id)
-        if component_unit_id is None:
-            raise GameLifecycleError("model_destroyed event references an unknown model.")
-        record_primary_destroyed_model_departures(
-            state=state,
-            destroyed_model_instance_ids=(model_id,),
-            source_id=f"{_PRIMARY_UNIT_DESTRUCTION_TRACKING_RULE_ID}:{event_id}",
-            occurrence_id=event_id,
-            fully_departed_component_unit_instance_ids=(
-                (component_unit_id,)
-                if (event_id, component_unit_id) in physical_completion_pairs
-                else ()
-            ),
-        )
-    record_new_primary_battlefield_departure_events(
-        state=state,
-        event_log=decisions.event_log,
-        departure_ids_before=departure_ids_before,
-    )
-    for event_id, payload in completion_events:
-        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
-        if "source_rules_unit_objective_proximity_witness" not in payload:
-            raise GameLifecycleError(
-                "model_destroyed event lacks source objective proximity evidence."
-            )
-        raw_source_witness = payload["source_rules_unit_objective_proximity_witness"]
-        source_witness = (
-            None
-            if raw_source_witness is None
-            else RulesUnitObjectiveProximityWitness.from_payload(raw_source_witness)
-        )
-        if "destroyed_rules_unit_objective_proximity_witness" not in payload:
-            raise GameLifecycleError(
-                "model_destroyed event lacks destroyed-unit objective proximity evidence."
-            )
-        RulesUnitObjectiveProximityWitness.from_payload(
-            payload["destroyed_rules_unit_objective_proximity_witness"]
-        )
-        destruction = record_primary_unit_destruction_for_logical_completion(
-            state=state,
-            destruction_attribution=attribution,
-            source_model_destroyed_event_id=event_id,
-            source_rules_unit_objective_proximity_witness=source_witness,
-            unattributed_cause=None,
-            source_mutation_id=None,
-            destroyed_unit_instance_id=_payload_string(
-                payload,
-                key="target_unit_instance_id",
-            ),
-            source_id=f"{_PRIMARY_UNIT_DESTRUCTION_TRACKING_RULE_ID}:{event_id}",
-        )
-        if destruction is not None:
-            record_primary_unit_destruction_event(
-                event_log=decisions.event_log,
-                destruction=destruction,
-            )
-
-
-def _player_id_for_unit(*, state: GameState, unit_instance_id: str) -> str:
-    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        if any(unit.unit_instance_id == requested_unit for unit in army.units):
-            return army.player_id
-    historical = tuple(
-        record
-        for record in state.starting_attached_unit_records
-        if record.attached_unit_instance_id == requested_unit
-    )
-    if len(historical) == 1:
-        return historical[0].player_id
-    raise GameLifecycleError("Unit owner lookup failed for unit-destroyed hook.")
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    if key not in payload:
-        raise GameLifecycleError(f"Unit-destroyed event payload missing {key}.")
-    return _validate_identifier(key, payload[key])
-
-
-def _emit_timing_window_if_missing(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    trigger_kind: TimingTriggerKind,
-    active_player_id: str | None,
-    phase: BattlePhase | None,
-    source_step: str,
-    window_id: str,
-    resolution_order: tuple[str, ...] = (),
-    runtime_event_index: RuntimeContentEventIndex,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-    ruleset_descriptor: RulesetDescriptor | None,
-    army_catalog: ArmyCatalog | None,
-) -> None:
-    if _timing_window_event_exists(
-        decisions=decisions,
-        event_type="timing_window_resolved",
-        window_id=window_id,
-    ):
-        return
-    window = TimingWindow(
-        window_id=window_id,
-        descriptor=TimingWindowDescriptor(
-            descriptor_id=f"{window_id}:descriptor",
-            trigger_kind=trigger_kind,
-            source_rule_id=_LIFECYCLE_TIMING_RULE_ID,
-            phase=phase,
-            source_step=source_step,
-        ),
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        active_player_id=active_player_id,
-        phase=phase,
-    )
-    payload_value = validate_json_value(
-        {
-            "timing_window": window.to_payload(),
-            "resolution_order": list(resolution_order),
-        }
-    )
-    if not isinstance(payload_value, dict):
-        raise GameLifecycleError("Timing window payload must be an object.")
-    payload = payload_value
-    decisions.event_log.append("timing_window_opened", payload)
-    decisions.event_log.append("timing_window_resolved", payload)
-    _dispatch_runtime_timing_window_event(
-        state=state,
-        decisions=decisions,
-        runtime_event_index=runtime_event_index,
-        runtime_modifier_registry=runtime_modifier_registry,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-        trigger_kind=trigger_kind,
-        active_player_id=active_player_id,
-        phase=phase,
-        window_payload=payload,
-    )
-
-
-def _dispatch_runtime_timing_window_event(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    runtime_event_index: RuntimeContentEventIndex,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-    ruleset_descriptor: RulesetDescriptor | None,
-    army_catalog: ArmyCatalog | None,
-    trigger_kind: TimingTriggerKind,
-    active_player_id: str | None,
-    phase: BattlePhase | None,
-    window_payload: dict[str, JsonValue],
-) -> None:
-    if not runtime_event_index.subscriptions_for(trigger_kind):
-        return
-    if ruleset_descriptor is None:
-        raise GameLifecycleError("Runtime timing events require ruleset_descriptor.")
-    if army_catalog is None:
-        raise GameLifecycleError("Runtime timing events require army_catalog.")
-    timing_window_payload = window_payload.get("timing_window")
-    if not isinstance(timing_window_payload, dict):
-        raise GameLifecycleError("Runtime timing event requires timing_window payload.")
-    window_id = _payload_string(timing_window_payload, key="window_id")
-    for player_id in _runtime_event_player_ids(state):
-        event = RuntimeContentEvent(
-            event_id=f"{window_id}:runtime:{player_id}",
-            game_id=state.game_id,
-            player_id=player_id,
-            battle_round=state.battle_round,
-            trigger_kind=trigger_kind,
-            phase=phase,
-            active_player_id=active_player_id,
-            event_payload=window_payload,
-        )
-        for result in runtime_event_index.dispatch(
-            event,
-            state=state,
-            decisions=decisions,
-            ruleset_descriptor=ruleset_descriptor,
-            army_catalog=army_catalog,
-            runtime_modifier_registry=runtime_modifier_registry,
-        ):
-            decisions.event_log.append(
-                "runtime_content_event_resolved",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "player_id": player_id,
-                    "trigger_kind": trigger_kind.value,
-                    "runtime_event": event.to_payload(),
-                    "result": result.to_payload(),
-                },
-            )
-
-
-def _runtime_event_player_ids(state: GameState) -> tuple[str, ...]:
-    player_ids = tuple(army.player_id for army in state.army_definitions)
-    if player_ids:
-        return tuple(sorted(player_ids))
-    return tuple(sorted(state.player_ids))
-
-
-def _timing_window_event_exists(
-    *,
-    decisions: DecisionController,
-    event_type: str,
-    window_id: str,
-) -> bool:
-    for record in decisions.event_log.records:
-        if record.event_type != event_type:
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            continue
-        timing_window_payload = payload.get("timing_window")
-        if not isinstance(timing_window_payload, dict):
-            continue
-        if timing_window_payload.get("window_id") == window_id:
-            return True
-    return False
 
 
 def _event_with_payload_id_exists(

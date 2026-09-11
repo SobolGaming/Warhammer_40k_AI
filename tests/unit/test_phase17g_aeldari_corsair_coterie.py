@@ -163,6 +163,11 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    SequencingParticipant,
+    SequencingRequirement,
+)
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
@@ -208,6 +213,7 @@ from warhammer40k_core.engine.stratagems import (
     request_stratagem_use,
 )
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.transport_disembark_state import (
     DisembarkedUnitState,
@@ -234,8 +240,7 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedMortalWoundEffect,
     UnitMoveCompletedMortalWoundHookBinding,
     UnitMoveCompletedMortalWoundHookRegistry,
-    resolve_unit_move_completed_battle_shock_hooks,
-    resolve_unit_move_completed_mortal_wound_hooks,
+    resolve_unit_move_completed_hooks,
 )
 from warhammer40k_core.engine.unit_state import starting_strength_records_for_units
 from warhammer40k_core.engine.wargear_selections import (
@@ -368,7 +373,9 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         enhancements.ARCHRAIDER_SETUP_HOOK_ID,
     }
     assert {binding.hook_id for binding in bundle.turn_end_hook_registry.all_bindings()} == {
-        enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID
+        enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
+        "core-rules:fight-end-boundary-providers",
+        "core-rules:movement-end-providers",
     }
     assert {
         binding.hook_id
@@ -400,7 +407,13 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
     ]
     assert summary["battle_formation_hook_ids"] == [enhancements.ARCHRAIDER_SETUP_HOOK_ID]
-    assert summary["turn_end_hook_ids"] == [enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID]
+    assert summary["turn_end_hook_ids"] == sorted(
+        [
+            enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
+            "core-rules:fight-end-boundary-providers",
+            "core-rules:movement-end-providers",
+        ]
+    )
     assert summary["unit_move_completed_mortal_wound_hook_ids"] == [rule.RELENTLESS_RAIDERS_HOOK_ID]
     assert summary["stratagem_cost_choice_hook_ids"] == [
         enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID
@@ -2453,7 +2466,7 @@ def test_webway_pathstone_turn_end_choice_moves_unit_to_strategic_reserves_once(
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
 
     result = DecisionResult.for_request(
         result_id="result-webway-pathstone-use",
@@ -2519,7 +2532,7 @@ def test_webway_pathstone_turn_end_decline_records_no_reserve_mutation() -> None
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
 
     result = DecisionResult.for_request(
         result_id="result-webway-pathstone-decline",
@@ -3240,9 +3253,9 @@ def test_corsair_event_filter_helpers_and_rule_guardrails_are_strict() -> None:
         "_archraider_cost_choice_used_for_source_result"
     ]
     webway_pathstone_decision_recorded_this_turn = vars(enhancements)[
-        "_webway_pathstone_decision_recorded_this_turn"
+        "webway_pathstone_decision_recorded_this_turn"
     ]
-    webway_pathstone_used_this_battle = vars(enhancements)["_webway_pathstone_used_this_battle"]
+    webway_pathstone_used_this_battle = vars(enhancements)["webway_pathstone_used_this_battle"]
     enhancement_active_player_id = vars(enhancements)["_active_player_id"]
     enhancement_payload_object = vars(enhancements)["_payload_object"]
     enhancement_payload_string = vars(enhancements)["_payload_string"]
@@ -3504,13 +3517,13 @@ def test_turn_end_hook_registry_routes_single_request_and_result() -> None:
             TurnEndHookBinding(
                 hook_id="hook-b",
                 source_id="source-b",
-                request_handler=lambda _context: None,
+                candidate_handler=lambda _context: (),
                 result_handler=lambda _context: False,
             ),
             TurnEndHookBinding(
                 hook_id="hook-a",
                 source_id="source-a",
-                request_handler=lambda _context: request,
+                candidate_handler=lambda _context: (_turn_candidate(request, "hook-a"),),
                 result_handler=lambda _context: True,
             ),
         )
@@ -3537,21 +3550,28 @@ def test_turn_end_hook_registry_routes_single_request_and_result() -> None:
         TurnEndHookBinding(hook_id="empty", source_id="source")
     with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
         TurnEndHookRegistry.from_bindings((registry.all_bindings()[0], registry.all_bindings()[0]))
-    with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
-        TurnEndHookRegistry.from_bindings(
-            (
-                TurnEndHookBinding(
-                    hook_id="request-a",
-                    source_id="source-a",
-                    request_handler=lambda _context: request,
-                ),
-                TurnEndHookBinding(
-                    hook_id="request-b",
-                    source_id="source-b",
-                    request_handler=lambda _context: request,
-                ),
-            )
-        ).next_request_for(request_context)
+    simultaneous = TurnEndHookRegistry.from_bindings(
+        (
+            TurnEndHookBinding(
+                hook_id="request-a",
+                source_id="source-a",
+                candidate_handler=lambda _context: (_turn_candidate(request, "request-a"),),
+            ),
+            TurnEndHookBinding(
+                hook_id="request-b",
+                source_id="source-b",
+                candidate_handler=lambda _context: (_turn_candidate(request, "request-b"),),
+            ),
+        )
+    ).next_request_for(
+        TurnEndRequestContext(
+            state=state, decisions=DecisionController(), completed_phase=BattlePhase.FIGHT
+        )
+    )
+    assert isinstance(simultaneous, DecisionRequest)
+    assert simultaneous.actor_id == "player-a"
+    assert simultaneous.decision_type == SEQUENCING_DECISION_TYPE
+    assert len(simultaneous.options) == 2
     with pytest.raises(GameLifecycleError, match="handled by multiple hooks"):
         TurnEndHookRegistry.from_bindings(
             (
@@ -3717,7 +3737,7 @@ def test_turn_end_hook_context_and_handler_validation_paths() -> None:
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
     )
-    with pytest.raises(GameLifecycleError, match="must return DecisionRequest or None"):
+    with pytest.raises(GameLifecycleError, match="pure candidate discovery"):
         registry.next_request_for(request_context)
     with pytest.raises(GameLifecycleError, match="request hooks require a context"):
         registry.next_request_for(cast(TurnEndRequestContext, object()))
@@ -4337,8 +4357,11 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
         active_player_id="player-b",
     )
     decisions = DecisionController()
+    from tests.secondary_destruction_helpers import record_current_turn_start_evidence_for_fixture
+
+    record_current_turn_start_evidence_for_fixture(state=state, event_log=decisions.event_log)
     decisions.event_log.append(
-        "test_move_completed",
+        "movement_activation_completed",
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
@@ -4377,16 +4400,32 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
         )
     )
 
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
         registry=registry,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         completed_phase=BattlePhase.MOVEMENT,
-        event_type="test_move_completed",
+        event_type="movement_activation_completed",
         movement_actions=("normal_move",),
     )
+
+    from tests.destruction_occurrence_fixture_helpers import finish_core_destructions_for_fixture
+
+    if status is not None:
+        assert status.status_kind is LifecycleStatusKind.ADVANCED
+        finish_core_destructions_for_fixture(state=state, decisions=decisions)
+        status = resolve_unit_move_completed_hooks(
+            state=state,
+            decisions=decisions,
+            registry=registry,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="movement_activation_completed",
+            movement_actions=("normal_move",),
+        )
 
     event_types = {record.event_type for record in decisions.event_log.records}
     assert status is None
@@ -4397,14 +4436,14 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
     }
     event_count_after_first_resolution = len(decisions.event_log.records)
     assert (
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
             registry=registry,
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             completed_phase=BattlePhase.MOVEMENT,
-            event_type="test_move_completed",
+            event_type="movement_activation_completed",
             movement_actions=("normal_move",),
         )
         is None
@@ -4490,7 +4529,7 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
     ]
     decisions = DecisionController()
     decisions.event_log.append(
-        "test_charge_completed",
+        "charge_move_completed",
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
@@ -4506,6 +4545,7 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
     ) -> tuple[UnitMoveCompletedBattleShockEffect, ...]:
         return (
             UnitMoveCompletedBattleShockEffect(
+                source_player_id="player-a",
                 hook_id="battle-shock-hook",
                 source_id="battle-shock-source",
                 source_rule_id="battle-shock-source",
@@ -4527,15 +4567,16 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
     )
     ability_indexes = {"player-b": AbilityCatalogIndex.from_records(())}
 
-    resolve_unit_move_completed_battle_shock_hooks(
+    resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
-        registry=registry,
+        registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+        battle_shock_move_hooks=registry,
         battle_shock_hooks=BattleShockHookRegistry.empty(),
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         completed_phase=BattlePhase.CHARGE,
-        event_type="test_charge_completed",
+        event_type="charge_move_completed",
         movement_actions=("charge_move",),
         ability_indexes_by_player_id=ability_indexes,
     )
@@ -4545,15 +4586,16 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
     assert "battle_shock_test_resolved" in event_types
     assert UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT in event_types
     event_count_after_first_resolution = len(decisions.event_log.records)
-    resolve_unit_move_completed_battle_shock_hooks(
+    resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
-        registry=registry,
+        registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+        battle_shock_move_hooks=registry,
         battle_shock_hooks=BattleShockHookRegistry.empty(),
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         completed_phase=BattlePhase.CHARGE,
-        event_type="test_charge_completed",
+        event_type="charge_move_completed",
         movement_actions=("charge_move",),
         ability_indexes_by_player_id=ability_indexes,
     )
@@ -4574,6 +4616,7 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
     )
     with pytest.raises(GameLifecycleError, match="Unsupported BattleShockTestReason"):
         UnitMoveCompletedBattleShockEffect(
+            source_player_id="player-a",
             hook_id="battle-shock-hook",
             source_id="battle-shock-source",
             source_rule_id="battle-shock-source",
@@ -4615,6 +4658,7 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
                     source_id="battle-shock-source",
                     handler=lambda _context: (
                         UnitMoveCompletedBattleShockEffect(
+                            source_player_id="player-a",
                             hook_id="drifted-hook",
                             source_id="battle-shock-source",
                             source_rule_id="battle-shock-source",
@@ -4627,67 +4671,72 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
             )
         ).effects_for(context)
     with pytest.raises(GameLifecycleError, match="requires Battle-shock hooks"):
-        resolve_unit_move_completed_battle_shock_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
-            registry=registry,
+            registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=registry,
             battle_shock_hooks=cast(BattleShockHookRegistry, object()),
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             completed_phase=BattlePhase.CHARGE,
-            event_type="test_charge_completed",
+            event_type="charge_move_completed",
             movement_actions=("charge_move",),
             ability_indexes_by_player_id=ability_indexes,
         )
-    with pytest.raises(GameLifecycleError, match="requires DecisionController"):
-        resolve_unit_move_completed_battle_shock_hooks(
+    with pytest.raises(GameLifecycleError, match="require a DecisionController"):
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=cast(DecisionController, object()),
-            registry=registry,
+            registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=registry,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             completed_phase=BattlePhase.CHARGE,
-            event_type="test_charge_completed",
+            event_type="charge_move_completed",
             movement_actions=("charge_move",),
             ability_indexes_by_player_id=ability_indexes,
         )
     with pytest.raises(GameLifecycleError, match="requires a registry"):
-        resolve_unit_move_completed_battle_shock_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
-            registry=cast(UnitMoveCompletedBattleShockHookRegistry, object()),
+            registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=cast(UnitMoveCompletedBattleShockHookRegistry, object()),
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             completed_phase=BattlePhase.CHARGE,
-            event_type="test_charge_completed",
+            event_type="charge_move_completed",
             movement_actions=("charge_move",),
             ability_indexes_by_player_id=ability_indexes,
         )
-    with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
-        resolve_unit_move_completed_battle_shock_hooks(
+    with pytest.raises(GameLifecycleError, match="require a RulesetDescriptor"):
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
-            registry=registry,
+            registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=registry,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             ruleset_descriptor=cast(RulesetDescriptor, object()),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             completed_phase=BattlePhase.CHARGE,
-            event_type="test_charge_completed",
+            event_type="charge_move_completed",
             movement_actions=("charge_move",),
             ability_indexes_by_player_id=ability_indexes,
         )
-    with pytest.raises(GameLifecycleError, match="requires a RuntimeModifierRegistry"):
-        resolve_unit_move_completed_battle_shock_hooks(
+    with pytest.raises(GameLifecycleError, match="require a RuntimeModifierRegistry"):
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
-            registry=registry,
+            registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=registry,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             runtime_modifier_registry=cast(RuntimeModifierRegistry, object()),
             completed_phase=BattlePhase.CHARGE,
-            event_type="test_charge_completed",
+            event_type="charge_move_completed",
             movement_actions=("charge_move",),
             ability_indexes_by_player_id=ability_indexes,
         )
@@ -4740,10 +4789,11 @@ def test_battle_shock_move_completed_hook_uses_opponent_turn_disembark_passenger
     )
 
     assert (
-        resolve_unit_move_completed_battle_shock_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
-            registry=registry,
+            registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+            battle_shock_move_hooks=registry,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
@@ -4947,7 +4997,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
         ).effects_for(context)
 
     with pytest.raises(GameLifecycleError, match="require a DecisionController"):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=cast(DecisionController, object()),
             registry=registry,
@@ -4958,7 +5008,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
             movement_actions=("normal_move",),
         )
     with pytest.raises(GameLifecycleError, match="require a registry"):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
             registry=cast(UnitMoveCompletedMortalWoundHookRegistry, object()),
@@ -4969,7 +5019,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
             movement_actions=("normal_move",),
         )
     with pytest.raises(GameLifecycleError, match="require a RulesetDescriptor"):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
             registry=registry,
@@ -4980,7 +5030,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
             movement_actions=("normal_move",),
         )
     with pytest.raises(GameLifecycleError, match="require a RuntimeModifierRegistry"):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
             registry=registry,
@@ -4991,7 +5041,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
             movement_actions=("normal_move",),
         )
     with pytest.raises(GameLifecycleError, match="movement_actions must be a tuple"):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
             registry=registry,
@@ -5002,6 +5052,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
             movement_actions=cast(tuple[str, ...], ["normal_move"]),
         )
 
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
     charge_actions: list[str] = []
     charge_decisions = DecisionController()
     charge_decisions.event_log.append(
@@ -5031,7 +5082,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
         )
     )
     assert (
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=charge_decisions,
             registry=charge_registry,
@@ -5057,7 +5108,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
         },
     )
     with pytest.raises(GameLifecycleError, match="missing movement action"):
-        resolve_unit_move_completed_mortal_wound_hooks(
+        resolve_unit_move_completed_hooks(
             state=state,
             decisions=bad_event_decisions,
             registry=registry,
@@ -6245,3 +6296,16 @@ def _replace_first_persisting_effect_payload(state: GameState, payload: JsonValu
     if not state.persisting_effects:
         raise AssertionError("Expected at least one persisting effect.")
     state.persisting_effects[0] = replace(state.persisting_effects[0], effect_payload=payload)
+
+
+def _turn_candidate(request: DecisionRequest, identifier: str) -> TimingRuleCandidate:
+    return TimingRuleCandidate(
+        participant=SequencingParticipant(
+            participant_id=identifier,
+            player_id=request.actor_id,
+            source_rule_id=f"source:{identifier}",
+            requirement=SequencingRequirement.OPTIONAL,
+        ),
+        activate=lambda: request,
+        request_template=request,
+    )

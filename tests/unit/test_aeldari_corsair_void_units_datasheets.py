@@ -951,6 +951,7 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
     expiration_decisions = DecisionController()
     tracked_runtime.unit_destroyed_handler(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, battle_state.active_player_id),
             state=battle_state,
             decisions=expiration_decisions,
             completed_phase=current_phase,
@@ -1385,6 +1386,7 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
 
     def destroyed_context(*, unit: UnitInstance, event_id: str) -> UnitDestroyedContext:
         return UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, battle_state.active_player_id),
             state=battle_state,
             decisions=target_expiration_decisions,
             completed_phase=current_phase,

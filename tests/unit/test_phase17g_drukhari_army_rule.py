@@ -66,6 +66,7 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
 from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHandler,
     CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
@@ -273,6 +274,7 @@ def test_power_from_pain_enemy_unit_destroyed_gains_one_pain_token() -> None:
 
     army_rule.resolve_enemy_unit_destroyed(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.SHOOTING,
@@ -2564,7 +2566,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
     state = battle_state()
     decisions = DecisionController()
     command_calls: list[str] = []
-    command_context = CommandPhaseStartContext(
+    command_context = CommandPhaseStartEffectContext(
         state=state,
         decisions=decisions,
         active_player_id="player-a",
@@ -2577,8 +2579,9 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
     command_registry = CommandPhaseStartHookRegistry.from_bindings((command_binding,))
 
     assert command_registry.all_bindings() == (command_binding,)
-    command_registry.resolve(command_context)
-    assert command_calls == ["player-a"]
+    with pytest.raises(GameLifecycleError, match="pure candidate discovery"):
+        command_registry.candidate_entries_for(command_context)
+    assert command_calls == []
     assert CommandPhaseStartHookRegistry.empty().all_bindings() == ()
 
     command_invalid_cases: tuple[Callable[[], object], ...] = (
@@ -2619,7 +2622,9 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
             bindings=cast(tuple[CommandPhaseStartHookBinding, ...], ("bad",)),
         ),
         lambda: CommandPhaseStartHookRegistry.from_bindings((command_binding, command_binding)),
-        lambda: command_registry.resolve(cast(CommandPhaseStartContext, object())),
+        lambda: command_registry.candidate_entries_for(
+            cast(CommandPhaseStartEffectContext, object())
+        ),
     )
     for command_invalid_case in command_invalid_cases:
         with pytest.raises(GameLifecycleError):
@@ -2649,6 +2654,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
     )
     unit_destroyed_calls: list[str] = []
     unit_destroyed_context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=decisions,
         completed_phase=cast(BattlePhase, BattlePhase.SHOOTING.value),
@@ -2661,7 +2667,9 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
     unit_binding = UnitDestroyedHookBinding(
         hook_id="drukhari-test:unit-destroyed-hook",
         source_id="drukhari-test:unit-destroyed-source",
-        handler=lambda context: unit_destroyed_calls.append(context.destroyed_player_id),
+        maintenance_handler=lambda context: unit_destroyed_calls.append(
+            context.destroyed_player_id
+        ),
     )
     unit_registry = UnitDestroyedHookRegistry.from_bindings((unit_binding,))
 
@@ -2672,6 +2680,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
 
     unit_invalid_cases: tuple[Callable[[], object], ...] = (
         lambda: UnitDestroyedContext(
+            sequencing_active_player_id="player-a",
             state=cast(GameState, object()),
             decisions=decisions,
             completed_phase=BattlePhase.SHOOTING,
@@ -2682,6 +2691,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
             destroyed_player_id="player-b",
         ),
         lambda: UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=cast(DecisionController, object()),
             completed_phase=BattlePhase.SHOOTING,
@@ -2692,6 +2702,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
             destroyed_player_id="player-b",
         ),
         lambda: UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=cast(BattlePhase, []),
@@ -2702,6 +2713,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
             destroyed_player_id="player-b",
         ),
         lambda: UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=cast(BattlePhase, "unsupported"),
@@ -2712,6 +2724,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
             destroyed_player_id="player-b",
         ),
         lambda: UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.SHOOTING,
@@ -2722,6 +2735,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
             destroyed_player_id="player-b",
         ),
         lambda: UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.SHOOTING,
@@ -2734,17 +2748,21 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
         lambda: UnitDestroyedHookBinding(
             hook_id=cast(str, 1),
             source_id="drukhari-test:unit-source",
-            handler=lambda context: unit_destroyed_calls.append(context.destroyed_player_id),
+            maintenance_handler=lambda context: unit_destroyed_calls.append(
+                context.destroyed_player_id
+            ),
         ),
         lambda: UnitDestroyedHookBinding(
             hook_id=" ",
             source_id="drukhari-test:unit-source",
-            handler=lambda context: unit_destroyed_calls.append(context.destroyed_player_id),
+            maintenance_handler=lambda context: unit_destroyed_calls.append(
+                context.destroyed_player_id
+            ),
         ),
         lambda: UnitDestroyedHookBinding(
             hook_id="drukhari-test:bad-unit-handler",
             source_id="drukhari-test:unit-source",
-            handler=cast(UnitDestroyedHandler, object()),
+            maintenance_handler=cast(UnitDestroyedHandler, object()),
         ),
         lambda: UnitDestroyedHookRegistry(
             bindings=cast(tuple[UnitDestroyedHookBinding, ...], []),
@@ -3385,6 +3403,7 @@ def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> 
     )
     army_rule.resolve_enemy_unit_destroyed(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, non_drukhari_destroyed_state.active_player_id),
             state=non_drukhari_destroyed_state,
             decisions=non_drukhari_destroyed_decisions,
             completed_phase=BattlePhase.SHOOTING,
@@ -3414,6 +3433,7 @@ def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> 
         },
     )
     destroyed_context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, destroyed_state.active_player_id),
         state=destroyed_state,
         decisions=destroyed_decisions,
         completed_phase=BattlePhase.SHOOTING,

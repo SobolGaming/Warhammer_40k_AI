@@ -1310,9 +1310,54 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 22
+    assert len(scope.source_packages) == 23
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
+
+
+def test_p01d_sequencing_source_pins_observations_and_boundary_exceptions() -> None:
+    from tools.build_core_sequencing_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_sequencing_2026_09 as source,
+    )
+
+    artifact, audit = build_payloads()
+    assert json.loads(ARTIFACT_PATH.read_bytes()) == artifact
+    assert json.loads(AUDIT_PATH.read_bytes()) == audit
+    assert {rule.section_id for rule in source.source_rules()} == {
+        "01.03",
+        "01.03.01",
+        "01.03.02",
+        "07.02",
+        "07.03",
+    }
+    package = source.source_package()
+    assert len(package.evidence_required_source_ids) == 5
+    assert len(source.source_evidence_records()) == 10
+    for rule in source.source_rules():
+        text = package.source_catalog.source_text_by_id(rule.source_id)
+        assert text.raw_text == rule.source_text
+        assert hashlib.sha256(text.raw_text.encode()).hexdigest() == rule.transcription_sha256
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "executable_engine_runtime"
+        assert rule.runtime_consumer_ids
+        mirror = next(
+            row
+            for row in source.source_evidence_records()
+            if row.rule_source_id == rule.source_id and row.evidence_kind == "third_party_mirror"
+        )
+        assert mirror.provider_name == "40k.app"
+        assert mirror.provider_non_affiliation_recorded
+        assert mirror.app_version is None
+        assert mirror.observed_at is not None
+        assert mirror.source_url == (
+            "https://www.40k.app/rules/07-the-battle-round"
+            if rule.section_id.startswith("07.")
+            else "https://www.40k.app/rules/01-core-concepts"
+        )
+    with pytest.raises(source.SequencingSourceError, match="reviewed pin"):
+        source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
 
 
 def test_p14_objective_source_package_pins_geometry_alias_and_provider_observations() -> None:

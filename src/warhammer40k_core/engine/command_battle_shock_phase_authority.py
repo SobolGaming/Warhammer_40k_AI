@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import cast
-
 from warhammer40k_core.engine import command_battle_shock_candidates as _cbsc
 from warhammer40k_core.engine.battle_shock_model_authority import battle_shock_model_ids
 from warhammer40k_core.engine.command_battle_shock_history import (
     COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
 )
-from warhammer40k_core.engine.command_points import CommandPhaseStep, CommandStepState
+from warhammer40k_core.engine.command_points import CommandPhaseStep
+from warhammer40k_core.engine.command_step_authority import (
+    command_step_state as _command_step_state,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
@@ -22,11 +23,12 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.sequencing import (
     SequencingConflictContext,
-    SequencingNextParticipantDecision,
-    SequencingNextParticipantDecisionPayload,
     SequencingParticipant,
-    apply_select_next_sequencing_participant_from_request,
-    create_select_next_sequencing_participant_request,
+    SequencingRequirement,
+)
+from warhammer40k_core.engine.timing_batch_runtime import (
+    select_timing_participant,
+    timing_batches_for_context,
 )
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -104,169 +106,93 @@ def resolve_candidate_order(
     )
     if not candidates:
         return None
-    if len(candidates) == 1:
-        expected_order = (candidates[0].unit_instance_id,)
-        if not command_state.battle_shock_candidate_order_unit_ids:
-            state.replace_command_step_state(
-                command_state.with_battle_shock_candidate_order(expected_order)
-            )
-        elif command_state.battle_shock_candidate_order_unit_ids != expected_order:
-            raise GameLifecycleError("Battle-shock trivial candidate order drifted.")
-        return None
-    context = _command_battle_shock_sequencing_context(state=state)
-    all_participants = _command_battle_shock_sequencing_participants(
+    context = command_battle_shock_sequencing_context(
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=command_state.active_player_id,
+        player_ids=state.player_ids,
+    )
+    participants = command_battle_shock_sequencing_participants(
         active_player_id=command_state.active_player_id,
         candidates=candidates,
     )
-    participant_by_id = {
-        participant.participant_id: participant for participant in all_participants
-    }
-    unit_id_by_participant_id = {
-        _command_battle_shock_participant_id(candidate): candidate.unit_instance_id
-        for candidate in candidates
-    }
-    matching_events: list[tuple[int, SequencingNextParticipantDecision]] = []
-    for event_index, event in enumerate(decisions.event_log.records):
-        if event.event_type != "sequencing_next_participant_selected":
-            continue
-        if not isinstance(event.payload, dict):
-            raise GameLifecycleError("Battle-shock sequencing event payload is malformed.")
-        if event.payload.get("conflict_id") != context.conflict_id:
-            continue
-        matching_events.append(
-            (
-                event_index,
-                SequencingNextParticipantDecision.from_payload(
-                    cast(SequencingNextParticipantDecisionPayload, event.payload)
-                ),
-            )
-        )
-    snapshot_indices = tuple(
-        index
-        for index, event in enumerate(decisions.event_log.records)
-        if event.event_type == "battle_shock_step_snapshot_created"
-        and isinstance(event.payload, dict)
-        and event.payload.get("game_id") == state.game_id
-        and event.payload.get("battle_round") == state.battle_round
-        and event.payload.get("active_player_id") == command_state.active_player_id
-    )
-    if len(snapshot_indices) != 1:
-        raise GameLifecycleError("Battle-shock sequencing snapshot authority is ambiguous.")
-    selected_participant_ids: list[str] = []
-    remaining_participant_ids = list(participant_by_id)
-    for event_index, sequencing_decision in matching_events:
-        if event_index <= snapshot_indices[0]:
-            raise GameLifecycleError("Battle-shock sequencing event escaped its snapshot boundary.")
-        if sequencing_decision.previously_selected_participant_ids != tuple(
-            selected_participant_ids
-        ) or sequencing_decision.remaining_participant_ids != tuple(remaining_participant_ids):
-            raise GameLifecycleError("Battle-shock sequencing selection prefix drifted.")
-        matching_records = tuple(
-            record
-            for record in decisions.records
-            if record.request.request_id == sequencing_decision.request_id
-            and record.result.result_id == sequencing_decision.result_id
-        )
-        if len(matching_records) != 1:
-            raise GameLifecycleError("Battle-shock sequencing lacks one decision record.")
-        record = matching_records[0]
-        remaining_participants = tuple(
-            participant_by_id[participant_id] for participant_id in remaining_participant_ids
-        )
-        expected_request = create_select_next_sequencing_participant_request(
-            request_id=record.request.request_id,
-            context=context,
-            previously_selected_participant_ids=tuple(selected_participant_ids),
-            remaining_participants=remaining_participants,
-        )
-        if (
-            record.request != expected_request
-            or apply_select_next_sequencing_participant_from_request(
-                request=record.request,
-                result=record.result,
-            )
-            != sequencing_decision
-        ):
-            raise GameLifecycleError("Battle-shock sequencing authority drifted.")
-        selected_participant_ids.append(sequencing_decision.selected_participant_id)
-        remaining_participant_ids.remove(sequencing_decision.selected_participant_id)
-
-    selected_unit_ids = tuple(
-        unit_id_by_participant_id[participant_id] for participant_id in selected_participant_ids
-    )
+    history = timing_batches_for_context(decisions, context)
     current_order = command_state.battle_shock_candidate_order_unit_ids
-    if current_order == selected_unit_ids[:-1] and selected_unit_ids:
-        command_state = command_state.with_battle_shock_candidate_order(selected_unit_ids)
-        state.replace_command_step_state(command_state)
-        current_order = command_state.battle_shock_candidate_order_unit_ids
-    elif current_order != selected_unit_ids:
-        auto_completed_order = (
-            (*selected_unit_ids, unit_id_by_participant_id[remaining_participant_ids[0]])
-            if len(remaining_participant_ids) == 1
-            else selected_unit_ids
+    completed_count = len(command_state.completed_battle_shock_test_request_ids)
+    completed_ids = tuple(
+        f"command-battle-shock-test:{unit_id}" for unit_id in current_order[:completed_count]
+    )
+    completion = None
+    if history:
+        batch = history[-1]
+        if len(history) != 1 or batch.participants != participants or batch.deferred_participants:
+            raise GameLifecycleError("Battle-shock timing population drifted from its snapshot.")
+        retained_ids = batch.completed_participant_ids
+        if batch.selected_participant_id in completed_ids:
+            completion = batch.selected_participant_id
+            retained_ids = (*retained_ids, completion)
+        if retained_ids != completed_ids:
+            raise GameLifecycleError("Battle-shock timing completion prefix drifted.")
+    elif completed_ids or current_order:
+        raise GameLifecycleError("Battle-shock ordering lacks its original timing batch.")
+    pending = decisions.queue.pending_requests
+    if len(pending) > 1:
+        raise GameLifecycleError("Battle-shock sequencing pending queue is ambiguous.")
+    selection = select_timing_participant(
+        decisions=decisions,
+        context=context,
+        unresolved_participants=participants,
+        next_request_id=(lambda: pending[0].request_id)
+        if pending
+        else state.next_decision_request_id,
+        completed_participant_id=completion,
+    )
+    if selection.request is not None:
+        if pending:
+            if pending != (selection.request,):
+                raise GameLifecycleError("Battle-shock sequencing pending request drifted.")
+        else:
+            decisions.request_decision(selection.request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=selection.request,
+            payload={
+                "phase": BattlePhase.COMMAND.value,
+                "phase_body_status": "battle_shock_next_test_selection_pending",
+                "pending_request_id": selection.request.request_id,
+                "selected_candidate_count": len(current_order),
+                "remaining_candidate_count": len(candidates) - len(current_order),
+            },
         )
-        if current_order != auto_completed_order:
-            raise GameLifecycleError("Battle-shock sequencing state prefix drifted.")
-
-    if len(command_state.completed_battle_shock_test_request_ids) < len(current_order):
-        return None
-    if len(command_state.completed_battle_shock_test_request_ids) != len(current_order):
-        raise GameLifecycleError("Battle-shock sequencing completion prefix drifted.")
-    if len(remaining_participant_ids) == 1:
-        if current_order == selected_unit_ids:
-            command_state = command_state.with_battle_shock_candidate_order(
-                (*current_order, unit_id_by_participant_id[remaining_participant_ids[0]])
+    if selection.participant_id is not None:
+        unit_id_by_participant = {
+            _command_battle_shock_participant_id(candidate): candidate.unit_instance_id
+            for candidate in candidates
+        }
+        expected_order = (
+            *current_order[:completed_count],
+            unit_id_by_participant[selection.participant_id],
+        )
+        if current_order == expected_order[:-1]:
+            state.replace_command_step_state(
+                command_state.with_battle_shock_candidate_order(expected_order)
             )
-            state.replace_command_step_state(command_state)
-        return None
-    if not remaining_participant_ids:
-        return None
-
-    remaining_participants = tuple(
-        participant_by_id[participant_id] for participant_id in remaining_participant_ids
-    )
-    pending_requests = decisions.queue.pending_requests
-    if pending_requests:
-        if len(pending_requests) != 1:
-            raise GameLifecycleError("Battle-shock sequencing pending queue is ambiguous.")
-        request = pending_requests[0]
-        expected = create_select_next_sequencing_participant_request(
-            request_id=request.request_id,
-            context=context,
-            previously_selected_participant_ids=tuple(selected_participant_ids),
-            remaining_participants=remaining_participants,
-        )
-        if request != expected:
-            raise GameLifecycleError("Battle-shock sequencing pending request drifted.")
-    else:
-        request = create_select_next_sequencing_participant_request(
-            request_id=state.next_decision_request_id(),
-            context=context,
-            previously_selected_participant_ids=tuple(selected_participant_ids),
-            remaining_participants=remaining_participants,
-        )
-        decisions.request_decision(request)
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload={
-            "phase": BattlePhase.COMMAND.value,
-            "phase_body_status": "battle_shock_next_test_selection_pending",
-            "pending_request_id": request.request_id,
-            "selected_candidate_count": len(selected_participant_ids),
-            "remaining_candidate_count": len(remaining_participant_ids),
-        },
-    )
+        elif current_order != expected_order:
+            raise GameLifecycleError("Battle-shock sequencing state prefix drifted.")
+    elif completed_count != len(candidates):
+        raise GameLifecycleError("Battle-shock timing batch completed before its required tests.")
+    return None
 
 
-def _command_battle_shock_sequencing_context(
+def command_battle_shock_sequencing_context(
     *,
-    state: GameState,
+    game_id: str,
+    battle_round: int,
+    active_player_id: str,
+    player_ids: tuple[str, ...],
 ) -> SequencingConflictContext:
-    active_player_id = _active_player_id(state)
     conflict_id = (
-        f"command-battle-shock-order:{state.game_id}:"
-        f"round-{state.battle_round:02d}:{active_player_id}"
+        f"command-battle-shock-order:{game_id}:round-{battle_round:02d}:{active_player_id}"
     )
     timing_window = TimingWindow(
         window_id=f"timing-window:{conflict_id}",
@@ -278,21 +204,21 @@ def _command_battle_shock_sequencing_context(
             source_step=CommandPhaseStep.BATTLE_SHOCK.value,
             metadata={"candidate_scope": "required_command_battle_shock_tests"},
         ),
-        game_id=state.game_id,
-        battle_round=state.battle_round,
+        game_id=game_id,
+        battle_round=battle_round,
         active_player_id=active_player_id,
         phase=BattlePhase.COMMAND,
     )
     return SequencingConflictContext(
         conflict_id=conflict_id,
-        game_id=state.game_id,
+        game_id=game_id,
         timing_window=timing_window,
-        player_ids=state.player_ids,
+        player_ids=player_ids,
         active_player_id=active_player_id,
     )
 
 
-def _command_battle_shock_sequencing_participants(
+def command_battle_shock_sequencing_participants(
     *,
     active_player_id: str,
     candidates: tuple[_cbsc.CommandBattleShockCandidate, ...],
@@ -302,6 +228,7 @@ def _command_battle_shock_sequencing_participants(
             participant_id=_command_battle_shock_participant_id(candidate),
             player_id=active_player_id,
             source_rule_id=COMMAND_BATTLE_SHOCK_SOURCE_RULE_ID,
+            requirement=SequencingRequirement.MANDATORY,
             payload=validate_json_value(candidate.to_payload()),
         )
         for candidate in candidates
@@ -312,15 +239,3 @@ def _command_battle_shock_participant_id(
     candidate: _cbsc.CommandBattleShockCandidate,
 ) -> str:
     return f"command-battle-shock-test:{candidate.unit_instance_id}"
-
-
-def _active_player_id(state: GameState) -> str:
-    if state.active_player_id is None:
-        raise GameLifecycleError("Battle state requires an active player.")
-    return state.active_player_id
-
-
-def _command_step_state(state: GameState) -> CommandStepState:
-    if state.command_step_state is None:
-        raise GameLifecycleError("Command phase requires CommandStepState.")
-    return state.command_step_state

@@ -68,7 +68,7 @@ if TYPE_CHECKING:
     )
     from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
-PRIMARY_SCORING_STATE_EVIDENCE_SCHEMA = "primary-scoring-state-evidence-v1"
+PRIMARY_SCORING_STATE_EVIDENCE_SCHEMA = "primary-scoring-state-evidence-v2"
 _PRIMARY_SCORING_STATE_EVIDENCE_ID_PREFIX = "primary-scoring-state-evidence"
 
 
@@ -83,6 +83,7 @@ class PrimaryScoringStateEvidencePayload(TypedDict):
     battlefield_id: str
     battle_round: int
     active_player_id: str
+    scoring_player_id: str
     phase: str
     timing: str
     scoring_boundary_kind: str
@@ -109,6 +110,7 @@ class PrimaryScoringStateEvidence:
     battlefield_id: str
     battle_round: int
     active_player_id: str
+    scoring_player_id: str
     phase: str
     timing: ObjectiveControlTiming
     scoring_boundary_kind: PrimaryScoringBoundaryKind
@@ -131,6 +133,7 @@ class PrimaryScoringStateEvidence:
             "game_id",
             "battlefield_id",
             "active_player_id",
+            "scoring_player_id",
             "phase",
             "objective_control_record_id",
             "scoring_commit_checkpoint_id",
@@ -240,6 +243,7 @@ class PrimaryScoringStateEvidence:
         battlefield_id: str,
         battle_round: int,
         active_player_id: str,
+        scoring_player_id: str,
         phase: str,
         timing: ObjectiveControlTiming,
         scoring_boundary_kind: PrimaryScoringBoundaryKind,
@@ -308,6 +312,7 @@ class PrimaryScoringStateEvidence:
             battlefield_id=validated_battlefield_id,
             battle_round=validated_round,
             active_player_id=validated_active_player,
+            scoring_player_id=scoring_player_id,
             phase=validated_phase,
             timing=timing,
             scoring_boundary_kind=scoring_boundary_kind,
@@ -329,6 +334,7 @@ class PrimaryScoringStateEvidence:
             battlefield_id=validated_battlefield_id,
             battle_round=validated_round,
             active_player_id=validated_active_player,
+            scoring_player_id=scoring_player_id,
             phase=validated_phase,
             timing=timing,
             scoring_boundary_kind=scoring_boundary_kind,
@@ -365,6 +371,7 @@ class PrimaryScoringStateEvidence:
             battlefield_id=self.battlefield_id,
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
+            scoring_player_id=self.scoring_player_id,
             phase=self.phase,
             timing=self.timing,
             scoring_boundary_kind=self.scoring_boundary_kind,
@@ -405,6 +412,7 @@ class PrimaryScoringStateEvidence:
             battlefield_id=cast(str, raw["battlefield_id"]),
             battle_round=cast(int, raw["battle_round"]),
             active_player_id=cast(str, raw["active_player_id"]),
+            scoring_player_id=cast(str, raw["scoring_player_id"]),
             phase=cast(str, raw["phase"]),
             timing=objective_control_timing_from_token(raw["timing"]),
             scoring_boundary_kind=_primary_scoring_boundary_kind_from_token(
@@ -468,6 +476,7 @@ def build_primary_scoring_state_evidence(
     state: GameState,
     record: ObjectiveControlRecord,
     end_of_battle: bool,
+    scoring_player_id: str,
     scoring_commit_checkpoint: PrimaryMissionBoundaryCheckpoint | None = None,
     proposed_objective_control_record: ObjectiveControlRecord | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
@@ -539,6 +548,7 @@ def build_primary_scoring_state_evidence(
         )
     scoring_commit_checkpoint = bound_primary_scoring_commit_checkpoint(
         state=state,
+        scoring_player_id=scoring_player_id,
         record=record,
         scoring_commit_checkpoint=scoring_commit_checkpoint,
         runtime_modifier_registry=runtime_modifier_registry,
@@ -626,6 +636,7 @@ def build_primary_scoring_state_evidence(
         battlefield_id=record.battlefield_id,
         battle_round=record.battle_round,
         active_player_id=record.active_player_id,
+        scoring_player_id=scoring_player_id,
         phase=record.phase,
         timing=record.timing,
         scoring_boundary_kind=(
@@ -686,6 +697,8 @@ def validate_primary_scoring_state_evidence_context(
     if evidence.scoring_boundary_kind is not expected_boundary_kind:
         raise GameLifecycleError("Primary scoring state boundary kind drifted.")
     ordered_players = _validate_turn_order(turn_order)
+    if evidence.scoring_player_id not in ordered_players:
+        raise GameLifecycleError("Primary scoring player is missing from turn_order.")
     setup_players = {
         mission_setup.attacker_player_id,
         mission_setup.defender_player_id,
@@ -810,6 +823,7 @@ def validate_primary_scoring_state_evidence_authority(
         state=state,
         record=record,
         end_of_battle=end_of_battle,
+        scoring_player_id=evidence.scoring_player_id,
         scoring_commit_checkpoint=scoring_commit_checkpoint,
         runtime_modifier_registry=runtime_modifier_registry,
     )
@@ -855,6 +869,7 @@ def record_primary_scoring_state_evidence(
         for stored in state.primary_scoring_state_evidence_records
         if stored.objective_control_record_id == evidence.objective_control_record_id
         and stored.scoring_boundary_kind is evidence.scoring_boundary_kind
+        and stored.scoring_player_id == evidence.scoring_player_id
     )
     if boundary_matches:
         if boundary_matches == (evidence,):
@@ -888,7 +903,7 @@ def validate_primary_scoring_state_evidence_records(
     boundaries_by_id = {record.record_id: record for record in objective_control_records}
     validated: list[PrimaryScoringStateEvidence] = []
     seen_evidence_ids: set[str] = set()
-    seen_boundary_keys: set[tuple[str, PrimaryScoringBoundaryKind]] = set()
+    seen_boundary_keys: set[tuple[str, PrimaryScoringBoundaryKind, str]] = set()
     for value in raw_values:
         if type(value) is not PrimaryScoringStateEvidence:
             raise GameLifecycleError(
@@ -904,6 +919,7 @@ def validate_primary_scoring_state_evidence_records(
         boundary_key = (
             evidence.objective_control_record_id,
             evidence.scoring_boundary_kind,
+            evidence.scoring_player_id,
         )
         if boundary_key in seen_boundary_keys:
             raise GameLifecycleError(
@@ -955,6 +971,7 @@ def _primary_scoring_state_content_payload(
     battlefield_id: str,
     battle_round: int,
     active_player_id: str,
+    scoring_player_id: str,
     phase: str,
     timing: ObjectiveControlTiming,
     scoring_boundary_kind: PrimaryScoringBoundaryKind,
@@ -975,6 +992,7 @@ def _primary_scoring_state_content_payload(
         "battlefield_id": battlefield_id,
         "battle_round": battle_round,
         "active_player_id": active_player_id,
+        "scoring_player_id": scoring_player_id,
         "phase": phase,
         "timing": timing.value,
         "scoring_boundary_kind": scoring_boundary_kind.value,
@@ -1024,8 +1042,6 @@ def _validate_builder_action_history(
     record: ObjectiveControlRecord,
     owner_by_rules_unit_id: dict[str, str],
 ) -> None:
-    from warhammer40k_core.engine.actions import MissionActionStatus
-
     known_players = set(player_ids)
     assignment_by_player = {
         assignment.player_id: assignment.primary_mission_id
@@ -1069,15 +1085,6 @@ def _validate_builder_action_history(
                 turn_order=turn_order,
                 battle_phase_sequence=battle_phase_sequence,
                 record=record,
-            )
-        if (
-            record.timing is ObjectiveControlTiming.TURN_END
-            and action.status is MissionActionStatus.STARTED
-            and action.player_id == record.active_player_id
-            and action.battle_round_started == record.battle_round
-        ):
-            raise GameLifecycleError(
-                "Primary scoring turn-end state cannot retain the current player's started Action."
             )
 
 

@@ -347,7 +347,9 @@
           "additionalProperties": false,
           "properties": {
             "movement_mode": {"const": "normal"},
-            "source_selected_option_id": {"const": "normal_move"}
+            "source_selected_option_id": {"const": "normal_move"},
+            "selected_movement_action_grant_hook_ids": {"type": "array", "maxItems": 0},
+            "selected_movement_action_grants": {"type": "array", "maxItems": 0}
           },
           "required": ["source_selected_option_id", "movement_mode"],
           "type": "object"

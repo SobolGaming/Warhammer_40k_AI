@@ -4,9 +4,11 @@ from __future__ import annotations
 # pyright: reportPrivateUsage=false
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import partial
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine import catalog_rule_consumption as _catalog
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -19,6 +21,7 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.bundle_validation import (
     validate_identifier as _validate_identifier,
 )
+from warhammer40k_core.engine.move_completion_candidates import resolve_mortal_wound_effects
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -26,6 +29,8 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
     UnitMoveCompletedMortalWoundEffect,
@@ -62,33 +67,49 @@ class CatalogUnitMoveCompletedMortalWoundsRuntime:
                 hook_id=_catalog.CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
                 source_id=_catalog.CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
                 handler=self.effect_handler,
-                request_handler=self.request_handler,
+                candidate_handler=self.candidates_for,
             ),
         )
 
-    def request_handler(self, context: UnitMoveCompletedContext) -> LifecycleStatus | None:
+    def candidates_for(self, context: UnitMoveCompletedContext) -> tuple[TimingRuleCandidate, ...]:
         if type(context) is not UnitMoveCompletedContext:
             raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
-        decisions = _catalog._unit_move_completed_decisions(context)
         groups = _catalog._available_catalog_unit_move_completed_mortal_wounds_groups(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id,
             armies=self.armies,
             context=context,
         )
-        if not groups:
-            return None
-        selected_group_keys = _catalog._resolved_unit_move_completed_mortal_wounds_group_keys(
-            decisions
-        )
-        unresolved_groups = tuple(
-            group
+        return tuple(
+            TimingRuleCandidate(
+                participant=SequencingParticipant(
+                    participant_id="catalog-move-rule:"
+                    + canonical_payload_sha256(
+                        {
+                            "group": list(
+                                _catalog._unit_move_completed_mortal_wounds_group_key(group)
+                            ),
+                        }
+                    ),
+                    player_id=context.triggering_player_id,
+                    source_rule_id=group.record.definition.source_id,
+                    requirement=SequencingRequirement.OPTIONAL
+                    if group.optional
+                    else SequencingRequirement.MANDATORY,
+                ),
+                activate=partial(self.activate_group, context, group),
+            )
             for group in groups
-            if _catalog._unit_move_completed_mortal_wounds_group_key(group)
-            not in selected_group_keys
         )
-        if not unresolved_groups:
-            return None
-        group = unresolved_groups[0]
+
+    def activate_group(
+        self,
+        context: UnitMoveCompletedContext,
+        group: _catalog.CatalogUnitMoveCompletedMortalWoundsGroup,
+    ) -> LifecycleStatus | None:
+        decisions = _catalog._unit_move_completed_decisions(context)
+        key = _catalog._unit_move_completed_mortal_wounds_group_key(group)
+        if key in _catalog._resolved_unit_move_completed_mortal_wounds_group_keys(decisions):
+            return resolve_mortal_wound_effects(context, self.effects_for_group(context, group))
         request = DecisionRequest(
             request_id=context.state.next_decision_request_id(),
             decision_type=(
@@ -190,59 +211,66 @@ class CatalogUnitMoveCompletedMortalWoundsRuntime:
     ) -> tuple[UnitMoveCompletedMortalWoundEffect, ...]:
         if type(context) is not UnitMoveCompletedContext:
             raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
+        _catalog._unit_move_completed_decisions(context)
+        return tuple(
+            effect
+            for group in _catalog._available_catalog_unit_move_completed_mortal_wounds_groups(
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                armies=self.armies,
+                context=context,
+            )
+            for effect in self.effects_for_group(context, group)
+        )
+
+    def effects_for_group(
+        self,
+        context: UnitMoveCompletedContext,
+        group: _catalog.CatalogUnitMoveCompletedMortalWoundsGroup,
+    ) -> tuple[UnitMoveCompletedMortalWoundEffect, ...]:
         decisions = _catalog._unit_move_completed_decisions(context)
         selected_targets = _catalog._selected_unit_move_completed_mortal_wounds_targets(decisions)
-        if not selected_targets:
-            return ()
         effects: list[UnitMoveCompletedMortalWoundEffect] = []
-        for group in _catalog._available_catalog_unit_move_completed_mortal_wounds_groups(
-            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
-            armies=self.armies,
-            context=context,
-        ):
-            selected = selected_targets.get(
-                _catalog._unit_move_completed_mortal_wounds_group_key(group)
+        selected = selected_targets.get(
+            _catalog._unit_move_completed_mortal_wounds_group_key(group)
+        )
+        if selected is None:
+            return ()
+        option_by_target = {option.target_unit_instance_id: option for option in group.options}
+        option = option_by_target.get(selected.target_unit_instance_id)
+        if option is None:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds selected target drifted."
             )
-            if selected is None:
-                continue
-            option_by_target = {option.target_unit_instance_id: option for option in group.options}
-            option = option_by_target.get(selected.target_unit_instance_id)
-            if option is None:
-                raise GameLifecycleError(
-                    "Catalog move-completed mortal wounds selected target drifted."
+        for roll_model_id in group.roll_model_instance_ids:
+            effects.append(
+                UnitMoveCompletedMortalWoundEffect(
+                    hook_id=(_catalog.CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID),
+                    source_id=(_catalog.CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID),
+                    source_rule_id=group.record.definition.source_id,
+                    target_unit_instance_id=option.target_unit_instance_id,
+                    target_player_id=option.target_player_id,
+                    rolling_player_id=context.triggering_player_id,
+                    trigger_event_id=context.trigger_event_id,
+                    roll_threshold=group.roll_threshold,
+                    mortal_wounds_expression=group.mortal_wounds_expression,
+                    maximum_total_mortal_wounds=group.maximum_mortal_wounds,
+                    mortal_wound_cap_group_id=(
+                        (
+                            f"{group.trigger_event_id}:{group.record.record_id}:"
+                            f"{group.clause.clause_id}:{option.target_unit_instance_id}"
+                        )
+                        if group.maximum_mortal_wounds is not None
+                        else None
+                    ),
+                    replay_payload=(
+                        _catalog._unit_move_completed_mortal_wounds_effect_payload(
+                            group=group,
+                            option=option,
+                            roll_model_instance_id=roll_model_id,
+                        )
+                    ),
                 )
-            for roll_model_id in group.roll_model_instance_ids:
-                effects.append(
-                    UnitMoveCompletedMortalWoundEffect(
-                        hook_id=(_catalog.CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID),
-                        source_id=(
-                            _catalog.CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID
-                        ),
-                        source_rule_id=group.record.definition.source_id,
-                        target_unit_instance_id=option.target_unit_instance_id,
-                        target_player_id=option.target_player_id,
-                        rolling_player_id=context.triggering_player_id,
-                        trigger_event_id=context.trigger_event_id,
-                        roll_threshold=group.roll_threshold,
-                        mortal_wounds_expression=group.mortal_wounds_expression,
-                        maximum_total_mortal_wounds=group.maximum_mortal_wounds,
-                        mortal_wound_cap_group_id=(
-                            (
-                                f"{group.trigger_event_id}:{group.record.record_id}:"
-                                f"{group.clause.clause_id}:{option.target_unit_instance_id}"
-                            )
-                            if group.maximum_mortal_wounds is not None
-                            else None
-                        ),
-                        replay_payload=(
-                            _catalog._unit_move_completed_mortal_wounds_effect_payload(
-                                group=group,
-                                option=option,
-                                roll_model_instance_id=roll_model_id,
-                            )
-                        ),
-                    )
-                )
+            )
         return tuple(effects)
 
 

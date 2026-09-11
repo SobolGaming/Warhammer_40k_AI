@@ -753,6 +753,63 @@ def test_aeldari_star_engines_rejects_invented_advance_grant_option() -> None:
     )
 
 
+@pytest.mark.parametrize("use_grant", [False, True])
+def test_movement_grant_batch_restores_and_replays_through_the_session(use_grant: bool) -> None:
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.timing_batch_runtime import timing_batch_from_event
+
+    session = LocalGameSession()
+    lifecycle, status = _advance_to_movement_unit_selection(_aeldari_config(), session=session)
+    action = _select_aeldari_vehicle_for_movement(lifecycle, status)
+    status = session.submit_option(
+        request_id=action.request_id,
+        option_id=MovementPhaseActionKind.ADVANCE.value,
+        result_id="grant-batch:advance",
+    )
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE
+    assert isinstance(request.payload, dict)
+    assert request.payload["source_decision_result_id"] == "grant-batch:advance"
+    participant_id = request.payload["timing_participant_id"]
+    for player_id in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=player_id)["pending_decision"] is not None
+        assert "timing_batch_transition" not in json.dumps(
+            session.events_since(EventStreamCursor(), viewer_player_id=player_id)
+        )
+    session = session.fork()
+    assert session.lifecycle.pending_decision_request() == request
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=army_rule.STAR_ENGINES_HOOK_ID
+        if use_grant
+        else DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
+        result_id="grant-batch:answer",
+    )
+    assert _decision_request(status).decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    decisions = session.lifecycle.decision_controller
+    assert (
+        sum(
+            event.event_type == "movement_action_grant_decision_resolved"
+            and isinstance(event.payload, dict)
+            and event.payload.get("timing_participant_id") == participant_id
+            for event in decisions.event_log.records
+        )
+        == 1
+    )
+    batch = next(
+        timing_batch_from_event(event)
+        for event in reversed(decisions.event_log.records)
+        if event.event_type == "timing_batch_transition"
+    )
+    assert batch.current_batch_complete
+    assert participant_id in batch.completed_participant_ids
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id=f"grant-batch:{use_grant}")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
 def test_aeldari_swift_as_the_wind_adds_two_inches_to_normal_move() -> None:
     config = _aeldari_config()
     lifecycle, movement_status = _advance_to_movement_unit_selection(config)
@@ -1012,7 +1069,7 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
     fight_state = state.fight_phase_state
     assert fight_state is not None
     policy = state.runtime_ruleset_descriptor().fight_policy
-    state.fight_phase_state = (
+    state.replace_fight_phase_state(
         fight_state.with_active_activation(None)
         .with_consolidate_state(
             FightMovementStepState.start(
@@ -1701,10 +1758,17 @@ def _mission_setup() -> MissionSetup:
 
 def _advance_to_movement_unit_selection(
     config: GameConfig,
+    *,
+    session: LocalGameSession | None = None,
 ) -> tuple[GameLifecycle, LifecycleStatus]:
-    lifecycle = GameLifecycle()
-    lifecycle.start(config)
-    status = lifecycle.advance_until_decision_or_terminal()
+    if session is None:
+        lifecycle = GameLifecycle()
+        lifecycle.start(config)
+        status = lifecycle.advance_until_decision_or_terminal()
+    else:
+        lifecycle = session.lifecycle
+        session.start(config)
+        status = session.advance_until_decision_or_terminal()
     secondary_index = 1
     while (
         status.decision_request is not None

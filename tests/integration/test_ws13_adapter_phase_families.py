@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -602,6 +603,26 @@ def test_local_session_accepts_no_move_fight_proposal_and_replays_continuation()
     assert session.decision_record_count() == 1
     state = session.lifecycle.state
     assert state is not None
+    assert next_request.actor_id == "player-b"
+    assert state.active_player_id == "player-a"
+    assert state.effective_active_player_id() == "player-b"
+    checkpoint = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(checkpoint))
+    assert restored.state is not None
+    assert restored.state.effective_active_player_id() == "player-b"
+    corrupted = deepcopy(checkpoint)
+    scopes = corrupted["state"]["active_player_scopes"]
+    scopes[-1]["source_rule_id"] = "forged-fight-movement-source"
+    for event in corrupted["decisions"]["event_log"]:
+        payload = event["payload"]
+        if (
+            event["event_type"] == "active_player_scope_started"
+            and isinstance(payload, dict)
+            and payload.get("selection_request_id") == next_request.request_id
+        ):
+            payload["source_rule_id"] = "forged-fight-movement-source"
+    with pytest.raises(GameLifecycleError, match="Fight movement scope lost its source proposal"):
+        GameLifecycle.from_payload(corrupted)
     assert state.battlefield_state is not None
     assert state.battlefield_state.unit_placement_by_id(attacker_id)
     _assert_event_types(
@@ -1572,25 +1593,6 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         pool_index=1,
         deferred_mortal_wounds=(deferred,),
     )
-    record_melee_declaration_for_executor_fixture(
-        state=state, decisions=lifecycle.decision_controller, sequence=sequence, result_id=result_id
-    )
-    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        ruleset_descriptor=_ruleset(),
-        attack_sequence=sequence,
-        already_allocated_model_ids=(),
-        dice_manager=DiceRollManager(
-            state.game_id,
-            event_log=lifecycle.decision_controller.event_log,
-        ),
-    )
-    request = _assert_request(
-        cast(LifecycleStatus, status),
-        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
-    )
-    assert remaining is not None
     policy = lifecycle.config.ruleset_descriptor.fight_policy
     fight_state = FightPhaseState.start(
         battle_round=state.battle_round,
@@ -1616,7 +1618,31 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         result_id="ws13-fight-mortal-wound-activation-result",
         interrupt_id="ws13-fight-mortal-wound-interrupt",
     )
-    state.fight_phase_state = (
+    from tests.completed_attack_fixture_helpers import record_fight_selection_for_executor_fixture
+
+    record_fight_selection_for_executor_fixture(
+        decisions=lifecycle.decision_controller, selection=activation
+    )
+    record_melee_declaration_for_executor_fixture(
+        state=state, decisions=lifecycle.decision_controller, sequence=sequence, result_id=result_id
+    )
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+    )
+    request = _assert_request(
+        cast(LifecycleStatus, status),
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
+    assert remaining is not None
+    state.replace_fight_phase_state(
         fight_state.with_activation(activation)
         .with_active_activation(activation)
         .with_attack_sequence_update(

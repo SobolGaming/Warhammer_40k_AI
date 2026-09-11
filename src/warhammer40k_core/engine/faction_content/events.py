@@ -18,6 +18,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     timing_trigger_kind_from_token,
@@ -307,11 +308,16 @@ class RuntimeContentEventSubscription:
 class RuntimeContentEventHandlerBinding:
     handler_id: str
     handler: RuntimeEventHandler
+    candidate_handler: (
+        Callable[[RuntimeContentEventContext], tuple[TimingRuleCandidate, ...]] | None
+    ) = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "handler_id", _validate_identifier("handler_id", self.handler_id))
         if not callable(self.handler):
             raise GameLifecycleError("Runtime event handler binding must be callable.")
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError("Runtime event candidate provider must be callable.")
 
     def to_summary_payload(self) -> dict[str, JsonValue]:
         return {"handler_id": self.handler_id}
@@ -351,6 +357,16 @@ class RuntimeContentEventHandlerRegistry:
 
     def all_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
         return tuple(sorted(self._bindings.values(), key=lambda binding: binding.handler_id))
+
+    def candidates_for(
+        self,
+        handler_id: str,
+        context: RuntimeContentEventContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        binding = self._bindings.get(handler_id)
+        if binding is None or binding.candidate_handler is None:
+            raise GameLifecycleError("Runtime timing provider requires pure candidate discovery.")
+        return binding.candidate_handler(context)
 
 
 @dataclass(frozen=True, slots=True)
@@ -402,6 +418,42 @@ class RuntimeContentEventIndex:
 
     def all_subscriptions(self) -> tuple[RuntimeContentEventSubscription, ...]:
         return self._subscriptions
+
+    def candidates_for(
+        self,
+        context: RuntimeContentEventContext,
+        *,
+        subscription_id: str | None = None,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        if type(context) is not RuntimeContentEventContext:
+            raise GameLifecycleError("Runtime timing discovery requires a typed context.")
+        candidates: list[TimingRuleCandidate] = []
+        if subscription_id is not None and not any(
+            subscription.subscription_id == subscription_id
+            for subscription in self.subscriptions_for(context.event.trigger_kind)
+        ):
+            raise GameLifecycleError("Runtime timing source subscription is not loaded.")
+        for subscription in self.subscriptions_for(context.event.trigger_kind):
+            if subscription_id is not None and subscription.subscription_id != subscription_id:
+                continue
+            if not _event_matches_filters(event=context.event, subscription=subscription):
+                continue
+            before = (context.state.to_payload(), context.decisions.to_payload())
+            discovered = self._handler_registry.candidates_for(subscription.handler_id, context)
+            if before != (context.state.to_payload(), context.decisions.to_payload()):
+                raise GameLifecycleError("Runtime timing discovery mutated engine state.")
+            if type(discovered) is not tuple or any(
+                type(candidate) is not TimingRuleCandidate for candidate in discovered
+            ):
+                raise GameLifecycleError("Runtime timing discovery requires typed candidates.")
+            if any(
+                candidate.participant.source_rule_id != subscription.source_rule_id
+                or candidate.participant.player_id != context.event.player_id
+                for candidate in discovered
+            ):
+                raise GameLifecycleError("Runtime timing discovery source ownership drift.")
+            candidates.extend(discovered)
+        return tuple(candidates)
 
     def dispatch(
         self,

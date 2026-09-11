@@ -210,6 +210,7 @@ def validate_primary_mission_action_integrity(
             policy=policy,
             start_event=start_event,
             event_index_by_id=event_index_by_id,
+            event_records=event_records,
         )
         _validate_marker_effect(
             state=state,
@@ -317,6 +318,7 @@ def _validate_lifecycle_policy_evidence(
         state=state,
         event=start_event,
         event_index_by_id=event_index_by_id,
+        event_records=event_records,
     )
     if active_primary_marker_ids_from_checkpoint(checkpoint) != expected_marker_ids:
         raise GameLifecycleError("Primary Mission Action checkpoint marker history drifted.")
@@ -927,6 +929,7 @@ def _validate_marker_effect(
         policy=policy,
         completion_event=completion_event,
         event_index_by_id=event_index_by_id,
+        event_records=event_records,
     )
     if len(removed) > 1:
         raise GameLifecycleError("Sensor Sweep removed more than one operation marker.")
@@ -1049,7 +1052,10 @@ def _sensor_marker_ids_at_completion(
     policy: MissionActionPolicyDescriptor,
     completion_event: EventRecord | None,
     event_index_by_id: dict[str, int],
+    event_records: tuple[EventRecord, ...],
 ) -> tuple[str, ...]:
+    from warhammer40k_core.engine.primary_marker_history import primary_marker_removal_event_index
+
     if completion_event is None:
         raise GameLifecycleError("Sensor Sweep completion event is missing.")
     completion_order = event_index_by_id[completion_event.event_id]
@@ -1060,13 +1066,9 @@ def _sensor_marker_ids_at_completion(
         creation_order = event_index_by_id.get(marker.source_event_id)
         if creation_order is None:
             raise GameLifecycleError("Sensor Sweep marker creation event is unknown.")
-        removal_order = (
-            None
-            if marker.removal_event_id is None
-            else event_index_by_id.get(marker.removal_event_id)
+        removal_order = primary_marker_removal_event_index(
+            marker=marker, event_records=event_records
         )
-        if marker.removal_event_id is not None and removal_order is None:
-            raise GameLifecycleError("Sensor Sweep marker removal event is unknown.")
         if creation_order > completion_order or (
             removal_order is not None and removal_order <= completion_order
         ):
@@ -1093,6 +1095,7 @@ def _validate_sensor_start_policy(
     policy: MissionActionPolicyDescriptor,
     start_event: EventRecord,
     event_index_by_id: dict[str, int],
+    event_records: tuple[EventRecord, ...],
 ) -> None:
     if policy.effect_descriptor not in _SENSOR_EFFECTS:
         return
@@ -1106,6 +1109,7 @@ def _validate_sensor_start_policy(
                 policy=policy,
                 start_event=start_event,
                 event_index_by_id=event_index_by_id,
+                event_records=event_records,
             )
         )
         <= 1
@@ -1122,7 +1126,10 @@ def _sensor_marker_ids_at_start(
     policy: MissionActionPolicyDescriptor,
     start_event: EventRecord,
     event_index_by_id: dict[str, int],
+    event_records: tuple[EventRecord, ...],
 ) -> tuple[str, ...]:
+    from warhammer40k_core.engine.primary_marker_history import primary_marker_removal_event_index
+
     start_order = event_index_by_id[start_event.event_id]
     candidates: list[str] = []
     for marker in state.primary_mission_progress_state.markers:
@@ -1131,13 +1138,9 @@ def _sensor_marker_ids_at_start(
         creation_order = event_index_by_id.get(marker.source_event_id)
         if creation_order is None:
             raise GameLifecycleError("Sensor Sweep marker creation event is unknown.")
-        removal_order = (
-            None
-            if marker.removal_event_id is None
-            else event_index_by_id.get(marker.removal_event_id)
+        removal_order = primary_marker_removal_event_index(
+            marker=marker, event_records=event_records
         )
-        if marker.removal_event_id is not None and removal_order is None:
-            raise GameLifecycleError("Sensor Sweep marker removal event is unknown.")
         if creation_order >= start_order or (
             removal_order is not None and removal_order <= start_order
         ):

@@ -101,7 +101,6 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockModifierApplication,
     BattleShockModifierApplicationAuthorityContext,
     BattleShockModifierContext,
-    BattleShockOutcomeContext,
     BattleShockPendingOutcomeAuthority,
     BattleShockPendingOutcomeAuthorityContext,
     BattleShockRerollPermissionContext,
@@ -1109,6 +1108,7 @@ def test_command_success_clears_step_start_shock_but_failure_and_forced_success_
         unit_instance_id=unit_id,
     )
     forced_request = _active_battle_shock_requests(forced_state)[0]
+    forced_state.battle_phase_index = forced_state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     forced_payload = _record_fixed_battle_shock_resolution(
         state=forced_state,
         request=forced_request,
@@ -1312,21 +1312,6 @@ def test_completed_rerolled_battle_shock_target_destruction_does_not_block_reent
         operand=-3,
     )
 
-    def destroy_failed_target(context: BattleShockOutcomeContext) -> None:
-        if context.result.passed:
-            raise AssertionError("forced modifier must make the rerolled test fail")
-        unit = _unit_by_id(context.state, context.result.request.unit_instance_id)
-        for model in unit.own_models:
-            if not model.is_alive:
-                continue
-            apply_damage_to_model(
-                state=context.state,
-                target_unit_instance_id=unit.unit_instance_id,
-                model_instance_id=model.model_instance_id,
-                damage=model.wounds_remaining,
-                damage_kind=DamageKind.NORMAL,
-            )
-
     def reroll_permission(
         context: BattleShockRerollPermissionContext,
     ) -> RerollPermission | None:
@@ -1345,7 +1330,6 @@ def test_completed_rerolled_battle_shock_target_destruction_does_not_block_reent
                 source_id="phase11c:command-self-destruction:source",
                 modifier_handler=lambda _context: (modifier,),
                 reroll_permission_handler=reroll_permission,
-                outcome_handler=destroy_failed_target,
                 historical_contribution_handler=lambda _context: HistoricalBattleShockContribution(
                     modifiers=(modifier,),
                     reroll_permission=RerollPermission(
@@ -1382,6 +1366,18 @@ def test_completed_rerolled_battle_shock_target_destruction_does_not_block_reent
     command_state = _command_step_state(state)
     assert len(command_state.completed_battle_shock_test_request_ids) == 1
     assert not command_state.battle_shock_step_resolved
+    # The completed request must remain valid if its target is destroyed before
+    # the Command owner resumes. Use the engine damage service for the fixture.
+    unit = _unit_by_id(state, unit_id)
+    for model in unit.own_models:
+        if model.is_alive:
+            apply_damage_to_model(
+                state=state,
+                target_unit_instance_id=unit_id,
+                model_instance_id=model.model_instance_id,
+                damage=model.wounds_remaining,
+                damage_kind=DamageKind.NORMAL,
+            )
     assert not any(model.is_alive for model in _unit_by_id(state, unit_id).own_models)
 
     completed = handler.begin_phase(state=state, decisions=decisions)
@@ -1620,6 +1616,16 @@ def test_command_reroll_round_trip_preserves_full_candidate_and_result_prefixes(
         if event.event_type == "battle_shock_test_resolved"
     )
     assert len(result_prefix) == 1
+
+    # A completed test creates a new rule timing. Its outcomes must wait for
+    # the entire original required-test population, including this pending reroll.
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+
+    triggers = rule_trigger_history(lifecycle.decision_controller)
+    assert len(triggers.observed) == 1
+    assert triggers.observed[0].parent_batch_id is not None
+    assert triggers.ready() == ()
+    assert triggers.released == ()
 
     payload = json.loads(json.dumps(lifecycle.to_payload()))
     restored = GameLifecycle.from_payload(payload, runtime_content_bundle=bundle)
@@ -1862,7 +1868,7 @@ def test_restore_rejects_two_candidate_selections_before_first_test_resolves() -
         )
 
 
-def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> None:
+def test_later_command_battle_shock_request_recomputes_after_internal_reroll() -> None:
     game_id = "phase11c-command-live-battle-shock-materialization"
     first_unit_id = "army-alpha:intercessor-unit-1"
     second_unit_id = "army-alpha:intercessor-unit-2"
@@ -1910,17 +1916,24 @@ def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> 
             return DiceExpression(quantity=3, sides=6)
         return None
 
-    def remove_source_after_first_outcome(context: BattleShockOutcomeContext) -> None:
-        if context.result.request.unit_instance_id != first_unit_id:
-            return
-        removed = context.state.remove_persisting_effects_by_id((modifier_source_effect_id,))
-        assert tuple(effect.effect_id for effect in removed) == (modifier_source_effect_id,)
+    # stubbed pure contribution: expose an internal reroll pause before the next
+    # test materializes; the test changes its canonical modifier source there.
+    def first_test_reroll(context: BattleShockRerollPermissionContext) -> RerollPermission | None:
+        if context.request.unit_instance_id != first_unit_id:
+            return None
+        return RerollPermission(
+            source_id="phase11c:source:live-command-materialization",
+            timing_window="battle_shock_test",
+            owning_player_id=context.request.player_id,
+            eligible_roll_type=context.request.spec.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
 
     binding = BattleShockHookBinding(
         hook_id="phase11c:hook:live-command-materialization",
         source_id="phase11c:source:live-command-materialization",
         dice_expression_handler=live_dice_expression,
-        outcome_handler=remove_source_after_first_outcome,
+        reroll_permission_handler=first_test_reroll,
         historical_contribution_handler=lambda _context: HistoricalBattleShockContribution(),
     )
     armies = tuple(state.army_definitions)
@@ -1989,7 +2002,7 @@ def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> 
     assert restored_request == request
     request = restored_request
 
-    lifecycle.submit_decision(
+    reroll_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase11c-live-materialization-order",
             request=request,
@@ -1997,8 +2010,22 @@ def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> 
         )
     )
 
+    reroll_request = _decision_request(reroll_status)
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert lifecycle.state is not None
+    removed = lifecycle.state.remove_persisting_effects_by_id((modifier_source_effect_id,))
+    assert tuple(effect.effect_id for effect in removed) == (modifier_source_effect_id,)
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase11c-live-materialization-keep",
+            request=reroll_request,
+            selected_option_id="decline",
+        )
+    )
+
     assert live_dice_contexts == [
         (first_unit_id, BattleShockTestReason.COMMAND_PHASE_REQUIRED, True),
+        (first_unit_id, BattleShockTestReason.COMMAND_PHASE_REQUIRED, False),
         (second_unit_id, BattleShockTestReason.COMMAND_PHASE_REQUIRED, False),
     ]
     assert lifecycle.state is not None
@@ -3914,13 +3941,13 @@ def test_command_start_authority_helpers_fail_closed() -> None:
     assert inventory_row["hook_id"] == binding.hook_id
     assert command_start_authority._registry_fingerprint(
         registry
-    ) == command_start_authority._payload_hash(inventory)
-    disposition_payload = command_start_authority._provider_dispositions_payload((disposition,))
+    ) == command_start_authority.payload_hash(inventory)
+    disposition_payload = command_start_authority.provider_dispositions_payload((disposition,))
     disposition_row = cast(dict[str, JsonValue], disposition_payload[0])
     assert disposition_row["emitted_event_ids"] == [emitted.event_id]
     for invalid in (cast(Any, []), (cast(Any, object()),)):
         with pytest.raises(GameLifecycleError, match="dispositions must be typed"):
-            command_start_authority._provider_dispositions_payload(invalid)
+            command_start_authority.provider_dispositions_payload(invalid)
     reserved_disposition = replace(
         disposition,
         emitted_events=(
@@ -3931,9 +3958,9 @@ def test_command_start_authority_helpers_fail_closed() -> None:
         ),
     )
     with pytest.raises(GameLifecycleError, match="reserved authority events"):
-        command_start_authority._provider_dispositions_payload((reserved_disposition,))
+        command_start_authority.provider_dispositions_payload((reserved_disposition,))
 
-    common = command_start_authority._authority_common_payload(
+    common = command_start_authority.authority_common_payload(
         state=state,
         registry=registry,
     )
@@ -3983,14 +4010,14 @@ def test_command_start_authority_helpers_fail_closed() -> None:
             )
 
     assert (
-        command_start_authority._binding_from_payload(
+        command_start_authority.binding_from_payload(
             payload={"provider_hook_id": binding.hook_id, "provider_source_id": binding.source_id},
             registry=registry,
         )
         == binding
     )
     with pytest.raises(GameLifecycleError, match="binding identity drifted"):
-        command_start_authority._binding_from_payload(
+        command_start_authority.binding_from_payload(
             payload={"provider_hook_id": "missing-hook", "provider_source_id": "missing-source"},
             registry=registry,
         )
@@ -4020,11 +4047,11 @@ def test_command_start_authority_helpers_fail_closed() -> None:
                 requires_result=requires_result,
             )
 
-    assert command_start_authority._event_payload(emitted) == {"value": "ok"}
+    assert command_start_authority.event_payload(emitted) == {"value": "ok"}
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
-        command_start_authority._event_payload(replace(emitted, payload=None))
+        command_start_authority.event_payload(replace(emitted, payload=None))
     assert (
-        command_start_authority._payload_string(
+        command_start_authority.payload_string(
             {"field": "value"},
             "field",
         )
@@ -4045,8 +4072,8 @@ def test_command_start_authority_helpers_fail_closed() -> None:
         == "value"
     )
     for helper, value in (
-        (command_start_authority._payload_string, None),
-        (command_start_authority._payload_string, ""),
+        (command_start_authority.payload_string, None),
+        (command_start_authority.payload_string, ""),
         (command_start_authority._optional_payload_string, 1),
         (command_start_authority._optional_payload_string, ""),
     ):
@@ -4054,7 +4081,7 @@ def test_command_start_authority_helpers_fail_closed() -> None:
             helper({"field": cast(Any, value)}, "field")
 
     assert (
-        command_start_authority._exact_event_index(
+        command_start_authority.exact_event_index(
             (emitted,),
             event_type=emitted.event_type,
             payload=emitted.payload,
@@ -4063,7 +4090,7 @@ def test_command_start_authority_helpers_fail_closed() -> None:
     )
     for events in ((), (emitted, emitted)):
         with pytest.raises(GameLifecycleError, match="one exact"):
-            command_start_authority._exact_event_index(
+            command_start_authority.exact_event_index(
                 events,
                 event_type=emitted.event_type,
                 payload=emitted.payload,
@@ -4074,7 +4101,7 @@ def test_command_start_authority_helpers_fail_closed() -> None:
         payload={"battle_round": 1, "active_player_id": "player-a"},
     )
     assert (
-        command_start_authority._command_step_anchor_index(
+        command_start_authority.command_step_anchor_index(
             (anchor,),
             battle_round=1,
             active_player_id="player-a",
@@ -4083,17 +4110,17 @@ def test_command_start_authority_helpers_fail_closed() -> None:
     )
     for events in ((), (anchor, anchor)):
         with pytest.raises(GameLifecycleError, match="Core CP anchor"):
-            command_start_authority._command_step_anchor_index(
+            command_start_authority.command_step_anchor_index(
                 events,
                 battle_round=1,
                 active_player_id="player-a",
             )
 
-    assert command_start_authority._current_command_key(state) == (1, "player-a")
+    assert command_start_authority.current_command_key(state) == (1, "player-a")
     assert command_start_authority._active_player_id(state) == "player-a"
     with pytest.raises(GameLifecycleError, match="CommandStepState"):
         command_start_authority._require_command_state(state)
-    command_start_authority._require_empty_pending_queue(
+    command_start_authority.require_empty_pending_queue(
         decisions=decisions,
         context="pending queue must be empty",
     )
@@ -4106,7 +4133,7 @@ def test_command_start_authority_helpers_fail_closed() -> None:
     )
     decisions.request_decision(pending)
     with pytest.raises(GameLifecycleError, match="pending queue must be empty"):
-        command_start_authority._require_empty_pending_queue(
+        command_start_authority.require_empty_pending_queue(
             decisions=decisions,
             context="pending queue must be empty",
         )
@@ -4284,12 +4311,12 @@ def test_command_start_hook_authority_helpers_fail_closed() -> None:
             CommandPhaseStartHookBinding(
                 hook_id="phase11c:hook:invalid-command-start-status",
                 source_id="phase11c:source:invalid-command-start-status",
-                effect_handler=lambda _context: cast(LifecycleStatus, object()),
+                candidate_handler=lambda _context: cast(Any, (object(),)),
             ),
         )
     )
-    with pytest.raises(GameLifecycleError, match="must return LifecycleStatus"):
-        invalid_status_registry.resolve_effects(effect_context)
+    with pytest.raises(GameLifecycleError, match="typed rule candidates"):
+        invalid_status_registry.candidate_entries_for(effect_context)
 
     result_context = command_start_hooks.CommandPhaseStartResultContext(**result_context_values)
     wrong_type_request = replace(request, decision_type="wrong-command-start-type")
@@ -4357,21 +4384,21 @@ def test_command_start_hook_authority_helpers_fail_closed() -> None:
         with pytest.raises(GameLifecycleError, match="exactly one source authority"):
             registry.binding_for_nested_pending_authority(pending_context)
 
-    before = command_start_hooks._provider_snapshot(effect_context)
-    disposition = command_start_hooks._provider_disposition(
+    before = command_start_hooks.provider_snapshot(effect_context)
+    disposition = command_start_hooks.provider_disposition(
         context=effect_context,
         binding=binding,
         before=before,
     )
     assert not disposition.state_changed
     with pytest.raises(GameLifecycleError, match="cannot record player decisions"):
-        command_start_hooks._provider_disposition(
+        command_start_hooks.provider_disposition(
             context=effect_context,
             binding=binding,
             before=(before[0], before[1], -1, before[3]),
         )
     with pytest.raises(GameLifecycleError, match="removed retained events"):
-        command_start_hooks._provider_disposition(
+        command_start_hooks.provider_disposition(
             context=effect_context,
             binding=binding,
             before=(before[0], before[1], before[2], before[3] + 1),
@@ -4402,7 +4429,7 @@ def test_command_start_hook_authority_helpers_fail_closed() -> None:
         active_player_id="player-a",
         runtime_modifier_registry=runtime_modifiers,
     )
-    side_effect_before = command_start_hooks._provider_snapshot(side_effect_context)
+    side_effect_before = command_start_hooks.provider_snapshot(side_effect_context)
     side_effect_decisions.event_log.append("unexpected", None)
     with pytest.raises(GameLifecycleError, match="side effect detected"):
         command_start_hooks._require_provider_side_effect_free(
@@ -4417,47 +4444,11 @@ def test_command_start_hook_authority_helpers_fail_closed() -> None:
         active_player_id="player-a",
     )
     with pytest.raises(GameLifecycleError, match="state snapshot is invalid"):
-        command_start_hooks._require_request_provider_side_effects(
+        command_start_hooks.require_request_provider_side_effects(
             context=request_context,
             before=(object(), (), 0, 0),
             request=None,
         )
-
-    active_request = request
-    non_active_allowed = replace(
-        request,
-        request_id="phase11c-command-start-non-active-allowed",
-        actor_id="player-b",
-        payload={"actor_may_be_non_active": True},
-    )
-    non_active_denied = replace(
-        non_active_allowed,
-        request_id="phase11c-command-start-non-active-denied",
-        payload=None,
-    )
-    assert command_start_hooks._sequenced_command_phase_start_emission(
-        context=request_context,
-        emissions=((active_request, binding), (non_active_allowed, binding)),
-    ) == (active_request, binding)
-    assert command_start_hooks._sequenced_command_phase_start_emission(
-        context=request_context,
-        emissions=((non_active_allowed, binding),),
-    ) == (non_active_allowed, binding)
-    assert (
-        command_start_hooks._sequenced_command_phase_start_emission(
-            context=request_context,
-            emissions=((non_active_denied, binding),),
-        )
-        is None
-    )
-    assert (
-        command_start_hooks._sequenced_command_phase_start_emission(
-            context=request_context,
-            emissions=(),
-        )
-        is None
-    )
-    assert not command_start_hooks._request_allows_non_active_actor(non_active_denied)
 
     assert command_start_hooks._validate_ability_index_mapping(
         {"player-a": AbilityCatalogIndex.from_records(())}
@@ -5525,6 +5516,7 @@ def test_battle_shock_event_authority_helpers_fail_closed() -> None:
             )
 
     effect = unit_move_completed_hooks.UnitMoveCompletedBattleShockEffect(
+        source_player_id="player-a",
         hook_id="phase11c:hook:move-completed",
         source_id="phase11c:source:move-completed",
         source_rule_id="phase11c:rule:move-completed",
@@ -9774,10 +9766,12 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
     with pytest.raises(GameLifecycleError, match="active player"):
         command_phase_module._active_player_id(inactive_state)
 
+    from warhammer40k_core.engine.command_step_authority import command_step_state
+
     missing_state = _battle_state(game_id="phase11c-command-private-missing-step")
     missing_state.command_step_state = None
     with pytest.raises(GameLifecycleError, match="requires CommandStepState"):
-        command_phase_module._command_step_state(missing_state)
+        command_step_state(missing_state)
 
     missing_battlefield = _battle_state(game_id="phase11c-command-private-battlefield")
     missing_battlefield.battlefield_state = None
@@ -9936,7 +9930,7 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
     )
     duplicated = DecisionController.from_payload(sequencing_decisions.to_payload())
     duplicated.event_log.append("sequencing_next_participant_selected", sequencing.to_payload())
-    with pytest.raises(GameLifecycleError, match="selection prefix drifted"):
+    with pytest.raises(GameLifecycleError, match="duplicate ordering decisions"):
         command_phase_module._resolve_command_battle_shock_candidate_order(
             state=sequencing_state,
             decisions=duplicated,
@@ -9944,7 +9938,7 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
 
     missing_record = DecisionController.from_payload(sequencing_decisions.to_payload())
     missing_record._records.clear()
-    with pytest.raises(GameLifecycleError, match="lacks one decision record"):
+    with pytest.raises(GameLifecycleError, match="lacks its unique decision record"):
         command_phase_module._resolve_command_battle_shock_candidate_order(
             state=sequencing_state,
             decisions=missing_record,
@@ -11011,7 +11005,7 @@ def _gate_of_infinity_pending_decision() -> tuple[
             completed_phase=BattlePhase.FIGHT,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert request.actor_id == army.player_id
     decisions.request_decision(request)
     return state, decisions, registry, request, unit, transport

@@ -1,0 +1,46 @@
+{
+  "runtime_manifest_sha256": "390231096e85983215cb4c0ba841706c59bbe79dd049f6670c3df594463838a0",
+  "fixture_policy": "Same workload and driver, each revision uses its canonical fixtures. Differing fixture hashes are retained in raw reports; old sequencing is not a correctness oracle.",
+  "results": {
+    "legal": {
+      "base_mean_seconds": 0.010732018006300288,
+      "head_mean_seconds": 0.016625976306386292,
+      "head_maximum_seconds": 0.01702741696499288,
+      "mean_ratio": 1.5491938512054233,
+      "timing_passed": true,
+      "work_violations": {}
+    },
+    "first_round": {
+      "base_mean_seconds": 2.8565293177962303e-05,
+      "head_mean_seconds": 3.203571707542453e-05,
+      "head_maximum_seconds": 3.341701813042164e-05,
+      "mean_ratio": 1.1214909252231868,
+      "timing_passed": true,
+      "work_violations": {}
+    },
+    "aircraft": {
+      "base_mean_seconds": 8.219043125531503e-05,
+      "head_mean_seconds": 9.428573373172964e-05,
+      "head_maximum_seconds": 0.00010058307088911533,
+      "mean_ratio": 1.147161929821757,
+      "timing_passed": true,
+      "work_violations": {}
+    },
+    "mixed": {
+      "base_mean_seconds": 0.06143163083054658,
+      "head_mean_seconds": 0.07458926185167261,
+      "head_maximum_seconds": 0.1006675410317257,
+      "mean_ratio": 1.2141833261340584,
+      "timing_passed": true,
+      "work_violations": {}
+    },
+    "placement": {
+      "base_mean_seconds": 0.11616103572305292,
+      "head_mean_seconds": 0.16261360115770782,
+      "head_maximum_seconds": 0.18902925006113946,
+      "mean_ratio": 1.3998979963075182,
+      "timing_passed": true,
+      "work_violations": {}
+    }
+  }
+}

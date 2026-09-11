@@ -24,7 +24,9 @@ from warhammer40k_core.engine.battle_formation_hooks import (
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
 )
-from warhammer40k_core.engine.command_phase_start_hooks import CommandPhaseStartHookBinding
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    CommandPhaseStartHookBinding,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
@@ -132,6 +134,9 @@ from .bondsman import (
     bondsman_request as bondsman_request,
 )
 from .bondsman import (
+    bondsman_sequencing_candidates,
+)
+from .bondsman import (
     model_is_affected_by_bondsman as model_is_affected_by_bondsman,
 )
 
@@ -232,6 +237,8 @@ _FIXED_QUALITIES = (
 
 
 def runtime_contribution() -> RuntimeContentContribution:
+    from .timing_sequencing import candidates
+
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
         event_subscriptions=(_END_TURN_SUBSCRIPTION, _END_BATTLE_ROUND_SUBSCRIPTION),
@@ -239,10 +246,12 @@ def runtime_contribution() -> RuntimeContentContribution:
             RuntimeContentEventHandlerBinding(
                 handler_id=END_TURN_EVENT_HANDLER_ID,
                 handler=resolve_code_chivalric_end_turn,
+                candidate_handler=candidates,
             ),
             RuntimeContentEventHandlerBinding(
                 handler_id=END_BATTLE_ROUND_EVENT_HANDLER_ID,
                 handler=resolve_code_chivalric_end_battle_round,
+                candidate_handler=candidates,
             ),
         ),
         battle_formation_hook_bindings=(
@@ -258,6 +267,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=BONDSMAN_HOOK_ID,
                 source_id=BONDSMAN_SOURCE_RULE_ID,
                 request_handler=bondsman_request,
+                candidate_handler=bondsman_sequencing_candidates,
                 result_handler=apply_bondsman_result,
             ),
         ),
@@ -265,7 +275,7 @@ def runtime_contribution() -> RuntimeContentContribution:
             UnitDestroyedHookBinding(
                 hook_id=UNIT_DESTROYED_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                handler=record_code_chivalric_enemy_unit_destroyed,
+                maintenance_handler=record_code_chivalric_enemy_unit_destroyed,
             ),
         ),
         shooting_unit_selected_hook_bindings=(

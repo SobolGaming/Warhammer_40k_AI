@@ -5,7 +5,6 @@ from enum import StrEnum
 from itertools import combinations
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -29,7 +28,6 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
-from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -55,6 +53,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     model_restoration_events_for_event_log_interval,
     unit_destruction_completion_events_for_interval,
@@ -178,6 +177,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=blessings_selection_request,
+                candidate_handler=round_sequencing_candidates,
                 result_handler=apply_blessings_selection_result,
             ),
         ),
@@ -205,71 +205,16 @@ def runtime_contribution() -> RuntimeContentContribution:
     )
 
 
-def blessings_selection_request(
-    context: BattleRoundStartRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not BattleRoundStartRequestContext:
-        raise GameLifecycleError("Blessings of Khorne requires request context.")
-    for army in _world_eaters_armies(context.state):
-        if _blessings_selection_recorded_for_player(context.state, player_id=army.player_id):
-            continue
-        target_unit_ids = _eligible_blessings_unit_ids_for_army(army)
-        if not target_unit_ids:
-            continue
-        bloodshed_points = bloodshed_points_available(
-            context.state,
-            event_log=context.decisions.event_log,
-            player_id=army.player_id,
-        )
-        dice_count = BLESSINGS_DICE_COUNT + bloodshed_points
-        roll_state = DiceRollManager(
-            context.state.game_id,
-            event_log=context.decisions.event_log,
-        ).roll(
-            DiceRollSpec(
-                expression=DiceExpression(quantity=dice_count, sides=6),
-                reason="Blessings of Khorne roll",
-                roll_type="world_eaters_blessings_of_khorne",
-                actor_id=army.player_id,
-            )
-        )
-        dice_values = tuple(roll_state.current_values)
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-            actor_id=army.player_id,
-            payload=validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "phase": BattlePhase.COMMAND.value,
-                    "faction_id": WORLD_EATERS_FACTION_ID,
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "hook_id": HOOK_ID,
-                    "effect_kind": BLESSINGS_OF_KHORNE_EFFECT_KIND,
-                    "roll_state": roll_state.to_payload(),
-                    "dice_values": list(dice_values),
-                    "base_dice_count": BLESSINGS_DICE_COUNT,
-                    "bloodshed_points_spent": bloodshed_points,
-                    "target_unit_instance_ids": list(target_unit_ids),
-                    "rules_update_sources": (
-                        [UNBRIDLED_BLOODLUST_RULE_UPDATE_SOURCE]
-                        if bloodshed_points == 0
-                        else [
-                            UNBRIDLED_BLOODLUST_RULE_UPDATE_SOURCE,
-                            ICON_OF_KHORNE_RULE_UPDATE_SOURCE,
-                        ]
-                    ),
-                }
-            ),
-            options=blessings_selection_options(
-                player_id=army.player_id,
-                battle_round=context.state.battle_round,
-                dice_values=dice_values,
-                bloodshed_points=bloodshed_points,
-            ),
-        )
-    return None
+def blessings_selection_request(context: BattleRoundStartRequestContext) -> DecisionRequest | None:
+    from .round_sequencing import candidates, request_for
+
+    available = candidates(context)
+    if not available:
+        return None
+    player_id = available[0].participant.player_id
+    if player_id is None:
+        raise GameLifecycleError("Blessings require an owning player.")
+    return request_for(context, player_id=player_id)
 
 
 def apply_blessings_selection_result(context: BattleRoundStartResultContext) -> bool:
@@ -287,14 +232,14 @@ def apply_blessings_selection_result(context: BattleRoundStartResultContext) -> 
     army = _world_eaters_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Blessings of Khorne actor does not own World Eaters.")
-    if _blessings_selection_recorded_for_player(context.state, player_id=player_id):
+    if blessings_selection_recorded_for_player(context.state, player_id=player_id):
         raise GameLifecycleError("Blessings of Khorne is already recorded for this round.")
     payload = _payload_object(result.payload)
     blessings = tuple(
         _blessing_from_token(token)
         for token in _payload_string_list(payload, key="selected_blessing_ids")
     )
-    target_unit_ids = _eligible_blessings_unit_ids_for_army(army)
+    target_unit_ids = eligible_blessings_unit_ids_for_army(army)
     if not target_unit_ids:
         raise GameLifecycleError("Blessings of Khorne selection has no eligible units.")
     effect = PersistingEffect(
@@ -433,7 +378,7 @@ def active_blessings_for_player(
     )
 
 
-def _blessings_selection_recorded_for_player(
+def blessings_selection_recorded_for_player(
     state: GameState,
     *,
     player_id: str,
@@ -804,7 +749,7 @@ def _matching_allocations(
     return tuple(sorted(set(allocations), key=lambda item: (len(item), item)))
 
 
-def _eligible_blessings_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
+def eligible_blessings_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Blessings of Khorne requires an ArmyDefinition.")
     return tuple(
@@ -831,7 +776,7 @@ def _unit_has_keyword_token(values: tuple[str, ...], expected: str) -> bool:
     return _validate_identifier("keyword", expected) in values
 
 
-def _world_eaters_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
+def world_eaters_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
     _validate_game_state(state)
     return tuple(
         army
@@ -846,7 +791,7 @@ def _world_eaters_army_for_player(
     player_id: str,
 ) -> ArmyDefinition | None:
     requested_player_id = _validate_identifier("player_id", player_id)
-    for army in _world_eaters_armies(state):
+    for army in world_eaters_armies(state):
         if army.player_id == requested_player_id:
             return army
     return None
@@ -1089,3 +1034,11 @@ def _validate_game_state(state: object) -> None:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def round_sequencing_candidates(
+    context: BattleRoundStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .round_sequencing import candidates
+
+    return candidates(context)

@@ -60,8 +60,8 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     build_return_on_death_placement_request,
     invalid_return_on_death_placement_status,
-    resolve_pending_return_on_death_phase_end,
 )
+from warhammer40k_core.engine.return_on_death_sequencing import resolve_return_phase_end_candidates
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
@@ -100,8 +100,25 @@ def test_return_on_death_failed_roll_resolves_without_restoring_target() -> None
         event_log=decisions.event_log,
         injected_results=(_roll_result(pending=pending, value=1),),
     )
+    from warhammer40k_core.engine.return_on_death_sequencing import return_phase_end_candidates
+    from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext
 
-    request = resolve_pending_return_on_death_phase_end(
+    before_discovery = (state.to_payload(), decisions.to_payload())
+    assert state.current_battle_phase is not None
+    candidates = return_phase_end_candidates(
+        TurnEndRequestContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=state.current_battle_phase,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+        ),
+        dice_manager=manager,
+    )
+    assert (state.to_payload(), decisions.to_payload()) == before_discovery
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == pending.owner_player_id
+
+    request = resolve_return_phase_end_candidates(
         state=state,
         decisions=decisions,
         dice_manager=manager,
@@ -124,13 +141,13 @@ def test_return_on_death_success_requests_placement_and_rejects_invalid_submissi
         injected_results=(_roll_result(pending=pending, value=6),),
     )
 
-    request = resolve_pending_return_on_death_phase_end(
+    request = resolve_return_phase_end_candidates(
         state=state,
         decisions=decisions,
         dice_manager=manager,
     )
 
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE
     alpha_pose = _first_alpha_model_pose(state)
     result = _placement_result(
@@ -357,6 +374,7 @@ def test_return_on_death_runtime_fail_fast_filter_and_out_of_phase_paths() -> No
     current_phase = state.current_battle_phase
     assert current_phase is not None
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=DecisionController(),
         completed_phase=current_phase,
@@ -441,13 +459,14 @@ def test_return_on_death_runtime_fail_fast_filter_and_out_of_phase_paths() -> No
             "model_instance_id": _beta_unit(filtered_state).own_models[0].model_instance_id,
         },
     )
-    runtime.phase_end_handler(
+    _record_return_captures(
+        runtime,
         PhaseEndObjectiveControlContext(
             state=filtered_state,
             event_log=filtered_decisions.event_log,
             completed_phase=filtered_phase,
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        )
+        ),
     )
     (out_of_phase_pending,) = filtered_state.pending_return_on_death
     assert out_of_phase_pending.trigger_phase == filtered_phase.value
@@ -460,13 +479,14 @@ def test_return_on_death_runtime_fail_fast_filter_and_out_of_phase_paths() -> No
     malformed_event_decisions = DecisionController()
     malformed_event_decisions.event_log.append("model_destroyed", [])
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
-        runtime.phase_end_handler(
+        _record_return_captures(
+            runtime,
             PhaseEndObjectiveControlContext(
                 state=filtered_state,
                 event_log=malformed_event_decisions.event_log,
                 completed_phase=filtered_phase,
                 runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-            )
+            ),
         )
 
     missing_index_state = _battle_state_with_scenario()
@@ -486,13 +506,14 @@ def test_return_on_death_runtime_fail_fast_filter_and_out_of_phase_paths() -> No
         },
     )
     with pytest.raises(GameLifecycleError, match="missing player ability index"):
-        runtime_missing_index.phase_end_handler(
+        _record_return_captures(
+            runtime_missing_index,
             PhaseEndObjectiveControlContext(
                 state=missing_index_state,
                 event_log=missing_index_decisions.event_log,
                 completed_phase=missing_index_phase,
                 runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-            )
+            ),
         )
 
 
@@ -510,6 +531,7 @@ def test_first_death_return_unit_destroyed_hook_records_pending_once() -> None:
     current_phase = state.current_battle_phase
     assert current_phase is not None
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=decisions,
         completed_phase=current_phase,
@@ -592,7 +614,7 @@ def test_return_on_death_catalog_helpers_reject_malformed_runtime_shapes() -> No
     )
     assert pending is not None
     state.return_on_death_consumed_keys.append(pending.consumed_key())
-    assert not catalog_return_on_death_runtime_module._record_pending_return_on_death(  # pyright: ignore[reportPrivateUsage]
+    assert not catalog_return_on_death_runtime_module.record_pending_return_on_death(
         pending=pending,
         event_log=DecisionController().event_log,
         state=state,
@@ -600,7 +622,7 @@ def test_return_on_death_catalog_helpers_reject_malformed_runtime_shapes() -> No
         model_destroyed_event_id="event:pending",
     )
     with pytest.raises(GameLifecycleError, match="capture requires GameState"):
-        catalog_return_on_death_runtime_module._record_pending_return_on_death(  # pyright: ignore[reportPrivateUsage]
+        catalog_return_on_death_runtime_module.record_pending_return_on_death(
             pending=pending,
             event_log=DecisionController().event_log,
             state=object(),
@@ -954,21 +976,23 @@ def test_first_death_return_phase_end_hook_captures_model_destroyed_once() -> No
     current_phase = state.current_battle_phase
     assert current_phase is not None
 
-    runtime.phase_end_handler(
+    _record_return_captures(
+        runtime,
         PhaseEndObjectiveControlContext(
             state=state,
             event_log=decisions.event_log,
             completed_phase=current_phase,
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        )
+        ),
     )
-    runtime.phase_end_handler(
+    _record_return_captures(
+        runtime,
         PhaseEndObjectiveControlContext(
             state=state,
             event_log=decisions.event_log,
             completed_phase=current_phase,
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        )
+        ),
     )
 
     assert len(state.pending_return_on_death) == 1
@@ -1056,17 +1080,18 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
     )
     current_phase = state.current_battle_phase
     assert current_phase is BattlePhase.COMMAND
-    runtime.phase_end_handler(
+    _record_return_captures(
+        runtime,
         PhaseEndObjectiveControlContext(
             state=state,
             event_log=decisions.event_log,
             completed_phase=current_phase,
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        )
+        ),
     )
     assert len(state.pending_return_on_death) == 1
     pending = state.pending_return_on_death[0]
-    request = resolve_pending_return_on_death_phase_end(
+    request = resolve_return_phase_end_candidates(
         state=state,
         decisions=decisions,
         dice_manager=DiceRollManager(
@@ -1075,7 +1100,7 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
             injected_results=(_roll_result(pending=pending, value=6),),
         ),
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     placement = UnitPlacement(
         army_id=destroyed_placement.army_id,
         player_id=destroyed_placement.player_id,
@@ -1461,3 +1486,18 @@ def _muster_request(
             ),
         ),
     )
+
+
+def _record_return_captures(
+    runtime: CatalogReturnOnDeathRuntime,
+    context: PhaseEndObjectiveControlContext,
+) -> tuple[()]:
+    for event_id, pending in runtime.pending_captures_for(context):
+        assert catalog_return_on_death_runtime_module.record_pending_return_on_death(
+            pending=pending,
+            state=context.state,
+            event_log=context.event_log,
+            phase=context.completed_phase.value,
+            model_destroyed_event_id=event_id,
+        )
+    return ()

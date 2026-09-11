@@ -12,6 +12,7 @@ from tests.fight_movement_event_helpers import (
     grouped_fight_movement_resolution_payload,
     standalone_fight_movement_event_evidence,
 )
+from tests.move_marker_fixture_helpers import resolve_cult_markers_for_fixture
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -63,7 +64,6 @@ from warhammer40k_core.engine.cult_ambush import (
     request_cult_ambush_resurgence,
     reserve_state_is_cult_ambush,
     resolve_cult_ambush_ingress_placement,
-    resolve_cult_ambush_marker_removal_for_completed_moves,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -165,7 +165,7 @@ def test_setup_grants_battle_size_resurgence_points_once() -> None:
 def test_cult_ambush_public_guards_fail_fast_for_wrong_context_types() -> None:
     with pytest.raises(GameLifecycleError, match="requires BattleFormationRequestContext"):
         grant_initial_resurgence_points(cast(BattleFormationRequestContext, object()))
-    with pytest.raises(GameLifecycleError, match="requires UnitDestroyedContext"):
+    with pytest.raises(GameLifecycleError, match="Unit-destroyed hooks require context"):
         request_cult_ambush_resurgence(cast(UnitDestroyedContext, object()))
     with pytest.raises(GameLifecycleError, match="requires TurnEndRequestContext"):
         cult_ambush_marker_ingress_request(cast(TurnEndRequestContext, object()))
@@ -497,6 +497,7 @@ def test_resurgence_hook_ignores_ineligible_or_duplicate_destroyed_units() -> No
         ),
     )
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=duplicate_decisions,
         completed_phase=BattlePhase.SHOOTING,
@@ -507,7 +508,10 @@ def test_resurgence_hook_ignores_ineligible_or_duplicate_destroyed_units() -> No
         destroyed_player_id=GSC_PLAYER_ID,
     )
     request_cult_ambush_resurgence(context)
-    request_cult_ambush_resurgence(context)
+    before_pending = state.to_payload(), duplicate_decisions.to_payload()
+    with pytest.raises(GameLifecycleError, match="pending decision to finish"):
+        request_cult_ambush_resurgence(context)
+    assert (state.to_payload(), duplicate_decisions.to_payload()) == before_pending
     assert len(duplicate_decisions.queue.pending_requests) == 1
     duplicate_request = duplicate_decisions.queue.pending_requests[0]
     duplicate_decline = DecisionResult.for_request(
@@ -1046,6 +1050,11 @@ def test_cult_ambush_reserve_cannot_rapid_ingress_but_remains_strategic_reserves
 
 
 def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> None:
+    from warhammer40k_core.engine.cult_ambush_marker_removal import (
+        cult_ambush_marker_removal_candidates,
+    )
+    from warhammer40k_core.engine.sequencing import SequencingRequirement
+
     state, _gsc_unit, enemy_unit = _battle_state(
         gsc_unit_id=ACOLYTE_UNIT_ID,
         gsc_datasheet_id="acolyte-hybrids-with-autopistols",
@@ -1072,7 +1081,20 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
         ),
     )
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    before = (state.to_payload(), decisions.to_payload())
+    candidates = cult_ambush_marker_removal_candidates(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.MOVEMENT,
+        trigger_event_id=trigger_event.event_id,
+    )
+    assert (state.to_payload(), decisions.to_payload()) == before
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == GSC_PLAYER_ID
+    assert candidates[0].participant.requirement is SequencingRequirement.MANDATORY
+    assert candidates[0].participant.source_rule_id == SOURCE_RULE_ID
+
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -1088,7 +1110,7 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
         marker=later_marker,
     )
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -1131,7 +1153,7 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
         ),
     )
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=aircraft_state,
         decisions=aircraft_decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -1178,7 +1200,7 @@ def test_attached_enemy_normal_move_accepts_physical_component_event_identity() 
         ),
     )
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -1259,7 +1281,7 @@ def test_standalone_enemy_fight_move_uses_authenticated_event_time_endpoint() ->
         )
     )
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
@@ -1328,7 +1350,7 @@ def test_fight_move_cannot_remove_marker_placed_after_moving_unit_is_destroyed()
         marker=later_marker,
     )
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
@@ -1381,7 +1403,7 @@ def test_standalone_enemy_fight_move_requires_event_time_endpoint_evidence() -> 
     )
 
     with pytest.raises(GameLifecycleError, match="requires event-time endpoint evidence"):
-        resolve_cult_ambush_marker_removal_for_completed_moves(
+        resolve_cult_markers_for_fixture(
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -1443,7 +1465,7 @@ def test_attached_enemy_fight_move_removes_marker_by_historical_canonical_endpoi
         state=state,
         component_ids=component_ids,
     )
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
@@ -1536,7 +1558,7 @@ def test_attached_enemy_fight_move_rejects_grouped_event_tampering(
     )
 
     with pytest.raises(GameLifecycleError, match=expected_message):
-        resolve_cult_ambush_marker_removal_for_completed_moves(
+        resolve_cult_markers_for_fixture(
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -1595,7 +1617,7 @@ def test_attached_enemy_fight_move_rejects_physical_component_event_identity() -
     )
 
     with pytest.raises(GameLifecycleError, match="identity must be canonical"):
-        resolve_cult_ambush_marker_removal_for_completed_moves(
+        resolve_cult_markers_for_fixture(
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -1646,7 +1668,7 @@ def test_attached_enemy_fight_move_requires_grouped_endpoint_evidence() -> None:
     )
 
     with pytest.raises(GameLifecycleError, match="requires grouped endpoint evidence"):
-        resolve_cult_ambush_marker_removal_for_completed_moves(
+        resolve_cult_markers_for_fixture(
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -1675,7 +1697,7 @@ def test_marker_removal_rejects_non_object_move_event_payload() -> None:
     )
 
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
-        resolve_cult_ambush_marker_removal_for_completed_moves(
+        resolve_cult_markers_for_fixture(
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.MOVEMENT,
@@ -1716,7 +1738,7 @@ def test_marker_removal_rejects_malformed_marker_placement_evidence() -> None:
     )
 
     with pytest.raises(GameLifecycleError, match="placement event payload shape drifted"):
-        resolve_cult_ambush_marker_removal_for_completed_moves(
+        resolve_cult_markers_for_fixture(
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.MOVEMENT,
@@ -1733,7 +1755,7 @@ def test_marker_removal_ignores_unmatched_events_and_missing_context() -> None:
         active_player_id=ENEMY_PLAYER_ID,
     )
     empty_decisions = DecisionController()
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=empty_state,
         decisions=empty_decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -1754,7 +1776,7 @@ def test_marker_removal_ignores_unmatched_events_and_missing_context() -> None:
     )
     no_battlefield_state.record_cult_ambush_marker(no_battlefield_marker)
     no_battlefield_state.battlefield_state = None
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=no_battlefield_state,
         decisions=DecisionController(),
         completed_phase=BattlePhase.MOVEMENT,
@@ -1853,7 +1875,7 @@ def test_marker_removal_ignores_unmatched_events_and_missing_context() -> None:
     for event_type, payload in event_payloads:
         decisions.event_log.append(event_type, validate_json_value(payload))
 
-    resolve_cult_ambush_marker_removal_for_completed_moves(
+    resolve_cult_markers_for_fixture(
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.MOVEMENT,
@@ -1893,7 +1915,7 @@ def test_marker_ingress_decline_closes_marker_window_without_placement_request()
             completed_phase=BattlePhase.MOVEMENT,
         )
     )
-    assert ingress_request is not None
+    assert isinstance(ingress_request, DecisionRequest)
     decline_result = DecisionResult.for_request(
         result_id="phase17g-gsc-decline-marker-ingress",
         request=ingress_request,
@@ -2075,6 +2097,16 @@ def test_marker_ingress_selection_routing_and_invalid_selection_fail_fast() -> N
 
 
 def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
+    from warhammer40k_core.engine.boundary_rule_flow import prepare_phase_end_boundary
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.genestealer_cults import (
+        army_rule as gsc_rules,
+    )
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        advance_model_destruction_triggers,
+    )
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
     state, decisions, marker_request, replacement = _state_waiting_for_marker_placement(
         gsc_unit_id=ACOLYTE_UNIT_ID,
         gsc_datasheet_id="acolyte-hybrids-with-autopistols",
@@ -2096,7 +2128,22 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
         request=marker_request,
         result=marker_result,
     )
+    assert (
+        advance_model_destruction_triggers(
+            state=state,
+            decisions=decisions,
+            registry=UnitDestroyedHookRegistry.from_bindings(
+                gsc_rules.runtime_contribution().unit_destroyed_hook_bindings
+            ),
+        )
+        is None
+    )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    prepare_phase_end_boundary(
+        state=state,
+        decisions=decisions,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
 
     ingress_request = cult_ambush_marker_ingress_request(
         TurnEndRequestContext(
@@ -2106,7 +2153,7 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
         )
     )
 
-    assert ingress_request is not None
+    assert isinstance(ingress_request, DecisionRequest)
     assert ingress_request.actor_id == GSC_PLAYER_ID
     ingress_option = _option_by_selection(ingress_request, "ingress")
     ingress_result = DecisionResult.for_request(
@@ -2176,11 +2223,15 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
     assert arrived_state.arrived_battle_round == 1
     assert state.battlefield_state is not None
     assert state.battlefield_state.unit_placement_by_id(replacement.unit_instance_id)
+    move_observation = _event_payloads(decisions, "rule_trigger_observed")[-1]
+    move_context = move_observation["context"]
+    assert isinstance(move_context, dict)
+    assert move_context["triggering_player_id"] == GSC_PLAYER_ID
+    assert move_context["turn_player_id"] == ENEMY_PLAYER_ID
     destroyed_unit = _unit_by_id(state, ACOLYTE_UNIT_ID)
-    state.replace_battlefield_state(
-        state.battlefield_state.with_unplaced_models_marked_removed(
-            tuple(model.model_instance_id for model in destroyed_unit.own_models)
-        )
+    assert all(
+        model.model_instance_id in state.battlefield_state.removed_model_ids
+        for model in destroyed_unit.own_models
     )
     lifecycle = GameLifecycle(state=state, decision_controller=decisions)
     lifecycle_payload = lifecycle.to_payload()
@@ -2198,7 +2249,7 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
     )
     assert isinstance(arrival_event_payload, dict)
     arrival_event_payload["active_player_id"] = GSC_PLAYER_ID
-    with pytest.raises(GameLifecycleError, match="Cult Ambush arrival source context drift"):
+    with pytest.raises(GameLifecycleError, match="Move completion trigger source authority drift"):
         GameLifecycle.from_payload(tampered_payload)
 
 
@@ -2232,7 +2283,7 @@ def test_invalid_marker_ingress_placement_records_retry_without_arrival() -> Non
             completed_phase=BattlePhase.MOVEMENT,
         )
     )
-    assert ingress_request is not None
+    assert isinstance(ingress_request, DecisionRequest)
     ingress_result = DecisionResult.for_request(
         result_id="phase17g-gsc-select-invalid-placement-ingress",
         request=ingress_request,
@@ -2833,21 +2884,28 @@ def _mission_setup(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
 ) -> MissionSetup:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id=GSC_PLAYER_ID,
+        attacker_force_disposition_id="take-and-hold",
+        defender_player_id=ENEMY_PLAYER_ID,
+        defender_force_disposition_id="purge-the-foe",
+    )
     return replace(
-        MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id=GSC_PLAYER_ID,
-            attacker_force_disposition_id="take-and-hold",
-            defender_player_id=ENEMY_PLAYER_ID,
-            defender_force_disposition_id="purge-the-foe",
-        ),
+        setup,
         deployment_map_id="phase17g-gsc-custom-deployment",
         terrain_layout_id="phase17g-gsc-custom-terrain",
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
-        objective_markers=(),
+        objective_markers=(
+            replace(
+                setup.objective_markers[0],
+                x_inches=battlefield_width_inches / 2,
+                y_inches=battlefield_depth_inches / 2,
+            ),
+        ),
         deployment_zones=(),
         battlefield_regions=(),
         terrain_areas=(),
@@ -2932,7 +2990,7 @@ def _state_waiting_for_ingress_placement() -> tuple[
             completed_phase=BattlePhase.MOVEMENT,
         )
     )
-    assert ingress_request is not None
+    assert isinstance(ingress_request, DecisionRequest)
     ingress_result = DecisionResult.for_request(
         result_id="phase17g-gsc-select-placement-helper-ingress",
         request=ingress_request,
@@ -2990,34 +3048,66 @@ def _run_resurgence_hook(
     destroying_player_id: str = ENEMY_PLAYER_ID,
     destroyed_player_id: str = GSC_PLAYER_ID,
 ) -> None:
-    target_unit_instance_id = destroyed_unit_instance_id or destroyed_unit.unit_instance_id
-    event = decisions.event_log.append(
-        "model_destroyed",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": state.current_battle_phase.value
-                if state.current_battle_phase is not None
-                else BattlePhase.SHOOTING.value,
-                "destroying_player_id": destroying_player_id,
-                "target_unit_instance_id": target_unit_instance_id,
-                "model_instance_id": destroyed_unit.own_models[-1].model_instance_id,
-            }
-        ),
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+    from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.genestealer_cults import (
+        army_rule as gsc_rules,
     )
-    request_cult_ambush_resurgence(
-        UnitDestroyedContext(
-            state=state,
-            decisions=decisions,
-            completed_phase=state.current_battle_phase or BattlePhase.SHOOTING,
-            model_destroyed_event_id=event.event_id,
-            model_destroyed_payload=cast(dict[str, JsonValue], event.payload),
-            destroying_player_id=destroying_player_id,
-            destroyed_unit_instance_id=target_unit_instance_id,
-            destroyed_player_id=destroyed_player_id,
-        )
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        advance_model_destruction_triggers,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+    assert state.current_battle_phase is not None
+    assert state.battlefield_state is not None
+    target_id = (
+        destroyed_unit.unit_instance_id
+        if destroyed_unit_instance_id is None
+        else destroyed_unit_instance_id
+    )
+    view = rules_unit_view_by_id(state=state, unit_instance_id=target_id)
+    assert view.owner_player_id == destroyed_player_id
+    components = (
+        (destroyed_unit,)
+        if destroyed_unit_instance_id is None
+        else tuple(component.unit for component in view.components)
+    )
+    for army in state.army_definitions:
+        for unit in army.units:
+            if state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None:
+                continue
+            if not any(model.is_alive for model in unit.own_models):
+                continue
+            state.replace_battlefield_state(
+                state.battlefield_state.with_added_unit_placement(
+                    _unit_placement(
+                        army_id=army.army_id,
+                        player_id=army.player_id,
+                        unit=unit,
+                        x_inches=0.5,
+                        y_inches=0.5,
+                    )
+                )
+            )
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
+    for unit in components:
+        for model in unit.own_models:
+            destroy_rule_model_for_fixture(
+                state=state,
+                decisions=decisions,
+                model_id=model.model_instance_id,
+                destroying_player_id=destroying_player_id,
+                source_unit_id=None,
+                source_model_id=None,
+            )
+    advance_model_destruction_triggers(
+        state=state,
+        decisions=decisions,
+        registry=UnitDestroyedHookRegistry.from_bindings(
+            gsc_rules.runtime_contribution().unit_destroyed_hook_bindings
+        ),
     )
 
 
@@ -3389,3 +3479,177 @@ def _muster_request(
             ),
         ),
     )
+
+
+@pytest.mark.parametrize("history", ["live", "closed", "removed", "arrived"])
+@pytest.mark.parametrize("aircraft", [False, True])
+def test_cult_marker_deferred_capture_preserves_source_move_endpoint(
+    history: str, aircraft: bool
+) -> None:
+    from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
+
+    from warhammer40k_core.engine.faction_content.unit_move_completed import (
+        move_completion_rule_registry,
+    )
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
+
+    state, _, enemy = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+        enemy_aircraft=aircraft,
+    )
+    decisions = DecisionController()
+    marker = _marker(replacement_unit_instance_id=ACOLYTE_UNIT_ID, x_inches=10.0, y_inches=10.0)
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    if history == "closed":
+        state.replace_cult_ambush_marker(replace(marker, ingress_window_closed=True))
+        decisions.event_log.append(
+            "genestealer_cults_cult_ambush_marker_ingress_declined", {"marker_id": marker.marker_id}
+        )
+    elif history in {"removed", "arrived"}:
+        state.remove_cult_ambush_marker(marker.marker_id)
+        if history == "removed":
+            decisions.event_log.append(
+                "genestealer_cults_cult_ambush_marker_removed", {"marker": marker.to_payload()}
+            )
+        else:
+            decisions.event_log.append(
+                "genestealer_cults_cult_ambush_unit_arrived", {"marker_id": marker.marker_id}
+            )
+    append_authenticated_normal_move(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=enemy.unit_instance_id,
+        suffix="cult-capture-source",
+        pose_transform=lambda pose: Pose.at(
+            pose.position.x + 0.1, pose.position.y, pose.position.z
+        ),
+    )
+    event = next(
+        row
+        for row in decisions.event_log.records
+        if row.event_type == "movement_activation_completed"
+    )
+    assert isinstance(event.payload, dict)
+    context = UnitMoveCompletedContext(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.MOVEMENT,
+        trigger_event_id=event.event_id,
+        trigger_event_payload=event.payload,
+        triggering_unit_instance_id=enemy.unit_instance_id,
+        triggering_player_id=ENEMY_PLAYER_ID,
+        movement_action="normal_move",
+    )
+    registry = move_completion_rule_registry()
+    candidates = registry.candidates_for(context)
+    if aircraft or history in {"removed", "arrived"}:
+        assert candidates == ()
+        return
+    assert len(candidates) == 1
+    original = candidates[0].participant
+    assert original.player_id == GSC_PLAYER_ID
+    assert original.source_rule_id == SOURCE_RULE_ID
+    # A later accepted movement cannot retroactively remove the earlier trigger.
+    append_authenticated_normal_move(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=enemy.unit_instance_id,
+        suffix="cult-capture-later",
+        pose_transform=lambda pose: Pose.at(
+            pose.position.x + 20.0, pose.position.y, pose.position.z
+        ),
+    )
+    before = (state.to_payload(), decisions.to_payload())
+    (resumed,) = registry.candidates_for(context)
+    assert resumed.participant == original
+    assert (state.to_payload(), decisions.to_payload()) == before
+    assert resumed.activate() is None
+    assert state.cult_ambush_markers == []
+    assert registry.candidates_for(context) == ()
+
+
+@pytest.mark.parametrize(
+    ("tamper", "message"),
+    [
+        ("source", "rule source identity drift"),
+        ("move_type", "move source drift"),
+        ("marker_object", "marker must be an object"),
+        ("owner", "marker owner drift"),
+        ("creation", "creation authority drift"),
+        ("current_state", "marker state drift"),
+    ],
+)
+def test_deferred_cult_marker_resume_rejects_rebound_participant(tamper: str, message: str) -> None:
+    from typing import Any
+
+    from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
+
+    from warhammer40k_core.engine.cult_ambush_marker_removal import resume_cult_marker_candidate
+    from warhammer40k_core.engine.sequencing import (
+        SequencingParticipant,
+        SequencingParticipantPayload,
+    )
+
+    state, _, enemy = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    decisions = DecisionController()
+    marker = _marker(replacement_unit_instance_id=ACOLYTE_UNIT_ID, x_inches=10.0, y_inches=10.0)
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    append_authenticated_normal_move(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=enemy.unit_instance_id,
+        suffix="cult-resume-authority",
+        pose_transform=lambda pose: Pose.at(
+            pose.position.x + 0.1, pose.position.y, pose.position.z
+        ),
+    )
+    captured = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "move_rule_candidates_observed"
+    )
+    raw = cast(dict[str, Any], captured.payload)
+    participant = SequencingParticipant.from_payload(
+        cast(SequencingParticipantPayload, raw["participants"][0])
+    )
+    payload = cast(dict[str, Any], participant.to_payload())
+    if tamper == "source":
+        payload["source_rule_id"] = "other-source"
+    elif tamper == "move_type":
+        payload["payload"]["trigger_event_type"] = "other-event"
+    elif tamper == "marker_object":
+        payload["payload"]["markers"] = [False]
+    elif tamper == "owner":
+        payload["payload"]["markers"][0]["player_id"] = ENEMY_PLAYER_ID
+    elif tamper == "creation":
+        payload["payload"]["markers"][0]["marker_id"] = "unplaced-marker"
+    else:
+        state.replace_cult_ambush_marker(replace(marker, x_inches=11.0))
+    participant = SequencingParticipant.from_payload(cast(SequencingParticipantPayload, payload))
+    with pytest.raises(GameLifecycleError, match=message):
+        resume_cult_marker_candidate(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.MOVEMENT,
+            trigger_event_id=raw["trigger_event_id"],
+            participant=participant,
+        )

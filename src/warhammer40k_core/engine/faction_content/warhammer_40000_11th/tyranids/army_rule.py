@@ -39,6 +39,7 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartCompletedBattleShockAuthorityContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartNestedPendingAuthorityContext,
     CommandPhaseStartNestedResultContext,
@@ -47,7 +48,7 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
 )
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import (
@@ -77,6 +78,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -125,6 +127,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=shadow_in_the_warp_request,
+                candidate_handler=command_sequencing_candidates,
                 result_handler=apply_shadow_in_the_warp_result,
                 nested_result_handler=apply_shadow_in_the_warp_nested_result,
                 nested_pending_authority_validator=(
@@ -157,63 +160,10 @@ def runtime_contribution() -> RuntimeContentContribution:
     )
 
 
-def shadow_in_the_warp_request(
-    context: CommandPhaseStartRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not CommandPhaseStartRequestContext:
-        raise GameLifecycleError("Shadow in the Warp requires request context.")
-    for army in _tyranids_armies(context.state):
-        if shadow_in_the_warp_unleashed_for_player(context.state, player_id=army.player_id):
-            continue
-        if _shadow_declined_this_command_phase(context.state, player_id=army.player_id):
-            continue
-        source_unit_ids = _eligible_shadow_source_unit_ids(
-            state=context.state,
-            army=army,
-        )
-        if not source_unit_ids:
-            continue
-        target_unit_ids = _enemy_unit_ids_on_battlefield(context.state, tyranids_army=army)
-        if not target_unit_ids:
-            continue
-        common_payload = _shadow_common_payload(
-            state=context.state,
-            active_player_id=context.active_player_id,
-            player_id=army.player_id,
-            source_unit_ids=source_unit_ids,
-            target_unit_ids=target_unit_ids,
-        )
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-            actor_id=army.player_id,
-            payload=validate_json_value(common_payload),
-            options=(
-                DecisionOption(
-                    option_id=SHADOW_UNLEASH_OPTION_ID,
-                    label="Unleash Shadow in the Warp",
-                    payload=validate_json_value(
-                        {
-                            **common_payload,
-                            "submission_kind": SHADOW_SELECTION_KIND,
-                            "selected_shadow_option": "unleash",
-                        }
-                    ),
-                ),
-                DecisionOption(
-                    option_id=SHADOW_DECLINE_OPTION_ID,
-                    label="Do not unleash Shadow in the Warp",
-                    payload=validate_json_value(
-                        {
-                            **common_payload,
-                            "submission_kind": SHADOW_SELECTION_KIND,
-                            "selected_shadow_option": "decline",
-                        }
-                    ),
-                ),
-            ),
-        )
-    return None
+def shadow_in_the_warp_request(context: CommandPhaseStartRequestContext) -> DecisionRequest | None:
+    from .command_sequencing import request_for
+
+    return request_for(context)
 
 
 def apply_shadow_in_the_warp_result(context: CommandPhaseStartResultContext) -> bool:
@@ -235,7 +185,7 @@ def apply_shadow_in_the_warp_result(context: CommandPhaseStartResultContext) -> 
         raise GameLifecycleError("Shadow in the Warp actor does not own Tyranids.")
     if shadow_in_the_warp_unleashed_for_player(context.state, player_id=player_id):
         raise GameLifecycleError("Shadow in the Warp has already been unleashed this battle.")
-    if _shadow_declined_this_command_phase(context.state, player_id=player_id):
+    if shadow_declined_this_command_phase(context.state, player_id=player_id):
         raise GameLifecycleError("Shadow in the Warp has already been declined this Command phase.")
     _validate_shadow_request_matches_current_state(context=context, army=army)
     try:
@@ -577,7 +527,7 @@ def shadow_in_the_warp_battle_shock_modifiers(
     if type(context) is not BattleShockModifierContext:
         raise GameLifecycleError("Shadow in the Warp Battle-shock modifiers require context.")
     modifiers: list[RollModifier] = []
-    for tyranids_army in _tyranids_armies(context.state):
+    for tyranids_army in tyranids_armies(context.state):
         if not context.request.request_id.startswith(
             _shadow_request_prefix(
                 battle_round=context.request.battle_round,
@@ -929,12 +879,12 @@ def _validate_shadow_continuation_occurrence(
     if len(records) != 1:
         raise GameLifecycleError("Shadow in the Warp source decision authority drifted.")
     record = records[0]
-    expected_common = _shadow_common_payload(
+    expected_common = shadow_common_payload(
         state=state,
         active_player_id=active_player_id,
         player_id=source_state.player_id,
-        source_unit_ids=_eligible_shadow_source_unit_ids(state=state, army=tyranids_army),
-        target_unit_ids=_enemy_unit_ids_on_battlefield(state, tyranids_army=tyranids_army),
+        source_unit_ids=eligible_shadow_source_unit_ids(state=state, army=tyranids_army),
+        target_unit_ids=enemy_unit_ids_on_battlefield(state, tyranids_army=tyranids_army),
     )
     expected_result_payload = validate_json_value(
         {
@@ -1311,7 +1261,7 @@ def _shadow_unleashed_state(
     )
 
 
-def _shadow_common_payload(
+def shadow_common_payload(
     *,
     state: GameState,
     active_player_id: str,
@@ -1356,16 +1306,16 @@ def _validate_shadow_request_matches_current_state(
     if _payload_string_list(
         request_payload,
         key="source_unit_instance_ids",
-    ) != _eligible_shadow_source_unit_ids(state=context.state, army=army):
+    ) != eligible_shadow_source_unit_ids(state=context.state, army=army):
         raise GameLifecycleError("Shadow in the Warp request source unit drift.")
     if _payload_string_list(
         request_payload,
         key="target_enemy_unit_instance_ids",
-    ) != _enemy_unit_ids_on_battlefield(context.state, tyranids_army=army):
+    ) != enemy_unit_ids_on_battlefield(context.state, tyranids_army=army):
         raise GameLifecycleError("Shadow in the Warp request target unit drift.")
 
 
-def _shadow_declined_this_command_phase(state: GameState, *, player_id: str) -> bool:
+def shadow_declined_this_command_phase(state: GameState, *, player_id: str) -> bool:
     requested_player_id = _validate_identifier("player_id", player_id)
     states = tuple(
         state_record
@@ -1394,7 +1344,7 @@ def _decline_state_matches_current_command_phase(
     )
 
 
-def _eligible_shadow_source_unit_ids(
+def eligible_shadow_source_unit_ids(
     *,
     state: GameState,
     army: ArmyDefinition,
@@ -1408,7 +1358,7 @@ def _eligible_shadow_source_unit_ids(
     )
 
 
-def _enemy_unit_ids_on_battlefield(
+def enemy_unit_ids_on_battlefield(
     state: GameState,
     *,
     tyranids_army: ArmyDefinition,
@@ -1484,7 +1434,7 @@ def _unit_and_army_by_id(
     raise GameLifecycleError("Tyranids army rule unit_instance_id was not found.")
 
 
-def _tyranids_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
+def tyranids_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
     _validate_game_state(state)
     return tuple(
         army
@@ -1495,7 +1445,7 @@ def _tyranids_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
 
 def _tyranids_army_for_player(state: GameState, *, player_id: str) -> ArmyDefinition | None:
     requested_player_id = _validate_identifier("player_id", player_id)
-    for army in _tyranids_armies(state):
+    for army in tyranids_armies(state):
         if army.player_id == requested_player_id:
             return army
     return None
@@ -1570,3 +1520,11 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"Tyranids army rule {field_name} must be positive.")
     return value
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .command_sequencing import candidates
+
+    return candidates(context)

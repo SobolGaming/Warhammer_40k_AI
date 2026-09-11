@@ -35,11 +35,11 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
-    CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
@@ -76,6 +76,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
@@ -177,7 +178,7 @@ def runtime_contribution() -> RuntimeContentContribution:
             CommandPhaseStartHookBinding(
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                request_handler=voice_of_command_request,
+                candidate_handler=command_sequencing_candidates,
                 result_handler=apply_voice_of_command_result,
             ),
         ),
@@ -185,7 +186,7 @@ def runtime_contribution() -> RuntimeContentContribution:
             BattleShockHookBinding(
                 hook_id=BATTLE_SHOCK_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                outcome_handler=voice_of_command_battle_shock_outcome,
+                outcome_state_handler=voice_of_command_battle_shock_outcome,
             ),
         ),
         unit_characteristic_modifier_bindings=(
@@ -227,63 +228,6 @@ def runtime_contribution() -> RuntimeContentContribution:
     )
 
 
-def voice_of_command_request(
-    context: CommandPhaseStartRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not CommandPhaseStartRequestContext:
-        raise GameLifecycleError("Voice of Command requires request context.")
-    army = _astra_militarum_army_for_player(context.state, player_id=context.active_player_id)
-    if army is None:
-        return None
-    if _voice_of_command_done_this_command_phase(context.state, player_id=army.player_id):
-        return None
-
-    issues = _eligible_voice_of_command_issues(context.state, army=army)
-    if not issues:
-        return None
-
-    common_payload = _payload_object(
-        validate_json_value(
-            {
-                "game_id": context.state.game_id,
-                "battle_round": context.state.battle_round,
-                "phase": BattlePhase.COMMAND.value,
-                "active_player_id": army.player_id,
-                "player_id": army.player_id,
-                "faction_id": ASTRA_MILITARUM_FACTION_ID,
-                "source_rule_id": SOURCE_RULE_ID,
-                "hook_id": HOOK_ID,
-                "effect_kind": VOICE_OF_COMMAND_EFFECT_KIND,
-                "selection_kind": VOICE_OF_COMMAND_SELECTION_KIND,
-                "order_range_inches": ORDER_RANGE_INCHES,
-                "eligible_issue_option_ids": [_voice_issue_option_id(issue) for issue in issues],
-                "expires_at_battle_round": _next_own_turn_battle_round(context.state),
-            }
-        )
-    )
-    options = tuple(_voice_issue_decision_option(issue, common_payload) for issue in issues)
-    return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
-        decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-        actor_id=army.player_id,
-        payload=validate_json_value(common_payload),
-        options=(
-            *options,
-            DecisionOption(
-                option_id=VOICE_OF_COMMAND_DONE_OPTION_ID,
-                label="No more Orders",
-                payload=validate_json_value(
-                    {
-                        **common_payload,
-                        "submission_kind": VOICE_OF_COMMAND_SELECTION_KIND,
-                        "selected_voice_of_command_option": "done",
-                    }
-                ),
-            ),
-        ),
-    )
-
-
 def apply_voice_of_command_result(context: CommandPhaseStartResultContext) -> bool:
     if type(context) is not CommandPhaseStartResultContext:
         raise GameLifecycleError("Voice of Command requires result context.")
@@ -300,28 +244,34 @@ def apply_voice_of_command_result(context: CommandPhaseStartResultContext) -> bo
     if result.actor_id is None:
         raise GameLifecycleError("Voice of Command result requires an actor.")
     player_id = result.actor_id
-    army = _astra_militarum_army_for_player(context.state, player_id=player_id)
+    army = astra_militarum_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Voice of Command actor does not own Astra Militarum.")
-    if _voice_of_command_done_this_command_phase(context.state, player_id=player_id):
+    officer_unit_id = _payload_string(request_payload, key="issuing_officer_unit_instance_id")
+    if _voice_of_command_done_this_command_phase(
+        context.state, player_id=player_id, officer_unit_instance_id=officer_unit_id
+    ):
         raise GameLifecycleError("Voice of Command was already completed this Command phase.")
 
     payload = _payload_object(result.payload)
+    if _payload_string(payload, key="issuing_officer_unit_instance_id") != officer_unit_id:
+        raise GameLifecycleError("Voice of Command officer payload drift.")
     selected = _payload_string(payload, key="selected_voice_of_command_option")
     if selected == "done":
         if result.selected_option_id != VOICE_OF_COMMAND_DONE_OPTION_ID:
             raise GameLifecycleError("Voice of Command done option ID drift.")
-        _record_voice_of_command_done(context, player_id=player_id)
+        _record_voice_of_command_done(
+            context, player_id=player_id, officer_unit_instance_id=officer_unit_id
+        )
         return True
     if selected != "issue":
         raise GameLifecycleError("Voice of Command selection is unsupported.")
 
     order = _order_from_token(_payload_string(payload, key="order_id"))
-    officer_unit_id = _payload_string(payload, key="issuing_officer_unit_instance_id")
     target_rules_unit_id = _payload_string(payload, key="ordered_rules_unit_instance_id")
     current_issues = {
-        _voice_issue_option_id(issue): issue
-        for issue in _eligible_voice_of_command_issues(context.state, army=army)
+        voice_issue_option_id(issue): issue
+        for issue in eligible_voice_of_command_issues(context.state, army=army)
     }
     issue = current_issues.get(result.selected_option_id)
     if issue is None:
@@ -631,11 +581,11 @@ def _record_voice_of_command_issue(
     )
 
 
-def _voice_issue_decision_option(
+def voice_issue_decision_option(
     issue: VoiceOfCommandIssueOption,
     common_payload: dict[str, JsonValue],
 ) -> DecisionOption:
-    option_id = _voice_issue_option_id(issue)
+    option_id = voice_issue_option_id(issue)
     return DecisionOption(
         option_id=option_id,
         label=(f"Issue {ORDER_LABELS[issue.order]}: {_rules_unit_label(issue.target_rules_unit)}"),
@@ -665,7 +615,7 @@ def _voice_issue_decision_option(
     )
 
 
-def _eligible_voice_of_command_issues(
+def eligible_voice_of_command_issues(
     state: GameState,
     *,
     army: ArmyDefinition,
@@ -675,6 +625,10 @@ def _eligible_voice_of_command_issues(
         raise GameLifecycleError("Voice of Command issue lookup requires an ArmyDefinition.")
     issues: list[VoiceOfCommandIssueOption] = []
     for officer in army.units:
+        if _voice_of_command_done_this_command_phase(
+            state, player_id=army.player_id, officer_unit_instance_id=officer.unit_instance_id
+        ):
+            continue
         if not _unit_has_faction_keyword(officer, ASTRA_MILITARUM_FACTION_KEYWORD):
             continue
         if not _unit_has_keyword(officer, OFFICER_KEYWORD):
@@ -709,7 +663,7 @@ def _eligible_voice_of_command_issues(
                         issued_count_before=issued_count,
                     )
                 )
-    return tuple(sorted(issues, key=_voice_issue_option_id))
+    return tuple(sorted(issues, key=voice_issue_option_id))
 
 
 def _eligible_voice_of_command_targets(
@@ -881,11 +835,12 @@ def _record_voice_of_command_done(
     context: CommandPhaseStartResultContext,
     *,
     player_id: str,
+    officer_unit_instance_id: str,
 ) -> None:
     done_state = FactionRuleState(
         state_id=(
             f"astra-militarum:voice-of-command:done:{context.state.game_id}:"
-            f"round-{context.state.battle_round:02d}:{player_id}:command"
+            f"round-{context.state.battle_round:02d}:{player_id}:command:{officer_unit_instance_id}"
         ),
         player_id=player_id,
         faction_id=ASTRA_MILITARUM_FACTION_ID,
@@ -902,6 +857,7 @@ def _record_voice_of_command_done(
                 "active_player_id": context.active_player_id,
                 "player_id": player_id,
                 "selected_voice_of_command_option": "done",
+                "issuing_officer_unit_instance_id": officer_unit_instance_id,
                 "source_rule_id": SOURCE_RULE_ID,
                 "hook_id": HOOK_ID,
             }
@@ -924,7 +880,9 @@ def _record_voice_of_command_done(
     )
 
 
-def _voice_of_command_done_this_command_phase(state: GameState, *, player_id: str) -> bool:
+def _voice_of_command_done_this_command_phase(
+    state: GameState, *, player_id: str, officer_unit_instance_id: str
+) -> bool:
     requested_player_id = _validate_identifier("player_id", player_id)
     matching = tuple(
         stored
@@ -933,6 +891,8 @@ def _voice_of_command_done_this_command_phase(state: GameState, *, player_id: st
             state_kind=VOICE_OF_COMMAND_DONE_STATE_KIND,
         )
         if _done_state_matches_current_command_phase(state, stored)
+        and _payload_string(_payload_object(stored.payload), key="issuing_officer_unit_instance_id")
+        == officer_unit_instance_id
     )
     if len(matching) > 1:
         raise GameLifecycleError("Voice of Command found multiple done states.")
@@ -1002,7 +962,7 @@ def _voice_of_command_order_effect(
     target_id = issue.target_rules_unit.unit_instance_id
     issue_state_payload = _payload_object(issue_state.payload)
     issued_count_after = _payload_positive_int(issue_state_payload, key="orders_issued_after")
-    expiration_battle_round = _next_own_turn_battle_round(context.state)
+    expiration_battle_round = next_own_turn_battle_round(context.state)
     expiration = EffectExpiration.start_turn(
         battle_round=expiration_battle_round,
         player_id=player_id,
@@ -1197,7 +1157,7 @@ def _source_ids_with_voice_of_command(source_ids: tuple[str, ...]) -> tuple[str,
     return tuple(sorted((*source_ids, SOURCE_RULE_ID)))
 
 
-def _voice_issue_option_id(issue: VoiceOfCommandIssueOption) -> str:
+def voice_issue_option_id(issue: VoiceOfCommandIssueOption) -> str:
     return (
         "astra_militarum:voice_of_command:"
         f"{issue.officer_unit.unit_instance_id}:"
@@ -1212,7 +1172,7 @@ def _rules_unit_label(rules_unit: RulesUnitView) -> str:
     return " + ".join(component.unit.name for component in rules_unit.components)
 
 
-def _astra_militarum_army_for_player(
+def astra_militarum_army_for_player(
     state: GameState,
     *,
     player_id: str,
@@ -1280,7 +1240,7 @@ def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
     return state.battlefield_state
 
 
-def _next_own_turn_battle_round(state: GameState) -> int:
+def next_own_turn_battle_round(state: GameState) -> int:
     _validate_game_state(state)
     return state.battle_round + 1
 
@@ -1371,3 +1331,11 @@ def _validate_game_state(state: object) -> None:
 
     if type(state) is not GameState:
         raise GameLifecycleError("Voice of Command requires GameState.")
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .command_sequencing import candidates
+
+    return candidates(context)

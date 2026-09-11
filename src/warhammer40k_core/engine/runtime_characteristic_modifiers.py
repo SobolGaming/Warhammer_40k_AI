@@ -12,6 +12,7 @@ from warhammer40k_core.core.modifiers import (
     ModifierTerm,
     resolve_characteristic_value,
 )
+from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
@@ -115,13 +116,20 @@ def resolve_runtime_objective_control(
         )
         modifiers.extend(operations)
         origin_ids.update((operation.modifier_id, binding.modifier_id) for operation in operations)
-    modifiers.extend(
-        generic_rule_characteristic_operations(
-            state=context.state,
-            unit_instance_id=context.unit_instance_id,
-            characteristic=Characteristic.OBJECTIVE_CONTROL,
+    # Other effect families cannot supply generic characteristic operations.
+    # Avoid rebuilding attached-unit applicability when no generic rules exist.
+    if any(
+        isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("effect_kind") == GENERIC_RULE_EFFECT_KIND
+        for effect in context.state.persisting_effects
+    ):
+        modifiers.extend(
+            generic_rule_characteristic_operations(
+                state=context.state,
+                unit_instance_id=context.unit_instance_id,
+                characteristic=Characteristic.OBJECTIVE_CONTROL,
+            )
         )
-    )
     resolved = resolve_characteristic_value(
         replace(value, raw=value.final),
         modifiers,

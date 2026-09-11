@@ -30,6 +30,7 @@ from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     StratagemCostChoiceResultContext,
 )
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
@@ -297,7 +298,7 @@ def aeldari_corsair_coterie_turn_end_abilities() -> tuple[GenericRuleTurnEndAbil
             coverage_descriptor_id=corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID,
             source_rule_id=corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID,
             hook_id_builder=_corsair_webway_pathstone_turn_end_hook_id,
-            request_builder=_corsair_webway_pathstone_turn_end_request,
+            candidate_builder=_corsair_webway_pathstone_turn_end_candidates,
             result_builder=_corsair_apply_webway_pathstone_turn_end_result,
         ),
     )
@@ -580,13 +581,17 @@ def _corsair_webway_pathstone_turn_end_hook_id(source: GenericRuleAbilitySource)
     return _corsair_coterie_enhancements().WEBWAY_PATHSTONE_TURN_END_HOOK_ID
 
 
-def _corsair_webway_pathstone_turn_end_request(
+def _corsair_webway_pathstone_turn_end_candidates(
     context: TurnEndRequestContext,
     source: GenericRuleAbilitySource,
-) -> DecisionRequest | None:
+) -> tuple[TimingRuleCandidate, ...]:
+    from .faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (
+        turn_sequencing,
+    )
+
     if type(source) is not GenericRuleAbilitySource:
-        raise GameLifecycleError("Webway Pathstone turn-end request requires source.")
-    return _corsair_coterie_enhancements().webway_pathstone_turn_end_request(context)
+        raise GameLifecycleError("Turn-end candidates require source.")
+    return turn_sequencing.candidates(context)
 
 
 def _corsair_apply_webway_pathstone_turn_end_result(

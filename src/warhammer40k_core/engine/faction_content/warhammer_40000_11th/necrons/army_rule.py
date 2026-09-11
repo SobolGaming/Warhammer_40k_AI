@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+from functools import partial
+
 from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSpec
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.command_phase_start_healing import validate_pending_healing_source
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -33,6 +37,7 @@ from warhammer40k_core.engine.healing_geometry import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 _event_payload_object = event_payload_object
@@ -65,7 +70,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=reanimation_protocols_request,
+                candidate_handler=command_sequencing_candidates,
                 result_handler=apply_reanimation_protocols_result,
+                nested_pending_authority_validator=partial(
+                    validate_pending_healing_source,
+                    hook_id=HOOK_ID,
+                    source_rule_id=SOURCE_RULE_ID,
+                ),
             ),
         ),
     )
@@ -74,60 +85,9 @@ def runtime_contribution() -> RuntimeContentContribution:
 def reanimation_protocols_request(
     context: CommandPhaseStartRequestContext,
 ) -> DecisionRequest | None:
-    if type(context) is not CommandPhaseStartRequestContext:
-        raise GameLifecycleError("Reanimation Protocols requires request context.")
-    army = _necrons_army_for_player(context.state, player_id=context.active_player_id)
-    if army is None:
-        return None
-    unresolved_rules_units = tuple(
-        rules_unit
-        for rules_unit in _eligible_reanimation_rules_units(context.state, army=army)
-        if not _reanimation_resolved_for_rules_unit(
-            records=context.decisions.event_log.records,
-            state=context.state,
-            player_id=army.player_id,
-            rules_unit_instance_id=rules_unit.unit_instance_id,
-        )
-    )
-    if not unresolved_rules_units:
-        return None
-    common_payload = {
-        "game_id": context.state.game_id,
-        "battle_round": context.state.battle_round,
-        "phase": BattlePhase.COMMAND.value,
-        "active_player_id": army.player_id,
-        "player_id": army.player_id,
-        "faction_id": NECRONS_FACTION_ID,
-        "source_rule_id": SOURCE_RULE_ID,
-        "hook_id": HOOK_ID,
-        "effect_kind": REANIMATION_EFFECT_KIND,
-        "selection_kind": REANIMATION_SELECTION_KIND,
-        "eligible_rules_unit_instance_ids": [
-            rules_unit.unit_instance_id for rules_unit in unresolved_rules_units
-        ],
-    }
-    return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
-        decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-        actor_id=army.player_id,
-        payload=validate_json_value(common_payload),
-        options=tuple(
-            DecisionOption(
-                option_id=_reanimation_option_id(rules_unit.unit_instance_id),
-                label=f"Reanimation Protocols: {_rules_unit_label(rules_unit)}",
-                payload=validate_json_value(
-                    {
-                        **common_payload,
-                        "rules_unit_instance_id": rules_unit.unit_instance_id,
-                        "rules_unit_owner_player_id": army.player_id,
-                        "rules_unit_name": _rules_unit_label(rules_unit),
-                        "component_unit_instance_ids": list(rules_unit.component_unit_instance_ids),
-                    }
-                ),
-            )
-            for rules_unit in unresolved_rules_units
-        ),
-    )
+    from .command_sequencing import request_for
+
+    return request_for(context)
 
 
 def apply_reanimation_protocols_result(context: CommandPhaseStartResultContext) -> bool:
@@ -148,7 +108,7 @@ def apply_reanimation_protocols_result(context: CommandPhaseStartResultContext) 
     player_id = result.actor_id
     if player_id != context.active_player_id:
         raise GameLifecycleError("Reanimation Protocols actor must be the active player.")
-    army = _necrons_army_for_player(context.state, player_id=player_id)
+    army = necrons_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Reanimation Protocols actor does not own Necrons.")
 
@@ -158,12 +118,12 @@ def apply_reanimation_protocols_result(context: CommandPhaseStartResultContext) 
     if _payload_string(payload, key="player_id") != player_id:
         raise GameLifecycleError("Reanimation Protocols player drift.")
     rules_unit_id = _payload_string(payload, key="rules_unit_instance_id")
-    if result.selected_option_id != _reanimation_option_id(rules_unit_id):
+    if result.selected_option_id != reanimation_option_id(rules_unit_id):
         raise GameLifecycleError("Reanimation Protocols option_id drift.")
     unresolved_rules_units = {
         rules_unit.unit_instance_id: rules_unit
-        for rules_unit in _eligible_reanimation_rules_units(context.state, army=army)
-        if not _reanimation_resolved_for_rules_unit(
+        for rules_unit in eligible_reanimation_rules_units(context.state, army=army)
+        if not reanimation_resolved_for_rules_unit(
             records=context.decisions.event_log.records,
             state=context.state,
             player_id=player_id,
@@ -272,7 +232,7 @@ def _reanimation_healing_effect(
     )
 
 
-def _eligible_reanimation_rules_units(
+def eligible_reanimation_rules_units(
     state: GameState,
     *,
     army: ArmyDefinition,
@@ -299,7 +259,7 @@ def _eligible_reanimation_rules_units(
     return tuple(sorted(rules_units, key=lambda rules_unit: rules_unit.unit_instance_id))
 
 
-def _reanimation_resolved_for_rules_unit(
+def reanimation_resolved_for_rules_unit(
     *,
     records: tuple[EventRecord, ...],
     state: GameState,
@@ -407,7 +367,7 @@ def _roll_reanimation_d3(
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
-            reason=f"Reanimation Protocols for {_rules_unit_label(rules_unit)}",
+            reason=f"Reanimation Protocols for {rules_unit_label(rules_unit)}",
             roll_type=REANIMATION_ROLL_TYPE,
             actor_id=rules_unit.unit_instance_id,
         )
@@ -429,7 +389,7 @@ def _rules_unit_is_on_battlefield(
     return any(model.model_instance_id in placed_model_ids for model in rules_unit.alive_models())
 
 
-def _necrons_army_for_player(state: object, *, player_id: str) -> ArmyDefinition | None:
+def necrons_army_for_player(state: object, *, player_id: str) -> ArmyDefinition | None:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -461,15 +421,23 @@ def _unit_has_necrons_keyword(unit: UnitInstance) -> bool:
     }
 
 
-def _rules_unit_label(rules_unit: RulesUnitView) -> str:
+def rules_unit_label(rules_unit: RulesUnitView) -> str:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Reanimation Protocols label requires rules unit.")
     return " + ".join(component.unit.name for component in rules_unit.components)
 
 
-def _reanimation_option_id(rules_unit_instance_id: str) -> str:
+def reanimation_option_id(rules_unit_instance_id: str) -> str:
     rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
     return f"necrons:reanimation_protocols:{rules_unit_id}"
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .command_sequencing import candidates
+
+    return candidates(context)

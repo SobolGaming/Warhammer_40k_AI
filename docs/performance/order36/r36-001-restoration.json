@@ -1,0 +1,64 @@
+{
+  "workload_id": "r36-001-retained-shooting-scope-restoration-v1",
+  "base_commit": "57957112dbb65596d99e44e8e97649b4abdb75c1",
+  "scope": "Only validate_active_player_history, on the same real retained-shooting state and history; module-isolated base uses unchanged dependencies. Not full lifecycle restore or full-game certification.",
+  "method": "7 alternating base/head batches of 100 calls after one warmup each; serial, no test workers, coverage or profiling; construction excluded.",
+  "setup_seconds": 2.2486304589547217,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional local host",
+  "event_count": 40,
+  "decision_count": 7,
+  "scope_kinds": [
+    "out_of_phase_shoot"
+  ],
+  "state_sha256": "9b930d1f545ad10fa49cf658581950cf5103cdb48e260ce2a6082c1aa93ed8d8",
+  "history_sha256": "14eb969f35064d877689b2aa01605d6b84b41fb849176a892828513765559da5",
+  "base_source_sha256": "1b675119ab4601390b76c3e0e0cbe375562f7111238cf3af38512b8fd9e8a561",
+  "hashes": {
+    "src/warhammer40k_core/engine/active_player_scope_history.py": "25c45478fceef919b22162cd41e3051e23e66983c7c4d61da9a7a128f53c46a9",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "src/warhammer40k_core/_engine_build_manifest.json": "836a9672740f2b39385a23eaacc39082e6b0b08c68604e92a7c3c2a28893ee47",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722"
+  },
+  "measurement_script": "\"\"\"Restoration-validator cost comparison; no game or timing certification.\"\"\"\nimport hashlib\nimport json\nimport math\nimport platform\nimport statistics\nimport subprocess\nimport time\nimport types\nfrom pathlib import Path\n\nfrom tests.psychic_modifier_helpers import pending_request\nfrom tests.retained_attack_helpers import pending_retained_attack\nfrom warhammer40k_core.engine.active_player_scope_history import validate_active_player_history\nfrom warhammer40k_core.engine.damage_allocation import DestructionReactionKind\n\nBASE = '57957112dbb65596d99e44e8e97649b4abdb75c1'\nSOURCE = 'src/warhammer40k_core/engine/active_player_scope_history.py'\nbase_source = subprocess.check_output(['git', 'show', f'{BASE}:{SOURCE}'])\nbase_module = types.ModuleType('r36_001_base_history')\nexec(compile(base_source, '<r36-001-base-history>', 'exec'), base_module.__dict__)\nstarted = time.perf_counter()\nsession, _ = pending_retained_attack(reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH)\nrequest = pending_request(session)\noption = next(option for option in request.options\n              if isinstance(option.payload, dict) and option.payload.get('action') == 'shoot')\nsession.submit_option(request_id=request.request_id, result_id='r36-001-benchmark-shoot',\n                      option_id=option.option_id)\nstate = session.lifecycle.state\nassert state is not None and len(state.active_player_scopes) == 1\ndecisions = session.lifecycle.decision_controller\nprepared = time.perf_counter()\nrows = {'base': [], 'head': []}\nfunctions = {'base': base_module.validate_active_player_history,\n             'head': validate_active_player_history}\nfor function in functions.values():\n    function(state=state, decisions=decisions)\nfor sample in range(7):\n    for name in ('base', 'head') if sample % 2 == 0 else ('head', 'base'):\n        function = functions[name]\n        start = time.perf_counter()\n        for _ in range(100):\n            function(state=state, decisions=decisions)\n        rows[name].append((time.perf_counter() - start) / 100)\nreport = {\n    'workload_id': 'r36-001-retained-shooting-scope-restoration-v1',\n    'base_commit': BASE,\n    'scope': 'Only validate_active_player_history, on the same real retained-shooting state and history; module-isolated base uses unchanged dependencies. Not full lifecycle restore or full-game certification.',\n    'method': '7 alternating base/head batches of 100 calls after one warmup each; serial, no test workers, coverage or profiling; construction excluded.',\n    'setup_seconds': prepared - started,\n    'platform': platform.platform(), 'python': platform.python_version(),\n    'cpu': subprocess.check_output(['sysctl', '-n', 'machdep.cpu.brand_string'], text=True).strip(),\n    'memory_bytes': int(subprocess.check_output(['sysctl', '-n', 'hw.memsize'], text=True)),\n    'hardware_status': 'provisional local host',\n    'event_count': len(decisions.event_log.records), 'decision_count': len(decisions.records),\n    'scope_kinds': [scope.kind.value for scope in state.active_player_scopes],\n    'state_sha256': hashlib.sha256(json.dumps(state.to_payload(), sort_keys=True).encode()).hexdigest(),\n    'history_sha256': hashlib.sha256(json.dumps(decisions.to_payload(), sort_keys=True).encode()).hexdigest(),\n    'base_source_sha256': hashlib.sha256(base_source).hexdigest(),\n    'hashes': {name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in\n               [SOURCE, 'uv.lock', 'src/warhammer40k_core/_engine_build_manifest.json',\n                'tests/retained_attack_helpers.py']},\n    'measurement_script': Path(__file__).read_text(),\n    'results': {name: {'seconds_per_call': values, 'mean_seconds': statistics.mean(values),\n                       'median_seconds': statistics.median(values),\n                       'p95_batch_mean_seconds': sorted(values)[math.ceil(len(values)*0.95)-1],\n                       'maximum_batch_mean_seconds': max(values), 'completion_rate': 1.0,\n                       'calls_per_second': 1/statistics.mean(values)}\n                for name, values in rows.items()},\n    'full_game_certified': False,\n}\nPath('docs/performance/order36/r36-001-restoration.json').write_text(json.dumps(report, indent=2)+'\\n')\nprint(json.dumps(report['results'], indent=2))\n",
+  "results": {
+    "base": {
+      "seconds_per_call": [
+        6.348340539261699e-06,
+        6.230830913409591e-06,
+        6.217500194907188e-06,
+        6.177079631015658e-06,
+        6.154580041766167e-06,
+        6.2225002329796556e-06,
+        6.1595800798386335e-06
+      ],
+      "mean_seconds": 6.2157730904540845e-06,
+      "median_seconds": 6.217500194907188e-06,
+      "p95_batch_mean_seconds": 6.348340539261699e-06,
+      "maximum_batch_mean_seconds": 6.348340539261699e-06,
+      "completion_rate": 1.0,
+      "calls_per_second": 160881.033694064
+    },
+    "head": {
+      "seconds_per_call": [
+        8.598749991506338e-06,
+        8.435830241069197e-06,
+        8.461249526590109e-06,
+        8.45541013404727e-06,
+        8.505000732839107e-06,
+        8.409579750150443e-06,
+        8.443749975413083e-06
+      ],
+      "mean_seconds": 8.472795764516506e-06,
+      "median_seconds": 8.45541013404727e-06,
+      "p95_batch_mean_seconds": 8.598749991506338e-06,
+      "maximum_batch_mean_seconds": 8.598749991506338e-06,
+      "completion_rate": 1.0,
+      "calls_per_second": 118024.79698471338
+    }
+  },
+  "full_game_certified": false
+}

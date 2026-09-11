@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
 from typing import cast
 
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
-from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -15,34 +13,27 @@ from warhammer40k_core.engine.abilities import (
 )
 from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battle_shock import battle_shock_leadership_target_for_unit
-from warhammer40k_core.engine.catalog_attack_context_rule_runtime import rules_units_within
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_source_matches_unit,
 )
 from warhammer40k_core.engine.catalog_selectable_ability_mode_support import (
     BEGUILING_FORM_MODE_SEMANTIC,
     CATALOG_IR_COMMAND_PHASE_ABILITY_MODE_CONSUMER_ID,
     DAEMONIC_SPEED_MODE_SEMANTIC,
-    ENTHRALLING_HYPNOSIS_MODE_SEMANTIC,
     SelectableAbilityModeOptionDescriptor,
     clause_is_command_phase_ability_mode_choice,
     selectable_ability_mode_option_descriptor,
 )
-from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
-    LEADERSHIP_TEST_ROLL_TYPE,
-    selected_target_test_roll_modifiers,
-)
+from warhammer40k_core.engine.command_phase_start_candidates import command_request_context
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -55,8 +46,10 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
     HitRollModifierContext,
-    RuntimeModifierRegistry,
 )
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, parameter_payload
 
@@ -126,60 +119,88 @@ class CatalogSelectableAbilityModeRuntime:
                 hook_id=CATALOG_IR_COMMAND_PHASE_ABILITY_MODE_CONSUMER_ID,
                 source_id=CATALOG_IR_COMMAND_PHASE_ABILITY_MODE_CONSUMER_ID,
                 request_handler=self.request,
+                candidate_handler=self.command_candidates,
                 result_handler=self.apply_result,
             ),
         )
 
     def request(self, context: CommandPhaseStartRequestContext) -> DecisionRequest | None:
+        requests = self.request_templates(context)
+        if not requests:
+            return None
+        return replace(requests[0], request_id=context.issue_request_id())
+
+    def command_candidates(
+        self, context: CommandPhaseStartEffectContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        candidates: list[TimingRuleCandidate] = []
+        for request in self.request_templates(command_request_context(context)):
+            payload = _payload_object(request.payload)
+            source_id = _payload_string(payload, "source_rule_id")
+            model_id = _payload_string(payload, "source_model_instance_id")
+            clause_id = _payload_string(payload, "clause_id")
+            candidates.append(
+                timing_candidate_for_request(
+                    template=request,
+                    participant_id=f"{source_id}:{model_id}:{clause_id}",
+                    source_rule_id=source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    next_request_id=context.state.next_decision_request_id,
+                )
+            )
+        return tuple(candidates)
+
+    def request_templates(
+        self, context: CommandPhaseStartRequestContext
+    ) -> tuple[DecisionRequest, ...]:
+        requests: list[DecisionRequest] = []
         if type(context) is not CommandPhaseStartRequestContext:
             raise GameLifecycleError("Catalog ability mode requires request context.")
         sources = tuple(
             source
             for player_id in sorted(self.ability_indexes_by_player_id)
             if player_id != context.active_player_id
-            for source in self._sources_for_player(
-                state=context.state,
-                player_id=player_id,
-            )
+            for source in self._sources_for_player(state=context.state, player_id=player_id)
             if not _source_resolved_this_command(
-                records=context.decisions.event_log.records,
-                state=context.state,
-                source=source,
+                records=context.decisions.event_log.records, state=context.state, source=source
             )
         )
         if not sources:
-            return None
-        source = sources[0]
-        common = _common_payload(state=context.state, source=source)
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-            actor_id=source.rules_unit.owner_player_id,
-            payload=validate_json_value(
-                {
-                    **common,
-                    "actor_may_be_non_active": True,
-                    "available_mode_source_rule_ids": [
-                        option.source_rule_id for option in source.options
-                    ],
-                }
-            ),
-            options=tuple(
-                DecisionOption(
-                    option_id=_option_id(source=source, option=option),
-                    label=option.record.definition.name,
+            return tuple(requests)
+        for source in sources:
+            common = _common_payload(state=context.state, source=source)
+            requests.append(
+                DecisionRequest(
+                    request_id="timing-request-template",
+                    decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+                    actor_id=source.rules_unit.owner_player_id,
                     payload=validate_json_value(
                         {
                             **common,
-                            "selected_mode_source_rule_id": option.source_rule_id,
-                            "selected_mode_name": option.record.definition.name,
-                            "selected_mode_semantic": option.descriptor.semantic,
+                            "actor_may_be_non_active": True,
+                            "available_mode_source_rule_ids": [
+                                option.source_rule_id for option in source.options
+                            ],
                         }
                     ),
+                    options=tuple(
+                        DecisionOption(
+                            option_id=_option_id(source=source, option=option),
+                            label=option.record.definition.name,
+                            payload=validate_json_value(
+                                {
+                                    **common,
+                                    "selected_mode_source_rule_id": option.source_rule_id,
+                                    "selected_mode_name": option.record.definition.name,
+                                    "selected_mode_semantic": option.descriptor.semantic,
+                                }
+                            ),
+                        )
+                        for option in source.options
+                    ),
                 )
-                for option in source.options
-            ),
-        )
+            )
+        return tuple(requests)
 
     def apply_result(self, context: CommandPhaseStartResultContext) -> bool:
         if type(context) is not CommandPhaseStartResultContext:
@@ -397,117 +418,6 @@ def _has_mode_records(
     )
 
 
-def resolve_catalog_fall_back_leadership_denial(
-    *,
-    state: object,
-    decisions: object,
-    target_unit_instance_id: str,
-    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> bool:
-    from warhammer40k_core.engine.decision_controller import DecisionController
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Catalog Fall Back denial requires GameState.")
-    if type(decisions) is not DecisionController:
-        raise GameLifecycleError("Catalog Fall Back denial requires DecisionController.")
-    target = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
-    effects = _fall_back_denial_effects(state=state, target=target)
-    if not effects:
-        return False
-    target_index = ability_indexes_by_player_id.get(target.owner_player_id)
-    if target_index is None:
-        raise GameLifecycleError("Catalog Fall Back denial missing target ability index.")
-    target_components = tuple(
-        (
-            component,
-            catalog_rule_current_placed_alive_model_instance_ids_for_unit(
-                state=state,
-                unit=component.unit,
-            ),
-        )
-        for component in target.components
-    )
-    alive_target_components = tuple(
-        (component, current_model_ids)
-        for component, current_model_ids in target_components
-        if current_model_ids
-    )
-    if not alive_target_components:
-        raise GameLifecycleError("Catalog Fall Back denial target has no placed alive models.")
-    target_leadership = min(
-        battle_shock_leadership_target_for_unit(
-            component.unit,
-            current_model_ids=current_model_ids,
-            ability_index=target_index,
-            state=state,
-            runtime_modifier_registry=runtime_modifier_registry,
-        )
-        for component, current_model_ids in alive_target_components
-    )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    for effect in effects:
-        payload = _payload_object(effect.effect_payload)
-        source_unit_id = _payload_string(payload, "source_rules_unit_instance_id")
-        source_model_id = _payload_string(payload, "source_model_instance_id")
-        aura_range = _payload_positive_float(payload, "aura_range_inches")
-        if (
-            state.battlefield_state is None
-            or state.battlefield_state.model_placement_or_none(source_model_id) is None
-        ):
-            continue
-        if not rules_units_within(
-            state,
-            source_unit_id,
-            target.unit_instance_id,
-            aura_range,
-            attacker_model_instance_id=source_model_id,
-        ):
-            continue
-        roll = manager.roll(
-            DiceRollSpec(
-                expression=DiceExpression(quantity=2, sides=6),
-                reason=f"Fall Back Leadership test for {target.unit_instance_id}",
-                roll_type="catalog.fall_back_leadership_denial",
-                actor_id=target.owner_player_id,
-            )
-        )
-        modified_roll = ModifiedRollResult.from_unmodified(
-            UnmodifiedRollResult.from_state(roll),
-            modifiers=selected_target_test_roll_modifiers(
-                state=state,
-                unit_instance_id=target.unit_instance_id,
-                roll_type=LEADERSHIP_TEST_ROLL_TYPE,
-            ),
-        )
-        passed = modified_roll.final_value >= target_leadership
-        decisions.event_log.append(
-            CATALOG_FALL_BACK_LEADERSHIP_TEST_EVENT,
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "active_player_id": state.active_player_id,
-                    "target_unit_instance_id": target.unit_instance_id,
-                    "target_player_id": target.owner_player_id,
-                    "source_rule_id": effect.source_rule_id,
-                    "source_unit_instance_id": source_unit_id,
-                    "source_model_instance_id": source_model_id,
-                    "leadership_target": target_leadership,
-                    "roll": roll.to_payload(),
-                    "modified_roll": modified_roll.to_payload(),
-                    "passed": passed,
-                    "fall_back_denied": not passed,
-                }
-            ),
-        )
-        if not passed:
-            return True
-    return False
-
-
 def _options_for_parent(
     *,
     index: AbilityCatalogIndex,
@@ -565,30 +475,6 @@ def _selected_mode_hit_roll_modifier(context: HitRollModifierContext) -> int:
     if len(modifiers) > 1:
         raise GameLifecycleError("Multiple selectable ability mode hit modifiers apply.")
     return modifiers[0] if modifiers else 0
-
-
-def _fall_back_denial_effects(
-    *,
-    state: object,
-    target: RulesUnitView,
-) -> tuple[PersistingEffect, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Catalog Fall Back denial source lookup requires GameState.")
-    effects: list[PersistingEffect] = []
-    for effect in state.persisting_effects:
-        payload = effect.effect_payload
-        if not isinstance(payload, dict):
-            continue
-        if (
-            payload.get("effect_kind") != CATALOG_ABILITY_MODE_EFFECT_KIND
-            or payload.get("mode_semantic") != ENTHRALLING_HYPNOSIS_MODE_SEMANTIC
-            or effect.owner_player_id == target.owner_player_id
-        ):
-            continue
-        effects.append(effect)
-    return tuple(sorted(effects, key=lambda effect: effect.effect_id))
 
 
 def _common_payload(*, state: object, source: _ModeSource) -> dict[str, JsonValue]:
@@ -656,10 +542,3 @@ def _payload_string(payload: Mapping[str, object], key: str) -> str:
     if type(value) is not str or not value.strip():
         raise GameLifecycleError(f"Catalog ability mode payload {key} must be text.")
     return value
-
-
-def _payload_positive_float(payload: Mapping[str, object], key: str) -> float:
-    value = payload.get(key)
-    if not isinstance(value, int | float) or type(value) is bool or float(value) <= 0.0:
-        raise GameLifecycleError(f"Catalog ability mode payload {key} must be positive.")
-    return float(value)

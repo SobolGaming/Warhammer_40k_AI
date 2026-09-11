@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from tests.movement_submission_helpers import (
+    core_movement_handler,
     straight_line_witness_for_state,
     submit_handler_movement_proposal,
 )
@@ -177,7 +178,7 @@ def test_movement_phase_requests_reserve_arrivals_inside_move_units() -> None:
     )
     decisions = DecisionController()
 
-    status = MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+    status = core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
         state=state,
         decisions=decisions,
     )
@@ -203,7 +204,7 @@ def test_move_units_selection_interleaves_battlefield_and_strategic_reserve_unit
         battle_round=3,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     decisions = DecisionController()
 
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
@@ -479,7 +480,7 @@ def test_aircraft_edge_departure_arrives_next_turn_and_round_trips() -> None:
         )
 
     decisions = lifecycle.decision_controller
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     _set_movement_ready_for_reinforcements(state=state, battle_round=2)
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
@@ -1282,7 +1283,7 @@ def test_reinforcements_invalid_arrival_does_not_mutate_state() -> None:
 
 def test_reinforcements_completion_choice_leaves_reserve_unarrived_and_advances_phase() -> None:
     state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve()
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     _set_movement_ready_for_reinforcements(state=state, battle_round=3)
     flow = BattleRoundFlow(phase_handlers={BattlePhase.MOVEMENT: handler})
@@ -1419,7 +1420,7 @@ def test_attached_rules_unit_strategic_reserve_arrival_adds_every_component_atom
     )
     decisions = DecisionController()
     selection_request = _decision_request(
-        MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+        core_movement_handler(state=state, ruleset_descriptor=_ruleset()).begin_phase(
             state=state,
             decisions=decisions,
         )
@@ -3158,7 +3159,7 @@ def _aircraft_edge_departure_lifecycle() -> tuple[GameLifecycle, UnitInstance]:
         battle_round=1,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor)
+    handler = core_movement_handler(state=state, ruleset_descriptor=ruleset_descriptor)
     decisions = DecisionController()
     unit_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert unit_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
@@ -3267,7 +3268,7 @@ def _rapid_ingress_arrival_lifecycle() -> GameLifecycle:
         state=state,
         decision_controller=decisions,
         _config=config,
-        _movement_phase_handler=MovementPhaseHandler(ruleset_descriptor=_ruleset()),
+        _movement_phase_handler=core_movement_handler(state=state, ruleset_descriptor=_ruleset()),
     )
     placement_status = lifecycle.submit_decision(
         DecisionResult(
@@ -3387,7 +3388,7 @@ def _declared_reserve_arrival_lifecycle() -> GameLifecycle:
         selected_unit_ids=("army-alpha:intercessor-unit-2",),
         moved_unit_ids=("army-alpha:intercessor-unit-2",),
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor)
+    handler = core_movement_handler(state=state, ruleset_descriptor=ruleset_descriptor)
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert (
         _submit_handler_decision(
@@ -3466,7 +3467,9 @@ def _enter_reinforcements_choice(
     ruleset_descriptor: RulesetDescriptor | None = None,
 ) -> tuple[MovementPhaseHandler, DecisionController, DecisionRequest]:
     _set_movement_ready_for_reinforcements(state=state, battle_round=battle_round)
-    handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor or _ruleset())
+    handler = core_movement_handler(
+        state=state, ruleset_descriptor=ruleset_descriptor or _ruleset()
+    )
     decisions = DecisionController()
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     reserve_unit_ids = {

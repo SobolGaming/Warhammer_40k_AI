@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -16,6 +16,7 @@ from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validat
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import rule_ir_weapon_selector_applies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -65,17 +66,25 @@ class AttackSequenceCompletedContext:
         )
 
 
+type AttackSequenceCompletedCandidateHandler = Callable[
+    [AttackSequenceCompletedContext], tuple[TimingRuleCandidate, ...]
+]
+
+
 @dataclass(frozen=True, slots=True)
 class AttackSequenceCompletedHookBinding:
     hook_id: str
     source_id: str
     handler: AttackSequenceCompletedHandler
+    candidate_handler: AttackSequenceCompletedCandidateHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         if not callable(self.handler):
             raise GameLifecycleError("Attack sequence completion hook handler is not callable.")
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError("Attack completion candidate handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -96,12 +105,51 @@ class AttackSequenceCompletedHookRegistry:
     def all_bindings(self) -> tuple[AttackSequenceCompletedHookBinding, ...]:
         return self.bindings
 
+    def candidates_for(
+        self, context: AttackSequenceCompletedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.hazardous_completion import hazardous_candidates
+
+        candidates = list(hazardous_candidates(context))
+        for binding in self.bindings:
+            if binding.candidate_handler is None:
+                raise GameLifecycleError(
+                    "Attack completion providers require pure candidate discovery."
+                )
+            before = (context.state.to_payload(), context.decisions.to_payload())
+            discovered = binding.candidate_handler(context)
+            if before != (context.state.to_payload(), context.decisions.to_payload()):
+                raise GameLifecycleError("Attack completion candidate discovery mutated state.")
+            if type(discovered) is not tuple or any(
+                type(item) is not TimingRuleCandidate for item in discovered
+            ):
+                raise GameLifecycleError("Attack completion discovery requires typed candidates.")
+            candidates.extend(discovered)
+        return tuple(candidates)
+
     def resolve_completed_sequence(
         self,
         context: AttackSequenceCompletedContext,
+        *,
+        additional_candidates: Callable[[], tuple[TimingRuleCandidate, ...]] | None = None,
     ) -> LifecycleStatus | None:
         if type(context) is not AttackSequenceCompletedContext:
             raise GameLifecycleError("Attack sequence completion hooks require context.")
+        from warhammer40k_core.engine.attack_completion_authority import completed_attack_sequence
+
+        completed = completed_attack_sequence(
+            event_records=context.decisions.event_log.records,
+            sequence_id=context.attack_sequence.sequence_id,
+        )
+        if (
+            completed.attack_pools != context.attack_sequence.attack_pools
+            or completed.attacker_player_id != context.attack_sequence.attacker_player_id
+            or completed.attacking_unit_instance_id
+            != context.attack_sequence.attacking_unit_instance_id
+            or completed.source_phase != context.attack_sequence.source_phase
+        ):
+            raise GameLifecycleError("Attack completion continuation source drift.")
+        context = replace(context, attack_sequence=completed)
         expire_attack_sequence_scoped_generic_effects(
             state=context.state,
             decisions=context.decisions,
@@ -109,16 +157,18 @@ class AttackSequenceCompletedHookRegistry:
             attack_sequence=context.attack_sequence,
             attack_sequence_completed_event_id=context.attack_sequence_completed_event_id,
         )
-        for binding in self.bindings:
-            status = binding.handler(context)
-            if status is None:
-                continue
-            if type(status) is not LifecycleStatus:
-                raise GameLifecycleError(
-                    "Attack sequence completion handlers must return status or None."
-                )
-            return status
-        return None
+        from warhammer40k_core.engine.attack_completion_sequencing import (
+            resolve_attack_completion_candidates,
+        )
+
+        def discover() -> tuple[TimingRuleCandidate, ...]:
+            before = (context.state.to_payload(), context.decisions.to_payload())
+            additional = () if additional_candidates is None else additional_candidates()
+            if before != (context.state.to_payload(), context.decisions.to_payload()):
+                raise GameLifecycleError("Attack continuation discovery mutated state.")
+            return (*self.candidates_for(context), *additional)
+
+        return resolve_attack_completion_candidates(context, discover)
 
 
 def attack_sequence_completed_event_id(

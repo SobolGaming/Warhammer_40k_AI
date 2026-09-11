@@ -3504,6 +3504,11 @@ def test_fight_on_death_models_and_survivors_share_one_normal_activation(
     )
     state = _state(lifecycle)
     state.active_player_id = "player-b"
+    from tests.secondary_destruction_helpers import record_current_turn_start_evidence_for_fixture
+
+    record_current_turn_start_evidence_for_fixture(
+        state=state, event_log=lifecycle.decision_controller.event_log
+    )
     battlefield = state.battlefield_state
     assert battlefield is not None
     retained = units["retained"]
@@ -4515,6 +4520,9 @@ def test_fight_on_death_only_unit_receives_no_consolidation_proposal() -> None:
 
     status = lifecycle.advance_until_decision_or_terminal()
     status = _drain_fight_movement_requests(lifecycle, status)
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    status = resolve_ordering_for_fixture(lifecycle, status)
     request = _decision_request(status)
 
     assert not any(

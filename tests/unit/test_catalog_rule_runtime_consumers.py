@@ -7,6 +7,10 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import (
+    record_completed_shooting_for_executor_fixture,
+)
+from tests.fight_end_fixture_helpers import single_fight_end_request
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase15a_charge_declaration_helpers import mission_setup as charge_mission_setup
 from tests.unit_keyword_helpers import with_unit_keywords
@@ -69,7 +73,7 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     muster_army,
 )
-from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -281,7 +285,10 @@ from warhammer40k_core.engine.fight_order import (
     FightPhaseState,
     FightsFirstRegistry,
 )
-from warhammer40k_core.engine.fight_phase_end_hooks import FightPhaseEndRequestContext
+from warhammer40k_core.engine.fight_phase_end_hooks import (
+    FightPhaseEndHookRegistry,
+    FightPhaseEndRequestContext,
+)
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
@@ -316,9 +323,8 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import ChargeMoveProposal, ChargePhaseHandler
 from warhammer40k_core.engine.phases.movement_reactions import (
     _movement_end_surge_event_already_processed,
-    _movement_end_surge_grant_groups,  # pyright: ignore[reportPrivateUsage]
-    _movement_end_surge_reaction_group_key,  # pyright: ignore[reportPrivateUsage]
-    _request_movement_end_surge_if_available,
+    movement_end_surge_grant_groups,
+    movement_end_surge_reaction_group_key,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
@@ -412,7 +418,8 @@ from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
-    resolve_unit_move_completed_battle_shock_hooks,
+    UnitMoveCompletedMortalWoundHookRegistry,
+    resolve_unit_move_completed_hooks,
     unit_move_completed_battle_shock_base_payload,
     unit_move_completed_battle_shock_effect_key,
     unit_move_completed_battle_shock_request_id,
@@ -2535,7 +2542,7 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
                     target_in_range_model_ids=target_unit.own_model_ids(),
                 ),
             ),
-        )
+        ).advanced_after_attack()
 
     decisions = DecisionController()
     binding = runtime.attack_sequence_completed_bindings()[0]
@@ -2543,14 +2550,11 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
         other_profile,
         sequence_id="attack-sequence:kharseth:fury:wrong-weapon",
     )
-    decisions.event_log.append(
-        "attack_sequence_step",
-        {
-            "sequence_id": wrong_weapon_sequence.sequence_id,
-            "step": AttackSequenceStep.HIT.value,
-            "pool_index": 0,
-            "payload": {"successful": True},
-        },
+    completion_event_id = record_completed_shooting_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=wrong_weapon_sequence,
+        successful_hit_pool_indices=(0,),
     )
     wrong_status = binding.handler(
         AttackSequenceCompletedContext(
@@ -2560,7 +2564,7 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=wrong_weapon_sequence,
-            attack_sequence_completed_event_id="event:kharseth:fury:wrong-weapon",
+            attack_sequence_completed_event_id=completion_event_id,
         )
     )
     assert wrong_status is None
@@ -2576,16 +2580,17 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
         active_player_id=target_army.player_id,
         phase=BattlePhase.SHOOTING,
     )
-    non_active_decisions = DecisionController()
-    non_active_decisions.event_log.append(
-        "attack_sequence_step",
-        {
-            "sequence_id": dread_sequence.sequence_id,
-            "step": AttackSequenceStep.HIT.value,
-            "pool_index": 0,
-            "payload": {"successful": True},
-        },
+    non_active_sequence = replace(
+        dread_sequence, sequence_id="out-of-phase-attack-sequence:kharseth:fury:non-active"
     )
+    non_active_decisions = DecisionController()
+    completion_event_id = record_completed_shooting_for_executor_fixture(
+        state=non_active_state,
+        decisions=non_active_decisions,
+        sequence=non_active_sequence,
+        successful_hit_pool_indices=(0,),
+    )
+    non_active_effects_before = tuple(non_active_state.persisting_effects)
     non_active_status = binding.handler(
         AttackSequenceCompletedContext(
             state=non_active_state,
@@ -2596,22 +2601,19 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
             ),
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
-            attack_sequence=dread_sequence,
-            attack_sequence_completed_event_id="event:kharseth:fury:non-active-attacker",
+            attack_sequence=non_active_sequence,
+            attack_sequence_completed_event_id=completion_event_id,
         )
     )
     assert non_active_status is None
     assert not non_active_decisions.queue.pending_requests
-    assert not non_active_state.persisting_effects
+    assert tuple(non_active_state.persisting_effects) == non_active_effects_before
 
-    decisions.event_log.append(
-        "attack_sequence_step",
-        {
-            "sequence_id": dread_sequence.sequence_id,
-            "step": AttackSequenceStep.HIT.value,
-            "pool_index": 0,
-            "payload": {"successful": True},
-        },
+    completion_event_id = record_completed_shooting_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=dread_sequence,
+        successful_hit_pool_indices=(0,),
     )
     status = binding.handler(
         AttackSequenceCompletedContext(
@@ -2621,7 +2623,7 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=dread_sequence,
-            attack_sequence_completed_event_id="event:kharseth:fury:dread",
+            attack_sequence_completed_event_id=completion_event_id,
         )
     )
     assert status is not None
@@ -2635,6 +2637,7 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
         selected_option_id=request.options[0].option_id,
     )
     decisions.submit_result(result)
+    effects_before = tuple(state.persisting_effects)
     assert (
         apply_catalog_post_shoot_hit_target_effect_result(
             state=state,
@@ -2647,8 +2650,11 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
         is None
     )
 
-    assert len(state.persisting_effects) == 1
-    effect = state.persisting_effects[0]
+    new_effects = tuple(
+        effect for effect in state.persisting_effects if effect not in effects_before
+    )
+    assert len(new_effects) == 1
+    effect = new_effects[0]
     assert effect.target_unit_instance_ids == (source_unit.unit_instance_id,)
     assert effect.expiration == EffectExpiration.end_turn(
         battle_round=state.battle_round,
@@ -2771,16 +2777,13 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
                 target_in_range_model_ids=target_unit.own_model_ids(),
             ),
         ),
-    )
+    ).advanced_after_attack()
     decisions = DecisionController()
-    decisions.event_log.append(
-        "attack_sequence_step",
-        {
-            "sequence_id": sequence.sequence_id,
-            "step": AttackSequenceStep.HIT.value,
-            "pool_index": 0,
-            "payload": {"successful": True},
-        },
+    completion_event_id = record_completed_shooting_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
+        successful_hit_pool_indices=(0,),
     )
     status = bindings[0].handler(
         AttackSequenceCompletedContext(
@@ -2790,7 +2793,7 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:post-shoot:negative-hit",
+            attack_sequence_completed_event_id=completion_event_id,
         )
     )
     assert status is not None
@@ -2802,6 +2805,7 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
         selected_option_id=request.options[0].option_id,
     )
     decisions.submit_result(result)
+    effects_before = tuple(state.persisting_effects)
     assert (
         apply_catalog_post_shoot_hit_target_effect_result(
             state=state,
@@ -2814,8 +2818,11 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
         is None
     )
 
-    assert len(state.persisting_effects) == 1
-    effect = state.persisting_effects[0]
+    new_effects = tuple(
+        effect for effect in state.persisting_effects if effect not in effects_before
+    )
+    assert len(new_effects) == 1
+    effect = new_effects[0]
     assert effect.target_unit_instance_ids == (source_unit.unit_instance_id,)
     effect_payload = cast(dict[str, JsonValue], effect.effect_payload)
     effect_spec_payload = cast(dict[str, JsonValue], effect_payload["effect"])
@@ -3017,7 +3024,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
         *,
         source_model_id: str,
         suffix: str,
-    ) -> tuple[AttackSequence, DecisionController]:
+    ) -> tuple[AttackSequence, DecisionController, str]:
         sequence = AttackSequence(
             sequence_id=f"attack-sequence:post-shoot:wargear-model-effect:{suffix}",
             attacker_player_id=source_army.player_id,
@@ -3037,21 +3044,18 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
                     target_in_range_model_ids=target_unit.own_model_ids(),
                 ),
             ),
-        )
+        ).advanced_after_attack()
         decisions = DecisionController()
-        decisions.event_log.append(
-            "attack_sequence_step",
-            {
-                "sequence_id": sequence.sequence_id,
-                "step": AttackSequenceStep.HIT.value,
-                "pool_index": 0,
-                "payload": {"successful": True},
-            },
+        completion_event_id = record_completed_shooting_for_executor_fixture(
+            state=state,
+            decisions=decisions,
+            sequence=sequence,
+            successful_hit_pool_indices=(0,),
         )
-        return sequence, decisions
+        return sequence, decisions, completion_event_id
 
     non_bearer_model_id = source_unit.own_models[1].model_instance_id
-    non_bearer_sequence, non_bearer_decisions = successful_sequence(
+    non_bearer_sequence, non_bearer_decisions, non_bearer_completion_event_id = successful_sequence(
         source_model_id=non_bearer_model_id,
         suffix="non-bearer",
     )
@@ -3067,7 +3071,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
                 runtime_modifier_registry=RuntimeModifierRegistry.empty(),
                 source_phase=BattlePhase.SHOOTING,
                 attack_sequence=non_bearer_sequence,
-                attack_sequence_completed_event_id="event:post-shoot:wargear:non-bearer",
+                attack_sequence_completed_event_id=non_bearer_completion_event_id,
             )
         )
         is None
@@ -3075,7 +3079,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
     assert not non_bearer_decisions.queue.pending_requests
 
     bearer_model_id = bearer_model.model_instance_id
-    bearer_sequence, bearer_decisions = successful_sequence(
+    bearer_sequence, bearer_decisions, bearer_completion_event_id = successful_sequence(
         source_model_id=bearer_model_id,
         suffix="bearer",
     )
@@ -3087,7 +3091,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=bearer_sequence,
-            attack_sequence_completed_event_id="event:post-shoot:wargear:bearer",
+            attack_sequence_completed_event_id=bearer_completion_event_id,
         )
     )
     assert status is not None
@@ -3099,6 +3103,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
         selected_option_id=request.options[0].option_id,
     )
     bearer_decisions.submit_result(result)
+    effects_before = tuple(state.persisting_effects)
     assert (
         apply_catalog_post_shoot_hit_target_effect_result(
             state=state,
@@ -3110,8 +3115,11 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
         )
         is None
     )
-    assert len(state.persisting_effects) == 1
-    effect_payload = cast(dict[str, JsonValue], state.persisting_effects[0].effect_payload)
+    new_effects = tuple(
+        effect for effect in state.persisting_effects if effect not in effects_before
+    )
+    assert len(new_effects) == 1
+    effect_payload = cast(dict[str, JsonValue], new_effects[0].effect_payload)
     selected_metadata = cast(dict[str, JsonValue], effect_payload["catalog_selected_target"])
     assert selected_metadata["source_model_instance_id"] == bearer_model_id
     modifier_context = HitRollModifierContext(
@@ -3498,59 +3506,11 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
         player_id=source_army.player_id,
         runtime_modifier_registry=bundle.runtime_modifier_registry,
     )
-    declaration_request = DecisionRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type="test:catalog-post-shoot:declaration",
-        actor_id=source_army.player_id,
-        payload=validate_json_value(
-            {"attack_pools": [pool.to_payload() for pool in sequence.attack_pools]}
-        ),
-        options=(
-            DecisionOption(
-                option_id="accept",
-                label="Accept declaration",
-                payload=validate_json_value(
-                    {"attack_pools": [pool.to_payload() for pool in sequence.attack_pools]}
-                ),
-            ),
-        ),
-    )
-    decisions.request_decision(declaration_request)
-    declaration_result = DecisionResult.for_request(
-        result_id=declaration_result_id,
-        request=declaration_request,
-        selected_option_id="accept",
-    )
-    decisions.submit_result(declaration_result)
-    decisions.event_log.append(
-        "shooting_declaration_accepted",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": source_army.player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "unit_instance_id": source_unit.unit_instance_id,
-            "request_id": declaration_request.request_id,
-            "result_id": declaration_result.result_id,
-            "attack_pools": [pool.to_payload() for pool in sequence.attack_pools],
-        },
-    )
-    decisions.event_log.append(
-        "attack_sequence_step",
-        {
-            "sequence_id": sequence.sequence_id,
-            "step": AttackSequenceStep.HIT.value,
-            "pool_index": 0,
-            "payload": {"successful": True},
-        },
-    )
-    completion_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": sequence.sequence_id,
-            "attacker_player_id": source_army.player_id,
-            "attacking_unit_instance_id": source_unit.unit_instance_id,
-        },
+    completion_event_id = record_completed_shooting_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
+        successful_hit_pool_indices=(0,),
     )
 
     bindings = runtime.attack_sequence_completed_bindings()
@@ -3562,7 +3522,7 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id=completion_event.event_id,
+            attack_sequence_completed_event_id=completion_event_id,
         )
     )
 
@@ -3579,6 +3539,7 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
     )
     decisions.submit_result(result)
 
+    effects_before = tuple(state.persisting_effects)
     apply_status = apply_catalog_post_shoot_hit_target_effect_result(
         state=state,
         decisions=decisions,
@@ -3589,7 +3550,7 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
     )
 
     assert apply_status is None
-    assert state.persisting_effects == []
+    assert tuple(state.persisting_effects) == effects_before
     event_types = tuple(event.event_type for event in decisions.event_log.records)
     assert "battle_shock_test_requested" in event_types
     assert "battle_shock_test_resolved" in event_types
@@ -4694,10 +4655,11 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
         != request_id
     )
 
-    status = resolve_unit_move_completed_battle_shock_hooks(
+    status = resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
-        registry=bundle.unit_move_completed_battle_shock_hook_registry,
+        registry=UnitMoveCompletedMortalWoundHookRegistry.empty(),
+        battle_shock_move_hooks=bundle.unit_move_completed_battle_shock_hook_registry,
         battle_shock_hooks=bundle.battle_shock_hook_registry,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         runtime_modifier_registry=bundle.runtime_modifier_registry,
@@ -4707,7 +4669,18 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
         ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
     )
 
-    assert status is None
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    from tests.phase11c_command_phase_helpers import resolve_deferred_battle_shock_outcomes
+
+    assert (
+        resolve_deferred_battle_shock_outcomes(
+            state=state,
+            decisions=decisions,
+            registry=bundle.battle_shock_hook_registry,
+        )
+        is None
+    )
     battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
         state=state,
         event_records=decisions.event_log.records,
@@ -5926,6 +5899,7 @@ def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent
     )
     runtime.resolve_unit_destroyed(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.SHOOTING,
@@ -5958,6 +5932,7 @@ def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent
     )
     destroyed_payload = cast(dict[str, JsonValue], destroyed_event.payload)
     context = UnitDestroyedContext(
+        sequencing_active_player_id=cast(str, state.active_player_id),
         state=state,
         decisions=decisions,
         completed_phase=BattlePhase.SHOOTING,
@@ -6127,6 +6102,103 @@ def test_catalog_command_point_phase_gain_supports_automatic_and_fixed_roll_gate
     payload = cast(dict[str, JsonValue], resolution.payload)
     assert payload["test_kind"] == ("fixed_roll" if expects_dice_roll else "automatic")
     assert payload["passed"] is True
+
+
+def test_command_point_runtime_uses_command_start_batch_without_discovery_mutation() -> None:
+    from warhammer40k_core.engine.command_phase_start_authority import (
+        resolve_command_phase_start_boundary,
+    )
+    from warhammer40k_core.engine.command_phase_start_hooks import (
+        CommandPhaseStartEffectContext,
+        CommandPhaseStartHookRegistry,
+    )
+    from warhammer40k_core.engine.command_points import CommandStepState
+    from warhammer40k_core.engine.runtime_event_phase_hooks import command_start_bindings
+
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_army.units[0],
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.COMMAND,
+    )
+    record = _command_point_record(
+        record_id="record:order36-command-start-cp",
+        raw_text=DIRECT_PHASE_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    event_index = RuntimeContentEventIndex.from_subscriptions(
+        runtime.event_subscriptions(),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            runtime.event_handler_bindings()
+        ),
+    )
+    registry = CommandPhaseStartHookRegistry.from_bindings(command_start_bindings(event_index))
+    decisions = DecisionController()
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id=source_army.player_id,
+        )
+    )
+    context = CommandPhaseStartEffectContext(
+        state=state,
+        decisions=decisions,
+        active_player_id=source_army.player_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+    )
+    before = (state.to_payload(), decisions.to_payload())
+    candidates = registry.candidate_entries_for(context)
+    assert len(candidates) == 1
+    assert (state.to_payload(), decisions.to_payload()) == before
+    assert (
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=decisions,
+            command_phase_start_hooks=registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ruleset_descriptor=context.ruleset_descriptor,
+            army_catalog=context.army_catalog,
+        )
+        is None
+    )
+    assert state.command_point_total(source_army.player_id) == 1
+    assert state.command_step_state is not None
+    assert state.command_step_state.command_phase_start_boundary_resolved
+    event_types = [event.event_type for event in decisions.event_log.records]
+    assert event_types.index("timing_window_opened") < event_types.index(
+        CATALOG_IR_COMMAND_POINT_PHASE_GAIN_EVENT
+    )
+    assert event_types.index(CATALOG_IR_COMMAND_POINT_PHASE_GAIN_EVENT) < event_types.index(
+        "timing_window_resolved"
+    )
+    after = (state.to_payload(), decisions.to_payload())
+    assert (
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=decisions,
+            command_phase_start_hooks=registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ruleset_descriptor=context.ruleset_descriptor,
+            army_catalog=context.army_catalog,
+        )
+        is None
+    )
+    assert (state.to_payload(), decisions.to_payload()) == after
 
 
 def test_catalog_command_point_phase_gain_records_failure_cap_and_inactive_owner() -> None:
@@ -6939,7 +7011,7 @@ def test_catalog_command_point_runtime_helpers_fail_fast_on_contract_drift() -> 
         armies=(source_army, target_army),
         records_by_player={},
     )
-    with pytest.raises(GameLifecycleError, match="unit-destroyed runtime requires context"):
+    with pytest.raises(GameLifecycleError, match="Unit-destroyed hooks require context"):
         runtime.resolve_unit_destroyed(cast(Any, object()))
     with pytest.raises(GameLifecycleError, match="cost choice requires context"):
         runtime.stratagem_cost_choice_request(cast(Any, object()))
@@ -9878,7 +9950,11 @@ def test_catalog_fight_end_triggered_movement_runtime_uses_raid_and_run_rule_ir(
         == CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID
     )
 
-    request = runtime.next_request(FightPhaseEndRequestContext(state=state, decisions=decisions))
+    state.mission_setup = charge_mission_setup()
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(runtime.bindings()),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
+    )
 
     assert request is not None
     assert request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
@@ -9947,7 +10023,7 @@ def test_catalog_fight_end_triggered_movement_runtime_fails_fast_on_invalid_host
     )
     assert runtime.bindings() == ()
     with pytest.raises(GameLifecycleError, match="requires request context"):
-        runtime.next_request(cast(Any, None))
+        runtime.candidates_for(cast(Any, None))
 
 
 def test_catalog_fight_end_triggered_movement_runtime_does_not_expose_attached_units() -> None:
@@ -10001,7 +10077,7 @@ def test_catalog_fight_end_triggered_movement_runtime_does_not_expose_attached_u
 
     assert runtime.bindings() == ()
     assert (
-        runtime.next_request(FightPhaseEndRequestContext(state=state, decisions=decisions)) is None
+        runtime.candidates_for(FightPhaseEndRequestContext(state=state, decisions=decisions)) == ()
     )
     assert not decisions.event_log.records
 
@@ -10206,11 +10282,27 @@ def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_b
         },
     )
 
-    status = _request_movement_end_surge_if_available(
+    from functools import partial
+
+    from warhammer40k_core.engine.phases.movement_completion_candidates import (
+        move_reaction_candidates,
+    )
+
+    status = resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
-        registry=bundle.movement_end_surge_hook_registry,
+        registry=bundle.unit_move_completed_mortal_wound_hook_registry,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
+        completed_phase=BattlePhase.MOVEMENT,
+        event_type="movement_activation_completed",
+        movement_actions=("normal_move",),
+        additional_candidates=partial(
+            move_reaction_candidates,
+            surge_hooks=bundle.movement_end_surge_hook_registry,
+            stratagem_index=bundle.stratagem_indexes_by_player_id[triggering_army.player_id],
+            cost_modifiers=bundle.stratagem_cost_modifier_registry,
+        ),
     )
 
     assert status is not None
@@ -10300,7 +10392,7 @@ def test_movement_end_reactive_units_have_independent_processed_windows() -> Non
         for unit_instance_id in ("rangers-alpha", "rangers-beta")
     )
 
-    groups = _movement_end_surge_grant_groups(grants)
+    groups = movement_end_surge_grant_groups(grants)
 
     assert tuple(group[0].unit_instance_id for group in groups) == (
         "rangers-alpha",
@@ -10308,8 +10400,8 @@ def test_movement_end_reactive_units_have_independent_processed_windows() -> Non
     )
     decisions = DecisionController()
     trigger_event_id = "event:enemy-move"
-    first_group_key = _movement_end_surge_reaction_group_key(groups[0])
-    second_group_key = _movement_end_surge_reaction_group_key(groups[1])
+    first_group_key = movement_end_surge_reaction_group_key(groups[0])
+    second_group_key = movement_end_surge_reaction_group_key(groups[1])
     decisions.event_log.append(
         "movement_end_surge_triggered",
         {

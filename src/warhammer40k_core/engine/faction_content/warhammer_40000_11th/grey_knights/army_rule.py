@@ -25,7 +25,7 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import BattleSize
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.primary_historical_events import (
     primary_reserve_entry_source_terminal_bindings_payload,
     record_primary_reserve_entry_provider_terminal_event,
@@ -38,8 +38,9 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
 )
 from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveStatus
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
-    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookBinding,
     TurnEndRequestContext,
     TurnEndResultContext,
@@ -96,65 +97,36 @@ def runtime_contribution() -> RuntimeContentContribution:
             TurnEndHookBinding(
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
-                request_handler=gate_of_infinity_turn_end_request,
+                candidate_handler=turn_candidates,
                 result_handler=apply_gate_of_infinity_turn_end_result,
             ),
         ),
     )
 
 
+def turn_candidates(context: TurnEndRequestContext) -> tuple[TimingRuleCandidate, ...]:
+    from .turn_sequencing import candidates
+
+    return candidates(context)
+
+
 def gate_of_infinity_turn_end_request(
     context: TurnEndRequestContext,
-) -> DecisionRequest | None:
+) -> DecisionRequest | LifecycleStatus | None:
+    from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+
+    from .turn_sequencing import (
+        candidates,
+    )
+
     if type(context) is not TurnEndRequestContext:
-        raise GameLifecycleError("Grey Knights Gate of Infinity requires request context.")
-    if context.completed_phase is not BattlePhase.FIGHT:
-        return None
-    active_player_id = _active_player_id(context.state)
-    for army in _grey_knights_armies(context.state):
-        if army.player_id == active_player_id:
-            continue
-        if _gate_of_infinity_completed_this_turn(context, player_id=army.player_id):
-            continue
-        selected_rules_unit_ids = _used_rules_unit_ids_this_turn(
-            context,
-            player_id=army.player_id,
-        )
-        max_units = gate_of_infinity_max_units_for_battle_size(army.battle_size)
-        remaining_units = max_units - len(selected_rules_unit_ids)
-        if remaining_units <= 0:
-            continue
-        eligible_views = _eligible_gate_of_infinity_rules_units(
-            state=context.state,
-            army=army,
-        )
-        if not eligible_views:
-            continue
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-            actor_id=army.player_id,
-            payload=_request_payload(
-                context=context,
-                army=army,
-                active_player_id=active_player_id,
-                max_units=max_units,
-                selected_rules_unit_ids=selected_rules_unit_ids,
-                eligible_views=eligible_views,
-            ),
-            options=(
-                *(
-                    _gate_of_infinity_option(
-                        player_id=army.player_id,
-                        rules_unit_view=view,
-                        use_ability=True,
-                    )
-                    for view in eligible_views
-                ),
-                _gate_of_infinity_complete_option(player_id=army.player_id),
-            ),
-        )
-    return None
+        raise GameLifecycleError("End-rule request requires a turn-end request context.")
+    return resolve_boundary_candidates(
+        state=context.state,
+        decisions=context.decisions,
+        trigger_kind=TimingTriggerKind.END_TURN,
+        discover=lambda: candidates(context),
+    )
 
 
 def apply_gate_of_infinity_turn_end_result(context: TurnEndResultContext) -> bool:
@@ -272,7 +244,7 @@ def gate_of_infinity_max_units_for_battle_size(battle_size: BattleSize) -> int:
     return _BATTLE_SIZE_CAPS[resolved_battle_size]
 
 
-def _request_payload(
+def gate_of_infinity_request_payload(
     *,
     context: TurnEndRequestContext,
     army: ArmyDefinition,
@@ -307,7 +279,7 @@ def _request_payload(
     )
 
 
-def _gate_of_infinity_option(
+def gate_of_infinity_option(
     *,
     player_id: str,
     rules_unit_view: RulesUnitView,
@@ -334,7 +306,7 @@ def _gate_of_infinity_option(
     )
 
 
-def _gate_of_infinity_complete_option(*, player_id: str) -> DecisionOption:
+def gate_of_infinity_complete_option(*, player_id: str) -> DecisionOption:
     return DecisionOption(
         option_id="grey-knights:gate-of-infinity:complete",
         label="Complete Gate of Infinity",
@@ -355,7 +327,7 @@ def _gate_of_infinity_complete_option(*, player_id: str) -> DecisionOption:
     )
 
 
-def _eligible_gate_of_infinity_rules_units(
+def eligible_gate_of_infinity_rules_units(
     *,
     state: GameState,
     army: ArmyDefinition,
@@ -567,7 +539,7 @@ def _validate_result_matches_request_context(
         raise GameLifecycleError("Grey Knights Gate of Infinity submission kind drift.")
 
 
-def _gate_of_infinity_completed_this_turn(
+def gate_of_infinity_completed_this_turn(
     context: TurnEndRequestContext,
     *,
     player_id: str,
@@ -606,7 +578,7 @@ def _gate_of_infinity_completed_this_turn_for_payload(
     return False
 
 
-def _used_rules_unit_ids_this_turn(
+def used_rules_unit_ids_this_turn(
     context: TurnEndRequestContext,
     *,
     player_id: str,

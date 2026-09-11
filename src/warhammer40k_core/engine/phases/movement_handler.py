@@ -2,6 +2,10 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
+
+from functools import partial
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
@@ -20,11 +24,11 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.mission_setup import MissionSetup
     from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
     from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
-    from warhammer40k_core.engine.phases.movement_reactions import _request_end_opponent_movement_reaction_if_available, _request_end_movement_active_player_stratagem_if_available, _request_rapid_ingress_reaction_if_available, _request_fire_overwatch_reaction_if_available, _request_selected_to_move_stratagem_if_available, _request_selected_to_fall_back_stratagem_if_available, _request_friendly_unit_fell_back_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _request_movement_end_surge_if_available, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
+    from warhammer40k_core.engine.phases.movement_reactions import _request_selected_to_move_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
     from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
     from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
-    from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
+    from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _apply_forced_desperate_escape_battle_shock_reroll_decision, _apply_desperate_escape_battle_shock_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move, _resume_desperate_escape_battle_shock_continuation, is_forced_desperate_escape_battle_shock_reroll_request, is_desperate_escape_battle_shock_reroll_request
     from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness, _interrupt_started_mission_actions_for_movement_activation
     from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
@@ -80,6 +84,9 @@ class MovementPhaseHandler:
     )
     battle_shock_hooks: BattleShockHookRegistry = field(
         default_factory=BattleShockHookRegistry.empty
+    )
+    move_completion_rule_registry: MoveCompletionRuleRegistry = field(
+        default_factory=lambda: MoveCompletionRuleRegistry(())
     )
 
     def __post_init__(self) -> None:
@@ -147,6 +154,8 @@ class MovementPhaseHandler:
             )
         if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
             raise GameLifecycleError("MovementPhaseHandler battle_shock_hooks must be a registry.")
+        if type(self.move_completion_rule_registry) is not MoveCompletionRuleRegistry:
+            raise GameLifecycleError("MovementPhaseHandler move rules must be a registry.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -159,6 +168,10 @@ class MovementPhaseHandler:
         decisions: DecisionController,
         reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
+        from warhammer40k_core.engine.phases.movement_completion_candidates import (
+            movement_handler_move_candidates,
+        )
+
         _validate_movement_phase_state(state)
         movement_state = _ensure_movement_phase_state(state=state, decisions=decisions)
         _ensure_transport_cargo_phase_states(state)
@@ -194,7 +207,8 @@ class MovementPhaseHandler:
                 )
                 if setup_boundary is None:
                     raise GameLifecycleError("Tactical Disembark setup boundary is missing.")
-                setup_status = resolve_unit_move_completed_mortal_wound_hooks(
+                setup_status = resolve_unit_move_completed_hooks(
+                    additional_candidates=partial(movement_handler_move_candidates, self),
                     state=state,
                     decisions=decisions,
                     registry=self.unit_move_completed_mortal_wound_hooks,
@@ -254,23 +268,26 @@ class MovementPhaseHandler:
                     )
                 movement_state = current_movement_state
             if movement_state.pending_action is not None:
-                from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
-                    request_catalog_movement_target_pair_start_if_available,
+                from warhammer40k_core.engine.phases.movement_start_actions import (
+                    resume_move_start_action,
                 )
 
-                target_pair_status = request_catalog_movement_target_pair_start_if_available(
+                start_status = resume_move_start_action(
                     state=state,
                     decisions=decisions,
                     pending_action=movement_state.pending_action,
+                    ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                    reaction_queue=reaction_queue,
+                    stratagem_index=self.stratagem_index,
+                    cost_modifiers=self.stratagem_cost_modifier_registry,
+                    advance_move_hooks=self.advance_move_hooks,
                     ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
                 )
-                if target_pair_status is not None:
-                    return target_pair_status
-                return _request_pending_movement_action_proposal(
-                    state=state,
-                    decisions=decisions,
-                    pending_action=movement_state.pending_action,
-                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                if start_status is not None:
+                    return start_status
+                return self.begin_phase(
+                    state=state, decisions=decisions, reaction_queue=reaction_queue
                 )
             stratagem_status = _request_selected_to_move_stratagem_if_available(
                 state=state,
@@ -295,12 +312,8 @@ class MovementPhaseHandler:
 
         if _overdue_required_reinforcement_reserve_states(state=state):
             raise GameLifecycleError("Required reserve arrival was missed.")
-        unit_candidates = _movement_unit_candidates(
-            state=state,
-            movement_state=movement_state,
-        )
-
-        move_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+        move_completed_status = resolve_unit_move_completed_hooks(
+            additional_candidates=partial(movement_handler_move_candidates, self),
             state=state,
             decisions=decisions,
             registry=self.unit_move_completed_mortal_wound_hooks,
@@ -319,7 +332,8 @@ class MovementPhaseHandler:
             return move_completed_status
 
         for setup_event_type in ("reinforcement_unit_arrived", "unit_disembarked"):
-            setup_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+            setup_completed_status = resolve_unit_move_completed_hooks(
+                additional_candidates=partial(movement_handler_move_candidates, self),
                 state=state,
                 decisions=decisions,
                 registry=self.unit_move_completed_mortal_wound_hooks,
@@ -333,39 +347,17 @@ class MovementPhaseHandler:
             if setup_completed_status is not None:
                 return setup_completed_status
 
-        fell_back_stratagem_status = _request_friendly_unit_fell_back_stratagem_if_available(
+        if movement_state.move_units_completed:
+            return _complete_move_units_step(state=state, decisions=decisions)
+        unit_candidates = _movement_unit_candidates(
             state=state,
-            decisions=decisions,
-            stratagem_index=self.stratagem_index,
-            stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
+            movement_state=movement_state,
         )
-        if fell_back_stratagem_status is not None:
-            return fell_back_stratagem_status
-
-        surge_status = _request_movement_end_surge_if_available(
-            state=state,
-            decisions=decisions,
-            registry=self.movement_end_surge_hooks,
-            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-        )
-        if surge_status is not None:
-            return surge_status
 
         if not unit_candidates:
             return _complete_move_units_step(
                 state=state,
                 decisions=decisions,
-                reaction_queue=reaction_queue,
-                stratagem_index=self.stratagem_index,
-                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
-                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
-                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-                army_catalog=self.army_catalog,
-                runtime_modifier_registry=self.runtime_modifier_registry,
-                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
-                unarrived_reserve_count=len(
-                    state.unarrived_reserve_states_for_player(_active_player_id(state))
-                ),
             )
 
         request = DecisionRequest(
@@ -670,6 +662,7 @@ class MovementPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                cost_modifiers=self.stratagem_cost_modifier_registry,
                 advance_move_hooks=self.advance_move_hooks,
                 ability_index=_ability_index_for_player(
                     self.ability_indexes_by_player_id,
@@ -784,64 +777,17 @@ def _complete_move_units_step(
     *,
     state: GameState,
     decisions: DecisionController,
-    reaction_queue: ReactionQueue | None,
-    stratagem_index: StratagemCatalogIndex | None,
-    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
-    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
-    ruleset_descriptor: RulesetDescriptor | None = None,
-    army_catalog: ArmyCatalog | None = None,
-    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
-    unarrived_reserve_count: int,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
         raise GameLifecycleError("Completing Move Units requires Move Units step.")
-    end_movement_active_status = _request_end_movement_active_player_stratagem_if_available(
-        state=state,
-        decisions=decisions,
-        stratagem_index=stratagem_index,
-    )
-    if end_movement_active_status is not None:
-        return end_movement_active_status
-    selected_target_status = CatalogMovementEndSelectedTargetEffectRuntime(
-        ability_indexes_by_player_id={
-            army.player_id: _ability_index_for_player(
-                {} if ability_indexes_by_player_id is None else ability_indexes_by_player_id,
-                player_id=army.player_id,
-            )
-            for army in state.army_definitions
-        },
-        armies=tuple(state.army_definitions),
-    ).request(
-        state=state,
-        decisions=decisions,
-    )
-    if selected_target_status is not None:
-        return selected_target_status
-    end_movement_reaction_status = _request_end_opponent_movement_reaction_if_available(
-        state=state,
-        decisions=decisions,
-        reaction_queue=reaction_queue,
-        stratagem_index=stratagem_index,
-        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-        runtime_modifier_registry=runtime_modifier_registry,
-        charge_target_restriction_hooks=charge_target_restriction_hooks,
-    )
-    if end_movement_reaction_status is not None:
-        return end_movement_reaction_status
-    phase_end_mortal_wounds_status = resolve_movement_phase_end_mortal_wounds(
-        state=state,
-        decisions=decisions,
-    )
-    if phase_end_mortal_wounds_status is not None:
-        return phase_end_mortal_wounds_status
-    if not movement_state.move_units_completed:
-        state.replace_movement_phase_state(movement_state.with_move_units_completed())
+    if movement_state.move_units_completed:
+        return LifecycleStatus.advanced(
+            stage=state.stage, payload={"phase_body_status": "move_units_complete"}
+        )
+    unarrived_reserve_count = len(state.unarrived_reserve_states_for_player(active_player_id))
+    state.replace_movement_phase_state(movement_state.with_move_units_completed())
     decisions.event_log.append(
         "move_units_completed",
         {

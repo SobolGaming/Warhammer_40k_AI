@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -134,7 +135,7 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        game_id="order34-own-hazard-True-16" if with_feel_no_pain else "order34-own-hazard-False-1",
+        game_id="order34-own-hazard-True-16" if with_feel_no_pain else "order36-own-hazard-False-3",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -195,6 +196,14 @@ def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_
     assert accepted, "Own Hazardous destruction must consult the source-backed shooting grant."
     assert saw_feel_no_pain is with_feel_no_pain
     events = session.lifecycle.decision_controller.event_log.records
+    assert (
+        sum(
+            event.event_type == "retained_shooting_hazardous_automatically_passed"
+            for event in events
+        )
+        == 1
+    )
+    assert sum(event.event_type == "hazardous_test_resolved" for event in events) == 1
     assert (
         sum(
             event.event_type == "attack_sequence_models_attacked"
@@ -631,8 +640,19 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         result_id="choose-fidelity-action",
         option_id=f"{source.source_id}:{action.value}",
     )
+    checked_scope_orders: set[tuple[str, ...]] = set()
     for _ in range(40):
         checkpoint = session.lifecycle.to_payload()
+        assert checkpoint["state"] is not None
+        scopes = checkpoint["state"]["active_player_scopes"]
+        if len(scopes) > 1:
+            # R36-001: restore must preserve the complete nesting order, including moves.
+            checked_scope_orders.add(tuple(scope["kind"] for scope in scopes))
+            forged = deepcopy(checkpoint)
+            assert forged["state"] is not None
+            forged["state"]["active_player_scopes"].reverse()
+            with pytest.raises(GameLifecycleError, match=r"scope stack.*action order"):
+                GameLifecycle.from_payload(forged)
         restored = GameLifecycle.from_payload(checkpoint)
         assert restored.to_payload() == checkpoint
         session = LocalGameSession(lifecycle=restored)
@@ -688,6 +708,8 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
             submit_fixture_request(session, request)
     else:
         raise AssertionError("Unending Fidelity attack did not complete.")
+    if action is RetainedAttackAction.SHOOT:
+        assert ("fight", "out_of_phase_shoot") in checked_scope_orders
     events = session.lifecycle.decision_controller.event_log.records
     participations = [
         event.payload
@@ -711,6 +733,14 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         == 1
     )
     assert not retained_destructions(state=state)
+
+    if attached and action is RetainedAttackAction.FIGHT:
+        # The first weapon group destroyed the sole target. The remaining
+        # declared group must finish without allocating or attacking again.
+        skipped = [event for event in events if event.event_type == "attack_pool_not_allocated"]
+        assert len(skipped) == 1
+        assert isinstance(skipped[0].payload, dict)
+        assert skipped[0].payload["reason"] == "target_destroyed_and_removed"
 
 
 @pytest.mark.parametrize(
@@ -1215,7 +1245,7 @@ def test_order_30_multiple_hazardous_casualties_keep_each_pending_authority() ->
     )
     lifecycle, units = _shooting_lifecycle(
         catalog=catalog,
-        game_id="order34-multi-hazard-1",
+        game_id="order36-multi-hazard-5",
         alpha_unit_ids=("intercessor-1",),
         alpha_unit_specs=(
             ("intercessor-1", "core-intercessor-like-infantry", "core-intercessor-like", 5),

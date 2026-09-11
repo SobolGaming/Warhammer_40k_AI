@@ -299,7 +299,7 @@ def test_phase17n_restore_rejects_coordinated_prior_shooting_history_erasure() -
 
     with pytest.raises(
         GameLifecycleError,
-        match="Activity restriction inventory differs",
+        match="ObjectiveControlRecord objective source inventory drifted",
     ):
         GameLifecycle.from_payload(forged_payload)
 

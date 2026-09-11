@@ -78,6 +78,28 @@ def _policy_has_rule_at_record(
     )
 
 
+def required_primary_scoring_boundaries(
+    *,
+    policies: MissionScoringPolicies,
+    record: ObjectiveControlRecord,
+    turn_order: tuple[str, ...],
+) -> tuple[tuple[PrimaryScoringBoundaryKind, str], ...]:
+    """Identify each player's mission separately at a scoreable boundary."""
+    kinds = required_primary_scoring_boundary_kinds(
+        policies=policies, record=record, turn_order=turn_order
+    )
+    return tuple(
+        (kind, player_id)
+        for kind in kinds
+        for player_id in turn_order
+        if _policy_has_rule_at_record(
+            policy=policies.policy_for_player(player_id),
+            record=record,
+            end_of_battle=kind is PrimaryScoringBoundaryKind.END_OF_BATTLE,
+        )
+    )
+
+
 def _is_final_end_of_battle_record(
     *,
     policies: MissionScoringPolicies,
@@ -107,4 +129,4 @@ def _identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
 _identifier = IdentifierValidator(GameLifecycleError)
 
 
-__all__ = ("required_primary_scoring_boundary_kinds",)
+__all__ = ("required_primary_scoring_boundaries", "required_primary_scoring_boundary_kinds")

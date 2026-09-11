@@ -18,10 +18,8 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
+    post_fight_candidates,
     post_fight_hit_target_request,
-)
-from warhammer40k_core.engine.catalog_post_shoot_sequencing import (
-    resolve_post_shoot_group_order as _resolve_post_shoot_group_order,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
@@ -49,12 +47,6 @@ from warhammer40k_core.engine.catalog_selected_target_decisions import (
 )
 from warhammer40k_core.engine.catalog_selected_target_decisions import (
     invalid_selected_target_effect_status as _invalid_selected_target_effect_status,
-)
-from warhammer40k_core.engine.catalog_selected_target_decisions import (
-    post_shoot_group_key as _post_shoot_group_key,
-)
-from warhammer40k_core.engine.catalog_selected_target_decisions import (
-    resolved_post_shoot_target_effect_group_keys as _resolved_post_shoot_target_effect_group_keys,
 )
 from warhammer40k_core.engine.catalog_selected_target_decisions import (
     resolved_shooting_start_group_keys as _resolved_shooting_start_group_keys,
@@ -208,7 +200,6 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
-    GameLifecycleStage,
     LifecycleStatus,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
@@ -219,6 +210,7 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartRequestContext,
     ShootingPhaseStartResultContext,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause
@@ -277,6 +269,7 @@ class CatalogSelectedTargetEffectRuntime:
                 hook_id=CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
                 source_id=CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
                 request_handler=self.fight_phase_start_request,
+                candidate_handler=self.fight_phase_start_candidates,
                 result_handler=self.apply_fight_phase_start_result,
             ),
         )
@@ -291,6 +284,7 @@ class CatalogSelectedTargetEffectRuntime:
                     hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
                     source_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
                     handler=self.post_shoot_hit_target_request,
+                    candidate_handler=self.post_shoot_candidates,
                 )
             )
         if _has_runtime_post_fight_records(self.ability_indexes_by_player_id, self.armies):
@@ -299,6 +293,7 @@ class CatalogSelectedTargetEffectRuntime:
                     hook_id=CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
                     source_id=CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
                     handler=self.post_fight_hit_target_request,
+                    candidate_handler=self.post_fight_candidates,
                 )
             )
         return tuple(bindings)
@@ -314,9 +309,20 @@ class CatalogSelectedTargetEffectRuntime:
                 hook_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
                 source_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
                 request_handler=self.shooting_phase_start_request,
+                candidate_handler=self.shooting_phase_start_candidates,
                 result_handler=self.apply_shooting_phase_start_result,
             ),
         )
+
+    def shooting_phase_start_candidates(
+        self,
+        context: ShootingPhaseStartRequestContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_phase_start_candidates import (
+            shooting_start_candidates,
+        )
+
+        return shooting_start_candidates(self, context)
 
     def shooting_phase_start_request(
         self,
@@ -329,6 +335,7 @@ class CatalogSelectedTargetEffectRuntime:
         )
         resolved = _resolved_shooting_start_group_keys(
             context.decisions,
+            state=context.state,
             event_type=CATALOG_SHOOTING_START_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
         )
         unresolved = tuple(group for group in groups if group.sort_key not in resolved)
@@ -387,6 +394,14 @@ class CatalogSelectedTargetEffectRuntime:
             phase=BattlePhase.SHOOTING,
         )
         return True
+
+    def fight_phase_start_candidates(
+        self,
+        context: FightPhaseStartRequestContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_phase_start_candidates import fight_start_candidates
+
+        return fight_start_candidates(self, context)
 
     def fight_phase_start_request(
         self,
@@ -454,82 +469,27 @@ class CatalogSelectedTargetEffectRuntime:
         self,
         context: AttackSequenceCompletedContext,
     ) -> LifecycleStatus | None:
-        if type(context) is not AttackSequenceCompletedContext:
-            raise GameLifecycleError("Catalog post-shoot target effect requires context.")
-        groups = _post_shoot_hit_target_effect_groups(
+        from warhammer40k_core.engine.catalog_attack_completion_candidates import resolve_post_shoot
+
+        return resolve_post_shoot(self, context)
+
+    def post_shoot_candidates(
+        self,
+        context: AttackSequenceCompletedContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_attack_completion_candidates import (
+            post_shoot_candidates,
+        )
+
+        return post_shoot_candidates(self, context)
+
+    def post_fight_candidates(
+        self, context: AttackSequenceCompletedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        return post_fight_candidates(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id,
             armies=self.armies,
             context=context,
-        )
-        resolved = _resolved_post_shoot_target_effect_group_keys(
-            context.decisions,
-            event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-        )
-        unresolved = tuple(
-            group for group in groups if _post_shoot_group_key(group) not in resolved
-        )
-        if not unresolved:
-            return None
-        sequencing = _resolve_post_shoot_group_order(
-            context=context,
-            groups=unresolved,
-        )
-        if sequencing.pending_status is not None:
-            return sequencing.pending_status
-        ordered_groups = sequencing.ordered_groups
-        if ordered_groups is None:
-            raise GameLifecycleError("Catalog post-shoot sequencing resolution is incomplete.")
-        if not ordered_groups:
-            return None
-        group = ordered_groups[0]
-        request = _selected_target_request(
-            state=context.state,
-            group=group,
-            decision_type=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
-        )
-        context.decisions.request_decision(request)
-        context.decisions.event_log.append(
-            "catalog_post_shoot_hit_target_effect_requested",
-            validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "phase": BattlePhase.SHOOTING.value,
-                    "active_player_id": context.state.active_player_id,
-                    "player_id": group.player_id,
-                    "hook_id": CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-                    "request_id": request.request_id,
-                    "catalog_record_id": group.record.record_id,
-                    "source_rule_id": group.record.definition.source_id,
-                    "unit_instance_id": group.unit.unit_instance_id,
-                    "source_model_instance_id": group.source_model_instance_id,
-                    "selection_clause_id": group.selection_clause.clause_id,
-                    "attack_sequence_id": (
-                        None if group.attack_sequence is None else group.attack_sequence.sequence_id
-                    ),
-                    "attack_sequence_completed_event_id": (
-                        group.attack_sequence_completed_event_id
-                    ),
-                    "available_target_unit_instance_ids": [
-                        option.target_unit_instance_id for option in group.options
-                    ],
-                    "phase_body_status": "catalog_post_shoot_hit_target_effect_pending",
-                }
-            ),
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=request,
-            payload=validate_json_value(
-                {
-                    "phase": BattlePhase.SHOOTING.value,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": context.state.active_player_id,
-                    "player_id": group.player_id,
-                    "pending_request_id": request.request_id,
-                    "phase_body_status": "catalog_post_shoot_hit_target_effect_pending",
-                }
-            ),
         )
 
     def post_fight_hit_target_request(
@@ -715,7 +675,7 @@ def _shooting_start_selected_target_groups(
     return tuple(sorted(groups, key=lambda group: group.sort_key))
 
 
-def _post_shoot_hit_target_effect_groups(
+def post_shoot_hit_target_effect_groups(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],

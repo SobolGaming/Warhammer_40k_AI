@@ -39,7 +39,6 @@ from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlace
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
 )
-from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -146,7 +145,6 @@ from warhammer40k_core.engine.return_on_death import (
     ReturnDestroyedTargetScope,
     ReturnRestoreWoundsMode,
     apply_return_on_death_placement_decision,
-    resolve_pending_return_on_death_phase_end,
 )
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
@@ -863,6 +861,7 @@ def test_evidence_without_scoring_commit_checkpoint_event_fails_restore() -> Non
     record = state.determine_current_phase_end_objective_control()
     _emit_oc_event(decisions=decisions, record=record)
     evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         end_of_battle=False,
@@ -879,6 +878,7 @@ def test_evidence_without_scoring_commit_checkpoint_event_fails_restore() -> Non
     for award in awards:
         state.award_victory_points(award)
     resolve_primary_scoring_boundary_lifecycle(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         scoring_boundary_kind=PrimaryScoringBoundaryKind.ORDINARY,
@@ -972,12 +972,14 @@ def test_forged_territory_unit_witness_fails_checkpoint_spatial_rebuild() -> Non
         runtime_modifier_registry=None,
     )
     checkpoint = bound_primary_scoring_commit_checkpoint(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         scoring_commit_checkpoint=None,
         runtime_modifier_registry=None,
     )
     evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         end_of_battle=True,
@@ -5456,17 +5458,16 @@ def _destroy_model_with_event(
     decisions: DecisionController,
     model_instance_id: str,
 ) -> None:
-    phase = state.current_battle_phase
-    assert phase is not None
-    destroy_model_by_rule(state=state, model_instance_id=model_instance_id)
-    decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": phase.value,
-            "model_instance_id": model_instance_id,
-        },
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+    assert state.active_player_id is not None
+    destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=model_instance_id,
+        destroying_player_id=state.active_player_id,
+        source_unit_id=None,
+        source_model_id=None,
     )
 
 
@@ -5497,10 +5498,6 @@ def _destroy_unit_with_events(
         state=state,
         rules_unit_instance_id=source_unit.unit_instance_id,
     )
-    destroyed_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=unit.unit_instance_id,
-    )
     attribution = ModelDestructionAttribution.for_non_attack(
         destroying_player_id="player-a",
         source_kind=DestructionSourceKind.ABILITY,
@@ -5510,30 +5507,17 @@ def _destroy_unit_with_events(
     destroyed_events: list[str] = []
     departures: list[PrimaryBattlefieldDepartureState] = []
     for model in unit.own_models:
-        model_placement = next(
-            row
-            for row in original_placement.model_placements
-            if row.model_instance_id == model.model_instance_id
-        )
-        event = decisions.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": BattlePhase.COMMAND.value,
-                "model_instance_id": model.model_instance_id,
-                "target_unit_instance_id": unit.unit_instance_id,
-                "destroyed_model_placement": model_placement.to_payload(),
-                "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-                "destroyed_rules_unit_objective_proximity_witness": (
-                    destroyed_witness.to_payload()
-                ),
-                **attribution.to_payload(),
-            },
+        from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+        event = destroy_rule_model_for_fixture(
+            state=state,
+            decisions=decisions,
+            model_id=model.model_instance_id,
+            destroying_player_id="player-a",
+            source_unit_id=source_unit.unit_instance_id,
+            source_model_id=source_unit.own_models[0].model_instance_id,
         )
         destroyed_events.append(event.event_id)
-        destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
         model_departures = record_primary_destroyed_model_departures(
             state=state,
             destroyed_model_instance_ids=(model.model_instance_id,),
@@ -5626,6 +5610,8 @@ def _return_destroyed_unit(
     original_placement: UnitPlacement,
     return_model_only: bool = False,
 ) -> None:
+    from warhammer40k_core.engine.return_on_death import resolve_return_on_death_occurrence
+
     pending = state.pending_return_on_death_by_id("p2-return-on-death-pending")
     dice_manager = DiceRollManager(
         state.game_id,
@@ -5645,12 +5631,14 @@ def _return_destroyed_unit(
             ),
         ),
     )
-    request = resolve_pending_return_on_death_phase_end(
+    request = resolve_return_on_death_occurrence(
         state=state,
         decisions=decisions,
         dice_manager=dice_manager,
+        pending=pending,
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
+    decisions.request_decision(request)
     attempted_placement = (
         original_placement.with_model_placements((original_placement.model_placements[0],))
         if return_model_only
@@ -5689,6 +5677,7 @@ def _assert_scoring_commit_differs_from_oc_checkpoint(lifecycle: GameLifecycle) 
         if candidate.objective_control_record_id == record.record_id
     )
     commit = bound_primary_scoring_commit_checkpoint(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         scoring_commit_checkpoint=None,

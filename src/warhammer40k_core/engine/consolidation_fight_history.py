@@ -91,7 +91,10 @@ def validate_consolidation_fight_history(
             and isinstance(event.payload, dict)
             and _trigger_id(event.payload) == trigger.event_id
         )
-        if len(queue_events) != 1 or queue_events[0][0] != trigger_index + 1:
+        boundary_index = _consolidation_response_boundary(
+            event_records=event_records, trigger_index=trigger_index, result_id=result_id
+        )
+        if len(queue_events) != 1 or queue_events[0][0] != boundary_index:
             raise GameLifecycleError("Consolidation requires one response boundary after movement.")
         start_index, start = queue_events[0]
         start_payload = _object(start.payload)
@@ -161,6 +164,32 @@ def validate_consolidation_fight_history(
             context=context,
             suspended=suspended,
         )
+
+
+def _consolidation_response_boundary(
+    *, event_records: tuple[EventRecord, ...], trigger_index: int, result_id: str
+) -> int:
+    """The response follows the move's observation, population and authority close."""
+    prefix = event_records[trigger_index + 1 : trigger_index + 4]
+    if tuple(event.event_type for event in prefix) != (
+        "rule_trigger_observed",
+        "move_rule_candidates_observed",
+        "active_player_scope_completed",
+    ):
+        raise GameLifecycleError("Consolidation lost its exact movement completion boundary.")
+    trigger = event_records[trigger_index]
+    observed = _object(prefix[0].payload)
+    population = _object(prefix[1].payload)
+    closed = _object(prefix[2].payload)
+    if (
+        _object(observed.get("context")).get("trigger_event_id") != trigger.event_id
+        or population.get("trigger_event_id") != trigger.event_id
+        or closed.get("result_id") != result_id
+        or _object(closed.get("scope")).get("unit_instance_id")
+        != _object(trigger.payload).get("unit_instance_id")
+    ):
+        raise GameLifecycleError("Consolidation movement completion source drifted.")
+    return trigger_index + 4
 
 
 def _validate_queue_completion(

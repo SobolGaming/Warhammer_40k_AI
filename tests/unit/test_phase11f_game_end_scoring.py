@@ -489,6 +489,7 @@ def test_phase11f_state_restore_revalidates_primary_score_count_semantics() -> N
         if stored.record_id == evidence.objective_control_record_id
     )
     resolve_primary_scoring_boundary_lifecycle(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         scoring_boundary_kind=evidence.scoring_boundary_kind,
@@ -656,6 +657,7 @@ def _immovable_object_primary_award_fixture() -> tuple[GameState, VictoryPointAw
         runtime_modifier_registry=None,
     )
     state_evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         end_of_battle=False,

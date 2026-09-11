@@ -14,7 +14,7 @@ from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_boundary_inventory import (
-    required_primary_scoring_boundary_kinds,
+    required_primary_scoring_boundaries,
 )
 from warhammer40k_core.engine.primary_scoring_state_evidence import PrimaryScoringBoundaryKind
 from warhammer40k_core.engine.scoring import VictoryPointSourceKind
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-PRIMARY_SCORING_BOUNDARY_LIFECYCLE_SCHEMA = "primary-scoring-boundary-lifecycle-v1"
+PRIMARY_SCORING_BOUNDARY_LIFECYCLE_SCHEMA = "primary-scoring-boundary-lifecycle-v2"
 _PRIMARY_SCORING_BOUNDARY_LIFECYCLE_ID_PREFIX = "primary-scoring-boundary-lifecycle"
 _OBJECTIVE_CONTROL_BOUNDARY_EVENT_TYPE = "end_boundary_objective_control_determined"
 
@@ -31,15 +31,18 @@ PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED = "phase_end_unit_destro
 PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH = "return_on_death_placement_required"
 PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE = "turn_end_faction_rule_required"
 PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE = "primary_mission_turn_end_choice_required"
+PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END = "mission_turn_end_rule_required"
 LEGAL_PRIMARY_SCORING_PENDING_WINDOWS = frozenset(
     {
         PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
         PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
         PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
         PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+        PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END,
     }
 )
 _PENDING_WINDOW_PROVENANCE_EVENT_TYPES = {
+    PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END: "decision_requested",
     PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED: "decision_requested",
     PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH: "return_on_death_set_back_up_requested",
     PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE: "turn_end_faction_rule_requested",
@@ -57,6 +60,7 @@ class PrimaryScoringBoundaryLifecyclePayload(TypedDict):
     objective_control_record_id: str
     objective_control_record_hash: str
     scoring_boundary_kind: str
+    scoring_player_id: str
     status: str
     pending_window: str | None
     pending_decision_request_id: str | None
@@ -76,6 +80,7 @@ class PrimaryScoringBoundaryLifecycle:
     objective_control_record_id: str
     objective_control_record_hash: str
     scoring_boundary_kind: PrimaryScoringBoundaryKind
+    scoring_player_id: str
     status: PrimaryScoringBoundaryStatus
     pending_window: str | None
     pending_decision_request_id: str | None
@@ -110,6 +115,9 @@ class PrimaryScoringBoundaryLifecycle:
                 field_name="PrimaryScoringBoundaryLifecycle objective_control_record_hash",
                 error_type=GameLifecycleError,
             ),
+        )
+        object.__setattr__(
+            self, "scoring_player_id", _identifier("Primary scoring player", self.scoring_player_id)
         )
         if type(self.scoring_boundary_kind) is not PrimaryScoringBoundaryKind:
             raise GameLifecycleError(
@@ -216,6 +224,7 @@ class PrimaryScoringBoundaryLifecycle:
         *,
         record: ObjectiveControlRecord,
         scoring_boundary_kind: PrimaryScoringBoundaryKind,
+        scoring_player_id: str,
         pending_window: str,
         pending_decision_request_id: str,
     ) -> Self:
@@ -231,6 +240,7 @@ class PrimaryScoringBoundaryLifecycle:
             objective_control_record_id=record.record_id,
             objective_control_record_hash=_record_hash(record),
             scoring_boundary_kind=scoring_boundary_kind,
+            scoring_player_id=scoring_player_id,
             status=PrimaryScoringBoundaryStatus.PENDING,
             pending_window=pending_window,
             pending_decision_request_id=pending_decision_request_id,
@@ -246,6 +256,7 @@ class PrimaryScoringBoundaryLifecycle:
         *,
         record: ObjectiveControlRecord,
         scoring_boundary_kind: PrimaryScoringBoundaryKind,
+        scoring_player_id: str,
         scoring_commit_checkpoint_id: str,
         scoring_commit_checkpoint_hash: str,
         evidence_id: str,
@@ -263,6 +274,7 @@ class PrimaryScoringBoundaryLifecycle:
             objective_control_record_id=record.record_id,
             objective_control_record_hash=_record_hash(record),
             scoring_boundary_kind=scoring_boundary_kind,
+            scoring_player_id=scoring_player_id,
             status=PrimaryScoringBoundaryStatus.RESOLVED,
             pending_window=None,
             pending_decision_request_id=None,
@@ -279,6 +291,7 @@ class PrimaryScoringBoundaryLifecycle:
         objective_control_record_id: str,
         objective_control_record_hash: str,
         scoring_boundary_kind: PrimaryScoringBoundaryKind,
+        scoring_player_id: str,
         status: PrimaryScoringBoundaryStatus,
         pending_window: str | None,
         pending_decision_request_id: str | None,
@@ -292,6 +305,7 @@ class PrimaryScoringBoundaryLifecycle:
             objective_control_record_id=objective_control_record_id,
             objective_control_record_hash=objective_control_record_hash,
             scoring_boundary_kind=scoring_boundary_kind,
+            scoring_player_id=scoring_player_id,
             status=status,
             pending_window=pending_window,
             pending_decision_request_id=pending_decision_request_id,
@@ -306,6 +320,7 @@ class PrimaryScoringBoundaryLifecycle:
             objective_control_record_id=objective_control_record_id,
             objective_control_record_hash=objective_control_record_hash,
             scoring_boundary_kind=scoring_boundary_kind,
+            scoring_player_id=scoring_player_id,
             status=status,
             pending_window=pending_window,
             pending_decision_request_id=pending_decision_request_id,
@@ -323,6 +338,7 @@ class PrimaryScoringBoundaryLifecycle:
             objective_control_record_id=self.objective_control_record_id,
             objective_control_record_hash=self.objective_control_record_hash,
             scoring_boundary_kind=self.scoring_boundary_kind,
+            scoring_player_id=self.scoring_player_id,
             status=self.status,
             pending_window=self.pending_window,
             pending_decision_request_id=self.pending_decision_request_id,
@@ -348,6 +364,7 @@ class PrimaryScoringBoundaryLifecycle:
             objective_control_record_id=cast(str, raw["objective_control_record_id"]),
             objective_control_record_hash=cast(str, raw["objective_control_record_hash"]),
             scoring_boundary_kind=_boundary_kind_from_token(raw["scoring_boundary_kind"]),
+            scoring_player_id=cast(str, raw["scoring_player_id"]),
             status=_status_from_token(raw["status"]),
             pending_window=cast(str | None, raw["pending_window"]),
             pending_decision_request_id=cast(str | None, raw["pending_decision_request_id"]),
@@ -378,7 +395,11 @@ def mark_pending_primary_scoring_boundaries(
     request_id = _identifier("pending_decision_request_id", pending_decision_request_id)
     required = _required_boundary_keys(state=state)
     evidenced = {
-        (evidence.objective_control_record_id, evidence.scoring_boundary_kind)
+        (
+            evidence.objective_control_record_id,
+            evidence.scoring_boundary_kind,
+            evidence.scoring_player_id,
+        )
         for evidence in state.primary_scoring_state_evidence_records
     }
     unresolved = required - evidenced
@@ -388,7 +409,8 @@ def mark_pending_primary_scoring_boundaries(
         if row.status is PrimaryScoringBoundaryStatus.RESOLVED
     )
     resolved_keys = {
-        (row.objective_control_record_id, row.scoring_boundary_kind) for row in resolved_rows
+        (row.objective_control_record_id, row.scoring_boundary_kind, row.scoring_player_id)
+        for row in resolved_rows
     }
     stale_pending = resolved_keys & unresolved
     if stale_pending:
@@ -400,12 +422,13 @@ def mark_pending_primary_scoring_boundaries(
         PrimaryScoringBoundaryLifecycle.pending(
             record=records_by_id[record_id],
             scoring_boundary_kind=kind,
+            scoring_player_id=player_id,
             pending_window=pending_window,
             pending_decision_request_id=request_id,
         )
-        for record_id, kind in sorted(
+        for record_id, kind, player_id in sorted(
             unresolved,
-            key=lambda item: (item[0], item[1].value),
+            key=lambda item: (item[0], item[1].value, item[2]),
         )
     )
     state.replace_primary_scoring_boundary_lifecycles(
@@ -419,6 +442,7 @@ def resolve_primary_scoring_boundary_lifecycle(
     state: GameState,
     record: ObjectiveControlRecord,
     scoring_boundary_kind: PrimaryScoringBoundaryKind,
+    scoring_player_id: str,
     scoring_commit_checkpoint_id: str,
     scoring_commit_checkpoint_hash: str,
     evidence_id: str,
@@ -441,6 +465,7 @@ def resolve_primary_scoring_boundary_lifecycle(
     resolved = PrimaryScoringBoundaryLifecycle.resolved(
         record=record,
         scoring_boundary_kind=scoring_boundary_kind,
+        scoring_player_id=scoring_player_id,
         scoring_commit_checkpoint_id=scoring_commit_checkpoint_id,
         scoring_commit_checkpoint_hash=scoring_commit_checkpoint_hash,
         evidence_id=evidence_id,
@@ -452,6 +477,7 @@ def resolve_primary_scoring_boundary_lifecycle(
         if not (
             row.objective_control_record_id == record.record_id
             and row.scoring_boundary_kind is scoring_boundary_kind
+            and row.scoring_player_id == scoring_player_id
         )
     )
     state.replace_primary_scoring_boundary_lifecycles(_sorted_lifecycles((*retained, resolved)))
@@ -464,9 +490,9 @@ def resolve_primary_scoring_boundary_lifecycle(
 def pending_primary_scoring_boundary_keys(
     *,
     state: GameState,
-) -> frozenset[tuple[str, PrimaryScoringBoundaryKind]]:
+) -> frozenset[tuple[str, PrimaryScoringBoundaryKind, str]]:
     return frozenset(
-        (row.objective_control_record_id, row.scoring_boundary_kind)
+        (row.objective_control_record_id, row.scoring_boundary_kind, row.scoring_player_id)
         for row in state.primary_scoring_boundary_lifecycles
         if row.status is PrimaryScoringBoundaryStatus.PENDING
     )
@@ -490,19 +516,23 @@ def validate_primary_scoring_boundary_lifecycles(
             "GameState primary_scoring_boundary_lifecycles must contain typed rows."
         )
     seen_ids: set[str] = set()
-    seen_keys: set[tuple[str, PrimaryScoringBoundaryKind]] = set()
+    seen_keys: set[tuple[str, PrimaryScoringBoundaryKind, str]] = set()
     pending_windows: set[str] = set()
     pending_request_ids: set[str] = set()
     records_by_id = {record.record_id: record for record in state.objective_control_records}
     evidence_by_key = {
-        (evidence.objective_control_record_id, evidence.scoring_boundary_kind): evidence
+        (
+            evidence.objective_control_record_id,
+            evidence.scoring_boundary_kind,
+            evidence.scoring_player_id,
+        ): evidence
         for evidence in state.primary_scoring_state_evidence_records
     }
     required = _required_boundary_keys(state=state)
     for row in rows:
         if row.lifecycle_id in seen_ids:
             raise GameLifecycleError("Primary scoring boundary lifecycle identity is duplicated.")
-        key = (row.objective_control_record_id, row.scoring_boundary_kind)
+        key = (row.objective_control_record_id, row.scoring_boundary_kind, row.scoring_player_id)
         if key in seen_keys:
             raise GameLifecycleError("Primary scoring boundary lifecycle key is duplicated.")
         seen_ids.add(row.lifecycle_id)
@@ -558,7 +588,7 @@ def validate_primary_scoring_boundary_lifecycles(
         )
     pending_keys = set(pending_primary_scoring_boundary_keys(state=state))
     resolved_keys = {
-        (row.objective_control_record_id, row.scoring_boundary_kind)
+        (row.objective_control_record_id, row.scoring_boundary_kind, row.scoring_player_id)
         for row in rows
         if row.status is PrimaryScoringBoundaryStatus.RESOLVED
     }
@@ -717,17 +747,26 @@ def _pending_window_decision_types(pending_window: str) -> frozenset[str]:
     from warhammer40k_core.engine.healing_revival import (
         SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
     )
+    from warhammer40k_core.engine.mission_decisions import TACTICAL_SECONDARY_SCORE_DECISION_TYPE
     from warhammer40k_core.engine.primary_mission_choices import (
         SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
     )
     from warhammer40k_core.engine.return_on_death import (
         SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
     )
+    from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
     from warhammer40k_core.engine.turn_end_hooks import (
         SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     )
 
     families = {
+        PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END: frozenset(
+            {
+                SEQUENCING_DECISION_TYPE,
+                SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+                TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
+            }
+        ),
         PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED: frozenset(
             {
                 SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
@@ -755,7 +794,7 @@ def _pending_window_decision_types(pending_window: str) -> frozenset[str]:
 def _required_boundary_keys(
     *,
     state: GameState,
-) -> set[tuple[str, PrimaryScoringBoundaryKind]]:
+) -> set[tuple[str, PrimaryScoringBoundaryKind, str]]:
     if state.mission_setup is None:
         if state.objective_control_records or state.primary_scoring_boundary_lifecycles:
             raise GameLifecycleError(
@@ -766,9 +805,9 @@ def _required_boundary_keys(
 
     policies = mission_scoring_policies_from_setup(state.mission_setup)
     return {
-        (record.record_id, kind)
+        (record.record_id, kind, player_id)
         for record in state.objective_control_records
-        for kind in required_primary_scoring_boundary_kinds(
+        for kind, player_id in required_primary_scoring_boundaries(
             policies=policies,
             record=record,
             turn_order=state.turn_order,
@@ -821,6 +860,7 @@ def _sorted_lifecycles(
         key=lambda row: (
             row.objective_control_record_id,
             row.scoring_boundary_kind.value,
+            row.scoring_player_id,
             row.lifecycle_id,
         ),
     )
@@ -840,6 +880,7 @@ def _content_payload(
     objective_control_record_id: str,
     objective_control_record_hash: str,
     scoring_boundary_kind: PrimaryScoringBoundaryKind,
+    scoring_player_id: str,
     status: PrimaryScoringBoundaryStatus,
     pending_window: str | None,
     pending_decision_request_id: str | None,
@@ -853,6 +894,7 @@ def _content_payload(
         "objective_control_record_id": objective_control_record_id,
         "objective_control_record_hash": objective_control_record_hash,
         "scoring_boundary_kind": scoring_boundary_kind.value,
+        "scoring_player_id": scoring_player_id,
         "status": status.value,
         "pending_window": pending_window,
         "pending_decision_request_id": pending_decision_request_id,

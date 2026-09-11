@@ -5,6 +5,9 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import (
+    resolve_core_attack_completion_for_executor_fixture,
+)
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase13b_shooting_declaration_helpers import (
     _advanced_unit_state,
@@ -149,7 +152,6 @@ from warhammer40k_core.engine.attack_sequence import (
     PendingGroupedDamage,
     SaveDieEntryPayload,
     WoundRoll,
-    _resolve_hazardous_tests,
     apply_allocation_order_decision,
     apply_damage_allocation_model_decision,
     apply_destroyed_transport_disembark_proposal_decision,
@@ -2782,6 +2784,44 @@ def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
             ),
         ),
     )
+    source_request = DecisionRequest(
+        request_id="phase13d:out-of-phase-source-request",
+        decision_type="phase13d_fixture_shooting_source",
+        actor_id="player-b",
+        payload={"source_rule_id": "phase13d:out-of-phase-post-roll-pools"},
+        options=(
+            DecisionOption(
+                option_id=attacker.unit_instance_id,
+                label="Select fixture attacker",
+                payload={"unit_instance_id": attacker.unit_instance_id},
+            ),
+        ),
+    )
+    lifecycle.decision_controller.request_decision(source_request)
+    lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            request=source_request,
+            result_id="phase13d:out-of-phase-source-result",
+            selected_option_id=attacker.unit_instance_id,
+        )
+    )
+    state.out_of_phase_shooting_state = OutOfPhaseShootingState(
+        battle_round=state.battle_round,
+        player_id="player-b",
+        parent_phase=BattlePhase.SHOOTING,
+        source_rule_id="phase13d:out-of-phase-post-roll-pools",
+        source_decision_request_id="phase13d:out-of-phase-source-request",
+        source_decision_result_id="phase13d:out-of-phase-source-result",
+        source_context={"active_player_id": "player-a"},
+        selected_unit_instance_id=attacker.unit_instance_id,
+        target_unit_ids=(defender.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+        allocated_model_ids=(),
+    )
+    from warhammer40k_core.engine.active_player_scopes import push_scope, shooting_scope
+
+    push_scope(state, shooting_scope(state.out_of_phase_shooting_state))
     remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
@@ -2810,13 +2850,13 @@ def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
 
     assert remaining is not None
     assert request.decision_type == SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE
-    assert request.actor_id == "player-a"
+    assert request.actor_id == "player-b"
     request_payload = cast(dict[str, object], request.payload)
-    assert request_payload["active_player_id"] == "player-a"
+    assert request_payload["active_player_id"] == "player-b"
     assert request_payload["attacker_player_id"] == "player-b"
     assert len(request.options) == 2
     assert remaining.post_roll_attack_pools is not None
-    assert remaining.post_roll_attack_pools.active_player_id == "player-a"
+    assert remaining.post_roll_attack_pools.active_player_id == "player-b"
     assert remaining.post_roll_attack_pools.selected_pool is None
     assert len(remaining.post_roll_attack_pools.unresolved_pools) == 2
     missing_identity_payload = json.loads(json.dumps(remaining.to_payload(), sort_keys=True))
@@ -7549,6 +7589,42 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
         dice_manager=dice_manager,
         result_id_prefix="phase13d-hazardous-model",
     )
+    assert remaining_sequence is None
+    assert status is None
+    status = resolve_core_attack_completion_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence_id=sequence.sequence_id,
+        dice_manager=dice_manager,
+    )
+    from warhammer40k_core.engine.hazardous_completion import apply_hazardous_completion_decision
+
+    for index in range(16):
+        if status is None:
+            break
+        request = _decision_request(status)
+        assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+        result = DecisionResult.for_request(
+            result_id=f"phase13d-hazardous-completion-model-{index}",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        lifecycle.decision_controller.submit_result(result)
+        status = apply_hazardous_completion_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            request=request,
+            result=result,
+        )
+        if status is None:
+            status = resolve_core_attack_completion_for_executor_fixture(
+                state=state,
+                decisions=lifecycle.decision_controller,
+                sequence_id=sequence.sequence_id,
+                dice_manager=dice_manager,
+            )
+    else:
+        raise AssertionError("Hazardous model allocation did not complete")
 
     hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
     event_types = [event.event_type for event in lifecycle.decision_controller.event_log.records]
@@ -7704,10 +7780,21 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
         already_allocated_model_ids=(),
         dice_manager=dice_manager,
     )
+    assert remaining_sequence is None
+    assert status is None
+    assert state.shooting_phase_state is not None
+    state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+        attack_sequence=None,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    status = resolve_core_attack_completion_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence_id=sequence.sequence_id,
+        dice_manager=dice_manager,
+    )
     request = _decision_request(cast(LifecycleStatus, status))
     hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
-
-    assert remaining_sequence is not None
     assert allocated_ids == (defender.own_models[0].model_instance_id,)
     assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert {option.option_id for option in request.options} == {"decline", source.source_id}
@@ -7815,7 +7902,9 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(
         "weapon-instance:p24d:alpha",
     )
     sequence = AttackSequence.start(
-        sequence_id="p24d-hazardous-fight-origin",
+        sequence_id="attack-sequence:p24d-hazardous"
+        if pending_fnp
+        else "p24d-hazardous-fight-origin",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -7878,11 +7967,39 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(
         ),
     )
 
-    status = _resolve_hazardous_tests(
+    from warhammer40k_core.engine.model_attack_history import (
+        record_attack_sequence_completed,
+        record_models_attacked,
+    )
+
+    sequence = replace(
+        sequence, pool_index=len(sequence.attack_pools), used_pool_indices=(0, 1, 2, 3)
+    )
+    if pending_fnp:
+        from tests.completed_attack_fixture_helpers import (
+            record_shooting_declaration_for_executor_fixture,
+        )
+
+        record_shooting_declaration_for_executor_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            sequence=sequence,
+            result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+        )
+        assert state.shooting_phase_state is not None
+        state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+            attack_sequence=None,
+            allocated_model_ids_this_phase=(),
+        )
+    record_models_attacked(state=state, decisions=lifecycle.decision_controller, sequence=sequence)
+    record_attack_sequence_completed(
+        state=state, decisions=lifecycle.decision_controller, sequence=sequence
+    )
+    status = resolve_core_attack_completion_for_executor_fixture(
         state=state,
         decisions=lifecycle.decision_controller,
-        manager=manager,
-        attack_sequence=sequence,
+        sequence_id=sequence.sequence_id,
+        dice_manager=manager,
     )
 
     payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
@@ -13726,6 +13843,9 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     assert event_records.index(unit_disembarked_event) < event_records.index(deadly_demise_event)
     assert event_records.index(deadly_demise_event) < event_records.index(transport_destroyed_event)
     assert post_disembark_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    post_disembark_status = resolve_ordering_for_fixture(lifecycle, post_disembark_status)
     phase_end_request = _decision_request(post_disembark_status)
     assert phase_end_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert state.current_battle_phase is BattlePhase.MOVEMENT
@@ -16463,6 +16583,23 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
     assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert request.actor_id == "player-a"
     assert defender_model.model_instance_id in battlefield_before_fnp.placed_model_ids()
+    from warhammer40k_core.engine.unit_destroyed_hooks import (
+        physical_component_destruction_completion_events_for_phase,
+        unit_destruction_completion_events_for_phase,
+    )
+
+    for completion_lookup in (
+        physical_component_destruction_completion_events_for_phase,
+        unit_destruction_completion_events_for_phase,
+    ):
+        assert all(
+            payload["target_unit_instance_id"] != defender.unit_instance_id
+            for _event_id, payload in completion_lookup(
+                state=state,
+                event_log=lifecycle.decision_controller.event_log,
+                completed_phase=BattlePhase.SHOOTING,
+            )
+        )
     assert (
         model_by_id(
             state=state, model_instance_id=defender_model.model_instance_id
@@ -16695,6 +16832,11 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         if payload["model_instance_id"] == collateral_model.model_instance_id
     ]
     assert len(secondary) == 1
+    from warhammer40k_core.engine.catalog_materialization_destruction_history import (
+        validate_materialization_destruction_history,
+    )
+
+    validate_materialization_destruction_history(lifecycle.decision_controller.event_log.records)
     attribution = ModelDestructionAttribution.from_model_destroyed_payload(secondary[0])
     assert (
         attribution.destruction_provenance.destruction_source_kind

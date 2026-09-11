@@ -553,6 +553,10 @@ class ShootingPhaseState:
         attack_sequence: AttackSequence | None,
         allocated_model_ids_this_phase: tuple[str, ...],
     ) -> Self:
+        from warhammer40k_core.engine.attack_completion_authority import (
+            attack_completion_continuation,
+        )
+
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
@@ -563,7 +567,11 @@ class ShootingPhaseState:
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=self.active_selection,
             selected_shooting_type=self.selected_shooting_type,
-            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
+            pending_completed_attack_sequence=attack_completion_continuation(
+                previous=self.attack_sequence,
+                updated=attack_sequence,
+                pending=self.pending_completed_attack_sequence,
+            ),
             attack_pools=self.attack_pools,
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=allocated_model_ids_this_phase,
@@ -877,6 +885,10 @@ class OutOfPhaseShootingState:
         attack_sequence: AttackSequence | None,
         allocated_model_ids: tuple[str, ...],
     ) -> Self:
+        from warhammer40k_core.engine.attack_completion_authority import (
+            attack_completion_continuation,
+        )
+
         return type(self)(
             battle_round=self.battle_round,
             player_id=self.player_id,
@@ -889,7 +901,11 @@ class OutOfPhaseShootingState:
             target_unit_ids=self.target_unit_ids,
             grant_effect_ids=self.grant_effect_ids,
             attack_pools=self.attack_pools,
-            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
+            pending_completed_attack_sequence=attack_completion_continuation(
+                previous=self.attack_sequence,
+                updated=attack_sequence,
+                pending=self.pending_completed_attack_sequence,
+            ),
             attack_sequence=attack_sequence,
             allocated_model_ids=allocated_model_ids,
         )

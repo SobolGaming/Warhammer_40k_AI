@@ -1878,7 +1878,9 @@ def test_gateway_unto_damnation_relentless_carnage_destruction_upgrades_and_pers
         fight_phase_end_hooks=bundle.fight_phase_end_hook_registry,
     )
 
-    status = handler.begin_phase(state=state, decisions=decisions)
+    from tests.fight_end_fixture_helpers import advance_fight_end_fixture
+
+    status = advance_fight_end_fixture(handler=handler, state=state, decisions=decisions)
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     request = status.decision_request

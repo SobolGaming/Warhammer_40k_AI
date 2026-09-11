@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_end_fixture_helpers import advance_fight_end_fixture, single_fight_end_request
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase11c_command_phase_helpers import (
     battle_state,
@@ -55,6 +56,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
+    fight_end_sequencing,
 )
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.fight_phase_decisions import (
@@ -62,10 +64,10 @@ from warhammer40k_core.engine.fight_phase_decisions import (
 )
 from warhammer40k_core.engine.fight_phase_end_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
+    FightPhaseEndCandidateHandler,
     FightPhaseEndHookBinding,
     FightPhaseEndHookRegistry,
     FightPhaseEndRequestContext,
-    FightPhaseEndRequestHandler,
     FightPhaseEndResultContext,
     FightPhaseEndResultHandler,
     apply_fight_phase_end_result,
@@ -101,7 +103,13 @@ from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    SequencingParticipant,
+    SequencingRequirement,
+)
 from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
@@ -501,6 +509,29 @@ def test_infected_outbreak_records_sticky_state_when_plaguebearers_control_objec
     assert sticky_state.objective_id == center_marker_definition(state).objective_marker_id
     replay_payload = cast(dict[str, JsonValue], sticky_state.replay_payload)
     assert replay_payload["hook_id"] == datasheets.INFECTED_OUTBREAK_HOOK_ID
+    from warhammer40k_core.engine.sticky_objective_control import (
+        PhaseEndObjectiveControlHookRegistry,
+    )
+    from warhammer40k_core.engine.sticky_objective_sequencing import sticky_boundary_candidates
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+    from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext
+
+    before = (state.to_payload(), decisions.to_payload())
+    candidates = sticky_boundary_candidates(
+        PhaseEndObjectiveControlHookRegistry.from_bindings(
+            contribution.phase_end_objective_control_hook_bindings
+        ),
+        TurnEndRequestContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.COMMAND,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+        ),
+    )
+    assert (state.to_payload(), decisions.to_payload()) == before
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == sticky_state.player_id
+    assert candidates[0].participant.requirement is SequencingRequirement.MANDATORY
 
 
 def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wounds() -> None:
@@ -518,8 +549,18 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
     starting_wounds = sum(
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
+    discovery_before = (state.to_payload(), decisions.to_payload())
+    candidates = handler.fight_phase_end_hooks.candidates_for(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert (state.to_payload(), decisions.to_payload()) == discovery_before
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == "player-a"
+    assert candidates[0].participant.source_rule_id == (
+        datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID
+    )
 
-    status = handler.begin_phase(state=state, decisions=decisions)
+    status = advance_fight_end_fixture(handler=handler, state=state, decisions=decisions)
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     request = _decision_request(status.decision_request)
@@ -582,21 +623,21 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
     assert payload["source_rule_id"] == datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID
     assert payload["hook_id"] == datasheets.RELENTLESS_CARNAGE_HOOK_ID
     assert payload["target_enemy_unit_instance_id"] == target_unit_id
-    assert payload["mortal_wounds"] == 4
+    assert payload["mortal_wounds"] == 3
     d6_payload = cast(dict[str, JsonValue], payload["d6_result"])
-    assert d6_payload["current_values"] == [3, 5, 1, 3, 1, 5, 6, 5]
+    assert d6_payload["current_values"] == [6, 3, 6, 2, 2, 3, 5, 2]
     application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
-    assert application["mortal_wounds"] == 4
+    assert application["mortal_wounds"] == 3
     assert (
         starting_wounds
         - sum(model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models)
-        == 4
+        == 3
     )
     assert (
-        datasheets.relentless_carnage_fight_phase_end_request(
+        fight_end_sequencing.relentless_carnage_candidates(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
-        is None
+        == ()
     )
 
 
@@ -693,7 +734,7 @@ def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -
     starting_wounds = sum(
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
-    status = handler.begin_phase(state=state, decisions=decisions)
+    status = advance_fight_end_fixture(handler=handler, state=state, decisions=decisions)
     request = _decision_request(status.decision_request)
     decline_option = request.options[0]
     result = DecisionResult.for_request(
@@ -715,7 +756,7 @@ def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -
 
 
 def test_relentless_carnage_records_zero_mortal_wounds_without_application() -> None:
-    state = _relentless_carnage_state(game_id="phase17g-current-source-0-91")
+    state = _relentless_carnage_state(game_id="order36-relentless-boundary-116")
     source_unit_id = "army-alpha:intercessor-unit-1"
     target_unit_id = "army-beta:intercessor-unit-3"
     decisions = DecisionController()
@@ -728,7 +769,7 @@ def test_relentless_carnage_records_zero_mortal_wounds_without_application() -> 
     starting_wounds = sum(
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
-    status = handler.begin_phase(state=state, decisions=decisions)
+    status = advance_fight_end_fixture(handler=handler, state=state, decisions=decisions)
     request = _decision_request(status.decision_request)
     result = DecisionResult.for_request(
         result_id="result-relentless-carnage-zero-mw",
@@ -782,10 +823,10 @@ def test_relentless_carnage_prior_fight_phase_record_does_not_block_later_round(
     )
 
     assert (
-        datasheets.relentless_carnage_fight_phase_end_request(
+        fight_end_sequencing.relentless_carnage_candidates(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
-        is not None
+        != ()
     )
     decisions.event_log.append(
         datasheets.RELENTLESS_CARNAGE_RESOLVED_EVENT,
@@ -795,10 +836,10 @@ def test_relentless_carnage_prior_fight_phase_record_does_not_block_later_round(
         ),
     )
     assert (
-        datasheets.relentless_carnage_fight_phase_end_request(
+        fight_end_sequencing.relentless_carnage_candidates(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
-        is None
+        == ()
     )
 
 
@@ -969,7 +1010,7 @@ def test_datasheet_public_handlers_reject_wrong_context_types() -> None:
             cast(PhaseEndObjectiveControlContext, object())
         )
     with pytest.raises(GameLifecycleError, match="Fight-end request context"):
-        datasheets.relentless_carnage_fight_phase_end_request(
+        fight_end_sequencing.relentless_carnage_candidates(
             cast(FightPhaseEndRequestContext, object())
         )
     with pytest.raises(GameLifecycleError, match="Fight-end result context"):
@@ -1249,13 +1290,13 @@ def test_relentless_carnage_does_not_request_without_source_or_engaged_enemy() -
     )
 
     assert (
-        datasheets.relentless_carnage_fight_phase_end_request(
+        fight_end_sequencing.relentless_carnage_candidates(
             FightPhaseEndRequestContext(
                 state=missing_source_state,
                 decisions=DecisionController(),
             )
         )
-        is None
+        == ()
     )
 
     no_target_state = battle_state_with_center_objective_positions(
@@ -1281,10 +1322,10 @@ def test_relentless_carnage_does_not_request_without_source_or_engaged_enemy() -
     )
 
     assert (
-        datasheets.relentless_carnage_fight_phase_end_request(
+        fight_end_sequencing.relentless_carnage_candidates(
             FightPhaseEndRequestContext(state=no_target_state, decisions=DecisionController())
         )
-        is None
+        == ()
     )
 
 
@@ -1393,9 +1434,9 @@ def test_fight_phase_end_hook_registry_routes_request_and_result() -> None:
     decisions = DecisionController()
     request = _generic_fight_end_request(state)
 
-    def request_handler(context: FightPhaseEndRequestContext) -> DecisionRequest:
+    def candidate_handler(context: FightPhaseEndRequestContext) -> tuple[TimingRuleCandidate, ...]:
         assert context.state is state
-        return request
+        return (_generic_fight_end_candidate(request, "phase17g-generic-fight-end-source"),)
 
     def result_handler(context: FightPhaseEndResultContext) -> bool:
         assert context.request.request_id == request.request_id
@@ -1407,7 +1448,7 @@ def test_fight_phase_end_hook_registry_routes_request_and_result() -> None:
             FightPhaseEndHookBinding(
                 hook_id="phase17g-generic-fight-end-hook",
                 source_id="phase17g-generic-fight-end-source",
-                request_handler=request_handler,
+                candidate_handler=candidate_handler,
                 result_handler=result_handler,
             ),
         )
@@ -1497,12 +1538,12 @@ def test_fight_phase_end_hook_registry_rejects_invalid_binding_outputs() -> None
             FightPhaseEndHookBinding(
                 hook_id="phase17g-invalid-request-hook",
                 source_id="phase17g-invalid-request-source",
-                request_handler=cast(FightPhaseEndRequestHandler, invalid_request_handler),
+                candidate_handler=cast(FightPhaseEndCandidateHandler, invalid_request_handler),
             ),
         )
     )
 
-    with pytest.raises(GameLifecycleError, match="DecisionRequest or None"):
+    with pytest.raises(GameLifecycleError, match="requires typed candidates"):
         invalid_request_registry.next_request_for(context)
 
     request = _generic_fight_end_request(state)
@@ -1596,11 +1637,11 @@ def test_fight_phase_end_hook_registry_guardrails() -> None:
             hook_id="phase17g-empty-hook",
             source_id="phase17g-empty-source",
         )
-    with pytest.raises(GameLifecycleError, match="request_handler must be callable"):
+    with pytest.raises(GameLifecycleError, match="candidate_handler must be callable"):
         FightPhaseEndHookBinding(
             hook_id="phase17g-noncallable-request-hook",
             source_id="phase17g-noncallable-request-source",
-            request_handler=cast(FightPhaseEndRequestHandler, object()),
+            candidate_handler=cast(FightPhaseEndCandidateHandler, object()),
         )
     with pytest.raises(GameLifecycleError, match="result_handler must be callable"):
         FightPhaseEndHookBinding(
@@ -1619,7 +1660,7 @@ def test_fight_phase_end_hook_registry_guardrails() -> None:
             FightPhaseEndHookBinding(
                 hook_id="phase17g-empty-request-hook",
                 source_id="phase17g-empty-request-source",
-                request_handler=lambda context: None,
+                candidate_handler=lambda context: (),
             ),
         )
     )
@@ -1653,16 +1694,24 @@ def test_fight_phase_end_hook_registry_sequences_requests_and_rejects_multiple_r
             FightPhaseEndHookBinding(
                 hook_id="phase17g-request-one-hook",
                 source_id="phase17g-request-one-source",
-                request_handler=lambda hook_context: request,
+                candidate_handler=lambda hook_context: (
+                    _generic_fight_end_candidate(request, "source-one"),
+                ),
             ),
             FightPhaseEndHookBinding(
                 hook_id="phase17g-request-two-hook",
                 source_id="phase17g-request-two-source",
-                request_handler=lambda hook_context: other_request,
+                candidate_handler=lambda hook_context: (
+                    _generic_fight_end_candidate(other_request, "source-two"),
+                ),
             ),
         )
     )
-    assert multiple_request_registry.next_request_for(context) == request
+    sequencing_request = multiple_request_registry.next_request_for(context)
+    assert isinstance(sequencing_request, DecisionRequest)
+    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
+    assert sequencing_request.actor_id == request.actor_id
+    assert len(sequencing_request.options) == 2
 
     result = DecisionResult.for_request(
         result_id="phase17g-fight-end-multiple-result",
@@ -2150,8 +2199,11 @@ def _relentless_carnage_request(
     state: GameState,
     decisions: DecisionController,
 ) -> DecisionRequest:
-    request = datasheets.relentless_carnage_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    request = single_fight_end_request(
+        FightPhaseEndHookRegistry.from_bindings(
+            datasheets.runtime_contribution().fight_phase_end_hook_bindings
+        ),
+        FightPhaseEndRequestContext(state=state, decisions=decisions),
     )
     return _decision_request(request)
 
@@ -2210,4 +2262,17 @@ def _generic_fight_start_request(state: GameState) -> DecisionRequest:
                 payload=payload,
             ),
         ),
+    )
+
+
+def _generic_fight_end_candidate(request: DecisionRequest, source_id: str) -> TimingRuleCandidate:
+    return TimingRuleCandidate(
+        participant=SequencingParticipant(
+            participant_id=source_id,
+            source_rule_id=source_id,
+            player_id=request.actor_id,
+            requirement=SequencingRequirement.OPTIONAL,
+        ),
+        activate=lambda: request,
+        request_template=request,
     )

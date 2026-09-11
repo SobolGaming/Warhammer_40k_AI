@@ -21,6 +21,9 @@ from tests.phase11c_command_phase_helpers import (
     unit_selection,
     with_model_offsets,
 )
+from tests.phase11c_command_phase_helpers import (
+    resolve_deferred_battle_shock_outcomes as _resolve_deferred_battle_shock_outcomes,
+)
 from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
 from tests.unit_keyword_helpers import with_unit_keywords
 
@@ -83,9 +86,6 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockRerollPermissionContext,
     HistoricalBattleShockContribution,
 )
-from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
-    CatalogSelectedTargetBattleShockContinuationPhase,
-)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
@@ -140,10 +140,6 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration, DetachmentSelection
-from warhammer40k_core.engine.model_attack_history import (
-    record_attack_sequence_completed,
-    record_models_attacked,
-)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -1012,6 +1008,9 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
     )
 
     completed = handler.begin_phase(state=state, decisions=decisions)
+    outcome = _resolve_deferred_battle_shock_outcomes(state, decisions, _battle_shock_hooks())
+    assert outcome is not None
+    completed = outcome
     assert completed.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert (
         _drain_delirium_mortal_wound_requests(
@@ -1092,6 +1091,7 @@ def test_harbingers_uses_attached_rules_unit_identity_for_forced_test_and_outcom
     ).begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    _resolve_deferred_battle_shock_outcomes(state, decisions, _battle_shock_hooks())
     requested = _event_payload(decisions, "battle_shock_test_requested")
     request_payload = cast(dict[str, JsonValue], requested["battle_shock_test_request"])
     assert request_payload["unit_instance_id"] == attached_id
@@ -1215,6 +1215,9 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
     )
 
     waiting = handler.begin_phase(state=state, decisions=decisions)
+    outcome = _resolve_deferred_battle_shock_outcomes(state, decisions, _battle_shock_hooks())
+    assert outcome is not None
+    waiting = outcome
 
     assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     request = waiting.decision_request
@@ -1613,32 +1616,29 @@ def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -
     )
     first_provider_request = lifecycle.decision_controller.queue.peek_next()
     assert first_provider_status.decision_request == first_provider_request
-    assert first_provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-    assert lifecycle.decision_controller.queue.pending_requests == (first_provider_request,)
-
+    assert first_provider_request.decision_type == DICE_REROLL_DECISION_TYPE
     state = lifecycle.state
-    if state is None:
-        raise AssertionError("selected-target later-reroll fixture requires state")
-    for provider_decision_index in range(50):
-        current_request = lifecycle.decision_controller.queue.peek_next()
-        if current_request.decision_type == DICE_REROLL_DECISION_TYPE:
-            break
-        assert current_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-        status = session.submit_option(
-            request_id=current_request.request_id,
-            option_id="decline",
-            result_id=f"{game_id}:first-provider:{provider_decision_index}",
-        )
-        assert status.decision_request == lifecycle.decision_controller.queue.peek_next()
-    else:
-        raise AssertionError("first provider outcome did not reach the later Battle-shock reroll")
+    assert state is not None
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+
+    history = rule_trigger_history(lifecycle.decision_controller)
+    assert not any(trigger.kind.value == "battle_shock_outcome" for trigger in history.ready())
+    assert not _events_of_type(
+        decisions=lifecycle.decision_controller,
+        event_type="chaos_knights_delirium_mortal_wounds_pending",
+    )
 
     reroll_request = lifecycle.decision_controller.queue.peek_next()
     assert lifecycle.decision_controller.queue.pending_requests == (reroll_request,)
     continuation = state.pending_catalog_selected_target_battle_shock_continuation
-    assert continuation is not None
-    assert continuation.continuation_phase is (
-        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
+    assert continuation is None
+    assert isinstance(reroll_request.payload, dict)
+    reroll_context = reroll_request.payload["battle_shock_context"]
+    assert isinstance(reroll_context, dict)
+    base_payload = reroll_context["base_payload"]
+    assert isinstance(base_payload, dict)
+    assert base_payload["selected_target_decision_result"] == (
+        lifecycle.decision_controller.records[initial_record_count].result.to_payload()
     )
     assert _selected_target_modifier_effects(state) == ()
     assert not _events_of_type(
@@ -1652,9 +1652,8 @@ def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -
     )
     if restored.state is None:
         raise AssertionError("restored selected-target later-reroll fixture requires state")
-    restored_continuation = restored.state.pending_catalog_selected_target_battle_shock_continuation
-    assert restored_continuation is not None
-    assert restored_continuation.to_payload() == continuation.to_payload()
+    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
+    assert restored.decision_controller.queue.peek_next() == reroll_request
     restored_session = LocalGameSession(lifecycle=restored)
     reroll_request = restored.decision_controller.queue.peek_next()
     reroll_option_id = next(
@@ -1669,63 +1668,25 @@ def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -
     assert second_provider_status.decision_request == second_provider_request
     assert second_provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert restored.decision_controller.queue.pending_requests == (second_provider_request,)
-    assert _selected_target_modifier_effects(restored.state) == ()
-
-    for provider_decision_index in range(50):
-        remaining_continuation = (
-            restored.state.pending_catalog_selected_target_battle_shock_continuation
-        )
-        if remaining_continuation is None:
-            break
-        current_request = restored.decision_controller.queue.peek_next()
-        assert current_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-        restored_session.submit_option(
-            request_id=current_request.request_id,
-            option_id="decline",
-            result_id=f"{game_id}:second-provider:{provider_decision_index}",
-        )
-        if restored.state.pending_catalog_selected_target_battle_shock_continuation is None:
-            break
-        assert _selected_target_modifier_effects(restored.state) == ()
-    else:
-        raise AssertionError("second provider outcome did not close")
-
+    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
     assert len(_selected_target_modifier_effects(restored.state)) == 1
-    requested = _events_of_type(restored.decision_controller, "battle_shock_test_requested")
     resolved = _events_of_type(
         restored.decision_controller,
         "battle_shock_test_resolved",
         source_kind="catalog_selected_target_effect",
     )
-    assert len(requested) == 2
     assert len(resolved) == 2
-    effect_indices = tuple(
-        cast(int, cast(dict[str, JsonValue], event.payload)["effect_index"]) for event in resolved
+    assert tuple(
+        cast(dict[str, JsonValue], event.payload)["effect_index"] for event in resolved
+    ) == (0, 1)
+    _assert_deferred_delirium_outcomes(
+        lifecycle=restored,
+        bundle=bundle,
+        initial_payload=initial_payload,
+        initial_record_count=initial_record_count,
+        game_id=game_id,
+        final_event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     )
-    assert tuple(sorted(effect_indices)) == (0, 1)
-    assert (
-        len(
-            _events_of_type(
-                restored.decision_controller,
-                CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-            )
-        )
-        == 1
-    )
-    selected_records = tuple(
-        record
-        for record in restored.decision_controller.records
-        if record.request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE
-    )
-    assert len(selected_records) == 1
-
-    replay = GameLifecycle.from_payload(initial_payload, runtime_content_bundle=bundle)
-    replay_session = LocalGameSession(lifecycle=replay)
-    for record in restored.decision_controller.records[initial_record_count:]:
-        submit_replay_record(session=replay_session, record=record)
-    assert replay.state is not None
-    assert replay.state.to_payload() == restored.state.to_payload()
-    assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()
 
 
 @pytest.mark.parametrize(
@@ -1739,136 +1700,114 @@ def test_phase_start_selected_target_battle_shock_waits_for_delirium_outcome_via
     _assert_phase_start_selected_target_delirium_continuation(phase=phase)
 
 
-def test_selected_target_continuation_phase_tamper_rejects_before_provider_mutation() -> None:
+def test_deferred_outcome_phase_tamper_rejects_before_provider_mutation() -> None:
+    from warhammer40k_core.engine.event_log import EventLog
+    from warhammer40k_core.engine.rule_trigger_state import RuleTrigger, RuleTriggerPayload
+
     lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
         game_id="order34-complete-boundary-phase_tamper-1"
     )
     payload = deepcopy(lifecycle.to_payload())
-    state_payload = cast(dict[str, Any], payload["state"])
-    continuation_payload = cast(
-        dict[str, Any],
-        state_payload["pending_catalog_selected_target_battle_shock_continuation"],
+    events = payload["decisions"]["event_log"]
+    observed = next(
+        event
+        for event in events
+        if event["event_type"] == "rule_trigger_observed"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("kind") == "battle_shock_outcome"
     )
-    assert continuation_payload["continuation_phase"] == "awaiting_provider_outcome"
-    continuation_payload["continuation_phase"] = "awaiting_remaining_effects"
-
-    with pytest.raises(
-        GameLifecycleError,
-        match="completed provider request remains queued",
-    ):
+    trigger = RuleTrigger.from_payload(cast(RuleTriggerPayload, observed["payload"]))
+    assert isinstance(trigger.context, dict)
+    changed = replace(trigger, context={**trigger.context, "phase": "command"})
+    observed["payload"] = validate_json_value(changed.to_payload())
+    for event in events:
+        if event["event_type"] == "rule_trigger_released" and event["payload"] == {
+            "trigger_id": trigger.trigger_id
+        }:
+            event["payload"] = {"trigger_id": changed.trigger_id}
+    expected_error = "trigger source authority drift"
+    with pytest.raises(GameLifecycleError, match=expected_error):
         GameLifecycle.from_payload(payload, runtime_content_bundle=bundle)
-
+    decisions = lifecycle.decision_controller
+    decisions.event_log = EventLog.from_payload(events)
     state = lifecycle.state
-    if state is None:
-        raise AssertionError("selected-target phase tamper requires state")
-    continuation = state.pending_catalog_selected_target_battle_shock_continuation
-    if continuation is None:
-        raise AssertionError("selected-target phase tamper requires continuation")
-    state.replace_catalog_selected_target_battle_shock_continuation(
-        replace(
-            continuation,
-            continuation_phase=(
-                CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
-            ),
-        )
-    )
+    assert state is not None
+    before = (deepcopy(state.to_payload()), deepcopy(decisions.to_payload()))
     result = DecisionResult.for_request(
-        result_id="order34-complete-boundary-phase_tamper-1:decline",
         request=provider_request,
+        result_id="order36-corrupt-trigger:decline",
         selected_option_id="decline",
     )
-    decisions = lifecycle.decision_controller
-    before_state = deepcopy(state.to_payload())
-    before_queue = decisions.queue.pending_requests
-    before_records = decisions.records
-    before_events = decisions.event_log.records
-
-    with pytest.raises(
-        GameLifecycleError,
-        match="completed provider request remains queued",
-    ):
+    with pytest.raises(GameLifecycleError, match=expected_error):
         lifecycle.submit_decision(result)
-
-    assert state.to_payload() == before_state
-    assert decisions.queue.pending_requests == before_queue
-    assert decisions.records == before_records
-    assert decisions.event_log.records == before_events
-    assert not _events_of_type(
-        decisions,
-        CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-    )
+    assert (state.to_payload(), decisions.to_payload()) == before
 
 
-def test_selected_target_continuation_rejects_completed_provider_in_pending_phase() -> None:
+def test_deferred_outcome_rejects_missing_parent_batch_completion() -> None:
+    from warhammer40k_core.engine.event_log import EventLog
+    from warhammer40k_core.engine.rule_trigger_state import RuleTrigger, RuleTriggerPayload
+
     lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="order34-complete-boundary-provider-3"
+        game_id="order34-complete-boundary-phase_tamper-1"
     )
-    state = lifecycle.state
-    if state is None:
-        raise AssertionError("selected-target completed provider requires state")
-    continuation = state.pending_catalog_selected_target_battle_shock_continuation
-    if continuation is None:
-        raise AssertionError("selected-target completed provider requires continuation")
-    assert continuation.continuation_phase is (
-        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_PROVIDER_OUTCOME
+    payload = deepcopy(lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    observed = next(
+        event
+        for event in events
+        if event["event_type"] == "rule_trigger_observed"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("kind") == "battle_shock_outcome"
     )
-    assert continuation.provider_pending_request == provider_request
-    retained_pending_continuation = continuation
-    session = LocalGameSession(lifecycle=lifecycle)
-    for provider_decision_index in range(30):
-        provider_request = lifecycle.decision_controller.queue.peek_next()
-        session.submit_option(
-            request_id=provider_request.request_id,
-            option_id="decline",
-            result_id=(f"order34-complete-boundary-provider-3:decline:{provider_decision_index}"),
-        )
-        if state.pending_catalog_selected_target_battle_shock_continuation is None:
-            break
-    else:
-        raise AssertionError("selected-target provider outcome did not complete")
-    assert any(
-        record.request == retained_pending_continuation.provider_pending_request
-        for record in lifecycle.decision_controller.records
-    )
-    state.replace_catalog_selected_target_battle_shock_continuation(retained_pending_continuation)
+    trigger = RuleTrigger.from_payload(cast(RuleTriggerPayload, observed["payload"]))
+    from warhammer40k_core.engine.timing_batch_state import TimingBatch, TimingBatchPayload
 
-    with pytest.raises(
-        GameLifecycleError,
-        match="pending provider request is already completed",
-    ):
-        GameLifecycle.from_payload(
-            deepcopy(lifecycle.to_payload()),
-            runtime_content_bundle=bundle,
-        )
+    parent_completion = next(
+        event
+        for event in events
+        if event["event_type"] == "timing_batch_transition"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("transition") == "completed"
+        and TimingBatch.from_payload(cast(TimingBatchPayload, event["payload"]["batch"])).batch_id
+        == trigger.parent_batch_id
+    )
+    parent_completion["event_type"] = "corrupted_missing_parent_completion"
+    expected_error = "completed with unfinished timing rules"
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameLifecycle.from_payload(payload, runtime_content_bundle=bundle)
+    decisions = lifecycle.decision_controller
+    decisions.event_log = EventLog.from_payload(events)
+    state = lifecycle.state
+    assert state is not None
+    before = (deepcopy(state.to_payload()), deepcopy(decisions.to_payload()))
+    result = DecisionResult.for_request(
+        request=provider_request,
+        result_id="order36-corrupt-trigger:decline",
+        selected_option_id="decline",
+    )
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        lifecycle.submit_decision(result)
+    assert (state.to_payload(), decisions.to_payload()) == before
 
 
 def test_selected_target_remaining_effect_request_requires_retained_ancestry() -> None:
     selected_target_record = _selected_target_battle_shock_then_mortal_record()
     lifecycle, bundle, _provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="order34-complete-boundary-remaining-1",
+        game_id="order36-source-internal-mortal-1",
         selected_target_record=selected_target_record,
     )
     state = lifecycle.state
     if state is None:
         raise AssertionError("selected-target remaining effects require state")
-    session = LocalGameSession(lifecycle=lifecycle)
-    for provider_decision_index in range(30):
-        continuation = state.pending_catalog_selected_target_battle_shock_continuation
-        if continuation is None:
-            raise AssertionError("selected-target remaining mortal-wound roll resolved to zero")
-        if continuation.continuation_phase is (
-            CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
-        ):
-            break
-        provider_request = lifecycle.decision_controller.queue.peek_next()
-        session.submit_option(
-            request_id=provider_request.request_id,
-            option_id="decline",
-            result_id=(f"order34-complete-boundary-remaining-1:provider:{provider_decision_index}"),
-        )
-    else:
-        raise AssertionError("selected-target provider outcome did not reach remaining effects")
+    # The source's own mortal wounds remain internal even though its preceding
+    # Battle-shock test has created a deferred Delirium outcome.
+    assert state.pending_catalog_selected_target_battle_shock_continuation is None
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
 
+    assert not any(
+        trigger.kind is RuleTriggerKind.BATTLE_SHOCK_OUTCOME
+        for trigger in rule_trigger_history(lifecycle.decision_controller).ready()
+    )
     nested_request = lifecycle.decision_controller.queue.peek_next()
     assert nested_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     restored = GameLifecycle.from_payload(
@@ -1876,7 +1815,15 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         runtime_content_bundle=bundle,
     )
     assert restored.state is not None
-    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is not None
+    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
+    source = mortal_wound_resolution_source_context(nested_request)
+    assert isinstance(source, dict)
+    assert source["source_kind"] == "catalog_selected_target_mortal_wounds"
+    assert source["source_rule_id"] == selected_target_record.definition.source_id
+    assert (
+        len(cast(list[JsonValue], source["selected_target_recorded_effects_before_mortal_wounds"]))
+        == 1
+    )
 
     forged_request = replace(
         nested_request,
@@ -1886,7 +1833,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         forged_request
     )
     result = DecisionResult.for_request(
-        result_id=("order34-complete-boundary-remaining-1:forged-result"),
+        result_id=("order36-source-internal-mortal-1:forged-result"),
         request=forged_request,
         selected_option_id="decline",
     )
@@ -1895,11 +1842,12 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
     before_records = lifecycle.decision_controller.records
     before_events = lifecycle.decision_controller.event_log.records
 
-    with pytest.raises(
-        GameLifecycleError,
-        match="remaining-effects request event authority drifted",
-    ):
-        lifecycle.submit_decision(result)
+    invalid = lifecycle.submit_decision(result)
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert invalid.payload == {
+        "invalid_reason": "invalid_mortal_wound_feel_no_pain_result",
+        "field": "allocation_occurrence",
+    }
 
     assert state.to_payload() == before_state
     assert lifecycle.decision_controller.queue.pending_requests == before_queue
@@ -1917,7 +1865,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         restored_session.submit_option(
             request_id=current_request.request_id,
             option_id="decline",
-            result_id=(f"order34-complete-boundary-remaining-1:nested:{nested_decision_index}"),
+            result_id=(f"order36-source-internal-mortal-1:nested:{nested_decision_index}"),
         )
     else:
         raise AssertionError("selected-target remaining effects did not complete")
@@ -2529,6 +2477,11 @@ def _record_real_harbingers_selection(
         )
     )
 
+    assert (
+        registry.next_request_for(BattleRoundStartRequestContext(state=state, decisions=decisions))
+        is None
+    )
+
 
 def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     game_id = (
@@ -2620,95 +2573,14 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     assert status.decision_request == provider_request
     assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert lifecycle.decision_controller.queue.pending_requests == (provider_request,)
-    state = lifecycle.state
-    if state is None:
-        raise AssertionError("selected-target continuation requires state")
-    continuation = state.pending_catalog_selected_target_battle_shock_continuation
-    assert continuation is not None
-    assert continuation.provider_pending_request == provider_request
-    assert (continuation.battle_shock_reroll_result_id is not None) is reroll
-    assert _selected_target_modifier_effects(state) == ()
-    assert not _events_of_type(
-        lifecycle.decision_controller,
-        CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+    _assert_deferred_delirium_outcomes(
+        lifecycle=lifecycle,
+        bundle=bundle,
+        initial_payload=initial_payload,
+        initial_record_count=initial_record_count,
+        game_id=game_id,
+        final_event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     )
-    provider_payload = deepcopy(lifecycle.to_payload())
-    restored = GameLifecycle.from_payload(
-        provider_payload,
-        runtime_content_bundle=bundle,
-    )
-    if restored.state is None:
-        raise AssertionError("restored selected-target continuation requires state")
-    restored_continuation = restored.state.pending_catalog_selected_target_battle_shock_continuation
-    assert restored_continuation is not None
-    assert restored_continuation.to_payload() == continuation.to_payload()
-    restored_session = LocalGameSession(lifecycle=restored)
-    final_status = status
-    for provider_decision_index in range(30):
-        restored_continuation = (
-            restored.state.pending_catalog_selected_target_battle_shock_continuation
-        )
-        if restored_continuation is None:
-            break
-        provider_request = restored.decision_controller.queue.peek_next()
-        assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-        assert restored.decision_controller.queue.pending_requests == (provider_request,)
-        assert restored_continuation.provider_pending_request == provider_request
-        final_status = restored_session.submit_option(
-            request_id=provider_request.request_id,
-            option_id="decline",
-            result_id=f"{game_id}:fnp-result:{provider_decision_index}",
-        )
-        if restored.state.pending_catalog_selected_target_battle_shock_continuation is not None:
-            assert _selected_target_modifier_effects(restored.state) == ()
-            assert not _events_of_type(
-                restored.decision_controller,
-                CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-            )
-    else:
-        raise AssertionError("selected-target provider outcome did not close")
-    assert final_status.decision_request is not None
-    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
-    assert len(_selected_target_modifier_effects(restored.state)) == 1
-    assert (
-        len(
-            _events_of_type(
-                restored.decision_controller,
-                "battle_shock_test_resolved",
-                source_kind="catalog_selected_target_effect",
-            )
-        )
-        == 1
-    )
-    assert (
-        len(
-            _events_of_type(
-                restored.decision_controller,
-                CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-            )
-        )
-        == 1
-    )
-    selected_records = tuple(
-        record
-        for record in restored.decision_controller.records
-        if record.request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE
-    )
-    assert len(selected_records) == 1
-    assert not any(
-        request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE
-        for request in restored.decision_controller.queue.pending_requests
-    )
-    replay = GameLifecycle.from_payload(
-        initial_payload,
-        runtime_content_bundle=bundle,
-    )
-    replay_session = LocalGameSession(lifecycle=replay)
-    for record in restored.decision_controller.records[initial_record_count:]:
-        submit_replay_record(session=replay_session, record=record)
-    assert replay.state is not None
-    assert replay.state.to_payload() == restored.state.to_payload()
-    assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()
 
 
 def _selected_target_delirium_provider_checkpoint(
@@ -2795,64 +2667,14 @@ def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePh
     assert provider_status.decision_request == provider_request
     assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert lifecycle.decision_controller.queue.pending_requests == (provider_request,)
-    state = lifecycle.state
-    if state is None:
-        raise AssertionError("phase-start selected-target continuation requires state")
-    continuation = state.pending_catalog_selected_target_battle_shock_continuation
-    assert continuation is not None
-    assert continuation.phase is phase
-    assert continuation.final_event_type == expected_final_event_type
-    assert _selected_target_modifier_effects(state) == ()
-    assert not _events_of_type(lifecycle.decision_controller, expected_final_event_type)
-
-    restored = GameLifecycle.from_payload(
-        deepcopy(lifecycle.to_payload()),
-        runtime_content_bundle=bundle,
+    _assert_deferred_delirium_outcomes(
+        lifecycle=lifecycle,
+        bundle=bundle,
+        initial_payload=initial_payload,
+        initial_record_count=initial_record_count,
+        game_id=game_id,
+        final_event_type=expected_final_event_type,
     )
-    if restored.state is None:
-        raise AssertionError("restored phase-start continuation requires state")
-    restored_session = LocalGameSession(lifecycle=restored)
-    for provider_decision_index in range(30):
-        restored_continuation = (
-            restored.state.pending_catalog_selected_target_battle_shock_continuation
-        )
-        if restored_continuation is None:
-            break
-        provider_request = restored.decision_controller.queue.peek_next()
-        assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-        assert restored.decision_controller.queue.pending_requests == (provider_request,)
-        assert restored_continuation.provider_pending_request == provider_request
-        restored_session.submit_option(
-            request_id=provider_request.request_id,
-            option_id="decline",
-            result_id=f"{game_id}:fnp-result:{provider_decision_index}",
-        )
-        if restored.state.pending_catalog_selected_target_battle_shock_continuation is not None:
-            assert _selected_target_modifier_effects(restored.state) == ()
-            assert not _events_of_type(restored.decision_controller, expected_final_event_type)
-    else:
-        raise AssertionError("phase-start provider outcome did not close")
-    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is None
-    assert len(_selected_target_modifier_effects(restored.state)) == 1
-    assert len(_events_of_type(restored.decision_controller, expected_final_event_type)) == 1
-    assert (
-        len(
-            tuple(
-                record
-                for record in restored.decision_controller.records
-                if record.request.decision_type == expected_decision_type
-            )
-        )
-        == 1
-    )
-
-    replay = GameLifecycle.from_payload(initial_payload, runtime_content_bundle=bundle)
-    replay_session = LocalGameSession(lifecycle=replay)
-    for record in restored.decision_controller.records[initial_record_count:]:
-        submit_replay_record(session=replay_session, record=record)
-    assert replay.state is not None
-    assert replay.state.to_payload() == restored.state.to_payload()
-    assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()
 
 
 def _selected_target_battle_shock_then_modifier_record() -> AbilityCatalogRecord:
@@ -3190,9 +3012,13 @@ def _queue_selected_target_delirium_request(
             "payload": {"successful": True},
         },
     )
-    record_models_attacked(state=state, decisions=decisions, sequence=sequence)
-    record_attack_sequence_completed(state=state, decisions=decisions, sequence=sequence)
-    completed = decisions.event_log.records[-1]
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    completed = record_attack_completion_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
+    )
     runtime = CatalogSelectedTargetEffectRuntime(
         ability_indexes_by_player_id={
             source_army.player_id: AbilityCatalogIndex.from_records((selected_target_record,)),
@@ -3384,6 +3210,13 @@ def _command_delirium_lifecycle_fixture(
         )
         return lifecycle, runtime_bundle
     status = handler.begin_phase(state=state, decisions=decisions)
+    outcome = _resolve_deferred_battle_shock_outcomes(
+        state,
+        decisions,
+        runtime_bundle.battle_shock_hook_registry,
+    )
+    if outcome is not None:
+        status = outcome
     expected_kind = (
         LifecycleStatusKind.WAITING_FOR_DECISION
         if with_feel_no_pain
@@ -3567,6 +3400,20 @@ def _resolve_failed_delirium_battle_shock(
     target_unit_id: str,
     phase: BattlePhase,
 ) -> None:
+    from tests.completed_attack_fixture_helpers import (
+        resolve_catalog_attack_children_for_executor_fixture,
+    )
+
+    # The setup casualties have their own earlier trigger occurrences. Finish
+    # those before creating this independent Battle-shock test.
+    resolve_catalog_attack_children_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=_battle_shock_hooks(),
+        ability_indexes={
+            player_id: AbilityCatalogIndex.from_records(()) for player_id in state.player_ids
+        },
+    )
     target = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     request = BattleShockTestRequest.for_unit(
         request_id=f"{state.game_id}:battle-shock",
@@ -3880,3 +3727,80 @@ def _event_payload(decisions: DecisionController, event_type: str) -> dict[str, 
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"missing event {event_type}")
+
+
+def _assert_deferred_delirium_outcomes(
+    *,
+    lifecycle: GameLifecycle,
+    bundle: RuntimeContentBundle,
+    initial_payload: GameLifecyclePayload,
+    initial_record_count: int,
+    game_id: str,
+    final_event_type: str,
+) -> None:
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+
+    state = lifecycle.state
+    assert state is not None
+    # The source's Battle-shock test and remaining clauses finish before a new
+    # outcome rule can trigger, even when that outcome needs nested FNP choices.
+    assert state.pending_catalog_selected_target_battle_shock_continuation is None
+    assert len(_selected_target_modifier_effects(state)) == 1
+    assert len(_events_of_type(lifecycle.decision_controller, final_event_type)) == 1
+    history = rule_trigger_history(lifecycle.decision_controller)
+    pending = tuple(
+        trigger
+        for trigger in history.ready()
+        if trigger.kind is RuleTriggerKind.BATTLE_SHOCK_OUTCOME
+    )
+    assert pending
+    assert all(trigger.parent_batch_id is not None for trigger in pending)
+    for trigger in pending:
+        parent = next(
+            batch for batch in history.batches if batch.batch_id == trigger.parent_batch_id
+        )
+        assert parent.current_batch_complete
+        events = lifecycle.decision_controller.event_log.records
+        completed_index = next(
+            index
+            for index, event in enumerate(events)
+            if event.event_type == "timing_batch_transition"
+            and isinstance(event.payload, dict)
+            and event.payload.get("batch") == parent.to_payload()
+        )
+        if trigger.trigger_id not in history.released:
+            continue
+        released_index = next(
+            index
+            for index, event in enumerate(events)
+            if event.event_type == "rule_trigger_released"
+            and event.payload == {"trigger_id": trigger.trigger_id}
+        )
+        assert completed_index < released_index
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()), runtime_content_bundle=bundle
+    )
+    session = LocalGameSession(lifecycle=restored)
+    for index in range(30):
+        request = restored.decision_controller.queue.peek_next()
+        if request.decision_type != SELECT_FEEL_NO_PAIN_DECISION_TYPE:
+            break
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id="decline",
+            result_id=f"{game_id}:deferred-fnp:{index}",
+        )
+        assert status.decision_request is not None
+    else:
+        raise AssertionError("Deferred Delirium outcome did not complete")
+    assert restored.state is not None
+    assert len(_selected_target_modifier_effects(restored.state)) == 1
+    assert len(_events_of_type(restored.decision_controller, final_event_type)) == 1
+    assert not rule_trigger_history(restored.decision_controller).ready()
+    replay = GameLifecycle.from_payload(initial_payload, runtime_content_bundle=bundle)
+    replay_session = LocalGameSession(lifecycle=replay)
+    for record in restored.decision_controller.records[initial_record_count:]:
+        submit_replay_record(session=replay_session, record=record)
+    assert replay.state is not None
+    assert replay.state.to_payload() == restored.state.to_payload()
+    assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()

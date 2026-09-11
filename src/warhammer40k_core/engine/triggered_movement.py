@@ -1355,6 +1355,15 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
         raise GameLifecycleError("Triggered movement actor must own the selected unit.")
     if payload.get("eligible_unit") != selected_unit.to_payload():
         raise GameLifecycleError("Triggered movement eligible unit payload drift.")
+    from warhammer40k_core.engine.active_player_scopes import begin_reactive_move
+
+    begin_reactive_move(
+        state=state,
+        decisions=decisions,
+        result=result,
+        unit_instance_id=unit_instance_id,
+        source_rule_id=descriptor.source_rule_id,
+    )
     decision_effect = _record_triggered_movement_decision_effect_if_needed(
         state=state,
         decisions=decisions,

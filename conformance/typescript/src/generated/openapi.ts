@@ -268,7 +268,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v14-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v15-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -632,7 +632,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v14-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v15-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -1168,8 +1168,9 @@ export interface components {
         };
         /** @description One content-addressed state snapshot required for every ordinary or end-of-battle boundary with an applicable assigned-Primary rule, including zero-award evaluations. */
         "replay-metadata--primary_scoring_state_evidence.schema": {
+            scoring_player_id: string;
             /** @constant */
-            schema_version: "primary-scoring-state-evidence-v1"; game_id: string; battlefield_id: string; battle_round: number;
+            schema_version: "primary-scoring-state-evidence-v2"; game_id: string; battlefield_id: string; battle_round: number;
             active_player_id: string;
             /** @enum {string} */
             phase: "command" | "movement" | "shooting" | "charge" | "fight";
@@ -1188,8 +1189,9 @@ export interface components {
         };
         /** @description Typed Objective Control capture to Primary scoring-commit lifecycle for one required boundary. */
         "replay-metadata--primary_scoring_boundary_lifecycle.schema": {
+            scoring_player_id: string;
             /** @constant */
-            schema_version: "primary-scoring-boundary-lifecycle-v1"; objective_control_record_id: string;
+            schema_version: "primary-scoring-boundary-lifecycle-v2"; objective_control_record_id: string;
             objective_control_record_hash: string;
             /** @enum {string} */
             scoring_boundary_kind: "ordinary" | "end_of_battle";
@@ -1278,7 +1280,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v8-phase17n-step5a";
+            schema_version: "replay-artifact-v9-sequencing";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

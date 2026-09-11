@@ -2,6 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -1224,6 +1225,8 @@ def _apply_valid_destroyed_transport_disembark(
     result: DecisionResult,
     source_phase: BattlePhase,
 ) -> None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     if isinstance(disembark, DestroyedTransportRulesUnitDisembark):
         _apply_valid_destroyed_transport_rules_unit_disembark(
             state=state,
@@ -1260,9 +1263,11 @@ def _apply_valid_destroyed_transport_disembark(
     )
     state.replace_transport_cargo_state(disembark.placement.updated_cargo_state)
     state.record_disembarked_unit_state(disembark.placement.disembarked_unit_state)
-    decisions.event_log.append(
-        "unit_disembarked",
-        validate_json_value(
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="unit_disembarked",
+        payload=validate_json_value(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
@@ -1304,6 +1309,8 @@ def _apply_valid_destroyed_transport_rules_unit_disembark(
     result: DecisionResult,
     source_phase: BattlePhase,
 ) -> None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     battlefield_state = state.battlefield_state
     cargo_state = disembark.placement.updated_cargo_state
     disembarked_state = disembark.placement.disembarked_unit_state
@@ -1336,9 +1343,11 @@ def _apply_valid_destroyed_transport_rules_unit_disembark(
     state.replace_transport_cargo_state(cargo_state)
     state.record_disembarked_unit_state(disembarked_state)
     hazard_rolls = disembark.hazard_rolls
-    decisions.event_log.append(
-        "unit_disembarked",
-        validate_json_value(
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="unit_disembarked",
+        payload=validate_json_value(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,

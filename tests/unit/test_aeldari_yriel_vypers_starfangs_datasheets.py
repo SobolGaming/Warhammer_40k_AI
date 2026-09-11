@@ -70,6 +70,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects import (
     apply_catalog_post_shoot_hit_target_effect_result,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.game_state import GameState
@@ -751,7 +752,7 @@ def test_hallucinogen_grenades_uses_opponent_shooting_start_decision_and_grants_
         )
     )
 
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert request.actor_id == "player-a"
     assert isinstance(request.payload, dict)
     assert request.payload["optional"] is True
@@ -854,6 +855,12 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
         },
     )
 
+    from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
+
+    sequence = replace(sequence, pool_index=len(sequence.attack_pools))
+    completion = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=sequence
+    )
     status = runtime.attack_sequence_completed_bindings()[0].handler(
         AttackSequenceCompletedContext(
             state=state,
@@ -862,7 +869,7 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:harassment-fire:attached-target",
+            attack_sequence_completed_event_id=completion.event_id,
         )
     )
 
@@ -973,7 +980,7 @@ def test_hallucinogen_grenades_enumerates_one_attached_rules_unit_from_either_co
         )
     )
 
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     assert isinstance(request.payload, dict)
     attached_id = formation.attached_unit_instance_id
     assert request.payload["available_target_unit_instance_ids"] == [attached_id]
@@ -1009,7 +1016,7 @@ def test_hallucinogen_grenades_persists_and_consumes_stealth_by_rules_unit_id() 
             shooting_target_restriction_hooks=restriction_hooks,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     attached_id = formation.attached_unit_instance_id
     target_option = next(
         option
@@ -1085,7 +1092,7 @@ def test_hallucinogen_grenades_stale_validation_tracks_surviving_rules_unit() ->
             shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     attached_id = formation.attached_unit_instance_id
     target_option = next(
         option
@@ -1165,7 +1172,7 @@ def test_hallucinogen_grenades_rejects_malformed_finite_results() -> None:
             shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     option = next(
         candidate
         for candidate in request.options
@@ -1227,7 +1234,7 @@ def test_hallucinogen_grenades_revalidates_target_eligibility_before_queue_pop()
             shooting_target_restriction_hooks=restriction_hooks,
         )
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     target_option = next(
         option
         for option in request.options

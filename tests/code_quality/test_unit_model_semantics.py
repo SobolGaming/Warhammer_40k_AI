@@ -696,11 +696,11 @@ def test_completed_fight_move_consumers_use_canonical_identity_and_group_endpoin
     for path, function_name in (
         (
             CULT_AMBUSH_MARKER_REMOVAL,
-            "resolve_cult_ambush_marker_removal_for_completed_moves",
+            "cult_ambush_marker_removal_candidates",
         ),
         (
             PRIMARY_MISSION_STATE_RUNTIME,
-            "resolve_surveil_marker_removal_for_completed_moves",
+            "surveil_move_marker_candidates",
         ),
     ):
         function = _function_node(path=path, function_name=function_name)

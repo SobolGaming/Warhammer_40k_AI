@@ -193,7 +193,7 @@ def generic_enhancement_deadly_demise_unit_destroyed_hook_bindings(
                         "deadly-demise-condition"
                     ),
                     source_id=source.rule_ir.source_id,
-                    handler=_deadly_demise_unit_destroyed_handler(
+                    maintenance_handler=_deadly_demise_unit_destroyed_handler(
                         binding_source=source,
                         assignment=assignment,
                     ),

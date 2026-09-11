@@ -102,6 +102,7 @@ from warhammer40k_core.engine.faction_resources import (
 from warhammer40k_core.engine.mission_action_eligibility import (
     rules_unit_started_mission_action_this_turn,
 )
+from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -862,6 +863,9 @@ class ChargePhaseState:
 
 @dataclass(frozen=True, slots=True)
 class ChargePhaseHandler:
+    move_completion_rule_registry: MoveCompletionRuleRegistry = field(
+        default_factory=lambda: MoveCompletionRuleRegistry(())
+    )
     ruleset_descriptor: RulesetDescriptor | None = None
     stratagem_index: StratagemCatalogIndex = field(default_factory=_default_stratagem_index)
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
@@ -2202,6 +2206,8 @@ def _apply_charge_move_proposal_decision(
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
     ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
     if result.actor_id != active_player_id:
@@ -2313,7 +2319,9 @@ def _apply_charge_move_proposal_decision(
         transition_batch=transition_batch,
         persisting_effect=effect,
     )
-    decisions.event_log.append("charge_move_completed", payload)
+    record_move_completion_event(
+        state=state, decisions=decisions, event_type="charge_move_completed", payload=payload
+    )
     return None
 
 

@@ -1527,7 +1527,7 @@ def test_generic_lifecycle_generated_handlers_reject_wrong_context_types() -> No
     with pytest.raises(GameLifecycleError, match="requires context"):
         unit_destroyed(cast(UnitDestroyedContext, object()))
 
-    turn_end_request = generic_rule_lifecycle_hooks._turn_end_request_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+    turn_end_request = generic_rule_lifecycle_hooks._turn_end_candidate_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
         source,
         registry.turn_end_abilities[0],
     )
@@ -1541,7 +1541,7 @@ def test_generic_lifecycle_generated_handlers_reject_wrong_context_types() -> No
         turn_end_result(cast(TurnEndResultContext, object()))
 
     fight_start_request = (
-        generic_rule_lifecycle_hooks._fight_phase_start_request_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        generic_rule_lifecycle_hooks._fight_phase_start_candidate_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
             source,
             registry.fight_phase_start_abilities[0],
         )

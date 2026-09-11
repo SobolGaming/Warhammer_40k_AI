@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import partial
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
@@ -11,6 +12,7 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_rule_group_sequencing import selected_target_group_participant
 from warhammer40k_core.engine.catalog_selected_target_decisions import (
     SelectedTargetGroup,
     invalid_selected_target_effect_status,
@@ -46,6 +48,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
@@ -76,17 +79,17 @@ class CatalogMovementEndSelectedTargetEffectRuntime:
         object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
         object.__setattr__(self, "armies", armies)
 
-    def request(
+    def candidates(
         self,
         *,
         state: GameState,
         decisions: DecisionController,
-    ) -> LifecycleStatus | None:
+    ) -> tuple[TimingRuleCandidate, ...]:
         if not has_movement_end_selected_target_runtime_records(
             self.ability_indexes_by_player_id,
             self.armies,
         ):
-            return None
+            return ()
         groups = _selected_target_groups(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id,
             armies=self.armies,
@@ -94,12 +97,35 @@ class CatalogMovementEndSelectedTargetEffectRuntime:
         )
         resolved = resolved_phase_selected_target_group_keys(
             decisions,
+            state=state,
             event_type=CATALOG_MOVEMENT_END_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
         )
         unresolved = tuple(group for group in groups if group.sort_key not in resolved)
-        if not unresolved:
-            return None
-        group = unresolved[0]
+        return tuple(
+            TimingRuleCandidate(
+                participant=selected_target_group_participant(group),
+                activate=partial(self._activate, state=state, decisions=decisions, group=group),
+            )
+            for group in unresolved
+        )
+
+    def request(self, *, state: GameState, decisions: DecisionController) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+
+        outcome = resolve_boundary_candidates(
+            state=state,
+            decisions=decisions,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            discover=partial(self.candidates, state=state, decisions=decisions),
+        )
+        if isinstance(outcome, DecisionRequest):
+            decisions.request_decision(outcome)
+            return LifecycleStatus.waiting_for_decision(stage=state.stage, decision_request=outcome)
+        return outcome
+
+    def _activate(
+        self, *, state: GameState, decisions: DecisionController, group: SelectedTargetGroup
+    ) -> LifecycleStatus:
         request = selected_target_request(
             state=state,
             group=group,

@@ -57,7 +57,7 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
     UnitMoveCompletedMortalWoundHookRegistry,
     apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
-    resolve_unit_move_completed_mortal_wound_hooks,
+    resolve_unit_move_completed_hooks,
 )
 from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
@@ -163,7 +163,39 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
             "movement_phase_action": "charge_move",
         },
     )
-    status = resolve_unit_move_completed_mortal_wound_hooks(
+    from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+    from warhammer40k_core.engine.move_completion_candidates import move_completion_candidates
+    from warhammer40k_core.engine.unit_move_completed_hooks import (
+        UnitMoveCompletedBattleShockHookRegistry,
+    )
+
+    trigger = decisions.event_log.records[-1]
+    assert isinstance(trigger.payload, dict)
+    context = UnitMoveCompletedContext(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.CHARGE,
+        trigger_event_id=trigger.event_id,
+        trigger_event_payload=trigger.payload,
+        triggering_unit_instance_id=unit.unit_instance_id,
+        triggering_player_id=army.player_id,
+        movement_action="charge_move",
+        ability_indexes_by_player_id=runtime.ability_indexes_by_player_id,
+    )
+    before_discovery = (state.to_payload(), decisions.to_payload())
+    candidates = move_completion_candidates(
+        context=context,
+        mortal_wound_hooks=registry,
+        battle_shock_move_hooks=UnitMoveCompletedBattleShockHookRegistry.empty(),
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+    )
+    assert (state.to_payload(), decisions.to_payload()) == before_discovery
+    assert len(candidates) == 1  # The target choice and every model's roll belong to one rule.
+    assert candidates[0].participant.player_id == army.player_id
+    assert candidates[0].participant.source_rule_id == record.definition.source_id
+    status = resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
         registry=registry,
@@ -444,7 +476,7 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
     assert selected_payload["target_unit_instance_id"] == target_unit.unit_instance_id
 
     while True:
-        mortal_wound_status = resolve_unit_move_completed_mortal_wound_hooks(
+        mortal_wound_status = resolve_unit_move_completed_hooks(
             state=state,
             decisions=decisions,
             registry=registry,
@@ -456,6 +488,18 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
         )
         if mortal_wound_status is None:
             break
+        if mortal_wound_status.status_kind is LifecycleStatusKind.ADVANCED:
+            from tests.completed_attack_fixture_helpers import (
+                resolve_catalog_attack_children_for_executor_fixture,
+            )
+
+            resolve_catalog_attack_children_for_executor_fixture(
+                state=state,
+                decisions=decisions,
+                battle_shock_hooks=BattleShockHookRegistry.empty(),
+                ability_indexes=runtime.ability_indexes_by_player_id,
+            )
+            continue
         while mortal_wound_status is not None:
             mortal_wound_request = mortal_wound_status.decision_request
             assert mortal_wound_request is not None
@@ -572,8 +616,8 @@ def test_phase17k_charge_end_catalog_mortal_wounds_runtime_noops_and_fail_fast()
 
     assert empty_runtime.bindings() == ()
     with pytest.raises(GameLifecycleError, match="requires context"):
-        runtime.request_handler(cast(UnitMoveCompletedContext, object()))
+        runtime.candidates_for(cast(UnitMoveCompletedContext, object()))
     with pytest.raises(GameLifecycleError, match="requires context"):
         runtime.effect_handler(cast(UnitMoveCompletedContext, object()))
-    assert runtime.request_handler(context) is None
+    assert runtime.candidates_for(context) == ()
     assert runtime.effect_handler(context) == ()

@@ -14,6 +14,8 @@ from warhammer40k_core.core.ruleset_descriptor import (
     setup_step_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import active_player as _active_player
+from warhammer40k_core.engine import active_player_scopes as _active_scopes
 from warhammer40k_core.engine import game_config_validation as _config_validation
 from warhammer40k_core.engine import game_state_phase_validation as _phase_validation
 from warhammer40k_core.engine import game_state_queries as _queries
@@ -1150,6 +1152,7 @@ class GameState:
     fight_phase_state: FightPhaseState | None = None
     shooting_phase_state: ShootingPhaseState | None = None
     out_of_phase_shooting_state: OutOfPhaseShootingState | None = None
+    active_player_scopes: tuple[_active_scopes.ActivePlayerScope, ...] = ()
     feel_no_pain_sources_by_model_id: dict[str, tuple[FeelNoPainSource, ...]] = field(
         default_factory=_new_feel_no_pain_sources_by_model_id
     )
@@ -1397,6 +1400,7 @@ class GameState:
         self.out_of_phase_shooting_state = _validate_optional_out_of_phase_shooting_state(
             self.out_of_phase_shooting_state
         )
+        _active_scopes.validate_scopes(self)
         self.feel_no_pain_sources_by_model_id = _validate_feel_no_pain_sources_by_model_id(
             self.feel_no_pain_sources_by_model_id,
             army_definitions=self.army_definitions,
@@ -1722,19 +1726,7 @@ class GameState:
         return self.battle_phase_sequence[self.battle_phase_index]
 
     def effective_active_player_id(self) -> str | None:
-        out_of_phase_shooting = self.out_of_phase_shooting_state
-        if out_of_phase_shooting is not None:
-            return out_of_phase_shooting.player_id
-        shooting_state = self.shooting_phase_state
-        if shooting_state is not None and shooting_state.active_selection is not None:
-            return shooting_state.active_selection.player_id
-        charge_state = self.charge_phase_state
-        if charge_state is not None and charge_state.active_selection is not None:
-            return charge_state.active_selection.player_id
-        movement_state = self.movement_phase_state
-        if movement_state is not None and movement_state.active_selection is not None:
-            return movement_state.active_selection.player_id
-        return self.active_player_id
+        return _active_player.effective_active_player_id(self)
 
     def effective_opposing_player_ids(self) -> tuple[str, ...]:
         return _queries.effective_opposing_player_ids(self)
@@ -2044,12 +2036,23 @@ class GameState:
         self._record_primary_objective_turn_start_boundary_if_available()
         self._expire_persisting_effects_at_current_phase_start()
 
+    def replace_active_player_scopes(
+        self, scopes: tuple[_active_scopes.ActivePlayerScope, ...]
+    ) -> None:
+        if type(scopes) is not tuple or any(
+            type(scope) is not _active_scopes.ActivePlayerScope for scope in scopes
+        ):
+            raise GameLifecycleError("Active-player scopes require typed scope records.")
+        self.active_player_scopes = scopes
+
     def advance_to_next_battle_phase(
         self,
         *,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
         event_log: EventLog | None = None,
     ) -> BattlePhase:
+        if self.active_player_scopes:
+            raise GameLifecycleError("Battle phase cannot end during a selected unit action.")
         if self.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("GameState can advance battle phases only during battle.")
         if self.battle_phase_index is None:
@@ -2253,9 +2256,9 @@ class GameState:
         )
 
     def replace_fight_phase_state(self, fight_phase_state: FightPhaseState | None) -> None:
-        self.fight_phase_state = _phase_validation.validate_optional_fight_phase_state(
-            fight_phase_state
-        )
+        validated = _phase_validation.validate_optional_fight_phase_state(fight_phase_state)
+        _active_scopes.update_fight_scope(self, validated)
+        self.fight_phase_state = validated
 
     def replace_shooting_phase_state(
         self,
@@ -2269,9 +2272,9 @@ class GameState:
         self,
         out_of_phase_shooting_state: OutOfPhaseShootingState | None,
     ) -> None:
-        self.out_of_phase_shooting_state = _validate_optional_out_of_phase_shooting_state(
-            out_of_phase_shooting_state
-        )
+        validated = _validate_optional_out_of_phase_shooting_state(out_of_phase_shooting_state)
+        _active_scopes.update_out_of_phase_scope(self, validated)
+        self.out_of_phase_shooting_state = validated
 
     def record_faction_rule_state(self, state: FactionRuleState) -> None:
         if type(state) is not FactionRuleState:
@@ -4740,6 +4743,7 @@ class GameState:
                 if self.out_of_phase_shooting_state is None
                 else self.out_of_phase_shooting_state.to_payload()
             ),
+            "active_player_scopes": [scope.to_payload() for scope in self.active_player_scopes],
             "feel_no_pain_sources_by_model_id": {
                 model_id: [source.to_payload() for source in sources]
                 for model_id, sources in self.feel_no_pain_sources_by_model_id.items()
@@ -5093,6 +5097,10 @@ class GameState:
                 None
                 if payload["out_of_phase_shooting_state"] is None
                 else OutOfPhaseShootingState.from_payload(payload["out_of_phase_shooting_state"])
+            ),
+            active_player_scopes=tuple(
+                _active_scopes.ActivePlayerScope.from_payload(scope)
+                for scope in payload["active_player_scopes"]
             ),
             feel_no_pain_sources_by_model_id={
                 model_id: tuple(FeelNoPainSource.from_payload(source) for source in sources)

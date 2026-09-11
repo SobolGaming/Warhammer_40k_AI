@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase11c_command_phase_helpers import (
     battle_state,
@@ -2101,6 +2102,21 @@ def test_malice_made_manifest_fight_start_applies_three_mortal_wounds_on_six() -
         - sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
         == 3
     )
+    completion = enhancements.malice_made_manifest_fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert isinstance(completion, LifecycleStatus)
+    assert completion.status_kind is LifecycleStatusKind.ADVANCED
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        advance_model_destruction_triggers,
+    )
+
+    assert (
+        advance_model_destruction_triggers(
+            state=state, decisions=decisions, registry=bundle.unit_destroyed_hook_registry
+        )
+        is None
+    )
     assert (
         enhancements.malice_made_manifest_fight_phase_start_request(
             FightPhaseStartRequestContext(state=state, decisions=decisions)
@@ -2895,13 +2911,8 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
         used_pool_indices=(0,),
         pool_index=1,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": "player-a",
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     manager = DiceRollManager(
         state.game_id,
@@ -4137,6 +4148,7 @@ def _record_fade_to_darkness_destroyed_enemy(
     )
     enhancements.record_fade_to_darkness_destroyed_enemy_unit(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -4480,9 +4492,8 @@ def _attack_pool(
     )
 
 
-def _decision_request(request: DecisionRequest | None) -> DecisionRequest:
-    if request is None:
-        raise AssertionError("Expected decision request.")
+def _decision_request(request: DecisionRequest | LifecycleStatus | None) -> DecisionRequest:
+    assert isinstance(request, DecisionRequest), "Expected decision request."
     return request
 
 

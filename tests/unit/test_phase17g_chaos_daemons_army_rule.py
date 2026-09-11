@@ -8,11 +8,13 @@ from typing import cast
 
 import pytest
 from tests.phase11c_command_phase_helpers import (
+    advance_command_phase_with_outcomes,
     battle_state,
     battle_state_with_center_objective_positions,
     center_marker_definition,
     complete_setup_through_gate,
     default_unit_selection,
+    destroy_models_with_recorded_mortal_wounds,
     remove_first_models,
     unit_by_id,
     unit_selection,
@@ -71,10 +73,6 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.destruction_provenance import (
-    DestructionSourceKind,
-    ModelDestructionAttribution,
-)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -508,7 +506,9 @@ def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> N
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     resolved_payload = _event_payload(decisions, "battle_shock_test_resolved")
@@ -571,7 +571,9 @@ def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
@@ -622,7 +624,9 @@ def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() 
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
@@ -1173,7 +1177,9 @@ def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> 
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert decisions.queue.pending_requests == ()
@@ -1914,7 +1920,9 @@ def test_staged_july_daemonic_manifestation_has_no_effect_without_eligible_model
         ),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert decisions.queue.pending_requests == ()
@@ -2074,29 +2082,17 @@ def test_completed_attached_manifestation_retains_identity_with_later_healing() 
         decisions=lifecycle.decision_controller,
         config=config,
     )
-    destruction_attribution = ModelDestructionAttribution.for_non_attack(
-        destroying_player_id="player-b",
-        source_kind=DestructionSourceKind.ABILITY,
-        source_rules_unit_instance_id=None,
-        source_model_instance_id=None,
-    )
-    for index, model_instance_id in enumerate(destroyed_model_ids, start=1):
-        destroyed_event = lifecycle.decision_controller.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": BattlePhase.COMMAND.value,
-                **destruction_attribution.to_payload(),
-                "target_unit_instance_id": formation.attached_unit_instance_id,
-                "model_instance_id": model_instance_id,
-                "damage_kind": "normal",
-                "damage_event_id": f"phase17g:retained-identity:damage:{index}",
-                "destroyed_model_rules_triggered": True,
-            },
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+    for model_instance_id in destroyed_model_ids:
+        destroyed_event = destroy_rule_model_for_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            model_id=model_instance_id,
+            destroying_player_id="player-b",
+            source_unit_id=None,
+            source_model_id=None,
         )
-        remove_first_models(state, unit_instance_id=bodyguard.unit_instance_id, count=1)
         departures = record_primary_destroyed_model_departures(
             state=state,
             destroyed_model_instance_ids=(model_instance_id,),
@@ -2116,7 +2112,9 @@ def test_completed_attached_manifestation_retains_identity_with_later_healing() 
         ),
     )
     manifestation_request = _required_decision_request(
-        handler.begin_phase(state=state, decisions=lifecycle.decision_controller)
+        advance_command_phase_with_outcomes(
+            handler=handler, state=state, decisions=lifecycle.decision_controller
+        )
     )
     selected_model_id = destroyed_model_ids[-1]
     survivor_anchor = starting_placements[tuple(starting_placements)[3]].pose.position
@@ -2148,6 +2146,14 @@ def test_completed_attached_manifestation_retains_identity_with_later_healing() 
             result_id="phase17g-attached-manifestation-retained-identity:placement",
         )
     )
+    if movement_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
+        movement_request = _required_decision_request(
+            session.submit_option(
+                request_id=movement_request.request_id,
+                option_id=_healing_finish_option_id(movement_request),
+                result_id="phase17g-attached-manifestation-retained-identity:finish",
+            )
+        )
     assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert lifecycle.decision_controller.queue.peek_next() == movement_request
 
@@ -2224,7 +2230,9 @@ def test_default_june_daemonic_manifestation_battleline_branch_remains_unsupport
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert decisions.queue.pending_requests == ()
@@ -2291,7 +2299,7 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
 
 def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> None:
     state = battle_state(
-        game_id="phase17g-shadow-phase-snapshot-ordered-1",
+        game_id="order36-shadow-phase-snapshot-0",
         player_a_units=(
             default_unit_selection("intercessor-unit-1"),
             default_unit_selection("intercessor-unit-2"),
@@ -2310,7 +2318,7 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    waiting = handler.begin_phase(state=state, decisions=decisions)
+    waiting = advance_command_phase_with_outcomes(handler=handler, state=state, decisions=decisions)
     sequencing_request = _required_decision_request(waiting)
     assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
     sequencing_result = DecisionResult.for_request(
@@ -2328,7 +2336,9 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
         sequencing_event_payload,
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = advance_command_phase_with_outcomes(
+        handler=handler, state=state, decisions=decisions
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     results_by_unit_id: dict[str, dict[str, JsonValue]] = {}
@@ -2380,7 +2390,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    waiting = handler.begin_phase(state=state, decisions=decisions)
+    waiting = advance_command_phase_with_outcomes(handler=handler, state=state, decisions=decisions)
     assert waiting.decision_request is not None
     request = waiting.decision_request
     assert request.decision_type == "select_mortal_wound_model"
@@ -2500,7 +2510,8 @@ def test_daemonic_terror_pending_model_choice_restores_with_provider_authority()
         battle_shock_hooks=bundle.battle_shock_hook_registry,
     )
 
-    waiting = handler.begin_phase(
+    waiting = advance_command_phase_with_outcomes(
+        handler=handler,
         state=state,
         decisions=lifecycle.decision_controller,
     )
@@ -2738,6 +2749,7 @@ def _record_lifecycle_battle_state(
     *,
     lifecycle: GameLifecycle,
     config: GameConfig,
+    complete_setup: bool = True,
 ) -> GameState:
     state = lifecycle.state
     if state is None:
@@ -2755,11 +2767,12 @@ def _record_lifecycle_battle_state(
     state.record_secondary_mission_choice(
         _fixed_secondary_choice(player_id="player-b"),
     )
-    complete_setup_through_gate(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        config=config,
-    )
+    if complete_setup:
+        complete_setup_through_gate(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            config=config,
+        )
     return state
 
 
@@ -3533,11 +3546,16 @@ def _july_manifestation_revival_session() -> tuple[
 ]:
     config = replace(
         _chaos_daemons_lifecycle_config(battleline=True),
-        game_id="phase17g-config-canonical-seed-0",
+        game_id="order36-manifestation-revival-3",
     )
     session = LocalGameSession()
     session.start(config)
     state = _record_lifecycle_battle_state(lifecycle=session.lifecycle, config=config)
+    from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+
+    record_current_battlefield_placements_for_fixture(
+        state, decisions=session.lifecycle.decision_controller
+    )
     unit_id = "army-alpha:manifestation-daemon"
     if state.battlefield_state is None:
         raise AssertionError("Manifestation test requires battlefield state.")
@@ -3565,13 +3583,14 @@ def _july_manifestation_revival_session() -> tuple[
             )
         ),
     }
-    remove_first_models(state, unit_instance_id=unit_id, count=3)
-    for model_instance_id in destroyed_model_ids:
-        _replace_model_wounds(
-            state,
-            model_instance_id=model_instance_id,
-            wounds_remaining=0,
-        )
+    destroy_models_with_recorded_mortal_wounds(
+        state=state,
+        decisions=session.lifecycle.decision_controller,
+        unit_instance_id=unit_id,
+        model_instance_ids=destroyed_model_ids,
+        application_id="order36-manifestation-fixture-casualties",
+        destroying_player_id="player-b",
+    )
     _record_battle_shock_auto_pass(
         state,
         decisions=session.lifecycle.decision_controller,
@@ -3584,7 +3603,8 @@ def _july_manifestation_revival_session() -> tuple[
             candidate.battle_shock_hook_bindings
         ),
     )
-    completed = handler.begin_phase(
+    completed = advance_command_phase_with_outcomes(
+        handler=handler,
         state=state,
         decisions=session.lifecycle.decision_controller,
     )
@@ -3609,21 +3629,7 @@ def _kairos_realm_lifecycle(
     config = _kairos_lifecycle_config(attached_primary=attached_primary)
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    state = _record_lifecycle_battle_state(lifecycle=lifecycle, config=config)
-    state.active_player_id = "player-a"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    record_completed_command_occurrences_for_fixture(
-        state,
-        decisions=lifecycle.decision_controller,
-        config=config,
-    )
-    state.gain_command_points(
-        player_id="player-b",
-        amount=3,
-        source_id="phase17g-kairos-test-command-points",
-        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
-        cap_exempt=True,
-    )
+    state = _record_lifecycle_battle_state(lifecycle=lifecycle, config=config, complete_setup=False)
     target_army = state.army_definition_for_player("player-b")
     if target_army is None:
         raise AssertionError("Kairos test requires the target army.")
@@ -3693,6 +3699,21 @@ def _kairos_realm_lifecycle(
         unit_instance_id=kairos_id,
         x=source_x,
         y=source_y,
+    )
+    complete_setup_through_gate(state=state, decisions=lifecycle.decision_controller, config=config)
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
+    state.gain_command_points(
+        player_id="player-b",
+        amount=3,
+        source_id="phase17g-kairos-test-command-points",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+        cap_exempt=True,
     )
     _runtime_content_bundle(lifecycle)
     return lifecycle, primary_id, companion_id

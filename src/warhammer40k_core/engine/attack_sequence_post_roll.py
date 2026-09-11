@@ -64,7 +64,7 @@ def split_or_resume_post_roll_attack_pools(
 ]:
     current = attack_sequence
     if current.post_roll_attack_pools is None:
-        active_player_id = state.active_player_id
+        active_player_id = state.effective_active_player_id()
         if active_player_id is None:
             raise GameLifecycleError("Post-roll attack pools require an active player.")
         modified_contexts = tuple(
@@ -184,7 +184,7 @@ def build_select_post_roll_attack_pool_request(
         raise GameLifecycleError(
             "Post-roll attack pool selection requires unresolved unselected pools."
         )
-    if pool_set.active_player_id != state.active_player_id:
+    if pool_set.active_player_id != state.effective_active_player_id():
         raise GameLifecycleError("Post-roll attack pool active player drift.")
     return DecisionRequest(
         request_id=request_id,

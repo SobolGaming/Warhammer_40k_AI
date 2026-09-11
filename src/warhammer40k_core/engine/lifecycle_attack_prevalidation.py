@@ -4,13 +4,11 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine import attack_sequence_decision_family as _asdf
-from warhammer40k_core.engine import attack_sequence_hazardous as _ash
 from warhammer40k_core.engine import battle_shock_lifecycle_authority as _bsa
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.attack_sequence import (
-    HAZARDOUS_SOURCE_KIND,
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
@@ -59,6 +57,27 @@ def pre_validate_attack_sequence_decision(
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.hazardous_completion import (
+        hazardous_sequence_for_progress,
+        is_hazardous_request,
+    )
+
+    if is_hazardous_request(request):
+        try:
+            hazardous_sequence_for_progress(
+                state=state,
+                event_records=decisions.event_log.records,
+                progress=_mw_model.mortal_wound_resolution_progress(request),
+            )
+        except GameLifecycleError as exc:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message=str(exc),
+                payload={
+                    "invalid_reason": "hazardous_authority_drift",
+                    "field": "mortal_wound_context",
+                },
+            )
     if is_retention_request(request):
         return invalid_retention_request_status(state=state, request=request, result=result)
     if request.decision_type == DECISION_TYPE:
@@ -132,38 +151,6 @@ def pre_validate_attack_sequence_decision(
         )
         if invalid_status is not None:
             return invalid_status
-        progress = _mw_model.mortal_wound_resolution_progress(request)
-        source_context = progress.source_context
-        if (
-            isinstance(source_context, dict)
-            and source_context.get("source_kind") == HAZARDOUS_SOURCE_KIND
-        ):
-            attack_sequence = _lsq.active_attack_sequence_for_state(state)
-            if attack_sequence is None:
-                return LifecycleStatus.invalid(
-                    stage=state.stage,
-                    message=("Pending Hazardous mortal wounds require an active attack sequence."),
-                    payload={
-                        "invalid_reason": "hazardous_authority_drift",
-                        "field": "mortal_wound_context",
-                    },
-                )
-            try:
-                _ash.validate_hazardous_mortal_wound_source_context(
-                    state=state,
-                    attack_sequence=attack_sequence,
-                    source_context_payload=progress.source_context,
-                    mortal_wounds=progress.mortal_wounds,
-                )
-            except GameLifecycleError as exc:
-                return LifecycleStatus.invalid(
-                    stage=state.stage,
-                    message=str(exc),
-                    payload={
-                        "invalid_reason": "hazardous_authority_drift",
-                        "field": "mortal_wound_context",
-                    },
-                )
         if rule_model_destruction.is_rule_model_destruction_mortal_wound_request(request):
             invalid_status = (
                 rule_model_destruction.invalid_rule_model_destruction_mortal_wound_status(

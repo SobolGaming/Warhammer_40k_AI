@@ -33,7 +33,11 @@ from warhammer40k_core.engine.faction_content.common import (
     payload_object,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    LifecycleStatus,
+    SetupStep,
+)
 from warhammer40k_core.engine.primary_historical_events import (
     primary_reserve_entry_source_terminal_bindings_payload,
     record_primary_reserve_entry_provider_terminal_event,
@@ -57,8 +61,8 @@ from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     source_result_payload_for_cost_choice,
 )
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
-    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndRequestContext,
     TurnEndResultContext,
 )
@@ -551,62 +555,23 @@ def voidstone_save_option_modifier(context: SaveOptionModifierContext) -> tuple[
     )
 
 
-def webway_pathstone_turn_end_request(context: TurnEndRequestContext) -> DecisionRequest | None:
+def webway_pathstone_turn_end_request(
+    context: TurnEndRequestContext,
+) -> DecisionRequest | LifecycleStatus | None:
+    from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+
+    from .turn_sequencing import (
+        candidates,
+    )
+
     if type(context) is not TurnEndRequestContext:
-        raise GameLifecycleError("Webway Pathstone requires a turn-end request context.")
-    if context.completed_phase is not BattlePhase.FIGHT:
-        return None
-    active_player_id = _active_player_id(context.state)
-    for army in _corsair_coterie_armies(context.state):
-        if army.player_id == active_player_id:
-            continue
-        for _assignment, unit in _assigned_units(
-            army,
-            enhancement_id=WEBWAY_PATHSTONE_ENHANCEMENT_ID,
-        ):
-            if _webway_pathstone_decision_recorded_this_turn(
-                context,
-                unit_instance_id=unit.unit_instance_id,
-            ):
-                continue
-            if _webway_pathstone_used_this_battle(
-                context.decisions,
-                unit_instance_id=unit.unit_instance_id,
-            ):
-                continue
-            if not _webway_pathstone_unit_can_enter_reserves(
-                context.state,
-                unit_instance_id=unit.unit_instance_id,
-            ):
-                continue
-            return DecisionRequest(
-                request_id=context.state.next_decision_request_id(),
-                decision_type=SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-                actor_id=army.player_id,
-                payload={
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": active_player_id,
-                    "phase": context.completed_phase.value,
-                    "source_rule_id": WEBWAY_PATHSTONE_SOURCE_RULE_ID,
-                    "hook_id": WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
-                    "enhancement_id": WEBWAY_PATHSTONE_ENHANCEMENT_ID,
-                    "target_unit_instance_id": unit.unit_instance_id,
-                },
-                options=(
-                    _webway_pathstone_option(
-                        player_id=army.player_id,
-                        unit_instance_id=unit.unit_instance_id,
-                        use_ability=True,
-                    ),
-                    _webway_pathstone_option(
-                        player_id=army.player_id,
-                        unit_instance_id=unit.unit_instance_id,
-                        use_ability=False,
-                    ),
-                ),
-            )
-    return None
+        raise GameLifecycleError("End-rule request requires a turn-end request context.")
+    return resolve_boundary_candidates(
+        state=context.state,
+        decisions=context.decisions,
+        trigger_kind=TimingTriggerKind.END_TURN,
+        discover=lambda: candidates(context),
+    )
 
 
 def apply_webway_pathstone_turn_end_result(context: TurnEndResultContext) -> bool:
@@ -745,7 +710,7 @@ def _archraider_model_options(
     )
 
 
-def _webway_pathstone_option(
+def webway_pathstone_option(
     *,
     player_id: str,
     unit_instance_id: str,
@@ -1016,7 +981,7 @@ def _archraider_cost_choice_answered_for_source_result(
     return False
 
 
-def _webway_pathstone_decision_recorded_this_turn(
+def webway_pathstone_decision_recorded_this_turn(
     context: TurnEndRequestContext,
     *,
     unit_instance_id: str,
@@ -1044,7 +1009,7 @@ def _webway_pathstone_decision_recorded_this_turn(
     return False
 
 
-def _webway_pathstone_used_this_battle(
+def webway_pathstone_used_this_battle(
     decisions: object,
     *,
     unit_instance_id: str,

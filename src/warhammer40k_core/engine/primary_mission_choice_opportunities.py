@@ -19,6 +19,31 @@ _SENSOR_SWEEP_ACTION_IDS = frozenset(
 )
 
 
+def primary_action_completion_choice_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    action_id: str,
+    request_id: str | None = None,
+) -> DecisionRequest | None:
+    actions = tuple(
+        action for action in state.mission_action_states if action.action_id == action_id
+    )
+    if len(actions) != 1:
+        raise GameLifecycleError("Primary Action completion identity is unknown or ambiguous.")
+    action = actions[0]
+    if action.status is not MissionActionStatus.COMPLETED:
+        return None
+    if action.mission_action_id not in _SENSOR_SWEEP_ACTION_IDS:
+        return None
+    return sensor_sweep_marker_removal_choice_request(
+        state=state,
+        decisions=decisions,
+        action_id=action_id,
+        request_id=request_id,
+    )
+
+
 def next_primary_mission_turn_end_choice_request(
     *,
     state: GameState,
@@ -61,4 +86,7 @@ def next_primary_mission_turn_end_choice_request(
     )
 
 
-__all__ = ("next_primary_mission_turn_end_choice_request",)
+__all__ = (
+    "next_primary_mission_turn_end_choice_request",
+    "primary_action_completion_choice_request",
+)

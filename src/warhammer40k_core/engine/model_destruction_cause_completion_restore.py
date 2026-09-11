@@ -18,6 +18,7 @@ from warhammer40k_core.engine.model_destruction_cause_authority import (
     ModelDestructionCauseKind,
     model_destruction_cause_authority_by_id_or_none,
 )
+from warhammer40k_core.engine.model_ownership_history import historical_physical_unit_id
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
@@ -580,7 +581,9 @@ def validate_mortal_wound_application_inventory(
     )
     destroyed_applications_by_model: dict[str, DamageApplication] = {}
     for item in application.applications:
-        physical_unit_id = state.unit_instance_id_for_model(item.model_instance_id)
+        physical_unit_id = historical_physical_unit_id(
+            state=state, model_instance_id=item.model_instance_id
+        )
         if item.target_unit_instance_id != application.target_unit_instance_id or all(
             physical_unit_id not in view.component_unit_instance_ids for view in target_views
         ):

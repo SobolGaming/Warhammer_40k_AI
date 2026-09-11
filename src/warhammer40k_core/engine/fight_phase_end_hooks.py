@@ -17,6 +17,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -26,9 +27,9 @@ SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE = (
     "select_faction_rule_fight_phase_end_option"
 )
 
-type FightPhaseEndRequestHandler = Callable[
+type FightPhaseEndCandidateHandler = Callable[
     ["FightPhaseEndRequestContext"],
-    DecisionRequest | None,
+    tuple[TimingRuleCandidate, ...],
 ]
 type FightPhaseEndResultHandler = Callable[
     ["FightPhaseEndResultContext"],
@@ -82,18 +83,18 @@ class FightPhaseEndResultContext:
 class FightPhaseEndHookBinding:
     hook_id: str
     source_id: str
-    request_handler: FightPhaseEndRequestHandler | None = None
     result_handler: FightPhaseEndResultHandler | None = None
+    candidate_handler: FightPhaseEndCandidateHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if self.request_handler is None and self.result_handler is None:
+        if self.result_handler is None and self.candidate_handler is None:
             raise GameLifecycleError("FightPhaseEndHookBinding requires a handler.")
-        if self.request_handler is not None and not callable(self.request_handler):
-            raise GameLifecycleError("FightPhaseEndHookBinding request_handler must be callable.")
         if self.result_handler is not None and not callable(self.result_handler):
             raise GameLifecycleError("FightPhaseEndHookBinding result_handler must be callable.")
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError("FightPhaseEndHookBinding candidate_handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -117,21 +118,39 @@ class FightPhaseEndHookRegistry:
     def next_request_for(
         self,
         context: FightPhaseEndRequestContext,
-    ) -> DecisionRequest | None:
+    ) -> DecisionRequest | LifecycleStatus | None:
+        from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+        from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
         if type(context) is not FightPhaseEndRequestContext:
             raise GameLifecycleError("Fight-phase end request hooks require context.")
+        return resolve_boundary_candidates(
+            state=context.state,
+            decisions=context.decisions,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            discover=lambda: self.candidates_for(context),
+        )
+
+    def candidates_for(
+        self,
+        context: FightPhaseEndRequestContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        if type(context) is not FightPhaseEndRequestContext:
+            raise GameLifecycleError("Fight-phase end request hooks require context.")
+        candidates: list[TimingRuleCandidate] = []
         for binding in self.bindings:
-            if binding.request_handler is None:
+            if binding.candidate_handler is None:
                 continue
-            request = binding.request_handler(context)
-            if request is None:
-                continue
-            if type(request) is not DecisionRequest:
-                raise GameLifecycleError(
-                    "Fight-phase end request handlers must return DecisionRequest or None."
-                )
-            return request
-        return None
+            before = (context.state.to_payload(), context.decisions.to_payload())
+            discovered = binding.candidate_handler(context)
+            if before != (context.state.to_payload(), context.decisions.to_payload()):
+                raise GameLifecycleError("Fight-end discovery mutated engine state.")
+            if type(discovered) is not tuple or any(
+                type(item) is not TimingRuleCandidate for item in discovered
+            ):
+                raise GameLifecycleError("Fight-end discovery requires typed candidates.")
+            candidates.extend(discovered)
+        return tuple(candidates)
 
     def apply_result(self, context: FightPhaseEndResultContext) -> bool | LifecycleStatus:
         if type(context) is not FightPhaseEndResultContext:
@@ -190,6 +209,8 @@ def request_fight_phase_end_rule_if_available(
     )
     if request is None:
         return None
+    if isinstance(request, LifecycleStatus):
+        return request
     decisions.request_decision(request)
     decisions.event_log.append(
         "fight_phase_end_faction_rule_requested",

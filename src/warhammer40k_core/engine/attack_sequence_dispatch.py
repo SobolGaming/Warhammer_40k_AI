@@ -207,12 +207,4 @@ def resolve_attack_sequence_until_blocked(
     from warhammer40k_core.engine.model_attack_history import record_attack_sequence_completed
 
     record_attack_sequence_completed(state=state, decisions=decisions, sequence=current)
-    hazardous_status = _resolve_hazardous_tests(
-        state=state,
-        decisions=decisions,
-        manager=manager,
-        attack_sequence=current,
-    )
-    if hazardous_status is not None:
-        return current, allocated_model_ids, hazardous_status
     return None, allocated_model_ids, None

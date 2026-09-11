@@ -164,8 +164,10 @@ class MortalWoundApplicationAuthority:
         self.target_lineage.validate_for_state(state)
         if self.destruction_evidence is not None:
             self.destruction_evidence.validate_for_state(state)
+        from warhammer40k_core.engine.model_ownership_history import historical_physical_unit_id
+
         if any(
-            state.unit_instance_id_for_model(model_id)
+            historical_physical_unit_id(state=state, model_instance_id=model_id)
             not in set(self.target_lineage.component_unit_instance_ids)
             for model_id in self.priority_model_ids
         ):
@@ -245,7 +247,9 @@ def ensure_started(
         raise GameLifecycleError(
             "Mortal-wound application authority requires typed application progress."
         )
-    expected = _authority_for_progress(state=state, progress=progress)
+    expected = _authority_for_progress(
+        state=state, event_records=event_log.records, progress=progress
+    )
     expected.validate_for_state(state)
     inventory = mortal_wound_application_authority_inventory(
         event_records=event_log.records,
@@ -371,7 +375,7 @@ def validate_pending_mortal_wound_application_authority(
     if existing is None:
         raise GameLifecycleError("Pending mortal-wound progress lacks its start authority.")
     started_event, authority = existing
-    expected = _authority_for_progress(state=state, progress=progress)
+    expected = _authority_for_progress(state=state, event_records=event_records, progress=progress)
     if authority != expected:
         raise GameLifecycleError("Pending mortal-wound start authority drift.")
     return _validate_progress_logical_death_authority(
@@ -1265,13 +1269,16 @@ def _validate_progress_logical_death_authority(
 def _authority_for_progress(
     *,
     state: GameState,
+    event_records: tuple[EventRecord, ...],
     progress: MortalWoundApplicationProgress,
 ) -> MortalWoundApplicationAuthority:
     binding = progress.logical_death_cause_binding
     if type(binding) is not MortalWoundLogicalDeathCauseBinding:
         raise GameLifecycleError("Mortal-wound application lacks logical-death binding authority.")
     initial_binding = _initial_binding(binding)
-    validate_initial_binding_source(state=state, progress=progress, binding=initial_binding)
+    validate_initial_binding_source(
+        state=state, event_records=event_records, progress=progress, binding=initial_binding
+    )
     authority = MortalWoundApplicationAuthority(
         game_id=state.game_id,
         application_id=progress.application_id,

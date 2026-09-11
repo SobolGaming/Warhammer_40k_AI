@@ -6,11 +6,12 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -26,6 +27,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_effect_payload,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CONTRIBUTION_ID = "warhammer_40000_11th:space_marines:army_rule:oath_of_moment"
@@ -60,6 +62,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=oath_of_moment_target_request,
+                candidate_handler=command_sequencing_candidates,
                 result_handler=apply_oath_of_moment_target_result,
             ),
         ),
@@ -76,56 +79,9 @@ def runtime_contribution() -> RuntimeContentContribution:
 def oath_of_moment_target_request(
     context: CommandPhaseStartRequestContext,
 ) -> DecisionRequest | None:
-    if type(context) is not CommandPhaseStartRequestContext:
-        raise GameLifecycleError("Oath of Moment target selection requires request context.")
-    army = _space_marines_army_for_player(context.state, player_id=context.active_player_id)
-    if army is None:
-        return None
-    if (
-        oath_of_moment_target_unit_id_for_player(context.state, player_id=army.player_id)
-        is not None
-    ):
-        return None
-    targets = _eligible_oath_target_units(context.state, player_id=army.player_id)
-    if not targets:
-        return None
-    common_payload = {
-        "game_id": context.state.game_id,
-        "battle_round": context.state.battle_round,
-        "phase": BattlePhase.COMMAND.value,
-        "active_player_id": army.player_id,
-        "player_id": army.player_id,
-        "faction_id": SPACE_MARINES_FACTION_ID,
-        "source_rule_id": SOURCE_RULE_ID,
-        "hook_id": HOOK_ID,
-        "effect_kind": OATH_OF_MOMENT_EFFECT_KIND,
-        "selection_kind": OATH_OF_MOMENT_SELECTION_KIND,
-        "eligible_target_unit_instance_ids": [
-            target.unit_instance_id for _owner_id, target in targets
-        ],
-        "expires_at_battle_round": _next_own_turn_battle_round(context.state),
-    }
-    return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
-        decision_type=SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-        actor_id=army.player_id,
-        payload=validate_json_value(common_payload),
-        options=tuple(
-            DecisionOption(
-                option_id=f"space_marines:oath_of_moment:{target.unit_instance_id}",
-                label=f"Oath of Moment: {target.name}",
-                payload=validate_json_value(
-                    {
-                        **common_payload,
-                        "target_owner_player_id": owner_id,
-                        "target_unit_instance_id": target.unit_instance_id,
-                        "target_unit_name": target.name,
-                    }
-                ),
-            )
-            for owner_id, target in targets
-        ),
-    )
+    from .command_sequencing import request_for
+
+    return request_for(context)
 
 
 def apply_oath_of_moment_target_result(context: CommandPhaseStartResultContext) -> bool:
@@ -143,7 +99,7 @@ def apply_oath_of_moment_target_result(context: CommandPhaseStartResultContext) 
     if result.actor_id is None:
         raise GameLifecycleError("Oath of Moment target selection requires an actor.")
     player_id = result.actor_id
-    army = _space_marines_army_for_player(context.state, player_id=player_id)
+    army = space_marines_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Oath of Moment actor does not own Space Marines.")
     if oath_of_moment_target_unit_id_for_player(context.state, player_id=player_id) is not None:
@@ -156,12 +112,12 @@ def apply_oath_of_moment_target_result(context: CommandPhaseStartResultContext) 
         target_unit_id,
     ) not in {
         (owner_id, unit.unit_instance_id)
-        for owner_id, unit in _eligible_oath_target_units(context.state, player_id=player_id)
+        for owner_id, unit in eligible_oath_target_units(context.state, player_id=player_id)
     }:
         raise GameLifecycleError("Oath of Moment target is no longer eligible.")
 
     expiration = EffectExpiration.start_turn(
-        battle_round=_next_own_turn_battle_round(context.state),
+        battle_round=next_own_turn_battle_round(context.state),
         player_id=player_id,
     )
     target_effect = _oath_target_effect(
@@ -221,7 +177,7 @@ def oath_of_moment_wound_roll_modifier(context: WoundRollModifierContext) -> int
     )
     if owner_id is None or attacking_unit is None:
         raise GameLifecycleError("Oath of Moment attacking unit is unknown.")
-    army = _space_marines_army_for_player(context.state, player_id=owner_id)
+    army = space_marines_army_for_player(context.state, player_id=owner_id)
     if army is None:
         return 0
     if not _unit_has_faction_keyword(attacking_unit, ADEPTUS_ASTARTES_KEYWORD):
@@ -352,7 +308,7 @@ def _oath_hit_reroll_effect(
     )
 
 
-def _eligible_oath_target_units(
+def eligible_oath_target_units(
     state: object,
     *,
     player_id: str,
@@ -382,7 +338,7 @@ def _eligible_oath_attacker_units(army: ArmyDefinition) -> tuple[UnitInstance, .
     )
 
 
-def _space_marines_army_for_player(
+def space_marines_army_for_player(
     state: object,
     *,
     player_id: str,
@@ -437,7 +393,7 @@ def _army_has_any_faction_keyword(
     return any(requested_keywords.intersection(unit.faction_keywords) for unit in army.units)
 
 
-def _next_own_turn_battle_round(state: object) -> int:
+def next_own_turn_battle_round(state: object) -> int:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -448,3 +404,11 @@ def _next_own_turn_battle_round(state: object) -> int:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def command_sequencing_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .command_sequencing import candidates
+
+    return candidates(context)

@@ -97,6 +97,10 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.model_attack_history import (
+    record_attack_sequence_completed,
+    record_models_attacked,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHandler,
@@ -170,7 +174,8 @@ def test_faction_aliases_include_common_faction_keyword_references() -> None:
     ) == len(faction_aliases())
 
 
-def test_attack_sequence_completed_hook_registry_is_ordered_and_fail_fast() -> None:
+@pytest.mark.stubbed
+def test_attack_sequence_completed_hook_registry_requires_pure_typed_candidates() -> None:
     state = _csm_battle_state()
     decisions = DecisionController()
     unit = _unit_for_player(state, player_id="player-a")
@@ -243,8 +248,9 @@ def test_attack_sequence_completed_hook_registry_is_ordered_and_fail_fast() -> N
         )
         == completed_event.event_id
     )
-    assert registry.resolve_completed_sequence(context) is expected_status
-    assert seen_hooks == ["a", "b"]
+    with pytest.raises(GameLifecycleError, match="require pure candidate discovery"):
+        registry.candidates_for(context)
+    assert seen_hooks == []
     assert AttackSequenceCompletedHookRegistry.empty().all_bindings() == ()
 
     duplicate_binding = AttackSequenceCompletedHookBinding(
@@ -264,16 +270,21 @@ def test_attack_sequence_completed_hook_registry_is_ordered_and_fail_fast() -> N
             source_id="test-source",
             handler=cast(AttackSequenceCompletedHandler, None),
         )
-    with pytest.raises(GameLifecycleError, match="must return status or None"):
+    from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
+
+    with pytest.raises(GameLifecycleError, match="requires typed candidates"):
         AttackSequenceCompletedHookRegistry.from_bindings(
             (
                 AttackSequenceCompletedHookBinding(
                     hook_id="bad-status",
                     source_id="test-source",
                     handler=lambda _context: cast(LifecycleStatus, "bad-status"),
+                    candidate_handler=lambda _context: cast(
+                        tuple[TimingRuleCandidate, ...], "bad-candidates"
+                    ),
                 ),
             )
-        ).resolve_completed_sequence(context)
+        ).candidates_for(context)
     with pytest.raises(GameLifecycleError, match="Completed attack sequence event is missing"):
         attack_sequence_completed_event_id(
             decisions=DecisionController(),
@@ -1020,13 +1031,10 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
         used_pool_indices=(0,),
         pool_index=1,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": "player-a",
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    record_models_attacked(state=state, decisions=decisions, sequence=attack_sequence)
+    record_attack_sequence_completed(state=state, decisions=decisions, sequence=attack_sequence)
+    completed_event_id = attack_sequence_completed_event_id(
+        decisions=decisions, attack_sequence=attack_sequence
     )
     manager = DiceRollManager(
         state.game_id,
@@ -1065,7 +1073,7 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=attack_sequence,
-            attack_sequence_completed_event_id=completed_event.event_id,
+            attack_sequence_completed_event_id=completed_event_id,
         )
     )
     for decision_index in range(16):
@@ -1154,13 +1162,10 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
         used_pool_indices=(0,),
         pool_index=1,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": "player-a",
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    record_models_attacked(state=state, decisions=decisions, sequence=attack_sequence)
+    record_attack_sequence_completed(state=state, decisions=decisions, sequence=attack_sequence)
+    completed_event_id = attack_sequence_completed_event_id(
+        decisions=decisions, attack_sequence=attack_sequence
     )
     manager = DiceRollManager(
         state.game_id,
@@ -1199,7 +1204,7 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=attack_sequence,
-            attack_sequence_completed_event_id=completed_event.event_id,
+            attack_sequence_completed_event_id=completed_event_id,
         )
     )
     model_request = _decision_request(None if status is None else status.decision_request)
@@ -1295,6 +1300,125 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
 
 
 def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -> None:
+    state, decisions, handler = _dark_pact_completion_handler()
+    status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
+    assert _event_count(decisions, "attack_sequence_completed") == 1
+    payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
+    assert payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+    assert payload["hook_id"] == army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
+    handler.begin_phase(state=state, decisions=decisions)
+    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
+
+
+@pytest.mark.parametrize("hazardous_first", [False, True])
+def test_hazardous_and_dark_pacts_offer_the_owner_a_shared_mandatory_order(
+    hazardous_first: bool,
+) -> None:
+    from warhammer40k_core.engine.attack_completion_authority import completed_attack_sequence
+    from warhammer40k_core.engine.hazardous_completion import (
+        apply_hazardous_completion_decision,
+        is_hazardous_request,
+    )
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+    from warhammer40k_core.engine.sequencing import sequencing_decision_event_from_request
+
+    state, decisions, handler = _dark_pact_completion_handler(hazardous=True)
+
+    status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = _decision_request(status.decision_request)
+    assert request.decision_type == "resolve_sequencing_order"
+    assert request.actor_id == "player-a"
+    assert len(request.options) == 2
+    assert not _has_event(decisions, "hazardous_test_resolved")
+    assert not _has_event(decisions, "chaos_space_marines_dark_pact_resolved")
+    decisions = DecisionController.from_payload(json.loads(json.dumps(decisions.to_payload())))
+    state = GameState.from_payload(json.loads(json.dumps(state.to_payload())))
+    result = DecisionResult.for_request(
+        request=request,
+        result_id=f"hazardous-order-{hazardous_first}",
+        selected_option_id=next(
+            option.option_id
+            for option in request.options
+            if option.option_id.startswith("next:hazardous-completion:") is hazardous_first
+        ),
+    )
+    decisions.submit_result(result)
+    event_type, payload = sequencing_decision_event_from_request(request=request, result=result)
+    decisions.event_log.append(event_type, payload)
+    sequence = completed_attack_sequence(
+        event_records=decisions.event_log.records,
+        sequence_id="dark-pact-handler-completed-sequence",
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=manager,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=sequence,
+        attack_sequence_completed_event_id=attack_sequence_completed_event_id(
+            decisions=decisions, attack_sequence=sequence
+        ),
+    )
+    for index in range(32):
+        completion_status = handler.attack_sequence_completed_hooks.resolve_completed_sequence(
+            context
+        )
+        if completion_status is None:
+            break
+        request = _decision_request(completion_status.decision_request)
+        assert is_mortal_wound_model_request(request) or is_mortal_wound_feel_no_pain_request(
+            request
+        )
+        choice = DecisionResult.for_request(
+            request=request,
+            result_id=f"hazardous-order-{hazardous_first}-damage-{index}",
+            selected_option_id="decline"
+            if is_mortal_wound_feel_no_pain_request(request)
+            else request.options[0].option_id,
+        )
+        decisions.submit_result(choice)
+        if is_hazardous_request(request):
+            continuation = apply_hazardous_completion_decision(
+                state=state, decisions=decisions, request=request, result=choice
+            )
+        else:
+            continuation = army_rule.apply_dark_pact_mortal_wound_feel_no_pain_decision(
+                MortalWoundFeelNoPainContinuationContext(
+                    state=state,
+                    decisions=decisions,
+                    request=request,
+                    result=choice,
+                    source_context=mortal_wound_resolution_source_context(request),
+                    dice_manager=manager,
+                    runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                )
+            )
+        assert continuation is None  # This fixture needs at most one model allocation per rule.
+    else:
+        raise AssertionError("Mandatory after-attacks rules did not complete")
+    resolutions = [
+        event.event_type
+        for event in decisions.event_log.records
+        if event.event_type in {"hazardous_test_resolved", "chaos_space_marines_dark_pact_resolved"}
+    ]
+    assert resolutions == (
+        ["hazardous_test_resolved", "chaos_space_marines_dark_pact_resolved"]
+        if hazardous_first
+        else ["chaos_space_marines_dark_pact_resolved", "hazardous_test_resolved"]
+    )
+    assert all(batch.current_batch_complete for batch in rule_trigger_history(decisions).batches)
+
+
+def _dark_pact_completion_handler(
+    *, hazardous: bool = False
+) -> tuple[GameState, DecisionController, ShootingPhaseHandler]:
     state = _csm_battle_state()
     unit = _unit_for_player(state, player_id="player-a")
     target = _unit_for_player(state, player_id="player-b")
@@ -1309,7 +1433,10 @@ def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -
     attack_pool = _attack_pool(
         attacker=unit,
         target=target,
-        weapon_profile=_weapon_profile(melee=False),
+        weapon_profile=replace(
+            _weapon_profile(melee=False),
+            keywords=(WeaponKeyword.HAZARDOUS,) if hazardous else (),
+        ),
     )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
@@ -1338,16 +1465,7 @@ def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -
         ),
     )
 
-    status = handler.begin_phase(state=state, decisions=decisions)
-
-    assert status.status_kind is LifecycleStatusKind.ADVANCED
-    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
-    assert _event_count(decisions, "attack_sequence_completed") == 1
-    payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
-    assert payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
-    assert payload["hook_id"] == army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    handler.begin_phase(state=state, decisions=decisions)
-    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
+    return state, decisions, handler
 
 
 def _daemonforge_fight_status(*, game_id: str) -> tuple[LocalGameSession, LifecycleStatus]:

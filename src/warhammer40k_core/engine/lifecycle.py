@@ -62,9 +62,6 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     invalid_any_phase_once_per_battle_status,
 )
-from warhammer40k_core.engine.catalog_command_restoration_runtime import (
-    invalid_catalog_command_restoration_status,
-)
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_model_materialization_runtime import (
     SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE,
@@ -80,7 +77,6 @@ from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
 )
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
-    invalid_catalog_post_fight_hit_target_effect_status,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
@@ -153,7 +149,6 @@ from warhammer40k_core.engine.fight_order import (
 )
 from warhammer40k_core.engine.fight_phase_decisions import (
     FIGHT_PHASE_FACTION_RULE_DECISION_TYPES,
-    invalid_fight_phase_faction_rule_status,
 )
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -265,15 +260,11 @@ from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
     CommandPhaseHandler,
-    invalid_command_phase_decision_status,
 )
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
-    invalid_fight_activation_ability_status,
-    invalid_fight_activation_status,
     invalid_fight_interrupt_status,
     invalid_fight_movement_proposal_status,
-    invalid_melee_declaration_status,
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
@@ -565,20 +556,19 @@ def _runtime_content_activation_input_hash(
         raise GameLifecycleError("Runtime content cache key requires GameConfig.")
     if type(armies) is not tuple:
         raise GameLifecycleError("Runtime content cache key requires army tuple.")
-    payload = validate_json_value(
-        {
-            "ruleset_descriptor": config.ruleset_descriptor.to_payload(),
-            "catalog_id": config.army_catalog.catalog_id,
-            "source_package_id": config.army_catalog.source_package_id,
-            "army_definitions": [
-                army.to_payload()
-                for army in sorted(
-                    _validate_runtime_content_armies(armies),
-                    key=lambda item: item.army_id,
-                )
-            ],
-        }
-    )
+    # canonical_json validates this complete payload before hashing it.
+    payload = {
+        "ruleset_descriptor": config.ruleset_descriptor.to_payload(),
+        "catalog_id": config.army_catalog.catalog_id,
+        "source_package_id": config.army_catalog.source_package_id,
+        "army_definitions": [
+            army.to_payload()
+            for army in sorted(
+                _validate_runtime_content_armies(armies),
+                key=lambda item: item.army_id,
+            )
+        ],
+    }
     return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
 
@@ -758,6 +748,16 @@ class GameLifecycle:
 
     def _advance_once(self) -> LifecycleStatus:
         state = self._require_state()
+        from warhammer40k_core.engine.rule_trigger_runtime import advance_rule_triggers
+
+        trigger_status = advance_rule_triggers(
+            state=state,
+            decisions=self.decision_controller,
+            runtime_bundle_provider=self._require_runtime_content_bundle,
+            shooting_handler_provider=lambda: self._shooting_phase_handler,
+        )
+        if trigger_status is not None:
+            return trigger_status
         pending_request = self._pending_decision_request()
         continuation_status = (
             _selected_target_bs.advance_catalog_selected_target_battle_shock_lifecycle(
@@ -824,6 +824,11 @@ class GameLifecycle:
         state = self._require_state()
         pending_request = self._pending_decision_request()
         if type(result) is DecisionResult and pending_request is not None:
+            from warhammer40k_core.engine.rule_trigger_runtime import validate_rule_trigger_history
+
+            validate_rule_trigger_history(
+                state=state, decisions=self.decision_controller, pending_only=True
+            )
             if state.stage is GameLifecycleStage.SETUP:
                 setup_invalid_status = self._setup_flow.invalid_pending_request_status(
                     state=state,
@@ -852,6 +857,18 @@ class GameLifecycle:
                         message="Opportunity-window submission is no longer valid.",
                         payload={"invalid_reason": opportunity_invalid_reason},
                     )
+            from warhammer40k_core.engine.lifecycle_destruction_prevalidation import (
+                invalid_destruction_request_status,
+            )
+
+            destruction_invalid = invalid_destruction_request_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=pending_request,
+                runtime_bundle_provider=self._require_runtime_content_bundle,
+            )
+            if destruction_invalid is not None:
+                return destruction_invalid
             handler = self._decision_dispatch_registry.handler_for(pending_request.decision_type)
             invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:
@@ -881,6 +898,15 @@ class GameLifecycle:
         status = self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
             record,
             result,
+        )
+        from warhammer40k_core.engine.rule_trigger_runtime import (
+            record_loaded_model_destruction_occurrences,
+        )
+
+        record_loaded_model_destruction_occurrences(
+            state=state,
+            decisions=self.decision_controller,
+            runtime_bundle_provider=self._require_runtime_content_bundle,
         )
         self._reconcile_catalog_model_state_changes()
         if self._runtime_content_bundle is not None:
@@ -995,6 +1021,44 @@ class GameLifecycle:
             decisions=lifecycle.decision_controller,
             runtime_content_bundle=refreshed_bundle,
         )
+        from warhammer40k_core.engine.active_player_scope_history import (
+            validate_active_player_history,
+        )
+
+        validate_active_player_history(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+        )
+        from warhammer40k_core.engine.rule_trigger_runtime import validate_rule_trigger_history
+
+        validate_rule_trigger_history(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+        )
+        from warhammer40k_core.engine.lifecycle_destruction_prevalidation import (
+            validate_destruction_request_authority,
+        )
+        from warhammer40k_core.engine.sequencing_submission_authority import (
+            validate_loaded_sequencing_authority,
+        )
+
+        for pending in lifecycle.decision_controller.queue.pending_requests:
+            if pending.decision_type == SEQUENCING_DECISION_TYPE:
+                validate_loaded_sequencing_authority(
+                    state=lifecycle._require_state(),
+                    decisions=lifecycle.decision_controller,
+                    request=pending,
+                    config=lifecycle._require_config(),
+                    reaction_queue=lifecycle.reaction_queue,
+                    runtime_bundle_provider=lifecycle._require_runtime_content_bundle,
+                    shooting_handler_provider=lambda: lifecycle._shooting_phase_handler,
+                )
+            validate_destruction_request_authority(
+                state=lifecycle._require_state(),
+                decisions=lifecycle.decision_controller,
+                request=pending,
+                runtime_bundle_provider=lifecycle._require_runtime_content_bundle,
+            )
         rule_ir_authority_index = (
             None
             if refreshed_bundle is None
@@ -1364,19 +1428,32 @@ class GameLifecycle:
             )
         if invalid_status is not None:
             return invalid_status
-        selected_target_reroll_status = invalid_charge_roll_reroll_context_status(
-            state=state,
-            request=request,
-            ruleset_descriptor=self._require_config().ruleset_descriptor,
-            charge_target_restriction_hooks=(
-                self._require_runtime_content_bundle().charge_target_restriction_hook_registry
-            ),
-        )
-        if selected_target_reroll_status is not None:
-            return selected_target_reroll_status
+        if request.decision_type == DICE_REROLL_DECISION_TYPE:
+            selected_target_reroll_status = invalid_charge_roll_reroll_context_status(
+                state=state,
+                request=request,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                charge_target_restriction_hooks=(
+                    self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+                ),
+            )
+            if selected_target_reroll_status is not None:
+                return selected_target_reroll_status
         if request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return self._movement_phase_handler.invalid_movement_action_selection_status(
                 state=state, request=request, result=result
+            )
+        if request.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE:
+            from warhammer40k_core.engine.phases.movement_grant_sequencing import (
+                invalid_movement_grant_request,
+            )
+
+            result.validate_for_request(request)
+            return invalid_movement_grant_request(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                registry=self._movement_phase_handler.advance_move_hooks,
             )
         if request.decision_type == SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE:
             return invalid_catalog_movement_target_pair_status(
@@ -1517,12 +1594,13 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if is_stratagem_placement_proposal_request(record.request):
             return self._apply_stratagem_placement_decision(record=record, result=result)
+        runtime_bundle = self._require_runtime_content_bundle()
         reroll_status = _bsa.apply_global_reroll_if_applicable(
             state=state,
             decisions=self.decision_controller,
             request=record.request,
             result=result,
-            runtime_content_bundle=self._require_runtime_content_bundle(),
+            runtime_content_bundle=runtime_bundle,
             reaction_queue=self.reaction_queue,
             resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
             advance_until_decision_or_terminal=self.advance_until_decision_or_terminal,
@@ -1532,7 +1610,7 @@ class GameLifecycle:
         setup_reactive_status = apply_setup_reactive_lifecycle_decision_if_applicable(
             state=state,
             config=self._require_config(),
-            runtime_content_bundle=self._require_runtime_content_bundle(),
+            runtime_content_bundle=runtime_bundle,
             decisions=self.decision_controller,
             reaction_queue=self.reaction_queue,
             record=record,
@@ -2072,62 +2150,11 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        state = self._require_state()
-        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
-            result.validate_for_request(request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = invalid_melee_declaration_status(
-                state=state,
-                request=request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                army_catalog=self._require_config().army_catalog,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if request.decision_type == _fu.SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
-            invalid_status = self._fight_phase_handler.invalid_fight_unit_selected_grant_status(
-                state=state,
-                request=request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if request.decision_type == SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE:
-            invalid_status = invalid_catalog_post_fight_hit_target_effect_status(
-                state=state,
-                request=request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        invalid_status = invalid_fight_phase_faction_rule_status(
-            state=state,
-            request=request,
-            result=result,
+        from warhammer40k_core.engine.lifecycle_fight_prevalidation import (
+            pre_validate_fight_decision,
         )
-        if invalid_status is not None:
-            return invalid_status
-        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
-            invalid_status = invalid_fight_activation_status(
-                state=state,
-                request=request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if request.decision_type == _fa.FIGHT_ACTIVATION_ABILITY_DECISION_TYPE:
-            invalid_status = invalid_fight_activation_ability_status(
-                state=state,
-                request=request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        return None
+
+        return pre_validate_fight_decision(self, request, result)
 
     def _pre_validate_fight_interrupt_decision(
         self,
@@ -2178,30 +2205,17 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        state = self._require_state()
-        invalid_status = _invalid_finite_decision_status(
-            state=state,
-            request=request,
-            result=result,
-            invalid_reason="invalid_command_phase_decision_result",
+        from warhammer40k_core.engine.lifecycle_command_prevalidation import (
+            invalid_command_phase_submission,
         )
-        if invalid_status is not None:
-            return invalid_status
-        restoration_invalid_status = invalid_catalog_command_restoration_status(
-            state=state,
+
+        return invalid_command_phase_submission(
+            state=self._require_state(),
             decisions=self.decision_controller,
+            config=self._require_config(),
+            handler=self._command_phase_handler,
             request=request,
             result=result,
-            ability_indexes_by_player_id=(self._command_phase_handler.ability_indexes_by_player_id),
-        )
-        if restoration_invalid_status is not None:
-            return restoration_invalid_status
-        return invalid_command_phase_decision_status(
-            state=state,
-            decisions=self.decision_controller,
-            request=request,
-            result=result,
-            battle_shock_hooks=self._command_phase_handler.battle_shock_hooks,
         )
 
     def _apply_command_phase_decision(
@@ -2475,31 +2489,11 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        state = self._require_state()
-        result.validate_for_request(request)
-        if self._result_resolves_active_reaction_frame(result):
-            self.reaction_queue.validate_result(result)
-        if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
-            request=request,
-            result=result,
-        ):
-            return LifecycleStatus.invalid(
-                stage=state.stage,
-                message="Stratagem window decline is not allowed for this request.",
-                payload={"invalid_reason": "decline_not_allowed"},
-            )
-        if not is_stratagem_window_decline_result(result):
-            invalid_status = invalid_stratagem_use_status(
-                state=state,
-                request=request,
-                result=result,
-                stratagem_cost_modifier_registry=(
-                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                ),
-            )
-            if invalid_status is not None:
-                return invalid_status
-        return None
+        from warhammer40k_core.engine.lifecycle_stratagem_prevalidation import (
+            prevalidate_stratagem_decision,
+        )
+
+        return prevalidate_stratagem_decision(self, request, result)
 
     def _apply_stratagem_decision(
         self,
@@ -2654,7 +2648,20 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.sequencing_submission_authority import (
+            validate_loaded_sequencing_authority,
+        )
+
         validate_sequencing_result_from_request(request=request, result=result)
+        validate_loaded_sequencing_authority(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            request=request,
+            config=self._require_config(),
+            reaction_queue=self.reaction_queue,
+            runtime_bundle_provider=self._require_runtime_content_bundle,
+            shooting_handler_provider=lambda: self._shooting_phase_handler,
+        )
         return None
 
     def _apply_sequencing_decision(
@@ -2785,6 +2792,8 @@ class GameLifecycle:
             decisions=self.decision_controller,
         )
         self._command_phase_handler = CommandPhaseHandler(
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            army_catalog=self._require_config().army_catalog,
             stratagem_index=runtime_stratagem_index,
             stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             battle_shock_hooks=bundle.battle_shock_hook_registry,
@@ -2801,6 +2810,7 @@ class GameLifecycle:
             advance_move_hooks=bundle.advance_move_hook_registry,
             fall_back_hooks=bundle.fall_back_hook_registry,
             movement_end_surge_hooks=bundle.movement_end_surge_hook_registry,
+            move_completion_rule_registry=bundle.move_completion_rule_registry,
             reserve_arrival_distance_hooks=bundle.reserve_arrival_distance_hook_registry,
             reserve_arrival_restriction_hooks=(bundle.reserve_arrival_restriction_hook_registry),
             unit_move_completed_mortal_wound_hooks=(
@@ -2817,6 +2827,7 @@ class GameLifecycle:
             stratagem_index=runtime_stratagem_index,
             stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             charge_declaration_hooks=bundle.charge_declaration_hook_registry,
+            move_completion_rule_registry=bundle.move_completion_rule_registry,
             charge_target_restriction_hooks=bundle.charge_target_restriction_hook_registry,
             unit_move_completed_mortal_wound_hooks=(
                 bundle.unit_move_completed_mortal_wound_hook_registry
@@ -3383,7 +3394,7 @@ def _validate_payload_consistency(
     )
     _ash.validate_pending_hazardous_mortal_wound_requests(
         state=state,
-        attack_sequence=_lsq.active_attack_sequence_for_state(state),
+        event_records=event_records,
         pending_decision_requests=pending_decision_requests,
     )
     _destroyed_transport_pending.validate_pending_destroyed_transport_restore(

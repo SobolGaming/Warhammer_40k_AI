@@ -25,7 +25,6 @@ from warhammer40k_core.engine.cult_ambush_resurgence import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
-    DecisionOption,
     DecisionRequest,
     parameterized_decision_option,
 )
@@ -54,8 +53,8 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatus,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
-    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndRequestContext,
     TurnEndResultContext,
 )
@@ -274,102 +273,22 @@ def grant_initial_resurgence_points(
     return None
 
 
-def request_cult_ambush_resurgence(context: UnitDestroyedContext) -> None:
-    if type(context) is not UnitDestroyedContext:
-        raise GameLifecycleError("Cult Ambush destruction hook requires UnitDestroyedContext.")
-    if context.destroyed_player_id not in _genestealer_cults_player_ids(context.state):
-        return
-    if _cult_ambush_resurgence_request_exists(
-        decisions=context.decisions,
-        model_destroyed_event_id=context.model_destroyed_event_id,
-        destroyed_unit_instance_id=context.destroyed_unit_instance_id,
-    ):
-        return
-    candidate = cult_ambush_return_candidate(
-        context.state,
-        destroyed_unit_instance_id=context.destroyed_unit_instance_id,
+def request_cult_ambush_resurgence(context: UnitDestroyedContext) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.cult_ambush_destruction_candidates import candidates
+    from warhammer40k_core.engine.unit_destroyed_hooks import (
+        UnitDestroyedHookBinding,
+        UnitDestroyedHookRegistry,
     )
-    if candidate is None:
-        return
-    unit = candidate.unit
-    cost = resurgence_cost(
-        unit=unit,
-        starting_strength=candidate.starting_strength,
-    )
-    if cost is None:
-        return
-    total = context.state.faction_resource_total(
-        player_id=context.destroyed_player_id,
-        resource_kind=RESURGENCE_RESOURCE_KIND,
-    )
-    if total < cost:
-        return
-    payload = validate_json_value(
-        {
-            "source_rule_id": SOURCE_RULE_ID,
-            "model_destroyed_event_id": context.model_destroyed_event_id,
-            "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
-            "destroyed_player_id": context.destroyed_player_id,
-            "destroying_player_id": context.destroying_player_id,
-            "battle_round": context.state.battle_round,
-            "phase": context.completed_phase.value,
-            "starting_strength": candidate.starting_strength,
-            "resurgence_cost": cost,
-            "current_resurgence_points": total,
-        }
-    )
-    request = DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
-        decision_type=SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
-        actor_id=context.destroyed_player_id,
-        payload=payload,
-        options=(
-            DecisionOption(
-                option_id=(
-                    f"genestealer_cults:cult_ambush:decline:{context.destroyed_unit_instance_id}"
-                ),
-                label="Decline Cult Ambush",
-                payload={
-                    "selection": "decline",
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
-                    "model_destroyed_event_id": context.model_destroyed_event_id,
-                },
+
+    return UnitDestroyedHookRegistry.from_bindings(
+        (
+            UnitDestroyedHookBinding(
+                hook_id=UNIT_DESTROYED_HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                candidate_handler=candidates,
             ),
-            DecisionOption(
-                option_id=(
-                    f"genestealer_cults:cult_ambush:spend:{context.destroyed_unit_instance_id}"
-                ),
-                label="Spend Resurgence Points",
-                payload={
-                    "selection": "spend",
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
-                    "model_destroyed_event_id": context.model_destroyed_event_id,
-                    "resurgence_cost": cost,
-                },
-            ),
-        ),
-    )
-    context.decisions.request_decision(request)
-    context.decisions.event_log.append(
-        "genestealer_cults_cult_ambush_resurgence_requested",
-        validate_json_value(
-            {
-                "game_id": context.state.game_id,
-                "battle_round": context.state.battle_round,
-                "active_player_id": context.state.active_player_id,
-                "phase": context.completed_phase.value,
-                "player_id": context.destroyed_player_id,
-                "request_id": request.request_id,
-                "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
-                "model_destroyed_event_id": context.model_destroyed_event_id,
-                "resurgence_cost": cost,
-                "current_resurgence_points": total,
-                "source_rule_id": SOURCE_RULE_ID,
-            }
-        ),
-    )
+        )
+    ).resolve(context)
 
 
 def invalid_cult_ambush_resurgence_status(
@@ -718,76 +637,18 @@ def apply_cult_ambush_marker_placement_decision(
 
 def cult_ambush_marker_ingress_request(
     context: TurnEndRequestContext,
-) -> DecisionRequest | None:
+) -> DecisionRequest | LifecycleStatus | None:
+    from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+    from warhammer40k_core.engine.cult_ambush_timing_candidates import candidates
+
     if type(context) is not TurnEndRequestContext:
         raise GameLifecycleError("Cult Ambush ingress requires TurnEndRequestContext.")
-    if context.completed_phase is not BattlePhase.MOVEMENT:
-        return None
-    active_player_id = _active_player_id(context.state)
-    markers = tuple(
-        marker
-        for marker in context.state.cult_ambush_markers
-        if marker.player_id != active_player_id
-        and not marker.ingress_window_closed
-        and not (
-            marker.created_battle_round == context.state.battle_round
-            and marker.created_phase is BattlePhase.MOVEMENT
-            and marker.created_active_player_id == active_player_id
-        )
+    return resolve_boundary_candidates(
+        state=context.state,
+        decisions=context.decisions,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        discover=lambda: candidates(context),
     )
-    if not markers:
-        return None
-    for marker in sorted(markers, key=lambda value: value.marker_id):
-        eligible_unit_ids = _cult_ambush_unarrived_unit_ids(
-            context.state,
-            player_id=marker.player_id,
-        )
-        if not eligible_unit_ids:
-            continue
-        payload = validate_json_value(
-            {
-                "source_rule_id": SOURCE_RULE_ID,
-                "hook_id": TURN_END_HOOK_ID,
-                "selection_kind": "cult_ambush_marker_ingress",
-                "marker": marker.to_payload(),
-                "eligible_unit_instance_ids": list(eligible_unit_ids),
-                "battle_round": context.state.battle_round,
-                "phase": context.completed_phase.value,
-                "active_player_id": active_player_id,
-            }
-        )
-        options = [
-            DecisionOption(
-                option_id=f"genestealer_cults:cult_ambush:marker:{marker.marker_id}:decline",
-                label="Do Not Use Cult Ambush Marker",
-                payload={
-                    "selection": "decline",
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "marker_id": marker.marker_id,
-                },
-            )
-        ]
-        for unit_id in eligible_unit_ids:
-            options.append(
-                DecisionOption(
-                    option_id=f"genestealer_cults:cult_ambush:marker:{marker.marker_id}:unit:{unit_id}",
-                    label=f"Cult Ambush Ingress: {unit_id}",
-                    payload={
-                        "selection": "ingress",
-                        "source_rule_id": SOURCE_RULE_ID,
-                        "marker_id": marker.marker_id,
-                        "unit_instance_id": unit_id,
-                    },
-                )
-            )
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-            actor_id=marker.player_id,
-            payload=payload,
-            options=tuple(options),
-        )
-    return None
 
 
 def apply_cult_ambush_marker_ingress_selection(
@@ -934,6 +795,8 @@ def apply_cult_ambush_placement(
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     submitted = PlacementProposalPayload.from_payload(
         cast(PlacementProposalPayloadPayload, result.payload)
@@ -998,9 +861,11 @@ def apply_cult_ambush_placement(
     )
     state.replace_reserve_state(arrived_state)
     state.remove_cult_ambush_marker(placement.marker.marker_id)
-    decisions.event_log.append(
-        "reinforcement_unit_arrived",
-        validate_json_value(
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="reinforcement_unit_arrived",
+        payload=validate_json_value(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
@@ -1103,23 +968,6 @@ def resolve_cult_ambush_ingress_placement(
         ),
         coherency_result=coherency_result,
         transition_batch=transition_batch,
-    )
-
-
-def resolve_cult_ambush_marker_removal_for_completed_moves(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    completed_phase: BattlePhase,
-) -> None:
-    from warhammer40k_core.engine.cult_ambush_marker_removal import (
-        resolve_cult_ambush_marker_removal_for_completed_moves as resolve_marker_removal,
-    )
-
-    resolve_marker_removal(
-        state=state,
-        decisions=decisions,
-        completed_phase=completed_phase,
     )
 
 
@@ -1292,7 +1140,7 @@ def _marker_id(
     )
 
 
-def _genestealer_cults_player_ids(state: GameState) -> set[str]:
+def genestealer_cults_player_ids(state: GameState) -> set[str]:
     return {
         army.player_id
         for army in state.army_definitions
@@ -1314,23 +1162,12 @@ def _faction_resource_source_exists(
     )
 
 
-def _cult_ambush_resurgence_request_exists(
+def cult_ambush_resurgence_was_resolved(
     *,
     decisions: DecisionController,
     model_destroyed_event_id: str,
     destroyed_unit_instance_id: str,
 ) -> bool:
-    for request in decisions.queue.pending_requests:
-        if request.decision_type != SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE:
-            continue
-        payload = request.payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("Cult Ambush request payload must be an object.")
-        if (
-            payload.get("model_destroyed_event_id") == model_destroyed_event_id
-            and payload.get("destroyed_unit_instance_id") == destroyed_unit_instance_id
-        ):
-            return True
     for record in decisions.records:
         request = record.request
         if request.decision_type != SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE:
@@ -1346,7 +1183,7 @@ def _cult_ambush_resurgence_request_exists(
     return False
 
 
-def _cult_ambush_unarrived_unit_ids(state: GameState, *, player_id: str) -> tuple[str, ...]:
+def cult_ambush_unarrived_unit_ids(state: GameState, *, player_id: str) -> tuple[str, ...]:
     return tuple(
         sorted(
             reserve_state.unit_instance_id

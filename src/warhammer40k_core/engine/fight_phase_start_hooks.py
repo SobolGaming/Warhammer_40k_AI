@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Self
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
@@ -19,7 +21,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.phase_start_sequencing import resolve_phase_start_candidates
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -43,6 +47,19 @@ type FightPhaseStartResultHandler = Callable[
 class FightPhaseStartRequestContext:
     state: GameState
     decisions: DecisionController
+    ruleset_descriptor: RulesetDescriptor | None = None
+    army_catalog: ArmyCatalog | None = None
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
+    authoritative_request_id: str | None = None
+
+    def issue_request_id(self) -> str:
+        return (
+            self.state.next_decision_request_id()
+            if self.authoritative_request_id is None
+            else self.authoritative_request_id
+        )
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -112,14 +129,25 @@ class FightPhaseStartHookBinding:
     source_id: str
     request_handler: FightPhaseStartRequestHandler | None = None
     result_handler: FightPhaseStartResultHandler | None = None
+    candidate_handler: (
+        Callable[[FightPhaseStartRequestContext], tuple[TimingRuleCandidate, ...]] | None
+    ) = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if self.request_handler is None and self.result_handler is None:
+        if (
+            self.request_handler is None
+            and self.result_handler is None
+            and self.candidate_handler is None
+        ):
             raise GameLifecycleError("FightPhaseStartHookBinding requires a handler.")
         if self.request_handler is not None and not callable(self.request_handler):
             raise GameLifecycleError("FightPhaseStartHookBinding request_handler must be callable.")
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError(
+                "FightPhaseStartHookBinding candidate_handler must be callable."
+            )
         if self.result_handler is not None and not callable(self.result_handler):
             raise GameLifecycleError("FightPhaseStartHookBinding result_handler must be callable.")
 
@@ -145,28 +173,34 @@ class FightPhaseStartHookRegistry:
     def next_request_for(
         self,
         context: FightPhaseStartRequestContext,
-    ) -> DecisionRequest | None:
+    ) -> DecisionRequest | LifecycleStatus | None:
         if type(context) is not FightPhaseStartRequestContext:
             raise GameLifecycleError("Fight-phase start request hooks require context.")
-        requests: list[DecisionRequest] = []
+        return resolve_phase_start_candidates(
+            state=context.state,
+            decisions=context.decisions,
+            discover=lambda: self.candidates_for(context),
+        )
+
+    def candidates_for(
+        self, context: FightPhaseStartRequestContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        candidates: list[TimingRuleCandidate] = []
         for binding in self.bindings:
-            if binding.request_handler is None:
+            if binding.request_handler is None and binding.candidate_handler is None:
                 continue
-            request = binding.request_handler(context)
-            if request is None:
-                continue
-            if type(request) is not DecisionRequest:
-                raise GameLifecycleError(
-                    "Fight-phase start request handlers must return DecisionRequest or None."
-                )
-            requests.append(request)
-        if len(requests) > 1:
-            raise GameLifecycleError(
-                "Fight-phase start hooks produced multiple simultaneous requests."
-            )
-        if not requests:
-            return None
-        return requests[0]
+            if binding.candidate_handler is None:
+                raise GameLifecycleError("Fight-start providers require pure candidate discovery.")
+            before = (context.state.to_payload(), context.decisions.to_payload())
+            discovered = binding.candidate_handler(context)
+            if before != (context.state.to_payload(), context.decisions.to_payload()):
+                raise GameLifecycleError("Fight-start discovery mutated engine state.")
+            if type(discovered) is not tuple or any(
+                type(item) is not TimingRuleCandidate for item in discovered
+            ):
+                raise GameLifecycleError("Fight-start discovery requires typed candidates.")
+            candidates.extend(discovered)
+        return tuple(candidates)
 
     def apply_result(self, context: FightPhaseStartResultContext) -> bool | LifecycleStatus:
         if type(context) is not FightPhaseStartResultContext:
@@ -222,13 +256,25 @@ def request_fight_phase_start_rule_if_available(
     registry: FightPhaseStartHookRegistry,
     state: GameState,
     decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     request = registry.next_request_for(
         FightPhaseStartRequestContext(
             state=state,
             decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            runtime_modifier_registry=(
+                RuntimeModifierRegistry.empty()
+                if runtime_modifier_registry is None
+                else runtime_modifier_registry
+            ),
         )
     )
+    if isinstance(request, LifecycleStatus):
+        return request
     if request is None:
         return None
     decisions.request_decision(request)

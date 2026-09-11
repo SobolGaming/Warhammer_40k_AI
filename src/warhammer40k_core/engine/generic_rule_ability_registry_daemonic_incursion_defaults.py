@@ -13,12 +13,13 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleReserveArrivalDistanceAbility,
     GenericRuleWeaponProfileModifierAbility,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceContext,
     ReserveArrivalDistanceGrant,
 )
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
 )
@@ -168,9 +169,19 @@ def _daemonic_incursion_everstave_weapon_profile_modifier(
     return enhancements.everstave_weapon_profile_modifier(context)
 
 
+def _daemonic_incursion_soulstealer_candidates(
+    context: AttackSequenceCompletedContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (
+        enhancements,
+    )
+
+    return enhancements.soulstealer_completion_candidates(context)
+
+
 def _daemonic_incursion_soulstealer_attack_sequence_completed(
     context: AttackSequenceCompletedContext,
-) -> None:
+) -> LifecycleStatus | None:
     from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
         enhancements,
     )
@@ -239,6 +250,7 @@ def daemonic_incursion_attack_sequence_completed_abilities() -> tuple[
             source_rule_id=daemonic_incursion_ir.SOULSTEALER_SOURCE_RULE_ID,
             hook_id_builder=_daemonic_incursion_soulstealer_hook_id,
             handler=_daemonic_incursion_soulstealer_attack_sequence_completed,
+            candidate_handler=_daemonic_incursion_soulstealer_candidates,
         ),
     )
 

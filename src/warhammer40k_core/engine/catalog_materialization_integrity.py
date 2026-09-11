@@ -528,6 +528,11 @@ def _destroyed_model_ids_for_sequence(
     attack_sequence_id: str,
     descriptor: MaterializeModelsDescriptor,
 ) -> set[str]:
+    from warhammer40k_core.engine.catalog_materialization_destruction_history import (
+        validate_materialization_destruction_history,
+    )
+
+    validate_materialization_destruction_history(event_records)
     destroyed_ids: set[str] = set()
     for event in event_records:
         if event.event_type == "model_destroyed":

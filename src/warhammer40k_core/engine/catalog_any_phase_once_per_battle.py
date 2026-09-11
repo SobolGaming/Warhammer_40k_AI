@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
+from functools import partial
 from types import MappingProxyType
 from typing import cast
 
@@ -47,6 +48,9 @@ from warhammer40k_core.engine.rule_frequency import (
     optional_ability_frequency_usage_key,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_event_candidates import runtime_event_candidate
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR, RuleIRPayload
@@ -115,12 +119,33 @@ class CatalogAnyPhaseOncePerBattleRuntime:
             RuntimeContentEventHandlerBinding(
                 handler_id=source.handler_id,
                 handler=self._event_handler(source),
+                candidate_handler=partial(self._event_candidates, source),
             )
             for source in self._sources()
         )
 
     def event_subscriptions(self) -> tuple[RuntimeContentEventSubscription, ...]:
         return tuple(source.subscription() for source in self._sources())
+
+    def _event_candidates(
+        self,
+        source: _AnyPhaseSource,
+        context: RuntimeContentEventContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        if _source_unavailable_reason(context, source) is not None:
+            return ()
+        candidate = runtime_event_candidate(
+            context,
+            source.subscription(),
+            occurrence_id=source.model_instance_id,
+            requirement=SequencingRequirement.OPTIONAL,
+            handler=self._event_handler(source),
+            source_payload={
+                "source_unit_id": source.unit.unit_instance_id,
+                "source_model_id": source.model_instance_id,
+            },
+        )
+        return () if candidate is None else (candidate,)
 
     def _event_handler(
         self, source: _AnyPhaseSource
@@ -129,47 +154,11 @@ class CatalogAnyPhaseOncePerBattleRuntime:
             if type(context) is not RuntimeContentEventContext:
                 raise GameLifecycleError("Catalog any-phase event requires context.")
             subscription = source.subscription()
-            if context.event.phase is None:
-                return RuntimeContentEventResult.invalid(
-                    subscription,
-                    reason="missing_phase",
-                )
-            if source.model_instance_id not in _current_source_model_ids(
-                state=context.state, source=source
-            ):
-                return RuntimeContentEventResult.applied(
-                    subscription,
-                    replay_payload={"available": False, "reason": "source_model_unavailable"},
-                )
-            psychic_reason = psychic_source_unavailable_reason(
-                rule_ir=source.rule_ir,
-                state=context.state,
-                event_log=context.decisions.event_log,
-                player_id=source.player_id,
-                source_unit_instance_id=source.unit.unit_instance_id,
-                source_model_instance_id=source.model_instance_id,
-            )
-            if psychic_reason is not None:
-                return RuntimeContentEventResult.applied(
-                    subscription,
-                    replay_payload={"available": False, "reason": psychic_reason},
-                )
-            unavailable = optional_ability_frequency_unavailable_reason(
-                rule_ir=source.rule_ir,
-                clause=source.clause,
-                event_log=context.decisions.event_log,
-                player_id=source.player_id,
-                source_unit_instance_id=source.unit.unit_instance_id,
-                source_model_instance_id=source.model_instance_id,
-            )
-            if unavailable == "frequency_limit_exhausted:battle":
+            unavailable = _source_unavailable_reason(context, source)
+            if unavailable is not None:
                 return RuntimeContentEventResult.applied(
                     subscription,
                     replay_payload={"available": False, "reason": unavailable},
-                )
-            if unavailable is not None:
-                raise GameLifecycleError(
-                    f"Catalog any-phase frequency lookup failed: {unavailable}."
                 )
             request = _activation_request(context=context, source=source)
             context.decisions.request_decision(request)
@@ -460,6 +449,40 @@ def _rule_ir_from_request(payload: dict[str, JsonValue]) -> RuleIR:
     ):
         raise GameLifecycleError("Catalog any-phase request RuleIR shape drifted.")
     return rule_ir
+
+
+def _source_unavailable_reason(
+    context: RuntimeContentEventContext, source: _AnyPhaseSource
+) -> str | None:
+    if type(context) is not RuntimeContentEventContext:
+        raise GameLifecycleError("Catalog any-phase event requires context.")
+    if context.event.phase is None:
+        raise GameLifecycleError("Catalog any-phase event requires a phase.")
+    if source.model_instance_id not in _current_source_model_ids(
+        state=context.state, source=source
+    ):
+        return "source_model_unavailable"
+    psychic_reason = psychic_source_unavailable_reason(
+        rule_ir=source.rule_ir,
+        state=context.state,
+        event_log=context.decisions.event_log,
+        player_id=source.player_id,
+        source_unit_instance_id=source.unit.unit_instance_id,
+        source_model_instance_id=source.model_instance_id,
+    )
+    if psychic_reason is not None:
+        return psychic_reason
+    unavailable = optional_ability_frequency_unavailable_reason(
+        rule_ir=source.rule_ir,
+        clause=source.clause,
+        event_log=context.decisions.event_log,
+        player_id=source.player_id,
+        source_unit_instance_id=source.unit.unit_instance_id,
+        source_model_instance_id=source.model_instance_id,
+    )
+    if unavailable is not None and unavailable != "frequency_limit_exhausted:battle":
+        raise GameLifecycleError(f"Catalog any-phase frequency lookup failed: {unavailable}.")
+    return unavailable
 
 
 def _current_source_model_ids(*, state: object, source: _AnyPhaseSource) -> tuple[str, ...]:

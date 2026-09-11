@@ -62,7 +62,6 @@ from warhammer40k_core.engine.prebattle import (
     prebattle_action_selection_request,
     prebattle_next_player_id_for_timing_state,
     prebattle_proposal_request_from_selection,
-    prebattle_sequencing_request_for_timing_state,
     prebattle_timing_state_for_state,
     redeploy_placement_request_from_selection,
     redeploy_timing_state_for_state,
@@ -77,10 +76,6 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_state_for_state,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
-from warhammer40k_core.engine.sequencing import (
-    SEQUENCING_DECISION_TYPE,
-    decision_controller_before_pending_sequencing_roll_off,
-)
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.start_battle_hooks import (
     StartBattleHookRegistry,
@@ -231,13 +226,6 @@ class SetupFlow:
                 request=nested_request,
                 is_start_battle_request=False,
             )
-        sequencing_roll_off_rewind = decision_controller_before_pending_sequencing_roll_off(
-            decisions=decisions_clone,
-            request=pending_request,
-        )
-        if sequencing_roll_off_rewind is not None:
-            decisions_clone = sequencing_roll_off_rewind.decisions
-        regenerated_suffix_start = len(decisions_clone.event_log.records)
         hook_state = GameState.from_payload(state_clone.to_payload())
         hook_decisions = DecisionController.from_payload(decisions_clone.to_payload())
         status = self.advance(
@@ -249,20 +237,6 @@ class SetupFlow:
         authoritative_request = status.decision_request
         if authoritative_request is None:
             return None
-        if authoritative_request.decision_type == SEQUENCING_DECISION_TYPE:
-            if sequencing_roll_off_rewind is None:
-                raise GameLifecycleError(
-                    "Setup sequencing request has no authoritative roll-off event suffix."
-                )
-            regenerated_suffix = decisions_clone.event_log.records[regenerated_suffix_start:]
-            if regenerated_suffix != sequencing_roll_off_rewind.removed_events:
-                raise GameLifecycleError(
-                    "Setup sequencing event suffix drifted from authoritative regeneration."
-                )
-        elif sequencing_roll_off_rewind is not None:
-            raise GameLifecycleError(
-                "Setup roll-off event suffix does not belong to the authoritative request."
-            )
         is_start_battle_request = False
         if is_start_battle_boundary(hook_state):
             hook_request = self.start_battle_hooks.next_request_for(
@@ -880,21 +854,6 @@ class SetupFlow:
         config: GameConfig,
     ) -> LifecycleStatus | None:
         setup_state = redeploy_timing_state_for_state(state)
-        sequencing_request = prebattle_sequencing_request_for_timing_state(
-            state=state,
-            decisions=decisions,
-            timing_state=setup_state,
-        )
-        if sequencing_request is not None:
-            decisions.request_decision(sequencing_request)
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.SETUP,
-                decision_request=sequencing_request,
-                payload={
-                    "setup_step": SetupStep.REDEPLOY_UNITS.value,
-                    "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
-                },
-            )
         next_player_id = prebattle_next_player_id_for_timing_state(
             decisions=decisions,
             timing_state=setup_state,
@@ -929,21 +888,6 @@ class SetupFlow:
             state,
             army_catalog=config.army_catalog,
         )
-        sequencing_request = prebattle_sequencing_request_for_timing_state(
-            state=state,
-            decisions=decisions,
-            timing_state=setup_state,
-        )
-        if sequencing_request is not None:
-            decisions.request_decision(sequencing_request)
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.SETUP,
-                decision_request=sequencing_request,
-                payload={
-                    "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
-                    "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
-                },
-            )
         next_player_id = prebattle_next_player_id_for_timing_state(
             decisions=decisions,
             timing_state=setup_state,

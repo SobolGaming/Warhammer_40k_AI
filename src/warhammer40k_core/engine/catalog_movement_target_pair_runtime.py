@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import partial
 from types import MappingProxyType
 from typing import cast
 
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -67,10 +69,12 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_views_for_state,
 )
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.shooting_terrain_visibility import (
     shooting_terrain_areas_for_state,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
@@ -152,7 +156,7 @@ class CatalogMovementTargetPairRuntime:
             UnitMoveCompletedMortalWoundHookBinding(
                 hook_id=CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
                 source_id=CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
-                request_handler=self.end_move_request,
+                candidate_handler=self.end_move_candidates,
             ),
         )
 
@@ -163,6 +167,30 @@ class CatalogMovementTargetPairRuntime:
         decisions: DecisionController,
         pending_action: PendingMovementActionSelection,
     ) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.game_state import GameState
+        from warhammer40k_core.engine.movement_start_sequencing import resolve_move_start_rules
+
+        if type(state) is not GameState:
+            raise GameLifecycleError("Catalog movement target-pair start requires GameState.")
+        return resolve_move_start_rules(
+            state=state,
+            decisions=decisions,
+            pending_action=pending_action,
+            discover=partial(
+                self.start_move_candidates,
+                state=state,
+                decisions=decisions,
+                pending_action=pending_action,
+            ),
+        )
+
+    def start_move_candidates(
+        self,
+        *,
+        state: object,
+        decisions: DecisionController,
+        pending_action: PendingMovementActionSelection,
+    ) -> tuple[TimingRuleCandidate, ...]:
         from warhammer40k_core.engine.game_state import GameState
 
         if type(state) is not GameState:
@@ -175,7 +203,8 @@ class CatalogMovementTargetPairRuntime:
         if pending_action.player_id != state.active_player_id:
             raise GameLifecycleError("Catalog movement target-pair active player drift.")
         if not _movement_action_triggers_target_pair(pending_action.movement_phase_action):
-            return None
+            return ()
+        candidates: list[TimingRuleCandidate] = []
         for source in self._sources_for_triggering_rules_unit(
             state=state,
             triggering_unit_instance_id=pending_action.unit_instance_id,
@@ -188,28 +217,47 @@ class CatalogMovementTargetPairRuntime:
                 action_result_id=pending_action.result_id,
             ):
                 continue
-            status = self._request_for_source(
-                state=state,
-                decisions=decisions,
-                source=source,
-                edge=_START_EDGE,
-                trigger_event_id=None,
-                movement_action=pending_action.movement_phase_action.value,
-                movement_action_result_id=pending_action.result_id,
+            if not self._eligible_pair_ids(state=state, source=source):
+                continue
+            identity: dict[str, JsonValue] = {
+                "movement_action_result_id": pending_action.result_id,
+                "source": list(source.sort_key),
+            }
+            candidates.append(
+                TimingRuleCandidate(
+                    participant=SequencingParticipant(
+                        participant_id="movement-target-pair:" + canonical_payload_sha256(identity),
+                        player_id=source.source_rules_unit.owner_player_id,
+                        source_rule_id=source.record.definition.source_id,
+                        requirement=SequencingRequirement.OPTIONAL,
+                        payload=identity,
+                    ),
+                    activate=partial(
+                        self._request_for_source,
+                        state=state,
+                        decisions=decisions,
+                        source=source,
+                        edge=_START_EDGE,
+                        trigger_event_id=None,
+                        movement_action=pending_action.movement_phase_action.value,
+                        movement_action_result_id=pending_action.result_id,
+                    ),
+                )
             )
-            if status is not None:
-                return status
-        return None
+        return tuple(candidates)
 
-    def end_move_request(self, context: UnitMoveCompletedContext) -> LifecycleStatus | None:
+    def end_move_candidates(
+        self, context: UnitMoveCompletedContext
+    ) -> tuple[TimingRuleCandidate, ...]:
         if type(context) is not UnitMoveCompletedContext:
             raise GameLifecycleError("Catalog movement target-pair end requires context.")
         if context.decisions is None:
             raise GameLifecycleError("Catalog movement target-pair end requires decisions.")
         if context.completed_phase is not BattlePhase.MOVEMENT:
-            return None
+            return ()
         if not _movement_action_triggers_target_pair(context.movement_action):
-            return None
+            return ()
+        candidates: list[TimingRuleCandidate] = []
         for source in self._sources_for_triggering_rules_unit(
             state=context.state,
             triggering_unit_instance_id=context.triggering_unit_instance_id,
@@ -226,18 +274,34 @@ class CatalogMovementTargetPairRuntime:
                 trigger_event_id=context.trigger_event_id,
             ):
                 continue
-            status = self._request_for_source(
-                state=context.state,
-                decisions=context.decisions,
-                source=source,
-                edge=_END_EDGE,
-                trigger_event_id=context.trigger_event_id,
-                movement_action=context.movement_action,
-                movement_action_result_id=None,
+            if not self._eligible_pair_ids(state=context.state, source=source):
+                continue
+            identity: dict[str, JsonValue] = {
+                "trigger_event_id": context.trigger_event_id,
+                "source": list(source.sort_key),
+            }
+            candidates.append(
+                TimingRuleCandidate(
+                    participant=SequencingParticipant(
+                        participant_id="movement-target-pair:" + canonical_payload_sha256(identity),
+                        player_id=source.source_rules_unit.owner_player_id,
+                        source_rule_id=source.record.definition.source_id,
+                        requirement=SequencingRequirement.OPTIONAL,
+                        payload=identity,
+                    ),
+                    activate=partial(
+                        self._request_for_source,
+                        state=context.state,
+                        decisions=context.decisions,
+                        source=source,
+                        edge=_END_EDGE,
+                        trigger_event_id=context.trigger_event_id,
+                        movement_action=context.movement_action,
+                        movement_action_result_id=None,
+                    ),
+                )
             )
-            if status is not None:
-                return status
-        return None
+        return tuple(candidates)
 
     def apply_result(
         self,

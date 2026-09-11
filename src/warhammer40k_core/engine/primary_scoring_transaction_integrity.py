@@ -7,7 +7,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_boundary_inventory import (
-    required_primary_scoring_boundary_kinds,
+    required_primary_scoring_boundaries,
 )
 from warhammer40k_core.engine.scoring import (
     VictoryPointAward,
@@ -66,16 +66,20 @@ def validate_primary_transaction_semantics(*, state: GameState) -> None:
         return
     policies = mission_scoring_policies_from_setup(state.mission_setup)
     required_boundary_keys = {
-        (record.record_id, boundary_kind)
+        (record.record_id, boundary_kind, player_id)
         for record in state.objective_control_records
-        for boundary_kind in required_primary_scoring_boundary_kinds(
+        for boundary_kind, player_id in required_primary_scoring_boundaries(
             policies=policies,
             record=record,
             turn_order=state.turn_order,
         )
     }
     evidence_boundary_keys = {
-        (evidence.objective_control_record_id, evidence.scoring_boundary_kind)
+        (
+            evidence.objective_control_record_id,
+            evidence.scoring_boundary_kind,
+            evidence.scoring_player_id,
+        )
         for evidence in state.primary_scoring_state_evidence_records
     }
     from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (

@@ -60,6 +60,11 @@ from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    SequencingParticipant,
+    SequencingRequirement,
+)
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
     SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
@@ -69,6 +74,7 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -591,12 +597,12 @@ def test_shooting_phase_start_hook_registry_fails_fast_and_orders_bindings() -> 
             ShootingPhaseStartHookBinding(
                 hook_id="phase17g-b",
                 source_id="phase17g-source",
-                request_handler=_request_handler(None),
+                candidate_handler=lambda _context: (),
             ),
             ShootingPhaseStartHookBinding(
                 hook_id="phase17g-a",
                 source_id="phase17g-source",
-                request_handler=_request_handler(request),
+                candidate_handler=lambda _context: (_timing_candidate(request),),
             ),
         )
     )
@@ -606,7 +612,8 @@ def test_shooting_phase_start_hook_registry_fails_fast_and_orders_bindings() -> 
 
     with pytest.raises(GameLifecycleError, match="request hooks require context"):
         ordered.next_request_for(cast(ShootingPhaseStartRequestContext, object()))
-    with pytest.raises(GameLifecycleError, match="DecisionRequest or None"):
+    context = _request_context(_battle_ready_lifecycle())
+    with pytest.raises(GameLifecycleError, match="pure candidate discovery"):
         ShootingPhaseStartHookRegistry.from_bindings(
             (
                 ShootingPhaseStartHookBinding(
@@ -616,21 +623,24 @@ def test_shooting_phase_start_hook_registry_fails_fast_and_orders_bindings() -> 
                 ),
             )
         ).next_request_for(context)
-    with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
-        ShootingPhaseStartHookRegistry.from_bindings(
-            (
-                ShootingPhaseStartHookBinding(
-                    hook_id="phase17g-request-a",
-                    source_id="phase17g-source",
-                    request_handler=_request_handler(request),
-                ),
-                ShootingPhaseStartHookBinding(
-                    hook_id="phase17g-request-b",
-                    source_id="phase17g-source",
-                    request_handler=_request_handler(alternate_request),
-                ),
-            )
-        ).next_request_for(context)
+    context = _request_context(_battle_ready_lifecycle())
+    simultaneous = ShootingPhaseStartHookRegistry.from_bindings(
+        (
+            ShootingPhaseStartHookBinding(
+                hook_id="phase17g-request-a",
+                source_id="phase17g-source",
+                candidate_handler=lambda _context: (_timing_candidate(request),),
+            ),
+            ShootingPhaseStartHookBinding(
+                hook_id="phase17g-request-b",
+                source_id="phase17g-source",
+                candidate_handler=lambda _context: (_timing_candidate(alternate_request),),
+            ),
+        )
+    ).next_request_for(context)
+    assert isinstance(simultaneous, DecisionRequest)
+    assert simultaneous.decision_type == SEQUENCING_DECISION_TYPE
+    assert len(simultaneous.options) == 2
 
     with pytest.raises(GameLifecycleError, match="result hooks require context"):
         ordered.apply_result(cast(ShootingPhaseStartResultContext, object()))
@@ -1245,3 +1255,16 @@ def _config(lifecycle: GameLifecycle) -> GameConfig:
         object.__getattribute__(lifecycle, "_require_config"),
     )
     return require_config()
+
+
+def _timing_candidate(request: DecisionRequest) -> TimingRuleCandidate:
+    return TimingRuleCandidate(
+        participant=SequencingParticipant(
+            participant_id=request.request_id,
+            player_id=request.actor_id,
+            source_rule_id="phase17g-source",
+            requirement=SequencingRequirement.MANDATORY,
+        ),
+        activate=lambda: request,
+        request_template=request,
+    )

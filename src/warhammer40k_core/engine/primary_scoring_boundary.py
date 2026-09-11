@@ -7,7 +7,7 @@ from warhammer40k_core.engine.missions import mission_scoring_policies_from_setu
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_boundary_inventory import (
-    required_primary_scoring_boundary_kinds,
+    required_primary_scoring_boundaries,
 )
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
     resolve_primary_scoring_boundary_lifecycle,
@@ -38,7 +38,59 @@ def score_primary_objective_control_boundary(
     event_log: EventLog | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> None:
-    """Score one authenticated Primary boundary through the shared policy path."""
+    """Complete each required player commit for an atomic engine scoring operation."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Primary boundary scoring requires GameState.")
+    if type(record) is not ObjectiveControlRecord:
+        raise GameLifecycleError("Primary boundary scoring requires an ObjectiveControlRecord.")
+    if type(end_of_battle) is not bool:
+        raise GameLifecycleError("Primary boundary end_of_battle must be a bool.")
+    if event_log is not None and type(event_log) is not EventLog:
+        raise GameLifecycleError("Primary boundary scoring event_log must be EventLog.")
+    if state.mission_setup is None:
+        raise GameLifecycleError("Mission scoring requires MissionSetup.")
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    kind = (
+        PrimaryScoringBoundaryKind.END_OF_BATTLE
+        if end_of_battle
+        else PrimaryScoringBoundaryKind.ORDINARY
+    )
+    from warhammer40k_core.engine.mission_scoring_transaction import (
+        capture_mission_scoring_aggregate,
+        restore_mission_scoring_aggregate,
+    )
+
+    snapshot = capture_mission_scoring_aggregate(state=state, event_log=event_log)
+    try:
+        for boundary_kind, player_id in required_primary_scoring_boundaries(
+            policies=policies, record=record, turn_order=state.turn_order
+        ):
+            if boundary_kind is kind:
+                score_primary_player_boundary(
+                    state=state,
+                    record=record,
+                    scoring_player_id=player_id,
+                    end_of_battle=end_of_battle,
+                    event_log=event_log,
+                    runtime_modifier_registry=runtime_modifier_registry,
+                )
+    except GameLifecycleError:
+        restore_mission_scoring_aggregate(state=state, event_log=event_log, snapshot=snapshot)
+        raise
+
+
+def score_primary_player_boundary(
+    *,
+    state: GameState,
+    record: ObjectiveControlRecord,
+    scoring_player_id: str,
+    end_of_battle: bool,
+    event_log: EventLog | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> None:
+    """Commit the selected player's mission with its own authenticated checkpoint."""
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -53,12 +105,14 @@ def score_primary_objective_control_boundary(
     if mission_setup is None:
         raise GameLifecycleError("Mission scoring requires MissionSetup.")
     policies = mission_scoring_policies_from_setup(mission_setup)
+    if scoring_player_id not in state.player_ids:
+        raise GameLifecycleError("Primary scoring player is not part of this game.")
     boundary_kind = (
         PrimaryScoringBoundaryKind.END_OF_BATTLE
         if end_of_battle
         else PrimaryScoringBoundaryKind.ORDINARY
     )
-    required_boundary_kinds = required_primary_scoring_boundary_kinds(
+    required_boundaries = required_primary_scoring_boundaries(
         policies=policies,
         record=record,
         turn_order=state.turn_order,
@@ -68,9 +122,10 @@ def score_primary_objective_control_boundary(
         for evidence in state.primary_scoring_state_evidence_records
         if evidence.objective_control_record_id == record.record_id
         and evidence.scoring_boundary_kind is boundary_kind
+        and evidence.scoring_player_id == scoring_player_id
     )
     if boundary_matches:
-        if boundary_kind not in required_boundary_kinds:
+        if (boundary_kind, scoring_player_id) not in required_boundaries:
             raise GameLifecycleError("Primary scoring produced state for an inapplicable boundary.")
         if len(boundary_matches) != 1:
             raise GameLifecycleError(
@@ -82,8 +137,12 @@ def score_primary_objective_control_boundary(
         )
         return
 
+    if (boundary_kind, scoring_player_id) not in required_boundaries:
+        raise GameLifecycleError("Primary scoring player has no rule at this boundary.")
+
     scoring_commit_checkpoint = bound_primary_scoring_commit_checkpoint(
         state=state,
+        scoring_player_id=scoring_player_id,
         record=record,
         scoring_commit_checkpoint=None,
         runtime_modifier_registry=runtime_modifier_registry,
@@ -92,6 +151,7 @@ def score_primary_objective_control_boundary(
         state=state,
         record=record,
         end_of_battle=end_of_battle,
+        scoring_player_id=scoring_player_id,
         scoring_commit_checkpoint=scoring_commit_checkpoint,
         runtime_modifier_registry=runtime_modifier_registry,
     )
@@ -100,21 +160,19 @@ def score_primary_objective_control_boundary(
         authoritative_state=state,
         state_evidence=state_evidence,
     )
-    if boundary_kind not in required_boundary_kinds:
-        if awards:
-            raise GameLifecycleError("Primary scoring produced state for an inapplicable boundary.")
-        return
+    from warhammer40k_core.engine.mission_scoring_transaction import (
+        capture_mission_scoring_aggregate,
+        restore_mission_scoring_aggregate,
+    )
 
-    evidence_records_before = tuple(state.primary_scoring_state_evidence_records)
-    ledgers_before = tuple(state.victory_point_ledgers)
-    lifecycles_before = tuple(state.primary_scoring_boundary_lifecycles)
-    event_records_before = None if event_log is None else event_log.records
+    snapshot = capture_mission_scoring_aggregate(state=state, event_log=event_log)
     try:
         if event_log is not None:
             emit_primary_scoring_commit_checkpoint(
                 event_log=event_log,
                 objective_control_record_id=record.record_id,
                 scoring_boundary_kind=boundary_kind.value,
+                scoring_player_id=scoring_player_id,
                 checkpoint=scoring_commit_checkpoint,
             )
         record_primary_scoring_state_evidence(
@@ -133,35 +191,14 @@ def score_primary_objective_control_boundary(
             state=state,
             record=record,
             scoring_boundary_kind=boundary_kind,
+            scoring_player_id=scoring_player_id,
             scoring_commit_checkpoint_id=state_evidence.scoring_commit_checkpoint_id,
             scoring_commit_checkpoint_hash=state_evidence.scoring_commit_checkpoint_hash,
             evidence_id=state_evidence.evidence_id,
         )
     except GameLifecycleError:
-        from warhammer40k_core.engine.mission_scoring_transaction import (
-            MissionScoringAggregateSnapshot,
-        )
-
-        state.restore_mission_scoring_aggregate(
-            MissionScoringAggregateSnapshot(
-                objective_control_records=tuple(state.objective_control_records),
-                objective_control_record_authorities=tuple(
-                    state.objective_control_record_authorities
-                ),
-                sticky_objective_control_states=tuple(state.sticky_objective_control_states),
-                primary_scoring_state_evidence_records=evidence_records_before,
-                secondary_scoring_state_evidence_records=tuple(
-                    state.secondary_scoring_state_evidence_records
-                ),
-                victory_point_ledgers=ledgers_before,
-                secondary_mission_card_states=tuple(state.secondary_mission_card_states),
-                primary_scoring_boundary_lifecycles=lifecycles_before,
-                event_records=(),
-            )
-        )
-        if event_log is not None and event_records_before is not None:
-            event_log.replace_records(event_records_before)
+        restore_mission_scoring_aggregate(state=state, event_log=event_log, snapshot=snapshot)
         raise
 
 
-__all__ = ("score_primary_objective_control_boundary",)
+__all__ = ("score_primary_objective_control_boundary", "score_primary_player_boundary")

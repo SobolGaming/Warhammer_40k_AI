@@ -73,6 +73,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionHookBinding,
     TargetRestriction,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -162,6 +163,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=templar_vow_selection_request,
+                candidate_handler=round_sequencing_candidates,
                 result_handler=apply_templar_vow_selection_result,
             ),
         ),
@@ -213,36 +215,9 @@ def runtime_contribution() -> RuntimeContentContribution:
 def templar_vow_selection_request(
     context: BattleRoundStartRequestContext,
 ) -> DecisionRequest | None:
-    if type(context) is not BattleRoundStartRequestContext:
-        raise GameLifecycleError("Templar Vows requires request context.")
-    for army in _black_templars_armies(context.state):
-        if _vow_selection_recorded_for_player(context.state, player_id=army.player_id):
-            continue
-        target_unit_ids = _eligible_templar_vow_unit_ids_for_army(army)
-        if not target_unit_ids:
-            continue
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-            actor_id=army.player_id,
-            payload=validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "phase": BattlePhase.COMMAND.value,
-                    "faction_id": BLACK_TEMPLARS_FACTION_ID,
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "hook_id": HOOK_ID,
-                    "effect_kind": TEMPLAR_VOWS_EFFECT_KIND,
-                    "target_unit_instance_ids": list(target_unit_ids),
-                }
-            ),
-            options=templar_vow_selection_options(
-                player_id=army.player_id,
-                battle_round=context.state.battle_round,
-            ),
-        )
-    return None
+    from .round_sequencing import request_for
+
+    return request_for(context)
 
 
 def apply_templar_vow_selection_result(context: BattleRoundStartResultContext) -> bool:
@@ -260,7 +235,7 @@ def apply_templar_vow_selection_result(context: BattleRoundStartResultContext) -
     army = _black_templars_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Templar Vows actor does not own Black Templars.")
-    if _vow_selection_recorded_for_player(context.state, player_id=player_id):
+    if vow_selection_recorded_for_player(context.state, player_id=player_id):
         raise GameLifecycleError("Templar Vows selection is already recorded.")
     try:
         expected_option = context.request.option_by_id(result.selected_option_id)
@@ -270,7 +245,7 @@ def apply_templar_vow_selection_result(context: BattleRoundStartResultContext) -
         raise GameLifecycleError("Templar Vows selected option payload drift.")
     payload = _payload_object(result.payload)
     vow = _templar_vow_from_token(_payload_string(payload, key="selected_vow_id"))
-    target_unit_ids = _eligible_templar_vow_unit_ids_for_army(army)
+    target_unit_ids = eligible_templar_vow_unit_ids_for_army(army)
     if not target_unit_ids:
         raise GameLifecycleError("Templar Vows selection has no eligible units.")
     definition = _VOW_DEFINITIONS_BY_VOW[vow]
@@ -554,7 +529,7 @@ def uphold_objective_control_states(
         return ()
     states: list[StickyObjectiveControlState] = []
     active_player_id = _active_player_id(context)
-    for army in _black_templars_armies(context.state):
+    for army in black_templars_armies(context.state):
         if army.player_id != active_player_id:
             continue
         if active_templar_vow_for_player(context.state, player_id=army.player_id) is not (
@@ -571,7 +546,7 @@ def _uphold_states_for_army(
     army: ArmyDefinition,
     record: ObjectiveControlRecord,
 ) -> tuple[StickyObjectiveControlState, ...]:
-    eligible_unit_ids = set(_eligible_templar_vow_unit_ids_for_army(army))
+    eligible_unit_ids = set(eligible_templar_vow_unit_ids_for_army(army))
     if not eligible_unit_ids:
         return ()
     states: list[StickyObjectiveControlState] = []
@@ -669,7 +644,7 @@ def _result_eligible_unit_ids_in_range(
     )
 
 
-def _vow_selection_recorded_for_player(
+def vow_selection_recorded_for_player(
     state: GameState,
     *,
     player_id: str,
@@ -819,7 +794,7 @@ def _unit_is_placed(state: GameState, *, unit_instance_id: str) -> bool:
     )
 
 
-def _eligible_templar_vow_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
+def eligible_templar_vow_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Templar Vows requires an ArmyDefinition.")
     return tuple(unit.unit_instance_id for unit in army.units if _unit_has_templar_vows(unit))
@@ -849,7 +824,7 @@ def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     )
 
 
-def _black_templars_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
+def black_templars_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
     _validate_game_state(state)
     return tuple(
         army
@@ -864,7 +839,7 @@ def _black_templars_army_for_player(
     player_id: str,
 ) -> ArmyDefinition | None:
     requested_player_id = _validate_identifier("player_id", player_id)
-    for army in _black_templars_armies(state):
+    for army in black_templars_armies(state):
         if army.player_id == requested_player_id:
             return army
     return None
@@ -922,3 +897,11 @@ def _validate_game_state(state: object) -> None:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def round_sequencing_candidates(
+    context: BattleRoundStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .round_sequencing import candidates
+
+    return candidates(context)

@@ -7,10 +7,11 @@ from typing import TYPE_CHECKING, Self, cast
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
-from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLog, EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -18,6 +19,9 @@ if TYPE_CHECKING:
 
 
 type UnitDestroyedHandler = Callable[["UnitDestroyedContext"], None]
+type UnitDestroyedCandidateHandler = Callable[
+    ["UnitDestroyedContext"], tuple[TimingRuleCandidate, ...]
+]
 type ModelDestroyedEvent = tuple[int, str, dict[str, JsonValue]]
 type ModelRestorationEvent = tuple[int, str, tuple[str, ...]]
 
@@ -31,6 +35,26 @@ ATTACHED_UNIT_DESTRUCTION_SOURCE_SHA256 = (
 
 
 @dataclass(frozen=True, slots=True)
+class ModelDestroyedContext:
+    state: GameState
+    decisions: DecisionController
+    phase: BattlePhase
+    event: EventRecord
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState or type(self.decisions) is not DecisionController:
+            raise GameLifecycleError("Model destruction requires typed state and decisions.")
+        if type(self.phase) is not BattlePhase or self.phase is not self.state.current_battle_phase:
+            raise GameLifecycleError("Model destruction occurrence phase drift.")
+        if type(self.event) is not EventRecord or self.event.event_type != "model_destroyed":
+            raise GameLifecycleError("Model destruction requires its typed source event.")
+        if not isinstance(self.event.payload, dict):
+            raise GameLifecycleError("Model destruction source payload must be an object.")
+
+
+@dataclass(frozen=True, slots=True)
 class UnitDestroyedContext:
     state: GameState
     decisions: DecisionController
@@ -40,6 +64,8 @@ class UnitDestroyedContext:
     destroying_player_id: str
     destroyed_unit_instance_id: str
     destroyed_player_id: str
+    sequencing_active_player_id: str
+    authoritative_request_id: str | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -73,21 +99,45 @@ class UnitDestroyedContext:
             "destroyed_player_id",
             _validate_identifier("destroyed_player_id", self.destroyed_player_id),
         )
+        if self.sequencing_active_player_id not in self.state.player_ids:
+            raise GameLifecycleError(
+                "Unit destruction requires explicit sequencing active-player authority."
+            )
         if self.destroying_player_id == self.destroyed_player_id:
             raise GameLifecycleError("UnitDestroyedContext requires enemy destruction.")
+
+    def issue_request_id(self) -> str:
+        return (
+            self.authoritative_request_id
+            if self.authoritative_request_id is not None
+            else self.state.next_decision_request_id()
+        )
 
 
 @dataclass(frozen=True, slots=True)
 class UnitDestroyedHookBinding:
     hook_id: str
     source_id: str
-    handler: UnitDestroyedHandler
+    maintenance_handler: UnitDestroyedHandler | None = None
+    model_maintenance_handler: Callable[[ModelDestroyedContext], None] | None = None
+    candidate_handler: UnitDestroyedCandidateHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if not callable(self.handler):
-            raise GameLifecycleError("UnitDestroyedHookBinding handler must be callable.")
+        if (
+            self.maintenance_handler is None
+            and self.candidate_handler is None
+            and self.model_maintenance_handler is None
+        ):
+            raise GameLifecycleError("Unit-destroyed binding requires maintenance or candidates.")
+        for handler in (
+            self.maintenance_handler,
+            self.candidate_handler,
+            self.model_maintenance_handler,
+        ):
+            if handler is not None and not callable(handler):
+                raise GameLifecycleError("Unit-destroyed binding handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,11 +158,52 @@ class UnitDestroyedHookRegistry:
     def all_bindings(self) -> tuple[UnitDestroyedHookBinding, ...]:
         return self.bindings
 
-    def resolve(self, context: UnitDestroyedContext) -> None:
+    def record_model_occurrence(self, context: ModelDestroyedContext) -> None:
+        if type(context) is not ModelDestroyedContext:
+            raise GameLifecycleError("Model occurrence maintenance requires typed context.")
+        pending = context.decisions.queue.pending_requests
+        for binding in self.bindings:
+            if binding.model_maintenance_handler is not None:
+                binding.model_maintenance_handler(context)
+        if context.decisions.queue.pending_requests != pending:
+            raise GameLifecycleError("Occurrence maintenance cannot request player choices.")
+
+    def record_occurrence(self, context: UnitDestroyedContext) -> None:
+        """Maintain existing effect conditions without resolving new player rules."""
         if type(context) is not UnitDestroyedContext:
             raise GameLifecycleError("Unit-destroyed hooks require context.")
+        pending = context.decisions.queue.pending_requests
         for binding in self.bindings:
-            binding.handler(context)
+            if binding.maintenance_handler is not None:
+                binding.maintenance_handler(context)
+        if context.decisions.queue.pending_requests != pending:
+            raise GameLifecycleError("Occurrence maintenance cannot request player choices.")
+
+    def candidates_for(self, context: UnitDestroyedContext) -> tuple[TimingRuleCandidate, ...]:
+        if type(context) is not UnitDestroyedContext:
+            raise GameLifecycleError("Unit-destroyed hooks require context.")
+        before = context.state.to_payload(), context.decisions.event_log.records
+        candidates: list[TimingRuleCandidate] = []
+        for binding in self.bindings:
+            if binding.candidate_handler is None:
+                continue
+            found = binding.candidate_handler(context)
+            if type(found) is not tuple or any(
+                type(value) is not TimingRuleCandidate for value in found
+            ):
+                raise GameLifecycleError("Unit-destroyed discovery requires typed candidates.")
+            candidates.extend(found)
+        if (context.state.to_payload(), context.decisions.event_log.records) != before:
+            raise GameLifecycleError("Unit-destroyed discovery mutated authoritative state.")
+        return tuple(candidates)
+
+    def resolve(self, context: UnitDestroyedContext) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.unit_destruction_sequencing import (
+            resolve_unit_destroyed_candidates,
+        )
+
+        self.record_occurrence(context)
+        return resolve_unit_destroyed_candidates(context=context, registry=self)
 
 
 def unit_destruction_completion_events_for_phase(
@@ -337,11 +428,20 @@ def _destruction_completion_records_by_identity(
                 )
             identity_by_model_id[model_id] = identity_id
     removed_model_ids = set(battlefield.removed_model_ids)
+    pending_destruction_model_ids = {
+        authority.model_instance_id
+        for authority in state.model_destruction_cause_authorities
+        if authority.model_destroyed_event is None
+    }
     alive_by_model_id = (
         dict.fromkeys(identity_by_model_id, True)
         if starts_with_all_models_alive
         else {
-            model_id: models_by_id[model_id].is_alive and model_id not in removed_model_ids
+            # A retained casualty has a logical death but no completed source
+            # event yet. It must not make an earlier casualty look like the
+            # unit's final destruction while its own reaction is still pending.
+            model_id: (models_by_id[model_id].is_alive and model_id not in removed_model_ids)
+            or model_id in pending_destruction_model_ids
             for model_id in identity_by_model_id
         }
     )

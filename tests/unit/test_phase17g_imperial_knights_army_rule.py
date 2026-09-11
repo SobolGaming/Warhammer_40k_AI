@@ -97,8 +97,8 @@ from warhammer40k_core.engine.return_on_death import (
     ReturnDestroyedTargetScope,
     ReturnRestoreWoundsMode,
     apply_return_on_death_placement_decision,
-    resolve_pending_return_on_death_phase_end,
 )
+from warhammer40k_core.engine.return_on_death_sequencing import resolve_return_phase_end_candidates
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     MovementBudgetModifierContext,
@@ -489,7 +489,10 @@ def test_bondsman_rejects_drifted_selection_before_mutation() -> None:
     )
 
 
-def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model() -> None:
+@pytest.mark.parametrize("sequenced", [False, True])
+def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model(
+    sequenced: bool,
+) -> None:
     config = phase11c_config()
     state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
@@ -522,18 +525,19 @@ def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model() ->
         },
     )
 
-    result = army_rule.resolve_code_chivalric_end_turn(
-        _runtime_event_context(
-            state=state,
-            decisions=decisions,
-            config=config,
-            trigger_kind=TimingTriggerKind.END_TURN,
-            active_player_id="player-b",
-            event_suffix="lay-low",
-        )
+    context = _runtime_event_context(
+        state=state,
+        decisions=decisions,
+        config=config,
+        trigger_kind=TimingTriggerKind.END_TURN,
+        active_player_id="player-b",
+        event_suffix="lay-low",
     )
-
-    assert result.status.value == "applied"
+    if sequenced:
+        _activate_deed_candidate(context)
+    else:
+        result = army_rule.resolve_code_chivalric_end_turn(context)
+        assert result.status.value == "applied"
     assert army_rule.army_is_honoured(state, player_id="player-a")
     fulfilled = state.faction_rule_states_for_player(
         player_id="player-a",
@@ -591,7 +595,10 @@ def test_code_chivalric_reclaim_honours_army_at_opponent_turn_end() -> None:
     assert army_rule.army_is_honoured(state, player_id="player-a")
 
 
-def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_units() -> None:
+@pytest.mark.parametrize("sequenced", [False, True])
+def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_units(
+    sequenced: bool,
+) -> None:
     config = phase11c_config()
     state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
@@ -611,17 +618,22 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
         decisions=decisions,
         model_destroyed_event_id_suffix="first-destruction",
     )
-    army_rule.resolve_code_chivalric_end_battle_round(
-        _runtime_event_context(
-            state=state,
-            decisions=decisions,
-            config=config,
-            trigger_kind=TimingTriggerKind.END_BATTLE_ROUND,
-            active_player_id=None,
-            event_suffix="one-destroyed-unit",
-        )
+    context = _runtime_event_context(
+        state=state,
+        decisions=decisions,
+        config=config,
+        trigger_kind=TimingTriggerKind.END_BATTLE_ROUND,
+        active_player_id=None,
+        event_suffix="one-destroyed-unit",
     )
+    if sequenced:
+        from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
+            timing_sequencing,
+        )
 
+        assert timing_sequencing.candidates(context) == ()
+    else:
+        army_rule.resolve_code_chivalric_end_battle_round(context)
     assert not army_rule.army_is_honoured(state, player_id="player-a")
 
     _restore_enemy_unit_for_code_chivalric_fixture(
@@ -637,17 +649,18 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
         decisions=decisions,
         model_destroyed_event_id_suffix="returned-unit-destroyed-again",
     )
-    army_rule.resolve_code_chivalric_end_battle_round(
-        _runtime_event_context(
-            state=state,
-            decisions=decisions,
-            config=config,
-            trigger_kind=TimingTriggerKind.END_BATTLE_ROUND,
-            active_player_id=None,
-            event_suffix="two-destroyed-units",
-        )
+    context = _runtime_event_context(
+        state=state,
+        decisions=decisions,
+        config=config,
+        trigger_kind=TimingTriggerKind.END_BATTLE_ROUND,
+        active_player_id=None,
+        event_suffix="two-destroyed-units",
     )
-
+    if sequenced:
+        _activate_deed_candidate(context)
+    else:
+        army_rule.resolve_code_chivalric_end_battle_round(context)
     assert army_rule.army_is_honoured(state, player_id="player-a")
     fulfilled = state.faction_rule_states_for_player(
         player_id="player-a",
@@ -1145,6 +1158,7 @@ def test_code_chivalric_unit_destroyed_hook_ignores_non_knights_and_duplicates()
     )
     army_rule.record_code_chivalric_enemy_unit_destroyed(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -1939,6 +1953,9 @@ def _record_enemy_unit_destroyed(
     model_destroyed_event_id_suffix: str,
     action_phase: BattlePhase = BattlePhase.FIGHT,
 ) -> EventRecord:
+    from tests.secondary_destruction_helpers import record_current_turn_start_evidence_for_fixture
+
+    record_current_turn_start_evidence_for_fixture(state=state, event_log=decisions.event_log)
     enemy = unit_by_id(state, ENEMY_UNIT_ID)
     expected_destroyed_model_ids = tuple(
         model.model_instance_id for model in enemy.own_models if model.is_alive
@@ -2013,6 +2030,7 @@ def _record_enemy_unit_destroyed(
     )
     army_rule.record_code_chivalric_enemy_unit_destroyed(
         UnitDestroyedContext(
+            sequencing_active_player_id=cast(str, state.active_player_id),
             state=state,
             decisions=decisions,
             completed_phase=BattlePhase.FIGHT,
@@ -2035,6 +2053,9 @@ def _restore_enemy_unit_for_code_chivalric_fixture(
     model_destroyed_event: EventRecord,
     restoration_suffix: str,
 ) -> None:
+    from tests.destruction_occurrence_fixture_helpers import finish_core_destructions_for_fixture
+
+    finish_core_destructions_for_fixture(state=state, decisions=decisions)
     destroyed_payload = cast(dict[str, JsonValue], model_destroyed_event.payload)
     restored_model_id = cast(str, destroyed_payload["model_instance_id"])
     restored_placement = next(
@@ -2083,11 +2104,11 @@ def _restore_enemy_unit_for_code_chivalric_fixture(
             "pending": pending.to_payload(),
         },
     )
-    request = resolve_pending_return_on_death_phase_end(
+    request = resolve_return_phase_end_candidates(
         state=state,
         decisions=decisions,
     )
-    assert request is not None
+    assert isinstance(request, DecisionRequest)
     returned_placement = UnitPlacement(
         army_id=restored_placement.army_id,
         player_id=restored_placement.player_id,
@@ -2168,3 +2189,22 @@ def _set_current_phase(
 ) -> None:
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
     state.active_player_id = active_player_id
+
+
+def _activate_deed_candidate(context: RuntimeContentEventContext) -> None:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
+        timing_sequencing,
+    )
+    from warhammer40k_core.engine.sequencing import SequencingRequirement
+
+    before = (context.state.to_payload(), context.decisions.to_payload())
+    (candidate,) = timing_sequencing.candidates(context)
+    assert (context.state.to_payload(), context.decisions.to_payload()) == before
+    assert candidate.participant.player_id == "player-a"
+    assert candidate.participant.requirement is SequencingRequirement.MANDATORY
+    assert candidate.activate() is None
+    assert timing_sequencing.candidates(context) == ()
+    event = context.decisions.event_log.records[-1]
+    assert event.event_type == "runtime_content_event_resolved"
+    assert isinstance(event.payload, dict)
+    assert event.payload["timing_participant_id"] == candidate.participant.participant_id

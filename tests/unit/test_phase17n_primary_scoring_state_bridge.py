@@ -314,6 +314,7 @@ def test_phase17n_step5a_bridge_accepts_normal_lifecycle_death_trap_action() -> 
     )
 
     evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
         state=state,
         record=record,
         end_of_battle=False,
@@ -528,6 +529,7 @@ def persisted_primary_scoring_boundary() -> tuple[
     )
     state.record_objective_control_record(scoring_record)
     evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=scoring_record.active_player_id,
         state=state,
         record=scoring_record,
         end_of_battle=False,
@@ -544,6 +546,7 @@ def persisted_primary_scoring_boundary() -> tuple[
     for award in awards:
         state.award_victory_points(award)
     resolve_primary_scoring_boundary_lifecycle(
+        scoring_player_id=scoring_record.active_player_id,
         state=state,
         record=scoring_record,
         scoring_boundary_kind=evidence.scoring_boundary_kind,
@@ -583,6 +586,7 @@ def test_phase17n_step5a_bridge_round_trips_complete_authoritative_state(
     assert departed_position.rules_unit_membership.evaluated_model_instance_ids == ()
     assert set(evidence.to_payload()) == {
         "schema_version",
+        "scoring_player_id",
         "game_id",
         "battlefield_id",
         "battle_round",
@@ -613,6 +617,7 @@ def test_phase17n_step5a_bridge_round_trips_complete_authoritative_state(
     )
     assert (
         build_primary_scoring_state_evidence(
+            scoring_player_id=restored_record.active_player_id,
             state=restored,
             record=restored_record,
             end_of_battle=False,
@@ -649,11 +654,13 @@ def test_phase17n_step5a_registry_distinguishes_final_ordinary_and_end_battle_bo
     )
     state.record_objective_control_record(final_record)
     ordinary = build_primary_scoring_state_evidence(
+        scoring_player_id=final_record.active_player_id,
         state=state,
         record=final_record,
         end_of_battle=False,
     )
     end_of_battle = build_primary_scoring_state_evidence(
+        scoring_player_id=final_record.active_player_id,
         state=state,
         record=final_record,
         end_of_battle=True,
@@ -965,6 +972,7 @@ def test_phase17n_step5a_current_positions_reject_unaccounted_alive_models(
 
     with pytest.raises(GameLifecycleError, match="alive model with no accounted placement"):
         build_primary_scoring_state_evidence(
+            scoring_player_id=restored_record.active_player_id,
             state=restored,
             record=restored_record,
             end_of_battle=False,
@@ -973,38 +981,46 @@ def test_phase17n_step5a_current_positions_reject_unaccounted_alive_models(
         build_primary_rules_unit_turn_start_snapshot(state=restored)
 
 
-def test_phase17n_step5a_context_rejects_rehashed_started_action_at_turn_end(
-    completed_primary_scoring_boundary: tuple[
-        GameState,
-        ObjectiveControlRecord,
-        PrimaryScoringStateEvidence,
-        str,
-    ],
-) -> None:
-    state, record, evidence, _departed_unit_id = completed_primary_scoring_boundary
-    action = evidence.primary_mission_action_states[0]
-    started = replace(
-        action,
-        status=MissionActionStatus.STARTED,
-        completed_battle_round=None,
-        completed_phase=None,
-        interrupted_reason=None,
-        score_transaction_id=None,
+def test_primary_commit_rejects_rehashed_action_from_before_its_selected_completion() -> None:
+    from warhammer40k_core.engine.primary_scoring_mission_history import (
+        validate_primary_mission_history_at_commit,
     )
-    drifted = _rebuild_state_evidence(
-        evidence,
-        primary_mission_action_states=(started,),
-    )
-    if state.mission_setup is None:
-        raise AssertionError("Step 5A fixture requires MissionSetup.")
 
-    with pytest.raises(GameLifecycleError, match=r"cannot retain.*started Action"):
-        validate_primary_scoring_state_evidence_context(
-            drifted,
-            mission_setup=state.mission_setup,
-            turn_order=state.turn_order,
-            record=record,
-            end_of_battle=False,
+    state, decisions, action, target_id = phase17n_started_primary_action_fixture(
+        layout_id="disruption-vs-reconnaissance-layout-1",
+        attacker_force_disposition_id="disruption",
+        defender_force_disposition_id="reconnaissance",
+        player_id="player-a",
+        mission_action_id="decoy-objective",
+        current_phase=BattlePhase.FIGHT,
+    )
+    record = phase17n_action_turn_end_record(
+        state=state,
+        decisions=decisions,
+        controlled_target_id=target_id,
+        action=action,
+    )
+    resolve_primary_mission_actions_at_turn_end(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+        turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    evidence = build_primary_scoring_state_evidence(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        scoring_player_id="player-a",
+    )
+    events = decisions.event_log.records
+    validate_primary_mission_history_at_commit(
+        state=state, evidence=evidence, events=events, commit_index=len(events)
+    )
+    drifted = _rebuild_state_evidence(evidence, primary_mission_action_states=(action,))
+    with pytest.raises(GameLifecycleError, match="Action drifted from its commit event"):
+        validate_primary_mission_history_at_commit(
+            state=state, evidence=drifted, events=events, commit_index=len(events)
         )
 
 
@@ -1231,6 +1247,7 @@ def test_phase17n_step5a_bridge_filters_non_primary_actions_and_preserves_groups
     )
 
     grouped = build_primary_scoring_state_evidence(
+        scoring_player_id=restored_record.active_player_id,
         state=restored,
         record=restored_record,
         end_of_battle=False,
@@ -1269,6 +1286,7 @@ def test_phase17n_step5a_bridge_rejects_unknown_assigned_primary_action(
 
     with pytest.raises(GameLifecycleError, match="Action policy is not registered"):
         build_primary_scoring_state_evidence(
+            scoring_player_id=restored_record.active_player_id,
             state=restored,
             record=restored_record,
             end_of_battle=False,
@@ -1301,6 +1319,7 @@ def test_phase17n_step5a_bridge_fails_closed_for_tamper_and_unauthenticated_stat
             PrimaryScoringStateEvidence.from_payload(payload)
 
     drifted = PrimaryScoringStateEvidence.create(
+        scoring_player_id=evidence.active_player_id,
         game_id="phase17n-step5a-foreign-game",
         battlefield_id=evidence.battlefield_id,
         battle_round=evidence.battle_round,
@@ -1336,6 +1355,7 @@ def test_phase17n_step5a_bridge_fails_closed_for_tamper_and_unauthenticated_stat
     missing_record_state.objective_control_records = []
     with pytest.raises(GameLifecycleError, match="authoritative stored record"):
         build_primary_scoring_state_evidence(
+            scoring_player_id=record.active_player_id,
             state=missing_record_state,
             record=record,
             end_of_battle=False,
@@ -1350,6 +1370,7 @@ def test_phase17n_step5a_bridge_fails_closed_for_tamper_and_unauthenticated_stat
     duplicate_record_state.objective_control_records.append(duplicate_record)
     with pytest.raises(GameLifecycleError, match="authoritative stored record"):
         build_primary_scoring_state_evidence(
+            scoring_player_id=duplicate_record.active_player_id,
             state=duplicate_record_state,
             record=duplicate_record,
             end_of_battle=False,
@@ -1403,7 +1424,7 @@ def test_phase17n_step5a_bridge_rejects_duplicate_untyped_and_unsorted_rows(
         )
 
 
-def test_phase17n_step5a_turn_end_bridge_rejects_unresolved_primary_action() -> None:
+def test_primary_commit_can_precede_a_pending_same_boundary_action() -> None:
     state, decisions, action, target_id = phase17n_started_primary_action_fixture(
         layout_id="reconnaissance-vs-reconnaissance-layout-1",
         attacker_force_disposition_id="reconnaissance",
@@ -1419,12 +1440,14 @@ def test_phase17n_step5a_turn_end_bridge_rejects_unresolved_primary_action() -> 
         action=action,
     )
 
-    with pytest.raises(GameLifecycleError, match=r"cannot retain.*started Action"):
-        build_primary_scoring_state_evidence(
-            state=state,
-            record=record,
-            end_of_battle=False,
-        )
+    evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=record.active_player_id,
+        state=state,
+        record=record,
+        end_of_battle=False,
+    )
+    assert evidence.primary_mission_action_states == (action,)
+    assert action.status is MissionActionStatus.STARTED
 
 
 @pytest.fixture(scope="module")
@@ -1977,6 +2000,7 @@ def _coordinated_objective_control_forgery_payload(
     ]
     forged_state.primary_scoring_state_evidence_records = []
     forged_evidence = build_primary_scoring_state_evidence(
+        scoring_player_id=forged_record.active_player_id,
         state=forged_state,
         record=forged_record,
         end_of_battle=False,
@@ -2035,6 +2059,7 @@ def _coordinated_objective_control_authority_payload(
     rebuilt_lifecycles = tuple(
         PrimaryScoringBoundaryLifecycle.create(
             objective_control_record_id=row.objective_control_record_id,
+            scoring_player_id=row.scoring_player_id,
             objective_control_record_hash=objective_control_record_hash(forged_record),
             scoring_boundary_kind=row.scoring_boundary_kind,
             status=row.status,
@@ -2123,6 +2148,7 @@ def _rebuild_state_evidence(
     | None = None,
 ) -> PrimaryScoringStateEvidence:
     return PrimaryScoringStateEvidence.create(
+        scoring_player_id=evidence.active_player_id if record is None else record.active_player_id,
         game_id=evidence.game_id,
         battlefield_id=evidence.battlefield_id,
         battle_round=evidence.battle_round if record is None else record.battle_round,

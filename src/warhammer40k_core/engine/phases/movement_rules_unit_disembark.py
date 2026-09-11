@@ -672,6 +672,7 @@ def apply_rules_unit_combat_disembark_to_state(
     from warhammer40k_core.engine.mortal_wound_application_progress import (
         start_hazardous_mortal_wound_application,
     )
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
 
     if type(state) is not GameState:
         raise GameLifecycleError("Rules-unit Combat Disembark requires GameState.")
@@ -713,9 +714,11 @@ def apply_rules_unit_combat_disembark_to_state(
             maximum_model_horizontal_distance_inches=0.0,
         )
     )
-    decisions.event_log.append(
-        "unit_disembarked",
-        {
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="unit_disembarked",
+        payload={
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": disembark.disembarked_unit_state.turn_player_id,

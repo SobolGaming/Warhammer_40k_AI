@@ -65,6 +65,8 @@
       "battle_round": 1,
       "context": {
         "movement_mode": "normal",
+        "selected_movement_action_grant_hook_ids": [],
+        "selected_movement_action_grants": [],
         "source_selected_option_id": "normal_move"
       },
       "decision_type": "submit_movement_proposal",

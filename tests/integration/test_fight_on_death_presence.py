@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import replace
 
 import pytest
@@ -251,6 +252,33 @@ def test_order_30_failed_trigger_continues_destruction_without_retention() -> No
         GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
         == session.lifecycle.to_payload()
     )
+
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        recorded_model_destruction_occurrences,
+    )
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+
+    decisions = session.lifecycle.decision_controller
+    history = rule_trigger_history(decisions)
+    death_triggers = tuple(
+        value for value in history.observed if value.kind is RuleTriggerKind.MODEL_DESTRUCTION
+    )
+    assert len(death_triggers) == 1
+    assert death_triggers[0].trigger_id in recorded_model_destruction_occurrences(decisions)
+    events = decisions.event_log.records
+    death_index = next(
+        index for index, event in enumerate(events) if event.event_type == "model_destroyed"
+    )
+    assert events[death_index + 1].event_type == "rule_trigger_observed"
+    assert not any(event.event_type == "battle_phase_completed" for event in events[death_index:])
+    tampered = deepcopy(session.lifecycle.to_payload())
+    tampered_events = tampered["decisions"]["event_log"]
+    tampered_events[death_index + 1]["event_type"] = "unobserved_model_destruction"
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"trigger observation|occurrence record|source event|no observed occurrence",
+    ):
+        GameLifecycle.from_payload(tampered)
 
 
 def test_order_30_pending_reaction_does_not_remove_model() -> None:

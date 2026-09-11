@@ -12,7 +12,7 @@ from warhammer40k_core.engine.damage_allocation import (
     MortalWoundRoutingResult,
 )
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.model_destruction_cause_authority import ModelDestructionCauseKind
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
@@ -42,18 +42,22 @@ HAZARDOUS_MODEL_DESTRUCTION_COMPLETED = "hazardous_model_destruction_completed"
 
 
 def validate_retained_hazardous_progress(
-    *, state: GameState, progress: MortalWoundApplicationProgress
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    progress: MortalWoundApplicationProgress,
 ) -> None:
     from warhammer40k_core.engine.attack_sequence_hazardous import (
         validate_hazardous_mortal_wound_source_context,
     )
-    from warhammer40k_core.engine.lifecycle_state_queries import active_attack_sequence_for_state
+    from warhammer40k_core.engine.hazardous_completion import hazardous_sequence_for_progress
     from warhammer40k_core.engine.weapon_abilities import HAZARDOUS_RULE_ID
 
-    sequence = active_attack_sequence_for_state(state)
+    sequence = hazardous_sequence_for_progress(
+        state=state, event_records=event_records, progress=progress
+    )
     if (
-        sequence is None
-        or progress.application_id != f"{sequence.sequence_id}:hazardous:mortal-wounds"
+        progress.application_id != f"{sequence.sequence_id}:hazardous:mortal-wounds"
         or progress.target_unit_instance_id != sequence.attacking_unit_instance_id
         or progress.source_rule_id != HAZARDOUS_RULE_ID
         or progress.destruction_evidence is not None

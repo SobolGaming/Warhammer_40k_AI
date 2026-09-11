@@ -385,11 +385,11 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     )
     mortal_wound_hook_source = function_source_for(
         (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
-        "resolve_unit_move_completed_mortal_wound_hooks",
+        "resolve_unit_move_completed_hooks",
     )
     battle_shock_hook_source = function_source_for(
         (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
-        "resolve_unit_move_completed_battle_shock_hooks",
+        "resolve_unit_move_completed_hooks",
     )
 
     assert "ASSAULT_DISEMBARK_MOVE_SOURCE_ID" in transport_source

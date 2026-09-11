@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from functools import partial
 from typing import cast
 
 from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSpec
@@ -42,6 +43,8 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 CATALOG_POISONED_COMMAND_MORTAL_WOUNDS_SOURCE_KIND = "catalog_poisoned_command_mortal_wounds"
 CATALOG_POISONED_COMMAND_ROLLED_EVENT = "catalog_poisoned_command_mortal_wounds_rolled"
@@ -67,6 +70,7 @@ def catalog_poisoned_command_start_bindings(
             hook_id=CATALOG_IR_POISONED_COMMAND_MORTAL_WOUNDS_CONSUMER_ID,
             source_id=CATALOG_IR_POISONED_COMMAND_MORTAL_WOUNDS_CONSUMER_ID,
             effect_handler=resolve_catalog_poisoned_command_mortal_wounds,
+            candidate_handler=poisoned_command_candidates,
             nested_pending_authority_validator=(
                 validate_catalog_poisoned_command_nested_pending_authority
             ),
@@ -414,3 +418,32 @@ def _payload_string(payload: Mapping[str, object], key: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Catalog poisoned status payload {key} must be text.")
     return value
+
+
+def poisoned_command_candidates(
+    context: CommandPhaseStartEffectContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    processed = _processed_target_ids(context)
+    candidates: list[TimingRuleCandidate] = []
+    for target, effects in _current_poisoned_targets(context):
+        if target.unit_instance_id in processed:
+            continue
+        owners = {effect.owner_player_id for effect in effects}
+        if len(owners) != 1:
+            raise GameLifecycleError("Poisoned status has ambiguous source ownership.")
+        source = effects[0]
+        candidates.append(
+            TimingRuleCandidate(
+                participant=SequencingParticipant(
+                    participant_id=f"catalog-poisoned:{source.owner_player_id}:{target.unit_instance_id}",
+                    player_id=source.owner_player_id,
+                    source_rule_id=source.source_rule_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    payload={"poison_effect_ids": [effect.effect_id for effect in effects]},
+                ),
+                activate=partial(
+                    _resolve_poisoned_target, context=context, target=target, effects=effects
+                ),
+            )
+        )
+    return tuple(candidates)

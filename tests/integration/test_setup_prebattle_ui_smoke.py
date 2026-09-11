@@ -35,7 +35,6 @@ from warhammer40k_core.engine.prebattle import (
 from warhammer40k_core.engine.reserve_declarations import (
     SELECT_RESERVE_DECLARATION_DECISION_TYPE,
 )
-from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -106,11 +105,12 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
         observed_decision_types=observed_decision_types,
     )
 
-    status = _submit_ordering(
+    status = _submit_finite(
         session,
         status=status,
-        setup_prefix="prebattle:redeploy_units",
-        result_id="setup-smoke-redeploy-sequencing",
+        expected_decision_type=SELECT_REDEPLOY_UNIT_DECISION_TYPE,
+        option_id="complete_redeploys",
+        result_id="setup-smoke-complete-redeploy-a",
         observed_decision_types=observed_decision_types,
     )
     redeploy_request = _projected_request(
@@ -149,14 +149,6 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
             pose_factory=lambda index: _event_companion_prebattle_pose(index, "player-b"),
         ),
         result_id="setup-smoke-place-redeploy-b",
-    )
-    status = _submit_finite(
-        session,
-        status=status,
-        expected_decision_type=SELECT_REDEPLOY_UNIT_DECISION_TYPE,
-        option_id="complete_redeploys",
-        result_id="setup-smoke-complete-redeploy-a",
-        observed_decision_types=observed_decision_types,
     )
 
     status = _submit_finite(
@@ -202,7 +194,6 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
         SELECT_RESERVE_DECLARATION_DECISION_TYPE,
         SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
         SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
-        SEQUENCING_DECISION_TYPE,
         SELECT_REDEPLOY_UNIT_DECISION_TYPE,
         SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
         SELECT_PREBATTLE_ACTION_DECISION_TYPE,
@@ -272,28 +263,6 @@ def _submit_deployment_pair(
         request=placement_request,
         result_id=f"{result_id_prefix}-place",
         pose_factory=_event_companion_deployment_pose,
-    )
-
-
-def _submit_ordering(
-    session: LocalGameSession,
-    *,
-    status: LifecycleStatus,
-    setup_prefix: str,
-    result_id: str,
-    observed_decision_types: list[str],
-) -> LifecycleStatus:
-    request = _projected_request(
-        session,
-        status=status,
-        expected_decision_type=SEQUENCING_DECISION_TYPE,
-        observed_decision_types=observed_decision_types,
-    )
-    option_id = _option_with_prefix(request, f"order:{setup_prefix}:player-b")
-    return session.submit_option(
-        request_id=request.request_id,
-        option_id=option_id,
-        result_id=result_id,
     )
 
 
@@ -573,10 +542,3 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
 
 def _option_ids(request: DecisionRequest) -> tuple[str, ...]:
     return tuple(option.option_id for option in request.options)
-
-
-def _option_with_prefix(request: DecisionRequest, prefix: str) -> str:
-    for option in request.options:
-        if option.option_id.startswith(prefix):
-            return option.option_id
-    raise GameLifecycleError("Expected sequencing option was not emitted.")

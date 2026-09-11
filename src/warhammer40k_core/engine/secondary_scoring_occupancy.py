@@ -663,6 +663,10 @@ def _shares_component(view: RulesUnitView, unit_ids: frozenset[str]) -> bool:
 def _eligible_scoring_unit(*, state: GameState, view: RulesUnitView) -> bool:
     if any(unit_has_keyword(component.unit, _AIRCRAFT_KEYWORD) for component in view.components):
         return False
+    # The caller already owns the canonical rules-unit view. An empty registry
+    # cannot contain any of its identities, even while sequencing revisits cards.
+    if not state.battle_shocked_unit_ids:
+        return True
     return not rules_unit_is_battle_shocked(state=state, unit_instance_id=view.unit_instance_id)
 
 

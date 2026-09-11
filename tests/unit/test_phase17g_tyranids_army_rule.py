@@ -12,6 +12,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_shock_request_for_unit,
     battle_state,
     center_marker_definition,
+    command_request_contract_candidate,
     default_unit_selection,
     remove_first_models,
     unit_by_id,
@@ -63,11 +64,13 @@ from warhammer40k_core.engine.battle_shock_resolution_authority import (
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
+from warhammer40k_core.engine.command_phase_start_sequencing import resolve_command_start_candidates
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -355,9 +358,9 @@ def test_shadow_reroll_restore_continues_each_target_before_success_completion()
     ]
 
 
-def test_shadow_outcome_revival_restore_preempts_completion_and_resumes_exactly_once() -> None:
+def test_shadow_outcome_revival_waits_for_original_batch_and_restores_once() -> None:
     lifecycle = _battle_ready_lifecycle(
-        game_id="phase17g-shadow-outcome-2",
+        game_id="phase17g-order36-shadow-outcome-0",
         active_player_id="player-b",
         enemy_chaos_daemons=True,
     )
@@ -377,10 +380,19 @@ def test_shadow_outcome_revival_restore_preempts_completion_and_resumes_exactly_
     outcome_request = pending.decision_request
     assert outcome_request is not None
     assert outcome_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
-    assert not any(
+    assert any(
         event.event_type == "tyranids_shadow_in_the_warp_unleashed"
         for event in lifecycle.decision_controller.event_log.records
     )
+    from warhammer40k_core.engine.command_phase_start_sequencing import command_start_timing_context
+    from warhammer40k_core.engine.timing_batch_runtime import timing_batches_for_context
+
+    original_batches = timing_batches_for_context(
+        lifecycle.decision_controller,
+        command_start_timing_context(state, battle_round=1, active_player_id="player-b"),
+    )
+    assert original_batches
+    assert original_batches[-1].current_batch_complete
     restored = GameLifecycle.from_payload(lifecycle.to_payload())
     restored_request = restored.decision_controller.queue.peek_next()
     finish_option = next(
@@ -405,7 +417,7 @@ def test_shadow_outcome_revival_restore_preempts_completion_and_resumes_exactly_
 
 def test_shadow_outcome_restore_rejects_coordinated_revival_amount_forgery() -> None:
     lifecycle = _battle_ready_lifecycle(
-        game_id="phase17g-shadow-outcome-amount-forgery",
+        game_id="phase17g-order36-shadow-outcome-0",
         active_player_id="player-b",
         enemy_chaos_daemons=True,
     )
@@ -415,12 +427,13 @@ def test_shadow_outcome_restore_rejects_coordinated_revival_amount_forgery() -> 
     outer_request = _initial_shadow_request(lifecycle)
     pending = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase17g-shadow-outcome-amount-forgery:unleash",
+            result_id="phase17g-tyranids-shadow-daemonic-outcome:unleash",
             request=outer_request,
             selected_option_id=army_rule.SHADOW_UNLEASH_OPTION_ID,
         )
     )
     assert pending.decision_request is not None
+    assert pending.decision_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
     forged = _mutable_lifecycle_payload(lifecycle)
     rewritten = 0
 
@@ -600,7 +613,15 @@ def test_restore_rejects_out_of_context_inserted_shadow_modifier_application() -
     )
     forged = _mutable_lifecycle_payload(lifecycle)
     events = _mutable_lifecycle_events(forged)
-    application_event = _mutable_event(events, "battle_shock_modifier_applications_recorded")
+    application_events = [
+        event
+        for event in events
+        if event["event_type"] == "battle_shock_modifier_applications_recorded"
+        and cast(dict[str, Any], event["payload"])["battle_shock_test_request"]["reason"]
+        == "forced_by_army_rule"
+    ]
+    assert len(application_events) == 1
+    application_event = application_events[0]
     application_payload = cast(dict[str, object], application_event["payload"])
     request_payload = cast(dict[str, object], application_payload["battle_shock_test_request"])
     request_id = cast(str, request_payload["request_id"])
@@ -619,7 +640,15 @@ def test_restore_rejects_out_of_context_inserted_shadow_modifier_application() -
             "modifiers": [modifier_payload],
         }
     ]
-    resolved_event = _mutable_event(events, "battle_shock_test_resolved")
+    resolved_events = [
+        event
+        for event in events
+        if event["event_type"] == "battle_shock_test_resolved"
+        and cast(dict[str, Any], event["payload"])["battle_shock_result"]["request"]["request_id"]
+        == request_id
+    ]
+    assert len(resolved_events) == 1
+    resolved_event = resolved_events[0]
     resolved_payload = cast(dict[str, object], resolved_event["payload"])
     result = cast(dict[str, object], resolved_payload["battle_shock_result"])
     modified_roll = cast(dict[str, object], result["modified_roll"])
@@ -648,24 +677,37 @@ def test_shadow_request_sequences_with_active_player_command_start_request() -> 
             CommandPhaseStartHookBinding(
                 hook_id="phase17g:active-command-start:test",
                 source_id="phase17g:active-command-start:source",
-                request_handler=_active_command_start_request,
+                candidate_handler=lambda context: command_request_contract_candidate(
+                    context,
+                    _active_command_start_request(
+                        CommandPhaseStartRequestContext(
+                            state=context.state,
+                            decisions=context.decisions,
+                            active_player_id=context.active_player_id,
+                            authoritative_request_id="timing-contract-template",
+                        )
+                    ),
+                ),
                 result_handler=lambda _context: False,
             ),
             contribution.command_phase_start_hook_bindings[0],
         )
     )
 
-    request = registry.next_request_for(
-        CommandPhaseStartRequestContext(
+    status = resolve_command_start_candidates(
+        CommandPhaseStartEffectContext(
             state=state,
             decisions=lifecycle.decision_controller,
             active_player_id="player-b",
-        )
+        ),
+        registry,
     )
-
+    assert status is not None
+    request = status.decision_request
     assert request is not None
-    assert request.request_id == "phase17g:active-command-start:player-b"
     assert request.actor_id == "player-b"
+    assert isinstance(request.payload, dict)
+    assert request.payload["effect_kind"] == "phase17g_active_command_start_test"
 
 
 def test_shadow_in_the_warp_targets_an_attached_enemy_once_by_canonical_identity() -> None:
@@ -1296,16 +1338,17 @@ def test_battle_shock_hook_registry_modifier_and_outcome_contracts() -> None:
 
     outcome_calls: list[str] = []
     outcome_context = _battle_shock_outcome_context(state)
-    BattleShockHookRegistry.from_bindings(
-        (
-            BattleShockHookBinding(
-                hook_id="phase17g:outcome",
-                source_id="phase17g:outcome:source",
-                outcome_handler=lambda context: outcome_calls.append(context.result.result_id),
-            ),
-        )
-    ).resolve_outcomes(outcome_context)
-    assert outcome_calls == [outcome_context.result.result_id]
+    with pytest.raises(GameLifecycleError, match="resolved source event"):
+        BattleShockHookRegistry.from_bindings(
+            (
+                BattleShockHookBinding(
+                    hook_id="phase17g:outcome",
+                    source_id="phase17g:outcome:source",
+                    outcome_handler=lambda context: outcome_calls.append(context.result.result_id),
+                ),
+            )
+        ).resolve_outcomes(outcome_context)
+    assert outcome_calls == []
     with pytest.raises(GameLifecycleError, match="outcome hooks require a context"):
         BattleShockHookRegistry.empty().resolve_outcomes(cast(BattleShockOutcomeContext, object()))
     with pytest.raises(GameLifecycleError, match="auto_passed must be a bool"):
@@ -1761,9 +1804,7 @@ def test_tyranids_army_rule_validation_helpers_are_fail_fast() -> None:
     payload_object = army_rule._payload_object  # pyright: ignore[reportPrivateUsage]
     payload_string_list = army_rule._payload_string_list  # pyright: ignore[reportPrivateUsage]
     shadow_request_prefix = army_rule._shadow_request_prefix  # pyright: ignore[reportPrivateUsage]
-    eligible_shadow_source_unit_ids = (
-        army_rule._eligible_shadow_source_unit_ids  # pyright: ignore[reportPrivateUsage]
-    )
+    eligible_shadow_source_unit_ids = army_rule.eligible_shadow_source_unit_ids
     unit_and_army_by_id = army_rule._unit_and_army_by_id  # pyright: ignore[reportPrivateUsage]
     tyranids_army_for_player = (
         army_rule._tyranids_army_for_player  # pyright: ignore[reportPrivateUsage]

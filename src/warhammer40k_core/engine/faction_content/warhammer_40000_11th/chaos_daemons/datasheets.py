@@ -52,7 +52,6 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.faction_content.common import payload_object as _payload_object
 from warhammer40k_core.engine.fight_phase_end_hooks import (
-    SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
     FightPhaseEndHookBinding,
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
@@ -188,6 +187,8 @@ RELENTLESS_CARNAGE_DECLINE_OPTION_SUFFIX = "decline"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
+    from .fight_end_sequencing import relentless_carnage_candidates
+
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
         hit_roll_modifier_bindings=(
@@ -244,7 +245,7 @@ def runtime_contribution() -> RuntimeContentContribution:
             FightPhaseEndHookBinding(
                 hook_id=RELENTLESS_CARNAGE_HOOK_ID,
                 source_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
-                request_handler=relentless_carnage_fight_phase_end_request,
+                candidate_handler=relentless_carnage_candidates,
                 result_handler=apply_relentless_carnage_fight_phase_end_result,
             ),
         ),
@@ -533,80 +534,6 @@ def infected_outbreak_sticky_objective_states(
                     )
                 )
     return tuple(sorted(states, key=lambda state: state.state_id))
-
-
-def relentless_carnage_fight_phase_end_request(
-    context: FightPhaseEndRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not FightPhaseEndRequestContext:
-        raise GameLifecycleError("Relentless Carnage requires a Fight-end request context.")
-    active_player_id = _active_player_id(context.state)
-    for army in _chaos_daemons_armies(context.state):
-        for source_unit in army.units:
-            if not _unit_has_datasheet_ability(
-                source_unit,
-                BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
-            ):
-                continue
-            if not source_unit.alive_own_models():
-                continue
-            source_rules_unit = rules_unit_view_by_id(
-                state=context.state,
-                unit_instance_id=source_unit.unit_instance_id,
-            )
-            if source_rules_unit.owner_player_id != army.player_id:
-                raise GameLifecycleError("Relentless Carnage rules-unit owner drift.")
-            if _relentless_carnage_recorded_this_fight_end(
-                context=context,
-                source_unit_instance_id=source_unit.unit_instance_id,
-            ):
-                continue
-            eligible_enemy_unit_ids = _enemy_rules_unit_ids_within_source_engagement_range(
-                state=context.state,
-                source_unit_instance_id=source_unit.unit_instance_id,
-            )
-            if not eligible_enemy_unit_ids:
-                continue
-            return DecisionRequest(
-                request_id=context.state.next_decision_request_id(),
-                decision_type=SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
-                actor_id=army.player_id,
-                payload={
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": active_player_id,
-                    "phase": BattlePhase.FIGHT.value,
-                    "player_id": army.player_id,
-                    "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
-                    "hook_id": RELENTLESS_CARNAGE_HOOK_ID,
-                    "source_unit_instance_id": source_unit.unit_instance_id,
-                    "source_rules_unit_instance_id": source_rules_unit.unit_instance_id,
-                    "eligible_enemy_unit_instance_ids": list(eligible_enemy_unit_ids),
-                },
-                options=(
-                    _relentless_carnage_decline_option(
-                        game_id=context.state.game_id,
-                        battle_round=context.state.battle_round,
-                        active_player_id=active_player_id,
-                        player_id=army.player_id,
-                        source_unit_instance_id=source_unit.unit_instance_id,
-                        source_rules_unit_instance_id=source_rules_unit.unit_instance_id,
-                    ),
-                    *(
-                        _relentless_carnage_target_option(
-                            game_id=context.state.game_id,
-                            battle_round=context.state.battle_round,
-                            active_player_id=active_player_id,
-                            player_id=army.player_id,
-                            source_unit_instance_id=source_unit.unit_instance_id,
-                            source_rules_unit_instance_id=source_rules_unit.unit_instance_id,
-                            target_enemy_unit_instance_id=enemy_unit_id,
-                        )
-                        for enemy_unit_id in eligible_enemy_unit_ids
-                    ),
-                ),
-            )
-    return None
 
 
 def apply_relentless_carnage_fight_phase_end_result(
@@ -973,7 +900,7 @@ def _infected_outbreak_sticky_state(
     )
 
 
-def _relentless_carnage_decline_option(
+def relentless_carnage_decline_option(
     *,
     game_id: str,
     battle_round: int,
@@ -1005,7 +932,7 @@ def _relentless_carnage_decline_option(
     )
 
 
-def _relentless_carnage_target_option(
+def relentless_carnage_target_option(
     *,
     game_id: str,
     battle_round: int,
@@ -1217,7 +1144,7 @@ def _relentless_carnage_target_from_payload(payload: dict[str, JsonValue]) -> st
     return _validate_identifier("target_enemy_unit_instance_id", target)
 
 
-def _relentless_carnage_recorded_this_fight_end(
+def relentless_carnage_recorded_this_fight_end(
     *,
     context: FightPhaseEndRequestContext,
     source_unit_instance_id: str,

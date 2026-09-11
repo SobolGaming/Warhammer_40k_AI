@@ -52,6 +52,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -161,6 +162,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 request_handler=doctrina_selection_request,
+                candidate_handler=round_sequencing_candidates,
                 result_handler=apply_doctrina_selection_result,
             ),
         ),
@@ -181,37 +183,10 @@ def runtime_contribution() -> RuntimeContentContribution:
     )
 
 
-def doctrina_selection_request(
-    context: BattleRoundStartRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not BattleRoundStartRequestContext:
-        raise GameLifecycleError("Doctrina Imperatives requires request context.")
-    for army in _adeptus_mechanicus_armies(context.state):
-        if _doctrina_selection_recorded_for_round(
-            context.state,
-            player_id=army.player_id,
-            battle_round=context.state.battle_round,
-        ):
-            continue
-        target_unit_ids = _eligible_doctrina_rules_unit_ids_for_army(
-            state=context.state,
-            army=army,
-        )
-        if not target_unit_ids:
-            continue
-        common_payload = doctrina_common_payload(
-            state=context.state,
-            player_id=army.player_id,
-            target_unit_ids=target_unit_ids,
-        )
-        return DecisionRequest(
-            request_id=context.state.next_decision_request_id(),
-            decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-            actor_id=army.player_id,
-            payload=validate_json_value(common_payload),
-            options=doctrina_selection_options(common_payload=common_payload),
-        )
-    return None
+def doctrina_selection_request(context: BattleRoundStartRequestContext) -> DecisionRequest | None:
+    from .round_sequencing import request_for
+
+    return request_for(context)
 
 
 def apply_doctrina_selection_result(context: BattleRoundStartResultContext) -> bool:
@@ -229,7 +204,7 @@ def apply_doctrina_selection_result(context: BattleRoundStartResultContext) -> b
     army = _adeptus_mechanicus_army_for_player(context.state, player_id=player_id)
     if army is None:
         raise GameLifecycleError("Doctrina Imperatives actor does not own Adeptus Mechanicus.")
-    if _doctrina_selection_recorded_for_round(
+    if doctrina_selection_recorded_for_round(
         context.state,
         player_id=player_id,
         battle_round=context.state.battle_round,
@@ -244,7 +219,7 @@ def apply_doctrina_selection_result(context: BattleRoundStartResultContext) -> b
         raise GameLifecycleError("Doctrina Imperatives selected option payload drift.")
     payload = _payload_object(result.payload)
     selection_mode = _payload_string(payload, key="selection_mode")
-    target_unit_ids = _eligible_doctrina_rules_unit_ids_for_army(
+    target_unit_ids = eligible_doctrina_rules_unit_ids_for_army(
         state=context.state,
         army=army,
     )
@@ -629,7 +604,7 @@ def _active_doctrina_effect_for_player(
     return None if not matching else matching[0]
 
 
-def _doctrina_selection_recorded_for_round(
+def doctrina_selection_recorded_for_round(
     state: object,
     *,
     player_id: str,
@@ -656,7 +631,7 @@ def _doctrina_selection_recorded_for_round(
     return bool(matching)
 
 
-def _eligible_doctrina_rules_unit_ids_for_army(
+def eligible_doctrina_rules_unit_ids_for_army(
     *,
     state: object,
     army: ArmyDefinition,
@@ -845,7 +820,7 @@ def _adeptus_mechanicus_army_for_player(
     return army
 
 
-def _adeptus_mechanicus_armies(state: object) -> tuple[ArmyDefinition, ...]:
+def adeptus_mechanicus_armies(state: object) -> tuple[ArmyDefinition, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -874,7 +849,7 @@ def _validate_request_matches_current_state(
     )
     _expect_payload_string(request_payload, key="source_rule_id", expected=SOURCE_RULE_ID)
     _expect_payload_string(request_payload, key="hook_id", expected=HOOK_ID)
-    expected_targets = _eligible_doctrina_rules_unit_ids_for_army(
+    expected_targets = eligible_doctrina_rules_unit_ids_for_army(
         state=context.state,
         army=army,
     )
@@ -1026,3 +1001,11 @@ def _validate_geometry_models(
                 f"Doctrina Imperatives {field_name} models must contain GeometryModel."
             )
     return models
+
+
+def round_sequencing_candidates(
+    context: BattleRoundStartRequestContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .round_sequencing import candidates
+
+    return candidates(context)

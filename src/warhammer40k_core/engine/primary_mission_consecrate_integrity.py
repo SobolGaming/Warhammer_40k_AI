@@ -607,8 +607,7 @@ def _validate_resolution_completeness(
         if not required_designation_ids:
             continue
 
-        resolved_prefix_length = 0
-        found_gap = False
+        unresolved: list[str] = []
         for designation_id in required_designation_ids:
             indices = resolution_indices.get((designation_id, record.record_id), [])
             if len(indices) > 1:
@@ -616,20 +615,35 @@ def _validate_resolution_completeness(
                     "Consecrate designation has duplicate turn-end resolutions."
                 )
             if indices:
-                resolution_index = indices[0]
-                if not boundary_index < resolution_index < next_boundary_index:
+                if not boundary_index < indices[0] < next_boundary_index:
                     raise GameLifecycleError("Consecrate resolution boundary ordering drifted.")
-                if found_gap:
-                    raise GameLifecycleError("Consecrate resolution queue ordering drifted.")
-                resolved_prefix_length += 1
             else:
-                found_gap = True
-
-        if resolved_prefix_length == len(required_designation_ids):
+                unresolved.append(designation_id)
+        if not unresolved:
             continue
-        if pending_authorized or pending_request is None:
+        batch_covers_pending = _pending_consecration_batch_covers(
+            state=state,
+            record=record,
+            event_records=event_records,
+            pending_requests=pending_decision_requests,
+            unresolved=tuple(unresolved),
+            designations=current_designations,
+        )
+        if pending_request is None:
+            if batch_covers_pending:
+                continue
             raise GameLifecycleError("Consecrate turn-end resolution authority is incomplete.")
-        expected_designation_id = required_designation_ids[resolved_prefix_length]
+        pending_choice = PrimaryMissionChoiceData.from_payload(pending_request.payload)
+        if pending_choice.choice_kind != CONSECRATE_CHOICE_KIND:
+            if batch_covers_pending:
+                continue
+            raise GameLifecycleError("Consecrate turn-end resolution authority is incomplete.")
+        if pending_authorized or pending_choice.subject_id not in unresolved:
+            raise GameLifecycleError("Pending Consecrate designation authority drifted.")
+        if len(unresolved) > 1 and not batch_covers_pending:
+            # Direct request construction remains valid for a single source occurrence.
+            raise GameLifecycleError("Multiple Consecrations require their owner timing batch.")
+        expected_designation_id = pending_choice.subject_id
         _validate_pending_consecrate_request(
             state=state,
             descriptor=descriptor,
@@ -649,6 +663,84 @@ def _validate_resolution_completeness(
         raw_choice = PrimaryMissionChoiceData.from_payload(pending_request.payload)
         if raw_choice.choice_kind == CONSECRATE_CHOICE_KIND:
             raise GameLifecycleError("Pending Consecrate request has no turn-end authority.")
+
+
+def _pending_consecration_batch_covers(
+    *,
+    state: GameState,
+    record: ObjectiveControlRecord,
+    event_records: tuple[EventRecord, ...],
+    pending_requests: tuple[DecisionRequest, ...],
+    unresolved: tuple[str, ...],
+    designations: dict[str, PrimaryConsecrationDesignationState],
+) -> bool:
+    """Retain unselected subjects under the current owner's recorded mission batch."""
+    from warhammer40k_core.engine.mission_decisions import TACTICAL_SECONDARY_SCORE_DECISION_TYPE
+    from warhammer40k_core.engine.mission_turn_end_sequencing import mission_turn_end_context
+    from warhammer40k_core.engine.sequencing import (
+        SEQUENCING_DECISION_TYPE,
+        SequencingRequirement,
+        SequencingRuleOrigin,
+    )
+    from warhammer40k_core.engine.timing_batch_decisions import request_for_timing_batch
+    from warhammer40k_core.engine.timing_batch_runtime import (
+        TIMING_BATCH_EVENT_TYPE,
+        timing_batch_from_event,
+    )
+
+    if (
+        record.battle_round != state.battle_round
+        or record.active_player_id != state.active_player_id
+        or state.current_battle_phase is None
+        or record.phase != state.current_battle_phase.value
+        or len(pending_requests) != 1
+    ):
+        return False
+    context = mission_turn_end_context(state)
+    batches = tuple(
+        batch
+        for event in event_records
+        if event.event_type == TIMING_BATCH_EVENT_TYPE
+        if (batch := timing_batch_from_event(event)).context == context
+    )
+    if not batches:
+        return False
+    batch = batches[-1]
+    request = pending_requests[0]
+    remaining = {
+        participant.participant_id: participant
+        for participant in batch.participants
+        if participant.participant_id not in batch.completed_participant_ids
+    }
+    for designation_id in unresolved:
+        designation = designations[designation_id]
+        participant = remaining.get(f"consecration:{designation_id}")
+        if (
+            participant is None
+            or participant.player_id != designation.owner_player_id
+            or participant.source_rule_id != designation.source_rule_id
+            or participant.origin is not SequencingRuleOrigin.MISSION
+            or participant.requirement is not SequencingRequirement.OPTIONAL
+        ):
+            raise GameLifecycleError("Pending Consecration timing population drifted.")
+    if request.decision_type == SEQUENCING_DECISION_TYPE:
+        if request_for_timing_batch(batch, request_id=request.request_id) != request:
+            raise GameLifecycleError("Pending mission ordering request drifted.")
+    elif request.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        choice = PrimaryMissionChoiceData.from_payload(request.payload)
+        if batch.selected_participant_id != f"consecration:{choice.subject_id}":
+            raise GameLifecycleError("Pending Consecration is not the selected mission rule.")
+    elif request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
+        selected = remaining.get(batch.selected_participant_id or "")
+        if (
+            selected is None
+            or selected.player_id != request.actor_id
+            or not selected.participant_id.startswith("secondary-scoring:")
+        ):
+            raise GameLifecycleError("Pending Tactical choice is not the selected mission rule.")
+    else:
+        return False
+    return True
 
 
 def _consecrate_turn_end_boundaries(

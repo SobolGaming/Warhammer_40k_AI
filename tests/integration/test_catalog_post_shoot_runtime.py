@@ -5,6 +5,7 @@ import json
 from dataclasses import replace
 from typing import cast
 
+from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
 from tests.support.catalog_package_fixtures import (
     flesh_hounds_army,
     named_weapon_choice_unit,
@@ -60,9 +61,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
     SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND,
     CatalogPostShootHitTargetStatusRuntime,
-    _available_catalog_post_shoot_hit_target_status_groups,
     _record_can_select_catalog_post_shoot_hit_target_status,
     apply_catalog_post_shoot_hit_target_status_result,
+    available_catalog_post_shoot_hit_target_status_groups,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
     invalid_catalog_post_shoot_hit_target_status_status,
@@ -102,6 +103,7 @@ from warhammer40k_core.engine.saves import (
     SaveResolutionRule,
     saving_throw_roll_spec,
 )
+from warhammer40k_core.engine.sequencing import sequencing_decision_event_from_request
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.rule_ir import (
@@ -160,13 +162,8 @@ def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect(
         attack_sequence=attack_sequence,
         successful=True,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     context = AttackSequenceCompletedContext(
         state=state,
@@ -185,7 +182,7 @@ def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect(
         armies=(army, enemy_army),
     )
 
-    groups = _available_catalog_post_shoot_hit_target_status_groups(
+    groups = available_catalog_post_shoot_hit_target_status_groups(
         ability_indexes_by_player_id={army.player_id: player_index},
         armies=(army, enemy_army),
         context=context,
@@ -555,13 +552,8 @@ def test_phase17k_post_shoot_selected_target_effect_records_generic_rule_effect(
         attack_sequence=attack_sequence,
         successful=True,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     context = AttackSequenceCompletedContext(
         state=state,
@@ -631,7 +623,12 @@ def test_phase17k_post_shoot_selected_target_effect_records_generic_rule_effect(
         )
         is None
     )
-    effects = state.persisting_effects_for_unit(unit.unit_instance_id)
+    effects = tuple(
+        effect
+        for effect in state.persisting_effects_for_unit(unit.unit_instance_id)
+        if cast(dict[str, JsonValue], effect.effect_payload)["effect_kind"]
+        == GENERIC_RULE_EFFECT_KIND
+    )
     assert len(effects) == 1
     effect_payload = cast(dict[str, JsonValue], effects[0].effect_payload)
     selected_payload = cast(dict[str, JsonValue], effect_payload["catalog_selected_target"])
@@ -760,13 +757,8 @@ def test_chaos_terminator_lethal_obsession_marks_required_charge_target() -> Non
         target=target_unit,
     )
     emit_successful_hit(decisions=decisions, attack_sequence=attack_sequence, successful=True)
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     status = CatalogSelectedTargetEffectRuntime(
         ability_indexes_by_player_id={
@@ -835,7 +827,12 @@ def test_chaos_terminator_lethal_obsession_marks_required_charge_target() -> Non
         is None
     )
 
-    effects = state.persisting_effects_for_unit(unit.unit_instance_id)
+    effects = tuple(
+        effect
+        for effect in state.persisting_effects_for_unit(unit.unit_instance_id)
+        if cast(dict[str, JsonValue], effect.effect_payload)["effect_kind"]
+        == GENERIC_RULE_EFFECT_KIND
+    )
     assert len(effects) == 1
     assert effects[0].expiration == EffectExpiration.end_turn(
         battle_round=state.battle_round,
@@ -934,13 +931,8 @@ def test_phase17k_datasheet_post_shoot_cover_denial_suppresses_save_cover() -> N
         attack_sequence=completed_sequence,
         successful=True,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": completed_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=completed_sequence
     )
     status = CatalogPostShootHitTargetStatusRuntime(
         ability_indexes_by_player_id={
@@ -1156,19 +1148,15 @@ def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound
         armies=(army, enemy_army),
     )
 
+    uncompleted_state_payload = state.to_payload()
     miss_decisions = DecisionController()
     emit_successful_hit(
         decisions=miss_decisions,
         attack_sequence=attack_sequence,
         successful=False,
     )
-    miss_completed_event = miss_decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    miss_completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=miss_decisions, sequence=attack_sequence
     )
     miss_context = AttackSequenceCompletedContext(
         state=state,
@@ -1188,7 +1176,7 @@ def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound
         == ()
     )
     assert (
-        _available_catalog_post_shoot_hit_target_status_groups(
+        available_catalog_post_shoot_hit_target_status_groups(
             ability_indexes_by_player_id={army.player_id: player_index},
             armies=(army, enemy_army),
             context=miss_context,
@@ -1198,6 +1186,7 @@ def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound
     assert runtime.request_handler(miss_context) is None
     assert miss_decisions.queue.pending_requests == ()
 
+    state = type(state).from_payload(uncompleted_state_payload)
     failed_wound_decisions = DecisionController()
     emit_successful_hit(
         decisions=failed_wound_decisions,
@@ -1209,13 +1198,8 @@ def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound
         attack_sequence=attack_sequence,
         successful=False,
     )
-    failed_wound_completed_event = failed_wound_decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    failed_wound_completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=failed_wound_decisions, sequence=attack_sequence
     )
     failed_wound_context = AttackSequenceCompletedContext(
         state=state,
@@ -1226,7 +1210,7 @@ def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound
         attack_sequence=attack_sequence,
         attack_sequence_completed_event_id=failed_wound_completed_event.event_id,
     )
-    failed_wound_groups = _available_catalog_post_shoot_hit_target_status_groups(
+    failed_wound_groups = available_catalog_post_shoot_hit_target_status_groups(
         ability_indexes_by_player_id={army.player_id: player_index},
         armies=(army, enemy_army),
         context=failed_wound_context,
@@ -1295,13 +1279,8 @@ def test_phase17k_post_shoot_hit_target_status_processes_all_source_groups() -> 
             successful=True,
             pool_index=pool_index,
         )
-    decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
@@ -1325,6 +1304,30 @@ def test_phase17k_post_shoot_hit_target_status_processes_all_source_groups() -> 
         ),
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
+
+    order_status = handler.begin_phase(state=state, decisions=decisions)
+    assert order_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    order_request = decisions.queue.peek_next()
+    assert order_request.decision_type == "resolve_sequencing_order"
+    assert order_request.actor_id == army.player_id
+    order_payload = cast(dict[str, JsonValue], order_request.payload)
+    participants = cast(list[dict[str, JsonValue]], order_payload["participants"])
+    assert len(participants) == 2
+    first_participant = next(
+        participant
+        for participant in participants
+        if cast(list[JsonValue], participant["payload"])[-1] == attacker_model_ids[0]
+    )
+    order_result = DecisionResult.for_request(
+        request=order_request,
+        result_id="post-shoot-cover-denial-source-order",
+        selected_option_id=f"next:{first_participant['participant_id']}",
+    )
+    decisions.submit_result(order_result)
+    event_type, payload = sequencing_decision_event_from_request(
+        request=order_request, result=order_result
+    )
+    decisions.event_log.append(event_type, payload)
 
     first_status = handler.begin_phase(state=state, decisions=decisions)
     assert first_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -1448,13 +1451,8 @@ def test_phase17k_post_shoot_hit_target_status_uses_runtime_clause_scoped_record
         attack_sequence=attack_sequence,
         successful=True,
     )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": army.player_id,
-            "attacking_unit_instance_id": unit.unit_instance_id,
-        },
+    completed_event = record_attack_completion_for_executor_fixture(
+        state=state, decisions=decisions, sequence=attack_sequence
     )
     context = AttackSequenceCompletedContext(
         state=state,
@@ -1466,7 +1464,7 @@ def test_phase17k_post_shoot_hit_target_status_uses_runtime_clause_scoped_record
         attack_sequence_completed_event_id=completed_event.event_id,
     )
 
-    groups = _available_catalog_post_shoot_hit_target_status_groups(
+    groups = available_catalog_post_shoot_hit_target_status_groups(
         ability_indexes_by_player_id={army.player_id: ability_index},
         armies=(army, enemy_army),
         context=context,

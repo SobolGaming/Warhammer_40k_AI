@@ -153,4 +153,6 @@ def _unit_has_cult_ambush_ability(unit: UnitInstance) -> bool:
 def _is_attached_character_component(component: RulesUnitComponent) -> bool:
     if component.role not in {"leader", "support"}:
         return False
-    return any(keyword.upper() == "CHARACTER" for keyword in component.unit.keywords)
+    # This rule evaluates the destroyed component. Live unit keywords correctly
+    # disappear on destruction; the models retain their catalog classification.
+    return any("CHARACTER" in model.keywords for model in component.unit.own_models)

@@ -94,6 +94,16 @@ def apply_attack_sequence_decision(
             if status is not None:
                 return status
         return context.advance()
+    from warhammer40k_core.engine.hazardous_completion import (
+        apply_hazardous_completion_decision,
+        is_hazardous_request,
+    )
+
+    if is_hazardous_request(record.request):
+        status = apply_hazardous_completion_decision(
+            state=state, decisions=context.decisions, request=record.request, result=result
+        )
+        return context.advance() if status is None else status
     from warhammer40k_core.engine.retained_destruction_cleanup import (
         active_retained_attack_destruction,
     )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import partial
 from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -29,6 +30,8 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
     is_unit_move_completed_mortal_wound_feel_no_pain_request,
@@ -66,15 +69,16 @@ def apply_movement_fnp_if_applicable(
     return False
 
 
-def resolve_movement_phase_end_mortal_wounds(
+def movement_phase_end_candidates(
     *,
     state: GameState,
     decisions: DecisionController,
-) -> LifecycleStatus | None:
+) -> tuple[TimingRuleCandidate, ...]:
     if state.current_battle_phase is not BattlePhase.MOVEMENT:
         raise GameLifecycleError("Movement phase-end mortal wounds require the Movement phase.")
     if state.active_player_id is None:
         raise GameLifecycleError("Movement phase-end mortal wounds require an active player.")
+    candidates: list[TimingRuleCandidate] = []
     processed_effect_ids = _processed_effect_ids(decisions)
     for effect in sorted(state.persisting_effects, key=lambda item: item.effect_id):
         if effect.effect_id in processed_effect_ids:
@@ -88,15 +92,45 @@ def resolve_movement_phase_end_mortal_wounds(
             continue
         if not isinstance(payload, dict):
             raise GameLifecycleError("Movement phase-end mortal wound effect payload drifted.")
-        status = _resolve_effect(
-            state=state,
-            decisions=decisions,
-            effect=effect,
-            payload=payload,
+        candidates.append(
+            TimingRuleCandidate(
+                participant=SequencingParticipant(
+                    participant_id=f"movement-end-damage:{effect.effect_id}",
+                    player_id=effect.owner_player_id,
+                    source_rule_id=effect.source_rule_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    payload={"effect_id": effect.effect_id},
+                ),
+                activate=partial(
+                    _resolve_effect,
+                    state=state,
+                    decisions=decisions,
+                    effect=effect,
+                    payload=payload,
+                ),
+            )
         )
-        if status is not None:
-            return status
-    return None
+    return tuple(candidates)
+
+
+def resolve_movement_phase_end_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    outcome = resolve_boundary_candidates(
+        state=state,
+        decisions=decisions,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        discover=partial(movement_phase_end_candidates, state=state, decisions=decisions),
+    )
+    if isinstance(outcome, DecisionRequest):
+        decisions.request_decision(outcome)
+        return LifecycleStatus.waiting_for_decision(stage=state.stage, decision_request=outcome)
+    return outcome
 
 
 def apply_movement_phase_end_mortal_wound_feel_no_pain_decision(

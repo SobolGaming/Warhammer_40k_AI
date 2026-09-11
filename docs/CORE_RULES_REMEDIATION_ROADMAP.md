@@ -4578,3 +4578,37 @@ their stated heads, not to this planning PR or complete Core Rules compliance.
 | 33 / P10 / C10-01 | [#437](https://github.com/SobolGaming/Warhammer_40k_AI/pull/437) merged; `e56c1a4caf2a6915548222caed0872627f8dbf43` | [Order 33 scope and review](ORDER_33_SCOPE_PLAN.md), including R33-001/002 and the deferred Heavy-history issue now assigned to P21A. |
 | 34 / P16 / C16-01, C16-02 | [#438](https://github.com/SobolGaming/Warhammer_40k_AI/pull/438) merged; `51952e49c2b360f1dacffc03d53916324a1e9253` | [Order 34 scope and review](ORDER_34_SCOPE_PLAN.md), including retained shooting and historical activity repairs; other Action interruption consumers remain explicitly listed above. |
 | 35 / P15G / C15-07 | [#441](https://github.com/SobolGaming/Warhammer_40k_AI/pull/441) merged; `b41e44323f66f494399b763d8c7c23f981d9239f` | [Order 35 scope and review](ORDER_35_SCOPE_PLAN.md); Rapid Ingress eligibility does not close C20-02 Core reserve policy. |
+
+
+## Order 36 — P01D owner-tiered Rules Sequencing
+
+**Status:** Implemented and locally validated; ready for PR review. This closes
+C01-04. The full consumer inventory, source record, scope explanation and
+acceptance matrix are in [Order 36 scope and validation](ORDER_36_SCOPE_PLAN.md).
+
+The shared timing owner now resolves active mandatory, active optional, opposing
+mandatory and opposing optional tiers, preserving each owner's choice and the
+original trigger population. New triggers wait for the original batch to finish.
+Temporary active-player authority follows selected moves and attacks; between
+turns it follows the first-turn player. Source-explicit exceptions remain intact.
+Phase/round/turn, Command Battle-shock, movement, attack, casualty and mission
+consumers use the shared authority, with historical ownership and viewer redaction.
+
+The pinned `gw-11e-core-sequencing` JSON package records the maintained-mirror
+observation separately from official historical evidence. Contract 15,
+persistence v7 and replay v9 carry the new authority; incomplete older payloads
+are rejected. No load-only content is promoted to executable support.
+
+Final local validation on 2026-09-11: **7,202 behavioral tests at 85.01% coverage**,
+**427 code-quality tests**, and **19 macOS semantic-audit tests** passed. Ruff,
+mypy, Pyright, all 11 import contracts, pre-commit, regenerated eight-shard
+inventory, source/engine identity, base-ref contract, TypeScript client and unit
+checks, 342 live conformance assertions and installed-wheel smoke passed.
+[Order 36 performance evidence](performance/order36/README.md) passes the unchanged
+Order 34 and Order 35 component budgets and retains initial failures. Complete-game
+performance remains uncertified. The source's move/shoot-back example has
+compositional coverage rather than a new playable load-only Stratagem scenario.
+
+Requested main refreshes include documentation PRs through #450 (`f9f33e47`).
+The delivered runtime manifest SHA-256 is
+`390231096e85983215cb4c0ba841706c59bbe79dd049f6670c3df594463838a0`.

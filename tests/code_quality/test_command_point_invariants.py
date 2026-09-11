@@ -24,6 +24,38 @@ COMMAND_PHASE_START_PRE_CP_METHODS = {
 }
 
 
+def test_command_start_target_legality_belongs_to_source_templates() -> None:
+    """Shared Command validation cannot assign enemy/friendly meaning to payload keys."""
+    tree = ast.parse(COMMAND_PHASE_OWNER.read_text(encoding="utf-8"))
+    validator = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_command_phase_start_faction_rule_drift_reason"
+    )
+    forbidden_source_fields = {
+        "target_unit_instance_id",
+        "target_owner_player_id",
+        "rules_unit_instance_id",
+        "rules_unit_owner_player_id",
+    }
+    assert not any(
+        isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and node.value in forbidden_source_fields
+        for node in ast.walk(validator)
+    )
+    selection_tree = ast.parse(
+        (ENGINE_ROOT / "command_phase_start_selection.py").read_text(encoding="utf-8")
+    )
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "selected_timing_request_is_current"
+        for node in ast.walk(selection_tree)
+    )
+
+
 def _receiver_identifies_command_phase_start_registry(node: ast.expr) -> bool:
     current = node
     while True:
@@ -187,51 +219,32 @@ def test_command_phase_start_registry_routes_through_one_pre_cp_boundary() -> No
         for method, owners in visitor.owners_by_method.items():
             registry_call_owners[method].extend(owners)
 
-    authority_owner = COMMAND_PHASE_START_AUTHORITY_OWNER.relative_to(ROOT).as_posix()
-    assert registry_call_owners == {
-        "resolve_with_provider_dispositions": [
-            f"{authority_owner}:resolve_command_phase_start_boundary"
-        ],
-        "resolve_effects_with_provider_dispositions": [
-            f"{authority_owner}:resolve_command_phase_start_boundary"
-        ],
-        "next_request_with_provider": [f"{authority_owner}:resolve_command_phase_start_boundary"],
-    }
-
-    authority_tree = ast.parse(
-        COMMAND_PHASE_START_AUTHORITY_OWNER.read_text(encoding="utf-8"),
-        filename=COMMAND_PHASE_START_AUTHORITY_OWNER.as_posix(),
-    )
-    boundary_functions = tuple(
+    assert registry_call_owners == {method: [] for method in COMMAND_PHASE_START_PRE_CP_METHODS}
+    registry_tree = ast.parse((ENGINE_ROOT / "command_phase_start_hooks.py").read_text())
+    assert not {
+        function.name
+        for function in ast.walk(registry_tree)
+        if isinstance(function, ast.FunctionDef)
+    }.intersection(COMMAND_PHASE_START_PRE_CP_METHODS)
+    authority_tree = ast.parse(COMMAND_PHASE_START_AUTHORITY_OWNER.read_text())
+    boundary = next(
         function
         for function in ast.walk(authority_tree)
         if isinstance(function, ast.FunctionDef)
         and function.name == "resolve_command_phase_start_boundary"
     )
-    assert len(boundary_functions) == 1
-    ordered_lines: dict[str, int] = {}
-    for node in ast.walk(boundary_functions[0]):
-        if not isinstance(node, ast.Call):
-            continue
-        if (
-            isinstance(node.func, ast.Attribute)
-            and _receiver_identifies_command_phase_start_registry(node.func.value)
-            and node.func.attr in COMMAND_PHASE_START_PRE_CP_METHODS
-        ):
-            ordered_lines[node.func.attr] = node.lineno
-
-    assert set(ordered_lines) == {
-        "resolve_with_provider_dispositions",
-        "resolve_effects_with_provider_dispositions",
-        "next_request_with_provider",
-    }
-    assert (
-        ordered_lines["resolve_with_provider_dispositions"]
-        < ordered_lines["resolve_effects_with_provider_dispositions"]
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "resolve_command_start_candidates"
+        for node in ast.walk(boundary)
     )
-    assert (
-        ordered_lines["resolve_effects_with_provider_dispositions"]
-        < ordered_lines["next_request_with_provider"]
+    sequencing_tree = ast.parse((ENGINE_ROOT / "command_phase_start_sequencing.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "resolve_timing_rule_candidates"
+        for node in ast.walk(sequencing_tree)
     )
     begin_call_lines = {
         node.func.id: node.lineno

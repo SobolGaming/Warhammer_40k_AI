@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -33,6 +33,9 @@ from warhammer40k_core.engine.rule_execution import (
     execute_rule_ir,
     rule_ir_from_execution_payload,
 )
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -63,9 +66,36 @@ class CatalogShadowFormRuntime:
                 hook_id=CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
                 source_id=CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
                 request_handler=self.battle_round_start_request,
+                candidate_handler=self.battle_round_start_candidates,
                 result_handler=self.apply_battle_round_start_result,
             ),
         )
+
+    def battle_round_start_candidates(
+        self,
+        context: BattleRoundStartRequestContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        requests = _shadow_form_selection_requests(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=replace(context, authoritative_request_id="timing-request-template"),
+        )
+        candidates: list[TimingRuleCandidate] = []
+        for request in requests:
+            payload = _payload_object(request.payload)
+            source_id = _payload_string(payload, key="source_rule_id")
+            unit_id = _payload_string(payload, key="source_unit_instance_id")
+            record_id = _payload_string(payload, key="catalog_record_id")
+            candidates.append(
+                timing_candidate_for_request(
+                    template=request,
+                    participant_id=f"{source_id}:{record_id}:{unit_id}",
+                    source_rule_id=source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    next_request_id=context.state.next_decision_request_id,
+                )
+            )
+        return tuple(candidates)
 
     def battle_round_start_request(
         self,
@@ -322,7 +352,7 @@ def _shadow_form_selection_request_for_record(
         ),
     )
     return DecisionRequest(
-        request_id=context.state.next_decision_request_id(),
+        request_id=context.issue_request_id(),
         decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
         actor_id=army.player_id,
         payload=validate_json_value(common_payload),

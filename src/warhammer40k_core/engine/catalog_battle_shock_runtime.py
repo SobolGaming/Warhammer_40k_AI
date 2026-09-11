@@ -63,6 +63,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.rule_ir import (
@@ -116,6 +117,7 @@ def catalog_battle_shock_hook_bindings(
                 hook_id=CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
                 source_id=CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
                 outcome_handler=resolve_catalog_battle_shock_failed_heal,
+                outcome_candidate_handler=catalog_battle_shock_failed_heal_candidates,
             )
         )
     if _has_catalog_battle_shock_records(
@@ -330,6 +332,33 @@ def catalog_forced_battle_shock_unit_ids(
             if _persisted_forced_battle_shock_effect(effect):
                 forced_ids.add(rules_unit.unit_instance_id)
     return tuple(sorted(forced_ids))
+
+
+def catalog_battle_shock_failed_heal_candidates(
+    context: BattleShockOutcomeContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from functools import partial
+
+    from warhammer40k_core.engine.battle_shock_outcome_sequencing import outcome_candidate
+
+    if context.phase is not BattlePhase.COMMAND or context.result.passed:
+        return ()
+    return tuple(
+        outcome_candidate(
+            context,
+            source_rule_id=effect.source_rule_id,
+            owner_player_id=effect.owner_player_id,
+            occurrence_id=effect.effect_id,
+            activate=partial(
+                _resolve_failed_battle_shock_heal_effect, context=context, effect=effect
+            ),
+        )
+        for effect in context.state.persisting_effects_for_unit(
+            context.result.request.unit_instance_id
+        )
+        if effect.owner_player_id != context.result.request.player_id
+        and _persisted_failed_battle_shock_heal_effect(effect)
+    )
 
 
 def resolve_catalog_battle_shock_failed_heal(context: BattleShockOutcomeContext) -> None:

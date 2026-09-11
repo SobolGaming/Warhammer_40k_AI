@@ -11,6 +11,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_destruction_evidence import (
     RulesUnitObjectiveProximityWitness,
 )
+from warhammer40k_core.engine.primary_marker_history import primary_marker_removal_event_index
 from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionMarkerState,
     PrimaryMissionMarkerStatus,
@@ -146,6 +147,8 @@ def validate_surveil_marker_removal_events(
             processed_payload=payload,
             source_id=descriptor.source_id,
             event_index_by_id=event_index_by_id,
+            event_records=event_records,
+            processed_index=processed_index,
         )
         raw_removed = _payload_list(
             payload.get("removed_primary_mission_markers"),
@@ -241,6 +244,8 @@ def _eligible_markers_at_trigger(
     processed_payload: dict[str, JsonValue],
     source_id: str,
     event_index_by_id: dict[str, int],
+    event_records: tuple[EventRecord, ...],
+    processed_index: int,
 ) -> tuple[PrimaryMissionMarkerState, ...]:
     trigger_index = event_index_by_id[trigger.event_id]
     candidates: list[PrimaryMissionMarkerState] = []
@@ -248,13 +253,9 @@ def _eligible_markers_at_trigger(
         creation_index = event_index_by_id.get(marker.source_event_id)
         if creation_index is None:
             raise GameLifecycleError("Surveil marker creation event is unknown.")
-        removal_index = (
-            None
-            if marker.removal_event_id is None
-            else event_index_by_id.get(marker.removal_event_id)
+        removal_index = primary_marker_removal_event_index(
+            marker=marker, event_records=event_records
         )
-        if marker.removal_event_id is not None and removal_index is None:
-            raise GameLifecycleError("Surveil marker removal event is unknown.")
         if creation_index >= trigger_index or (
             removal_index is not None and removal_index < trigger_index
         ):
@@ -264,6 +265,10 @@ def _eligible_markers_at_trigger(
             or marker.owner_player_id == player_id
             or marker.objective_marker_id not in objective_ids
         ):
+            continue
+        if removal_index is not None and removal_index < processed_index:
+            # Another original rule can consume a captured marker before this
+            # deferred rule activates. Its own mutation evidence remains mandatory.
             continue
         if (
             marker.status is not PrimaryMissionMarkerStatus.REMOVED

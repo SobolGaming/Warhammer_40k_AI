@@ -17,7 +17,6 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     ModelDisplacementRecord,
 )
-from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -25,12 +24,8 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.destruction_provenance import (
-    DestructionSourceKind,
-    ModelDestructionAttribution,
-)
 from warhammer40k_core.engine.effects import EffectExpirationBoundary
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
@@ -67,15 +62,7 @@ from warhammer40k_core.engine.phases.movement_model import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
-from warhammer40k_core.engine.primary_battlefield_departure import (
-    PrimaryBattlefieldDepartureState,
-)
-from warhammer40k_core.engine.primary_destruction_evidence import (
-    rules_unit_objective_proximity_witness,
-)
 from warhammer40k_core.engine.primary_historical_events import (
-    record_new_primary_unit_destruction_events,
-    record_primary_battlefield_departure_event,
     record_primary_turn_start_evidence_event,
 )
 from warhammer40k_core.engine.primary_mission_action_resolution import (
@@ -97,9 +84,6 @@ from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
 )
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     build_primary_rules_unit_turn_start_snapshot,
-)
-from warhammer40k_core.engine.primary_unit_destruction_tracking import (
-    record_primary_destroyed_model_departures,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import PrimaryObjectiveTurnStartState
@@ -360,6 +344,7 @@ def phase17n_started_primary_action_fixture(
                     )
                 )
     decisions = DecisionController()
+    _record_empty_current_turn_start_evidence(state=state, decisions=decisions)
     status = request_mission_action_start(
         state=state,
         decisions=decisions,
@@ -530,9 +515,19 @@ def append_authenticated_normal_move(
             for model_id, poses in model_paths
         )
     )
-    decisions.event_log.append(
-        "movement_activation_completed",
-        {
+    state.battlefield_state = battlefield.with_unit_placement(
+        placement.with_model_placements(
+            tuple(row.with_pose(pose_transform(row.pose)) for row in placement.model_placements)
+        )
+    )
+
+    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
+
+    record_move_completion_event(
+        state=state,
+        decisions=decisions,
+        event_type="movement_activation_completed",
+        payload={
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
@@ -542,15 +537,10 @@ def append_authenticated_normal_move(
             "result_id": action_result.result_id,
             "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
             "movement_mode": "normal",
-            "witness": witness.to_payload(),
-            "transition_batch": transition.to_payload(),
+            "witness": validate_json_value(witness.to_payload()),
+            "transition_batch": validate_json_value(transition.to_payload()),
             "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
         },
-    )
-    state.battlefield_state = battlefield.with_unit_placement(
-        placement.with_model_placements(
-            tuple(row.with_pose(pose_transform(row.pose)) for row in placement.model_placements)
-        )
     )
 
 
@@ -817,11 +807,9 @@ def _attach_first_two_enemy_units(state: GameState, *, enemy_player_id: str) -> 
     ]
 
 
-def phase17n_consecrate_pending_fixture() -> tuple[
-    GameState,
-    DecisionController,
-    DecisionRequest,
-]:
+def phase17n_consecrate_turn_end_fixture(
+    *, subjects: int = 1, capture_boundary: bool = True
+) -> tuple[GameState, DecisionController]:
     setup = phase17n_event_setup(
         layout_id="purge-the-foe-vs-reconnaissance-layout-1",
         attacker_force_disposition_id="purge-the-foe",
@@ -832,18 +820,18 @@ def phase17n_consecrate_pending_fixture() -> tuple[
         active_player_id="player-a",
         phase=BattlePhase.SHOOTING,
         battle_round=1,
+        player_a_units=tuple(
+            default_unit_selection(f"consecrator-{index}") for index in range(subjects)
+        ),
+        player_b_units=tuple(
+            default_unit_selection(f"victim-{index}") for index in range(subjects)
+        ),
     )
     decisions = DecisionController()
     friendly = next(
         unit
         for army in state.army_definitions
         if army.player_id == "player-a"
-        for unit in army.units
-    )
-    enemy = next(
-        unit
-        for army in state.army_definitions
-        if army.player_id == "player-b"
         for unit in army.units
     )
     target = next(
@@ -861,81 +849,53 @@ def phase17n_consecrate_pending_fixture() -> tuple[
         )
     )
     _record_empty_current_turn_start_evidence(state=state, decisions=decisions)
-    source_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=friendly.unit_instance_id,
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+    from warhammer40k_core.engine.model_destruction_triggers import (
+        record_model_destruction_occurrences,
+        resolve_model_destruction_trigger,
     )
-    destroyed_witness = rules_unit_objective_proximity_witness(
-        state=state,
-        rules_unit_instance_id=enemy.unit_instance_id,
-    )
-    attribution = ModelDestructionAttribution.for_non_attack(
-        destroying_player_id="player-a",
-        source_kind=DestructionSourceKind.ABILITY,
-        source_rules_unit_instance_id=friendly.unit_instance_id,
-        source_model_instance_id=friendly.own_models[0].model_instance_id,
-    )
-    destroyed_model_ids = enemy.own_model_ids()
-    departures: list[PrimaryBattlefieldDepartureState] = []
-    model_events: list[EventRecord] = []
-    for model_id in destroyed_model_ids:
-        model_event = decisions.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": BattlePhase.SHOOTING.value,
-                "model_instance_id": model_id,
-                "target_unit_instance_id": enemy.unit_instance_id,
-                "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
-                "destroyed_rules_unit_objective_proximity_witness": (
-                    destroyed_witness.to_payload()
-                ),
-                **attribution.to_payload(),
-            },
-        )
-        model_events.append(model_event)
-        destroy_model_by_rule(state=state, model_instance_id=model_id)
-        model_departures = record_primary_destroyed_model_departures(
-            state=state,
-            destroyed_model_instance_ids=(model_id,),
-            source_id=(f"core-rules:primary-unit-destruction-tracking:{model_event.event_id}"),
-            occurrence_id=model_event.event_id,
-        )
-        departures.extend(model_departures)
-        for departure in model_departures:
-            record_primary_battlefield_departure_event(
-                event_log=decisions.event_log,
-                departure=departure,
+    from warhammer40k_core.engine.rule_trigger_state import rule_trigger_history
+    from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+    registry = UnitDestroyedHookRegistry.empty()
+    friendlies = next(army.units for army in state.army_definitions if army.player_id == "player-a")
+    enemies = next(army.units for army in state.army_definitions if army.player_id == "player-b")
+    for source, enemy in zip(friendlies, enemies, strict=True):
+        for model_id in enemy.own_model_ids():
+            destroy_rule_model_for_fixture(
+                state=state,
+                decisions=decisions,
+                model_id=model_id,
+                destroying_player_id="player-a",
+                source_unit_id=source.unit_instance_id,
+                source_model_id=source.own_models[0].model_instance_id,
             )
-    model_event = model_events[-1]
-    source_id = f"core-rules:primary-unit-destruction-tracking:{model_event.event_id}"
-    destruction_ids_before = tuple(
-        destruction.destruction_id for destruction in state.primary_unit_destruction_states
-    )
-    state.record_primary_unit_destruction(
-        destruction_attribution=attribution,
-        source_model_destroyed_event_id=model_event.event_id,
-        source_rules_unit_objective_proximity_witness=source_witness,
-        source_battlefield_departure_ids=tuple(departure.departure_id for departure in departures),
-        unattributed_cause=None,
-        source_mutation_id=None,
-        destroyed_unit_instance_id=enemy.unit_instance_id,
-        source_id=f"{source_id}:{enemy.unit_instance_id}",
-    )
-    record_new_primary_unit_destruction_events(
-        state=state,
-        event_log=decisions.event_log,
-        destruction_ids_before=destruction_ids_before,
-    )
+            record_model_destruction_occurrences(
+                state=state, decisions=decisions, registry=registry
+            )
+            for trigger in rule_trigger_history(decisions).ready():
+                assert (
+                    resolve_model_destruction_trigger(
+                        state=state,
+                        decisions=decisions,
+                        trigger=trigger,
+                        registry=registry,
+                    )
+                    is None
+                )
     _enter_turn_end(state)
-    record = state.record_objective_control_boundary(
-        completed_phase=BattlePhase.FIGHT,
-        timing=ObjectiveControlTiming.TURN_END,
-        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-    )
-    _record_turn_end_objective_boundary(decisions=decisions, record=record)
+    if capture_boundary:
+        record = state.record_objective_control_boundary(
+            completed_phase=BattlePhase.FIGHT,
+            timing=ObjectiveControlTiming.TURN_END,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+        _record_turn_end_objective_boundary(decisions=decisions, record=record)
+    return state, decisions
+
+
+def phase17n_consecrate_pending_fixture() -> tuple[GameState, DecisionController, DecisionRequest]:
+    state, decisions = phase17n_consecrate_turn_end_fixture()
     request = consecrate_choice_request(state=state, decisions=decisions)
     assert request is not None
     decisions.request_decision(request)
@@ -948,11 +908,7 @@ def phase17n_consecrate_pending_fixture() -> tuple[
     return state, decisions, request
 
 
-def phase17n_sensor_pending_fixture() -> tuple[
-    GameState,
-    DecisionController,
-    DecisionRequest,
-]:
+def phase17n_sensor_turn_end_fixture() -> tuple[GameState, DecisionController, MissionActionState]:
     state, decisions, locate_request = phase17n_locate_pending_fixture()
     locate_result = DecisionResult.for_request(
         result_id=f"{locate_request.request_id}:result",
@@ -996,6 +952,7 @@ def phase17n_sensor_pending_fixture() -> tuple[
             offsets=((0.0, 0.0), (0.8, 0.0), (1.6, 0.0), (0.0, 0.8), (0.8, 0.8)),
         )
     )
+    _record_empty_current_turn_start_evidence(state=state, decisions=decisions)
     status = request_mission_action_start(
         state=state,
         decisions=decisions,
@@ -1019,6 +976,13 @@ def phase17n_sensor_pending_fixture() -> tuple[
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     action = state.mission_action_states[-1]
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.replace_shooting_phase_state(None)
+    return state, decisions, action
+
+
+def phase17n_sensor_pending_fixture() -> tuple[GameState, DecisionController, DecisionRequest]:
+    state, decisions, action = phase17n_sensor_turn_end_fixture()
     _enter_turn_end(state)
     record = state.record_objective_control_boundary(
         completed_phase=BattlePhase.FIGHT,

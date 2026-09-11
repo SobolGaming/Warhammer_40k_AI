@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from functools import partial
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battlefield_state import (
@@ -23,6 +24,8 @@ from warhammer40k_core.engine.fight_rules_unit_movement_types import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 
@@ -37,6 +40,9 @@ _PROCESSED_MARKER_REMOVAL_MOVE_EVENTS = frozenset(
         "fight_movement_completed",
         "unit_disembarked",
         "reinforcement_unit_arrived",
+        "triggered_movement_resolved",
+        "heroic_intervention_charge_move_completed",
+        "catalog_setup_reactive_charge_move_completed",
     }
 )
 _CULT_AMBUSH_MARKER_PLACED_EVENT_TYPE = "genestealer_cults_cult_ambush_marker_placed"
@@ -70,20 +76,25 @@ _CULT_AMBUSH_MARKER_PAYLOAD_KEYS = frozenset(
 )
 
 
-def resolve_cult_ambush_marker_removal_for_completed_moves(
+def cult_ambush_marker_removal_candidates(
     *,
     state: GameState,
     decisions: DecisionController,
     completed_phase: BattlePhase,
-) -> None:
+    trigger_event_id: str,
+) -> tuple[TimingRuleCandidate, ...]:
     if not state.cult_ambush_markers or state.battlefield_state is None:
-        return
+        return ()
+    candidates: list[TimingRuleCandidate] = []
     marker_placement_evidence = _marker_placement_event_evidence(
         state=state,
         decisions=decisions,
     )
     for record_index, record in enumerate(tuple(decisions.event_log.records)):
-        if record.event_type not in _PROCESSED_MARKER_REMOVAL_MOVE_EVENTS:
+        if (
+            record.event_id != trigger_event_id
+            or record.event_type not in _PROCESSED_MARKER_REMOVAL_MOVE_EVENTS
+        ):
             continue
         if _marker_removal_already_processed(decisions, trigger_event_id=record.event_id):
             continue
@@ -119,6 +130,7 @@ def resolve_cult_ambush_marker_removal_for_completed_moves(
         )
         if _rules_unit_has_aircraft_keyword(rules_units=rules_units, endpoint=endpoint):
             continue
+        eligible: dict[str, list[CultAmbushMarker]] = {}
         for marker in tuple(state.cult_ambush_markers):
             if marker.player_id == owner_id:
                 continue
@@ -134,26 +146,175 @@ def resolve_cult_ambush_marker_removal_for_completed_moves(
                 state=state,
                 marker=marker,
                 rules_units=rules_units,
-                endpoint=endpoint,
+                placements=(
+                    _current_rules_unit_model_placements(state=state, rules_units=rules_units)
+                    if endpoint is None
+                    else endpoint.model_placements
+                ),
             ):
-                state.remove_cult_ambush_marker(marker.marker_id)
-                decisions.event_log.append(
-                    "genestealer_cults_cult_ambush_marker_removed",
-                    validate_json_value(
-                        {
-                            "game_id": state.game_id,
-                            "battle_round": state.battle_round,
-                            "active_player_id": state.active_player_id,
-                            "phase": completed_phase.value,
-                            "player_id": marker.player_id,
-                            "marker": marker.to_payload(),
-                            "trigger_event_id": record.event_id,
-                            "trigger_event_type": record.event_type,
-                            "enemy_unit_instance_id": unit_id,
-                            "source_rule_id": SOURCE_RULE_ID,
-                        }
+                eligible.setdefault(marker.player_id, []).append(marker)
+        for player_id, markers in sorted(eligible.items()):
+            candidates.append(
+                TimingRuleCandidate(
+                    participant=SequencingParticipant(
+                        participant_id=f"cult-marker-removal:{record.event_id}:{player_id}",
+                        player_id=player_id,
+                        source_rule_id=SOURCE_RULE_ID,
+                        requirement=SequencingRequirement.MANDATORY,
+                        payload=validate_json_value(
+                            {
+                                "trigger_event_id": record.event_id,
+                                "trigger_event_type": record.event_type,
+                                "moving_unit_instance_id": unit_id,
+                                "markers": [marker.to_payload() for marker in markers],
+                            }
+                        ),
+                    ),
+                    activate=partial(
+                        _remove_markers,
+                        state=state,
+                        decisions=decisions,
+                        completed_phase=completed_phase,
+                        markers=tuple(markers),
+                        trigger_event_id=record.event_id,
+                        trigger_event_type=record.event_type,
+                        unit_id=unit_id,
                     ),
                 )
+            )
+    return tuple(candidates)
+
+
+def resume_cult_marker_candidate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_phase: BattlePhase,
+    trigger_event_id: str,
+    participant: SequencingParticipant,
+) -> TimingRuleCandidate | None:
+    payload = participant.payload
+    if (
+        not isinstance(payload, dict)
+        or set(payload)
+        != {"trigger_event_id", "trigger_event_type", "moving_unit_instance_id", "markers"}
+        or payload["trigger_event_id"] != trigger_event_id
+        or type(payload["trigger_event_type"]) is not str
+        or type(payload["moving_unit_instance_id"]) is not str
+        or not isinstance(payload["markers"], list)
+        or not payload["markers"]
+        or participant.source_rule_id != SOURCE_RULE_ID
+        or participant.requirement is not SequencingRequirement.MANDATORY
+        or participant.participant_id
+        != f"cult-marker-removal:{trigger_event_id}:{participant.player_id}"
+    ):
+        raise GameLifecycleError("Captured Cult marker rule source identity drift.")
+    if participant != SequencingParticipant(
+        participant_id=participant.participant_id,
+        player_id=participant.player_id,
+        source_rule_id=SOURCE_RULE_ID,
+        requirement=SequencingRequirement.MANDATORY,
+        payload=payload,
+    ):
+        raise GameLifecycleError("Captured Cult participant classification drift.")
+    evidence = _marker_placement_event_evidence(state=state, decisions=decisions)
+    sources = tuple(
+        (index, event)
+        for index, event in enumerate(decisions.event_log.records)
+        if event.event_id == trigger_event_id
+    )
+    if len(sources) != 1 or sources[0][1].event_type != payload["trigger_event_type"]:
+        raise GameLifecycleError("Captured Cult marker move source drift.")
+    markers: list[CultAmbushMarker] = []
+    for raw in payload["markers"]:
+        if not isinstance(raw, dict):
+            raise GameLifecycleError("Captured Cult marker must be an object.")
+        marker = CultAmbushMarker.from_payload(cast(CultAmbushMarkerPayload, raw))
+        if marker.player_id != participant.player_id:
+            raise GameLifecycleError("Captured Cult marker owner drift.")
+        placed = evidence.get(marker.marker_id)
+        if (
+            placed is None
+            or placed[0] >= sources[0][0]
+            or placed[1] != replace(marker, ingress_window_closed=False)
+        ):
+            raise GameLifecycleError("Captured Cult marker creation authority drift.")
+        current = tuple(
+            item for item in state.cult_ambush_markers if item.marker_id == marker.marker_id
+        )
+        if current:
+            if len(current) != 1 or replace(current[0], ingress_window_closed=False) != replace(
+                marker, ingress_window_closed=False
+            ):
+                raise GameLifecycleError("Captured Cult marker state drift.")
+            markers.append(current[0])
+    if not markers or _marker_removal_already_processed(
+        decisions, trigger_event_id=trigger_event_id
+    ):
+        return None
+    return TimingRuleCandidate(
+        participant=participant,
+        activate=partial(
+            _remove_markers,
+            state=state,
+            decisions=decisions,
+            completed_phase=completed_phase,
+            markers=tuple(markers),
+            trigger_event_id=trigger_event_id,
+            trigger_event_type=payload["trigger_event_type"],
+            unit_id=payload["moving_unit_instance_id"],
+        ),
+    )
+
+
+def _remove_markers(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_phase: BattlePhase,
+    markers: tuple[CultAmbushMarker, ...],
+    trigger_event_id: str,
+    trigger_event_type: str,
+    unit_id: str,
+) -> None:
+    for marker in markers:
+        _remove_marker(
+            state=state,
+            decisions=decisions,
+            completed_phase=completed_phase,
+            marker=marker,
+            trigger_event_id=trigger_event_id,
+            trigger_event_type=trigger_event_type,
+            unit_id=unit_id,
+        )
+
+
+def _remove_marker(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_phase: BattlePhase,
+    marker: CultAmbushMarker,
+    trigger_event_id: str,
+    trigger_event_type: str,
+    unit_id: str,
+) -> None:
+    state.remove_cult_ambush_marker(marker.marker_id)
+    decisions.event_log.append(
+        "genestealer_cults_cult_ambush_marker_removed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": completed_phase.value,
+            "player_id": marker.player_id,
+            "marker": marker.to_payload(),
+            "trigger_event_id": trigger_event_id,
+            "trigger_event_type": trigger_event_type,
+            "enemy_unit_instance_id": unit_id,
+            "source_rule_id": SOURCE_RULE_ID,
+        },
+    )
 
 
 def _marker_placement_event_evidence(
@@ -242,7 +403,7 @@ def _rules_unit_has_aircraft_keyword(
 ) -> bool:
     if endpoint is None:
         return any(
-            keyword.upper() == "AIRCRAFT"
+            keyword == "AIRCRAFT"
             for rules_unit in rules_units
             for keyword in (*rules_unit.keywords, *rules_unit.faction_keywords)
         )
@@ -252,7 +413,7 @@ def _rules_unit_has_aircraft_keyword(
         else (endpoint.unit_instance_id,)
     )
     return any(
-        keyword.upper() == "AIRCRAFT"
+        keyword == "AIRCRAFT"
         for rules_unit in rules_units
         for component in rules_unit.components
         if component.unit.unit_instance_id in endpoint_component_ids
@@ -265,13 +426,8 @@ def _rules_unit_is_within_marker_removal_distance(
     state: GameState,
     marker: CultAmbushMarker,
     rules_units: tuple[RulesUnitView, ...],
-    endpoint: FightMovementCompletedEndpoint | None,
+    placements: tuple[ModelPlacement, ...],
 ) -> bool:
-    placements = (
-        _current_rules_unit_model_placements(state=state, rules_units=rules_units)
-        if endpoint is None
-        else endpoint.model_placements
-    )
     model_by_id, component_by_model_id = _rules_unit_model_inventory(rules_units)
     for placement in placements:
         model = model_by_id.get(placement.model_instance_id)
@@ -359,4 +515,4 @@ def _event_unit_instance_id(payload: dict[str, JsonValue]) -> str | None:
     return None
 
 
-__all__ = ("resolve_cult_ambush_marker_removal_for_completed_moves",)
+__all__ = ("cult_ambush_marker_removal_candidates",)

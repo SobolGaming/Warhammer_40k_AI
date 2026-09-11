@@ -7,13 +7,13 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedBattleShockHookRegistry,
     UnitMoveCompletedMortalWoundHookRegistry,
-    resolve_unit_move_completed_battle_shock_hooks,
-    resolve_unit_move_completed_mortal_wound_hooks,
+    resolve_unit_move_completed_hooks,
 )
 
 if TYPE_CHECKING:
@@ -21,6 +21,9 @@ if TYPE_CHECKING:
 
 
 class ChargeMoveCompletedHookProvider(Protocol):
+    @property
+    def move_completion_rule_registry(self) -> MoveCompletionRuleRegistry: ...
+
     @property
     def ruleset_descriptor(self) -> RulesetDescriptor | None: ...
 
@@ -52,23 +55,12 @@ def resolve_charge_move_completed_hooks(
     movement_action: str,
 ) -> LifecycleStatus | None:
     ruleset_descriptor = _ruleset_descriptor_for_handler(handler)
-    move_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+    return resolve_unit_move_completed_hooks(
         state=state,
         decisions=decisions,
         registry=handler.unit_move_completed_mortal_wound_hooks,
-        ruleset_descriptor=ruleset_descriptor,
-        runtime_modifier_registry=handler.runtime_modifier_registry,
-        completed_phase=BattlePhase.CHARGE,
-        event_type="charge_move_completed",
-        movement_actions=(movement_action,),
-        ability_indexes_by_player_id=handler.ability_indexes_by_player_id,
-    )
-    if move_completed_status is not None:
-        return move_completed_status
-    battle_shock_status = resolve_unit_move_completed_battle_shock_hooks(
-        state=state,
-        decisions=decisions,
-        registry=handler.unit_move_completed_battle_shock_hooks,
+        additional_candidates=handler.move_completion_rule_registry.candidates_for,
+        battle_shock_move_hooks=handler.unit_move_completed_battle_shock_hooks,
         battle_shock_hooks=handler.battle_shock_hooks,
         ruleset_descriptor=ruleset_descriptor,
         runtime_modifier_registry=handler.runtime_modifier_registry,
@@ -77,14 +69,13 @@ def resolve_charge_move_completed_hooks(
         movement_actions=(movement_action,),
         ability_indexes_by_player_id=handler.ability_indexes_by_player_id,
     )
-    if battle_shock_status is not None:
-        return battle_shock_status
-    return None
 
 
 def validate_charge_move_completed_hook_provider(
     handler: ChargeMoveCompletedHookProvider,
 ) -> None:
+    if type(handler.move_completion_rule_registry) is not MoveCompletionRuleRegistry:
+        raise GameLifecycleError("ChargePhaseHandler move rules must be a registry.")
     if (
         type(handler.unit_move_completed_mortal_wound_hooks)
         is not UnitMoveCompletedMortalWoundHookRegistry

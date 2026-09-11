@@ -50,7 +50,12 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     PlacementProposalPayload,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
     MovementPhaseHandler,
@@ -96,7 +101,7 @@ def test_gate_of_infinity_runtime_contribution_registers_turn_end_hook() -> None
     binding = contribution.turn_end_hook_bindings[0]
     assert binding.hook_id == army_rule.HOOK_ID
     assert binding.source_id == army_rule.SOURCE_RULE_ID
-    assert binding.request_handler is army_rule.gate_of_infinity_turn_end_request
+    assert binding.candidate_handler is army_rule.turn_candidates
     assert binding.result_handler is army_rule.apply_gate_of_infinity_turn_end_result
 
 
@@ -1252,9 +1257,8 @@ def _arrive_rules_unit_from_strategic_reserves(
     )
 
 
-def _decision_request(request: DecisionRequest | None) -> DecisionRequest:
-    if request is None:
-        raise AssertionError("Expected Gate of Infinity request.")
+def _decision_request(request: DecisionRequest | LifecycleStatus | None) -> DecisionRequest:
+    assert isinstance(request, DecisionRequest), "Expected Gate of Infinity request."
     return request
 
 

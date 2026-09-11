@@ -1,0 +1,158 @@
+{
+  "workload_id": "order35-rapid-ingress-v2",
+  "commit": "05ca3d8506a695d2a1e0b36ccb5b828dfb7f505a",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "profile",
+  "hardware_status": "provisional; one process, no concurrent test workers",
+  "timing_boundary": "setup separate; availability, target enumeration, rejected target preflight; legal Movement-end facade target submission; placement case also completes placement and parent resume",
+  "terrain_shapes": 0,
+  "rng_source": "engine game_id=phase12c-game; no random choices in measured slice",
+  "cpu_allocation": "one benchmark process; host CPU allocation not pinned",
+  "models_per_unit": 5,
+  "decision_policy": "remain stationary; select legal reserve target",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_rapid_ingress.py": "4b927d0038d4ca0f0a6fde714179292c6507dda37b10ec954c57924983d860f0",
+    "tests/rapid_ingress_helpers.py": "645e16294b559ba4fd88283c9a64e1dc80d470e5b6a89aa2bd4896c9e0e0e750",
+    "tests/core_stratagem_helpers.py": "90a4dd5fa5d14ebd2b1a48865d661d7f3ce37af64383f6f08642e9b0c2bdfd62",
+    "tests/setup_completion_helpers.py": "c95866658729694a06365e7b517d84d330abb4b56c8db5ef886b62127b535d25",
+    "tests/unit_keyword_helpers.py": "3f290f4f7bcd08cdb65d01f8b3cb062da3ba919aa426a4ba190fae1eafd862a5",
+    "tests/psychic_modifier_helpers.py": "6b6b802c4cb40d4f657d6e68c9b74d1b462f9ab0e5f0b29146c2f809355e4bd9"
+  },
+  "summaries": {
+    "legal": {
+      "mean": 0.037825083010829985,
+      "median": 0.037825083010829985,
+      "p95": 0.037825083010829985,
+      "max": 0.037825083010829985,
+      "samples": 1,
+      "completion_rate": 1.0,
+      "slices_per_second": 26.43748328889807
+    },
+    "first_round": {
+      "mean": 0.0001015419838950038,
+      "median": 0.0001015419838950038,
+      "p95": 0.0001015419838950038,
+      "max": 0.0001015419838950038,
+      "samples": 1,
+      "completion_rate": 1.0,
+      "slices_per_second": 9848.14321762728
+    },
+    "aircraft": {
+      "mean": 0.00028779194690287113,
+      "median": 0.00028779194690287113,
+      "p95": 0.00028779194690287113,
+      "max": 0.00028779194690287113,
+      "samples": 1,
+      "completion_rate": 1.0,
+      "slices_per_second": 3474.7323917909935
+    },
+    "mixed": {
+      "mean": 0.22685604193247855,
+      "median": 0.22685604193247855,
+      "p95": 0.22685604193247855,
+      "max": 0.22685604193247855,
+      "samples": 1,
+      "completion_rate": 1.0,
+      "slices_per_second": 4.408081845568125
+    },
+    "placement": {
+      "mean": 0.35765250003896654,
+      "median": 0.35765250003896654,
+      "p95": 0.35765250003896654,
+      "max": 0.35765250003896654,
+      "samples": 1,
+      "completion_rate": 1.0,
+      "slices_per_second": 2.79601009329181
+    }
+  },
+  "samples": [
+    {
+      "case": "legal",
+      "setup_seconds": 2.377006416907534,
+      "slice_seconds": 0.037825083010829985,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "target_unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {
+        "rules_unit_view_by_id": 7,
+        "reserve_state_for_unit": 4,
+        "unarrived_reserve_states_for_player": 10,
+        "_rapid_ingress_unit_ids": 3,
+        "rapid_ingress_target_error": 3
+      }
+    },
+    {
+      "case": "first_round",
+      "setup_seconds": 0.2786319999722764,
+      "slice_seconds": 0.0001015419838950038,
+      "inventory_size": 1,
+      "eligible_targets": 0,
+      "unavailable_reason": "rapid_ingress_first_battle_round",
+      "target_unavailable_reason": "rapid_ingress_first_battle_round",
+      "submitted": false,
+      "work_counts": {
+        "_rapid_ingress_unit_ids": 1
+      }
+    },
+    {
+      "case": "aircraft",
+      "setup_seconds": 0.41954362497199327,
+      "slice_seconds": 0.00028779194690287113,
+      "inventory_size": 1,
+      "eligible_targets": 0,
+      "unavailable_reason": "no_eligible_reserve_unit",
+      "target_unavailable_reason": "rapid_ingress_aircraft_target",
+      "submitted": false,
+      "work_counts": {
+        "rules_unit_view_by_id": 3,
+        "reserve_state_for_unit": 1,
+        "unarrived_reserve_states_for_player": 2,
+        "_rapid_ingress_unit_ids": 2,
+        "rapid_ingress_target_error": 1
+      }
+    },
+    {
+      "case": "mixed",
+      "setup_seconds": 2.1223372500389814,
+      "slice_seconds": 0.22685604193247855,
+      "inventory_size": 16,
+      "eligible_targets": 8,
+      "unavailable_reason": null,
+      "target_unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {
+        "rules_unit_view_by_id": 59,
+        "reserve_state_for_unit": 11,
+        "unarrived_reserve_states_for_player": 10,
+        "_rapid_ingress_unit_ids": 3,
+        "rapid_ingress_target_error": 10
+      }
+    },
+    {
+      "case": "placement",
+      "setup_seconds": 0.41946966701652855,
+      "slice_seconds": 0.35765250003896654,
+      "inventory_size": 1,
+      "eligible_targets": 1,
+      "unavailable_reason": null,
+      "target_unavailable_reason": null,
+      "submitted": true,
+      "work_counts": {
+        "rules_unit_view_by_id": 229,
+        "reserve_state_for_unit": 8,
+        "unarrived_reserve_states_for_player": 16,
+        "_rapid_ingress_unit_ids": 4,
+        "rapid_ingress_target_error": 4,
+        "resolve_reserve_arrival": 1
+      }
+    }
+  ],
+  "full_game_certified": false
+}

@@ -87,7 +87,7 @@ def validate_sensor_sweep_choice_historical_policy(
         if _marker_was_active_at_index(
             marker=candidate,
             authority_index=request_index,
-            event_index_by_id=event_index_by_id,
+            event_records=event_records,
             creation_index_by_marker_id=creation_index_by_marker_id,
         )
     )
@@ -172,9 +172,11 @@ def _marker_was_active_at_index(
     *,
     marker: PrimaryMissionMarkerState,
     authority_index: int,
-    event_index_by_id: dict[str, int],
+    event_records: tuple[EventRecord, ...],
     creation_index_by_marker_id: dict[str, int],
 ) -> bool:
+    from warhammer40k_core.engine.primary_marker_history import primary_marker_removal_event_index
+
     creation_index = creation_index_by_marker_id.get(marker.marker_id)
     if creation_index is None:
         raise GameLifecycleError("Sensor Sweep marker is missing creation authority.")
@@ -185,7 +187,7 @@ def _marker_was_active_at_index(
     removal_event_id = marker.removal_event_id
     if removal_event_id is None:
         raise GameLifecycleError("Removed Sensor Sweep marker lacks removal authority.")
-    removal_index = event_index_by_id.get(removal_event_id)
+    removal_index = primary_marker_removal_event_index(marker=marker, event_records=event_records)
     if removal_index is None:
         raise GameLifecycleError("Removed Sensor Sweep marker cites an unknown event.")
     return removal_index > authority_index

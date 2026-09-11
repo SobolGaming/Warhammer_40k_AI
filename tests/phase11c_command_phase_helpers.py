@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
@@ -9,9 +11,16 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestReason,
     BattleShockTestRequest,
 )
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_state import UnitPlacement
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
+    CommandPhaseStartHandler,
+)
 from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -25,11 +34,17 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
+    LifecycleStatus,
+    LifecycleStatusKind,
     SetupStep,
 )
+from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SetupFlow
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
@@ -39,6 +54,105 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+
+
+def resolve_deferred_battle_shock_outcomes(
+    state: GameState,
+    decisions: DecisionController,
+    registry: BattleShockHookRegistry,
+) -> LifecycleStatus | None:
+    """Resume the engine's deferred outcome owner in low-level Command hook tests."""
+    from warhammer40k_core.engine.battle_shock_outcome_triggers import resolve_battle_shock_trigger
+    from warhammer40k_core.engine.rule_trigger_state import RuleTriggerKind, rule_trigger_history
+
+    while ready := rule_trigger_history(decisions).ready():
+        trigger = ready[0]
+        if trigger.kind is RuleTriggerKind.MODEL_DESTRUCTION:
+            from warhammer40k_core.engine.model_destruction_triggers import (
+                record_model_destruction_occurrences,
+                resolve_model_destruction_trigger,
+            )
+            from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookRegistry
+
+            destruction_registry = UnitDestroyedHookRegistry.empty()
+            record_model_destruction_occurrences(
+                state=state, decisions=decisions, registry=destruction_registry
+            )
+            status = resolve_model_destruction_trigger(
+                state=state, decisions=decisions, trigger=trigger, registry=destruction_registry
+            )
+            assert status is None or status.status_kind is LifecycleStatusKind.ADVANCED
+            continue
+        assert trigger.kind is RuleTriggerKind.BATTLE_SHOCK_OUTCOME
+        status = resolve_battle_shock_trigger(
+            state=state,
+            decisions=decisions,
+            trigger=trigger,
+            registry=registry,
+        )
+        if status is not None and status.status_kind is not LifecycleStatusKind.ADVANCED:
+            return status
+    return None
+
+
+def advance_command_phase_with_outcomes(
+    *,
+    handler: CommandPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+) -> LifecycleStatus:
+    status = handler.begin_phase(state=state, decisions=decisions)
+    if status.status_kind is not LifecycleStatusKind.ADVANCED:
+        return status
+    outcome = resolve_deferred_battle_shock_outcomes(state, decisions, handler.battle_shock_hooks)
+    return status if outcome is None else outcome
+
+
+def automatic_command_contract_candidate(
+    context: CommandPhaseStartEffectContext, handler: CommandPhaseStartHandler
+) -> tuple[TimingRuleCandidate, ...]:
+    """Exercise provider contract rejection with real engine contexts and state."""
+    return command_contract_candidate(
+        context,
+        lambda: handler(
+            CommandPhaseStartContext(
+                state=context.state,
+                decisions=context.decisions,
+                active_player_id=context.active_player_id,
+            )
+        ),
+    )
+
+
+def command_contract_candidate(
+    context: CommandPhaseStartEffectContext,
+    activate: Callable[[], LifecycleStatus | None],
+) -> tuple[TimingRuleCandidate, ...]:
+    return (
+        TimingRuleCandidate(
+            participant=SequencingParticipant(
+                participant_id="command-provider-contract-audit",
+                source_rule_id="command-provider-contract-audit-source",
+                player_id=context.active_player_id,
+                requirement=SequencingRequirement.MANDATORY,
+            ),
+            activate=activate,
+        ),
+    )
+
+
+def command_request_contract_candidate(
+    context: CommandPhaseStartEffectContext, template: DecisionRequest
+) -> tuple[TimingRuleCandidate, ...]:
+    return (
+        timing_candidate_for_request(
+            template=template,
+            participant_id="command-provider-contract-audit",
+            source_rule_id="command-provider-contract-audit-source",
+            requirement=SequencingRequirement.MANDATORY,
+            next_request_id=context.state.next_decision_request_id,
+        ),
+    )
 
 
 def battle_shock_request_for_unit(
@@ -121,6 +235,109 @@ def remove_first_models(state: GameState, *, unit_instance_id: str, count: int) 
             damage=model.wounds_remaining,
             damage_kind=DamageKind.NORMAL,
         )
+
+
+def destroy_models_with_recorded_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    unit_instance_id: str,
+    model_instance_ids: tuple[str, ...],
+    application_id: str,
+    destroying_player_id: str,
+) -> None:
+    """Create pre-existing casualties with full physical and decision history for restore tests."""
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplicationProgress,
+        continue_mortal_wound_application,
+    )
+    from warhammer40k_core.engine.decision_result import DecisionResult
+    from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MortalWoundDestructionEvidence,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import resolve_mortal_wound_decision
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    target = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    models = {model.model_instance_id: model for model in target.alive_models()}
+    assert model_instance_ids
+    assert set(model_instance_ids).issubset(models)
+    phase = state.current_battle_phase
+    assert phase is not None
+    first_event = len(decisions.event_log.records)
+    routed = continue_mortal_wound_application(
+        state=state,
+        decisions=decisions,
+        request_id=f"{application_id}:request:0",
+        progress=MortalWoundApplicationProgress.start(
+            application_id=application_id,
+            source_rule_id=f"{application_id}:source",
+            source_context={"source_kind": "fixture_preexisting_casualties"},
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+                state=state,
+                destroying_player_id=destroying_player_id,
+                source_rules_unit_instance_id=None,
+                source_model_instance_id=None,
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=phase,
+                source_step="fixture_preexisting_casualties",
+            ),
+            target_unit_instance_id=unit_instance_id,
+            defender_player_id=target.owner_player_id,
+            mortal_wounds=sum(
+                models[identifier].wounds_remaining for identifier in model_instance_ids
+            ),
+            spill_over=True,
+        ),
+    )
+    index = 0
+    while routed.request is not None:
+        request = decisions.request_decision(routed.request)
+        option_id = next(
+            option.option_id for option in request.options if option.option_id in model_instance_ids
+        )
+        result = DecisionResult.for_request(
+            request=request,
+            result_id=f"{application_id}:result:{index}",
+            selected_option_id=option_id,
+        )
+        decisions.submit_result(result)
+        index += 1
+        routed = resolve_mortal_wound_decision(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            next_request_id=f"{application_id}:request:{index}",
+        )
+    assert routed.application is not None
+    assert {
+        damage.model_instance_id for damage in routed.application.applications if damage.destroyed
+    } == set(model_instance_ids)
+    from warhammer40k_core.engine.primary_historical_events import (
+        record_primary_battlefield_departure_event,
+    )
+    from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+        record_primary_destroyed_model_departures,
+    )
+
+    for event in decisions.event_log.records[first_event:]:
+        if event.event_type != "model_destroyed":
+            continue
+        assert isinstance(event.payload, dict)
+        identifier = event.payload["model_instance_id"]
+        assert isinstance(identifier, str)
+        assert identifier in model_instance_ids
+        for departure in record_primary_destroyed_model_departures(
+            state=state,
+            destroyed_model_instance_ids=(identifier,),
+            source_id=f"core-rules:primary-unit-destruction-tracking:{event.event_id}",
+            occurrence_id=event.event_id,
+        ):
+            record_primary_battlefield_departure_event(
+                event_log=decisions.event_log, departure=departure
+            )
 
 
 def unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:

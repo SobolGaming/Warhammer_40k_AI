@@ -332,120 +332,47 @@ def test_blessings_options_require_matching_disjoint_dice() -> None:
     assert consumed["decapitating_strikes"] == [0, 1]
 
 
-def test_battle_round_start_hook_registry_validates_and_dispatches() -> None:
+def test_battle_round_start_hook_registry_discovers_before_rolling_or_allocating() -> None:
     state = _battle_ready_state()
     decisions = DecisionController()
     context = BattleRoundStartRequestContext(state=state, decisions=decisions)
-    request = _dummy_battle_round_request(state)
-
-    request_binding = BattleRoundStartHookBinding(
-        hook_id="phase17g-test:request",
-        source_id="phase17g-test:source",
-        request_handler=lambda _context: request,
+    registry = BattleRoundStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().battle_round_start_hook_bindings
     )
-    no_request_binding = BattleRoundStartHookBinding(
-        hook_id="phase17g-test:no-request",
-        source_id="phase17g-test:source",
-        result_handler=lambda _context: False,
-    )
-    registry = BattleRoundStartHookRegistry.from_bindings((request_binding, no_request_binding))
-
-    assert BattleRoundStartHookRegistry.empty().all_bindings() == ()
-    assert registry.all_bindings() == (no_request_binding, request_binding)
-    assert registry.next_request_for(context) == request
+    before = (state.to_payload(), decisions.to_payload())
+    candidates = registry.candidates_for(context)
+    assert len(candidates) == 1
+    assert candidates[0].participant.player_id == "player-a"
+    assert (state.to_payload(), decisions.to_payload()) == before
+    request = registry.next_request_for(context)
+    assert request is not None
+    assert request.actor_id == "player-a"
     assert (
-        BattleRoundStartHookRegistry.from_bindings((no_request_binding,)).next_request_for(context)
-        is None
+        len([event for event in decisions.event_log.records if event.event_type == "dice_rolled"])
+        == 1
     )
-
+    decisions.request_decision(request)
     result = DecisionResult.for_request(
-        result_id="phase17g-battle-round-hooks-result",
+        result_id="order36-blessings-result",
         request=request,
-        selected_option_id="phase17g-battle-round-hooks-option",
+        selected_option_id="world_eaters:blessings:none",
     )
-    result_context = BattleRoundStartResultContext(
-        state=state,
-        decisions=decisions,
-        request=request,
-        result=result,
-    )
-
-    def _bad_request_handler(_context: BattleRoundStartRequestContext) -> DecisionRequest | None:
-        return cast(DecisionRequest, object())
-
-    def _bad_result_handler(_context: BattleRoundStartResultContext) -> bool:
-        return cast(bool, "handled")
-
-    result_registry = BattleRoundStartHookRegistry.from_bindings(
-        (
-            BattleRoundStartHookBinding(
-                hook_id="phase17g-test:false-result",
-                source_id="phase17g-test:source",
-                result_handler=lambda _context: False,
-            ),
-            BattleRoundStartHookBinding(
-                hook_id="phase17g-test:true-result",
-                source_id="phase17g-test:source",
-                result_handler=lambda _context: True,
-            ),
+    decisions.submit_result(result)
+    assert registry.apply_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
         )
     )
-
-    assert result_registry.apply_result(result_context)
-    assert not BattleRoundStartHookRegistry.from_bindings((request_binding,)).apply_result(
-        result_context
+    assert registry.next_request_for(context) is None
+    assert (
+        len([event for event in decisions.event_log.records if event.event_type == "dice_rolled"])
+        == 1
     )
-
     with pytest.raises(GameLifecycleError, match="request hooks require a context"):
         registry.next_request_for(cast(BattleRoundStartRequestContext, object()))
-    with pytest.raises(GameLifecycleError, match="result hooks require a context"):
-        registry.apply_result(cast(BattleRoundStartResultContext, object()))
-    with pytest.raises(GameLifecycleError, match="return DecisionRequest or None"):
-        BattleRoundStartHookRegistry.from_bindings(
-            (
-                BattleRoundStartHookBinding(
-                    hook_id="phase17g-test:bad-request",
-                    source_id="phase17g-test:source",
-                    request_handler=_bad_request_handler,
-                ),
-            )
-        ).next_request_for(context)
-    with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
-        BattleRoundStartHookRegistry.from_bindings(
-            (
-                request_binding,
-                BattleRoundStartHookBinding(
-                    hook_id="phase17g-test:request-two",
-                    source_id="phase17g-test:source",
-                    request_handler=lambda _context: request,
-                ),
-            )
-        ).next_request_for(context)
-    with pytest.raises(GameLifecycleError, match="result handlers must return bool"):
-        BattleRoundStartHookRegistry.from_bindings(
-            (
-                BattleRoundStartHookBinding(
-                    hook_id="phase17g-test:bad-result",
-                    source_id="phase17g-test:source",
-                    result_handler=_bad_result_handler,
-                ),
-            )
-        ).apply_result(result_context)
-    with pytest.raises(GameLifecycleError, match="handled by multiple hooks"):
-        BattleRoundStartHookRegistry.from_bindings(
-            (
-                BattleRoundStartHookBinding(
-                    hook_id="phase17g-test:true-one",
-                    source_id="phase17g-test:source",
-                    result_handler=lambda _context: True,
-                ),
-                BattleRoundStartHookBinding(
-                    hook_id="phase17g-test:true-two",
-                    source_id="phase17g-test:source",
-                    result_handler=lambda _context: True,
-                ),
-            )
-        ).apply_result(result_context)
 
 
 def test_battle_round_start_hook_dataclasses_reject_malformed_inputs() -> None:

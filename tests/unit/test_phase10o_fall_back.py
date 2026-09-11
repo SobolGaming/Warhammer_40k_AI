@@ -165,7 +165,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09a-dice-0003"
-_INCOHERENT_SURVIVORS_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09b-coherency-0001"
+_INCOHERENT_SURVIVORS_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09b-coherency-0002"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -1044,7 +1044,7 @@ def _advance_voluntary_desperate_escape_to_delirium_fnp(
 def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
     with_reroll: bool,
 ) -> None:
-    seed_suffix = 16 if with_reroll else 3
+    seed_suffix = 1 if with_reroll else 6
     game_id = f"phase10o-p09b-delirium-fnp-reroll-{int(with_reroll)}-{seed_suffix}"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,

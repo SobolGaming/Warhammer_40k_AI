@@ -54,6 +54,9 @@ from warhammer40k_core.engine.rule_frequency import (
     optional_ability_frequency_usage_key,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR, parameter_payload
@@ -106,8 +109,38 @@ class CatalogOncePerBattleRuntime:
                 hook_id=CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
                 source_id=CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
                 request_handler=self.fight_phase_start_request,
+                candidate_handler=self.fight_phase_start_candidates,
                 result_handler=self.apply_fight_phase_start_result,
             ),
+        )
+
+    def fight_phase_start_candidates(
+        self,
+        context: FightPhaseStartRequestContext,
+    ) -> tuple[TimingRuleCandidate, ...]:
+        return tuple(
+            timing_candidate_for_request(
+                template=_activation_request(
+                    state=context.state,
+                    activation=activation,
+                    request_id=f"template:{activation.usage_key}",
+                ),
+                participant_id=activation.usage_key,
+                label=f"{activation.record.definition.name}: {activation.unit.unit_instance_id}",
+                participant_payload={
+                    "source_unit_instance_id": activation.unit.unit_instance_id,
+                    "source_rules_unit_instance_id": activation.source_rules_unit.unit_instance_id,
+                    "source_model_instance_id": activation.source_model_instance_id,
+                },
+                source_rule_id=activation.record.definition.source_id,
+                requirement=SequencingRequirement.OPTIONAL,
+                next_request_id=context.state.next_decision_request_id,
+            )
+            for activation in _available_activations(
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                armies=self.armies,
+                context=context,
+            )
         )
 
     def fight_phase_start_request(
@@ -368,6 +401,7 @@ def _activation_request(
     *,
     state: object,
     activation: _OncePerBattleActivation,
+    request_id: str | None = None,
 ) -> DecisionRequest:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -377,7 +411,7 @@ def _activation_request(
     decline_id = f"{activation.usage_key}:decline"
     use_id = f"{activation.usage_key}:use"
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=state.next_decision_request_id() if request_id is None else request_id,
         decision_type=SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
         actor_id=activation.player_id,
         payload={**base, "available_option_ids": [decline_id, use_id]},

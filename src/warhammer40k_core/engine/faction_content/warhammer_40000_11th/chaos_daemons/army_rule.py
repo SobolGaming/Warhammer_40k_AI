@@ -173,6 +173,10 @@ def _runtime_contribution(
         BattleShockPendingOutcomeAuthorityValidator | None
     ) = None,
 ) -> RuntimeContentContribution:
+    from functools import partial
+
+    from .outcome_sequencing import candidates
+
     return RuntimeContentContribution(
         contribution_id=contribution_id,
         battle_shock_hook_bindings=(
@@ -182,6 +186,12 @@ def _runtime_contribution(
                 modifier_handler=modifier_handler,
                 modifier_application_validator=modifier_application_validator,
                 outcome_handler=outcome_handler,
+                outcome_candidate_handler=partial(
+                    candidates,
+                    hook_id=hook_id,
+                    source_rule_id=source_rule_id,
+                    battleline_revival_enabled=source_rule_id == JULY_SOURCE_RULE_ID,
+                ),
                 pending_outcome_authority_validator=(pending_outcome_authority_validator),
                 historical_contribution_handler=historical_handler,
             ),

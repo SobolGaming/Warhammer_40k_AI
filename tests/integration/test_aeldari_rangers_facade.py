@@ -198,6 +198,11 @@ def test_generated_rangers_cannot_repeat_normal_move_reactions_in_one_phase(
         result_id_prefix="rangers-repeat-enemy-one",
         dx=0.25,
     )
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    status = resolve_ordering_for_fixture(
+        session.lifecycle, status, source_unit_instance_id=alpha.unit_instance_id
+    )
     alpha_first_request = _assert_triggered_request(
         status,
         unit_instance_id=alpha.unit_instance_id,
@@ -240,6 +245,9 @@ def test_generated_rangers_cannot_repeat_normal_move_reactions_in_one_phase(
         unit_instance_id=enemy_two.unit_instance_id,
         result_id_prefix="rangers-repeat-enemy-two",
         dx=0.25,
+    )
+    status = resolve_ordering_for_fixture(
+        session.lifecycle, status, source_unit_instance_id=alpha.unit_instance_id
     )
     second_request = _request(
         status,

@@ -66,7 +66,7 @@ _EXPECTED_CALLS = {
     ),
     (
         "unit_move_completed_hooks.py",
-        "_resolve_battle_shock_effect",
+        "resolve_battle_shock_effect",
         "resolve_battle_shock_test_with_optional_reroll",
     ): _ExpectedCall(_Policy.BOTH_FIELDS),
     (

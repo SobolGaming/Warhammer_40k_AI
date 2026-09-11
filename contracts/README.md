@@ -1,6 +1,11 @@
 # CORE V2 external contract
 
-Contract version: `14.0.0`
+Contract version: `15.0.0`
+
+Contract 15 implements owner-controlled Rules Sequencing, deferred triggers,
+temporary active-player authority and per-owner Primary scoring commits. Replay
+and operator persistence require the corresponding source/batch history. See
+[14-to-15.md](migrations/14-to-15.md) for the migration boundary.
 
 Contract 14 replaces sampled visibility witnesses with continuous analytic
 evidence and complete context fingerprints. Shooting candidates publish the new
@@ -132,7 +137,7 @@ family as the standalone submission schema; it is not an unrestricted JSON
 value. The generated TypeScript gate constructs and schema-validates every
 published interaction case.
 
-Replay exports use `replay-artifact-v8-phase17n-step5a`. Their embedded mission
+Replay exports use `replay-artifact-v9-sequencing`. Their embedded mission
 setup requires both directed player Primary Mission assignments and explicit
 logical terrain-area identities; their game state requires group-aware
 turn-start position history, typed destruction attribution, and battlefield

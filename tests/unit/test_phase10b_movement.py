@@ -64,7 +64,6 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementDistanceRecord,
     MovementPhaseActionKind,
-    MovementPhaseHandler,
     MovementPhaseState,
     MovementPhaseStepKind,
     MovementUnitSelection,
@@ -363,8 +362,12 @@ def test_movement_phase_requires_complete_placement_before_unit_selection() -> N
     state = _movement_state_with_partial_placement()
     decisions = DecisionController()
 
+    from tests.movement_submission_helpers import core_movement_handler
+
     with pytest.raises(GameLifecycleError, match="complete placed armies"):
-        MovementPhaseHandler().begin_phase(state=state, decisions=decisions)
+        core_movement_handler(
+            state=state, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh()
+        ).begin_phase(state=state, decisions=decisions)
 
     assert decisions.queue.pending_requests == ()
 

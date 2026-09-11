@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.command_core_cp_history import (
     expected_core_command_occurrence_keys,
     expected_restored_core_command_occurrence_keys,
@@ -10,13 +12,11 @@ from warhammer40k_core.engine.command_core_cp_history import (
 from warhammer40k_core.engine.command_phase_start_hooks import (
     COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-    CommandPhaseStartContext,
     CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
     CommandPhaseStartNestedPendingAuthorityContext,
     CommandPhaseStartProviderDisposition,
-    CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.command_points import CommandStepState
@@ -43,6 +43,10 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
+COMMAND_START_DISCOVERED_EVENT = "command_phase_start_rules_discovered"
+COMMAND_START_RULE_COMPLETED_EVENT = "command_phase_start_rule_completed"
+COMMAND_START_ORDER_REQUESTED_EVENT = "command_phase_start_order_requested"
+
 COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT = "command_phase_start_synchronous_hooks_completed"
 COMMAND_START_EFFECT_PAUSED_EVENT = "command_phase_start_effect_hook_paused"
 COMMAND_START_EFFECT_PASS_COMPLETED_EVENT = "command_phase_start_effect_pass_completed"
@@ -50,8 +54,11 @@ COMMAND_START_FINITE_REQUESTED_EVENT = "command_phase_start_faction_rule_request
 COMMAND_START_FINITE_RESULT_EVENT = "command_phase_start_finite_provider_result_applied"
 COMMAND_START_BOUNDARY_COMPLETED_EVENT = "command_phase_start_boundary_completed"
 
-_AUTHORITY_EVENT_TYPES = frozenset(
+AUTHORITY_EVENT_TYPES = frozenset(
     {
+        COMMAND_START_DISCOVERED_EVENT,
+        COMMAND_START_RULE_COMPLETED_EVENT,
+        COMMAND_START_ORDER_REQUESTED_EVENT,
         COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
         COMMAND_START_EFFECT_PAUSED_EVENT,
         COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
@@ -109,6 +116,19 @@ _PROVIDER_DISPOSITION_KEYS = frozenset(
     }
 )
 _PAYLOAD_KEYS_BY_EVENT_TYPE = {
+    COMMAND_START_DISCOVERED_EVENT: _COMPLETION_PAYLOAD_KEYS,
+    COMMAND_START_RULE_COMPLETED_EVENT: _COMMON_PAYLOAD_KEYS
+    | {
+        "participant_id",
+        "provider_hook_id",
+        "provider_source_id",
+        "provider_dispositions",
+    },
+    COMMAND_START_ORDER_REQUESTED_EVENT: _COMMON_PAYLOAD_KEYS
+    | {
+        "request_id",
+        "request_payload_hash",
+    },
     COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT: _COMPLETION_PAYLOAD_KEYS,
     COMMAND_START_EFFECT_PAUSED_EVENT: _EFFECT_PAUSE_PAYLOAD_KEYS,
     COMMAND_START_EFFECT_PASS_COMPLETED_EVENT: _EFFECT_PASS_PAYLOAD_KEYS,
@@ -124,6 +144,8 @@ def resolve_command_phase_start_boundary(
     decisions: DecisionController,
     command_phase_start_hooks: CommandPhaseStartHookRegistry,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
 ) -> LifecycleStatus | None:
     """Resolve the pre-Core-CP boundary while retaining exact restore evidence."""
     _validate_runtime_inputs(
@@ -137,108 +159,69 @@ def resolve_command_phase_start_boundary(
         raise GameLifecycleError("Command-start boundary requires CommandStepState.")
     if command_state.command_points_granted:
         raise GameLifecycleError("Command-start boundary cannot run after Core CP is granted.")
-    _require_empty_pending_queue(
+    require_empty_pending_queue(
         decisions=decisions,
         context="Command-start boundary cannot run with a pending decision",
     )
+    from warhammer40k_core.engine.command_phase_start_sequencing import (
+        command_start_timing_context,
+        resolve_command_start_candidates,
+    )
+    from warhammer40k_core.engine.timing_window_events import record_timing_window_boundary
+
+    if command_state.command_phase_start_boundary_resolved:
+        return None
+    window = command_start_timing_context(
+        state,
+        battle_round=state.battle_round,
+        active_player_id=_active_player_id(state),
+    ).timing_window
+    record_timing_window_boundary(decisions=decisions, window=window, completed=False)
     active_player_id = _active_player_id(state)
-    if not command_state.command_phase_start_synchronous_hooks_resolved:
-        synchronous_dispositions = command_phase_start_hooks.resolve_with_provider_dispositions(
-            CommandPhaseStartContext(
-                state=state,
-                decisions=decisions,
-                active_player_id=active_player_id,
-            )
-        )
-        _require_empty_pending_queue(
-            decisions=decisions,
-            context="Command-start synchronous hooks cannot enqueue decisions",
-        )
+    if not any(
+        event.event_type == COMMAND_START_DISCOVERED_EVENT
+        and isinstance(event.payload, dict)
+        and event.payload.get("battle_round") == state.battle_round
+        and event.payload.get("active_player_id") == active_player_id
+        for event in decisions.event_log.records
+    ):
         _append_completion_event(
             state=state,
             decisions=decisions,
             registry=command_phase_start_hooks,
-            event_type=COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
-            dispositions=synchronous_dispositions,
+            event_type=COMMAND_START_DISCOVERED_EVENT,
+            dispositions=(),
         )
-        state.replace_command_step_state(
-            _require_command_state(state).with_command_phase_start_synchronous_hooks_resolved()
-        )
-        command_state = _require_command_state(state)
-    if command_state.command_phase_start_boundary_resolved:
-        return None
-
-    (
-        effect_status,
-        effect_binding,
-        effect_dispositions,
-    ) = command_phase_start_hooks.resolve_effects_with_provider_dispositions(
+    status = resolve_command_start_candidates(
         CommandPhaseStartEffectContext(
             state=state,
             decisions=decisions,
             active_player_id=active_player_id,
             runtime_modifier_registry=runtime_modifier_registry,
-        )
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+        ),
+        command_phase_start_hooks,
     )
-    if effect_status is not None:
-        if effect_binding is None:
-            raise GameLifecycleError("Command-start effect pause lacks a provider binding.")
-        _record_effect_pause(
-            state=state,
-            decisions=decisions,
-            registry=command_phase_start_hooks,
-            binding=effect_binding,
-            status=effect_status,
-            dispositions=effect_dispositions,
-        )
-        return effect_status
-
-    _require_empty_pending_queue(
+    if status is not None:
+        return status
+    record_timing_window_boundary(decisions=decisions, window=window, completed=True)
+    _append_completion_event(
+        state=state,
         decisions=decisions,
-        context="Command-start effect hooks must return their pending decision status",
+        registry=command_phase_start_hooks,
+        event_type=COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
+        dispositions=(),
     )
-
+    state.replace_command_step_state(
+        _require_command_state(state).with_command_phase_start_synchronous_hooks_resolved()
+    )
     _record_effect_pass_completion(
         state=state,
         decisions=decisions,
         registry=command_phase_start_hooks,
-        dispositions=effect_dispositions,
+        dispositions=(),
     )
-    emission = command_phase_start_hooks.next_request_with_provider(
-        CommandPhaseStartRequestContext(
-            state=state,
-            decisions=decisions,
-            active_player_id=active_player_id,
-        )
-    )
-    if emission is not None:
-        request, binding = emission
-        decisions.request_decision(request)
-        if decisions.queue.pending_requests != (request,):
-            raise GameLifecycleError(
-                "Command-start finite provider did not enqueue exactly one request."
-            )
-        decisions.event_log.append(
-            COMMAND_START_FINITE_REQUESTED_EVENT,
-            {
-                **_authority_common_payload(state=state, registry=command_phase_start_hooks),
-                "decision_type": request.decision_type,
-                "request_id": request.request_id,
-                "request_payload_hash": _payload_hash(request.to_payload()),
-                "provider_hook_id": binding.hook_id,
-                "provider_source_id": binding.source_id,
-            },
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=request,
-            payload={
-                "phase": BattlePhase.COMMAND.value,
-                "active_player_id": active_player_id,
-                "phase_body_status": "command_phase_start_faction_rule_pending",
-            },
-        )
-
     _append_completion_event(
         state=state,
         decisions=decisions,
@@ -269,15 +252,15 @@ def record_command_phase_start_finite_result(
     context.decisions.event_log.append(
         COMMAND_START_FINITE_RESULT_EVENT,
         {
-            **_authority_common_payload(state=context.state, registry=registry),
+            **authority_common_payload(state=context.state, registry=registry),
             "decision_type": context.request.decision_type,
             "request_id": context.request.request_id,
-            "request_payload_hash": _payload_hash(context.request.to_payload()),
+            "request_payload_hash": payload_hash(context.request.to_payload()),
             "result_id": context.result.result_id,
-            "result_payload_hash": _payload_hash(context.result.to_payload()),
+            "result_payload_hash": payload_hash(context.result.to_payload()),
             "provider_hook_id": binding.hook_id,
             "provider_source_id": binding.source_id,
-            "provider_dispositions": _provider_dispositions_payload((disposition,)),
+            "provider_dispositions": provider_dispositions_payload((disposition,)),
         },
     )
 
@@ -307,9 +290,9 @@ def validate_command_phase_start_restore_authority(
 
     events_by_key: dict[tuple[int, str], list[tuple[int, EventRecord]]] = {}
     for event_index, event in enumerate(decisions.event_log.records):
-        if event.event_type not in _AUTHORITY_EVENT_TYPES:
+        if event.event_type not in AUTHORITY_EVENT_TYPES:
             continue
-        payload = _event_payload(event)
+        payload = event_payload(event)
         _validate_exact_payload_shape(event_type=event.event_type, payload=payload)
         key = _validate_authority_common_payload(
             payload=payload,
@@ -352,208 +335,20 @@ def _validate_occurrence(
     completed: bool,
     runtime_content_bundle: RuntimeContentBundle | None,
 ) -> None:
-    by_type = {
-        event_type: tuple(
-            (event_index, event)
-            for event_index, event in occurrence_events
-            if event.event_type == event_type
-        )
-        for event_type in _AUTHORITY_EVENT_TYPES
-    }
-    command_state = state.command_step_state if key == _current_command_key(state) else None
-    synchronous_required = completed or (
-        command_state is not None and command_state.command_phase_start_synchronous_hooks_resolved
-    )
-    boundary_required = completed or (
-        command_state is not None and command_state.command_phase_start_boundary_resolved
-    )
-    synchronous = by_type[COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT]
-    boundaries = by_type[COMMAND_START_BOUNDARY_COMPLETED_EVENT]
-    if len(synchronous) != int(synchronous_required):
-        raise GameLifecycleError("Command-start synchronous completion authority drifted.")
-    if len(boundaries) != int(boundary_required):
-        raise GameLifecycleError("Command-start boundary completion authority drifted.")
-    if not synchronous_required:
-        if occurrence_events:
-            raise GameLifecycleError("Command-start authority exists before synchronous progress.")
-        if command_state is not None and decisions.queue.pending_requests:
-            raise GameLifecycleError(
-                "Command-start cannot retain a pending request before synchronous progress."
-            )
-        return
+    from warhammer40k_core.engine.command_phase_start_history import validate_occurrence
 
-    synchronous_index = synchronous[0][0]
-    _validate_provider_dispositions(
-        payload=_event_payload(synchronous[0][1]),
-        registry=registry,
-        events=decisions.event_log.records,
-        authority_event_index=synchronous_index,
-        expected_bindings=tuple(
-            binding for binding in registry.all_bindings() if binding.handler is not None
-        ),
-    )
-    effect_passes = by_type[COMMAND_START_EFFECT_PASS_COMPLETED_EVENT]
-    for expected_pass_index, (event_index, event) in enumerate(effect_passes, start=1):
-        if event_index <= synchronous_index:
-            raise GameLifecycleError("Command-start effect pass precedes synchronous completion.")
-        payload = _event_payload(event)
-        if payload.get("effect_pass_index") != expected_pass_index:
-            raise GameLifecycleError("Command-start effect pass sequence drifted.")
-        _validate_provider_dispositions(
-            payload=payload,
-            registry=registry,
-            events=decisions.event_log.records,
-            authority_event_index=event_index,
-            expected_bindings=tuple(
-                binding for binding in registry.all_bindings() if binding.effect_handler is not None
-            ),
-        )
-    request_rows = _validate_finite_requests(
+    validate_occurrence(
+        state=state,
         decisions=decisions,
         registry=registry,
-        synchronous_index=synchronous_index,
-        rows=by_type[COMMAND_START_FINITE_REQUESTED_EVENT],
+        key=key,
+        occurrence_events=occurrence_events,
+        completed=completed,
+        runtime_content_bundle=runtime_content_bundle,
     )
-    result_index_by_request_id = _validate_finite_results(
-        decisions=decisions,
-        registry=registry,
-        request_rows=request_rows,
-        rows=by_type[COMMAND_START_FINITE_RESULT_EVENT],
-    )
-    boundary_index = None if not boundaries else boundaries[0][0]
-    unresolved_effect_request_ids = _validate_effect_pauses(
-        decisions=decisions,
-        registry=registry,
-        synchronous_index=synchronous_index,
-        later_progress_indexes=tuple(
-            sorted(
-                (
-                    *(event_index for event_index, _event in effect_passes),
-                    *(
-                        event_index
-                        for event_index, _event in by_type[COMMAND_START_FINITE_REQUESTED_EVENT]
-                    ),
-                    *(
-                        event_index
-                        for event_index, _event in by_type[COMMAND_START_FINITE_RESULT_EVENT]
-                    ),
-                    *((boundary_index,) if boundary_index is not None else ()),
-                )
-            )
-        ),
-        pauses=by_type[COMMAND_START_EFFECT_PAUSED_EVENT],
-    )
-    expected_effect_pass_count = len(request_rows) + int(boundary_required)
-    if len(effect_passes) != expected_effect_pass_count:
-        raise GameLifecycleError("Command-start effect-pass/finite-provider chain drifted.")
-    unresolved_request_indexes = tuple(
-        index for index, row in enumerate(request_rows) if row[2] is None
-    )
-    if unresolved_request_indexes not in ((), (len(request_rows) - 1,)):
-        raise GameLifecycleError("Command-start finite provider progress overlaps.")
-    for request_position, (request_index, request, record, _binding) in enumerate(request_rows):
-        pass_index = effect_passes[request_position][0]
-        if pass_index >= request_index:
-            raise GameLifecycleError("Command-start finite request precedes its effect pass.")
-        if request_position > 0:
-            previous_request = request_rows[request_position - 1][1]
-            previous_result_index = result_index_by_request_id.get(previous_request.request_id)
-            if previous_result_index is None or previous_result_index >= pass_index:
-                raise GameLifecycleError("Command-start finite providers overlap or reorder.")
-        if record is not None:
-            result_index = result_index_by_request_id[request.request_id]
-            next_pass_position = request_position + 1
-            if (
-                next_pass_position < len(effect_passes)
-                and result_index >= effect_passes[next_pass_position][0]
-            ):
-                raise GameLifecycleError(
-                    "Command-start finite result does not precede the next effect pass."
-                )
-
-    if boundary_required:
-        if not effect_passes:
-            raise GameLifecycleError("Command-start boundary lacks an effect completion pass.")
-        if boundary_index is None:
-            raise GameLifecycleError("Command-start boundary authority is absent.")
-        _validate_provider_dispositions(
-            payload=_event_payload(boundaries[0][1]),
-            registry=registry,
-            events=decisions.event_log.records,
-            authority_event_index=boundary_index,
-            expected_bindings=(),
-        )
-        if effect_passes[-1][0] >= boundary_index:
-            raise GameLifecycleError("Command-start boundary precedes its final effect pass.")
-        if request_rows and request_rows[-1][0] >= boundary_index:
-            raise GameLifecycleError("Command-start boundary precedes finite provider progress.")
-        unresolved = tuple(row for row in request_rows if row[2] is None)
-        if unresolved:
-            raise GameLifecycleError("Completed Command-start boundary has a pending provider.")
-        if completed or (command_state is not None and command_state.command_points_granted):
-            anchor_index = _command_step_anchor_index(
-                decisions.event_log.records,
-                battle_round=key[0],
-                active_player_id=key[1],
-            )
-            if anchor_index < 3 or tuple(
-                event.event_type
-                for event in decisions.event_log.records[anchor_index - 3 : anchor_index]
-            ) != (
-                COMMAND_START_BOUNDARY_COMPLETED_EVENT,
-                "command_points_gained",
-                "command_points_gained",
-            ):
-                raise GameLifecycleError("Command-start Core CP event prefix drifted.")
-            if boundary_index != anchor_index - 3:
-                raise GameLifecycleError(
-                    "Command-start boundary is not adjacent to both Core CP gains."
-                )
-        for pending_request in decisions.queue.pending_requests:
-            requested_index = _exact_event_index(
-                decisions.event_log.records,
-                event_type="decision_requested",
-                payload=pending_request.to_payload(),
-            )
-            if requested_index <= boundary_index:
-                raise GameLifecycleError(
-                    "Command-start boundary retained an unrelated pending request."
-                )
-    elif boundaries:
-        raise GameLifecycleError("Incomplete Command-start occurrence has boundary authority.")
-
-    if command_state is not None:
-        unresolved = tuple(row for row in request_rows if row[2] is None)
-        expected_pending_request_ids = (
-            *(row[1].request_id for row in unresolved),
-            *unresolved_effect_request_ids,
-        )
-        pending_request_ids = tuple(
-            request.request_id for request in decisions.queue.pending_requests
-        )
-        if expected_pending_request_ids:
-            if pending_request_ids != expected_pending_request_ids:
-                raise GameLifecycleError("Pending Command-start provider inventory drifted.")
-        elif not boundary_required and decisions.queue.pending_requests:
-            _validate_nested_finite_provider_pending_request(
-                state=state,
-                decisions=decisions,
-                registry=registry,
-                effect_pauses=by_type[COMMAND_START_EFFECT_PAUSED_EVENT],
-                request_rows=request_rows,
-                result_index_by_request_id=result_index_by_request_id,
-                runtime_content_bundle=runtime_content_bundle,
-            )
-        elif boundary_required and decisions.queue.pending_requests:
-            if boundary_index is None:
-                raise GameLifecycleError("Command-start completed queue lacks a boundary.")
-            if not command_state.command_points_granted:
-                raise GameLifecycleError(
-                    "Command-start boundary cannot retain a pending request before Core CP."
-                )
 
 
-def _validate_effect_pauses(
+def validate_effect_pauses(
     *,
     decisions: DecisionController,
     registry: CommandPhaseStartHookRegistry,
@@ -566,9 +361,9 @@ def _validate_effect_pauses(
     for event_index, event in pauses:
         if event_index <= synchronous_index:
             raise GameLifecycleError("Command-start effect pause precedes synchronous completion.")
-        payload = _event_payload(event)
-        binding = _binding_from_payload(payload=payload, registry=registry)
-        if binding.effect_handler is None:
+        payload = event_payload(event)
+        binding = binding_from_payload(payload=payload, registry=registry)
+        if binding.effect_handler is None and binding.candidate_handler is None:
             raise GameLifecycleError("Command-start effect pause provider lacks an effect handler.")
         request_id = _optional_payload_string(payload, "pending_request_id")
         request_hash = payload.get("pending_request_payload_hash")
@@ -577,35 +372,24 @@ def _validate_effect_pauses(
         if request_id in seen_request_ids:
             raise GameLifecycleError("Command-start effect pause request is duplicated.")
         seen_request_ids.add(request_id)
-        request = _request_by_id(decisions=decisions, request_id=request_id)
-        if request is None or request_hash != _payload_hash(request.to_payload()):
+        request = request_by_id(decisions=decisions, request_id=request_id)
+        if request is None or request_hash != payload_hash(request.to_payload()):
             raise GameLifecycleError("Command-start effect pause request authority drifted.")
-        requested_index = _exact_event_index(
+        requested_index = exact_event_index(
             decisions.event_log.records,
             event_type="decision_requested",
             payload=request.to_payload(),
         )
         if requested_index >= event_index:
             raise GameLifecycleError("Command-start effect pause precedes its decision request.")
-        effect_bindings = tuple(
-            candidate
-            for candidate in registry.all_bindings()
-            if candidate.effect_handler is not None
-        )
-        try:
-            binding_position = effect_bindings.index(binding)
-        except ValueError as exc:
-            raise GameLifecycleError(
-                "Command-start effect pause provider capability drifted."
-            ) from exc
-        _validate_provider_dispositions(
+        validate_provider_dispositions(
             payload=payload,
             registry=registry,
             events=decisions.event_log.records,
             authority_event_index=event_index,
-            expected_bindings=effect_bindings[: binding_position + 1],
+            expected_bindings=(binding,),
         )
-        record = _decision_record_by_request_id(decisions.records, request_id=request_id)
+        record = decision_record_by_request_id(decisions.records, request_id=request_id)
         if record is None:
             if (
                 sum(
@@ -620,7 +404,7 @@ def _validate_effect_pauses(
                 )
             unresolved_request_ids.append(request_id)
             continue
-        recorded_index = _exact_event_index(
+        recorded_index = exact_event_index(
             decisions.event_log.records,
             event_type="decision_recorded",
             payload=record.to_payload(),
@@ -639,7 +423,7 @@ def _validate_effect_pauses(
     return tuple(unresolved_request_ids)
 
 
-def _validate_finite_requests(
+def validate_finite_requests(
     *,
     decisions: DecisionController,
     registry: CommandPhaseStartHookRegistry,
@@ -655,31 +439,31 @@ def _validate_finite_requests(
             raise GameLifecycleError(
                 "Command-start finite request precedes synchronous completion."
             )
-        payload = _event_payload(event)
-        request_id = _payload_string(payload, "request_id")
+        payload = event_payload(event)
+        request_id = payload_string(payload, "request_id")
         if request_id in seen_request_ids:
             raise GameLifecycleError("Command-start finite request authority is duplicated.")
         seen_request_ids.add(request_id)
-        request = _request_by_id(decisions=decisions, request_id=request_id)
+        request = request_by_id(decisions=decisions, request_id=request_id)
         if request is None:
             raise GameLifecycleError("Command-start finite request is absent from decisions.")
         if (
             request.decision_type != SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE
             or payload.get("decision_type") != request.decision_type
-            or payload.get("request_payload_hash") != _payload_hash(request.to_payload())
+            or payload.get("request_payload_hash") != payload_hash(request.to_payload())
         ):
             raise GameLifecycleError("Command-start finite request payload authority drifted.")
-        binding = _binding_from_payload(payload=payload, registry=registry)
+        binding = binding_from_payload(payload=payload, registry=registry)
         if binding.request_handler is None or binding.result_handler is None:
             raise GameLifecycleError("Command-start finite request provider capability drifted.")
-        requested_index = _exact_event_index(
+        requested_index = exact_event_index(
             decisions.event_log.records,
             event_type="decision_requested",
             payload=request.to_payload(),
         )
         if requested_index >= event_index:
             raise GameLifecycleError("Command-start provider event precedes its decision request.")
-        record = _decision_record_by_request_id(
+        record = decision_record_by_request_id(
             decisions.records,
             request_id=request.request_id,
         )
@@ -687,7 +471,7 @@ def _validate_finite_requests(
     return tuple(validated)
 
 
-def _validate_finite_results(
+def validate_finite_results(
     *,
     decisions: DecisionController,
     registry: CommandPhaseStartHookRegistry,
@@ -698,8 +482,8 @@ def _validate_finite_results(
 ) -> dict[str, int]:
     result_by_request_id: dict[str, tuple[int, EventRecord]] = {}
     for event_index, event in rows:
-        payload = _event_payload(event)
-        request_id = _payload_string(payload, "request_id")
+        payload = event_payload(event)
+        request_id = payload_string(payload, "request_id")
         if request_id in result_by_request_id:
             raise GameLifecycleError("Command-start finite result authority is duplicated.")
         result_by_request_id[request_id] = (event_index, event)
@@ -713,25 +497,25 @@ def _validate_finite_results(
         if record is None:
             continue
         result_index, result_event = result_by_request_id[request.request_id]
-        payload = _event_payload(result_event)
-        binding = _binding_from_payload(payload=payload, registry=registry)
+        payload = event_payload(result_event)
+        binding = binding_from_payload(payload=payload, registry=registry)
         if binding != request_binding:
             raise GameLifecycleError("Command-start finite result provider drifted.")
         if (
             payload.get("decision_type") != request.decision_type
-            or payload.get("request_payload_hash") != _payload_hash(request.to_payload())
+            or payload.get("request_payload_hash") != payload_hash(request.to_payload())
             or payload.get("result_id") != record.result.result_id
-            or payload.get("result_payload_hash") != _payload_hash(record.result.to_payload())
+            or payload.get("result_payload_hash") != payload_hash(record.result.to_payload())
         ):
             raise GameLifecycleError("Command-start finite result payload authority drifted.")
-        recorded_index = _exact_event_index(
+        recorded_index = exact_event_index(
             decisions.event_log.records,
             event_type="decision_recorded",
             payload=record.to_payload(),
         )
         if not request_index < recorded_index < result_index:
             raise GameLifecycleError("Command-start finite result ordering drifted.")
-        disposition_start_index = _validate_provider_dispositions(
+        disposition_start_index = validate_provider_dispositions(
             payload=payload,
             registry=registry,
             events=decisions.event_log.records,
@@ -746,7 +530,7 @@ def _validate_finite_results(
     }
 
 
-def _validate_nested_finite_provider_pending_request(
+def validate_nested_finite_provider_pending_request(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -766,7 +550,7 @@ def _validate_nested_finite_provider_pending_request(
             "Pending Command-start provider progress requires loaded runtime authority."
         )
     pending_request = pending[0]
-    pending_index = _exact_event_index(
+    pending_index = exact_event_index(
         decisions.event_log.records,
         event_type="decision_requested",
         payload=pending_request.to_payload(),
@@ -780,7 +564,7 @@ def _validate_nested_finite_provider_pending_request(
     for _request_index, request, record, binding in request_rows:
         if record is None:
             continue
-        recorded_index = _exact_event_index(
+        recorded_index = exact_event_index(
             decisions.event_log.records,
             event_type="decision_recorded",
             payload=record.to_payload(),
@@ -802,16 +586,16 @@ def _validate_nested_finite_provider_pending_request(
     )
     continued_effect_bindings: list[CommandPhaseStartHookBinding] = []
     for _pause_index, pause_event in effect_pauses:
-        pause_payload = _event_payload(pause_event)
-        source_request_id = _payload_string(pause_payload, "pending_request_id")
-        source_request = _request_by_id(decisions=decisions, request_id=source_request_id)
-        source_record = _decision_record_by_request_id(
+        pause_payload = event_payload(pause_event)
+        source_request_id = payload_string(pause_payload, "pending_request_id")
+        source_request = request_by_id(decisions=decisions, request_id=source_request_id)
+        source_record = decision_record_by_request_id(
             decisions.records,
             request_id=source_request_id,
         )
         if source_request is None or source_record is None:
             continue
-        source_recorded_index = _exact_event_index(
+        source_recorded_index = exact_event_index(
             decisions.event_log.records,
             event_type="decision_recorded",
             payload=source_record.to_payload(),
@@ -822,7 +606,7 @@ def _validate_nested_finite_provider_pending_request(
             recorded_index=source_recorded_index,
         ):
             continued_effect_bindings.append(
-                _binding_from_payload(payload=pause_payload, registry=registry)
+                binding_from_payload(payload=pause_payload, registry=registry)
             )
     if continued_effect_bindings:
         if len(continued_effect_bindings) != 1:
@@ -885,7 +669,7 @@ def _validate_nested_finite_provider_pending_request(
             or state_payload.get("hook_id") != binding.hook_id
         ):
             raise GameLifecycleError("Pending Command-start Battle-shock provider drifted.")
-    recorded_index = _exact_event_index(
+    recorded_index = exact_event_index(
         decisions.event_log.records,
         event_type="decision_recorded",
         payload=outer_record.to_payload(),
@@ -894,7 +678,7 @@ def _validate_nested_finite_provider_pending_request(
         raise GameLifecycleError("Pending Command-start provider ordering drifted.")
 
 
-def _record_effect_pause(
+def record_effect_pause(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -917,7 +701,7 @@ def _record_effect_pause(
         raise GameLifecycleError(
             "Command-start effect provider must enqueue exactly its returned request."
         )
-    _exact_event_index(
+    exact_event_index(
         decisions.event_log.records,
         event_type="decision_requested",
         payload=request.to_payload(),
@@ -925,13 +709,13 @@ def _record_effect_pause(
     decisions.event_log.append(
         COMMAND_START_EFFECT_PAUSED_EVENT,
         {
-            **_authority_common_payload(state=state, registry=registry),
+            **authority_common_payload(state=state, registry=registry),
             "provider_hook_id": binding.hook_id,
             "provider_source_id": binding.source_id,
             "status_kind": status.status_kind.value,
             "pending_request_id": request.request_id,
-            "pending_request_payload_hash": _payload_hash(request.to_payload()),
-            "provider_dispositions": _provider_dispositions_payload(dispositions),
+            "pending_request_payload_hash": payload_hash(request.to_payload()),
+            "provider_dispositions": provider_dispositions_payload(dispositions),
         },
     )
 
@@ -954,9 +738,9 @@ def _record_effect_pass_completion(
     decisions.event_log.append(
         COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
         {
-            **_authority_common_payload(state=state, registry=registry),
+            **authority_common_payload(state=state, registry=registry),
             "effect_pass_index": pass_count + 1,
-            "provider_dispositions": _provider_dispositions_payload(dispositions),
+            "provider_dispositions": provider_dispositions_payload(dispositions),
         },
     )
 
@@ -972,14 +756,14 @@ def _append_completion_event(
     decisions.event_log.append(
         event_type,
         {
-            **_authority_common_payload(state=state, registry=registry),
+            **authority_common_payload(state=state, registry=registry),
             "provider_binding_inventory": _registry_inventory(registry),
-            "provider_dispositions": _provider_dispositions_payload(dispositions),
+            "provider_dispositions": provider_dispositions_payload(dispositions),
         },
     )
 
 
-def _authority_common_payload(
+def authority_common_payload(
     *,
     state: GameState,
     registry: CommandPhaseStartHookRegistry,
@@ -1037,6 +821,7 @@ def _registry_inventory(registry: CommandPhaseStartHookRegistry) -> list[JsonVal
             "has_synchronous_handler": binding.handler is not None,
             "has_effect_handler": binding.effect_handler is not None,
             "has_request_handler": binding.request_handler is not None,
+            "has_candidate_handler": binding.candidate_handler is not None,
             "has_result_handler": binding.result_handler is not None,
             "has_nested_result_handler": binding.nested_result_handler is not None,
             "has_nested_pending_authority_validator": (
@@ -1048,10 +833,10 @@ def _registry_inventory(registry: CommandPhaseStartHookRegistry) -> list[JsonVal
 
 
 def _registry_fingerprint(registry: CommandPhaseStartHookRegistry) -> str:
-    return _payload_hash(_registry_inventory(registry))
+    return payload_hash(_registry_inventory(registry))
 
 
-def _provider_dispositions_payload(
+def provider_dispositions_payload(
     dispositions: tuple[CommandPhaseStartProviderDisposition, ...],
 ) -> list[JsonValue]:
     if type(dispositions) is not tuple or any(
@@ -1061,7 +846,7 @@ def _provider_dispositions_payload(
         raise GameLifecycleError("Command-start provider dispositions must be typed.")
     payloads: list[JsonValue] = []
     for disposition in dispositions:
-        if any(event.event_type in _AUTHORITY_EVENT_TYPES for event in disposition.emitted_events):
+        if any(event.event_type in AUTHORITY_EVENT_TYPES for event in disposition.emitted_events):
             raise GameLifecycleError("Command-start provider emitted reserved authority events.")
         payloads.append(
             {
@@ -1069,7 +854,7 @@ def _provider_dispositions_payload(
                 "provider_source_id": disposition.binding.source_id,
                 "state_changed": disposition.state_changed,
                 "emitted_event_ids": [event.event_id for event in disposition.emitted_events],
-                "emitted_events_hash": _payload_hash(
+                "emitted_events_hash": payload_hash(
                     [event.to_payload() for event in disposition.emitted_events]
                 ),
             }
@@ -1077,7 +862,7 @@ def _provider_dispositions_payload(
     return payloads
 
 
-def _validate_provider_dispositions(
+def validate_provider_dispositions(
     *,
     payload: dict[str, JsonValue],
     registry: CommandPhaseStartHookRegistry,
@@ -1093,7 +878,7 @@ def _validate_provider_dispositions(
         if not isinstance(raw_row, dict) or frozenset(raw_row) != _PROVIDER_DISPOSITION_KEYS:
             raise GameLifecycleError("Command-start provider disposition shape drifted.")
         row = raw_row
-        binding = _binding_from_payload(payload=row, registry=registry)
+        binding = binding_from_payload(payload=row, registry=registry)
         state_changed = row.get("state_changed")
         raw_event_ids = row.get("emitted_event_ids")
         events_hash = row.get("emitted_events_hash")
@@ -1124,25 +909,25 @@ def _validate_provider_dispositions(
         emitted = events[start:cursor]
         if (
             tuple(event.event_id for event in emitted) != event_ids
-            or any(event.event_type in _AUTHORITY_EVENT_TYPES for event in emitted)
-            or _payload_hash([event.to_payload() for event in emitted]) != events_hash
+            or any(event.event_type in AUTHORITY_EVENT_TYPES for event in emitted)
+            or payload_hash([event.to_payload() for event in emitted]) != events_hash
         ):
             raise GameLifecycleError("Command-start provider output evidence drifted.")
         cursor = start
     return cursor
 
 
-def _payload_hash(payload: object) -> str:
+def payload_hash(payload: object) -> str:
     return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
 
-def _binding_from_payload(
+def binding_from_payload(
     *,
     payload: dict[str, JsonValue],
     registry: CommandPhaseStartHookRegistry,
 ) -> CommandPhaseStartHookBinding:
-    hook_id = _payload_string(payload, "provider_hook_id")
-    source_id = _payload_string(payload, "provider_source_id")
+    hook_id = payload_string(payload, "provider_hook_id")
+    source_id = payload_string(payload, "provider_source_id")
     matches = tuple(
         binding
         for binding in registry.all_bindings()
@@ -1164,19 +949,19 @@ def _require_registry_binding(
         raise GameLifecycleError("Command-start authority requires a provider binding.")
     if sum(stored == binding for stored in registry.all_bindings()) != 1:
         raise GameLifecycleError("Command-start authority provider is not loaded exactly once.")
-    if requires_effect and binding.effect_handler is None:
+    if requires_effect and binding.effect_handler is None and binding.candidate_handler is None:
         raise GameLifecycleError("Command-start authority provider lacks an effect handler.")
     if requires_result and binding.result_handler is None:
         raise GameLifecycleError("Command-start authority provider lacks a result handler.")
 
 
-def _event_payload(event: EventRecord) -> dict[str, JsonValue]:
+def event_payload(event: EventRecord) -> dict[str, JsonValue]:
     if not isinstance(event.payload, dict):
         raise GameLifecycleError("Command-start authority event payload must be an object.")
     return event.payload
 
 
-def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
+def payload_string(payload: dict[str, JsonValue], key: str) -> str:
     value = payload.get(key)
     if type(value) is not str or not value.strip():
         raise GameLifecycleError(f"Command-start authority {key} must be a string.")
@@ -1192,7 +977,7 @@ def _optional_payload_string(payload: dict[str, JsonValue], key: str) -> str | N
     return value
 
 
-def _request_by_id(
+def request_by_id(
     *,
     decisions: DecisionController,
     request_id: str,
@@ -1231,7 +1016,7 @@ def _has_pending_continuation_for_request(
         or source_progress.source_context != pending_progress.source_context
     ):
         return False
-    pending_index = _exact_event_index(
+    pending_index = exact_event_index(
         decisions.event_log.records,
         event_type="decision_requested",
         payload=pending[0].to_payload(),
@@ -1241,7 +1026,7 @@ def _has_pending_continuation_for_request(
     )
 
 
-def _decision_record_by_request_id(
+def decision_record_by_request_id(
     records: tuple[DecisionRecord, ...],
     *,
     request_id: str,
@@ -1252,7 +1037,7 @@ def _decision_record_by_request_id(
     return None if not matches else matches[0]
 
 
-def _exact_event_index(
+def exact_event_index(
     events: tuple[EventRecord, ...],
     *,
     event_type: str,
@@ -1269,7 +1054,7 @@ def _exact_event_index(
     return indexes[0]
 
 
-def _command_step_anchor_index(
+def command_step_anchor_index(
     events: tuple[EventRecord, ...],
     *,
     battle_round: int,
@@ -1288,7 +1073,7 @@ def _command_step_anchor_index(
     return indexes[0]
 
 
-def _current_command_key(state: GameState) -> tuple[int, str] | None:
+def current_command_key(state: GameState) -> tuple[int, str] | None:
     if state.stage is not GameLifecycleStage.BATTLE:
         return None
     if state.current_battle_phase is not BattlePhase.COMMAND:
@@ -1299,7 +1084,7 @@ def _current_command_key(state: GameState) -> tuple[int, str] | None:
 
 
 def _current_incomplete_command_key(state: GameState) -> tuple[int, str] | None:
-    key = _current_command_key(state)
+    key = current_command_key(state)
     if key is None or key in expected_core_command_occurrence_keys(state):
         return None
     return key
@@ -1312,7 +1097,7 @@ def _active_player_id(state: GameState) -> str:
     return active_player_id
 
 
-def _require_empty_pending_queue(
+def require_empty_pending_queue(
     *,
     decisions: DecisionController,
     context: str,

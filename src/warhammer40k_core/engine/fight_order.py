@@ -442,7 +442,16 @@ class FightPhaseState:
     ) -> Self:
         if attack_sequence is not None and type(attack_sequence) is not AttackSequence:
             raise GameLifecycleError("FightPhaseState attack_sequence update requires sequence.")
+        from warhammer40k_core.engine.attack_completion_authority import (
+            attack_completion_continuation,
+        )
+
         return self._replace(
+            pending_completed_attack_sequence=attack_completion_continuation(
+                previous=self.attack_sequence,
+                updated=attack_sequence,
+                pending=self.pending_completed_attack_sequence,
+            ),
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=allocated_model_ids_this_phase,
         )

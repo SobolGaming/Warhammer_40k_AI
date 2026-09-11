@@ -4,7 +4,6 @@ from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
@@ -29,8 +28,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     army_rule,
 )
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 from . import rule
@@ -95,7 +95,7 @@ def argath_weapon_profile_modifier(context: WeaponProfileModifierContext) -> Wea
     if assignment is None:
         return profile
     army, _enhancement_assignment, bearer = assignment
-    delta = 2 if _bearer_within_shadow(context.state, army=army, bearer=bearer) else 1
+    delta = 2 if bearer_within_shadow(context.state, army=army, bearer=bearer) else 1
     return _profile_with_attacks_and_strength_delta(
         profile=profile,
         attacks_delta=delta,
@@ -120,7 +120,7 @@ def everstave_weapon_profile_modifier(context: WeaponProfileModifierContext) -> 
     if assignment is None:
         return profile
     army, _enhancement_assignment, bearer = assignment
-    strength_delta = 2 if _bearer_within_shadow(context.state, army=army, bearer=bearer) else 1
+    strength_delta = 2 if bearer_within_shadow(context.state, army=army, bearer=bearer) else 1
     range_delta = 6 if strength_delta == 2 else 3
     return _profile_with_strength_and_range_delta(
         profile=profile,
@@ -138,7 +138,7 @@ def endless_gift_effect(
         raise GameLifecycleError("Endless Gift requires an EnhancementEffectContext.")
     if context.assignment.enhancement_id != ENDLESS_GIFT_ENHANCEMENT_ID:
         return ()
-    _validate_daemonic_incursion_bearer(
+    validate_daemonic_incursion_bearer(
         army=context.army,
         unit=context.target_unit,
         required_keyword="NURGLE",
@@ -170,69 +170,18 @@ def endless_gift_effect(
 
 def resolve_soulstealer_attack_sequence_completion(
     context: AttackSequenceCompletedContext,
-) -> None:
-    if type(context) is not AttackSequenceCompletedContext:
-        raise GameLifecycleError("Soulstealer requires an attack sequence completion context.")
-    if context.source_phase is not BattlePhase.FIGHT:
-        return
-    for army, assignment, bearer in _assigned_soulstealer_bearers(context.state):
-        _validate_daemonic_incursion_bearer(
-            army=army,
-            unit=bearer,
-            required_keyword="SLAANESH",
-            rule_label="Soulstealer",
-        )
-        bearer_model_ids = {model.model_instance_id for model in bearer.own_models}
-        for event_id, payload in _destroyed_enemy_model_events_for_sequence(
-            context=context,
-            army=army,
-            bearer=bearer,
-            bearer_model_ids=frozenset(bearer_model_ids),
-        ):
-            if _soulstealer_event_already_resolved(
-                context=context,
-                destroyed_model_event_id=event_id,
-            ):
-                continue
-            bearer_model_id = _payload_identifier(payload, "attacking_model_instance_id")
-            shadow_bonus = (
-                1 if _bearer_within_shadow(context.state, army=army, bearer=bearer) else 0
-            )
-            d6_result = context.dice_manager.roll(
-                DiceRollSpec(
-                    expression=DiceExpression(quantity=1, sides=6),
-                    reason="Soulstealer",
-                    roll_type=SOULSTEALER_D6_ROLL_TYPE,
-                    actor_id=bearer_model_id,
-                )
-            )
-            roll_total = d6_result.current_total + shadow_bonus
-            heal_succeeded = roll_total >= 4
-            before_wounds, after_wounds = _heal_bearer_model(
-                state=context.state,
-                unit_instance_id=bearer.unit_instance_id,
-                model_instance_id=bearer_model_id,
-                amount=1 if heal_succeeded else 0,
-            )
-            context.decisions.event_log.append(
-                SOULSTEALER_RESOLVED_EVENT,
-                _soulstealer_resolution_payload(
-                    context=context,
-                    army=army,
-                    assignment=assignment,
-                    bearer=bearer,
-                    destroyed_model_event_id=event_id,
-                    destroyed_model_payload=payload,
-                    bearer_model_id=bearer_model_id,
-                    d6_result=validate_json_value(d6_result.to_payload()),
-                    shadow_bonus=shadow_bonus,
-                    roll_total=roll_total,
-                    heal_succeeded=heal_succeeded,
-                    before_wounds=before_wounds,
-                    after_wounds=after_wounds,
-                ),
-            )
-    return
+) -> LifecycleStatus | None:
+    from .soulstealer_sequencing import resolve
+
+    return resolve(context)
+
+
+def soulstealer_completion_candidates(
+    context: AttackSequenceCompletedContext,
+) -> tuple[TimingRuleCandidate, ...]:
+    from .soulstealer_sequencing import candidates
+
+    return candidates(context)
 
 
 def _assigned_bearer_for_attack_context(
@@ -251,7 +200,7 @@ def _assigned_bearer_for_attack_context(
                 for model in bearer.own_models
             ):
                 continue
-            _validate_daemonic_incursion_bearer(
+            validate_daemonic_incursion_bearer(
                 army=army,
                 unit=bearer,
                 required_keyword=required_keyword,
@@ -261,7 +210,7 @@ def _assigned_bearer_for_attack_context(
     return None
 
 
-def _assigned_soulstealer_bearers(
+def assigned_soulstealer_bearers(
     state: GameState,
 ) -> tuple[tuple[ArmyDefinition, EnhancementAssignment, UnitInstance], ...]:
     assignments: list[tuple[ArmyDefinition, EnhancementAssignment, UnitInstance]] = []
@@ -365,7 +314,7 @@ def _strength_with_delta(
     return CharacteristicValue.from_raw(Characteristic.STRENGTH, value.final + delta)
 
 
-def _destroyed_enemy_model_events_for_sequence(
+def destroyed_enemy_model_events_for_sequence(
     *,
     context: AttackSequenceCompletedContext,
     army: ArmyDefinition,
@@ -387,10 +336,10 @@ def _destroyed_enemy_model_events_for_sequence(
             continue
         if payload.get("attacking_unit_instance_id") != bearer.unit_instance_id:
             continue
-        attacker_model_id = _payload_identifier(payload, "attacking_model_instance_id")
+        attacker_model_id = payload_identifier(payload, "attacking_model_instance_id")
         if attacker_model_id not in bearer_model_ids:
             continue
-        target_unit_id = _payload_identifier(payload, "target_unit_instance_id")
+        target_unit_id = payload_identifier(payload, "target_unit_instance_id")
         if (
             _owner_player_id_for_unit(context.state, unit_instance_id=target_unit_id)
             == army.player_id
@@ -402,7 +351,7 @@ def _destroyed_enemy_model_events_for_sequence(
             target_unit_instance_id=target_unit_id,
         ):
             raise GameLifecycleError("Soulstealer destroyed model event has no melee attack pool.")
-        _payload_identifier(payload, "model_instance_id")
+        payload_identifier(payload, "model_instance_id")
         events.append((record.event_id, payload))
     return tuple(events)
 
@@ -423,7 +372,7 @@ def _sequence_has_bearer_melee_pool(
     )
 
 
-def _soulstealer_event_already_resolved(
+def soulstealer_event_already_resolved(
     *,
     context: AttackSequenceCompletedContext,
     destroyed_model_event_id: str,
@@ -442,7 +391,7 @@ def _soulstealer_event_already_resolved(
     return False
 
 
-def _heal_bearer_model(
+def heal_bearer_model(
     *,
     state: GameState,
     unit_instance_id: str,
@@ -485,7 +434,7 @@ def _heal_bearer_model(
     return before_wounds, after_wounds
 
 
-def _soulstealer_resolution_payload(
+def soulstealer_resolution_payload(
     *,
     context: AttackSequenceCompletedContext,
     army: ArmyDefinition,
@@ -533,7 +482,7 @@ def _soulstealer_resolution_payload(
     )
 
 
-def _bearer_within_shadow(
+def bearer_within_shadow(
     state: GameState,
     *,
     army: ArmyDefinition,
@@ -548,7 +497,7 @@ def _bearer_within_shadow(
     )
 
 
-def _validate_daemonic_incursion_bearer(
+def validate_daemonic_incursion_bearer(
     *,
     army: ArmyDefinition,
     unit: UnitInstance,
@@ -625,7 +574,7 @@ def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
     return requested_keyword in {_canonical_keyword(stored) for stored in unit.faction_keywords}
 
 
-def _payload_identifier(payload: dict[str, JsonValue], key: str) -> str:
+def payload_identifier(payload: dict[str, JsonValue], key: str) -> str:
     value = payload.get(key)
     if type(value) is not str:
         raise GameLifecycleError(f"Soulstealer payload requires {key}.")

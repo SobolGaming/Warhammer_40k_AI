@@ -19,7 +19,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.primary_historical_events import (
     primary_reserve_entry_source_terminal_bindings_payload,
     record_primary_reserve_entry_provider_terminal_event,
@@ -32,8 +32,9 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
 from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveStatus
 from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
-    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookBinding,
     TurnEndRequestContext,
     TurnEndResultContext,
@@ -84,71 +85,30 @@ class CatalogTurnEndReserveRuntime:
             TurnEndHookBinding(
                 hook_id=CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
                 source_id=CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
-                request_handler=self.request_handler,
+                candidate_handler=self.candidates,
                 result_handler=self.result_handler,
             ),
         )
 
-    def request_handler(self, context: TurnEndRequestContext) -> DecisionRequest | None:
+    def candidates(self, context: TurnEndRequestContext) -> tuple[TimingRuleCandidate, ...]:
+        from warhammer40k_core.engine.catalog_turn_end_reserve_candidates import candidates
+
+        return candidates(self, context)
+
+    def request_handler(
+        self, context: TurnEndRequestContext
+    ) -> DecisionRequest | LifecycleStatus | None:
+        from warhammer40k_core.engine.boundary_sequencing import resolve_boundary_candidates
+        from warhammer40k_core.engine.catalog_turn_end_reserve_candidates import candidates
+
         if type(context) is not TurnEndRequestContext:
-            raise GameLifecycleError("Catalog turn-end reserves require request context.")
-        if context.completed_phase is not BattlePhase.FIGHT:
-            return None
-        active_player_id = _active_player_id(context)
-        for army in self.armies:
-            index = self.ability_indexes_by_player_id[army.player_id]
-            for unit, record, rule_ir in _turn_end_reserve_candidates(
-                index=index,
-                army=army,
-                active_player_id=active_player_id,
-                state=context.state,
-            ):
-                if _decision_recorded_this_turn(
-                    context,
-                    catalog_record_id=record.record_id,
-                    unit_instance_id=unit.unit_instance_id,
-                ):
-                    continue
-                if not _unit_can_enter_strategic_reserves(
-                    context.state,
-                    unit_instance_id=unit.unit_instance_id,
-                ):
-                    continue
-                return DecisionRequest(
-                    request_id=context.state.next_decision_request_id(),
-                    decision_type=SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-                    actor_id=army.player_id,
-                    payload={
-                        "game_id": context.state.game_id,
-                        "battle_round": context.state.battle_round,
-                        "active_player_id": active_player_id,
-                        "phase": context.completed_phase.value,
-                        "source_rule_id": record.definition.source_id,
-                        "hook_id": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
-                        "catalog_record_id": record.record_id,
-                        "ability_id": record.definition.ability_id,
-                        "ability_name": record.definition.name,
-                        "datasheet_id": record.datasheet_id,
-                        "source_kind": record.source_kind.value,
-                        "target_unit_instance_id": unit.unit_instance_id,
-                        "rule_ir_hash": rule_ir.ir_hash(),
-                    },
-                    options=(
-                        _catalog_turn_end_reserve_option(
-                            player_id=army.player_id,
-                            record=record,
-                            unit_instance_id=unit.unit_instance_id,
-                            use_ability=True,
-                        ),
-                        _catalog_turn_end_reserve_option(
-                            player_id=army.player_id,
-                            record=record,
-                            unit_instance_id=unit.unit_instance_id,
-                            use_ability=False,
-                        ),
-                    ),
-                )
-        return None
+            raise GameLifecycleError("End-rule request requires a turn-end request context.")
+        return resolve_boundary_candidates(
+            state=context.state,
+            decisions=context.decisions,
+            trigger_kind=TimingTriggerKind.END_TURN,
+            discover=lambda: candidates(self, context),
+        )
 
     def result_handler(self, context: TurnEndResultContext) -> bool:
         if type(context) is not TurnEndResultContext:
@@ -251,7 +211,7 @@ def catalog_turn_end_reserve_hook_bindings(
     ).bindings()
 
 
-def _turn_end_reserve_candidates(
+def turn_end_reserve_candidates(
     *,
     index: AbilityCatalogIndex,
     army: ArmyDefinition,
@@ -398,7 +358,7 @@ def _unit_can_enter_strategic_reserves(
     return not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
 
 
-def _catalog_turn_end_reserve_option(
+def catalog_turn_end_reserve_option(
     *,
     player_id: str,
     record: AbilityCatalogRecord,
@@ -468,7 +428,7 @@ def _validate_request_payload_matches_result(
         raise GameLifecycleError("Catalog turn-end reserve submission kind drift.")
 
 
-def _decision_recorded_this_turn(
+def decision_recorded_this_turn(
     context: TurnEndRequestContext,
     *,
     catalog_record_id: str,

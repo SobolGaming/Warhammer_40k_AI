@@ -35,6 +35,21 @@ from warhammer40k_core.engine.primary_mission_state import (
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 
+def pending_primary_mission_actions_at_turn_end(state: GameState) -> tuple[MissionActionState, ...]:
+    policy_ids = {
+        descriptor.mission_action_id for descriptor in mission_action_policy_descriptors()
+    }
+    return tuple(
+        action
+        for action in state.mission_action_states
+        if action.status is MissionActionStatus.STARTED
+        and action.mission_action_id in policy_ids
+        and action.player_id == state.active_player_id
+        and action.battle_round_started == state.battle_round
+        and action.completion_timing == "turn_end"
+    )
+
+
 def resolve_primary_mission_actions_at_turn_end(
     *,
     state: GameState,
@@ -49,18 +64,42 @@ def resolve_primary_mission_actions_at_turn_end(
         completed_phase=completed_phase,
         turn_end_record=turn_end_record,
     )
-    policy_ids = {
-        descriptor.mission_action_id for descriptor in mission_action_policy_descriptors()
-    }
+    return tuple(
+        resolved
+        for action in pending_primary_mission_actions_at_turn_end(state)
+        for resolved in resolve_primary_mission_action_at_turn_end(
+            state=state,
+            decisions=decisions,
+            action_id=action.action_id,
+            completed_phase=completed_phase,
+            turn_end_record=turn_end_record,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+    )
+
+
+def resolve_primary_mission_action_at_turn_end(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    action_id: str,
+    completed_phase: BattlePhase,
+    turn_end_record: ObjectiveControlRecord,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> tuple[MissionActionState, ...]:
+    _validate_boundary(
+        state=state,
+        decisions=decisions,
+        completed_phase=completed_phase,
+        turn_end_record=turn_end_record,
+    )
     pending = tuple(
         action
-        for action in state.mission_action_states
-        if action.status is MissionActionStatus.STARTED
-        and action.mission_action_id in policy_ids
-        and action.player_id == state.active_player_id
-        and action.battle_round_started == state.battle_round
-        and action.completion_timing == "turn_end"
+        for action in pending_primary_mission_actions_at_turn_end(state)
+        if action.action_id == action_id
     )
+    if len(pending) != 1:
+        raise GameLifecycleError("Selected Primary Action is not pending at this boundary.")
     vanguard_checkpoint = (
         record_primary_mission_boundary_checkpoint(
             state=state,

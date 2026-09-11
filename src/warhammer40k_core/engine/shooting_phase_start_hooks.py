@@ -18,9 +18,12 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.phase_start_sequencing import resolve_phase_start_candidates
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookRegistry,
 )
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -50,6 +53,17 @@ class ShootingPhaseStartRequestContext:
     ruleset_descriptor: RulesetDescriptor
     army_catalog: ArmyCatalog
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
+    authoritative_request_id: str | None = None
+
+    def issue_request_id(self) -> str:
+        return (
+            self.state.next_decision_request_id()
+            if self.authoritative_request_id is None
+            else self.authoritative_request_id
+        )
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -165,15 +179,26 @@ class ShootingPhaseStartHookBinding:
     source_id: str
     request_handler: ShootingPhaseStartRequestHandler | None = None
     result_handler: ShootingPhaseStartResultHandler | None = None
+    candidate_handler: (
+        Callable[[ShootingPhaseStartRequestContext], tuple[TimingRuleCandidate, ...]] | None
+    ) = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if self.request_handler is None and self.result_handler is None:
+        if (
+            self.request_handler is None
+            and self.result_handler is None
+            and self.candidate_handler is None
+        ):
             raise GameLifecycleError("ShootingPhaseStartHookBinding requires a handler.")
         if self.request_handler is not None and not callable(self.request_handler):
             raise GameLifecycleError(
                 "ShootingPhaseStartHookBinding request_handler must be callable."
+            )
+        if self.candidate_handler is not None and not callable(self.candidate_handler):
+            raise GameLifecycleError(
+                "ShootingPhaseStartHookBinding candidate_handler must be callable."
             )
         if self.result_handler is not None and not callable(self.result_handler):
             raise GameLifecycleError(
@@ -202,28 +227,36 @@ class ShootingPhaseStartHookRegistry:
     def next_request_for(
         self,
         context: ShootingPhaseStartRequestContext,
-    ) -> DecisionRequest | None:
+    ) -> DecisionRequest | LifecycleStatus | None:
         if type(context) is not ShootingPhaseStartRequestContext:
             raise GameLifecycleError("Shooting-phase start request hooks require context.")
-        requests: list[DecisionRequest] = []
+        return resolve_phase_start_candidates(
+            state=context.state,
+            decisions=context.decisions,
+            discover=lambda: self.candidates_for(context),
+        )
+
+    def candidates_for(
+        self, context: ShootingPhaseStartRequestContext
+    ) -> tuple[TimingRuleCandidate, ...]:
+        candidates: list[TimingRuleCandidate] = []
         for binding in self.bindings:
-            if binding.request_handler is None:
+            if binding.request_handler is None and binding.candidate_handler is None:
                 continue
-            request = binding.request_handler(context)
-            if request is None:
-                continue
-            if type(request) is not DecisionRequest:
+            if binding.candidate_handler is None:
                 raise GameLifecycleError(
-                    "Shooting-phase start request handlers must return DecisionRequest or None."
+                    "Shooting-start providers require pure candidate discovery."
                 )
-            requests.append(request)
-        if len(requests) > 1:
-            raise GameLifecycleError(
-                "Shooting-phase start hooks produced multiple simultaneous requests."
-            )
-        if not requests:
-            return None
-        return requests[0]
+            before = (context.state.to_payload(), context.decisions.to_payload())
+            discovered = binding.candidate_handler(context)
+            if before != (context.state.to_payload(), context.decisions.to_payload()):
+                raise GameLifecycleError("Shooting-start discovery mutated engine state.")
+            if type(discovered) is not tuple or any(
+                type(item) is not TimingRuleCandidate for item in discovered
+            ):
+                raise GameLifecycleError("Shooting-start discovery requires typed candidates.")
+            candidates.extend(discovered)
+        return tuple(candidates)
 
     def apply_result(self, context: ShootingPhaseStartResultContext) -> bool | LifecycleStatus:
         if type(context) is not ShootingPhaseStartResultContext:

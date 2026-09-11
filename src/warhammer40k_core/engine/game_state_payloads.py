@@ -6,6 +6,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalogPayload
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecordPayload
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptorPayload
 from warhammer40k_core.engine.actions import MissionActionStatePayload
+from warhammer40k_core.engine.active_player_scopes import ActivePlayerScopePayload
 from warhammer40k_core.engine.aircraft import HoverModeStatePayload
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinitionPayload,
@@ -194,6 +195,7 @@ class GameStatePayload(TypedDict):
     fight_phase_state: FightPhaseStatePayload | None
     shooting_phase_state: ShootingPhaseStatePayload | None
     out_of_phase_shooting_state: OutOfPhaseShootingStatePayload | None
+    active_player_scopes: list[ActivePlayerScopePayload]
     feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
     feel_no_pain_decline_allowed_model_ids: list[str]
     destruction_reaction_sources_by_model_id: dict[str, list[DestructionReactionSourcePayload]]
