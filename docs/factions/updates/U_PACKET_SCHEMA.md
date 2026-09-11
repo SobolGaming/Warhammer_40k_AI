@@ -77,17 +77,18 @@ generic-family gap, or one overlay:
 | `required_work` | Closed work-item IDs from §5 |
 | `forbidden_work` | Work the agent must not claim, including Layer A carry-forward when a sibling `unclassified_clause` exists |
 | `allowed_surfaces` | Closed surfaces from §7 |
-| `forbidden_surfaces` | Always include the denylist in §7.2 |
+| `forbidden_surfaces` | Denylist from §7.2, then §7.3 precedence |
 | `blocked_on` | Holds that keep the packet unpublished as implementation work |
 | `depends_on` | Other `packet_id` values that must complete first |
 | `t2_family_ids` / `t1_window_ids` / `t6_delta_ids` | Citations only; do not rename those catalogs |
 | `named_handler_justification` | Required iff `python_policy` is `named_handler_justified` |
 | `display_label` | Human only; never the join key |
 
-`source_diff_row` is S2 `catalog_id` plus `entity_kind` plus
-`source_entry_binding` plus `field_path` plus from/to content set plus
-exactly one `impact_class`. Null `catalog_id` is legal only for
-`structural_add` before FM0 allocation, keyed by `source_entry_binding`.
+`source_diff_row` carries the full S2 binding for evidence, including
+`display_label` and `parent_app_canonical_url`. Packet identity hashes
+only the locator projection in §3.3, not that whole object. Null
+`catalog_id` is legal only for `structural_add` before FM0 allocation,
+keyed by the locator.
 
 A certification-slice packet uses the same identity grain against the
 demand matrix row it closes. It is not "implement this faction's Python
@@ -114,18 +115,65 @@ when the sibling shares a PR.
 
 ### 3.3 `packet_id`
 
-Canonical identity tuple, UTF-8 JSON object with sorted keys, SHA-256 hex
-digest, prefixed `pkt_`:
+`packet_id` hashes an **identity projection**, not the packet body and not
+the full S2 `source_entry_binding`.
 
-- `origin_kind`
-- `packet_kind`
-- `from_content_set` / `to_content_set` (nulls allowed for non-update origins)
-- `catalog_id` (or the literal `unallocated`)
-- `source_entry_binding` object
-- `field_path` (or the literal `overlay` / `family`)
-- `impact_class` (or the family ID for `generic_family_demand`)
+S2 distinguishes the locator (`parent_source_document_id` + `section_kind`
++ `ordinal_in_section`) from evidence and display fields on the same
+binding (`display_label`, `parent_app_canonical_url`, `listing_role`,
+`entry_transcription_sha256`). Only the locator participates in packet
+identity. The authentication hash, URL, listing role, and label may be
+stored on the packet; they are not identity.
 
-Do not hash display names, URLs, or file paths into `packet_id`.
+Identity object (every key present):
+
+| Key | Value |
+| --- | --- |
+| `origin_kind` | string |
+| `packet_kind` | string |
+| `from_content_set` | App-data version string, or JSON `null` when the origin has no from-version |
+| `to_content_set` | App-data version string, or JSON `null` when the origin has no to-version |
+| `catalog_id` | S2 `catalog_id`, or the literal `unallocated` |
+| `source_entry_locator` | object `{parent_source_document_id, section_kind, ordinal_in_section}`, or JSON `null` for a `family_gap` packet |
+| `field_path` | classified path, or the literal `overlay` / `family` |
+| `impact_class` | classified class, or the T1/T2/T6 family ID for `generic_family_demand` |
+
+`source_entry_locator.ordinal_in_section` is a JSON number (integer). Do
+not stringify it. Do not add other locator keys.
+
+**Excluded from the identity object:** `display_label`,
+`parent_app_canonical_url`, `listing_role`, `entry_transcription_sha256`,
+file paths, GitHub numbers, `pr_group`, `display_label` punctuation, and
+any other evidence field.
+
+**Canonical bytes.** Encode that object as RFC 8785 JSON Canonicalization
+Scheme (JCS): UTF-8, no BOM, no insignificant whitespace, object keys
+sorted by Unicode code point, JSON `null` for nulls, integers in shortest
+decimal form, no trailing newline. Equivalent Python construction for this
+ASCII identity set:
+
+```text
+json.dumps(identity, ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False).encode('utf-8')
+```
+
+`packet_id` is `pkt_` plus the lowercase hex SHA-256 digest of those
+bytes. Two implementations of this recipe must produce the same digest.
+Pretty-printed JSON, spaced separators, omitted null keys, hashed full
+bindings, or `ensure_ascii=True` with extra ASCII escapes are not this
+recipe.
+
+Worked fixture (Army of Faith Enhancement ordinal 2; S2's Divine Aspect
+row). Canonical UTF-8 bytes:
+
+```text
+{"catalog_id":"unallocated","field_path":"existence","from_content_set":null,"impact_class":"structural_add","origin_kind":"certification_slice","packet_kind":"implementation","source_entry_locator":{"ordinal_in_section":2,"parent_source_document_id":"faction-app:adepta-sororitas:detachment:army-of-faith","section_kind":"enhancement"},"to_content_set":"946"}
+```
+
+`packet_id`: `pkt_998a933016222f0b8b1648bc1d5258ab5f84c1d42495f4527b96fb60fde78d28`
+
+Changing the carried binding's `display_label` from `Divine Aspect` to
+`DIVINE ASPECT`, or changing `parent_app_canonical_url`, must not change
+that digest. Changing `ordinal_in_section` or `section_kind` must.
 
 ## 4. Closed kinds and Python policy
 
@@ -143,7 +191,7 @@ Do not hash display names, URLs, or file paths into `packet_id`.
 | --- | --- | --- |
 | `none` | Default for content, review, overlay, and re-pin | Forbidden. Tests are allowed |
 | `named_handler_justified` | AGENTS.md bespoke-subsystem rubric is met **and** the packet carries the seven justification fields | Only the named handler module listed on the packet |
-| `generic_family` | This packet **is** the Track G family PR | Generic engine modules plus tests; two-consumer rule applies |
+| `generic_family` | This packet **is** the Track G family PR | Generic engine modules, the narrow runtime-integration exception in §7.2, plus tests; two-consumer rule applies |
 
 Content packets default to `none`. A content packet must not set
 `generic_family` to smuggle engine work. A family packet must not bind a
@@ -186,6 +234,12 @@ overlay or family packets are extra rows, not substitutes.
 build identity. Until Q1 exists, packets still *require* that work item;
 they do not invent the Q1 artifact.
 
+When `required_work` includes `layer_a_carry_forward_review`, the same
+implementation packet may write a scoped `review_record` (old/new
+transcription-hash equivalence). That is not a second packet and is not a
+substitute `status_claim`. Sibling `unclassified_clause` removes that work
+item and that surface permission.
+
 ## 6. Sibling, overlay, and family coupling
 
 1. **Union is a Q1/U4 fact, not a packet merge.** Bannernob's A/B/C union
@@ -193,7 +247,8 @@ they do not invent the Q1 artifact.
    `clause.unattributed`/`unclassified_clause` separately.
 2. **Sibling unclassified forbids Layer A carry-forward** on every other
    packet for that `catalog_id` in the same from/to pair. The points or
-   composition packet may still regenerate Layer B records.
+   composition packet may still regenerate Layer B records. It must not
+   include `review_record` or `layer_a_carry_forward_review`.
 3. **Known structural change does not erase review.** Ghazghkull keeps
    three packets. Completing composition work must not mark
    `clause.unattributed` done.
@@ -220,33 +275,60 @@ they do not invent the Q1 artifact.
 | `content_set_record` | `implementation`, `overlay` | Runtime Python; parsing page text |
 | `tombstone_record` | `structural_remove` | Removing Python still referenced by a packaged version |
 | `observation_pin` | `observation_repin`, reviews that re-pin hashes | Treating a new hash as Layer A |
-| `review_record` | `review` | Inventing a component path |
-| `status_claim` | any non-`observation_repin` packet | Writing a live Q1 schema in this PR; asserting `current` while `stale` |
+| `review_record` | `review` packets; `implementation` packets whose `required_work` includes `layer_a_carry_forward_review` | Inventing a component path; carry-forward review when a sibling `unclassified_clause` forbids it |
+| `status_claim` | any non-`observation_repin` packet | Writing a live Q1 schema in this PR; asserting `current` while `stale`; substituting for a required `review_record` |
 | `focused_test` | all kinds | Importing other `test_*.py` modules; replacing `lifecycle.decision_controller` |
 | `named_handler_module` | only `named_handler_justified` | Generic lifecycle branching on faction or display name |
 | `generic_family_module` | only `family_gap` | Faction catalog IDs as the packet identity |
+| `runtime_integration` | only `family_gap` | Content, review, overlay, or re-pin packets; faction or display-name branching |
 | `adapter_contract_delta` | only `family_gap` that cites a T6 delta | Content, review, overlay, or re-pin packets |
 
 Exact content-set paths remain S3a's layout. Packets name **record
 kinds** (`cost_rows`, `composition`, `army_construction`, clause
 bindings), not speculative file trees.
 
-### 7.2 Forbidden surfaces (every packet)
+### 7.2 Forbidden surfaces
 
-- `src/` runtime loader, lifecycle, bundle, or manifest machinery
+**Unconditional** (no packet kind may override):
+
 - generic lifecycle modules branched on faction, detachment, Enhancement,
   Stratagem, display name, or source-text tokens
-- [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md)
-  except a `family_gap` packet that cites `t6_delta_ids`
 - F00 policy text and source-authority registry
 - catalog ID minting from display names or App slugs
 - army-list ID rewrites (grandfathered IDs stay resolvable)
 - raw rule-text parsing in runtime modules
 - the live Python scaffold allowlist as a substitute for this schema
 
+**Denied except `family_gap`:**
+
+- `src/` runtime loader, lifecycle, bundle, or manifest machinery, except
+  the narrow `runtime_integration` surface below
+- [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md),
+  except a `family_gap` packet that cites `t6_delta_ids`
+
+`runtime_integration` on a `family_gap` packet may register the new
+generic family's validator, applier, hook binding, or bundle/lifecycle
+load path required by AGENTS.md and by a real source-backed consumer in
+the same PR. It must not branch generic modules on faction or display
+name, and it does not widen any content, review, overlay, or re-pin
+packet.
+
 The live agent contract's War Horde example lists
 `rule.py` / `enhancements.py` / `stratagems.py`. Those paths are **not**
 valid `allowed_surfaces` on a data-first packet.
+
+### 7.3 Allow/deny precedence
+
+1. The unconditional denylist always wins.
+2. A surface listed on the packet's `allowed_surfaces` is permitted only
+   for the `packet_kind` values in §7.1.
+3. The `family_gap` exceptions in §7.2 apply only when `packet_kind` is
+   `family_gap`. They never attach to content, review, overlay, or
+   re-pin packets.
+4. `review_record` on an `implementation` packet is permitted only while
+   `layer_a_carry_forward_review` remains in `required_work`. Sibling
+   unclassified moves that item to `forbidden_work` and removes the
+   surface.
 
 ## 8. Draft Track D D3 relationship
 
@@ -270,8 +352,8 @@ This PR only defines them.
 2. One Blitz Brigade feed line emits many packets (DP, each Enhancement
    add/remove, each Stratagem add/remove), not one page packet.
 3. Bannernob emits two packets. The `points_only` packet forbids
-   `layer_a_carry_forward_review` while the `unclassified_clause` packet
-   is open.
+   `layer_a_carry_forward_review` and `review_record` while the
+   `unclassified_clause` packet is open.
 4. Ghazghkull emits three packets (`cost_rows`, `composition`,
    `clause.unattributed`). Completing the composition packet does not
    close the review packet.
@@ -282,8 +364,8 @@ This PR only defines them.
 8. Dakkajet "Rules Updated" is a `review` packet on
    `clause.unattributed`. It must not set `field_path` to
    `clause.effect_ir`.
-9. A content packet with `adapter_contract_delta` in `allowed_surfaces`
-   is invalid.
+9. A content packet with `adapter_contract_delta` or
+   `runtime_integration` in `allowed_surfaces` is invalid.
 10. A `family_gap` packet with a faction `catalog_id` as its identity is
     invalid. A content packet with `python_policy: generic_family` is
     invalid.
@@ -291,6 +373,15 @@ This PR only defines them.
     justification fields is unpublished.
 12. `faction_rewrite` overlay plus More Dakka! `structural_remove` plus
     Brute Bosses `structural_add` are three identities, not one.
+13. Packet identity uses the §3.3 locator projection. Changing only
+    `display_label` or `parent_app_canonical_url` on the carried binding
+    leaves `packet_id` unchanged. The Divine Aspect worked fixture digest
+    must match across implementations of the published canonical bytes.
+14. A `family_gap` packet may include `runtime_integration` and
+    `generic_family_module` so the new family loads through lifecycle or
+    bundle without manual injection. It still must not set
+    `generic_lifecycle_content_branching`. A content packet still must not
+    include `runtime_integration`.
 
 ## 10. Mapping exercise (not emitted packets)
 
@@ -304,13 +395,15 @@ cross-faction samples. FM0 emits the real packets. This PR does not.
 | Brute Bosses | `implementation` | `existence` / `structural_add` | `blocked_on` provenance and catalog ID |
 | Blitz Brigade 2DP → 1DP | `implementation` | `army_construction` / `construction_constraint` | Not points; Layer A not remapped |
 | Boss Boomer | `implementation` | `existence` / `structural_add` | Sibling Gizmos out of scope |
-| Bannernob | `implementation` + `review` | `cost_rows` and `clause.unattributed` | Two packets; A carry-forward forbidden |
+| Bannernob | `implementation` + `review` | `cost_rows` and `clause.unattributed` | Two packets; A carry-forward and `review_record` forbidden |
 | Ghazghkull | `implementation` + `implementation` + `review` | `cost_rows`, `composition`, `clause.unattributed` | Three packets; union A/B/C is not a merge |
 | Dakkajet | `review` | `clause.unattributed` / `unclassified_clause` | No component guess |
-| Eldrad 130→120 | `implementation` | `cost_rows` / `points_only` | No sibling unclassified in F-DATA-01 |
+| Eldrad 130→120 | `implementation` | `cost_rows` / `points_only` | Carry-forward `review_record` permitted; no sibling unclassified in F-DATA-01 |
 | Eldrad Leader list | `implementation` | `leader_support` / `attachment_or_keyword` | |
 | Acts of Faith trigger | `implementation` | `clause.timing` / `clause_envelope_changed` | F-ARMY-01 |
 | Effect RuleIR with envelope unchanged | `implementation` | `clause.effect_ir` / `effect_ir_changed` | Class illustration, not a named corpus row |
+| Family-gap runtime integration | `family_gap` | `family` / generic family | May include `runtime_integration`; must not branch on faction or display name |
+| Content packet `runtime_integration` | invalid | n/a | Infrastructure exception is `family_gap` only |
 | Live War Horde Python triad | invalid | n/a | Failure mode this schema replaces |
 
 Do not publish a histogram of all 53 datasheet URLs as packets here.
@@ -361,11 +454,14 @@ FM0 packet generation may be implemented. It has:
 
 - entity-and-field packet grain on S2 locators plus a classified field
   path;
+- locator-only `packet_id` projection and canonical bytes;
 - five packet kinds and three Python policies;
 - a closed class-to-packet map, including sibling unclassified forbidding
   Layer A carry-forward;
-- closed allow/deny surfaces that reject the live Python-scaffold packet;
-- twelve acceptance fixtures;
+- closed allow/deny surfaces, with `review_record` on points-only
+  implementation packets and a narrow `family_gap` runtime-integration
+  exception;
+- fourteen acceptance fixtures;
 - an Orks mapping exercise that does not emit packets.
 
 This survey does not add a generator, live contract rewrite, adapter
