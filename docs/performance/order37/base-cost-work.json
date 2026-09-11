@@ -1,6 +1,6 @@
 {
-  "workload_id": "order37-stratagem-cost-v1",
-  "commit": "35f492b200290a4be22053c016f5c108fa8ad4eb",
+  "workload_id": "order37-stratagem-cost-v2",
+  "commit": "73faf584a96ec71e044f7ff0313a3ac3154bd7ab",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -13,37 +13,44 @@
   "timing_boundary": "fixture and initial pending request separate; target submission through cost choices to spend/failure",
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
-    "scripts/measure_stratagem_cost.py": "ad7181fb775d5f4315b42c6b81fbdad691311a4f2d0e7880e4c61980ae8b29cb",
-    "tests/stratagem_cost_helpers.py": "d50e1a3d3a64ca5d86b804f1af0ab7822c38833fe258ffff038ec437648365b4",
+    "scripts/measure_stratagem_cost.py": "d764ecf9dea3e3b3d2bf277c78bf567264f6d155b13b0b74036273930f6ac8d2",
+    "tests/stratagem_cost_helpers.py": "9189c4be2b352294b9256216b560bd4bf76ae7f376047ecc5f5d2db98a71466c",
     "tests/rapid_ingress_helpers.py": "645e16294b559ba4fd88283c9a64e1dc80d470e5b6a89aa2bd4896c9e0e0e750",
     "tests/core_stratagem_helpers.py": "90a4dd5fa5d14ebd2b1a48865d661d7f3ce37af64383f6f08642e9b0c2bdfd62"
   },
   "summaries": {
     "optional": {
-      "mean": 0.07997183303814381,
-      "median": 0.07997183303814381,
-      "max": 0.07997183303814381,
+      "mean": 0.0801397500326857,
+      "median": 0.0801397500326857,
+      "max": 0.0801397500326857,
       "samples": 1,
       "completion_rate": 1.0
     },
     "automatic": {
-      "mean": 0.029849834041669965,
-      "median": 0.029849834041669965,
-      "max": 0.029849834041669965,
+      "mean": 0.03163587499875575,
+      "median": 0.03163587499875575,
+      "max": 0.03163587499875575,
       "samples": 1,
       "completion_rate": 1.0
     },
     "unaffordable": {
-      "mean": 0.07068766606971622,
-      "median": 0.07068766606971622,
-      "max": 0.07068766606971622,
+      "mean": 0.07055499998386949,
+      "median": 0.07055499998386949,
+      "max": 0.07055499998386949,
       "samples": 1,
       "completion_rate": 1.0
     },
     "zero": {
-      "mean": 0.08399358298629522,
-      "median": 0.08399358298629522,
-      "max": 0.08399358298629522,
+      "mean": 0.0868244159501046,
+      "median": 0.0868244159501046,
+      "max": 0.0868244159501046,
+      "samples": 1,
+      "completion_rate": 1.0
+    },
+    "non_cumulative": {
+      "mean": 0.08399245899636298,
+      "median": 0.08399245899636298,
+      "max": 0.08399245899636298,
       "samples": 1,
       "completion_rate": 1.0
     }
@@ -51,54 +58,67 @@
   "samples": [
     {
       "case": "optional",
-      "setup_seconds": 2.1205294999526814,
-      "slice_seconds": 0.07997183303814381,
+      "setup_seconds": 2.0535679169697687,
+      "slice_seconds": 0.0801397500326857,
       "accepted": 5,
-      "cost": 6,
+      "cost": 2,
       "effects_resolved": true,
       "commitments": 5,
       "work_counts": {
-        "modified_command_point_cost_with_sources": 4,
-        "handler": 40
+        "handler": 40,
+        "modified_command_point_cost_with_sources": 4
       }
     },
     {
       "case": "automatic",
-      "setup_seconds": 0.2725695000262931,
-      "slice_seconds": 0.029849834041669965,
+      "setup_seconds": 0.26440200000070035,
+      "slice_seconds": 0.03163587499875575,
       "accepted": 0,
-      "cost": 6,
+      "cost": 2,
       "effects_resolved": true,
       "commitments": 5,
       "work_counts": {
-        "modified_command_point_cost_with_sources": 3,
-        "handler": 30
+        "handler": 30,
+        "modified_command_point_cost_with_sources": 3
       }
     },
     {
       "case": "unaffordable",
-      "setup_seconds": 0.29988691699691117,
-      "slice_seconds": 0.07068766606971622,
+      "setup_seconds": 0.2931760000064969,
+      "slice_seconds": 0.07055499998386949,
       "accepted": 5,
-      "cost": 6,
+      "cost": 2,
       "effects_resolved": false,
       "commitments": 5,
       "work_counts": {
-        "modified_command_point_cost_with_sources": 6,
-        "handler": 60
+        "handler": 60,
+        "modified_command_point_cost_with_sources": 6
       }
     },
     {
       "case": "zero",
-      "setup_seconds": 0.27552537503652275,
-      "slice_seconds": 0.08399358298629522,
+      "setup_seconds": 0.2740758340805769,
+      "slice_seconds": 0.0868244159501046,
       "accepted": 5,
       "cost": 0,
       "effects_resolved": true,
       "commitments": 6,
       "work_counts": {
-        "modified_command_point_cost_with_sources": 4,
-        "handler": 48
+        "handler": 48,
+        "modified_command_point_cost_with_sources": 4
+      }
+    },
+    {
+      "case": "non_cumulative",
+      "setup_seconds": 0.2742907910142094,
+      "slice_seconds": 0.08399245899636298,
+      "accepted": 5,
+      "cost": 1,
+      "effects_resolved": true,
+      "commitments": 6,
+      "work_counts": {
+        "handler": 48,
+        "modified_command_point_cost_with_sources": 4
       }
     }
   ],

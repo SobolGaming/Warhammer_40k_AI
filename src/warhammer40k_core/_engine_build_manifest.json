@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c01108ad5a914002c545c2c8dcaf322157474befb4cae8ee351b91184ba1d236",
-  "fingerprint": "c01108ad5a914002c545c2c8dcaf322157474befb4cae8ee351b91184ba1d236",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:80224f33123f6634931acd9f2ced14fd145bba3070a95a2eb4acc4eb2f4dbfb0",
+  "fingerprint": "80224f33123f6634931acd9f2ced14fd145bba3070a95a2eb4acc4eb2f4dbfb0",
   "resource_count": 2747,
   "resources": [
     {
@@ -475,9 +475,9 @@
       "sha256": "d48740de6aa60f11f53294e065a0a04e72c2f10a62d4a1ede6a06c9620b48a13"
     },
     {
-      "byte_length": 36262,
+      "byte_length": 38880,
       "path": "warhammer40k_core/core/modifiers.py",
-      "sha256": "999caa7b2ebfc5ea2f56805fdb88ba088b3119ea2be221e0fa25482629714204"
+      "sha256": "b9a5a1ecc4740ee9226a080284e422265617bbf1284cd4ab0faa70dffbccadb1"
     },
     {
       "byte_length": 4290,
@@ -11655,9 +11655,9 @@
       "sha256": "c37c244800484309d8d8f126c9e88e0ce252897e5ac1f58d41f178a838c09a94"
     },
     {
-      "byte_length": 10994,
+      "byte_length": 9854,
       "path": "warhammer40k_core/engine/stratagem_cost_modifiers.py",
-      "sha256": "bfea67049e74c183858b7f62a262d173e20e0c57957d4d1d2be1a24644218e49"
+      "sha256": "0daa43b8228d79981838488052c95f3b63e5115851c9857e4044bda81c2cd351"
     },
     {
       "byte_length": 8618,

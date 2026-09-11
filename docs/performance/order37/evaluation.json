@@ -1,18 +1,20 @@
 {
-  "assessment_id": "order37-final-components-2026-09-11",
-  "base_commit": "35f492b2",
-  "base_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:c0beba12ada64bbc210848e9498695969d81b30381781e5ed9338783a92890c2",
-  "head_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:c01108ad5a914002c545c2c8dcaf322157474befb4cae8ee351b91184ba1d236",
+  "assessment_id": "order37-r37-001-final-components-2026-09-11",
+  "base_commit": "73faf584",
+  "base_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:c01108ad5a914002c545c2c8dcaf322157474befb4cae8ee351b91184ba1d236",
+  "head_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:80224f33123f6634931acd9f2ced14fd145bba3070a95a2eb4acc4eb2f4dbfb0",
   "cost_timing": "passed",
   "rapid_ingress_timing": "passed",
   "full_game_certified": false,
   "evidence_sha256": {
-    "base-cost-work.json": "b8a13d497f21982eed31d8ee207e5f42103d292bf7b445295b0747b8a7b5d51d",
-    "base-cost.json": "73418f014d4dfa80eff78deb9623b316beb3fbccbd892acaf395c0295d9c00a9",
+    "base-cost-work.json": "db3e1154d01c63bdb9bab35f0521e826ecac4f8758721ae718ab9b3d8ac7fe7b",
+    "base-cost.json": "b92c88acb6c12edfa9554cc188946730a99d837ed4e59f356077df191dc89762",
     "base.json": "a67cc62fe02b22a88545c5f23bd8c16d2fe56a415e843237ad65d60927799975",
-    "budgets.json": "5b519f18459a303da10a6b284532cc41bb30847e3054b1d7a4cbb8f3a18fbcd4",
-    "head-cost-work.json": "d71c4d7fe22118c6e991a2ec80dae0186994b347ccc3b4990603b679b4a32ddd",
-    "head-cost.json": "a6eea99780278c94cf19c7f721af49bfa173f162cdaaf3f2a705eb8a8524a041",
-    "head.json": "bd14f13bc7caf670f3a9ebf09e6eba5369e7e6d105ef87e1dd882898eb8b79c0"
-  }
+    "budgets.json": "10e7a2293cd9aabd24d8f6b8d227b912f30f728f89d0d503af7d7d8951eec70d",
+    "head-cost-work.json": "7eae2321a4d6bb9fe124f117eba8a6be377d443e0729612e6501aa38ca782346",
+    "head-cost.json": "4dfeed8549a7bbcc4f2fd54822e40500651d50c02a3ee2d05b540a51652bd820",
+    "head.json": "aaffd9b4011154bede88c1b59baba57f4bf85a1227a0b46e36359964c3d1fd74"
+  },
+  "rapid_ingress_base_commit": "35f492b2",
+  "rapid_ingress_base_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:c0beba12ada64bbc210848e9498695969d81b30381781e5ed9338783a92890c2"
 }

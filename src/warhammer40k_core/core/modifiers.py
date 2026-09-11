@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from fractions import Fraction
 from math import ceil, isfinite
@@ -776,26 +776,91 @@ def resolve_roll_modifiers(
 
 
 def resolve_stratagem_cost(
-    base_cost: int, modifiers: tuple[Modifier, ...]
+    base_cost: int,
+    modifiers: tuple[Modifier, ...],
+    *,
+    non_cumulative_increase_ids: tuple[str, ...] = (),
 ) -> tuple[int, tuple[ModifierArithmeticStep, ...]]:
-    """02.02.01: exact cumulative operations, then the final 0/base+1 limits."""
+    """Resolve legal operation combinations exactly, then apply 0/base+1 limits."""
     if type(base_cost) is not int or base_cost < 0:
         raise ModifierError("Stratagem base cost must be a nonnegative integer.")
     for modifier in modifiers:
         _validate_modifier(modifier)
         if modifier.scope != ModifierScope.any():
             raise ModifierError("Stratagem operations must already be selected for this use.")
-    _validate_unique_modifier_ids(modifiers)
-    _validate_supported_stacking(modifiers)
-    current = Fraction(base_cost)
-    steps: list[ModifierArithmeticStep] = []
-    for modifier in sorted(modifiers, key=_modifier_order_key):
         if modifier.operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR}:
             raise ModifierError("Stratagem cost requires numeric operations.")
+    _validate_unique_modifier_ids(modifiers)
+    _validate_supported_stacking(modifiers)
+    exclusive_ids = frozenset(
+        _validate_identifier_tuple("Non-cumulative increase IDs", non_cumulative_increase_ids)
+    )
+    if not exclusive_ids <= {modifier.modifier_id for modifier in modifiers}:
+        raise ModifierError("Non-cumulative increase IDs must identify selected modifiers.")
+    ordered = tuple(
+        sorted(map(_normalize_signed_cost_operation, modifiers), key=_modifier_order_key)
+    )
+    exclusive = tuple(modifier for modifier in ordered if modifier.modifier_id in exclusive_ids)
+    for modifier in exclusive:
+        if modifier.operation is not ModifierOperation.ADD or modifier.operand <= 0:
+            raise ModifierError("Non-cumulative cost increase requires a positive addition.")
+    ordinary = tuple(modifier for modifier in ordered if modifier.modifier_id not in exclusive_ids)
+    current, steps = _stratagem_cost_steps(base_cost, ordinary)
+    if exclusive:
+        strongest = max(exclusive, key=lambda modifier: modifier.operand)
+        alternative, alternative_steps = _stratagem_cost_steps(
+            base_cost,
+            tuple(
+                modifier
+                for modifier in ordered
+                if modifier.modifier_id not in exclusive_ids or modifier is strongest
+            ),
+            exclusive_increase_id=strongest.modifier_id,
+        )
+        # Compare exact legal results before rounding or the terminal cost limits.
+        if alternative > current:
+            current, steps = alternative, alternative_steps
+    return max(0, min(base_cost + 1, ceil(current))), steps
+
+
+def _normalize_signed_cost_operation(modifier: Modifier) -> Modifier:
+    if modifier.operand < 0:
+        if modifier.operation is ModifierOperation.ADD:
+            return replace(
+                modifier,
+                operation=ModifierOperation.SUBTRACT,
+                timing=ModifierTiming.SUBTRACTIVE,
+                operand=-modifier.operand,
+            )
+        if modifier.operation is ModifierOperation.SUBTRACT:
+            return replace(
+                modifier,
+                operation=ModifierOperation.ADD,
+                timing=ModifierTiming.ADDITIVE,
+                operand=-modifier.operand,
+            )
+    return modifier
+
+
+def _stratagem_cost_steps(
+    base_cost: int,
+    modifiers: tuple[Modifier, ...],
+    *,
+    exclusive_increase_id: str | None = None,
+) -> tuple[Fraction, tuple[ModifierArithmeticStep, ...]]:
+    current = Fraction(base_cost)
+    steps: list[ModifierArithmeticStep] = []
+    for modifier in modifiers:
         modified = _apply_numeric_operation(modifier.operation.value, modifier.operand, current)
+        if (
+            exclusive_increase_id is not None
+            and modifier.modifier_id != exclusive_increase_id
+            and modified > current
+        ):
+            continue
         steps.append(ModifierArithmeticStep(modifier, current, modified))
         current = modified
-    return max(0, min(base_cost + 1, ceil(current))), tuple(steps)
+    return current, tuple(steps)
 
 
 def resolve_targeting_range(value: float) -> float:

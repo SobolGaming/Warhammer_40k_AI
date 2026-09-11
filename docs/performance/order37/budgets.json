@@ -1,5 +1,5 @@
 {
-  "workload_id": "order37-stratagem-cost-v1",
+  "workload_id": "order37-stratagem-cost-v2",
   "reference_mean_ratio": 1.5,
   "reference_mean_allowance_seconds": 0.001,
   "maximum_seconds": 0.1,
@@ -8,7 +8,8 @@
     "optional": 10,
     "automatic": 10,
     "unaffordable": 10,
-    "zero": 12
+    "zero": 12,
+    "non_cumulative": 12
   },
   "full_game_certified": false
 }

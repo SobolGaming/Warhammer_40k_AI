@@ -1,6 +1,6 @@
 {
-  "workload_id": "order37-stratagem-cost-v1",
-  "commit": "35f492b200290a4be22053c016f5c108fa8ad4eb",
+  "workload_id": "order37-stratagem-cost-v2",
+  "commit": "73faf584a96ec71e044f7ff0313a3ac3154bd7ab",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -13,37 +13,44 @@
   "timing_boundary": "fixture and initial pending request separate; target submission through cost choices to spend/failure",
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
-    "scripts/measure_stratagem_cost.py": "ad7181fb775d5f4315b42c6b81fbdad691311a4f2d0e7880e4c61980ae8b29cb",
-    "tests/stratagem_cost_helpers.py": "d50e1a3d3a64ca5d86b804f1af0ab7822c38833fe258ffff038ec437648365b4",
+    "scripts/measure_stratagem_cost.py": "d764ecf9dea3e3b3d2bf277c78bf567264f6d155b13b0b74036273930f6ac8d2",
+    "tests/stratagem_cost_helpers.py": "9189c4be2b352294b9256216b560bd4bf76ae7f376047ecc5f5d2db98a71466c",
     "tests/rapid_ingress_helpers.py": "645e16294b559ba4fd88283c9a64e1dc80d470e5b6a89aa2bd4896c9e0e0e750",
     "tests/core_stratagem_helpers.py": "90a4dd5fa5d14ebd2b1a48865d661d7f3ce37af64383f6f08642e9b0c2bdfd62"
   },
   "summaries": {
     "optional": {
-      "mean": 0.08052604191470891,
-      "median": 0.08052604191470891,
-      "max": 0.08052604191470891,
+      "mean": 0.08171579102054238,
+      "median": 0.08171579102054238,
+      "max": 0.08171579102054238,
       "samples": 1,
       "completion_rate": 1.0
     },
     "automatic": {
-      "mean": 0.030077625066041946,
-      "median": 0.030077625066041946,
-      "max": 0.030077625066041946,
+      "mean": 0.030197582906112075,
+      "median": 0.030197582906112075,
+      "max": 0.030197582906112075,
       "samples": 1,
       "completion_rate": 1.0
     },
     "unaffordable": {
-      "mean": 0.07100933289621025,
-      "median": 0.07100933289621025,
-      "max": 0.07100933289621025,
+      "mean": 0.0718865409726277,
+      "median": 0.0718865409726277,
+      "max": 0.0718865409726277,
       "samples": 1,
       "completion_rate": 1.0
     },
     "zero": {
-      "mean": 0.08421233296394348,
-      "median": 0.08421233296394348,
-      "max": 0.08421233296394348,
+      "mean": 0.08556045801378787,
+      "median": 0.08556045801378787,
+      "max": 0.08556045801378787,
+      "samples": 1,
+      "completion_rate": 1.0
+    },
+    "non_cumulative": {
+      "mean": 0.08550783293321729,
+      "median": 0.08550783293321729,
+      "max": 0.08550783293321729,
       "samples": 1,
       "completion_rate": 1.0
     }
@@ -51,8 +58,8 @@
   "samples": [
     {
       "case": "optional",
-      "setup_seconds": 2.08724775002338,
-      "slice_seconds": 0.08052604191470891,
+      "setup_seconds": 2.110137459007092,
+      "slice_seconds": 0.08171579102054238,
       "accepted": 5,
       "cost": 2,
       "effects_resolved": true,
@@ -64,8 +71,8 @@
     },
     {
       "case": "automatic",
-      "setup_seconds": 0.27223891695030034,
-      "slice_seconds": 0.030077625066041946,
+      "setup_seconds": 0.2705386250745505,
+      "slice_seconds": 0.030197582906112075,
       "accepted": 0,
       "cost": 2,
       "effects_resolved": true,
@@ -77,8 +84,8 @@
     },
     {
       "case": "unaffordable",
-      "setup_seconds": 0.29833300004247576,
-      "slice_seconds": 0.07100933289621025,
+      "setup_seconds": 0.2974017499946058,
+      "slice_seconds": 0.0718865409726277,
       "accepted": 5,
       "cost": 2,
       "effects_resolved": false,
@@ -90,10 +97,23 @@
     },
     {
       "case": "zero",
-      "setup_seconds": 0.2770626669516787,
-      "slice_seconds": 0.08421233296394348,
+      "setup_seconds": 0.27925270795822144,
+      "slice_seconds": 0.08556045801378787,
       "accepted": 5,
       "cost": 0,
+      "effects_resolved": true,
+      "commitments": 6,
+      "work_counts": {
+        "handler": 48,
+        "modified_command_point_cost_with_sources": 4
+      }
+    },
+    {
+      "case": "non_cumulative",
+      "setup_seconds": 0.2778834589989856,
+      "slice_seconds": 0.08550783293321729,
+      "accepted": 5,
+      "cost": 1,
       "effects_resolved": true,
       "commitments": 6,
       "work_counts": {

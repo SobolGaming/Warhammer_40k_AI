@@ -902,17 +902,20 @@ def test_lone_operative_uses_the_same_terminal_range(
 
 
 @pytest.mark.parametrize(
-    ("available_cp", "discount", "expected"), [(2, 0, 2), (1, 0, 2), (1, 9, 0)]
+    ("available_cp", "discount", "non_cumulative", "expected"),
+    [(2, 0, False, 2), (1, 0, False, 2), (1, 9, False, 0), (1, 1, True, 1)],
 )
 def test_order37_catalog_costs_preserve_commitments_through_facade_restore_and_replay(
-    available_cp: int, discount: int, expected: int
+    available_cp: int, discount: int, non_cumulative: bool, expected: int
 ) -> None:
     from tests.rapid_ingress_helpers import reach_ingress_window, submit_ingress_target
     from tests.stratagem_cost_helpers import cost_session
 
     from warhammer40k_core.engine.phase import LifecycleStatusKind
 
-    session = cost_session(available_cp=available_cp, discount=discount)
+    session = cost_session(
+        available_cp=available_cp, discount=discount, non_cumulative_increases=non_cumulative
+    )
     request = reach_ingress_window(session)
     status = submit_ingress_target(session, request)
     accepted = 0

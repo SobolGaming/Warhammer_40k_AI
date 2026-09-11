@@ -89,6 +89,9 @@ all seven completed samples per case are recorded in
 
 ## Final validation
 
+These results certify the initial `73faf584` implementation. R37-001 below records
+the review repair and its replacement validation results.
+
 Validated the final production tree with runtime identity
 `warhammer40k-core-v2:runtime-tree-sha256-v1:c01108ad5a914002c545c2c8dcaf322157474befb4cae8ee351b91184ba1d236`.
 
@@ -115,3 +118,58 @@ ran once with coverage. It reported ten SQLite `ResourceWarning`s without test
 failures. This host has Node but no `npm` executable, so `npm ci` could not run.
 The package's exact generated-client, TypeScript, unit-test and conformance
 entry points ran directly with Node and the existing installed dependencies.
+
+## R37-001 — operation-independent non-cumulative increases
+
+The reviewed invariant also applies to every numeric operation accepted by the
+new provider API. The initial registry counted only positive `ADD` operands,
+allowing `SUBTRACT(-1)`, `MULTIPLY(2)` and increasing `SET` operations to stack
+with an exclusive +1 increase. Real-state regressions reproduce the reported
+base-1, +1, -1 overcharge; reversing source IDs reproduces it as well.
+
+The repair moves all numeric combination selection into `core.modifiers`.
+Signed additions/subtractions are normalized. One exact pass computes the
+ordinary cumulative result; when a non-cumulative source is present, a second
+pass evaluates the strongest such addition and suppresses every other operation
+that would increase the running exact value. Reducing operations still apply in
+source-defined order. The higher legal exact result is selected before rounding
+and final bounds. The registry evaluates each provider once and retains every
+accepted source independently of the selected arithmetic trace.
+
+The bug-class search found the opcode-specific filter only in this registry;
+catalog loading merely carries the existing stacking descriptor. Other numeric
+operations already share core arithmetic. The static owner audit now forbids
+operation/operand branching in registry resolution. There are no provider,
+catalog grammar, adapter schema, decision or source-evidence changes. Existing
+contract documentation is extended for the repaired combination semantics.
+
+Regressions cover equivalent signed operations, multiplication, replacement,
+floors, ceilings, divisions, zero base/replacement, stronger ordinary/exclusive
+alternatives, exact comparison before bounds, invalid source references, all
+source commitments and one provider evaluation. The real catalog facade adds
+non-cumulative +1 sources with a discount, checking spending, both viewers,
+pending/final restoration and replay. The cost workload adds that same case
+without changing any timing threshold or removing existing cases; its base is
+`73faf584`. The earlier Rapid Ingress evidence remains retained separately.
+
+The production diff audit is limited to the core resolver and registry. The
+required runtime identity and external contract examples were regenerated;
+source packages and authority hashes are unchanged. Final repair identity:
+`warhammer40k-core-v2:runtime-tree-sha256-v1:80224f33123f6634931acd9f2ced14fd145bba3070a95a2eb4acc4eb2f4dbfb0`.
+
+Focused validation: 62 passed (78.54 s). Ruff, formatting, Mypy, Pyright,
+all 11 import contracts, pre-commit, shard inventory, source/build generators,
+contract base-ref checks, installed-wheel smoke, five TypeScript unit tests and
+the 342-assertion live conformance scenario passed. Node entry points were used
+directly with existing dependencies because this host lacks npm. All five cost
+timing cases, unchanged provider work counts and the retained Rapid Ingress
+timing budgets passed; full-game performance remains uncertified.
+
+The replacement complete behavioral gate ran once with coverage and the required
+Node `PATH` prefix, `-n auto --dist=worksteal`: **7,268 passed in 475.57 s**,
+**85.02% coverage** against the 85% requirement. Ten SQLite resource warnings
+were reported without failures.
+
+The subsequent complete code-quality gate, `-n auto --dist=worksteal --no-cov`,
+passed **430 tests in 99.69 s**. The final shard-inventory check and pre-commit
+hooks passed before committing this repair.

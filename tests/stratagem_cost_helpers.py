@@ -30,7 +30,11 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 
 
 def cost_session(
-    *, available_cp: int, optional_increases: bool = True, discount: int = 0
+    *,
+    available_cp: int,
+    optional_increases: bool = True,
+    discount: int = 0,
+    non_cumulative_increases: bool = False,
 ) -> LocalGameSession:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     sheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
@@ -44,6 +48,11 @@ def cost_session(
         'within 12" of this model with a Stratagem, '
         "increase the CP cost of that use of that Stratagem by 1CP."
     ]
+    if non_cumulative_increases:
+        texts[0] = texts[0].removesuffix(".") + (
+            " (this is not cumulative with any other rules that would increase "
+            "the CP cost of that Stratagem)."
+        )
     if discount:
         texts.append(
             "Each time you target this model's unit with a Stratagem, reduce the CP cost "

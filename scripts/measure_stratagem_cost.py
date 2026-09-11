@@ -19,7 +19,7 @@ from tests.stratagem_cost_helpers import cost_session
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
 ROOT = Path(__file__).resolve().parents[1]
-CASES = ("optional", "automatic", "unaffordable", "zero")
+CASES = ("optional", "automatic", "unaffordable", "zero", "non_cumulative")
 
 
 def sample(case: str, *, profile: bool = False) -> dict[str, object]:
@@ -27,7 +27,8 @@ def sample(case: str, *, profile: bool = False) -> dict[str, object]:
     session = cost_session(
         available_cp=1 if case in {"zero", "unaffordable"} else 20,
         optional_increases=case != "automatic",
-        discount=9 if case == "zero" else 0,
+        discount=9 if case == "zero" else int(case == "non_cumulative"),
+        non_cumulative_increases=case == "non_cumulative",
     )
     request = reach_ingress_window(session)
     prepared = time.perf_counter()
@@ -101,7 +102,7 @@ def main() -> None:
             "completion_rate": 1.0,
         }
     report = {
-        "workload_id": "order37-stratagem-cost-v1",
+        "workload_id": "order37-stratagem-cost-v2",
         "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "platform": platform.platform(),
         "python": platform.python_version(),

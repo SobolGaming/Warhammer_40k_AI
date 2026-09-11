@@ -203,6 +203,21 @@ def test_stratagem_cost_providers_return_operations_without_intermediate_prices(
     assert "resolve_stratagem_cost" in _calls(
         "engine/stratagem_cost_modifiers.py", "modified_command_point_cost_with_sources"
     )
+    registry = ast.parse((PACKAGE / "engine/stratagem_cost_modifiers.py").read_text())
+    resolver = next(
+        node
+        for node in ast.walk(registry)
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "modified_command_point_cost_with_sources"
+    )
+    assert not any(
+        isinstance(node, ast.Attribute) and node.attr in {"operation", "operand"}
+        for node in ast.walk(resolver)
+    ), "The registry must delegate operation arithmetic and non-cumulative filtering to core."
+    assert any(
+        isinstance(node, ast.keyword) and node.arg == "non_cumulative_increase_ids"
+        for node in ast.walk(resolver)
+    )
     owners = (
         ("engine/catalog_command_point_runtime.py", "_stratagem_cost_modifier_handler"),
         (
@@ -259,5 +274,5 @@ def test_stratagem_cost_provider_work_is_bounded_for_real_catalog_consumers() ->
         assert counts["handler"] == (
             registry_calls * budget["provider_calls_per_registry_call"][case]
         )
-        assert row["cost"] == (0 if case == "zero" else 2)
-        assert row["commitments"] == (6 if case == "zero" else 5)
+        assert row["cost"] == (0 if case == "zero" else 1 if case == "non_cumulative" else 2)
+        assert row["commitments"] == (6 if case in {"zero", "non_cumulative"} else 5)

@@ -6328,11 +6328,30 @@ def test_order37_cost_bounds_follow_all_modifiers(deltas: tuple[int, ...], expec
 
 @pytest.mark.parametrize("reverse_ids", [False, True])
 @pytest.mark.parametrize(
-    ("non_cumulative", "deltas", "expected"),
-    [((), (1, 1, -1), 2), ((0, 1), (1, 1, -1), 1), ((0,), (1, 1, -1), 1), ((1,), (1, 2, -1), 2)],
+    ("non_cumulative", "operations", "expected"),
+    [
+        ((), (("add", 1), ("add", 1), ("add", -1)), 2),
+        ((0, 1), (("add", 1), ("add", 1), ("add", -1)), 1),
+        ((0,), (("add", 1), ("add", 1), ("add", -1)), 1),
+        ((1,), (("add", 1), ("add", 2), ("add", -1)), 2),
+        ((0,), (("add", 1), ("subtract", -1), ("subtract", 1)), 1),
+        ((0,), (("add", 1), ("multiply", 2), ("subtract", 1)), 1),
+        ((0,), (("add", 1), ("set", 2), ("subtract", 1)), 1),
+        ((0,), (("subtract", -1), ("multiply", 2), ("add", -1)), 1),
+        ((0,), (("add", 1), ("multiply", 3), ("subtract", 2)), 1),
+        ((0,), (("add", 3), ("multiply", 2), ("subtract", 3)), 1),
+        ((0,), (("add", 1), ("set", 0), ("subtract", 1)), 0),
+        ((0,), (("add", 1), ("multiply", 1), ("subtract", 1)), 1),
+        ((0,), (("add", 1), ("divide", 2), ("subtract", 1)), 0),
+        ((0,), (("add", 1), ("floor", 2), ("subtract", 1)), 2),
+        ((0,), (("add", 1), ("ceiling", 1), ("subtract", 1)), 1),
+    ],
 )
 def test_order37_registry_preserves_all_commitments_and_evaluates_each_provider_once(
-    reverse_ids: bool, non_cumulative: tuple[int, ...], deltas: tuple[int, ...], expected: int
+    reverse_ids: bool,
+    non_cumulative: tuple[int, ...],
+    operations: tuple[tuple[str, int], ...],
+    expected: int,
 ) -> None:
     state, _, _ = _corsair_state(phase=BattlePhase.SHOOTING, active_player_id="player-b")
     context = StratagemCostModifierContext(
@@ -6347,11 +6366,11 @@ def test_order37_registry_preserves_all_commitments_and_evaluates_each_provider_
     )
     calls: list[int] = []
 
-    def provider(index: int, delta: int) -> StratagemCostModifierHandler:
+    def provider(index: int, term: ModifierTerm) -> StratagemCostModifierHandler:
         def operation(received: StratagemCostModifierContext) -> ModifierTerm:
             assert received is context
             calls.append(index)
-            return ModifierTerm(ModifierOperation.ADD, delta)
+            return term
 
         return operation
 
@@ -6359,10 +6378,10 @@ def test_order37_registry_preserves_all_commitments_and_evaluates_each_provider_
         StratagemCostModifierBinding(
             modifier_id=f"cost-{2 - i if reverse_ids else i}",
             source_id=f"source-{i}",
-            handler=provider(i, delta),
+            handler=provider(i, ModifierTerm(ModifierOperation(operation), operand)),
             non_cumulative_increase=i in non_cumulative,
         )
-        for i, delta in enumerate(deltas)
+        for i, (operation, operand) in enumerate(operations)
     )
     registry = StratagemCostModifierRegistry.from_bindings(bindings)
     result = registry.modified_command_point_cost_with_sources(context)
@@ -6391,10 +6410,12 @@ def test_order37_invalid_operations_fail_before_returning_any_cost() -> None:
     )
     with pytest.raises(GameLifecycleError, match="must be bool"):
         replace(binding, non_cumulative_increase=cast(bool, 1))
-    with pytest.raises(GameLifecycleError, match="positive addition"):
+    with pytest.raises(GameLifecycleError, match="Invalid Stratagem cost operations") as error:
         StratagemCostModifierRegistry.from_bindings(
             (replace(binding, non_cumulative_increase=True),)
         ).modified_command_point_cost(context)
+    assert error.value.__cause__ is not None
+    assert "positive addition" in str(error.value.__cause__)
 
     def symbolic(_context: StratagemCostModifierContext) -> ModifierTerm:
         return ModifierTerm(ModifierOperation.SET_DASH, 0)

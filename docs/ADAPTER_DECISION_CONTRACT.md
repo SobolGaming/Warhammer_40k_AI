@@ -5486,6 +5486,12 @@ consume that same final cost. The existing `command_point_modifier_ids` and
 `command_point_modifier_source_ids` record every applicable/accepted source,
 including operations made numerically redundant by a bound or an explicit
 non-cumulative restriction. Such a source remains committed for frequency limits.
+Signed additions/subtractions are normalized before arithmetic. A non-cumulative
+increase competes with the ordinary cumulative combination; its alternative
+excludes any other operation that would increase the running exact cost,
+including multiplication, replacement and floor operations. The resolver selects
+the higher legal exact result before final rounding and bounds, while keeping
+the source commitments from both alternatives. Providers are evaluated once.
 Declined and inapplicable sources remain absent. No new choice, visibility class
 or payload field is introduced; existing viewer-scoped projections and events
 remain authoritative.

@@ -5,9 +5,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.modifiers import (
-    Modifier,
     ModifierError,
-    ModifierOperation,
     ModifierTerm,
     resolve_stratagem_cost,
 )
@@ -190,39 +188,20 @@ class StratagemCostModifierRegistry:
                 raise GameLifecycleError(
                     "Stratagem cost modifier must return ModifierTerm or None."
                 )
-            if binding.non_cumulative_increase and (
-                term.operation is not ModifierOperation.ADD or term.operand <= 0
-            ):
-                raise GameLifecycleError(
-                    "Non-cumulative cost increase requires a positive addition."
-                )
             selected.append((binding, term))
-        # Explicit non-cumulative increases compete with the total ordinary increase.
-        # All accepted sources remain commitments, including capped/non-stacking ones.
-        ordinary_increase = sum(
-            term.operand
-            for binding, term in selected
-            if not binding.non_cumulative_increase
-            and term.operation is ModifierOperation.ADD
-            and term.operand > 0
-        )
-        non_cumulative = [
-            (binding, term) for binding, term in selected if binding.non_cumulative_increase
-        ]
-        strongest = max(non_cumulative, key=lambda item: item[1].operand, default=None)
-        use_non_cumulative = strongest is not None and strongest[1].operand > ordinary_increase
-        numeric: list[Modifier] = []
-        for binding, term in selected:
-            if binding.non_cumulative_increase:
-                if not use_non_cumulative or (binding, term) != strongest:
-                    continue
-            elif (
-                use_non_cumulative and term.operation is ModifierOperation.ADD and term.operand > 0
-            ):
-                continue
-            numeric.append(term.bind(modifier_id=binding.modifier_id, source_id=binding.source_id))
         try:
-            final, steps = resolve_stratagem_cost(context.base_command_point_cost, tuple(numeric))
+            final, steps = resolve_stratagem_cost(
+                context.base_command_point_cost,
+                tuple(
+                    term.bind(modifier_id=binding.modifier_id, source_id=binding.source_id)
+                    for binding, term in selected
+                ),
+                non_cumulative_increase_ids=tuple(
+                    binding.modifier_id
+                    for binding, _ in selected
+                    if binding.non_cumulative_increase
+                ),
+            )
         except ModifierError as exc:
             raise GameLifecycleError("Invalid Stratagem cost operations.") from exc
         return StratagemCostModificationResult(
