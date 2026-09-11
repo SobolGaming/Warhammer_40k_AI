@@ -1,6 +1,6 @@
 # T4 — Army-construction grammar
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Core P25A–C](../../CORE_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Core P25A–C](../../CORE_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Track U classification](../updates/U_CLASSIFICATION_SYSTEM.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T4. It is planning evidence delivered read-only to
 Core orders P25A, P25B and P25C. It does not implement engine semantics, populate

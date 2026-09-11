@@ -1,6 +1,6 @@
 # S2 — Identity model
 
-[Identity index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Source policy (F00)](../../FACTION_RULES_SOURCE_POLICY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Track T taxonomy](../taxonomy/README.md)
+[Identity index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Source policy (F00)](../../FACTION_RULES_SOURCE_POLICY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Track T taxonomy](../taxonomy/README.md) · [Track U classification](../updates/U_CLASSIFICATION_SYSTEM.md)
 
 This document is Track S item S2 as **FM-pre planning evidence**. It closes the
 identity axes FM0 must implement. It does not allocate catalog IDs, rewrite
@@ -68,6 +68,8 @@ F00 page IDs are provenance identities, not catalog or clause execution IDs.
 One source document may bind many catalog entities. One catalog entity may
 appear in many listing documents. The join is a `source_entry_binding`
 (§5), not a sixth runtime identity layer and not a display-name match.
+Track U diffs that same join plus a field path; a page URL is not a diff
+row ([U classification](../updates/U_CLASSIFICATION_SYSTEM.md)).
 
 One catalog entity may have many source-document IDs (inherited chapter or
 related-army listings of the same **page**). Many source documents never become

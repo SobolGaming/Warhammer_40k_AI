@@ -159,7 +159,7 @@ evidence. Owning work now references tracks and milestones.
 
 | ID | Priority | Finding and consequence | Owning work |
 | --- | --- | --- | --- |
-| F-ARMY-01 | 1 | Current Acts of Faith grants a Miracle die at each turn start; the Sororitas consumer and regression use battle-round start. | Debt item 9 in FM0; first case for the "IR changed → consumer stale" rule (U4) |
+| F-ARMY-01 | 1 | Current Acts of Faith grants a Miracle die at each turn start; the Sororitas consumer and regression use battle-round start. | Debt item 9 in FM0; first case for U4 Layer A/C demotion via `clause_envelope_changed` on `clause.timing` |
 | F-ORK-01 | 1 | v946 refreshes the Ork army and detachment roster: seven detachments added, More Dakka! removed, DP costs and Enhancement/Stratagem inventories changed, 73 unit changes. Retired scaffold directories remain. | FM0.5 pilot; U5–U6 |
 | F-DATA-01 | 1 | Current costs and attachments differ from older records (Eldrad, Bloodcrushers, Exorcist surcharge). | S3a; impact class "points only" and "attachment change" in U3; FM1 and FM3 |
 | F-EVID-01 | 1 | Module status, source labels, execution classifications and component labels describe different facts with different denominators. | Q1 |
@@ -322,9 +322,9 @@ waves may run as parallel agent packets under the data-first contract (D3).
 | ID | Deliverable |
 | --- | --- |
 | U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00 |
-| U2 | Content-set diff (S4) between the packaged version and the staged version |
-| U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format |
-| U4 | Automatic, layer-specific status invalidation (rules below): semantic execution, roster legality and certification claims are bound to separate evidence tuples; a changed transcription hash is provenance, not automatic semantic demotion, and requires impact classification plus a recorded carry-forward or a stale claim; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row |
+| U2 | Content-set diff (S4) between the packaged version and the staged version. **FM-pre grain delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); the S4 tool remains FM0. Diff rows are S2 `catalog_id` plus `source_entry_binding` plus field path, not page URLs; the Orks 931→946 fixture still required at S4 |
+| U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format. **FM-pre classes delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); classifier, packets, and the next packet-schema design remain. Closed class set includes `construction_constraint` and `composition_or_options`; one class per field path; `Rules Updated` is `unclassified_clause` until S3a |
+| U4 | Automatic, layer-specific status invalidation (rules below): semantic execution, roster legality and certification claims are bound to separate evidence tuples; a changed transcription hash is provenance, not automatic semantic demotion, and requires impact classification plus a recorded carry-forward or a stale claim; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row. **FM-pre layers delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); Q1 storage and runtime invalidation remain |
 | U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it |
 | U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
 | U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the engine build identity and the content-set version of every participating faction; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it |
@@ -415,10 +415,13 @@ evidence that authorizes them. Until that re-attestation exists, L7/L8 for
 the affected rosters are `stale` even when Layer A remains current.
 
 Acceptance fixtures for U3/U4 (implementation tests required when U3/U4
-land; this documentation PR only defines them):
+land; this documentation PR only defines them). The closed grain, class IDs
+and extra fixtures are in
+[U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md):
 
 1. Changed timing with unchanged effect IR and a new transcription hash
-   invalidates Layer A (and dependent Layer C).
+   invalidates Layer A (and dependent Layer C) (`clause_envelope_changed`
+   on `clause.timing`).
 2. A reviewed editorial-only change uses different old and new transcription
    hashes, carries Layer A forward through the recorded equivalence review,
    and re-attests Layer C to the new content-set/build identity without
@@ -426,6 +429,14 @@ land; this documentation PR only defines them):
 3. A points-only change uses different old and new transcription hashes,
    preserves Layer A through carry-forward, invalidates affected Layer B
    claims, and re-attests dependent Layer C only after roster validation.
+4. Detachment DP 2→1 with unchanged clauses demotes Layer B and C, not A
+   (`construction_constraint`).
+5. A "Rules Updated" feed line without retained dual-version clauses uses
+   `clause.unattributed` with class `unclassified_clause`, even when the
+   same line lists a points or composition delta.
+6. Adding a child Enhancement on a detachment page does not demote siblings
+   (`structural_add` is per child locator).
+7. Inherited listings of the same `source_entry_binding` do not add rows.
 
 Impact classes assigned by U3:
 
@@ -434,13 +445,19 @@ Impact classes assigned by U3:
 | Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | B (affected rosters); C until re-attested | Regenerate cost records; re-run roster validation; carry Layer A forward with a recorded hash-link review that the semantic fingerprint is unchanged (points live in provenance text, not in the fingerprint); re-attest Layer C to the new content-set/build identity |
 | Text hash equal | Page re-rendered, same operative text | none | Re-pin observation; provenance hash already matches |
 | Editorial equivalent | Wording tweak; semantic fingerprint unchanged | C until re-attested | Record the equivalence review linking old and new transcription hashes; carry Layer A forward; re-attest Layer C to the new content-set/build identity. Named-handler-backed clauses require the review to confirm handler identity |
-| Timing, target, restriction or bearer changed, effect IR equal | WHEN clause moves to a different window; bearer widened | A, C | Demote to `stale`; re-map and re-certify L4–L8 |
-| Effect IR changed | Acts of Faith battle-round → turn start | A, C | Demote to `stale`; re-certify L4–L8 |
+| Timing, target, restriction or bearer changed, effect IR equal | Acts of Faith battle-round → turn start; WHEN clause moves to a different window; bearer widened | A, C | Demote to `stale`; re-map and re-certify L4–L8 |
+| Effect IR changed | Effect RuleIR changes with envelope unchanged (mortal-wound expression, resource-gain amount, or granted-ability identity) | A, C | Demote to `stale`; re-certify L4–L8 |
 | Unclassified clause change | Classifier cannot attribute the diff | A, C | `stale` pending human review; no automatic carry-forward |
 | Structural add | Nazdreg; Brute Bosses; a new Enhancement | n/a | Staging observation until official provenance is registered; then L0–L8 from scratch; no Python unless a new family is needed |
 | Structural remove | More Dakka!; a removed Stratagem | C for rosters using it | Tombstone with `retired_in`; current-version mustering rejection regression; Python removed only when no packaged version references it |
 | Attachment or keyword change | Eldrad's narrowed Leader list | B, C | Regenerate attachment records; fieldability regressions |
-| Faction rewrite | Orks v946 | all, for the faction | U6 procedure |
+| Construction constraint | Blitz Brigade 2DP → 1DP; Green Tide 3DP → 1DP | B, C | Regenerate T4 constraint records; mustering regressions |
+| Composition or options | Ghazghkull 2-model size removed | B, C | Regenerate composition/option records; fieldability regressions |
+| Faction rewrite | Orks v946 | all, for the faction | U6 procedure; still emit per-entity rows |
+
+The closed IDs, field paths, union-demotion rules and Orks mapping exercise
+are in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md).
+A page URL is not a diff row.
 
 Worked pilot (FM0.5, Orks): retain the two most recent Orks versions (the
 931→946 pair is retained through versioned-path URLs under the S1 amendment as
@@ -571,8 +588,10 @@ Permitted in parallel with the remaining Core Rules orders:
   [T6_DECISION_KIND_VISIBILITY.md](factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md);
 - the S2 identity model design document is delivered:
   [S2_IDENTITY_MODEL.md](factions/identity/S2_IDENTITY_MODEL.md);
-- Track U design and runbook documents: impact classes, packet schema,
-  retention policy;
+- Track U classification (U2 grain, U3 classes, U4 layers) is delivered:
+  [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md);
+- remaining Track U design: packet schema, retention policy, and the U8
+  runbook;
 - the Q1 status-artifact schema document;
 - draft D3 contracts, marked draft until FM0 makes them binding.
 

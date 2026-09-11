@@ -1,6 +1,6 @@
 # Faction corpus taxonomy (Track T)
 
-[S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md)
+[S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Track U classification](../updates/U_CLASSIFICATION_SYSTEM.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md)
 
 Pre-gate surveys live here as planning evidence. They do not admit content, change
 catalogs, or implement engine semantics. FM0 regenerates the semantic demand
