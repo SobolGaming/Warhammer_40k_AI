@@ -323,7 +323,7 @@ waves may run as parallel agent packets under the data-first contract (D3).
 | --- | --- |
 | U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00 |
 | U2 | Content-set diff (S4) between the packaged version and the staged version. **FM-pre grain delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); the S4 tool remains FM0. Diff rows are S2 `catalog_id` plus `source_entry_binding` plus field path, not page URLs; the Orks 931→946 fixture still required at S4 |
-| U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format. **FM-pre classes delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); classifier, packets, and the next packet-schema design remain. Closed class set includes `construction_constraint` and `composition_or_options`; one class per field path; `Rules Updated` is `unclassified_clause` until S3a |
+| U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format. **FM-pre classes delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md). **FM-pre packet schema delivered** in [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md); classifier, packet generator, emission, and the live agent-contract rewrite remain FM0. Closed class set includes `construction_constraint` and `composition_or_options`; one class per field path; one packet per classified row; `Rules Updated` is a `review` packet on `clause.unattributed` until S3a |
 | U4 | Automatic, layer-specific status invalidation (rules below): semantic execution, roster legality and certification claims are bound to separate evidence tuples; a changed transcription hash is provenance, not automatic semantic demotion, and requires impact classification plus a recorded carry-forward or a stale claim; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row. **FM-pre layers delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); Q1 storage and runtime invalidation remain |
 | U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it |
 | U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
@@ -486,7 +486,7 @@ packaged as loadable content.
 | --- | --- |
 | D1 | Guides and audits generated from Q1 only; no hand-edited status |
 | D2 | Per-content-set changelog generated from U2/U3 |
-| D3 | `ADAPTER_DECISION_CONTRACT.md` updated in the same PR as any new family or decision kind; `FACTION_AGENT_IMPLEMENTATION_CONTRACT.md` rewritten for data-first packets (records and bindings; Python only for a new family or a justified named handler) |
+| D3 | `ADAPTER_DECISION_CONTRACT.md` updated in the same PR as any new family or decision kind; `FACTION_AGENT_IMPLEMENTATION_CONTRACT.md` rewritten for data-first packets (records and bindings; Python only for a new family or a justified named handler). **FM-pre packet schema delivered** in [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md); this is the draft packet half of Track D D3. Live adapter-contract and live agent-contract files are unchanged until FM0. Owner D3 (content-set retention) is a different decision |
 
 ## Debt retired in FM0
 
@@ -590,10 +590,13 @@ Permitted in parallel with the remaining Core Rules orders:
   [S2_IDENTITY_MODEL.md](factions/identity/S2_IDENTITY_MODEL.md);
 - Track U classification (U2 grain, U3 classes, U4 layers) is delivered:
   [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md);
-- remaining Track U design: packet schema, retention policy, and the U8
-  runbook;
+- Track U packet schema (draft Track D agent-contract packet half) is
+  delivered: [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md);
+- remaining Track U design: retention policy and the U8 runbook;
 - the Q1 status-artifact schema document;
-- draft D3 contracts, marked draft until FM0 makes them binding.
+- remaining draft D3 work: live adapter-contract and live agent-contract
+  rewrites, marked draft until FM0 makes them binding. Owner D3 retention
+  is a later design PR.
 
 Not permitted before Gate 0: any change under `src/`, packaged data artifacts,
 generators, the source-authority registry, the F00 policy text, or catalog and
