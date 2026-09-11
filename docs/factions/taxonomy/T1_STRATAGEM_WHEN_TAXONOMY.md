@@ -1,6 +1,6 @@
 # T1 — Stratagem WHEN taxonomy
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md) · [T6 decision-kind taxonomy](T6_DECISION_KIND_VISIBILITY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T1. It is planning evidence delivered read-only to
 Track G's timing-window family. It does not implement engine semantics, add
@@ -194,9 +194,11 @@ Orks rewrite post-dates the extract).
 
 ### 3.4 Envelopes (not extra trigger kinds)
 
-Stratagem *use* stays the finite `use_stratagem` decision in
-[the adapter contract](../../ADAPTER_DECISION_CONTRACT.md). Reaction and
-opportunity types wrap that decision; they do not replace it.
+Stratagem *use* stays `use_stratagem` (or a parameterized Stratagem target
+proposal) in [the adapter contract](../../ADAPTER_DECISION_CONTRACT.md).
+T1 names the WHEN envelope. Finite versus parameterized target binding is
+T6. Reaction and opportunity types wrap that decision; they do not replace
+it.
 
 | Envelope | When T1 assigns it |
 | --- | --- |

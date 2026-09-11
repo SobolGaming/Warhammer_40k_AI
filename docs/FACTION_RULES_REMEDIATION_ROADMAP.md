@@ -251,7 +251,7 @@ complete-provenance record is admitted.
 | T3 | Bearer, target and condition grammar, including state tokens such as "riled up" or "Waaagh! active", ranges, visibility, phase and turn ownership. **Delivered** read-only to Track G in [T3_BEARER_TARGET_CONDITION_GRAMMAR.md](factions/taxonomy/T3_BEARER_TARGET_CONDITION_GRAMMAR.md) |
 | T4 | Army-construction grammar: DP budgets per battle size, multiple detachments per army, force-disposition consistency, duplicate-detachment prohibition, required and prohibited units and detachments, Enhancement counts, Enhancement-only detachments (Brute Bosses has six Enhancements and no Stratagems), related-army admission and caps, model-specific Warlord and bearer. **Delivered** read-only to Core P25C in [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) before P25C is implemented |
 | T5 | Resource and state-token taxonomy across all 28 army rules (Miracle dice, Pain, Blessings, Battle Focus, Waaagh!, Strands of Fate, Yield, Cabal, Doctrina, Dread, Oath, Vows, Ka'tah, Orders, Kill Teams, Cult Ambush, Reanimation, Synapse/Shadow, Greater Good, Gate of Infinity, Assigned Agents, Code Chivalric, Power from Pain, Thrill Seekers, Dark Pacts, Nurgle's Gift, Shadow of Chaos): which share a typed `ResourceLedger` service and which remain bespoke state machines under the named-handler budget. **Delivered** read-only to Track G in [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](factions/taxonomy/T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) |
-| T6 | Decision-kind and viewer-visibility demand: finite options versus parameterized proposals per rule family; adapter contract deltas |
+| T6 | Decision-kind and viewer-visibility demand: finite options versus parameterized proposals per rule family; adapter contract deltas. **Delivered** read-only to Track G in [T6_DECISION_KIND_VISIBILITY.md](factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md) |
 
 Output: `semantic_demand_matrix.json` plus a generated table, regenerated on
 every content-set change. Pre-gate surveys are planning evidence; FM0
@@ -259,8 +259,9 @@ regenerates the matrix from the retained content set and reconciles it with
 the surveys. T1's [`t1_when_windows.json`](factions/taxonomy/t1_when_windows.json),
 T2's [`t2_effect_families.json`](factions/taxonomy/t2_effect_families.json),
 T3's [`t3_bearer_target_conditions.json`](factions/taxonomy/t3_bearer_target_conditions.json),
-T4's [`t4_constraint_families.json`](factions/taxonomy/t4_constraint_families.json)
-and T5's [`t5_resource_state_tokens.json`](factions/taxonomy/t5_resource_state_tokens.json)
+T4's [`t4_constraint_families.json`](factions/taxonomy/t4_constraint_families.json),
+T5's [`t5_resource_state_tokens.json`](factions/taxonomy/t5_resource_state_tokens.json),
+and T6's [`t6_decision_kinds.json`](factions/taxonomy/t6_decision_kinds.json)
 are planning evidence only and are not that matrix.
 
 ### Track G: generic engine families
@@ -283,7 +284,9 @@ records on Core P25C surfaces (T4 delivered the grammar in
 shared resource ledgers (T5 delivered the closed token set and ledger-fit
 split in
 [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](factions/taxonomy/T5_RESOURCE_STATE_TOKEN_TAXONOMY.md));
-decision-kind and viewer-visibility demand (T6).
+decision-kind and viewer-visibility demand (T6 delivered the closed
+submission and visibility axes and the adapter-contract delta list in
+[T6_DECISION_KIND_VISIBILITY.md](factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md)).
 New families require a real source-backed consumer in the same PR; speculative
 registries are forbidden.
 
@@ -561,7 +564,9 @@ Permitted in parallel with the remaining Core Rules orders:
   T4 is delivered:
   [T4_ARMY_CONSTRUCTION_GRAMMAR.md](factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md).
   T5 is delivered:
-  [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](factions/taxonomy/T5_RESOURCE_STATE_TOKEN_TAXONOMY.md);
+  [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](factions/taxonomy/T5_RESOURCE_STATE_TOKEN_TAXONOMY.md).
+  T6 is delivered:
+  [T6_DECISION_KIND_VISIBILITY.md](factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md);
 - the S2 identity model design document: ID registry scheme, crosswalk schema,
   Space Marines overlay model, related-army ownership;
 - Track U design and runbook documents: impact classes, packet schema,

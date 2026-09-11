@@ -1,6 +1,6 @@
 # T5 — Resource and state-token taxonomy
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T2 effect taxonomy](T2_EFFECT_TAXONOMY.md) · [T3 bearer/target/condition grammar](T3_BEARER_TARGET_CONDITION_GRAMMAR.md) · [T4 army-construction grammar](T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T2 effect taxonomy](T2_EFFECT_TAXONOMY.md) · [T3 bearer/target/condition grammar](T3_BEARER_TARGET_CONDITION_GRAMMAR.md) · [T4 army-construction grammar](T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [T6 decision-kind taxonomy](T6_DECISION_KIND_VISIBILITY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T5. It is planning evidence delivered read-only to
 Track G's shared resource-ledger family. It does not implement engine
@@ -32,8 +32,9 @@ T1 still owns WHEN (including when a Waaagh! is called). T2 still owns
 EFFECT families, including `resource_gain_spend`, `persisting_status`,
 `doctrine_mode`, and `order_issue`. T3 still owns bearer, TARGET and
 condition atoms, including `state_token`. T4 still owns related-army pacts
-and construction. T6 still owns finite versus parameterized spend, pick
-and target decisions.
+and construction. T6 delivered finite versus parameterized spend, pick
+and target decisions in
+[T6_DECISION_KIND_VISIBILITY.md](T6_DECISION_KIND_VISIBILITY.md).
 
 ## 2. Methodology and snapshot
 
@@ -69,7 +70,7 @@ Classification rules that a token hit-list would flatten:
 | Pain and Power From Pain | one token `pain` |
 | Synapse/Shadow | two tokens: `synapse` is `aura_zone`; `shadow_in_the_warp` is a once-per-battle `protocol` |
 | For the Greater Good as an aura | observer/spotted `designated_target` **and** shooting-phase `protocol`; visibility is T3 |
-| Battle Focus token spend vs manoeuvre pick | ledger half **and** named/T6 half |
+| Battle Focus token spend vs manoeuvre pick | ledger half **and** T6 `finite_mode_pick` |
 | Cult Ambush markers vs Resurgence points | placement machine **and** integer ledger |
 | Cabal ritual attempt vs a point pool | current named handler is the ritual machine |
 | "Waaagh! is active" and "riled up" | two pulse tokens; they do not share a ledger |
@@ -176,7 +177,8 @@ already-unleashed, and then runs a Battle-shock sequence; Synapse range
 used in that sequence is the `synapse` token, not an aura half of Shadow.
 For the Greater Good stores observer/spotted pairs and Shooting-phase
 completion; visibility used to form a mark is T3, not `aura_zone`.
-Unleash timing remains T1. Decision shape remains T6. App 946 operative
+Unleash timing remains T1. Decision shape is T6 `finite_binary_activate`
+for Shadow and T6 finite mark/done for Greater Good. App 946 operative
 text is not retained (`T5-HOLD-APP-ARMY-RULE`). An aura-shaped source
 page would be an unresolved source/runtime distinction, not a closed
 aura-only fit.
@@ -359,7 +361,7 @@ exist. Unused-by-June-Stratagem is not `gap_no_kind`.
 
 ### 7.2 Splits that require a real consumer before a new kind
 
-- Battle Focus manoeuvre pick (T6 / named), distinct from the token ledger
+- Battle Focus manoeuvre pick (`finite_mode_pick` in [T6](T6_DECISION_KIND_VISIBILITY.md)), distinct from the token ledger
 - Cult Ambush marker placement, distinct from Resurgence points
 - Cabal ritual machine; mint a Cabal integer kind only if S3a retains a pool
 - Miracle-dice face operations (discard, set, substitute) on the existing pool
@@ -374,7 +376,8 @@ exist. Unused-by-June-Stratagem is not `gap_no_kind`.
 - EFFECT families remain T2, including `resource_gain_spend`.
 - Bearer, TARGET and condition atoms remain T3, including `state_token`.
 - Related-army pacts and DP remain T4.
-- Finite versus parameterized spend and pick decisions remain T6.
+- Finite versus parameterized spend and pick decisions are closed in
+  [T6](T6_DECISION_KIND_VISIBILITY.md).
 
 ## 8. Open holds
 
@@ -383,9 +386,9 @@ exist. Unused-by-June-Stratagem is not `gap_no_kind`.
 | T5-HOLD-APP-ARMY-RULE | App 946 army-rule operative text is not retained for every heading | S3a, then FM0 |
 | T5-HOLD-STRANDS | Strands of Fate is a Seer Council heading; pool shape is not retained | S3a |
 | T5-HOLD-CABAL-SHAPE | Current handler is ritual attempts; June/T2 wording still says Cabal spend | S3a |
-| T5-HOLD-PLEDGE-SHAPE | Unbound Arrogance increments an integer; thresholds or picks may also be a mode | S3a / T6 |
+| T5-HOLD-PLEDGE-SHAPE | Unbound Arrogance increments an integer; thresholds or picks may also be a mode. T6 closes a later pick as `finite_mode_pick` | S3a |
 | T5-HOLD-DETACHMENT-OPERATIVE | App 946 detachment rule bodies are not retained; this inventory is headings plus June Stratagem text | S3a, then FM0 |
-| T5-HOLD-BATTLE-FOCUS-SPLIT | Token ledger versus manoeuvre pick | Track G / T6 |
+| T5-HOLD-BATTLE-FOCUS-SPLIT | Token ledger versus manoeuvre pick. T6 closes the pick as `finite_mode_pick` | Track G |
 | T5-HOLD-CULT-AMBUSH-SPLIT | Markers versus Resurgence points | Track G |
 | T2-HOLD-RESOURCE-SPLIT | Answered here for the ledger question; T2 EFFECT counts stay T2 | this survey |
 | F-ORK-01 | Orks v946 Waaagh!, Da Boss and "riled up" may be new | FM0.5 |
