@@ -67,7 +67,8 @@ Classification rules that a token hit-list would flatten:
 | Flattened token | Published split |
 | --- | --- |
 | Pain and Power From Pain | one token `pain` |
-| Synapse/Shadow | `synapse` **and** `shadow_in_the_warp` |
+| Synapse/Shadow | two tokens: `synapse` is `aura_zone`; `shadow_in_the_warp` is a once-per-battle `protocol` |
+| For the Greater Good as an aura | observer/spotted `designated_target` **and** shooting-phase `protocol`; visibility is T3 |
 | Battle Focus token spend vs manoeuvre pick | ledger half **and** named/T6 half |
 | Cult Ambush markers vs Resurgence points | placement machine **and** integer ledger |
 | Cabal ritual attempt vs a point pool | current named handler is the ritual machine |
@@ -97,10 +98,10 @@ split (the T1-001 failure mode).
 | `specialized_face_pool` | no | Countable dice that keep rolled faces |
 | `pulse_flag` | no | On/off window ("active", "riled up") |
 | `mode_machine` | no | Doctrine, vow, order, pact, blessing, ritual, or manoeuvre pick |
-| `designated_target` | no | Remember one selected enemy or subject |
-| `aura_zone` | no | Contagion, Synapse, Shadow, Greater Good range |
+| `designated_target` | no | Remember selected subjects (Oath target; observer/spotted pairs) |
+| `aura_zone` | no | Contagion, Synapse, Nurgle’s Gift, Shadow of Chaos range |
 | `placement_reserve` | no | Markers, off-board setup, reserve identity |
-| `protocol` | no | Reanimation or Gate sequence |
+| `protocol` | no | Once-per-battle or phase-scoped resolution (Reanimation, Gate, Shadow unleash, Greater Good shooting-phase done) |
 | `composition` | no | Kill Team, Assigned Agents, Drones |
 | `contextual_status` | no | T3-named unit status that is not the army pool |
 
@@ -159,8 +160,8 @@ the token.
 | `cult_ambush` | Cult Ambush | `faction_integer_ledger` (`resurgence_points`) **and** `placement_reserve` | yes |
 | `reanimation` | Reanimation Protocols | `protocol` | yes |
 | `synapse` | Synapse | `aura_zone` | yes |
-| `shadow_in_the_warp` | Shadow in the Warp | `aura_zone` | yes |
-| `greater_good` | For the Greater Good | `aura_zone` | yes |
+| `shadow_in_the_warp` | Shadow in the Warp | `protocol` (once-per-battle unleash and Battle-shock sequence) | yes |
+| `greater_good` | For the Greater Good | `designated_target` **and** `protocol` | yes |
 | `gate_of_infinity` | Gate of Infinity | `protocol` | yes |
 | `assigned_agents` | Assigned Agents | `composition` | no pre-WS14 army-rule row |
 | `code_chivalric` | Code Chivalric | `mode_machine` | yes |
@@ -168,6 +169,17 @@ the token.
 | `dark_pacts` | Dark Pacts | `mode_machine` | yes |
 | `nurgles_gift` | Nurgle’s Gift (Aura) | `aura_zone` | yes |
 | `shadow_of_chaos` | The Shadow of Chaos | `aura_zone` | yes |
+
+Pinned Tyranids and T’au handlers are the crosswalk for those two
+tokens. Shadow in the Warp offers unleash or decline, records
+already-unleashed, and then runs a Battle-shock sequence; Synapse range
+used in that sequence is the `synapse` token, not an aura half of Shadow.
+For the Greater Good stores observer/spotted pairs and Shooting-phase
+completion; visibility used to form a mark is T3, not `aura_zone`.
+Unleash timing remains T1. Decision shape remains T6. App 946 operative
+text is not retained (`T5-HOLD-APP-ARMY-RULE`). An aura-shaped source
+page would be an unresolved source/runtime distinction, not a closed
+aura-only fit.
 
 `strands_of_fate` is not a current **army-rule** heading. Current Aeldari /
 Harlequins / Ynnari army headings are Battle Focus and Disparate Paths.
