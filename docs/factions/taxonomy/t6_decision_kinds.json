@@ -1,0 +1,456 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "T6",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md",
+  "delivered_to": "Track G decision-kind and viewer-visibility; adapter contract deltas as planning evidence",
+  "does_not_edit_adapter_contract": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "reporting_groups": 28,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "cited_demand": {
+    "june_stratagem_rows": 1025,
+    "t2_resource_gain_spend_june_rows": 60,
+    "t3_condition_assignments": 1520,
+    "t5_catalog_token_count": 45,
+    "note": "T6 cites T1-T5. It does not recount June EFFECT families, TARGET atoms, or ledgers, and it does not publish a 1025-row finite-versus-parameterized histogram."
+  },
+  "authoritative_existing_surfaces": {
+    "adapter_decision_contract": "docs/ADAPTER_DECISION_CONTRACT.md",
+    "decision_submission_catalog": "docs/DECISION_SUBMISSION_CATALOG.md",
+    "finite_submission": "FiniteOptionSubmission",
+    "parameterized_submission": "ParameterizedSubmission",
+    "parameterized_option_id": "submit_parameterized_payload",
+    "hidden_placeholder_decision_type": "hidden_decision",
+    "hidden_placeholder_is_not_an_engine_submission": true,
+    "redaction_module": "adapters.redaction",
+    "nested_allowlist": [
+      "WEAPON_ABILITY_SELECTION_DECISION_TYPE"
+    ],
+    "stratagem_finite_decision_type": "use_stratagem",
+    "stratagem_parameterized_decision_type": "submit_stratagem_target_proposal",
+    "stratagem_parameterized_proposal_kind": "stratagem_target_binding"
+  },
+  "closed_axes": {
+    "submission_kinds": [
+      "finite_option",
+      "parameterized_proposal"
+    ],
+    "visibility_classes": [
+      "public",
+      "owner_secret"
+    ],
+    "hidden_decision_is_not_a_third_submission_kind": true,
+    "hidden_decision_is_not_a_third_visibility_class": true,
+    "do_not_lift_one_decision_type_over_a_split": true,
+    "finite_enumerated_candidates_are_not_parameterized": true,
+    "parameterized_path_or_placement_is_not_finite_select": true
+  },
+  "classification_rules": [
+    {
+      "id": "no_stratagem_use_lift",
+      "flattened_token": "use a Stratagem / select a Stratagem target",
+      "demand_families": [
+        "stratagem_window_use"
+      ],
+      "note": "Finite enumerated use_stratagem and parameterized stratagem_target_binding are a split. T1 owns WHEN and the envelope. Stored target_kind must not decide the split."
+    },
+    {
+      "id": "no_select_a_unit_lift",
+      "flattened_token": "select a unit",
+      "demand_families": [
+        "finite_candidate_select"
+      ],
+      "note": "T3 names TARGET atoms. T6 is finite_option once the engine lists current legal candidates."
+    },
+    {
+      "id": "no_spend_lift",
+      "flattened_token": "spend",
+      "demand_families": [
+        "finite_optional_grant",
+        "finite_enumerated_amount",
+        "finite_binary_activate"
+      ],
+      "note": "T5 owns ledger identity. T6 is grant/decline, enumerated 0..N, or T6-DELTA-UNBOUNDED-SPEND if the legal set cannot be listed."
+    },
+    {
+      "id": "no_battle_focus_lift",
+      "flattened_token": "Battle Focus",
+      "demand_families": [
+        "finite_optional_grant",
+        "finite_mode_pick"
+      ],
+      "note": "Token spend is the T5 ledger half. Manoeuvre pick is finite_mode_pick on an existing faction-rule or grant window unless S3a shows that window cannot carry it."
+    },
+    {
+      "id": "no_cult_ambush_lift",
+      "flattened_token": "Cult Ambush",
+      "demand_families": [
+        "finite_binary_activate",
+        "parameterized_placement"
+      ],
+      "note": "Resurgence spend/decline is finite. Marker and ingress placement are parameterized. Do not lift one decision_type over the split."
+    },
+    {
+      "id": "no_greater_good_coordinate_lift",
+      "flattened_token": "For the Greater Good as placement or aura pick",
+      "demand_families": [
+        "finite_candidate_select",
+        "finite_binary_activate"
+      ],
+      "note": "Observer/spotted pairs plus done are finite. Visibility to form a mark is T3. Not parameterized coordinates."
+    },
+    {
+      "id": "no_shadow_aura_decision_lift",
+      "flattened_token": "Shadow in the Warp as an aura choice",
+      "demand_families": [
+        "finite_binary_activate"
+      ],
+      "note": "Unleash or decline is finite_binary_activate. Battle-shock after unleash is engine-owned. Synapse range is T5 aura_zone, not this pick."
+    },
+    {
+      "id": "no_extra_move_endpoint_lift",
+      "flattened_token": "make a Normal move / extra move",
+      "demand_families": [
+        "finite_candidate_select",
+        "parameterized_path"
+      ],
+      "note": "Finite trigger or unit select may precede PathWitness. Endpoint-only movement is invalid except teleport/set-up placement."
+    },
+    {
+      "id": "no_hidden_third_path",
+      "flattened_token": "hidden_decision as an engine type",
+      "demand_families": [
+        "secret_setup"
+      ],
+      "note": "owner_secret plus adapter placeholder. Adapters must not submit hidden_decision."
+    }
+  ],
+  "demand_families": [
+    {
+      "id": "stratagem_window_use",
+      "submission_kind": "split_finite_or_parameterized",
+      "visibility": "public",
+      "coverage": "catalog_split",
+      "finite_decision_type": "use_stratagem",
+      "parameterized_decision_type": "submit_stratagem_target_proposal",
+      "note": "T1 owns WHEN. Command Re-roll is finite use_stratagem in an OpportunityWindow. Insane Bravery is parameterized target binding. Do not publish a June histogram from stored target_kind."
+    },
+    {
+      "id": "finite_candidate_select",
+      "submission_kind": "finite_option",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_decision_types": [
+        "select_faction_rule_command_phase_start_option",
+        "select_faction_rule_shooting_phase_start_option",
+        "select_faction_rule_fight_phase_start_option",
+        "select_tracked_target",
+        "select_healing_model"
+      ],
+      "note": "Engine lists current legal candidates. Greater Good observer/spotted pairs belong here."
+    },
+    {
+      "id": "finite_mode_pick",
+      "submission_kind": "finite_option",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_decision_types": [
+        "select_faction_rule_setup_option",
+        "select_faction_rule_battle_round_option",
+        "select_fight_unit_grant"
+      ],
+      "note": "Named options: doctrines, vows, blessings, Ka'tah, Orders, oath, plague, Cabal ritual, Battle Focus manoeuvre, idols. Not a type per display name."
+    },
+    {
+      "id": "finite_binary_activate",
+      "submission_kind": "finite_option",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_decision_types": [
+        "select_faction_rule_command_phase_start_option",
+        "select_cult_ambush_resurgence",
+        "select_catalog_any_phase_once_per_battle_ability"
+      ],
+      "note": "Waaagh call/decline, Shadow unleash/decline, Cult Ambush spend/decline, Greater Good done."
+    },
+    {
+      "id": "finite_optional_grant",
+      "submission_kind": "finite_option",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_decision_types": [
+        "select_movement_action_grant",
+        "select_shooting_unit_grant",
+        "select_charge_declaration_grant",
+        "select_fight_unit_grant",
+        "select_stratagem_cost_modifier_option"
+      ],
+      "note": "Existing Pain-token and catalog grant windows. Do not fork a spend type per faction."
+    },
+    {
+      "id": "finite_enumerated_amount",
+      "submission_kind": "finite_option",
+      "visibility": "public",
+      "coverage": "prefer_before_quantity_delta",
+      "note": "Spend 0..N when the engine can list every legal integer. Preferred over T6-DELTA-UNBOUNDED-SPEND."
+    },
+    {
+      "id": "parameterized_path",
+      "submission_kind": "parameterized_proposal",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_proposal_kinds": [
+        "normal_move",
+        "advance",
+        "fall_back",
+        "surge_move",
+        "charge_move",
+        "pile_in",
+        "consolidate",
+        "scout_move"
+      ],
+      "note": "Requires PathWitness. Finite trigger select may precede it."
+    },
+    {
+      "id": "parameterized_placement",
+      "submission_kind": "parameterized_proposal",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_proposal_kinds": [
+        "reinforcement_placement",
+        "deep_strike_placement",
+        "strategic_reserves_placement",
+        "cult_ambush_marker_placement",
+        "cult_ambush_placement",
+        "healing_revival_placement",
+        "deployment_placement",
+        "disembark_placement"
+      ],
+      "note": "Cult Ambush marker and ingress belong here. Greater Good marks do not."
+    },
+    {
+      "id": "parameterized_declaration",
+      "submission_kind": "parameterized_proposal",
+      "visibility": "public",
+      "coverage": "catalog_covered",
+      "example_proposal_kinds": [
+        "shooting_declaration",
+        "melee_declaration"
+      ]
+    },
+    {
+      "id": "secret_setup",
+      "submission_kind": "finite_option",
+      "visibility": "owner_secret",
+      "coverage": "catalog_covered",
+      "example_decision_types": [
+        "select_secondary_missions",
+        "select_unit_split_membership",
+        "select_beacon_unit",
+        "select_burden_of_trust_guard",
+        "resolve_tactical_secondary_when_drawn"
+      ],
+      "note": "Non-actor viewers see hidden_decision until the contract reveal point."
+    },
+    {
+      "id": "opponent_reaction",
+      "submission_kind": "same_as_wrapped_family",
+      "visibility": "public",
+      "coverage": "composition_not_a_kind",
+      "note": "T1 owns opponent WHEN and ReactionWindow / OpportunityWindow. T6 does not add a third submission path."
+    },
+    {
+      "id": "nested_disambiguation",
+      "submission_kind": "finite_option",
+      "visibility": "public",
+      "coverage": "allowlist_one_entry",
+      "nested_allowlist_entry": "WEAPON_ABILITY_SELECTION_DECISION_TYPE",
+      "note": "Not a top-level GameLifecycle dispatch entry. Additional nested types are T6-DELTA-NESTED-ALLOWLIST."
+    }
+  ],
+  "june_effect_cues_not_a_histogram": {
+    "profiles_scanned": 1025,
+    "method": "Naive substring hits on effect_descriptor. Not family assignments. T2-HOLD-TOKEN-FLATTENING applies.",
+    "hits": {
+      "you_can": 162,
+      "instead": 121,
+      "select_one": 108,
+      "normal_move": 64,
+      "place": 37,
+      "set_up": 25,
+      "spend": 20,
+      "choose": 6,
+      "select_up_to": 3,
+      "one_of_the_following": 2
+    },
+    "note": "Cue rows are not demand-family counts and must not be summed as if they were a closed assignment total."
+  },
+  "t5_crosswalk": [
+    {
+      "token_or_split": "battle_focus",
+      "t6_families": [
+        "finite_optional_grant",
+        "finite_mode_pick"
+      ],
+      "not_t6": "Ledger identity stays T5."
+    },
+    {
+      "token_or_split": "cult_ambush",
+      "t6_families": [
+        "finite_binary_activate",
+        "parameterized_placement"
+      ],
+      "not_t6": "Resurgence points stay T5 integer ledger. Markers stay T5 placement_reserve."
+    },
+    {
+      "token_or_split": "shadow_in_the_warp",
+      "t6_families": [
+        "finite_binary_activate"
+      ],
+      "not_t6": "Synapse aura_zone and Battle-shock EFFECT stay T5/T2."
+    },
+    {
+      "token_or_split": "greater_good",
+      "t6_families": [
+        "finite_candidate_select",
+        "finite_binary_activate"
+      ],
+      "not_t6": "Visibility to form a mark stays T3."
+    },
+    {
+      "token_or_split": "waaagh",
+      "t6_families": [
+        "finite_binary_activate"
+      ],
+      "not_t6": "riled_up is a T5 pulse, not this pick."
+    },
+    {
+      "token_or_split": "slaanesh_pledge",
+      "t6_families": [],
+      "not_t6": "Unbound Arrogance increment is automatic T2 EFFECT unless S3a retains a pick; then finite_mode_pick."
+    },
+    {
+      "token_or_split": "yield_spend_any_number",
+      "t6_families": [
+        "finite_enumerated_amount"
+      ],
+      "not_t6": "If 0..N cannot be listed, T6-DELTA-UNBOUNDED-SPEND. Ledger stays T5."
+    }
+  ],
+  "contract_deltas": [
+    {
+      "id": "T6-DELTA-NEW-FAMILY",
+      "demand": "Any new concrete decision_type, option family, proposal_kind, or interaction kind",
+      "requires_adapter_contract_update_in_same_pr": true
+    },
+    {
+      "id": "T6-DELTA-HIDDEN-STRATAGEM",
+      "demand": "Hidden Stratagem use or hidden CP",
+      "requires_adapter_contract_update_in_same_pr": true,
+      "current_visibility": "public"
+    },
+    {
+      "id": "T6-DELTA-HIDDEN-HEALING",
+      "demand": "Hidden healing or revival choice",
+      "requires_adapter_contract_update_in_same_pr": true,
+      "current_visibility": "public"
+    },
+    {
+      "id": "T6-DELTA-HIDDEN-SETUP",
+      "demand": "Hidden deployment, reserve, Cult Ambush, or faction-rule setup beyond existing owner_secret rows",
+      "requires_adapter_contract_update_in_same_pr": true
+    },
+    {
+      "id": "T6-DELTA-UNBOUNDED-SPEND",
+      "demand": "Spend any number of a T5 integer when 0..N cannot be enumerated",
+      "requires_adapter_contract_update_in_same_pr": true,
+      "prefer_family": "finite_enumerated_amount",
+      "interaction_kind_exists_without_decision_type": "quantity_selection"
+    },
+    {
+      "id": "T6-DELTA-NESTED-ALLOWLIST",
+      "demand": "A nested decision other than weapon-ability disambiguation",
+      "requires_adapter_contract_update_in_same_pr": true,
+      "current_allowlist_size": 1
+    }
+  ],
+  "samples": [
+    {
+      "source": "https://www.40k.app/rules/15-stratagems",
+      "note": "Command Re-roll is finite use_stratagem in an opportunity window. Insane Bravery is parameterized Stratagem target binding."
+    },
+    {
+      "source": "https://www.40k.app/factions/orks/detachments/war-horde",
+      "note": "Waaagh call or decline is finite_binary_activate on the existing Command-start faction-rule window."
+    },
+    {
+      "source": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "note": "Malice Made Manifest is finite_candidate_select on the existing Fight-start faction-rule window."
+    }
+  ],
+  "holds": [
+    {
+      "id": "T6-HOLD-APP-DECISION",
+      "hold": "App 946 operative text is not retained for every rule's player choice",
+      "unblocks": "S3a, then FM0"
+    },
+    {
+      "id": "T6-HOLD-PROFILE-STALENESS",
+      "hold": "1025 profiles dated 2026-06-21; 40 admitted views at App-data 946",
+      "unblocks": "S3a / S3d"
+    },
+    {
+      "id": "T6-HOLD-STRATAGEM-KIND",
+      "hold": "Per-Stratagem finite versus parameterized target is S3a using the real target policy, not stored target_kind",
+      "unblocks": "S3a / Track G"
+    },
+    {
+      "id": "T6-HOLD-UNBOUNDED-SPEND",
+      "hold": "Spend any number of Yield and similar may be enumerable 0..N or a quantity contract delta",
+      "unblocks": "S3a, then Track G"
+    },
+    {
+      "id": "T5-HOLD-BATTLE-FOCUS-SPLIT",
+      "hold": "Token ledger versus manoeuvre pick; T6 closes the pick as finite_mode_pick",
+      "unblocks": "Track G"
+    },
+    {
+      "id": "T5-HOLD-PLEDGE-SHAPE",
+      "hold": "Unbound Arrogance increment is not a pick; a later threshold pick would be finite_mode_pick",
+      "unblocks": "S3a"
+    },
+    {
+      "id": "F-ORK-01",
+      "hold": "Orks v946 Waaagh and War Horde choices may be new",
+      "unblocks": "FM0.5"
+    }
+  ],
+  "not_in_this_pr": [
+    "engine decision types or proposal kinds",
+    "ADAPTER_DECISION_CONTRACT.md edits",
+    "DECISION_SUBMISSION_CATALOG.md edits",
+    "nested-allowlist change",
+    "named-handler budget change",
+    "semantic_demand_matrix.json",
+    "src/ or packaged data changes"
+  ],
+  "reconciliation": {
+    "submission_kind_count": 2,
+    "visibility_class_count": 2,
+    "demand_family_count": 12,
+    "contract_delta_count": 6,
+    "june_rows_assigned_to_finite_versus_parameterized": 0,
+    "june_histogram_published": false,
+    "june_cue_table_is_not_a_family_histogram": true,
+    "nested_allowlist_size": 1,
+    "track_t_surveys_written": 6,
+    "note": "12 demand families are not 12 new decision_type values. Cue hits must not be summed as assignments. Track T surveys are planning evidence; FM0 still regenerates semantic_demand_matrix.json."
+  }
+}

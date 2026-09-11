@@ -1,6 +1,6 @@
 # T2 — Effect taxonomy
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T3 bearer/target/condition grammar](T3_BEARER_TARGET_CONDITION_GRAMMAR.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T3 bearer/target/condition grammar](T3_BEARER_TARGET_CONDITION_GRAMMAR.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [T6 decision-kind taxonomy](T6_DECISION_KIND_VISIBILITY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T2. It is planning evidence delivered read-only to
 Track G's generic effect families. It does not implement engine semantics, add
@@ -33,6 +33,8 @@ on their current templates until a later order remaps them.
 T3 still owns bearer, target and condition grammar. T5 delivered which
 resources share a `ResourceLedger` in
 [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md).
+T6 delivered finite versus parameterized submission in
+[T6_DECISION_KIND_VISIBILITY.md](T6_DECISION_KIND_VISIBILITY.md).
 T2 only names the effect families those tracks bind.
 
 ## 2. Methodology and snapshot
@@ -308,7 +310,8 @@ must be stored as RuleIR rather than `effect_kind` strings.
 - Timing and reaction windows remain T1.
 - Bearer, target atoms and state tokens ("riled up", "Waaagh! active") remain T3.
 - Which army resources share one ledger remains T5.
-- Finite versus parameterized decisions remain T6.
+- Finite versus parameterized decisions are closed in
+  [T6](T6_DECISION_KIND_VISIBILITY.md).
 
 ## 7. Engine gaps this survey is not fixing
 

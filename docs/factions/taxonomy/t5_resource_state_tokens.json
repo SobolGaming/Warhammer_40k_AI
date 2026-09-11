@@ -110,7 +110,7 @@
         "faction_integer_ledger",
         "mode_machine"
       ],
-      "note": "Token count is the ledger half. Manoeuvre pick is named/T6."
+      "note": "Token count is the ledger half. Manoeuvre pick is T6 finite_mode_pick."
     },
     {
       "id": "no_cult_ambush_lift",
@@ -630,7 +630,7 @@
       "named_handler_execution_id": "phase17f:phase17e:tyranids:army-rule",
       "shares_typed_resource_ledger": false,
       "paired_token_id": "synapse",
-      "note": "Pinned runtime is once-per-battle unleash or decline, an unleashed-this-battle reject, and a Battle-shock resolution sequence. Synapse range used during that sequence is the synapse token, not an aura half of Shadow. Unleash timing remains T1; Battle-shock EFFECT remains T2; the decision shape remains T6. App 946 operative text is not retained (T5-HOLD-APP-ARMY-RULE); an aura-shaped source page would be an unresolved source/runtime distinction, not a closed aura-only fit."
+      "note": "Pinned runtime is once-per-battle unleash or decline, an unleashed-this-battle reject, and a Battle-shock resolution sequence. Synapse range used during that sequence is the synapse token, not an aura half of Shadow. Unleash timing remains T1; Battle-shock EFFECT remains T2; the decision shape is T6 finite_binary_activate. App 946 operative text is not retained (T5-HOLD-APP-ARMY-RULE); an aura-shaped source page would be an unresolved source/runtime distinction, not a closed aura-only fit."
     },
     {
       "token_id": "greater_good",
@@ -661,7 +661,7 @@
       "existing_resource_kind": null,
       "named_handler_execution_id": "phase17f:phase17e:tau-empire:army-rule",
       "shares_typed_resource_ledger": false,
-      "note": "Pinned runtime stores observer/spotted-target pairs and a Shooting-phase done record. Visibility used to form an eligible mark is T3, not aura_zone. Mark and done options remain T6. App 946 operative text is not retained (T5-HOLD-APP-ARMY-RULE); an aura-shaped source page would be an unresolved source/runtime distinction, not a closed aura-only fit."
+      "note": "Pinned runtime stores observer/spotted-target pairs and a Shooting-phase done record. Visibility used to form an eligible mark is T3, not aura_zone. Mark and done options are T6 finite_candidate_select plus finite_binary_activate. App 946 operative text is not retained (T5-HOLD-APP-ARMY-RULE); an aura-shaped source page would be an unresolved source/runtime distinction, not a closed aura-only fit."
     },
     {
       "token_id": "gate_of_infinity",
@@ -1117,8 +1117,8 @@
     },
     {
       "id": "T5-HOLD-PLEDGE-SHAPE",
-      "hold": "Unbound Arrogance increments an integer; thresholds or picks may also be a mode",
-      "unblocks": "S3a / T6"
+      "hold": "Unbound Arrogance increment is not a pick; a later threshold pick would be T6 finite_mode_pick",
+      "unblocks": "S3a"
     },
     {
       "id": "T5-HOLD-DETACHMENT-OPERATIVE",
@@ -1127,8 +1127,8 @@
     },
     {
       "id": "T5-HOLD-BATTLE-FOCUS-SPLIT",
-      "hold": "Token ledger versus manoeuvre pick",
-      "unblocks": "Track G / T6"
+      "hold": "Token ledger versus manoeuvre pick; T6 closes the pick as finite_mode_pick",
+      "unblocks": "Track G"
     },
     {
       "id": "T5-HOLD-CULT-AMBUSH-SPLIT",
@@ -1150,7 +1150,6 @@
     "engine kinds",
     "named-handler budget change",
     "semantic_demand_matrix.json",
-    "T6 decision-kind survey",
     "src/ or packaged data changes"
   ],
   "reconciliation": {

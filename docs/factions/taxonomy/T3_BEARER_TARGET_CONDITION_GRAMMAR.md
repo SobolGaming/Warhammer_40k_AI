@@ -1,6 +1,6 @@
 # T3 — Bearer, target and condition grammar
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T2 effect taxonomy](T2_EFFECT_TAXONOMY.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [T1 WHEN taxonomy](T1_STRATAGEM_WHEN_TAXONOMY.md) · [T2 effect taxonomy](T2_EFFECT_TAXONOMY.md) · [T5 resource and state-token taxonomy](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md) · [T6 decision-kind taxonomy](T6_DECISION_KIND_VISIBILITY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T3. It is planning evidence delivered read-only to
 Track G's bearer, target and condition surfaces. It does not implement engine
@@ -33,8 +33,9 @@ list without a real source-backed consumer in the same PR.
 T1 still owns WHEN windows. T2 still owns EFFECT families. T5 delivered which
 resources share a `ResourceLedger` in
 [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](T5_RESOURCE_STATE_TOKEN_TAXONOMY.md).
-T6 still owns finite versus parameterized decisions. T3 names the atoms
-those tracks bind.
+T6 delivered finite versus parameterized decisions in
+[T6_DECISION_KIND_VISIBILITY.md](T6_DECISION_KIND_VISIBILITY.md). T3 names
+the atoms those tracks bind.
 
 ## 2. Methodology and snapshot
 
@@ -314,8 +315,8 @@ Demand, each requiring a real consumer before a new kind exists:
   the Command Re-roll reroll itself. Listed roll-type eligibility is T3
   `dice_roll_type`.
 - Resource ledger identity remains T5.
-- Finite versus parameterized target *decisions* remain T6. T3 only names
-  the selectable atoms.
+- Finite versus parameterized target *decisions* are closed in
+  [T6](T6_DECISION_KIND_VISIBILITY.md). T3 only names the selectable atoms.
 
 ## 7. Engine gaps this survey is not fixing
 
