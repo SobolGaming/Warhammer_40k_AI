@@ -1,0 +1,126 @@
+{
+  "workload_id": "order37-stratagem-cost-v2",
+  "commit": "73faf584a96ec71e044f7ff0313a3ac3154bd7ab",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "profile",
+  "hardware_status": "provisional; one process, no competing test workers",
+  "models": 10,
+  "terrain_shapes": 0,
+  "rng": "none in measured cost slice",
+  "timing_boundary": "fixture and initial pending request separate; target submission through cost choices to spend/failure",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_stratagem_cost.py": "d764ecf9dea3e3b3d2bf277c78bf567264f6d155b13b0b74036273930f6ac8d2",
+    "tests/stratagem_cost_helpers.py": "9189c4be2b352294b9256216b560bd4bf76ae7f376047ecc5f5d2db98a71466c",
+    "tests/rapid_ingress_helpers.py": "645e16294b559ba4fd88283c9a64e1dc80d470e5b6a89aa2bd4896c9e0e0e750",
+    "tests/core_stratagem_helpers.py": "90a4dd5fa5d14ebd2b1a48865d661d7f3ce37af64383f6f08642e9b0c2bdfd62"
+  },
+  "summaries": {
+    "optional": {
+      "mean": 0.0801397500326857,
+      "median": 0.0801397500326857,
+      "max": 0.0801397500326857,
+      "samples": 1,
+      "completion_rate": 1.0
+    },
+    "automatic": {
+      "mean": 0.03163587499875575,
+      "median": 0.03163587499875575,
+      "max": 0.03163587499875575,
+      "samples": 1,
+      "completion_rate": 1.0
+    },
+    "unaffordable": {
+      "mean": 0.07055499998386949,
+      "median": 0.07055499998386949,
+      "max": 0.07055499998386949,
+      "samples": 1,
+      "completion_rate": 1.0
+    },
+    "zero": {
+      "mean": 0.0868244159501046,
+      "median": 0.0868244159501046,
+      "max": 0.0868244159501046,
+      "samples": 1,
+      "completion_rate": 1.0
+    },
+    "non_cumulative": {
+      "mean": 0.08399245899636298,
+      "median": 0.08399245899636298,
+      "max": 0.08399245899636298,
+      "samples": 1,
+      "completion_rate": 1.0
+    }
+  },
+  "samples": [
+    {
+      "case": "optional",
+      "setup_seconds": 2.0535679169697687,
+      "slice_seconds": 0.0801397500326857,
+      "accepted": 5,
+      "cost": 2,
+      "effects_resolved": true,
+      "commitments": 5,
+      "work_counts": {
+        "handler": 40,
+        "modified_command_point_cost_with_sources": 4
+      }
+    },
+    {
+      "case": "automatic",
+      "setup_seconds": 0.26440200000070035,
+      "slice_seconds": 0.03163587499875575,
+      "accepted": 0,
+      "cost": 2,
+      "effects_resolved": true,
+      "commitments": 5,
+      "work_counts": {
+        "handler": 30,
+        "modified_command_point_cost_with_sources": 3
+      }
+    },
+    {
+      "case": "unaffordable",
+      "setup_seconds": 0.2931760000064969,
+      "slice_seconds": 0.07055499998386949,
+      "accepted": 5,
+      "cost": 2,
+      "effects_resolved": false,
+      "commitments": 5,
+      "work_counts": {
+        "handler": 60,
+        "modified_command_point_cost_with_sources": 6
+      }
+    },
+    {
+      "case": "zero",
+      "setup_seconds": 0.2740758340805769,
+      "slice_seconds": 0.0868244159501046,
+      "accepted": 5,
+      "cost": 0,
+      "effects_resolved": true,
+      "commitments": 6,
+      "work_counts": {
+        "handler": 48,
+        "modified_command_point_cost_with_sources": 4
+      }
+    },
+    {
+      "case": "non_cumulative",
+      "setup_seconds": 0.2742907910142094,
+      "slice_seconds": 0.08399245899636298,
+      "accepted": 5,
+      "cost": 1,
+      "effects_resolved": true,
+      "commitments": 6,
+      "work_counts": {
+        "handler": 48,
+        "modified_command_point_cost_with_sources": 4
+      }
+    }
+  ],
+  "full_game_certified": false
+}

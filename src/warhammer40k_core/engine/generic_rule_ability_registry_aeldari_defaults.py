@@ -96,7 +96,7 @@ class _CorsairCoterieEnhancementsModule(Protocol):
     def archraider_command_point_cost_modifier(
         self,
         context: StratagemCostModifierContext,
-    ) -> int: ...
+    ) -> ModifierTerm | None: ...
 
     def infamy_effect(
         self,
@@ -479,7 +479,7 @@ def _corsair_archraider_cost_modifier_id(source: GenericRuleAbilitySource) -> st
 def _corsair_archraider_cost_modifier(
     context: StratagemCostModifierContext,
     source: GenericRuleAbilitySource,
-) -> int:
+) -> ModifierTerm | None:
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Archraider cost modifier requires source.")
     return _corsair_coterie_enhancements().archraider_command_point_cost_modifier(context)

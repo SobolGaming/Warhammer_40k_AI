@@ -32,5 +32,12 @@
     "consumer": "warhammer40k_core.engine.attack_sequence_psychic_modifiers",
     "source_url": "https://www.40k.app/rules/02-datasheets",
     "observed_at": "2026-09-07T16:05:47Z"
+  },
+  {
+    "slug": "stratagem-cost-limits",
+    "section": "02.02.01",
+    "source_text": "OTHER MODIFIED RULES\n\nA stratagem cannot have its CP increased by more than 1 or reduced to below 0 after all modifiers have been applied.",
+    "consumer": "warhammer40k_core.engine.stratagem_cost_modifiers:StratagemCostModifierRegistry",
+    "observed_at": "2026-09-11T19:52:51Z"
   }
 ]

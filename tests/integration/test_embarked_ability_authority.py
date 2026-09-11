@@ -250,7 +250,6 @@ def test_stratagem_cost_sources_enforce_their_own_battlefield_restriction(
                 target_binding=target_binding,
                 effect_selection=None,
                 base_command_point_cost=definition.command_point_cost,
-                current_command_point_cost=definition.command_point_cost,
             )
         )
         assert cost == definition.command_point_cost - int(eligible)

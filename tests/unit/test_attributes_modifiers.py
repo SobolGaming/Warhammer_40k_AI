@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from fractions import Fraction
 from itertools import permutations
 from typing import cast
 
@@ -758,3 +759,118 @@ def test_order26_invalid_division_fails_before_resolution(divisor: int) -> None:
 def test_order29_targeting_range_rejects_invalid_numbers(value: float) -> None:
     with pytest.raises(ModifierError, match="finite"):
         resolve_targeting_range(value)
+
+
+@pytest.mark.parametrize(
+    ("base", "operations", "expected"),
+    [
+        (0, (), 0),
+        (0, (("add", 5),), 1),
+        (1, (("add", 5),), 2),
+        (2, (("subtract", 8),), 0),
+        (1, (("subtract", 5), ("add", 3)), 0),
+        (1, (("add", 3), ("subtract", 2)), 2),
+        (2, (("subtract", 1), ("divide", 2), ("add", 1), ("multiply", 2)), 2),
+        (2, (("set", 0), ("add", 2)), 2),
+        (2, (("set", 8), ("divide", 3), ("subtract", 1)), 2),
+    ],
+)
+def test_order37_stratagem_cost_uses_exact_operation_order_and_terminal_bounds(
+    base: int, operations: tuple[tuple[str, int], ...], expected: int
+) -> None:
+    from warhammer40k_core.core.modifiers import (
+        ModifierTerm,
+        modifier_operation_from_token,
+        resolve_stratagem_cost,
+    )
+
+    for reverse_ids in (False, True):
+        modifiers = tuple(
+            ModifierTerm(modifier_operation_from_token(operation), operand).bind(
+                modifier_id=f"cost-{len(operations) - i if reverse_ids else i}",
+                source_id=f"source-{i}",
+            )
+            for i, (operation, operand) in enumerate(operations)
+        )
+        final, steps = resolve_stratagem_cost(base, modifiers)
+        assert final == expected
+        assert {step.modifier.source_id for step in steps} == {
+            f"source-{i}" for i in range(len(operations))
+        }
+        assert all(type(step.before) is Fraction and type(step.after) is Fraction for step in steps)
+
+
+def test_order37_stratagem_cost_rejects_malformed_and_ambiguous_operations() -> None:
+    from warhammer40k_core.core.modifiers import ModifierTerm, resolve_stratagem_cost
+
+    with pytest.raises(ModifierError, match="nonnegative"):
+        resolve_stratagem_cost(-1, ())
+    modifier = ModifierTerm(ModifierOperation.SET, 0).bind(modifier_id="a", source_id="s")
+    with pytest.raises(ModifierError, match="unique"):
+        resolve_stratagem_cost(1, (modifier, modifier))
+    with pytest.raises(ModifierError, match="base-setting"):
+        resolve_stratagem_cost(1, (modifier, replace(modifier, modifier_id="b")))
+    with pytest.raises(ModifierError, match="numeric"):
+        resolve_stratagem_cost(1, (replace(modifier, operation=ModifierOperation.SET_DASH),))
+    with pytest.raises(ModifierError, match="already be selected"):
+        resolve_stratagem_cost(1, (replace(modifier, scope=ModifierScope.for_targets(("unit",))),))
+
+
+@pytest.mark.parametrize(
+    ("base", "increase", "operations", "expected", "selected_increase"),
+    [
+        (1, 1, (("subtract", -1), ("add", -1)), 1, "ordinary-0"),
+        (1, 1, (("multiply", 2), ("subtract", 1)), 1, "ordinary-0"),
+        (1, 1, (("set", 2), ("subtract", 1)), 1, "ordinary-0"),
+        (1, 3, (("multiply", 2), ("subtract", 3)), 1, "exclusive"),
+        (2, 1, (("set", 6), ("subtract", 4)), 2, "ordinary-0"),
+        (2, 1, (("divide", 2), ("subtract", 1)), 1, "exclusive"),
+        (1, 1, (("set", 0),), 1, "exclusive"),
+        (0, 1, (("multiply", 2),), 1, "exclusive"),
+        (1, 1, (("floor", 2), ("subtract", 1)), 2, "ordinary-0"),
+        (2, 3, (("add", 1), ("floor", 4), ("subtract", 3)), 3, "ordinary-1"),
+        (2, 1, (("set", 4), ("multiply", 2), ("subtract", 6)), 2, "ordinary-0"),
+    ],
+)
+def test_order37_non_cumulative_increase_compares_exact_legal_operations(
+    base: int,
+    increase: int,
+    operations: tuple[tuple[str, int], ...],
+    expected: int,
+    selected_increase: str,
+) -> None:
+    from warhammer40k_core.core.modifiers import ModifierTerm, resolve_stratagem_cost
+
+    modifiers = (
+        ModifierTerm(ModifierOperation.ADD, increase).bind(
+            modifier_id="exclusive", source_id="exclusive-source"
+        ),
+        *(
+            ModifierTerm(ModifierOperation(operation), operand).bind(
+                modifier_id=f"ordinary-{i}", source_id=f"ordinary-source-{i}"
+            )
+            for i, (operation, operand) in enumerate(operations)
+        ),
+    )
+    final, steps = resolve_stratagem_cost(
+        base, modifiers, non_cumulative_increase_ids=("exclusive",)
+    )
+    assert final == expected
+    increases = {step.modifier.modifier_id for step in steps if step.after > step.before}
+    assert selected_increase in increases
+    if "exclusive" in increases:
+        assert increases == {"exclusive"}
+    assert all(
+        step.modifier.operand >= 0
+        for step in steps
+        if step.modifier.operation in {ModifierOperation.ADD, ModifierOperation.SUBTRACT}
+    )
+
+
+@pytest.mark.parametrize("ids", [("missing",), ("cost", "cost")])
+def test_order37_non_cumulative_source_references_fail_closed(ids: tuple[str, ...]) -> None:
+    from warhammer40k_core.core.modifiers import ModifierTerm, resolve_stratagem_cost
+
+    modifier = ModifierTerm(ModifierOperation.ADD, 1).bind(modifier_id="cost", source_id="source")
+    with pytest.raises(ModifierError, match="Non-cumulative increase IDs"):
+        resolve_stratagem_cost(1, (modifier,), non_cumulative_increase_ids=ids)

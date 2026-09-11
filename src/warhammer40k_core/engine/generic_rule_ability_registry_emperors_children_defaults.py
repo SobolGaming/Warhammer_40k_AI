@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol, cast
 
+from warhammer40k_core.core.modifiers import ModifierTerm
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilitySource,
     GenericRuleStratagemCostModifierAbility,
@@ -24,7 +25,7 @@ class _CourtOfThePhoenicianRuleModule(Protocol):
     def master_of_the_pageant_command_point_cost_modifier(
         self,
         context: StratagemCostModifierContext,
-    ) -> int: ...
+    ) -> ModifierTerm | None: ...
 
 
 def emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities() -> tuple[
@@ -70,7 +71,7 @@ def _master_of_the_pageant_cost_modifier_id(source: GenericRuleAbilitySource) ->
 def _master_of_the_pageant_cost_modifier(
     context: StratagemCostModifierContext,
     source: GenericRuleAbilitySource,
-) -> int:
+) -> ModifierTerm | None:
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Master of the Pageant modifier requires source.")
     return _court_of_the_phoenician_rule().master_of_the_pageant_command_point_cost_modifier(

@@ -351,16 +351,18 @@ def apply_archraider_model_selection_result(context: BattleFormationResultContex
     return True
 
 
-def archraider_command_point_cost_modifier(context: StratagemCostModifierContext) -> int:
+def archraider_command_point_cost_modifier(
+    context: StratagemCostModifierContext,
+) -> ModifierTerm | None:
     if type(context) is not StratagemCostModifierContext:
         raise GameLifecycleError("Archraider CP modifier requires context.")
     if not _archraider_cost_choice_used_for_source_result(context):
-        return context.current_command_point_cost
+        return None
     target = context.target_binding
     if target is None or target.target_unit_instance_id is None or target.target_player_id is None:
-        return context.current_command_point_cost
+        return None
     if target.target_player_id != context.eligibility_context.player_id:
-        return context.current_command_point_cost
+        return None
     for army in _corsair_coterie_armies(context.state):
         if army.player_id == context.eligibility_context.player_id:
             continue
@@ -385,8 +387,8 @@ def archraider_command_point_cost_modifier(context: StratagemCostModifierContext
             )
             for model_id in selected_model_ids
         ):
-            return context.current_command_point_cost + 1
-    return context.current_command_point_cost
+            return ModifierTerm(ModifierOperation.ADD, 1)
+    return None
 
 
 def archraider_command_point_cost_choice_request(

@@ -197,3 +197,82 @@ def test_psychic_selection_and_hit_resolution_share_individual_source_owner() ->
     assert {"capture", "ReplayRunner", "run"} <= _calls(
         "engine/psychic_modifier_history_origin.py", "validate_psychic_history_origin"
     )
+
+
+def test_stratagem_cost_providers_return_operations_without_intermediate_prices() -> None:
+    assert "resolve_stratagem_cost" in _calls(
+        "engine/stratagem_cost_modifiers.py", "modified_command_point_cost_with_sources"
+    )
+    registry = ast.parse((PACKAGE / "engine/stratagem_cost_modifiers.py").read_text())
+    resolver = next(
+        node
+        for node in ast.walk(registry)
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "modified_command_point_cost_with_sources"
+    )
+    assert not any(
+        isinstance(node, ast.Attribute) and node.attr in {"operation", "operand"}
+        for node in ast.walk(resolver)
+    ), "The registry must delegate operation arithmetic and non-cumulative filtering to core."
+    assert any(
+        isinstance(node, ast.keyword) and node.arg == "non_cumulative_increase_ids"
+        for node in ast.walk(resolver)
+    )
+    owners = (
+        ("engine/catalog_command_point_runtime.py", "_stratagem_cost_modifier_handler"),
+        (
+            "engine/generic_rule_lifecycle_hook_handlers.py",
+            "stratagem_cost_modifier_handler_for_descriptor",
+        ),
+        (
+            "engine/generic_rule_ability_registry_warptide_defaults.py",
+            "_warptide_soul_hungry_cost_modifier",
+        ),
+        (
+            "engine/faction_content/warhammer_40000_11th/aeldari/detachments/corsair_coterie/enhancements.py",
+            "archraider_command_point_cost_modifier",
+        ),
+        (
+            "engine/faction_content/warhammer_40000_11th/emperors_children/detachments/court_of_the_phoenician/rule.py",
+            "master_of_the_pageant_command_point_cost_modifier",
+        ),
+        (
+            "engine/faction_content/warhammer_40000_11th/thousand_sons/july_2026_updates.py",
+            "_destroyer_of_futures_counteroffensive_cost",
+        ),
+    )
+    for path, function in owners:
+        tree = ast.parse((PACKAGE / path).read_text())
+        scope = next(
+            n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == function
+        )
+        assert not any(
+            isinstance(n, ast.Attribute) and n.attr == "current_command_point_cost"
+            for n in ast.walk(scope)
+        )
+        assert not {"max", "min"} & _calls(path, function)
+    assert "_selected_command_point_cost_result" in _calls(
+        "engine/stratagems_apply.py", "_apply_stratagem_use"
+    )
+    assert "_selected_command_point_cost_result" in _calls(
+        "engine/stratagems_apply.py", "stratagem_cost_increase_made_use_unaffordable"
+    )
+
+
+def test_stratagem_cost_provider_work_is_bounded_for_real_catalog_consumers() -> None:
+    import json
+    from typing import cast
+
+    from scripts.measure_stratagem_cost import CASES, sample
+
+    budget = json.loads((ROOT / "docs/performance/order37/budgets.json").read_text())
+    for case in CASES:
+        row = sample(case, profile=True)
+        counts = cast(dict[str, int], row["work_counts"])
+        registry_calls = counts["modified_command_point_cost_with_sources"]
+        assert 1 <= registry_calls <= budget["maximum_registry_calls_per_use"]
+        assert counts["handler"] == (
+            registry_calls * budget["provider_calls_per_registry_call"][case]
+        )
+        assert row["cost"] == (0 if case == "zero" else 1 if case == "non_cumulative" else 2)
+        assert row["commitments"] == (6 if case in {"zero", "non_cumulative"} else 5)

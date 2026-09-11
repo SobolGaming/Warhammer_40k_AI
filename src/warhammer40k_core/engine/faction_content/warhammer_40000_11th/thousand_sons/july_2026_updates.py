@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.stratagem_catalog import (
@@ -59,7 +60,7 @@ def runtime_contribution() -> RuntimeContentContribution:
 
 def _destroyer_of_futures_counteroffensive_cost(
     context: StratagemCostModifierContext,
-) -> int:
+) -> ModifierTerm | None:
     artifact = july_faction_packs_2026_07.thousand_sons_defiler()
     target_id = (
         None if context.target_binding is None else context.target_binding.target_unit_instance_id
@@ -68,11 +69,11 @@ def _destroyer_of_futures_counteroffensive_cost(
         context.definition.stratagem_id != artifact.counteroffensive_stratagem_id
         or target_id is None
     ):
-        return context.current_command_point_cost
+        return None
     for army in context.state.army_definitions:
         for unit in army.units:
             if unit.unit_instance_id == target_id:
                 if unit.datasheet_id == artifact.datasheet_id:
-                    return context.current_command_point_cost - 1
-                return context.current_command_point_cost
-    return context.current_command_point_cost
+                    return ModifierTerm(ModifierOperation.SUBTRACT, 1)
+                return None
+    return None

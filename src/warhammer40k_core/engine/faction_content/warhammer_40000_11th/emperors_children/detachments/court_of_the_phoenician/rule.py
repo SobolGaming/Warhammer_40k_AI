@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
@@ -32,30 +33,30 @@ def runtime_contribution() -> RuntimeContentContribution:
 
 def master_of_the_pageant_command_point_cost_modifier(
     context: StratagemCostModifierContext,
-) -> int:
+) -> ModifierTerm | None:
     if type(context) is not StratagemCostModifierContext:
         raise GameLifecycleError("Master of the Pageant requires cost modifier context.")
     if context.definition.stratagem_id not in MASTER_OF_THE_PAGEANT_STRATAGEM_IDS:
-        return context.current_command_point_cost
+        return None
     if context.target_binding is None or context.target_binding.target_unit_instance_id is None:
-        return context.current_command_point_cost
+        return None
     target_unit = _unit_by_id(
         state=context.state,
         unit_instance_id=context.target_binding.target_unit_instance_id,
     )
     if not _unit_has_keyword(target_unit, court_ir.FULGRIM_KEYWORD):
-        return context.current_command_point_cost
+        return None
     if not _player_has_master_of_the_pageant_effect(
         context=context,
         player_id=context.eligibility_context.player_id,
     ):
-        return context.current_command_point_cost
+        return None
     if _master_of_the_pageant_used_this_battle_round(
         context=context,
         player_id=context.eligibility_context.player_id,
     ):
-        return context.current_command_point_cost
-    return max(0, context.current_command_point_cost - 1)
+        return None
+    return ModifierTerm(ModifierOperation.SUBTRACT, 1)
 
 
 def _player_has_master_of_the_pageant_effect(

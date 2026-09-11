@@ -1,4 +1,4 @@
-"""Build the reviewed Orders 26, 27 and 29 source artifacts offline."""
+"""Build the reviewed Orders 26, 27, 28, 29 and 37 source artifacts offline."""
 
 from __future__ import annotations
 
@@ -87,7 +87,9 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "review_audit_row_id": None,
             "review_audit_source_observation_sha256": None,
             "provider_name": "CORE V2 Source Review",
-            "source_title": f"P02A/P02B/P02C {section} {slug}"
+            "source_title": f"P02E {section} {slug}"
+            if slug == "stratagem-cost-limits"
+            else f"P02A/P02B/P02C {section} {slug}"
             if section == "02.02.01"
             else f"P24I {section} {slug}",
             "source_platform": "Repository",
@@ -156,7 +158,9 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "02.02.01, 02.02.02 and 24.29 operative clauses observed through "
             "the 40k.app search index; "
             "direct retrieval returned HTTP 403. No App version or co-version comparison "
-            "is inferred. The retained transcription separates the three reviewed obligations."
+            "is inferred. The retained transcription separates reviewed obligations. "
+            "Order 37 adds the 02.02.01 CP-cost limit observed in the same search index "
+            "on 2026-09-11T19:52:51Z; earlier observation tuples remain unchanged."
         ),
     }
 

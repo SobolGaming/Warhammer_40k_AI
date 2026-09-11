@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
+from warhammer40k_core.core.modifiers import (
+    ModifierError,
+    ModifierTerm,
+    resolve_stratagem_cost,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -18,7 +23,7 @@ if TYPE_CHECKING:
     )
 
 
-type StratagemCostModifierHandler = Callable[["StratagemCostModifierContext"], int]
+type StratagemCostModifierHandler = Callable[["StratagemCostModifierContext"], ModifierTerm | None]
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,7 +71,6 @@ class StratagemCostModifierContext:
     target_binding: StratagemTargetBinding | None
     effect_selection: JsonValue
     base_command_point_cost: int
-    current_command_point_cost: int
     decisions: DecisionController | None = None
     source_decision_request_id: str | None = None
     source_decision_result_id: str | None = None
@@ -105,14 +109,6 @@ class StratagemCostModifierContext:
                 self.base_command_point_cost,
             ),
         )
-        object.__setattr__(
-            self,
-            "current_command_point_cost",
-            _validate_non_negative_int(
-                "current_command_point_cost",
-                self.current_command_point_cost,
-            ),
-        )
         if self.decisions is not None and type(self.decisions) is not DecisionController:
             raise GameLifecycleError(
                 "Stratagem cost modifier decisions must be DecisionController."
@@ -140,6 +136,7 @@ class StratagemCostModifierBinding:
     modifier_id: str
     source_id: str
     handler: StratagemCostModifierHandler
+    non_cumulative_increase: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -148,6 +145,8 @@ class StratagemCostModifierBinding:
             _validate_identifier("modifier_id", self.modifier_id),
         )
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        if type(self.non_cumulative_increase) is not bool:
+            raise GameLifecycleError("Stratagem non_cumulative_increase must be bool.")
         if not callable(self.handler):
             raise GameLifecycleError("Stratagem cost modifier handler must be callable.")
 
@@ -179,27 +178,39 @@ class StratagemCostModifierRegistry:
     ) -> StratagemCostModificationResult:
         if type(context) is not StratagemCostModifierContext:
             raise GameLifecycleError("Stratagem cost modifiers require a context.")
-        current = context.current_command_point_cost
-        modifier_ids: list[str] = []
-        source_ids: list[str] = []
-        increased_modifier_ids: list[str] = []
+        # Evaluate each source once against the same use, without a running price.
+        selected: list[tuple[StratagemCostModifierBinding, ModifierTerm]] = []
         for binding in self.bindings:
-            raw_modified = _validate_int(
-                f"{binding.modifier_id} returned command point cost",
-                binding.handler(replace(context, current_command_point_cost=current)),
+            term = binding.handler(context)
+            if term is None:
+                continue
+            if type(term) is not ModifierTerm:
+                raise GameLifecycleError(
+                    "Stratagem cost modifier must return ModifierTerm or None."
+                )
+            selected.append((binding, term))
+        try:
+            final, steps = resolve_stratagem_cost(
+                context.base_command_point_cost,
+                tuple(
+                    term.bind(modifier_id=binding.modifier_id, source_id=binding.source_id)
+                    for binding, term in selected
+                ),
+                non_cumulative_increase_ids=tuple(
+                    binding.modifier_id
+                    for binding, _ in selected
+                    if binding.non_cumulative_increase
+                ),
             )
-            modified = max(0, raw_modified)
-            if modified != current:
-                modifier_ids.append(binding.modifier_id)
-                source_ids.append(binding.source_id)
-            if modified > current:
-                increased_modifier_ids.append(binding.modifier_id)
-            current = modified
+        except ModifierError as exc:
+            raise GameLifecycleError("Invalid Stratagem cost operations.") from exc
         return StratagemCostModificationResult(
-            command_point_cost=current,
-            modifier_ids=tuple(modifier_ids),
-            source_ids=tuple(source_ids),
-            increased_modifier_ids=tuple(increased_modifier_ids),
+            command_point_cost=final,
+            modifier_ids=tuple(binding.modifier_id for binding, _ in selected),
+            source_ids=tuple(binding.source_id for binding, _ in selected),
+            increased_modifier_ids=tuple(
+                step.modifier.modifier_id for step in steps if step.after > step.before
+            ),
         )
 
 
@@ -223,12 +234,6 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
         raise GameLifecycleError(f"{field_name} must be an int.")
     if value < 0:
         raise GameLifecycleError(f"{field_name} must not be negative.")
-    return value
-
-
-def _validate_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an int.")
     return value
 
 

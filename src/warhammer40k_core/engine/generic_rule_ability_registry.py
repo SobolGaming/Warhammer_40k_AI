@@ -209,7 +209,7 @@ type StratagemCostModifierContextPredicate = Callable[
 ]
 type StratagemCostModifierBuilder = Callable[
     [StratagemCostModifierContext, GenericRuleAbilitySource],
-    int,
+    ModifierTerm | None,
 ]
 type SaveOptionModifierContextPredicate = Callable[
     [SaveOptionModifierContext, GenericRuleAbilitySource],

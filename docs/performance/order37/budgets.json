@@ -1,0 +1,15 @@
+{
+  "workload_id": "order37-stratagem-cost-v2",
+  "reference_mean_ratio": 1.5,
+  "reference_mean_allowance_seconds": 0.001,
+  "maximum_seconds": 0.1,
+  "maximum_registry_calls_per_use": 6,
+  "provider_calls_per_registry_call": {
+    "optional": 10,
+    "automatic": 10,
+    "unaffordable": 10,
+    "zero": 12,
+    "non_cumulative": 12
+  },
+  "full_game_certified": false
+}

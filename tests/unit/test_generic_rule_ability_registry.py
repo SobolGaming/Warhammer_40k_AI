@@ -12,6 +12,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine import (
@@ -623,7 +624,9 @@ def test_warptide_soul_hungry_cost_modifier_reduces_core_reactive_stratagems() -
     context = _warptide_cost_modifier_context(state=state, target_unit_id=_WARPTIDE_UNIT_ID)
 
     assert descriptor.context_predicate(context, source)
-    assert descriptor.modifier_builder(context, source) == 0
+    assert descriptor.modifier_builder(context, source) == ModifierTerm(
+        ModifierOperation.SUBTRACT, 1
+    )
 
     enemy_context = _warptide_cost_modifier_context(state=state, target_unit_id=_ENEMY_UNIT_ID)
     assert not descriptor.context_predicate(enemy_context, source)
@@ -649,7 +652,6 @@ def test_warptide_soul_hungry_cost_modifier_rejects_wrong_contexts() -> None:
         descriptor.modifier_builder(context, cast(GenericRuleAbilitySource, object()))
     with pytest.raises(GameLifecycleError, match="modifier ID requires source"):
         descriptor.modifier_id(cast(GenericRuleAbilitySource, object()))
-    assert descriptor.modifier_builder(replace(context, current_command_point_cost=0), source) == 0
 
 
 def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants() -> None:
@@ -2146,7 +2148,6 @@ def _warptide_cost_modifier_context(
         ),
         effect_selection=None,
         base_command_point_cost=1,
-        current_command_point_cost=1,
     )
 
 

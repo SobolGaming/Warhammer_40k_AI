@@ -39,6 +39,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -185,6 +186,7 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModificationResult,
     StratagemCostModifierBinding,
     StratagemCostModifierContext,
+    StratagemCostModifierHandler,
     StratagemCostModifierRegistry,
 )
 from warhammer40k_core.engine.stratagems import (
@@ -2675,13 +2677,12 @@ def test_archraider_lord_of_deceit_is_optional_and_modifies_only_accepted_source
                 target_binding=target_binding,
                 effect_selection=None,
                 base_command_point_cost=1,
-                current_command_point_cost=1,
                 decisions=decisions,
                 source_decision_request_id=source_request.request_id,
                 source_decision_result_id=source_result.result_id,
             )
         )
-        == 1
+        is None
     )
     request = enhancements.archraider_command_point_cost_choice_request(context)
     assert request is not None
@@ -2710,23 +2711,19 @@ def test_archraider_lord_of_deceit_is_optional_and_modifies_only_accepted_source
     )
 
     assert handled is True
-    assert (
-        enhancements.archraider_command_point_cost_modifier(
-            StratagemCostModifierContext(
-                state=state,
-                definition=definition,
-                eligibility_context=eligibility,
-                target_binding=target_binding,
-                effect_selection=None,
-                base_command_point_cost=1,
-                current_command_point_cost=1,
-                decisions=decisions,
-                source_decision_request_id=source_request.request_id,
-                source_decision_result_id=source_result.result_id,
-            )
+    assert enhancements.archraider_command_point_cost_modifier(
+        StratagemCostModifierContext(
+            state=state,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+            base_command_point_cost=1,
+            decisions=decisions,
+            source_decision_request_id=source_request.request_id,
+            source_decision_result_id=source_result.result_id,
         )
-        == 2
-    )
+    ) == ModifierTerm(ModifierOperation.ADD, 1)
     assert enhancements.archraider_command_point_cost_choice_request(context) is None
 
 
@@ -2800,13 +2797,12 @@ def test_archraider_lord_of_deceit_decline_and_drift_paths_do_not_modify_cost() 
                 target_binding=target_binding,
                 effect_selection=None,
                 base_command_point_cost=1,
-                current_command_point_cost=1,
                 decisions=decisions,
                 source_decision_request_id=source_request.request_id,
                 source_decision_result_id=source_result.result_id,
             )
         )
-        == 1
+        is None
     )
     assert any(
         record.event_type == enhancements.ARCHRAIDER_COST_MODIFIER_DECLINED_EVENT
@@ -3238,7 +3234,6 @@ def test_corsair_event_filter_helpers_and_rule_guardrails_are_strict() -> None:
         target_binding=target_binding,
         effect_selection=None,
         base_command_point_cost=1,
-        current_command_point_cost=1,
         decisions=decisions,
         source_decision_request_id="source-request",
         source_decision_result_id="source-result",
@@ -3378,7 +3373,6 @@ def test_corsair_event_filter_helpers_and_rule_guardrails_are_strict() -> None:
         target_binding=target_binding,
         effect_selection=None,
         base_command_point_cost=1,
-        current_command_point_cost=1,
         decisions=decisions,
     )
     assert archraider_cost_choice_used_for_source_result(no_source_context) is False
@@ -3792,7 +3786,6 @@ def test_stratagem_cost_hook_registries_track_sources_and_round_trip_result() ->
         target_binding=target_binding,
         effect_selection=None,
         base_command_point_cost=1,
-        current_command_point_cost=1,
         decisions=decisions,
         source_decision_request_id=source_request.request_id,
         source_decision_result_id=source_result.result_id,
@@ -3802,12 +3795,12 @@ def test_stratagem_cost_hook_registries_track_sources_and_round_trip_result() ->
             StratagemCostModifierBinding(
                 modifier_id="modifier-same",
                 source_id="source-same",
-                handler=lambda context: context.current_command_point_cost,
+                handler=lambda context: None,
             ),
             StratagemCostModifierBinding(
                 modifier_id="modifier-plus-one",
                 source_id="source-plus-one",
-                handler=lambda context: context.current_command_point_cost + 1,
+                handler=lambda context: ModifierTerm(ModifierOperation.ADD, 1),
             ),
         )
     )
@@ -3827,7 +3820,7 @@ def test_stratagem_cost_hook_registries_track_sources_and_round_trip_result() ->
             StratagemCostModifierBinding(
                 modifier_id="negative-modifier",
                 source_id="source-negative",
-                handler=lambda _context: -1,
+                handler=lambda _context: ModifierTerm(ModifierOperation.SUBTRACT, 2),
             ),
         )
     ).modified_command_point_cost(cost_context)
@@ -4232,7 +4225,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
         target_binding=target_binding,
         effect_selection=None,
         base_command_point_cost=1,
-        current_command_point_cost=1,
         decisions=decisions,
         source_decision_request_id="source-request",
         source_decision_result_id="source-result",
@@ -4259,7 +4251,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=1,
-            current_command_point_cost=1,
         )
     with pytest.raises(GameLifecycleError, match="requires StratagemDefinition"):
         StratagemCostModifierContext(
@@ -4269,7 +4260,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=1,
-            current_command_point_cost=1,
         )
     with pytest.raises(GameLifecycleError, match="requires eligibility context"):
         StratagemCostModifierContext(
@@ -4279,7 +4269,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=1,
-            current_command_point_cost=1,
         )
     with pytest.raises(GameLifecycleError, match="target_binding must be"):
         StratagemCostModifierContext(
@@ -4289,7 +4278,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=cast(StratagemTargetBinding, object()),
             effect_selection=None,
             base_command_point_cost=1,
-            current_command_point_cost=1,
         )
     with pytest.raises(GameLifecycleError, match="must not be negative"):
         StratagemCostModifierContext(
@@ -4299,7 +4287,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=-1,
-            current_command_point_cost=1,
         )
     with pytest.raises(GameLifecycleError, match="decisions must be DecisionController"):
         StratagemCostModifierContext(
@@ -4309,7 +4296,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=1,
-            current_command_point_cost=1,
             decisions=cast(DecisionController, object()),
         )
     with pytest.raises(GameLifecycleError, match="must not be empty"):
@@ -4320,7 +4306,6 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=1,
-            current_command_point_cost=1,
             source_decision_request_id=" ",
         )
     with pytest.raises(GameLifecycleError, match="handler must be callable"):
@@ -4339,13 +4324,13 @@ def test_stratagem_cost_modifier_validation_paths() -> None:
         StratagemCostModifierRegistry.empty().modified_command_point_cost(
             cast(StratagemCostModifierContext, object())
         )
-    with pytest.raises(GameLifecycleError, match="must be an int"):
+    with pytest.raises(GameLifecycleError, match="must return ModifierTerm"):
         StratagemCostModifierRegistry.from_bindings(
             (
                 StratagemCostModifierBinding(
                     modifier_id="string-cost",
                     source_id="source",
-                    handler=lambda _context: cast(int, "2"),
+                    handler=lambda _context: cast(ModifierTerm, "2"),
                 ),
             )
         ).modified_command_point_cost(context)
@@ -6309,3 +6294,133 @@ def _turn_candidate(request: DecisionRequest, identifier: str) -> TimingRuleCand
         activate=lambda: request,
         request_template=request,
     )
+
+
+@pytest.mark.parametrize(("deltas", "expected"), [((3,), 2), ((-5, 3), 0), ((1, 1, -1), 2)])
+def test_order37_cost_bounds_follow_all_modifiers(deltas: tuple[int, ...], expected: int) -> None:
+    state, _, _ = _corsair_state(phase=BattlePhase.SHOOTING, active_player_id="player-b")
+    context = StratagemCostModifierContext(
+        state=state,
+        definition=_test_stratagem_definition(),
+        eligibility_context=StratagemEligibilityContext.from_state(
+            state=state, player_id="player-b", trigger_kind=TimingTriggerKind.START_PHASE
+        ),
+        target_binding=None,
+        effect_selection=None,
+        base_command_point_cost=1,
+    )
+
+    def handler(delta: int) -> StratagemCostModifierHandler:
+        return lambda context: ModifierTerm(ModifierOperation.ADD, delta)
+
+    registry = StratagemCostModifierRegistry.from_bindings(
+        tuple(
+            StratagemCostModifierBinding(
+                modifier_id=f"modifier-{index}", source_id=f"source-{index}", handler=handler(delta)
+            )
+            for index, delta in enumerate(deltas)
+        )
+    )
+    result = registry.modified_command_point_cost_with_sources(context)
+    assert result.command_point_cost == expected
+    assert len(result.modifier_ids) == len(deltas)
+
+
+@pytest.mark.parametrize("reverse_ids", [False, True])
+@pytest.mark.parametrize(
+    ("non_cumulative", "operations", "expected"),
+    [
+        ((), (("add", 1), ("add", 1), ("add", -1)), 2),
+        ((0, 1), (("add", 1), ("add", 1), ("add", -1)), 1),
+        ((0,), (("add", 1), ("add", 1), ("add", -1)), 1),
+        ((1,), (("add", 1), ("add", 2), ("add", -1)), 2),
+        ((0,), (("add", 1), ("subtract", -1), ("subtract", 1)), 1),
+        ((0,), (("add", 1), ("multiply", 2), ("subtract", 1)), 1),
+        ((0,), (("add", 1), ("set", 2), ("subtract", 1)), 1),
+        ((0,), (("subtract", -1), ("multiply", 2), ("add", -1)), 1),
+        ((0,), (("add", 1), ("multiply", 3), ("subtract", 2)), 1),
+        ((0,), (("add", 3), ("multiply", 2), ("subtract", 3)), 1),
+        ((0,), (("add", 1), ("set", 0), ("subtract", 1)), 0),
+        ((0,), (("add", 1), ("multiply", 1), ("subtract", 1)), 1),
+        ((0,), (("add", 1), ("divide", 2), ("subtract", 1)), 0),
+        ((0,), (("add", 1), ("floor", 2), ("subtract", 1)), 2),
+        ((0,), (("add", 1), ("ceiling", 1), ("subtract", 1)), 1),
+    ],
+)
+def test_order37_registry_preserves_all_commitments_and_evaluates_each_provider_once(
+    reverse_ids: bool,
+    non_cumulative: tuple[int, ...],
+    operations: tuple[tuple[str, int], ...],
+    expected: int,
+) -> None:
+    state, _, _ = _corsair_state(phase=BattlePhase.SHOOTING, active_player_id="player-b")
+    context = StratagemCostModifierContext(
+        state=state,
+        definition=_test_stratagem_definition(),
+        eligibility_context=StratagemEligibilityContext.from_state(
+            state=state, player_id="player-b", trigger_kind=TimingTriggerKind.START_PHASE
+        ),
+        target_binding=None,
+        effect_selection=None,
+        base_command_point_cost=1,
+    )
+    calls: list[int] = []
+
+    def provider(index: int, term: ModifierTerm) -> StratagemCostModifierHandler:
+        def operation(received: StratagemCostModifierContext) -> ModifierTerm:
+            assert received is context
+            calls.append(index)
+            return term
+
+        return operation
+
+    bindings = tuple(
+        StratagemCostModifierBinding(
+            modifier_id=f"cost-{2 - i if reverse_ids else i}",
+            source_id=f"source-{i}",
+            handler=provider(i, ModifierTerm(ModifierOperation(operation), operand)),
+            non_cumulative_increase=i in non_cumulative,
+        )
+        for i, (operation, operand) in enumerate(operations)
+    )
+    registry = StratagemCostModifierRegistry.from_bindings(bindings)
+    result = registry.modified_command_point_cost_with_sources(context)
+    assert result.command_point_cost == expected
+    assert sorted(calls) == [0, 1, 2]
+    assert result.source_ids == ("source-0", "source-1", "source-2")
+    assert set(result.modifier_ids) == {b.modifier_id for b in bindings}
+
+
+def test_order37_invalid_operations_fail_before_returning_any_cost() -> None:
+    state, _, _ = _corsair_state(phase=BattlePhase.SHOOTING, active_player_id="player-b")
+    context = StratagemCostModifierContext(
+        state=state,
+        definition=_test_stratagem_definition(),
+        eligibility_context=StratagemEligibilityContext.from_state(
+            state=state, player_id="player-b", trigger_kind=TimingTriggerKind.START_PHASE
+        ),
+        target_binding=None,
+        effect_selection=None,
+        base_command_point_cost=1,
+    )
+    binding = StratagemCostModifierBinding(
+        modifier_id="invalid-cost",
+        source_id="invalid-cost-source",
+        handler=lambda _context: ModifierTerm(ModifierOperation.SUBTRACT, 1),
+    )
+    with pytest.raises(GameLifecycleError, match="must be bool"):
+        replace(binding, non_cumulative_increase=cast(bool, 1))
+    with pytest.raises(GameLifecycleError, match="Invalid Stratagem cost operations") as error:
+        StratagemCostModifierRegistry.from_bindings(
+            (replace(binding, non_cumulative_increase=True),)
+        ).modified_command_point_cost(context)
+    assert error.value.__cause__ is not None
+    assert "positive addition" in str(error.value.__cause__)
+
+    def symbolic(_context: StratagemCostModifierContext) -> ModifierTerm:
+        return ModifierTerm(ModifierOperation.SET_DASH, 0)
+
+    with pytest.raises(GameLifecycleError, match="Invalid Stratagem cost operations"):
+        StratagemCostModifierRegistry.from_bindings(
+            (replace(binding, handler=symbolic),)
+        ).modified_command_point_cost(context)

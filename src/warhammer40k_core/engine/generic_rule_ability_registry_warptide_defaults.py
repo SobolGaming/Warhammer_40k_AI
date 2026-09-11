@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -225,12 +226,12 @@ def _warptide_soul_hungry_cost_context_predicate(
 def _warptide_soul_hungry_cost_modifier(
     context: StratagemCostModifierContext,
     source: GenericRuleAbilitySource,
-) -> int:
+) -> ModifierTerm | None:
     if type(context) is not StratagemCostModifierContext:
         raise GameLifecycleError("Warptide Soul-hungry Slaughterers requires context.")
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Warptide Soul-hungry Slaughterers requires source.")
-    return max(0, context.current_command_point_cost - 1)
+    return ModifierTerm(ModifierOperation.SUBTRACT, 1)
 
 
 def _warptide_advance_move_hook_id(source: GenericRuleAbilitySource) -> str:
