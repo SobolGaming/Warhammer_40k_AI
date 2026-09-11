@@ -64,7 +64,7 @@ The 40 rows are source views, including six additional Marine chapters and six r
 
 ## What to work on first?
 
-1. **Correct stale claims:** reconcile Acts of Faith turn timing, the Orks v946 refresh, changed costs/attachments, and conflicting coverage labels. The [Track U classification](factions/updates/U_CLASSIFICATION_SYSTEM.md) closes diff grain, impact classes and layer demotion; the S4 tool remains FM0.
+1. **Correct stale claims:** reconcile Acts of Faith turn timing, the Orks v946 refresh, changed costs/attachments, and conflicting coverage labels. The [Track U classification](factions/updates/U_CLASSIFICATION_SYSTEM.md) closes diff grain, impact classes and layer demotion; the [packet schema](factions/updates/U_PACKET_SCHEMA.md) closes the work those classes produce. The S4 tool and packet generator remain FM0.
 2. **Establish exact identities and source evidence:** the [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) closes the axes; FM0 implements the registry. Resolve remaining holds (Warbuggies) and source-scope before adding missing content.
 3. **Close each field and rule gate:** use the linked unit/detachment audit and F02–F07 workstreams.
 4. **Prove usable rosters:** complete adapter, replay, invalid-input and full-game coverage before upgrading status.
@@ -82,6 +82,6 @@ The [roadmap findings and sequence](FACTION_RULES_REMEDIATION_ROADMAP.md#initial
 | [Faction Audit Sources](FACTION_AUDIT_SOURCES.md) | Observed versions, scope, counting and reconciliation method, pinned repository artifacts |
 | [Track T taxonomy](factions/taxonomy/README.md) | Pre-gate semantic surveys; T1–T6 are delivered |
 | [S2 identity model](factions/identity/README.md) | Pre-gate identity design; registry scheme, crosswalk schema, Space Marines overlay and related-army ownership are delivered; registry implementation remains FM0 |
-| [Track U classification](factions/updates/README.md) | Pre-gate update classification; U2 grain, U3 classes and U4 layers are delivered; S4 tool, packets and invalidation remain FM0 |
+| [Track U classification](factions/updates/README.md) | Pre-gate update classification and packet schema; U2 grain, U3 classes, U4 layers and the data-first packet contract are delivered; S4 tool, generator, emission, packets' live-contract rewrite, and invalidation remain FM0 |
 
 Do not hand-edit the older generated reports to change a support claim. Fix the owning source/execution evidence and regenerate them in the corresponding implementation PR. Keep the readable guide synchronized with the evidence actually established.

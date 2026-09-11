@@ -1,6 +1,6 @@
 # U2 / U3 / U4 — Classification system
 
-[Update-pipeline index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is Track U items U2 (diff grain), U3 (impact classes), and U4
 (layer demotion) as **FM-pre planning evidence**. It closes the classification
@@ -25,8 +25,9 @@ faction view. Lifting any of those over S2 `catalog_id` plus
 **FM0 implements the S4 tool, the classifier, and U4 invalidation.** It
 must not classify by display name, emit one class per page, treat a new
 transcription hash as a Layer A demotion, or carry Layer A forward without
-a recorded equivalence review. Packets, Q1 schema, capture tooling, and
-retention remain later design PRs.
+a recorded equivalence review. Packet *emission*, Q1 schema, capture
+tooling, and retention remain later. The packet *schema* is delivered in
+[U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md).
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms used inside the semantic
 fingerprint. T4 still owns construction families this grain binds as
@@ -198,7 +199,8 @@ them.
 5. `editorial_equivalent` is never automatic.
 6. `structural_add` does not demote siblings on the same parent page.
 7. `faction_rewrite` is an overlay, not a substitute for child rows.
-8. Do not emit packets here. Packet schema is the next FM-pre PR.
+8. Packet *emission* is FM0. The packet schema is
+   [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md).
 
 ### 5.2 Acceptance fixtures (U3/U4)
 
@@ -270,8 +272,8 @@ indexes them.
 ### 7.2 Work that remains later (not this PR)
 
 - S4 version ledger and dual-run diff tool (U2 implementation)
-- Classifier and generated packets (U3 implementation; packet *schema* is
-  the next FM-pre PR)
+- Classifier and generated packets (U3 implementation; packet *schema*
+  delivered in [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md))
 - Status invalidation and Q1 artifact (U4 implementation + Q1 design)
 - U1 capture, U5 tombstone loaders, U6 rewrite runbook, U7/U7a, U8, Q6
 - Orks 20/73 fixture reproduction
@@ -293,9 +295,9 @@ indexes them.
 | U-HOLD-ORKS-S4-COUNTS | Exact 20 detachment / 73 unit S4 integers, including removals | S1 versioned-path fixture, then S4 |
 | U-HOLD-RULES-UPDATED | App "Rules Updated" lines have no retained dual-version clauses | S3a, then FM0 classifier |
 | U-HOLD-NAME-PUNCTUATION | Feed punctuation twins are not locators | S2 locators on retained pages |
-| F-ORK-01 | Waaagh! / Da Boss / "riled up" may be new tokens as well as a rewrite | FM0.5 after this classification |
-| Packet schema | Data-first work packets | next FM-pre PR |
-| Q1 schema | Where U4 tuples are stored | after packets or with U4 implementation design |
+| F-ORK-01 | Waaagh! / Da Boss / "riled up" may be new tokens as well as a rewrite | FM0.5 after classification |
+| Packet generator | Actual emission of work packets | FM0 U3; schema delivered in [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md) |
+| Q1 schema | Where U4 tuples are stored | after this schema, or with U4 implementation design |
 
 ## 9. What "U2/U3/U4 classification delivered" means
 
