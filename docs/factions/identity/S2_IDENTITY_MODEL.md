@@ -118,6 +118,8 @@ fields, not one identity.
 | Sir Hekhtur | Datasheet `000002770` **and** inclusion of Canis Rex `000001484` |
 | Warbuggies | Held identity, not a name-join to excluded historical content |
 | Gladius / Stormlance / Ironstorm after a Codex rewrite | Same label is not the same `catalog_id` |
+| Oath of Moment (App-data 946 army rule) | Not the announced Combat Doctrines army rule |
+| Combat Doctrines as a Gladius (and inherited) detachment heading | Not the announced Combat Doctrines army rule |
 
 ## 4. Registry scheme
 
@@ -228,14 +230,32 @@ fact, not overlay membership (`S2-HOLD-REPORTING-GROUP-MAP`).
 
 ### 6.1 Announced Codex rewrite (not admitted)
 
-A Warhammer Community preview dated 11 September 2026 describes fifteen
-Space Marine detachments, `Unique:` listing tags, and stopgap chapter
-updates that will not mix old chapter rules with the new Codex. That
-article is not an F00 observation and does not change App-data 946.
+Two Warhammer Community previews are not F00 observations and do not
+change App-data 946:
+
+- 10 September 2026 [Space Marines rules – First look](https://www.warhammer-community.com/en-gb/articles/ifgezlgu/space-marines-rules-first-look/):
+  Combat Doctrines announced as the new army rule in place of Oath of
+  Moment; Assault, Devastator, and Tactical doctrines; `Unique: Doctrines`
+  on Assault Brethren, Tactical Brethren, and Devastator Brethren.
+- 11 September 2026: fifteen Space Marine detachments, further `Unique:`
+  listing tags, and stopgap chapter updates that will not mix old chapter
+  rules with the new Codex.
 
 S2 constraints when a later retained App version actually carries that
 rewrite:
 
+- Oath of Moment (current Space Marines army rule, T5
+  `oath_of_moment`) is not Combat Doctrines. Tombstone the Oath army-rule
+  row; allocate a new `army_rule` entity. Do not name-join.
+- The App-data 946 Gladius Task Force heading Combat Doctrines (T2
+  `doctrine_mode`, inherited on chapter overlay listings) is not that
+  announced army rule, even though the display name matches. Keep the
+  detachment heading on its grandfathered detachment ID until S1 shows
+  retirement or rewrite; do not lift it to `owner_faction_id` army-rule
+  identity.
+- Captain doctrine activation, Guilliman Codex Adept, and doctrine-gated
+  character abilities are datasheet or Enhancement rows, not a second
+  army rule and not overlay membership.
 - Same display names (Gladius Task Force, Stormlance Task Force, Ironstorm
   Spearhead) are not identity. Allocate or tombstone; do not name-join.
 - `Unique: Doctrines`, `Unique: Tacticus`, `Unique: Phobos`, and
@@ -356,7 +376,7 @@ The registry indexes them.
 | F-SCOPE-01 | Warbuggies identity; no admission | Later source review, not this PR |
 | S2-HOLD-DISTINCT-COUNTS | Exact distinct-rule integers after owner-versus-alias grouping | S1, then FM0 |
 | S2-HOLD-ENHANCEMENT-ID-COLLISION | Enhancement/Stratagem IDs are mixed slug, numeric, and composite; grandfather per row | FM0 alias table |
-| S2-HOLD-SM-CODEX-REWRITE | Announced SM detachment rewrite and `Unique:` tags are not App-data 946 | S1 re-observation when retained |
+| S2-HOLD-SM-CODEX-REWRITE | Announced Combat Doctrines army rule, SM detachment rewrite, and `Unique:` tags are not App-data 946; Oath and the Gladius Combat Doctrines heading stay distinct IDs | S1 re-observation when retained |
 | S2-HOLD-REPORTING-GROUP-MAP | Which six chapter views share the Space Marines evidence report | Q1 |
 | S2-HOLD-WAHAPEDIA-SNAPSHOT-LABEL | Frozen snapshot directory label is S3c, not this design | S3c |
 | F-OWN-01 | Answered here for the identity axes; listing still must not substitute owner | this survey / FM0 loaders |

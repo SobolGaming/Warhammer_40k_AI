@@ -95,7 +95,10 @@
     ],
     "overlay_count": 11,
     "shared_detachments_certified_once_on_owner": true,
-    "kill_team_cassius_has_no_catalog_row": true
+    "kill_team_cassius_has_no_catalog_row": true,
+    "announced_codex_rewrite_is_not_app_data_946": true,
+    "oath_of_moment_is_not_announced_combat_doctrines_army_rule": true,
+    "gladius_combat_doctrines_heading_is_not_announced_army_rule": true
   },
   "related_army_views": [
     {
@@ -193,8 +196,19 @@
     },
     {
       "id": "S2-HOLD-SM-CODEX-REWRITE",
-      "hold": "Announced Space Marine detachment rewrite and Unique listing tags are not App-data 946",
-      "unblocks": "S1 re-observation when retained"
+      "hold": "Announced Combat Doctrines army rule, Space Marine detachment rewrite, and Unique listing tags are not App-data 946; Oath of Moment and the Gladius Combat Doctrines heading stay distinct IDs",
+      "unblocks": "S1 re-observation when retained",
+      "community_previews": [
+        {
+          "observed_on": "2026-09-10",
+          "url": "https://www.warhammer-community.com/en-gb/articles/ifgezlgu/space-marines-rules-first-look/",
+          "note": "Combat Doctrines announced as army rule in place of Oath of Moment; Unique Doctrines on Assault, Tactical, and Devastator Brethren"
+        },
+        {
+          "observed_on": "2026-09-11",
+          "note": "Fifteen detachment listings, further Unique tags, chapter stopgaps; not F00"
+        }
+      ]
     },
     {
       "id": "S2-HOLD-REPORTING-GROUP-MAP",
