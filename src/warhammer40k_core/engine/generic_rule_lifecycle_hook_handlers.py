@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.modifiers import ModifierTerm
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationRequestHandler,
@@ -181,14 +182,16 @@ def stratagem_cost_modifier_handler_for_descriptor(
     source: GenericRuleAbilitySource,
     descriptor: GenericRuleStratagemCostModifierAbility,
 ) -> StratagemCostModifierHandler:
-    def handler(context: StratagemCostModifierContext) -> int:
+    def handler(context: StratagemCostModifierContext) -> ModifierTerm | None:
         if type(context) is not StratagemCostModifierContext:
             raise GameLifecycleError("Generic RuleIR stratagem cost modifier requires context.")
         if not descriptor.context_predicate(context, source):
-            return context.current_command_point_cost
+            return None
         modified = descriptor.modifier_builder(context, source)
-        if type(modified) is not int:
-            raise GameLifecycleError("Generic RuleIR stratagem cost modifier must return int.")
+        if modified is not None and type(modified) is not ModifierTerm:
+            raise GameLifecycleError(
+                "Generic RuleIR stratagem cost modifier must return ModifierTerm or None."
+            )
         return modified
 
     return handler

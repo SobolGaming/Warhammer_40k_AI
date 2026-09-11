@@ -169,6 +169,7 @@ from warhammer40k_core.engine.stratagems import (
     GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
+    HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND,
     HIT_TARGET_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
@@ -7681,3 +7682,40 @@ def test_order35_attached_reserve_enumerates_only_canonical_rules_unit() -> None
             )
             == "unit_not_eligible_for_rapid_ingress"
         )
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected"),
+    [(HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND, 2), (HEROIC_INTERVENTION_MODE_INTO_THE_FRAY, 3)],
+)
+def test_order37_cost_ceiling_uses_the_selected_stratagem_section(mode: str, expected: int) -> None:
+    from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+    from warhammer40k_core.engine.stratagem_cost_modifiers import (
+        StratagemCostModifierBinding,
+        StratagemCostModifierRegistry,
+    )
+    from warhammer40k_core.engine.stratagems_selection import (
+        _selected_command_point_cost_result,
+    )
+
+    state = _battle_state()
+    result = _selected_command_point_cost_result(
+        state=state,
+        definition=_source_stratagem_record("heroic-intervention").definition,
+        context=_context(
+            state=state, player_id="player-a", trigger_kind=TimingTriggerKind.END_PHASE
+        ),
+        target_binding=None,
+        effect_selection={HEROIC_INTERVENTION_MODE_CONTEXT_KEY: mode},
+        stratagem_cost_modifier_registry=StratagemCostModifierRegistry.from_bindings(
+            (
+                StratagemCostModifierBinding(
+                    modifier_id="cost-ceiling-test",
+                    source_id="source:cost-ceiling-test",
+                    handler=lambda _context: ModifierTerm(ModifierOperation.ADD, 5),
+                ),
+            )
+        ),
+    )
+    assert result.command_point_cost == expected
+    assert result.modifier_ids == ("cost-ceiling-test",)

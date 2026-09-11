@@ -10,6 +10,7 @@ from typing import cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -214,6 +215,10 @@ class CatalogCommandPointRuntime:
                 modifier_id=source.modifier_id,
                 source_id=source.record.definition.source_id,
                 handler=self._stratagem_cost_modifier_handler(source),
+                non_cumulative_increase=(
+                    command_point_effect_parameters(source.clause).get("stacking")
+                    == "non_cumulative_cost_increase"
+                ),
             )
             for source in self._cost_sources()
         )
@@ -448,25 +453,21 @@ class CatalogCommandPointRuntime:
         self,
         source: _CostSource,
     ) -> StratagemCostModifierHandler:
-        def handler(context: StratagemCostModifierContext) -> int:
+        def handler(context: StratagemCostModifierContext) -> ModifierTerm | None:
             if type(context) is not StratagemCostModifierContext:
                 raise GameLifecycleError("Catalog Stratagem cost modifier requires context.")
             if not self._cost_source_is_eligible(source=source, context=context):
-                return context.current_command_point_cost
+                return None
             parameters = command_point_effect_parameters(source.clause)
             delta = _mapping_int(parameters, key="delta")
             if _cost_source_is_optional(source) and (
                 context.source_decision_result_id is None
                 or not _cost_choice_was_accepted(context=context, source=source)
             ):
-                return context.current_command_point_cost
-            if (
-                parameters.get("stacking") == "non_cumulative_cost_increase"
-                and delta > 0
-                and context.current_command_point_cost > context.base_command_point_cost
-            ):
-                return context.current_command_point_cost
-            return context.current_command_point_cost + delta
+                return None
+            return ModifierTerm(
+                ModifierOperation.ADD if delta >= 0 else ModifierOperation.SUBTRACT, abs(delta)
+            )
 
         return handler
 

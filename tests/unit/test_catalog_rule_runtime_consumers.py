@@ -6524,7 +6524,6 @@ def test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_us
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=definition.command_point_cost,
-            current_command_point_cost=definition.command_point_cost,
         )
     )
 
@@ -6632,7 +6631,6 @@ def test_catalog_unnamed_zero_cp_rule_reduces_current_use_by_one_in_generic_regi
             target_binding=target_binding,
             effect_selection=None,
             base_command_point_cost=definition.command_point_cost,
-            current_command_point_cost=definition.command_point_cost,
         )
     )
     accepted_cost = registry.modified_command_point_cost(
@@ -9579,7 +9577,6 @@ def _cost_modifier_context(
         target_binding=target_binding,
         effect_selection=None,
         base_command_point_cost=definition.command_point_cost,
-        current_command_point_cost=definition.command_point_cost,
         decisions=decisions,
         source_decision_request_id=source_request_id,
         source_decision_result_id=source_result_id,

@@ -1,0 +1,18 @@
+{
+  "assessment_id": "order37-final-components-2026-09-11",
+  "base_commit": "35f492b2",
+  "base_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:c0beba12ada64bbc210848e9498695969d81b30381781e5ed9338783a92890c2",
+  "head_runtime_identity": "warhammer40k-core-v2:runtime-tree-sha256-v1:c01108ad5a914002c545c2c8dcaf322157474befb4cae8ee351b91184ba1d236",
+  "cost_timing": "passed",
+  "rapid_ingress_timing": "passed",
+  "full_game_certified": false,
+  "evidence_sha256": {
+    "base-cost-work.json": "b8a13d497f21982eed31d8ee207e5f42103d292bf7b445295b0747b8a7b5d51d",
+    "base-cost.json": "73418f014d4dfa80eff78deb9623b316beb3fbccbd892acaf395c0295d9c00a9",
+    "base.json": "a67cc62fe02b22a88545c5f23bd8c16d2fe56a415e843237ad65d60927799975",
+    "budgets.json": "5b519f18459a303da10a6b284532cc41bb30847e3054b1d7a4cbb8f3a18fbcd4",
+    "head-cost-work.json": "d71c4d7fe22118c6e991a2ec80dae0186994b347ccc3b4990603b679b4a32ddd",
+    "head-cost.json": "a6eea99780278c94cf19c7f721af49bfa173f162cdaaf3f2a705eb8a8524a041",
+    "head.json": "bd14f13bc7caf670f3a9ebf09e6eba5369e7e6d105ef87e1dd882898eb8b79c0"
+  }
+}

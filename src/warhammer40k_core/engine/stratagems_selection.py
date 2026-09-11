@@ -578,7 +578,6 @@ def _selected_command_point_cost_result(
             target_binding=target_binding,
             effect_selection=effect_selection,
             base_command_point_cost=base_cost,
-            current_command_point_cost=base_cost,
             decisions=decisions,
             source_decision_request_id=source_decision_request_id,
             source_decision_result_id=source_decision_result_id,

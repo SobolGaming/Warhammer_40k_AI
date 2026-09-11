@@ -643,7 +643,7 @@ def test_modifier_source_artifact_matches_reviewed_evidence_and_rejects_drift() 
     assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
     assert json.loads(AUDIT_PATH.read_bytes()) == audit
     package = source.source_package()
-    assert len(source.source_rules()) == 5
+    assert len(source.source_rules()) == 6
     for rule in source.source_rules():
         assert rule.source_id in package.evidence_required_source_ids
         assert package.source_catalog.source_text_by_id(rule.source_id).raw_text == rule.source_text
@@ -899,3 +899,111 @@ def test_lone_operative_uses_the_same_terminal_range(
         )
         is expected
     )
+
+
+@pytest.mark.parametrize(
+    ("available_cp", "discount", "expected"), [(2, 0, 2), (1, 0, 2), (1, 9, 0)]
+)
+def test_order37_catalog_costs_preserve_commitments_through_facade_restore_and_replay(
+    available_cp: int, discount: int, expected: int
+) -> None:
+    from tests.rapid_ingress_helpers import reach_ingress_window, submit_ingress_target
+    from tests.stratagem_cost_helpers import cost_session
+
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = cost_session(available_cp=available_cp, discount=discount)
+    request = reach_ingress_window(session)
+    status = submit_ingress_target(session, request)
+    accepted = 0
+    while status.decision_request is not None and status.decision_request.decision_type == (
+        "select_stratagem_cost_modifier_option"
+    ):
+        request = status.decision_request
+        if accepted == 0:
+            from warhammer40k_core.engine.decision_request import DecisionError
+
+            before = session.lifecycle.to_payload()
+            with pytest.raises(GameLifecycleError, match="does not match pending"):
+                session.submit_option(
+                    request_id="stale-cost-request",
+                    result_id="order37:stale",
+                    option_id=request.options[0].option_id,
+                )
+            with pytest.raises(DecisionError, match="option"):
+                session.submit_option(
+                    request_id=request.request_id,
+                    result_id="order37:malformed",
+                    option_id="invented-cost-option",
+                )
+            assert session.lifecycle.to_payload() == before
+        persisted = session.to_persistence_payload()
+        restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(persisted)))
+        assert restored.to_persistence_payload() == persisted
+        assert (
+            ReplayRunner.from_payload(
+                session.replay_artifact(artifact_id=f"order37:pending-{accepted}")
+            )
+            .run()
+            .status
+            is ReplayRunStatus.REPRODUCED
+        )
+        for viewer in ("player-a", "player-b"):
+            assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        use_option = next(
+            o
+            for o in request.options
+            if isinstance(o.payload, dict) and o.payload.get("use_ability") is True
+        )
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"order37:increase-{accepted}",
+            option_id=use_option.option_id,
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        accepted += 1
+        assert accepted <= 5
+    assert accepted == 5
+    state = session.lifecycle.state
+    assert state is not None
+    record = state.stratagem_use_records[-1]
+    assert record.command_point_cost == expected
+    assert len(record.command_point_modifier_ids) == 5 + int(bool(discount))
+    assert record.command_point_modifier_source_ids == (
+        ("test:order37:cost-0", "test:order37:cost-1") if discount else ("test:order37:cost-0",)
+    )
+    assert record.effects_resolved is (available_cp >= expected)
+    assert state.command_point_total("player-b") == (
+        available_cp - expected if record.effects_resolved else available_cp
+    )
+    assert (record.command_point_transaction_id is not None) is (
+        record.effects_resolved and expected > 0
+    )
+    for viewer in ("player-a", "player-b"):
+        events = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        assert "0x" not in json.dumps(events)
+    persisted = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(persisted)))
+    assert restored.to_persistence_payload() == persisted
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="order37:resolved")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+def test_order37_automatic_increases_use_the_capped_price_for_target_affordability() -> None:
+    from tests.rapid_ingress_helpers import reach_ingress_window, submit_ingress_target
+    from tests.stratagem_cost_helpers import cost_session
+
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = cost_session(available_cp=2, optional_increases=False)
+    status = submit_ingress_target(session, reach_ingress_window(session))
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "submit_shooting_declaration"
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.command_point_total("player-b") == 0
+    assert state.stratagem_use_records[-1].command_point_cost == 2
+    assert len(state.stratagem_use_records[-1].command_point_modifier_ids) == 5

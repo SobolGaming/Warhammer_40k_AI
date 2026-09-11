@@ -139,12 +139,18 @@ class ModifierTerm:
     operation: ModifierOperation
     operand: int
 
-    def bind(self, *, modifier_id: str, source_id: str, characteristic: Characteristic) -> Modifier:
+    def bind(
+        self, *, modifier_id: str, source_id: str, characteristic: Characteristic | None = None
+    ) -> Modifier:
         timings = _OPERATION_TIMINGS[self.operation]
         return Modifier(
             modifier_id=modifier_id,
             source_id=source_id,
-            scope=ModifierScope.for_characteristics((characteristic,)),
+            scope=(
+                ModifierScope.any()
+                if characteristic is None
+                else ModifierScope.for_characteristics((characteristic,))
+            ),
             timing=min(timings, key=lambda timing: timing.order),
             operation=self.operation,
             operand=self.operand,
@@ -767,6 +773,29 @@ def resolve_roll_modifiers(
         bound_modified_roll(limited, maximum=maximum),
         tuple(applied_modifier_ids),
     )
+
+
+def resolve_stratagem_cost(
+    base_cost: int, modifiers: tuple[Modifier, ...]
+) -> tuple[int, tuple[ModifierArithmeticStep, ...]]:
+    """02.02.01: exact cumulative operations, then the final 0/base+1 limits."""
+    if type(base_cost) is not int or base_cost < 0:
+        raise ModifierError("Stratagem base cost must be a nonnegative integer.")
+    for modifier in modifiers:
+        _validate_modifier(modifier)
+        if modifier.scope != ModifierScope.any():
+            raise ModifierError("Stratagem operations must already be selected for this use.")
+    _validate_unique_modifier_ids(modifiers)
+    _validate_supported_stacking(modifiers)
+    current = Fraction(base_cost)
+    steps: list[ModifierArithmeticStep] = []
+    for modifier in sorted(modifiers, key=_modifier_order_key):
+        if modifier.operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR}:
+            raise ModifierError("Stratagem cost requires numeric operations.")
+        modified = _apply_numeric_operation(modifier.operation.value, modifier.operand, current)
+        steps.append(ModifierArithmeticStep(modifier, current, modified))
+        current = modified
+    return max(0, min(base_cost + 1, ceil(current))), tuple(steps)
 
 
 def resolve_targeting_range(value: float) -> float:

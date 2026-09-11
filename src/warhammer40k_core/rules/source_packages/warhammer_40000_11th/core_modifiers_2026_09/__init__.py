@@ -23,7 +23,7 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "07db393dbbcbe13435a3c24c1f999bb96271c6d696e80892803cc633d6ae0995"
+EXPECTED_ARTIFACT_SHA256: Final = "b1b8224dfc0bde7fe5290688cabca0f7c1a68b80a8dc462b59826d8666010f78"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-modifiers"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-07"
 ORDERED_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ordered-modifiers"
@@ -31,6 +31,7 @@ MODIFIED_DICE_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:modified-dice-limi
 TARGETING_RANGE_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:detection-lone-operative-limits"
 
 PSYCHIC_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:psychic-individual-modifiers"
+STRATAGEM_COST_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:stratagem-cost-limits"
 IGNORE_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ignore-individual-modifiers"
 
 
@@ -77,6 +78,7 @@ def validate_source_artifact_bytes(raw: bytes) -> CoreModifiersSourceArtifact:
             TARGETING_RANGE_LIMITS_SOURCE_ID,
             PSYCHIC_MODIFIERS_SOURCE_ID,
             IGNORE_MODIFIERS_SOURCE_ID,
+            STRATAGEM_COST_LIMITS_SOURCE_ID,
         )
     ):
         raise CoreModifiersSourceError("Core modifiers source identity drifted.")

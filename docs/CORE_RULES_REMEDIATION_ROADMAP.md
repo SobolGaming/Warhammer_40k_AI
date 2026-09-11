@@ -4612,3 +4612,15 @@ compositional coverage rather than a new playable load-only Stratagem scenario.
 Requested main refreshes include documentation PRs through #450 (`f9f33e47`).
 The delivered runtime manifest SHA-256 is
 `390231096e85983215cb4c0ba841706c59bbe79dd049f6670c3df594463838a0`.
+
+## Order 37 — P02E final Stratagem CP costs
+
+C02-05 is implemented by the shared Stratagem cost registry and the exact core
+modifier arithmetic owner. Existing catalog, generic and faction providers now
+return typed operations; final costs are bounded to zero through the selected
+use's unmodified cost plus one after all operations and rounding. Source
+commitments survive terminal limits and explicit non-cumulative restrictions.
+All existing option, target, spending, increased-cost failure, event and replay
+consumers share that result. See the [scope and validation record](ORDER_37_SCOPE_PLAN.md)
+for the source observation, consumer audit, acceptance matrix and publication gates.
+Other category 02 and Stratagem findings retain their own owners.

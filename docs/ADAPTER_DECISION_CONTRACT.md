@@ -5470,3 +5470,22 @@ source unit in their label and carry `source_unit_instance_id`,
 `source_rules_unit_instance_id`, and nullable `source_model_instance_id` in the
 participant payload. These fields distinguish copies of the same source rule;
 they use the existing JSON-safe participant payload and shared secrecy policy.
+
+## Order 37 — final Stratagem CP costs
+
+Existing finite Stratagem options, parameterized targets and cost-modifier choices
+retain their schemas. Applicable providers supply source-linked operations to the
+shared cost registry. It applies replacement, multiplication, addition, division,
+subtraction and one final rounding step, then bounds the result between zero and
+the unmodified cost of the selected use plus one. An additional section selected
+within a Stratagem remains part of that use's unmodified cost (15.01).
+
+Affordability, submission validation, spending, the increased-cost failure path,
+`stratagem_used`, `stratagem_effects_not_resolved`, persisted use records and replay
+consume that same final cost. The existing `command_point_modifier_ids` and
+`command_point_modifier_source_ids` record every applicable/accepted source,
+including operations made numerically redundant by a bound or an explicit
+non-cumulative restriction. Such a source remains committed for frequency limits.
+Declined and inapplicable sources remain absent. No new choice, visibility class
+or payload field is introduced; existing viewer-scoped projections and events
+remain authoritative.
