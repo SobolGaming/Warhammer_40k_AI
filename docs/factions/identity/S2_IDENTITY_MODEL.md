@@ -45,7 +45,8 @@ T5, and T6 still own WHEN, EFFECT, TARGET, ledgers, and decision shape.
 | Engine inspection | Read-only: catalog generation, F00 observations, `army_mustering.py`, player army-list schema |
 
 September audits store listing URLs. Exact post-resolution distinct-rule
-counts wait on S1 retained pages plus this model's owner-versus-alias pass
+counts wait on S1 retained pages plus this model's page grouping,
+child-entity locators, and proven inherited-alias merge
 (`S2-HOLD-DISTINCT-COUNTS`). This document still closes the *axes*.
 
 This document does not copy bulk operative text. Community teasers are not
@@ -58,13 +59,18 @@ F00 observations.
 | Layer | Owns | Must not |
 | --- | --- | --- |
 | `catalog_id` | Runtime catalog, army lists, replay, mustering | Change because a page slug or display name moved |
-| `source_document_id` | F00 page provenance (`faction-app:<view>:<kind>:<slug>`) | Replace `catalog_id` |
+| `source_document_id` | F00 **page** provenance (`faction-app:<view>:<kind>:<slug>`) | Replace `catalog_id`; identify an Enhancement or Stratagem |
 | `official_source_id` | Retained GW PDF row, path, and hash | Replace `catalog_id` |
 | `execution_id` | Named handlers, RuleIR clause IDs, phase consumers | Gate behaviour by display name |
 | `provider_local_ref` | 39k.pro and other secondary lookups | Enter the catalog_id column |
 
+F00 page IDs are provenance identities, not catalog or clause execution IDs.
+One source document may bind many catalog entities. One catalog entity may
+appear in many listing documents. The join is a `source_entry_binding`
+(§5), not a sixth runtime identity layer and not a display-name match.
+
 One catalog entity may have many source-document IDs (inherited chapter or
-related-army listings of the same page). Many source documents never become
+related-army listings of the same **page**). Many source documents never become
 catalog rows (withheld, excluded, or `blocked_provenance` staging).
 
 ### 3.2 Registry entity kinds
@@ -78,8 +84,8 @@ Each row has one `catalog_id`, one `entity_kind`, one `owner_faction_id`
 | `overlay` | Chapter slug (`blood-angels`) | Not a second catalog faction for shared detachments |
 | `army_rule` | Mixed numeric and consumer IDs | Headings are labels; the rule is the ID |
 | `pact` | Construction record, not a datasheet | T4 families bind these IDs |
-| `detachment` | App slug in army lists (`shadow-legion`, `corsair-coterie`); Wahapedia numerics in some catalogs | One ID per distinct rule; inherited URLs are aliases |
-| `enhancement` | Mixed slug, numeric, and composite | Grandfather per row; do not unify by name |
+| `detachment` | App slug in army lists (`shadow-legion`, `corsair-coterie`); Wahapedia numerics in some catalogs | One ID per distinct rule; inherited **pages** are aliases |
+| `enhancement` | Mixed slug, numeric, and composite | Grandfather per row; siblings on one detachment page are distinct IDs |
 | `stratagem` | Mixed slug composite and numeric | Same as Enhancement |
 | `datasheet` | 9-digit zero-padded (`000004083`, `000001148`, `000002770`) | Army lists already use this shape |
 | `model_variant` | `<datasheet_id>:<slug>` | Geometry S5 consumes this ID |
@@ -109,7 +115,10 @@ fields, not one identity.
 | App path slug | Provenance key; catalog_id only when grandfathered from existing artifacts |
 | Wahapedia row ID | Frozen alias |
 | 39k.pro path | `provider_local_ref` only |
-| Shared URL on two views | One catalog row, two listing memberships |
+| Shared URL on two views | One **page** row, two listing memberships; children of that page still need locators |
+| F00 `source_document_id` | Page provenance; not an Enhancement or Stratagem identity |
+| Enhancement or Stratagem display name on a detachment page | Sibling label; never `catalog_id` and never the source-entry locator |
+| URL plus `entity_kind` | Still insufficient when one page has four Enhancements |
 | Space Marines chapter view | Overlay, not a duplicate SM catalog faction |
 | Grey Knights | Separate catalog faction, not an overlay |
 | Related-army view | Listing view plus army-faction gate; not automatic Army Faction |
@@ -149,9 +158,11 @@ Worked examples:
 ### 4.2 Allocation (new IDs only)
 
 A new entity (no grandfathered ID) receives a registry-allocated
-`catalog_id`. Allocation records the App path, official provenance, and
-display label in the crosswalk. The allocator must not slugify a display
-name into the ID.
+`catalog_id`. Allocation records the `source_entry_binding` (parent source
+document plus locator), official provenance, and display label in the
+crosswalk. The allocator must not slugify a display name into the ID or
+into the locator. Distinct `catalog_id` values without bindings do not
+establish which retained source entry each row represents.
 
 New datasheets may keep the 9-digit shape if the registry assigns that
 digit string; the digits are then an allocated ID, not a name hash. New
@@ -162,7 +173,10 @@ explicitly.
 
 `retired_in` and `superseded_by` live on the registry row (roadmap design
 rule 6). A slug change on 40k.app updates `source_document_id` and
-`app_canonical_url`. It does not mint a new `catalog_id`. A Codex rewrite
+`app_canonical_url`. It does not mint a new `catalog_id`. Child
+`source_entry_bindings` stay on that parent page; a later retained
+observation rebinds locators by entry transcription hash, not by display
+name. A Codex rewrite
 that replaces a detachment's rules is a new entity plus a tombstone on the
 old ID, never a name-join (`S2-HOLD-SM-CODEX-REWRITE`).
 
@@ -181,6 +195,17 @@ entity. Planning fields:
   ],
   "app_canonical_url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
   "listing_view_ids": ["chaos-daemons"],
+  "source_entry_bindings": [
+    {
+      "parent_source_document_id": "faction-app:chaos-daemons:detachment:shadow-legion",
+      "parent_app_canonical_url": "https://www.40k.app/factions/chaos-daemons/detachments/shadow-legion",
+      "listing_role": "owner",
+      "section_kind": "detachment",
+      "ordinal_in_section": 1,
+      "entry_transcription_sha256": null,
+      "display_label": "Shadow Legion"
+    }
+  ],
   "wahapedia_source_row_id": null,
   "official_source_ids": [],
   "provider_local_refs": [],
@@ -195,9 +220,88 @@ entity. Planning fields:
 load 39k.pro content. Official provenance stays `official_source_ids` with
 retained hashes, as F00 already requires.
 
-Inherited Space Marine chapter listings of a shared detachment add extra
-`app_source_document_ids` and `listing_view_ids`. They do not duplicate the
-row.
+`app_source_document_ids` and `app_canonical_url` remain **page**
+identifiers. Inherited Space Marine chapter listings of a shared
+detachment add extra page IDs and `listing_view_ids`. They do not duplicate
+the detachment row, and they do not by themselves distinguish Enhancements
+or Stratagems on that page.
+
+### 5.1 Page versus child cardinality
+
+The crosswalk must support both:
+
+- one source document containing many catalog entities;
+- one catalog entity appearing in many listing documents.
+
+A detachment page is the usual many-child case. A datasheet page may still
+yield `model_variant` children. An army-rules page may yield more than one
+`army_rule` heading. Grouping by URL, or by URL plus `entity_kind`, is not
+enough.
+
+### 5.2 Source-entry binding
+
+Every catalog entity extracted from a retained page carries one or more
+`source_entry_bindings`. Each binding has:
+
+| Field | Role |
+| --- | --- |
+| `parent_source_document_id` | F00 page identity of the document that contains the entry |
+| `parent_app_canonical_url` | Owning App URL of that page |
+| `listing_role` | `owner` on the canonical page; `listing` on an inherited reprint |
+| `section_kind` | Section on that page: `detachment`, `enhancement`, `stratagem`, `datasheet`, `army_rule`, `model_variant` |
+| `ordinal_in_section` | 1-based order of that entry inside the named section of the retained observation |
+| `entry_transcription_sha256` | Hash of that entry's retained operative suffix once S1/S3a split the page; `null` until then |
+| `display_label` | Human label only. Never a join key |
+
+The locator is `parent_source_document_id` + `section_kind` +
+`ordinal_in_section`, authenticated by `entry_transcription_sha256` when
+that hash exists. It is not `catalog_id`. It must not be only a
+display-name match, a slugified name, or a Wahapedia numeric used as a
+stand-in for the retained entry.
+
+Wahapedia row IDs and mixed MFM slugs remain aliases or grandfathered
+`catalog_id` candidates (`S2-HOLD-ENHANCEMENT-ID-COLLISION`). They do not
+replace the locator.
+
+Two listing observations name the same child entity only when they share
+the owning parent document and the same locator (same section and ordinal
+on that observation, or the same entry transcription hash). Same
+`display_label` on two pages is not that proof.
+
+Planning locators for this document use the named Enhancement then
+Stratagem row order in the September audit block for the owning URL. FM0
+rebinds from the retained page.
+
+Child example (no `catalog_id` allocated in this PR). Blade of Saint
+Ellynor is Enhancement ordinal 1 on Army of Faith; Divine Aspect is
+ordinal 2 on the same page:
+
+```json
+{
+  "catalog_id": null,
+  "entity_kind": "enhancement",
+  "owner_faction_id": "adepta-sororitas",
+  "app_source_document_ids": [
+    "faction-app:adepta-sororitas:detachment:army-of-faith"
+  ],
+  "app_canonical_url": "https://www.40k.app/factions/adepta-sororitas/detachments/army-of-faith",
+  "listing_view_ids": ["adepta-sororitas"],
+  "source_entry_bindings": [
+    {
+      "parent_source_document_id": "faction-app:adepta-sororitas:detachment:army-of-faith",
+      "parent_app_canonical_url": "https://www.40k.app/factions/adepta-sororitas/detachments/army-of-faith",
+      "listing_role": "owner",
+      "section_kind": "enhancement",
+      "ordinal_in_section": 2,
+      "entry_transcription_sha256": null,
+      "display_label": "Divine Aspect"
+    }
+  ]
+}
+```
+
+`catalog_id` stays `null` here because FM0 still grandfathers or allocates
+it. The binding already says which retained page entry the future row is.
 
 ## 6. Space Marines overlay model
 
@@ -330,14 +434,64 @@ datasheet (`000001484`) that lists Sir Hekhtur as an attachment recipient.
 
 ## 9. Distinct-rule counting method
 
-Listing URLs and listing names are not denominators.
+Listing URLs and listing names are not denominators. Page grouping avoids
+duplicate captures. It does not count the entities extracted from those
+pages.
 
-A distinct detachment (or datasheet, Enhancement, Stratagem) is one
+A distinct detachment, datasheet, Enhancement, or Stratagem is one
 `catalog_id` after:
 
-1. grouping observations that share the owning App URL;
-2. treating inherited chapter/related listings as aliases;
-3. excluding withheld, Titan, Legends, and `held_unresolved` rows.
+1. **Page grouping.** Group observations that share the owning App URL.
+   Inherited chapter or related-army captures of the same owning URL are
+   duplicate page observations, not yet catalog entities.
+2. **Child-entity resolution.** On each remaining owning document, extract
+   catalog entities by `source_entry_binding`. One page may yield many
+   rows. URL plus `entity_kind` is not enough: Army of Faith's four
+   Enhancements are siblings, not one Enhancement.
+3. **Inherited alias merge.** Merge a listing observation onto an existing
+   child only after its binding is shown to reference that same child
+   (owning parent document plus locator, or matching entry transcription
+   hash). Display-name agreement is not that proof. Unproven reprints stay
+   distinct until S1/S3a binds them.
+4. **Exclusion.** Drop withheld, Titan, Legends, and `held_unresolved`
+   rows.
+
+### 9.1 Worked example — Army of Faith
+
+Owning page: [Army of Faith](https://www.40k.app/factions/adepta-sororitas/detachments/army-of-faith).
+F00 parent (page-level): `faction-app:adepta-sororitas:detachment:army-of-faith`.
+September audit block: `docs/factions/audit/adepta-sororitas.md#detachment-army-of-faith`.
+Page observation SHA-256
+`43aa38dcfa513bc8c08bb14213d715cfbacde5df3be76972b1ea0f6bba220d46`
+authenticates the page, not each child.
+
+That single document retains these catalog identities (no `catalog_id`
+allocated here):
+
+| `section_kind` | `ordinal_in_section` | `display_label` (not a join key) |
+| --- | --- | --- |
+| `detachment` | 1 | Army of Faith |
+| `enhancement` | 1 | Blade of Saint Ellynor |
+| `enhancement` | 2 | Divine Aspect |
+| `enhancement` | 3 | Litanies of Faith |
+| `enhancement` | 4 | Triptych of the Macharian Crusade |
+| `stratagem` | 1 | Shield of Faith |
+| `stratagem` | 2 | Light of the Emperor |
+| `stratagem` | 3 | Faith and Fury |
+| `stratagem` | 4 | Blinding Radiance |
+| `stratagem` | 5 | Divine Guidance |
+| `stratagem` | 6 | Angelic Descent |
+
+Four Enhancement identities and six Stratagem identities. Blade of Saint
+Ellynor and Divine Aspect are siblings. Shield of Faith and Light of the
+Emperor are siblings. An inherited listing of the same owning URL would
+add `listing` bindings to those rows. It would not add four Enhancements
+or six Stratagems.
+
+The same merge step on Gladius Task Force (owned at
+[space-marines/gladius-task-force](https://www.40k.app/factions/space-marines/detachments/gladius-task-force)
+and listed on all eleven chapter overlays) does not mint twelve Adept of
+the Codex rows.
 
 T4's 270 unique *names* is a name count. The September register's 270–300
 expectation is a forecast. FM0 records the exact integers after S1
@@ -349,8 +503,9 @@ histogram in this PR.
 ### 10.1 Surfaces that exist and must not be forked
 
 Committed army-list IDs, packaged catalog entity IDs, F00
-`source_document_id` values, and official provenance IDs already exist.
-The registry indexes them.
+`source_document_id` values (page-level), and official provenance IDs
+already exist. The registry indexes them. Child locators are new
+crosswalk fields; they do not rewrite F00 page IDs.
 
 ### 10.2 Work that remains FM0 (not this PR)
 
@@ -374,7 +529,7 @@ The registry indexes them.
 | ID | Hold | Unblocks |
 | --- | --- | --- |
 | F-SCOPE-01 | Warbuggies identity; no admission | Later source review, not this PR |
-| S2-HOLD-DISTINCT-COUNTS | Exact distinct-rule integers after owner-versus-alias grouping | S1, then FM0 |
+| S2-HOLD-DISTINCT-COUNTS | Exact distinct-rule integers after page grouping, child-entity resolution, and proven inherited-alias merge | S1, then FM0 |
 | S2-HOLD-ENHANCEMENT-ID-COLLISION | Enhancement/Stratagem IDs are mixed slug, numeric, and composite; grandfather per row | FM0 alias table |
 | S2-HOLD-SM-CODEX-REWRITE | Announced Combat Doctrines army rule, SM detachment rewrite, and `Unique:` tags are not App-data 946; Oath and the Gladius Combat Doctrines heading stay distinct IDs | S1 re-observation when retained |
 | S2-HOLD-REPORTING-GROUP-MAP | Which six chapter views share the Space Marines evidence report | Q1 |
@@ -387,8 +542,12 @@ The registry indexes them.
 FM0 registry work may be implemented. It has:
 
 - the closed identity layers and entity kinds;
+- page versus child-entity cardinality and source-entry locators;
 - grandfather-versus-allocate rules that keep army lists resolvable;
 - the crosswalk field list;
+- Army of Faith as four Enhancement identities and six Stratagem
+  identities on one page, with inherited reprints not increasing those
+  counts;
 - the Space Marines overlay (11 chapter overlays, Grey Knights separate);
 - related-army owner / listing / host split;
 - Sir Hekhtur resolved as `000002770` included by `000001484`;
