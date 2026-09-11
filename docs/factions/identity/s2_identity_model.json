@@ -1,0 +1,388 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "S2",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/identity/S2_IDENTITY_MODEL.md",
+  "delivered_to": "FM0 identity registry (design only)",
+  "does_not_change_catalog_ids": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "admitted_views": 40,
+    "reporting_groups": 28,
+    "distinct_datasheet_urls": 982,
+    "distinct_detachment_urls": 506,
+    "enhancement_listing_rows": 1756,
+    "stratagem_listing_rows": 2520,
+    "t4_unique_detachment_listing_names": 270,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "closed_axes": {
+    "identity_layers": [
+      "catalog_id",
+      "source_document_id",
+      "official_source_id",
+      "execution_id",
+      "provider_local_ref"
+    ],
+    "entity_kinds": [
+      "faction_view",
+      "overlay",
+      "army_rule",
+      "pact",
+      "detachment",
+      "enhancement",
+      "stratagem",
+      "datasheet",
+      "model_variant",
+      "content_set"
+    ],
+    "roles": [
+      "owner",
+      "listing_view",
+      "overlay",
+      "host_army"
+    ],
+    "do_not_lift_display_name": true,
+    "do_not_lift_app_slug": true,
+    "do_not_name_join": true,
+    "reporting_group_is_not_catalog_faction": true,
+    "provider_local_ref_is_not_catalog_id": true,
+    "source_document_id_is_page_level": true,
+    "one_source_document_may_contain_many_catalog_entities": true,
+    "one_catalog_entity_may_appear_in_many_source_documents": true,
+    "source_entry_locator_is_not_catalog_id": true,
+    "source_entry_locator_must_not_be_display_name_only": true,
+    "url_plus_entity_kind_is_not_enough": true
+  },
+  "grandfather_precedence": [
+    "committed_player_army_list_id",
+    "packaged_catalog_entity_id",
+    "fm0_review_app_path_as_candidate"
+  ],
+  "new_entity_allocation": {
+    "mint_from_display_name": false,
+    "app_path_recorded_in_crosswalk": true,
+    "catalog_id_requires_registry_row": true,
+    "source_entry_binding_required": true,
+    "locator_must_not_be_display_name": true
+  },
+  "crosswalk_fields": [
+    "catalog_id",
+    "entity_kind",
+    "owner_faction_id",
+    "app_source_document_ids",
+    "app_canonical_url",
+    "listing_view_ids",
+    "source_entry_bindings",
+    "wahapedia_source_row_id",
+    "official_source_ids",
+    "provider_local_refs",
+    "overlay_id",
+    "inclusion_of",
+    "retired_in",
+    "superseded_by"
+  ],
+  "source_entry_binding_fields": [
+    "parent_source_document_id",
+    "parent_app_canonical_url",
+    "listing_role",
+    "section_kind",
+    "ordinal_in_section",
+    "entry_transcription_sha256",
+    "display_label"
+  ],
+  "source_entry_binding": {
+    "locator": [
+      "parent_source_document_id",
+      "section_kind",
+      "ordinal_in_section"
+    ],
+    "authenticator": "entry_transcription_sha256",
+    "display_label_is_join_key": false,
+    "listing_roles": [
+      "owner",
+      "listing"
+    ],
+    "section_kinds": [
+      "detachment",
+      "enhancement",
+      "stratagem",
+      "datasheet",
+      "army_rule",
+      "model_variant"
+    ]
+  },
+  "counting_method": {
+    "listing_urls_are_not_denominators": true,
+    "steps": [
+      "page_grouping",
+      "child_entity_resolution",
+      "inherited_alias_merge_after_same_child_proven",
+      "exclusion"
+    ],
+    "inherited_alias_requires_locator_or_entry_hash": true,
+    "display_name_is_not_alias_proof": true
+  },
+  "worked_example_army_of_faith": {
+    "owning_url": "https://www.40k.app/factions/adepta-sororitas/detachments/army-of-faith",
+    "parent_source_document_id": "faction-app:adepta-sororitas:detachment:army-of-faith",
+    "audit_anchor": "docs/factions/audit/adepta-sororitas.md#detachment-army-of-faith",
+    "page_observation_sha256": "43aa38dcfa513bc8c08bb14213d715cfbacde5df3be76972b1ea0f6bba220d46",
+    "catalog_ids_allocated_in_this_pr": false,
+    "detachment_identities": 1,
+    "enhancement_identities": 4,
+    "stratagem_identities": 6,
+    "inherited_listings_do_not_increase_child_counts": true,
+    "children": [
+      {
+        "section_kind": "detachment",
+        "ordinal_in_section": 1,
+        "display_label": "Army of Faith"
+      },
+      {
+        "section_kind": "enhancement",
+        "ordinal_in_section": 1,
+        "display_label": "Blade of Saint Ellynor"
+      },
+      {
+        "section_kind": "enhancement",
+        "ordinal_in_section": 2,
+        "display_label": "Divine Aspect"
+      },
+      {
+        "section_kind": "enhancement",
+        "ordinal_in_section": 3,
+        "display_label": "Litanies of Faith"
+      },
+      {
+        "section_kind": "enhancement",
+        "ordinal_in_section": 4,
+        "display_label": "Triptych of the Macharian Crusade"
+      },
+      {
+        "section_kind": "stratagem",
+        "ordinal_in_section": 1,
+        "display_label": "Shield of Faith"
+      },
+      {
+        "section_kind": "stratagem",
+        "ordinal_in_section": 2,
+        "display_label": "Light of the Emperor"
+      },
+      {
+        "section_kind": "stratagem",
+        "ordinal_in_section": 3,
+        "display_label": "Faith and Fury"
+      },
+      {
+        "section_kind": "stratagem",
+        "ordinal_in_section": 4,
+        "display_label": "Blinding Radiance"
+      },
+      {
+        "section_kind": "stratagem",
+        "ordinal_in_section": 5,
+        "display_label": "Divine Guidance"
+      },
+      {
+        "section_kind": "stratagem",
+        "ordinal_in_section": 6,
+        "display_label": "Angelic Descent"
+      }
+    ],
+    "sibling_pairs": [
+      [
+        "Blade of Saint Ellynor",
+        "Divine Aspect"
+      ],
+      [
+        "Shield of Faith",
+        "Light of the Emperor"
+      ]
+    ]
+  },
+  "space_marines_overlay": {
+    "owner_faction_id": "space-marines",
+    "grey_knights_is_overlay": false,
+    "grey_knights_catalog_faction_id": "grey-knights",
+    "overlay_view_ids": [
+      "black-templars",
+      "blood-angels",
+      "dark-angels",
+      "deathwatch",
+      "imperial-fists",
+      "iron-hands",
+      "raven-guard",
+      "salamanders",
+      "space-wolves",
+      "ultramarines",
+      "white-scars"
+    ],
+    "overlay_count": 11,
+    "shared_detachments_certified_once_on_owner": true,
+    "kill_team_cassius_has_no_catalog_row": true,
+    "announced_codex_rewrite_is_not_app_data_946": true,
+    "oath_of_moment_is_not_announced_combat_doctrines_army_rule": true,
+    "gladius_combat_doctrines_heading_is_not_announced_army_rule": true
+  },
+  "related_army_views": [
+    {
+      "listing_view_id": "harlequins",
+      "default_shared_owner_faction_id": "aeldari",
+      "owned_datasheet_count_september": 8
+    },
+    {
+      "listing_view_id": "ynnari",
+      "default_shared_owner_faction_id": "aeldari",
+      "owned_datasheet_count_september": 11
+    },
+    {
+      "listing_view_id": "blood-legions",
+      "host_army_faction_id": "world-eaters",
+      "owned_datasheet_count_september": 5
+    },
+    {
+      "listing_view_id": "plague-legions",
+      "host_army_faction_id": "death-guard",
+      "owned_datasheet_count_september": 6
+    },
+    {
+      "listing_view_id": "legions-of-excess",
+      "host_army_faction_id": "emperors-children",
+      "owned_datasheet_count_september": 5
+    },
+    {
+      "listing_view_id": "scintillating-legions",
+      "host_army_faction_id": "thousand-sons",
+      "owned_datasheet_count_september": 6
+    }
+  ],
+  "resolved_identities": [
+    {
+      "id": "sir_hekhtur",
+      "catalog_id": "000002770",
+      "entity_kind": "datasheet",
+      "owner_faction_id": "imperial-knights",
+      "inclusion_of": "000001484",
+      "inclusion_of_label": "Canis Rex",
+      "standalone_cost": false,
+      "status": "resolved"
+    }
+  ],
+  "grandfather_samples": [
+    {
+      "label": "Lucius",
+      "catalog_id": "000004083",
+      "entity_kind": "datasheet",
+      "army_list": "data/army_lists/court-of-slaughter.json"
+    },
+    {
+      "label": "Be'lakor",
+      "catalog_id": "000001148",
+      "entity_kind": "datasheet",
+      "not_identity": "display name BELAKOR"
+    },
+    {
+      "label": "Shadow Legion",
+      "catalog_id": "shadow-legion",
+      "entity_kind": "detachment",
+      "army_list": "data/army_lists/cavalcade-shadow-bloodthirster.json"
+    },
+    {
+      "label": "Corsair Coterie Archraider",
+      "catalog_id": "archraider",
+      "entity_kind": "enhancement",
+      "note": "Slug grandfather; do not replace with a numeric alias as catalog_id"
+    }
+  ],
+  "held_unresolved": [
+    {
+      "id": "F-SCOPE-01",
+      "name": "Warbuggies",
+      "catalog_id": null,
+      "reason": "App name overlaps historically excluded content; no admitted URL or F00 row"
+    }
+  ],
+  "holds": [
+    {
+      "id": "F-SCOPE-01",
+      "hold": "Warbuggies identity; no admission",
+      "unblocks": "Later source review, not this PR"
+    },
+    {
+      "id": "S2-HOLD-DISTINCT-COUNTS",
+      "hold": "Exact distinct-rule integers after page grouping, child-entity resolution, and proven inherited-alias merge",
+      "unblocks": "S1, then FM0"
+    },
+    {
+      "id": "S2-HOLD-ENHANCEMENT-ID-COLLISION",
+      "hold": "Enhancement and Stratagem IDs are mixed slug, numeric, and composite; grandfather per row",
+      "unblocks": "FM0 alias table"
+    },
+    {
+      "id": "S2-HOLD-SM-CODEX-REWRITE",
+      "hold": "Announced Combat Doctrines army rule, Space Marine detachment rewrite, and Unique listing tags are not App-data 946; Oath of Moment and the Gladius Combat Doctrines heading stay distinct IDs",
+      "unblocks": "S1 re-observation when retained",
+      "community_previews": [
+        {
+          "observed_on": "2026-09-10",
+          "url": "https://www.warhammer-community.com/en-gb/articles/ifgezlgu/space-marines-rules-first-look/",
+          "note": "Combat Doctrines announced as army rule in place of Oath of Moment; Unique Doctrines on Assault, Tactical, and Devastator Brethren"
+        },
+        {
+          "observed_on": "2026-09-11",
+          "note": "Fifteen detachment listings, further Unique tags, chapter stopgaps; not F00"
+        }
+      ]
+    },
+    {
+      "id": "S2-HOLD-REPORTING-GROUP-MAP",
+      "hold": "Which six chapter views share the Space Marines evidence report",
+      "unblocks": "Q1"
+    },
+    {
+      "id": "S2-HOLD-WAHAPEDIA-SNAPSHOT-LABEL",
+      "hold": "Frozen snapshot directory label is S3c, not this design",
+      "unblocks": "S3c"
+    },
+    {
+      "id": "F-OWN-01",
+      "hold": "Answered here for the identity axes; listing still must not substitute owner",
+      "unblocks": "this survey / FM0 loaders"
+    },
+    {
+      "id": "F-DEBT-01",
+      "hold": "Name and faction branches in generic mustering",
+      "unblocks": "FM0 debt item 1"
+    }
+  ],
+  "not_in_this_pr": [
+    "src/ registry or loaders",
+    "catalog.json rewrites",
+    "army-list ID changes",
+    "F00 policy amendment",
+    "semantic_demand_matrix.json",
+    "Warbuggies admission",
+    "Space Marine Codex content",
+    "Army of Faith catalog_id allocation"
+  ],
+  "reconciliation": {
+    "admitted_views": 40,
+    "reporting_groups": 28,
+    "space_marine_overlay_count": 11,
+    "grey_knights_is_not_an_overlay": true,
+    "related_army_view_count": 6,
+    "identity_layer_count": 5,
+    "entity_kind_count": 10,
+    "page_versus_child_cardinality_closed": true,
+    "army_of_faith_enhancement_identities": 4,
+    "army_of_faith_stratagem_identities": 6,
+    "sir_hekhtur_resolved": true,
+    "warbuggies_unresolved": true,
+    "distinct_rule_integers_published": false,
+    "note": "28 reporting groups are not 40 catalog factions. 270 T4 names are not 270 catalog_ids. 506 detachment URLs include inherited aliases. One Army of Faith page is four Enhancement identities and six Stratagem identities, not one of each."
+  }
+}

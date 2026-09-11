@@ -1,6 +1,6 @@
 # T4 — Army-construction grammar
 
-[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Core P25A–C](../../CORE_RULES_REMEDIATION_ROADMAP.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Taxonomy index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Core P25A–C](../../CORE_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This survey is Track T item T4. It is planning evidence delivered read-only to
 Core orders P25A, P25B and P25C. It does not implement engine semantics, populate
@@ -46,7 +46,9 @@ faction-shaped schema. Their records are populated in FM0.
 Counts below are listing observations, including inherited Space Marine chapter
 and related-army views. They are not distinct-rule denominators. S2 records
 identity; the September register expects about 270–300 distinct detachments
-after resolution. This survey's unique listing names: **270**.
+after resolution. This survey's unique listing names: **270**. The closed
+identity axes are in
+[S2_IDENTITY_MODEL.md](../identity/S2_IDENTITY_MODEL.md).
 
 This document does not copy bulk operative text. Sampled clauses are paraphrased
 and linked. Exact transcription remains an F00/S3a obligation.
@@ -351,7 +353,7 @@ Two layers appear in this corpus:
    the "specifically stated otherwise" that makes the related units legal
    without selecting the related view as Army Faction.
 
-S2 must record ownership: Khorne Daemonkin is listed on the Blood Legions view
+S2 records ownership: Khorne Daemonkin is listed on the Blood Legions view
 and admits BLOOD LEGIONS units into a World Eaters army. Tallyband Summoners is
 listed on the Plague Legions view and admits PLAGUE LEGIONS units into a Death
 Guard army. Parallel listings Changehost of Deceit (Scintillating) and Carnival
@@ -392,8 +394,8 @@ Declare Battle Formations is Core 18.01 / P18A, not an Agents-only rule.
 
 Space Marine Chapters current text names a Legends Agents exception for Kill
 Team Cassius. CORE V2 must not ingest, scaffold, or expose that datasheet.
-Record the clause as out-of-scope exception text on an in-scope army rule (S2 /
-F-SCOPE).
+Record the clause as out-of-scope exception text on an in-scope army rule (S2:
+no catalog row / F-SCOPE).
 
 ### 7.2 Related-army construction families
 
@@ -493,8 +495,8 @@ Read-only findings for later Core or FM0 work:
 | T4-HOLD-DAEMONKIN-PARALLELS | Changehost of Deceit, Carnival of Excess full Restrictions/admission text | S3a |
 | T4-HOLD-BROOD-BROTHERS | Brood Brothers Auxilia operative admission text | S3a |
 | T4-HOLD-OTHER-DETACHMENT-EXAMPLE | No retained required/prohibited-other-detachment example | P25C still ships empty slots; FM0 fills or records absence |
-| F-SCOPE-01 | Warbuggies identity | S2 |
-| Legends exception on Space Marine Chapters | Kill Team Cassius named as Legends | S2; do not ingest |
+| F-SCOPE-01 | Warbuggies identity; listed unresolved in S2 with no catalog_id | Later source review |
+| Legends exception on Space Marine Chapters | Kill Team Cassius named as Legends | S2: no catalog row; do not ingest |
 
 ## 11. What "T4 delivered to P25C" means
 

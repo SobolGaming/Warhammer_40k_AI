@@ -65,7 +65,7 @@ The 40 rows are source views, including six additional Marine chapters and six r
 ## What to work on first?
 
 1. **Correct stale claims:** reconcile Acts of Faith turn timing, the Orks v946 refresh, changed costs/attachments, and conflicting coverage labels.
-2. **Establish exact identities and source evidence:** resolve shared/variant ownership, retired entries and the source-scope hold before adding missing content.
+2. **Establish exact identities and source evidence:** the [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) closes the axes; FM0 implements the registry. Resolve remaining holds (Warbuggies) and source-scope before adding missing content.
 3. **Close each field and rule gate:** use the linked unit/detachment audit and F02–F07 workstreams.
 4. **Prove usable rosters:** complete adapter, replay, invalid-input and full-game coverage before upgrading status.
 
@@ -80,6 +80,7 @@ The [roadmap findings and sequence](FACTION_RULES_REMEDIATION_ROADMAP.md#initial
 | `docs/factions/<faction>.md` | Existing generated historical coverage evidence; preserved under its generator contract |
 | [Faction Rules Remediation Roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) | Findings, evidence gates, dependencies and ordered implementation work |
 | [Faction Audit Sources](FACTION_AUDIT_SOURCES.md) | Observed versions, scope, counting and reconciliation method, pinned repository artifacts |
-| [Track T taxonomy](factions/taxonomy/README.md) | Pre-gate semantic surveys; T1 Stratagem WHEN taxonomy, T2 effect taxonomy, T3 bearer/target/condition grammar, T4 army-construction grammar, T5 resource and state-token taxonomy and T6 decision-kind and viewer-visibility demand are delivered |
+| [Track T taxonomy](factions/taxonomy/README.md) | Pre-gate semantic surveys; T1–T6 are delivered |
+| [S2 identity model](factions/identity/README.md) | Pre-gate identity design; registry scheme, crosswalk schema, Space Marines overlay and related-army ownership are delivered; registry implementation remains FM0 |
 
 Do not hand-edit the older generated reports to change a support claim. Fix the owning source/execution evidence and regenerate them in the corresponding implementation PR. Keep the readable guide synchronized with the evidence actually established.
