@@ -39,7 +39,9 @@ views inventoried on 5 September 2026 at App-data 946: 982 distinct datasheet
 URLs, 506 detachment URLs, 1,756 Enhancement/Upgrade entries and 2,520 Stratagem
 entries including inherited repeats. After identity resolution the distinct
 denominators are expected near 270–300 detachments, 1,000 Enhancements/Upgrades
-and 1,400 Stratagems; S2 records the exact figures. The [observation
+and 1,400 Stratagems. The [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md)
+closes the counting method; exact integers wait on S1 retention
+(`S2-HOLD-DISTINCT-COUNTS`). The [observation
 register](FACTION_AUDIT_SOURCES.md) and [scope method](FACTION_AUDIT_SOURCES.md#scope-and-identity)
 remain the record of that inventory. Every later milestone re-observes the
 corpus at the then-current App-data version; the September counts are not
@@ -161,11 +163,11 @@ evidence. Owning work now references tracks and milestones.
 | F-ORK-01 | 1 | v946 refreshes the Ork army and detachment roster: seven detachments added, More Dakka! removed, DP costs and Enhancement/Stratagem inventories changed, 73 unit changes. Retired scaffold directories remain. | FM0.5 pilot; U5–U6 |
 | F-DATA-01 | 1 | Current costs and attachments differ from older records (Eldrad, Bloodcrushers, Exorcist surcharge). | S3a; impact class "points only" and "attachment change" in U3; FM1 and FM3 |
 | F-EVID-01 | 1 | Module status, source labels, execution classifications and component labels describe different facts with different denominators. | Q1 |
-| F-OWN-01 | 2 | Shared URLs, same-name variants, chapters and related daemon views are not interchangeable identities. | S2 |
+| F-OWN-01 | 2 | Shared URLs, same-name variants, chapters and related daemon views are not interchangeable identities. | S2 design delivered in [S2_IDENTITY_MODEL.md](factions/identity/S2_IDENTITY_MODEL.md); FM0 registry |
 | F-GEOM-01 | 2 | No model-height field on App datasheets; 17 pages lack a base field. | S5 |
 | F-CORE-01 | 2 | Shared Core Ability wording belongs to the common engine owner. | Gate 0 (Core roadmap PFINAL) |
 | F-DOC-01 | 2 | Generated reports mix evidence layers; guides are hand-maintained. | Q1, D1 |
-| F-SCOPE-01 | 2 | Warbuggies reuses the name of historically excluded content; held pending exact identity review. | S2 |
+| F-SCOPE-01 | 2 | Warbuggies reuses the name of historically excluded content; held pending exact identity review. | Listed unresolved in S2; later source review |
 | F-DEBT-01 | 1 | Generic lifecycle code branches on faction/detachment IDs and a display name (`army_mustering.py`); the scaffold generator carries a hand-maintained implemented-ID map; per-detachment RuleIR and the detachment source table are Python modules; dated runtime modules encode a source version; only Death Guard has unit/wargear Python modules. | Debt items 1–8 in FM0 |
 
 Evidence for F-ARMY-01, F-ORK-01 and F-DATA-01 is unchanged from the September
@@ -211,7 +213,7 @@ evidence recorded before the next starts.
 | ID | Deliverable | Acceptance evidence |
 | --- | --- | --- |
 | S1 | Retain all 40 admitted views at V0 (the App-data version current at Gate 0) under the F00 contract. Amend the F00 policy to admit 40k.app versioned-path observations (`/<version>/factions/...`) for historical diff fixtures only; they never authorize a current content set. | Every admitted URL has a retained observation with fingerprint; excluded and held content rejected by validators; source-authority registry updated; policy amendment and validator coverage in the same PR |
-| S2 | Identity: project-owned catalog ID registry (existing catalog IDs are grandfathered and become project-owned; new entities receive registry-allocated IDs, never name-derived), crosswalk to 40k.app page IDs, GW PDF rows and the frozen Wahapedia IDs; Space Marines inheritance/overlay model; related-army and shared-page ownership; Warbuggies and Sir Hekhtur resolved or listed unresolved | No name joins; slug renames are crosswalk updates, not identity changes; existing army lists and replay artifacts resolve unchanged |
+| S2 | Identity: project-owned catalog ID registry (existing catalog IDs are grandfathered and become project-owned; new entities receive registry-allocated IDs, never name-derived), crosswalk to 40k.app page IDs, GW PDF rows and the frozen Wahapedia IDs; Space Marines inheritance/overlay model; related-army and shared-page ownership; Warbuggies and Sir Hekhtur resolved or listed unresolved. **FM-pre design delivered** in [S2_IDENTITY_MODEL.md](factions/identity/S2_IDENTITY_MODEL.md); registry loaders, catalog rewrites and army-list migration remain FM0. Sir Hekhtur is resolved as datasheet `000002770` included by Canis Rex `000001484`. Warbuggies stays [F-SCOPE-01](#initial-findings) with no catalog ID | No name joins; slug renames are crosswalk updates, not identity changes; existing army lists and replay artifacts resolve unchanged |
 | S3a | Structured extraction at the data boundary from retained pages into the content set: datasheets, detachments, army rules, pacts; typed fail-fast loader | Missing fields fail; every admitted record carries source ID, transcription hash and registered official provenance (non-empty `official_source_ids` resolving to retained official artifacts with hashes, exactly as the F00 validator requires today); an observation without registered official provenance is a **staging observation** (see below), never an admitted record; no runtime module parses page text |
 | S3b | Dual-run catalog generation for currently supported content: Wahapedia rows versus content set, field-by-field diff | Every difference attributed to source drift or an extraction defect; nothing accepted silently |
 | S3c | Switch `rules/catalog_generation.py` to the content set; freeze the Wahapedia snapshot as legacy crosswalk input only. Depends on U7a (replay compatibility contract) being merged first | Engine build identity and external contract regenerated; committed player army-list artifacts resolve their grandfathered catalog IDs unchanged; committed replay fixtures reproduce under the new build through the U7a mechanism, or are regenerated with a recorded justification per fixture; snapshot path label resolved |
@@ -307,7 +309,7 @@ against V0 before any new work reuses them.
 | C-WE World Eaters | 25 datasheets, 7 detachments; Blessings of Khorne | Blood Legions pact; Khorne Daemonkin cross-faction eligibility |
 | C-OR Orks | 53 datasheets, 15 detachments; Waaagh!, Da Boss, Unstable energies, Special Move Types | Follows the FM0.5 pilot; retired detachments already tombstoned |
 | Wave 2: Chaos | Chaos Space Marines, Death Guard, Thousand Sons, Chaos Knights | Share Dark Pacts and daemon pacts; RuleIR shards exist for CSM and Thousand Sons |
-| Wave 3: Space Marines super-family | Space Marines' shared detachments certified once; 12 chapter overlays (chapter-owned army rules such as Templar Vows, The Sons of Sanguinius, The Unforgiven, Curse of the Wulfen/Sagas; chapter-owned detachments: Black Templars 6, Blood Angels 8, Dark Angels 8, Space Wolves 7, Ultramarines 2, Deathwatch 1 plus Kill Teams, Imperial Fists/Iron Hands/Raven Guard/Salamanders/White Scars 1 each, subject to S2) | Grey Knights (Gate of Infinity, 9 own detachments) is certified separately |
+| Wave 3: Space Marines super-family | Space Marines' shared detachments certified once; **11 chapter overlays** (S2): Black Templars, Blood Angels, Dark Angels, Deathwatch, Imperial Fists, Iron Hands, Raven Guard, Salamanders, Space Wolves, Ultramarines, White Scars. Chapter-owned army rules such as Templar Vows, The Sons of Sanguinius, The Unforgiven, Curse of the Wulfen/Sagas; chapter-owned detachments: Black Templars 6, Blood Angels 8, Dark Angels 8, Space Wolves 7, Ultramarines 2, Deathwatch 1 plus Kill Teams, Imperial Fists/Iron Hands/Raven Guard/Salamanders/White Scars 1 each | Grey Knights is a separate catalog faction, not an overlay (Gate of Infinity, 9 own detachments) |
 | Wave 4: Imperium | Adepta Sororitas (F-ARMY-01 closed in FM0), Adeptus Custodes, Astra Militarum, Adeptus Mechanicus, Imperial Agents, Imperial Knights | |
 | Wave 5: Xenos | Drukhari, Genestealer Cults, Leagues of Votann, Necrons, Tyranids, T'au Empire | |
 | C-FINAL | Corpus-wide L8 audit at one pinned version | |
@@ -567,8 +569,8 @@ Permitted in parallel with the remaining Core Rules orders:
   [T5_RESOURCE_STATE_TOKEN_TAXONOMY.md](factions/taxonomy/T5_RESOURCE_STATE_TOKEN_TAXONOMY.md).
   T6 is delivered:
   [T6_DECISION_KIND_VISIBILITY.md](factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md);
-- the S2 identity model design document: ID registry scheme, crosswalk schema,
-  Space Marines overlay model, related-army ownership;
+- the S2 identity model design document is delivered:
+  [S2_IDENTITY_MODEL.md](factions/identity/S2_IDENTITY_MODEL.md);
 - Track U design and runbook documents: impact classes, packet schema,
   retention policy;
 - the Q1 status-artifact schema document;

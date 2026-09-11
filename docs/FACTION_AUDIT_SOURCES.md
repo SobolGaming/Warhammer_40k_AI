@@ -1,6 +1,6 @@
 # Faction audit: source and evidence register
 
-[Faction directory](FACTION_SUPPORT.md) · [Remediation roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md)
+[Faction directory](FACTION_SUPPORT.md) · [Remediation roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md)
 
 ## Observation boundary
 
@@ -37,7 +37,9 @@ Unit navigation contains **2,095 admitted listing references**, resolved to **98
 
 Scope screening compared listing names with archived source classifications (`Source.json` and `Datasheets.json`, dated 2026-06-14, under `data/source_snapshots/wahapedia/`), then checked complete current-PDF review evidence in `data/source_manifests/faction_pack_datasheet_review_v1.json`. Historical-only excluded identities were withheld; Land Speeder and Wartrakks were retained because the manifest has complete current faction-pack review evidence. Historical classifications are an exclusion aid only; active operative rules must come from approved 11th Edition sources.
 
-**72 listing references representing 46 distinct source URLs were withheld** by that screening, in addition to the two excluded Titan views. One of those identities, **Warbuggies**, remains a current-source ambiguity: the new App name overlaps a historical Legends entry. It is held for F-SCOPE-01 review and has no supported catalog/audit row here. The other exclusions follow the retained out-of-scope source classification. Reconcile exact current origin before changing any decision; a matching name alone cannot prove identity.
+**72 listing references representing 46 distinct source URLs were withheld** by that screening, in addition to the two excluded Titan views. One of those identities, **Warbuggies**, remains a current-source ambiguity: the new App name overlaps a historical Legends entry. The [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) lists it unresolved with no `catalog_id`. The other exclusions follow the retained out-of-scope source classification. Reconcile exact current origin before changing any decision; a matching name alone cannot prove identity.
+
+Identity layers, overlay membership, related-army owner/listing/host split, and grandfather-versus-allocate rules are closed in that S2 document. Exact distinct-rule integers after owner-versus-alias grouping remain `S2-HOLD-DISTINCT-COUNTS`.
 
 Consequently, “all” in this audit means the admitted navigation corpus with these declared exclusions and hold. It is not a claim to inventory every Games Workshop publication, every sculpt, or every historical datasheet. No excluded content is scaffolded or exposed as supported.
 
