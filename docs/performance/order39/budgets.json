@@ -1,0 +1,7 @@
+{
+  "workload_id": "order39-stealth-cover-v1",
+  "mean_base_multiplier": 1.5,
+  "mean_additive_seconds": 0.001,
+  "maximum_seconds": 0.01,
+  "samples_per_case": 7
+}

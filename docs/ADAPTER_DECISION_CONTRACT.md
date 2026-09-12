@@ -2906,7 +2906,7 @@ Accepted catalog named-weapon choices create an engine-owned `PersistingEffect` 
 
 Catalog Shooting-start selected-target requests reuse `select_faction_rule_shooting_phase_start_option` with `submission_kind: "catalog_selected_target_shooting_start_effect"` and hook ID `catalog-ir:shooting-start-selected-target-effect`. The non-active source player is the actor for an opponent-turn ability. Request payloads carry the catalog record/ability/source RuleIR IDs and hash, source unit/model and clause IDs, the replay-safe serialized `selection_clause`, effect clause IDs, the engine-enumerated `available_target_unit_instance_ids`, and replay-safe `available_catalog_selected_target_options`. Supported source predicates include exact friendly keyword sequences, source-to-target distance, and visibility. The engine enumerates each placed `RulesUnitView` once, canonicalizes supplied target IDs, and evaluates range and visibility across the complete set of placed living component models. Optional abilities include one deterministic decline option. Target options carry `use_ability: true`, `selected_catalog_target_effect`, and engine-prepared `generic_rule_effect_records`; decline carries `use_ability: false` and no effects. Adapters must not enumerate targets, calculate visibility/range, normalize keyword requirements, or prepare effect payloads locally.
 
-Accepted catalog Shooting-start selected-target choices persist engine-owned generic RuleIR effects with the source catalog/rule/clause identity and canonical selected rules-unit gate. The current generic grant-ability consumer can grant `stealth` through the end of the Shooting phase; the shared ranged hit-roll path resolves the attack target to its canonical rules-unit ID and consumes that one rules-unit effect as the ordinary Stealth hit modifier. Decline records resolution without creating an effect. Adapters must not grant Stealth or mutate hit rolls locally.
+Accepted catalog Shooting-start selected-target choices persist engine-owned generic RuleIR effects with the source catalog/rule/clause identity and canonical selected rules-unit gate. The current generic grant-ability consumer can grant `stealth` through the end of the Shooting phase; the shared Stealth query resolves the attack target to its canonical rules-unit ID and grants Benefit of Cover only when every present model has the ability. Decline records resolution without creating an effect. Adapters must not grant Stealth or mutate hit rolls locally.
 
 Accepted Cabal attempts record the model and ritual attempt before the Psychic test, roll 2D6 or 3D6 when `channel_the_warp` is true, route Channel doubles/triples through the standard mortal-wound Feel No Pain continuation path, and resolve the ritual only if the manifesting model is not destroyed and the test meets the ritual warp charge. Destiny's Ruin records source-backed hit rerolls against the target, restricted to Hit rolls of 1 unless the Psychic test result reaches 10+. Twist of Fate records a phase-scoped weapon profile AP modifier of 1, or 2 on a 12+. Doombolt routes D3 mortal wounds, or D3+3 on an 11+, while excluding non-attached Lone Operative units more than 12" from the manifesting model. Temporal Surge records a turn-scoped charge-forbidden effect and uses the shared `select_triggered_movement` request for its selected ritual target. Choosing to move establishes active-player authority and emits `submit_movement_proposal` with proposal kind `surge_move`; choosing to decline ends the movement opportunity. The request carries the engine-rolled maximum move distance, and adapters must answer the proposal with a `PathWitness`. The charge restriction remains in either case.
 
@@ -3186,7 +3186,7 @@ Accepted World Eaters selections create a deterministic `PersistingEffect` with 
 
 The 11th Edition Icon of Khorne update is represented as Bloodshed points. When a World Eaters unit destroys an enemy unit, the engine grants the next Blessings roll one additional D6 only if the destroying unit had a live Icon of Khorne bearer when the enemy unit destruction completed. Bloodshed points are spent into the next Blessings request and then consumed by that request payload; adapters must render this as engine-derived state, not calculate it from static selected wargear.
 
-Accepted Chaos Knights selections create a deterministic `FactionRuleState` with state kind `chaos_knights_harbingers_of_dread_selection` and emit `chaos_knights_harbingers_of_dread_selected`. Deathly Terror is always active; selected or rolled Dread abilities accumulate across battle rounds 1, 3, and 5. Later hosts consume the state only through shared engine hooks: Deathly Terror and Despair worsen Leadership in the live aura, Dismay adds forced below-starting Battle-shock tests in the opponent Command phase, Delirium applies engine-owned D3 mortal wounds after failed Battle-shock, Doom adds 1 to wound rolls against Battle-shocked units, and Darkness applies the 11th Edition update as a ranged hit-roll Stealth penalty against Chaos Knights models.
+Accepted Chaos Knights selections create a deterministic `FactionRuleState` with state kind `chaos_knights_harbingers_of_dread_selection` and emit `chaos_knights_harbingers_of_dread_selected`. Deathly Terror is always active; selected or rolled Dread abilities accumulate across battle rounds 1, 3, and 5. Later hosts consume the state only through shared engine hooks: Deathly Terror and Despair worsen Leadership in the live aura, Dismay adds forced below-starting Battle-shock tests in the opponent Command phase, Delirium applies engine-owned D3 mortal wounds after failed Battle-shock, Doom adds 1 to wound rolls against Battle-shocked units, and Darkness grants Stealth to the eligible Chaos Knights models; the shared Core query grants Benefit of Cover only if every present model in the targeted rules unit has Stealth.
 
 Malformed, stale, wrong-actor, wrong-faction, duplicate-selection, unsupported-option, active/available Dread drift, Shadow Form source/hash/record drift, Triumph source/damaged-limit drift, and option-payload drift submissions reject before the pending queue is popped and before a `DecisionRecord`, `FactionRuleState`, persisting effect, destruction-reaction source, or event is created.
 
@@ -5531,3 +5531,27 @@ proposal kind or visibility classification changes: both players observe these
 public decisions and events through the shared redaction owner. Shock engagement
 ownership and forced Fight behavior remain outside C18-08; this section supersedes
 older Normal-only/Advance-only eligibility descriptions, not those other semantics.
+
+
+## Order 39 — model-complete Stealth and shared Cover
+
+Core 24.33 uses `gw-11e-core-stealth:stealth`: every living or retained-present
+model in the target rules unit must have Stealth before it grants Benefit of
+Cover against a ranged attack. Component-native descriptors and canonical model
+keyword assignments cover their own models. Source-linked catalog Aura/self
+bindings, Darkness and persisted RuleIR grants retain their actual model
+footprints, source conditions and expiration. They do not add a Hit modifier.
+
+Stealth enters the existing one-per-attack Cover Ballistic Skill modifier,
+including ranged attacks outside the Shooting phase. Terrain, Indirect Fire and
+multiple ability grants do not stack Cover. Ignores Cover and an applicable
+Cover-denial effect suppress it. Melee attacks are unaffected.
+
+The existing Psychic modifier contract already covers this skill modifier. Its
+opaque ID commits to the current native/granted source inventory and model
+footprints, so replacing a source at the same numeric total invalidates a pending
+choice before queue pop. Existing decision types, option families, payload
+schemas and visibility classes suffice; no contract-version change is required.
+Both viewers use the shared public projection and event redaction path. Adapters
+must submit the pending engine choices and must not calculate or apply Stealth
+or Cover themselves. Persistence and replay remain exact-runtime-bound.

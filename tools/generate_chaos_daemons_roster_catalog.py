@@ -6,7 +6,12 @@ import json
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING or __package__:
+    from tools.core_stealth_catalog_overlay import with_current_stealth
+else:
+    from core_stealth_catalog_overlay import with_current_stealth
 
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
@@ -180,6 +185,7 @@ def build_catalog_package() -> CanonicalCatalogPackage:
         army_catalog=current_catalog,
         source_artifacts=source_artifacts_with_provenance,
     )
+    package = with_current_stealth(package)
     roster_catalog.validate_catalog_against_reconciliation(
         catalog=package.army_catalog,
         reconciliation=reconciliation,

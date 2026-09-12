@@ -66800,7 +66800,7 @@
       "runtime_consumer_ids": [
         "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
         "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock",
-        "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll",
+        "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:ability-grant",
         "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll",
         "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership"
       ],
@@ -121988,8 +121988,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "2a0d7bc5eda6d53d4e32b99f235dc0845f1899eca247b41179b041ef6c335211",
+  "source_payload_checksum_sha256": "ae1291b22e8a9a4f1ff7ebae0bd1e30bd0130316ea4c47b2d093ef6fe12ef34e",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 807,
-  "upstream_execution_checksum_sha256": "834125acc90177293fe986b60d1caa75c6fb47bef2aa6d9bf0571d0a54fd9347"
+  "upstream_execution_checksum_sha256": "91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de"
 }

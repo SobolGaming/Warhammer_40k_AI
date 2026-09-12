@@ -1,0 +1,256 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "dice_calls": 0,
+  "file_hashes": {
+    "scripts/measure_stealth_cover.py": "b200e919da35524137e9ba8583bde0ed6f68c22f3740d100348cbd273fb9adb9",
+    "src/warhammer40k_core/_engine_build_manifest.json": "92a1354250ef433b5d52e0dbc220644e132837af23e58bc0377bb833d721bab4",
+    "tests/generic_modifier_helpers.py": "03e2c0fc9376229b6ba2cd399a2de3d0f62a520e2ebedaaa66876ef6bcd2e2dd",
+    "tests/phase13b_shooting_declaration_helpers.py": "6d8d4ec8f51b4e96e485a23b993168b8f2ace7c269959658466ebf9d73f10839",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 10,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "case": "plain",
+      "query_seconds": 0.00012454957934096455,
+      "sample": 0,
+      "setup_seconds": 1.650671209092252,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 3.68216703645885e-05,
+      "sample": 1,
+      "setup_seconds": 0.00545466598123312,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 3.780375001952052e-05,
+      "sample": 2,
+      "setup_seconds": 0.0052820839919149876,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 3.700292087160051e-05,
+      "sample": 3,
+      "setup_seconds": 0.005355999921448529,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 3.658666973933577e-05,
+      "sample": 4,
+      "setup_seconds": 0.005904917023144662,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 3.645625081844628e-05,
+      "sample": 5,
+      "setup_seconds": 0.005188082926906645,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 3.6687500542029736e-05,
+      "sample": 6,
+      "setup_seconds": 0.005157332983799279,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.7437499267980454e-05,
+      "sample": 0,
+      "setup_seconds": 0.006269417004659772,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.6454580258578064e-05,
+      "sample": 1,
+      "setup_seconds": 0.006163583020679653,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.703666036017239e-05,
+      "sample": 2,
+      "setup_seconds": 0.006177542032673955,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.662374918349087e-05,
+      "sample": 3,
+      "setup_seconds": 0.006051042000763118,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.69670893996954e-05,
+      "sample": 4,
+      "setup_seconds": 0.006168958032503724,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.7041669711470606e-05,
+      "sample": 5,
+      "setup_seconds": 0.006001290981657803,
+      "snapshot_count": 0
+    },
+    {
+      "case": "native",
+      "query_seconds": 3.780166967771947e-05,
+      "sample": 6,
+      "setup_seconds": 0.005928000085987151,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.122458980418742e-05,
+      "sample": 0,
+      "setup_seconds": 0.005366500001400709,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.219084046781063e-05,
+      "sample": 1,
+      "setup_seconds": 0.005176124977879226,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.117375006899238e-05,
+      "sample": 2,
+      "setup_seconds": 0.006343666929751635,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.215957946144045e-05,
+      "sample": 3,
+      "setup_seconds": 0.00512950005941093,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.239666042849421e-05,
+      "sample": 4,
+      "setup_seconds": 0.005311999935656786,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.120207973755896e-05,
+      "sample": 5,
+      "setup_seconds": 0.005131875048391521,
+      "snapshot_count": 0
+    },
+    {
+      "case": "grant",
+      "query_seconds": 4.1450420394539836e-05,
+      "sample": 6,
+      "setup_seconds": 0.0052255409536883235,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.384209052659571e-05,
+      "sample": 0,
+      "setup_seconds": 0.005205500056035817,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.412833019159734e-05,
+      "sample": 1,
+      "setup_seconds": 0.005209124996326864,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.433374968357384e-05,
+      "sample": 2,
+      "setup_seconds": 0.005243625026196241,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.509250051341951e-05,
+      "sample": 3,
+      "setup_seconds": 0.005223957938142121,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.5522500295192e-05,
+      "sample": 4,
+      "setup_seconds": 0.005281332996673882,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.470999934710562e-05,
+      "sample": 5,
+      "setup_seconds": 0.005255124997347593,
+      "snapshot_count": 0
+    },
+    {
+      "case": "duplicate_grants",
+      "query_seconds": 4.4146250002086165e-05,
+      "sample": 6,
+      "setup_seconds": 0.005460666958242655,
+      "snapshot_count": 0
+    }
+  ],
+  "summaries": {
+    "duplicate_grants": {
+      "completion_rate": 1.0,
+      "max": 4.5522500295192e-05,
+      "mean": 4.453934579422431e-05,
+      "median": 4.433374968357384e-05,
+      "p95": 4.5522500295192e-05,
+      "queries_per_second": 22452.058560089496,
+      "samples": 7
+    },
+    "grant": {
+      "completion_rate": 1.0,
+      "max": 4.239666042849421e-05,
+      "mean": 4.1685417194717695e-05,
+      "median": 4.1450420394539836e-05,
+      "p95": 4.239666042849421e-05,
+      "queries_per_second": 23989.20455393015,
+      "samples": 7
+    },
+    "native": {
+      "completion_rate": 1.0,
+      "max": 3.780166967771947e-05,
+      "mean": 3.7051845408443895e-05,
+      "median": 3.703666036017239e-05,
+      "p95": 3.780166967771947e-05,
+      "queries_per_second": 26989.209011762367,
+      "samples": 7
+    },
+    "plain": {
+      "completion_rate": 1.0,
+      "max": 0.00012454957934096455,
+      "mean": 4.941547738521227e-05,
+      "median": 3.68216703645885e-05,
+      "p95": 0.00012454957934096455,
+      "queries_per_second": 20236.574711291833,
+      "samples": 7
+    }
+  },
+  "terrain_count": 0,
+  "timing_boundary": "100 attack_modifier_snapshots queries per sample; setup separate",
+  "workload_id": "order39-stealth-cover-v1"
+}

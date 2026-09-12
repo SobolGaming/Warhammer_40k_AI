@@ -39,9 +39,6 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
-from warhammer40k_core.engine.catalog_datasheet_rule_support import (
-    CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
-)
 from warhammer40k_core.engine.catalog_prebattle_redeploy import (
     CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
     CatalogPrebattleRedeployPermission,
@@ -788,24 +785,10 @@ def test_hallucinogen_grenades_uses_opponent_shooting_start_decision_and_grants_
     assert applied is True
     assert len(state.persisting_effects_for_unit("army-a:yriel")) == 1
 
-    stealth_binding = next(
-        binding
-        for binding in CatalogDatasheetRuleRuntime(indexes, armies).hit_roll_modifier_bindings()
-        if binding.modifier_id == CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID
-    )
-    enemy_vyper = _unit(armies, "army-b:vypers")
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
     assert (
-        stealth_binding.handler(
-            HitRollModifierContext(
-                state=state,
-                attacking_unit_instance_id=enemy_vyper.unit_instance_id,
-                attacker_model_instance_id=enemy_vyper.own_models[0].model_instance_id,
-                target_unit_instance_id="army-a:yriel",
-                weapon_profile=_weapon_profile(VYPERS_ID, "Bright lance"),
-                source_phase=BattlePhase.SHOOTING,
-            )
-        )
-        == -1
+        rules_unit_stealth_sources(state=state, target_unit_instance_id="army-a:yriel") is not None
     )
 
 
@@ -1051,25 +1034,12 @@ def test_hallucinogen_grenades_persists_and_consumes_stealth_by_rules_unit_id() 
         is True
     )
     assert len(state.persisting_effects_for_unit(attached_id)) == 1
-    stealth_binding = next(
-        binding
-        for binding in CatalogDatasheetRuleRuntime(indexes, armies).hit_roll_modifier_bindings()
-        if binding.modifier_id == CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID
-    )
-    enemy_vyper = _unit(armies, "army-b:vypers")
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
     for target_component_id in ("army-a:yriel", "army-a:voidreavers"):
         assert (
-            stealth_binding.handler(
-                HitRollModifierContext(
-                    state=state,
-                    attacking_unit_instance_id=enemy_vyper.unit_instance_id,
-                    attacker_model_instance_id=enemy_vyper.own_models[0].model_instance_id,
-                    target_unit_instance_id=target_component_id,
-                    weapon_profile=_weapon_profile(VYPERS_ID, "Bright lance"),
-                    source_phase=BattlePhase.SHOOTING,
-                )
-            )
-            == -1
+            rules_unit_stealth_sources(state=state, target_unit_instance_id=target_component_id)
+            is not None
         )
 
 

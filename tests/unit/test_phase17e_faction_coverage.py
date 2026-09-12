@@ -415,7 +415,7 @@ CHAOS_DAEMONS_DAEMONIC_MANIFESTATION_RUNTIME_CONSUMERS = (
 CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
     "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock",
-    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll",
+    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:ability-grant",
     "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll",
     "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership",
 )

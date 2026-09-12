@@ -696,8 +696,10 @@ def test_harbingers_public_handlers_fail_fast_for_invalid_inputs() -> None:
         army_rule.result_actor_is_missing(cast(BattleRoundStartResultContext, object()))
     with pytest.raises(GameLifecycleError, match="Leadership modifier requires context"):
         army_rule.harbingers_leadership_modifier(cast(UnitCharacteristicModifierContext, object()))
-    with pytest.raises(GameLifecycleError, match="Darkness hit modifier requires context"):
-        army_rule.harbingers_darkness_hit_roll_modifier(cast(HitRollModifierContext, object()))
+    from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantContext
+
+    with pytest.raises(GameLifecycleError, match="Darkness requires a model grant context"):
+        army_rule.harbingers_darkness_model_ability_grant(cast(ModelAbilityGrantContext, object()))
     with pytest.raises(GameLifecycleError, match="Doom wound modifier requires context"):
         army_rule.harbingers_doom_wound_roll_modifier(cast(WoundRollModifierContext, object()))
     with pytest.raises(GameLifecycleError, match="forced tests require context"):
@@ -2319,7 +2321,17 @@ def test_doom_and_darkness_runtime_modifiers_apply_to_enemy_attacks() -> None:
     )
 
     assert wound_modifier == 1
-    assert hit_modifier == -1
+    assert hit_modifier == 0
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+            runtime_modifier_registry=registry,
+        )
+        is not None
+    )
 
 
 def test_harbingers_modifiers_return_neutral_outside_required_contexts() -> None:
@@ -2397,7 +2409,7 @@ def test_chaos_knights_army_rule_uses_phase17f_execution_source_id() -> None:
     assert contribution.battle_shock_hook_bindings[0].source_id == record.execution_id
     assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].source_id == record.execution_id
     assert contribution.unit_characteristic_modifier_bindings[0].source_id == record.execution_id
-    assert contribution.hit_roll_modifier_bindings[0].source_id == record.execution_id
+    assert contribution.model_ability_grant_bindings[0].source_id == record.execution_id
     assert contribution.wound_roll_modifier_bindings[0].source_id == record.execution_id
 
 
@@ -2416,6 +2428,7 @@ def _runtime_modifier_registry() -> RuntimeModifierRegistry:
     return RuntimeModifierRegistry.from_bindings(
         unit_characteristic_modifier_bindings=contribution.unit_characteristic_modifier_bindings,
         hit_roll_modifier_bindings=contribution.hit_roll_modifier_bindings,
+        model_ability_grant_bindings=contribution.model_ability_grant_bindings,
         wound_roll_modifier_bindings=contribution.wound_roll_modifier_bindings,
     )
 
@@ -3804,3 +3817,30 @@ def _assert_deferred_delirium_outcomes(
     assert replay.state is not None
     assert replay.state.to_payload() == restored.state.to_payload()
     assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()
+
+
+def test_order39_model_grant_bindings_reject_identity_and_registry_drift() -> None:
+    from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantBinding
+
+    (binding,) = army_rule.runtime_contribution().model_ability_grant_bindings
+    assert binding.ability_id == "core-stealth"
+    assert binding.source_id == army_rule.SOURCE_RULE_ID
+    for modifier_id, source_id, ability_id in (
+        (" ", binding.source_id, binding.ability_id),
+        (binding.modifier_id, " ", binding.ability_id),
+        (binding.modifier_id, binding.source_id, " "),
+    ):
+        with pytest.raises(GameLifecycleError, match="nonempty IDs"):
+            ModelAbilityGrantBinding(modifier_id, source_id, ability_id, binding.handler)
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        replace(binding, handler=cast(Any, None))
+    with pytest.raises(GameLifecycleError, match="modifier IDs must be unique"):
+        RuntimeModifierRegistry(model_ability_grant_bindings=(binding, binding))
+    with pytest.raises(GameLifecycleError, match="must contain ModelAbilityGrantBinding"):
+        RuntimeModifierRegistry(
+            model_ability_grant_bindings=(cast(ModelAbilityGrantBinding, object()),)
+        )
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        RuntimeModifierRegistry(
+            model_ability_grant_bindings=cast(tuple[ModelAbilityGrantBinding, ...], [binding])
+        )

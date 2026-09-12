@@ -14,7 +14,6 @@ from warhammer40k_core.core.dice import (
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.weapon_profiles import (
-    RangeProfileKind,
     WeaponProfile,
 )
 from warhammer40k_core.engine.abilities import (
@@ -50,16 +49,12 @@ from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     defensive_strength_toughness_wound_handler,
     half_range_weapon_ability_handler,
     passive_self_defensive_hit_handler,
-    passive_self_stealth_hit_handler,
 )
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     rules_units_within as _rules_units_within,
 )
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     source_applies_to_rules_unit as _source_applies_to_rules_unit,
-)
-from warhammer40k_core.engine.catalog_conditional_leader_queries import (
-    catalog_granted_stealth_hit_roll_modifier,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     CatalogAllocatedAttackDamageModifierDescriptor,
@@ -87,16 +82,12 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
-    CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
     CATALOG_IR_PASSIVE_SELF_DEFENSIVE_HIT_MODIFIER_CONSUMER_ID,
-    CATALOG_IR_PASSIVE_SELF_STEALTH_CONSUMER_ID,
-    CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
     clause_is_charge_end_leading_unit_weapon_ability_grant,
     clause_is_conditional_lone_operative,
     clause_is_consolidation_move_distance_modifier,
     clause_is_defensive_strength_toughness_wound_modifier,
     clause_is_fight_selected_weapon_ability_choice,
-    clause_is_granted_stealth_effect,
     clause_is_half_range_weapon_ability_grant,
     clause_is_leading_unit_hit_roll_modifier,
     clause_is_leading_unit_wound_roll_modifier,
@@ -146,8 +137,8 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
 )
+from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantBinding
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     rule_ir_from_execution_payload,
@@ -493,17 +484,16 @@ class CatalogDatasheetRuleRuntime:
         )
         return tuple(bindings)
 
+    def model_ability_grant_bindings(self) -> tuple[ModelAbilityGrantBinding, ...]:
+        from warhammer40k_core.engine.catalog_stealth_grants import catalog_stealth_grant_bindings
+
+        return catalog_stealth_grant_bindings(
+            aura_sources=self._sources(clause_is_stealth_aura),
+            self_sources=self._sources(clause_is_passive_self_stealth),
+        )
+
     def hit_roll_modifier_bindings(self) -> tuple[HitRollModifierBinding, ...]:
-        sources = self._sources(clause_is_stealth_aura)
         bindings: list[HitRollModifierBinding] = []
-        if sources:
-            bindings.append(
-                HitRollModifierBinding(
-                    modifier_id=CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
-                    source_id=CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
-                    handler=self._stealth_handler(sources),
-                )
-            )
         bindings.extend(
             HitRollModifierBinding(
                 modifier_id=source.binding_id,
@@ -511,14 +501,6 @@ class CatalogDatasheetRuleRuntime:
                 handler=self._leading_unit_hit_roll_handler(source),
             )
             for source in self._sources(clause_is_leading_unit_hit_roll_modifier)
-        )
-        bindings.extend(
-            HitRollModifierBinding(
-                modifier_id=f"{CATALOG_IR_PASSIVE_SELF_STEALTH_CONSUMER_ID}:{source.binding_id}",
-                source_id=source.rule_ir.source_id,
-                handler=passive_self_stealth_hit_handler(source),
-            )
-            for source in self._sources(clause_is_passive_self_stealth)
         )
         bindings.extend(
             HitRollModifierBinding(
@@ -542,14 +524,6 @@ class CatalogDatasheetRuleRuntime:
             )
             if descriptor.hit_roll_delta is not None
         )
-        if self._sources(clause_is_granted_stealth_effect):
-            bindings.append(
-                HitRollModifierBinding(
-                    modifier_id=CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
-                    source_id=CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
-                    handler=self._granted_stealth_handler,
-                )
-            )
         return tuple(bindings)
 
     def wound_roll_modifier_bindings(self) -> tuple[WoundRollModifierBinding, ...]:
@@ -1082,34 +1056,6 @@ class CatalogDatasheetRuleRuntime:
             if type(delta) is not int:
                 raise GameLifecycleError("Catalog datasheet hit delta must be integer.")
             return delta
-
-        return handler
-
-    def _granted_stealth_handler(self, context: HitRollModifierContext) -> int:
-        return catalog_granted_stealth_hit_roll_modifier(context)
-
-    def _stealth_handler(
-        self, sources: tuple[_CatalogClauseSource, ...]
-    ) -> Callable[[HitRollModifierContext], int]:
-        def handler(context: HitRollModifierContext) -> int:
-            if (
-                context.target_unit_instance_id == context.attacking_unit_instance_id
-                or context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE
-            ):
-                return 0
-            target = rules_unit_view_by_id(
-                state=context.state, unit_instance_id=context.target_unit_instance_id
-            )
-            for source in sources:
-                for model_id in _current_source_model_ids(state=context.state, source=source):
-                    if target.unit_instance_id in aura_affected_unit_ids(
-                        clause=source.clause,
-                        state=context.state,
-                        source_unit_instance_id=source.unit.unit_instance_id,
-                        source_model_instance_id=model_id,
-                    ):
-                        return -1
-            return 0
 
         return handler
 

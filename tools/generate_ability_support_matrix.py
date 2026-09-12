@@ -1104,7 +1104,7 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     chaos_knights_army_rule.LEADERSHIP_MODIFIER_ID: (
         "Harbingers of Dread - Deathly Terror and Despair"
     ),
-    chaos_knights_army_rule.DARKNESS_HIT_MODIFIER_ID: "Harbingers of Dread - Darkness",
+    chaos_knights_army_rule.DARKNESS_ABILITY_GRANT_ID: "Harbingers of Dread - Darkness",
     chaos_knights_army_rule.DOOM_WOUND_MODIFIER_ID: "Harbingers of Dread - Doom",
     imperial_knights_army_rule.HOOK_ID: "Code Chivalric",
     imperial_knights_army_rule.SETUP_HOOK_ID: "Code Chivalric - Oath Selection",
@@ -2922,7 +2922,7 @@ def _chaos_knights_runtime_consumer_ids() -> tuple[str, ...]:
                     binding.modifier_id
                     for binding in contribution.unit_characteristic_modifier_bindings
                 ),
-                *(binding.modifier_id for binding in contribution.hit_roll_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.model_ability_grant_bindings),
                 *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
             }
         )
@@ -5791,6 +5791,14 @@ def _add_runtime_content_inventory_entries(
         inventory,
         (
             (binding.modifier_id, binding.source_id)
+            for binding in contribution.model_ability_grant_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
             for binding in contribution.wound_roll_modifier_bindings
         ),
         labels_by_id,
@@ -6050,13 +6058,13 @@ def _structured_support_sections_markdown() -> list[str]:
                 ),
                 SupportSectionRow(
                     "Stealth",
-                    "Shooting target candidate hit-roll penalty",
+                    "Model-complete Stealth through the shared Benefit of Cover query",
                     "Architecture, source-row registry, and generated matrix",
                     "Focused descriptor-backed Shooting target tests",
                     "Full",
                     (
                         "Consumes keyword or descriptor-backed Stealth on target rules units "
-                        "and carries the -1 hit-roll modifier through accepted ranged pools."
+                        "only when every present model has it; grants share non-stacking Cover."
                     ),
                 ),
                 SupportSectionRow(
@@ -6382,7 +6390,7 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Implements battle-round Dread selections and 2D6 rolls, Deathly "
                         "Terror/Despair Leadership auras, Dismay forced below-starting "
                         "Battle-shock tests, Delirium D3 mortal wounds, Doom wound modifiers, "
-                        "and the Darkness Stealth hit modifier. Delirium mortal-wound "
+                        "and the Darkness Stealth model grant. Delirium mortal-wound "
                         "Feel No Pain continuation is explicitly deferred and emits a typed "
                         "unsupported event without applying wounds."
                     ),

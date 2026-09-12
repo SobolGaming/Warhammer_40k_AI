@@ -1071,12 +1071,33 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
         target_unit_instance_id=source.unit_instance_id,
         shooting_type=ShootingType.NORMAL,
     )
-    assert hit_registry.hit_roll_modifier(hit_context) == -1
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    grants = RuntimeModifierRegistry.from_bindings(
+        model_ability_grant_bindings=runtime.model_ability_grant_bindings()
+    )
+    assert hit_registry.hit_roll_modifier(hit_context) == 0
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=source.unit_instance_id,
+            runtime_modifier_registry=grants,
+        )
+        is not None
+    )
     support_hit_context = replace(
         hit_context,
         target_unit_instance_id=support.unit_instance_id,
     )
-    assert hit_registry.hit_roll_modifier(support_hit_context) == -1
+    assert hit_registry.hit_roll_modifier(support_hit_context) == 0
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=support.unit_instance_id,
+            runtime_modifier_registry=grants,
+        )
+        is not None
+    )
     assert (
         hit_registry.hit_roll_modifier(
             replace(
@@ -1096,6 +1117,14 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
     assert restrictions[0].violation_code == "conditional_lone_operative_range"
 
     state.battlefield_state = battlefield(30.0)
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=support.unit_instance_id,
+            runtime_modifier_registry=grants,
+        )
+        is None
+    )
     assert restriction_registry.restrictions_for(restriction_context) == ()
     assert hit_registry.hit_roll_modifier(support_hit_context) == 0
 
@@ -1106,6 +1135,14 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
         wounds_remaining=0,
     )
     assert source.own_models[0].is_alive
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=support.unit_instance_id,
+            runtime_modifier_registry=grants,
+        )
+        is None
+    )
     assert hit_registry.hit_roll_modifier(support_hit_context) == 0
     assert restriction_registry.restrictions_for(restriction_context) == ()
 

@@ -229,6 +229,10 @@ def runtime_content_bundle_summary_payload(
             binding.modifier_id
             for binding in bundle.runtime_modifier_registry.hit_roll_modifier_bindings
         ],
+        "model_ability_grant_ids": [
+            binding.modifier_id
+            for binding in bundle.runtime_modifier_registry.model_ability_grant_bindings
+        ],
         "wound_roll_modifier_ids": [
             binding.modifier_id
             for binding in bundle.runtime_modifier_registry.wound_roll_modifier_bindings

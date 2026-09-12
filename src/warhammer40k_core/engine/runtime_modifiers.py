@@ -12,6 +12,7 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierBinding,
     AllocatedAttackDamageModifierContext,
 )
+from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantBinding
 from warhammer40k_core.engine.movement_budget_modifiers import (
     MovementBudgetModifierApplication as MovementBudgetModifierApplication,
 )
@@ -21,6 +22,9 @@ from warhammer40k_core.engine.movement_budget_modifiers import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
     PostRollWeaponProfileModifierBinding,
+)
+from warhammer40k_core.engine.runtime_binding_validation import (
+    validate_bindings as _validate_bindings,
 )
 from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.source_backed_rerolls import (
@@ -763,6 +767,7 @@ class FailedSaveDamageReplacementBinding:
 class RuntimeModifierRegistry:
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
+    model_ability_grant_bindings: tuple[ModelAbilityGrantBinding, ...] = ()
     wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = ()
     damage_roll_modifier_bindings: tuple[DamageRollModifierBinding, ...] = ()
     allocated_attack_damage_modifier_bindings: tuple[
@@ -802,6 +807,15 @@ class RuntimeModifierRegistry:
                 "RuntimeModifierRegistry hit_roll_modifier_bindings",
                 self.hit_roll_modifier_bindings,
                 HitRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_ability_grant_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry model_ability_grant_bindings",
+                self.model_ability_grant_bindings,
+                ModelAbilityGrantBinding,
             ),
         )
         object.__setattr__(
@@ -926,6 +940,7 @@ class RuntimeModifierRegistry:
             ...,
         ] = (),
         hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = (),
+        model_ability_grant_bindings: tuple[ModelAbilityGrantBinding, ...] = (),
         wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = (),
         damage_roll_modifier_bindings: tuple[DamageRollModifierBinding, ...] = (),
         allocated_attack_damage_modifier_bindings: tuple[
@@ -951,6 +966,7 @@ class RuntimeModifierRegistry:
         return cls(
             unit_characteristic_modifier_bindings=unit_characteristic_modifier_bindings,
             hit_roll_modifier_bindings=hit_roll_modifier_bindings,
+            model_ability_grant_bindings=model_ability_grant_bindings,
             wound_roll_modifier_bindings=wound_roll_modifier_bindings,
             damage_roll_modifier_bindings=damage_roll_modifier_bindings,
             allocated_attack_damage_modifier_bindings=(allocated_attack_damage_modifier_bindings),
@@ -1297,79 +1313,6 @@ def unified_attack_reroll_permission_contexts_for_unit(
         )
     )
     return (*source_backed_contexts, *catalog_contexts)
-
-
-def _validate_bindings[T](
-    field_name: str,
-    value: object,
-    binding_type: type[T],
-) -> tuple[T, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    bindings: list[T] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not binding_type:
-            raise GameLifecycleError(f"{field_name} must contain {binding_type.__name__}.")
-        modifier_id = cast(
-            UnitCharacteristicModifierBinding
-            | HitRollModifierBinding
-            | WoundRollModifierBinding
-            | DamageRollModifierBinding
-            | AllocatedAttackDamageModifierBinding
-            | SaveOptionModifierBinding
-            | MovementBudgetModifierBinding
-            | ObjectiveControlModifierBinding
-            | AdvanceRollModifierBinding
-            | ChargeRollModifierBinding
-            | WeaponProfileModifierBinding
-            | PostRollWeaponProfileModifierBinding
-            | AttackRerollPermissionBinding
-            | FailedSaveDamageReplacementBinding,
-            binding,
-        ).modifier_id
-        if modifier_id in seen:
-            raise GameLifecycleError(f"{field_name} modifier IDs must be unique.")
-        seen.add(modifier_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=_modifier_id_for_binding))
-
-
-def _modifier_id_for_binding(binding: object) -> str:
-    if type(binding) in {
-        UnitCharacteristicModifierBinding,
-        HitRollModifierBinding,
-        WoundRollModifierBinding,
-        SaveOptionModifierBinding,
-        DamageRollModifierBinding,
-        AllocatedAttackDamageModifierBinding,
-        MovementBudgetModifierBinding,
-        ObjectiveControlModifierBinding,
-        AdvanceRollModifierBinding,
-        ChargeRollModifierBinding,
-        WeaponProfileModifierBinding,
-        PostRollWeaponProfileModifierBinding,
-        AttackRerollPermissionBinding,
-        FailedSaveDamageReplacementBinding,
-    }:
-        return cast(
-            UnitCharacteristicModifierBinding
-            | HitRollModifierBinding
-            | WoundRollModifierBinding
-            | DamageRollModifierBinding
-            | AllocatedAttackDamageModifierBinding
-            | SaveOptionModifierBinding
-            | MovementBudgetModifierBinding
-            | ObjectiveControlModifierBinding
-            | AdvanceRollModifierBinding
-            | ChargeRollModifierBinding
-            | WeaponProfileModifierBinding
-            | PostRollWeaponProfileModifierBinding
-            | AttackRerollPermissionBinding
-            | FailedSaveDamageReplacementBinding,
-            binding,
-        ).modifier_id
-    raise GameLifecycleError("Runtime modifier binding has an unsupported type.")
 
 
 def _validate_modifier_binding(

@@ -16,7 +16,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 ARTIFACT_PATH: Final = "artifacts/catalog.json"
 EXPECTED_PACKAGE_ID: Final = "data-package:core-v2:court-of-slaughter-anvanth:2026-08"
 EXPECTED_CATALOG_ID: Final = "core-v2:court-of-slaughter-anvanth:2026-08"
-EXPECTED_PACKAGE_HASH: Final = "9a4ee814aad8d908b47d605965e8bf29e7e443bba8246362a45f63059d41fa47"
+EXPECTED_PACKAGE_HASH: Final = "96bb2281197d8a64721c6ff13b211845ef4996450e4ab607e7c9815666b881c9"
 EXPECTED_BRIDGE_SOURCE_PREFIX: Final = (
     "data-package:core-v2:court-of-slaughter-anvanth-bridge:2026-08:"
 )
@@ -112,7 +112,7 @@ def validate_catalog_package(package: CanonicalCatalogPackage) -> None:
         )
     if EXPECTED_PACKAGE_HASH and package.package_hash() != EXPECTED_PACKAGE_HASH:
         raise CourtOfSlaughterAnvanthCatalogError(
-            "Court of Slaughter/Anvanth package content hash drifted."
+            f"Court of Slaughter/Anvanth package content hash drifted: {package.package_hash()}."
         )
     catalog = package.army_catalog
     if catalog.catalog_id != EXPECTED_CATALOG_ID:

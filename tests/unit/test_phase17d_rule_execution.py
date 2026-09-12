@@ -972,7 +972,20 @@ def test_catalog_stealth_aura_uses_shared_source_inclusion(exclude_source: bool)
         weapon_profile=_weapon_profile("core-bolt-rifle"),
         source_phase=BattlePhase.SHOOTING,
     )
-    assert registry.hit_roll_modifier(context) == (0 if exclude_source else -1)
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    assert registry.hit_roll_modifier(context) == 0
+    grants = RuntimeModifierRegistry.from_bindings(
+        model_ability_grant_bindings=runtime.model_ability_grant_bindings()
+    )
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=context.target_unit_instance_id,
+            runtime_modifier_registry=grants,
+        )
+        is None
+    ) is exclude_source
 
 
 def test_phase17d_once_per_battle_activation_consumes_and_modifies_source_model() -> None:

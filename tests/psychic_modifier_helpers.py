@@ -6,6 +6,7 @@ from typing import cast
 from tests.generic_modifier_helpers import generic_effect
 from tests.phase13b_shooting_declaration_helpers import (
     _canonical_catalog,
+    _catalog_with_stealth_datasheet,
     _compact_intercessor_catalog,
     _compact_shooting_lifecycle,
     _proposal_from_request,
@@ -23,8 +24,10 @@ from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.geometry.pose import Pose
 
 
-def psychic_session(phase: BattlePhase) -> LocalGameSession:
-    catalog = _compact_intercessor_catalog(_canonical_catalog())
+def psychic_session(phase: BattlePhase, *, native_stealth: bool = False) -> LocalGameSession:
+    catalog = _compact_intercessor_catalog(
+        _catalog_with_stealth_datasheet() if native_stealth else _canonical_catalog()
+    )
     catalog = replace(
         catalog,
         wargear=tuple(

@@ -2063,7 +2063,7 @@ def test_phase13d_lone_operative_targeting_ignores_dead_model_placements(
     assert candidates[0].targeting_rule_ids == (LONE_OPERATIVE_RULE_ID,)
 
 
-def test_phase13d_stealth_descriptor_applies_ranged_hit_roll_penalty() -> None:
+def test_order39_stealth_descriptor_has_no_ranged_hit_roll_penalty() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_pose=Pose.at(25.0, 35.0),
@@ -2088,9 +2088,427 @@ def test_phase13d_stealth_descriptor_applies_ranged_hit_roll_penalty() -> None:
     )
 
     assert candidates[0].is_legal
-    assert candidates[0].hit_roll_modifier == -1
+    assert candidates[0].hit_roll_modifier == 0
     assert STEALTH_RULE_ID in candidates[0].targeting_rule_ids
     assert candidates[0] == type(candidates[0]).from_payload(candidates[0].to_payload())
+
+
+@pytest.mark.parametrize("stealth_count", [0, 1, 4, 5])
+@pytest.mark.parametrize("grant", [False, True])
+def test_order39_stealth_requires_each_model_or_a_complete_grant(
+    stealth_count: int, grant: bool
+) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    target = units["enemy"]
+    replacement = replace(
+        target,
+        own_models=tuple(
+            replace(
+                model,
+                keyword_assignment=replace(
+                    model.keyword_assignment,
+                    keywords=tuple(sorted({*model.keywords, "STEALTH"})),
+                ),
+            )
+            if index < stealth_count
+            else model
+            for index, model in enumerate(target.own_models)
+        ),
+    )
+    if stealth_count:
+        _replace_unit_instance_in_state(state=state, replacement=replacement)
+    if grant:
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id="order39:grant",
+                owner_player_id="player-b",
+                target_unit_instance_ids=(target.unit_instance_id,),
+                target_kind="this_unit",
+                effect_kind="grant_ability",
+                parameters={"ability": "stealth"},
+            )
+        )
+    sources = rules_unit_stealth_sources(
+        state=state, target_unit_instance_id=target.unit_instance_id
+    )
+    assert (sources is not None) is (grant or stealth_count == 5)
+    restored = GameState.from_payload(state.to_payload())
+    assert (
+        rules_unit_stealth_sources(state=restored, target_unit_instance_id=target.unit_instance_id)
+        == sources
+    )
+
+
+@pytest.mark.parametrize("stealth_components", [0, 1, 2, 3, 4, 5, 6, 7])
+def test_order39_stealth_attached_components_share_complete_model_authority(
+    stealth_components: int,
+) -> None:
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.stealth import rules_unit_has_native_stealth
+
+    lifecycle, _units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    formation = _attached_formation_for_player(state=state, player_id="player-b")
+    view = rules_unit_view_by_id(state=state, unit_instance_id=formation.attached_unit_instance_id)
+    for index, component in enumerate(view.components):
+        if stealth_components & (1 << index):
+            _replace_unit_instance_in_state(
+                state=state,
+                replacement=with_unit_keywords(
+                    component.unit, keywords=(*component.unit.keywords, "STEALTH")
+                ),
+            )
+    view = rules_unit_view_by_id(state=state, unit_instance_id=formation.attached_unit_instance_id)
+    assert rules_unit_has_native_stealth(view) is (stealth_components == 7)
+
+
+@pytest.mark.parametrize("ignored", [False, True])
+@pytest.mark.parametrize("indirect", [False, True])
+def test_order39_stealth_uses_one_cover_skill_modifier(ignored: bool, indirect: bool) -> None:
+    from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.weapon_abilities import INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID
+
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",), catalog=_catalog_with_stealth_datasheet()
+    )
+    attacker, target = units["intercessor-1"], units["enemy"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    if ignored:
+        profile = replace(profile, keywords=(*profile.keywords, WeaponKeyword.IGNORES_COVER))
+    pool = _attack_pool_for_test(
+        attacker=attacker, defender=target, weapon_profile=profile, attacks=1
+    )
+    if indirect:
+        pool = replace(pool, targeting_rule_ids=(INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,))
+    snapshots = attack_modifier_snapshots(
+        state=_state(lifecycle),
+        pool=pool,
+        source_phase=BattlePhase.SHOOTING,
+        runtime_modifier_registry=RuntimeModifierRegistry(),
+    )
+    assert len(snapshots) == (0 if ignored else 1)
+    if snapshots:
+        assert snapshots[0].kind == "skill"
+
+
+@pytest.mark.parametrize("retained", [False, True])
+def test_order39_removed_models_stop_counting_but_retained_models_still_count(
+    retained: bool,
+) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+
+    from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    target = units["enemy"]
+    replacement = replace(
+        target,
+        own_models=tuple(
+            replace(
+                model,
+                keyword_assignment=replace(
+                    model.keyword_assignment,
+                    keywords=tuple(sorted({*model.keywords, "STEALTH"})),
+                ),
+            )
+            if index
+            else model
+            for index, model in enumerate(target.own_models)
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=replacement)
+    assert (
+        rules_unit_stealth_sources(state=state, target_unit_instance_id=target.unit_instance_id)
+        is None
+    )
+    model = target.own_models[0]
+    assert state.battlefield_state is not None
+    placement = state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=target.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    if retained:
+        retain_destroyed_model_for_fixture(
+            decisions=lifecycle.decision_controller,
+            state=state,
+            placement=placement,
+            effect_id="order39:retained",
+            source_rule_id="order39:retained-source",
+            source_phase=BattlePhase.SHOOTING,
+        )
+    assert (
+        rules_unit_stealth_sources(state=state, target_unit_instance_id=target.unit_instance_id)
+        is not None
+    ) is (not retained)
+
+
+@pytest.mark.parametrize("all_components", [False, True])
+def test_order39_one_effect_tracks_every_targeted_attached_component(
+    all_components: bool,
+) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    lifecycle, _ = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    formation = _attached_formation_for_player(state=state, player_id="player-b")
+    view = rules_unit_view_by_id(state=state, unit_instance_id=formation.attached_unit_instance_id)
+    state.record_persisting_effect(
+        generic_effect(
+            effect_id="order39:component-grants",
+            owner_player_id="player-b",
+            target_unit_instance_ids=view.component_unit_instance_ids
+            if all_components
+            else view.component_unit_instance_ids[:2],
+            target_kind="this_unit",
+            effect_kind="grant_ability",
+            parameters={"ability": "stealth"},
+        )
+    )
+    for unit_id in (view.unit_instance_id, *view.component_unit_instance_ids):
+        assert (
+            rules_unit_stealth_sources(state=state, target_unit_instance_id=unit_id) is not None
+        ) is all_components
+
+
+@pytest.mark.parametrize("grant_count", [1, 5])
+def test_order39_model_grants_and_expiry_use_the_live_model_footprint(grant_count: int) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    target = units["enemy"]
+    for index, model in enumerate(target.own_models[:grant_count]):
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id=f"order39:model:{index}",
+                owner_player_id="player-b",
+                target_unit_instance_ids=(target.unit_instance_id,),
+                target_kind="this_model",
+                effect_kind="grant_ability",
+                parameters={"ability": "stealth"},
+                source_model_instance_id=model.model_instance_id,
+            )
+        )
+    assert (
+        rules_unit_stealth_sources(state=state, target_unit_instance_id=target.unit_instance_id)
+        is not None
+    ) is (grant_count == 5)
+    state.remove_persisting_effects_by_id(("order39:model:0",))
+    assert (
+        rules_unit_stealth_sources(state=state, target_unit_instance_id=target.unit_instance_id)
+        is None
+    )
+
+
+def test_order39_model_grant_without_model_context_fails_closed() -> None:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    state.record_persisting_effect(
+        generic_effect(
+            effect_id="order39:invalid-model",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+            target_kind="this_model",
+            effect_kind="grant_ability",
+            parameters={"ability": "stealth"},
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="source model ID"):
+        rules_unit_stealth_sources(
+            state=state, target_unit_instance_id=units["enemy"].unit_instance_id
+        )
+
+
+@pytest.mark.parametrize("block", ["none", "melee", "denial"])
+@pytest.mark.parametrize("source_phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def test_order39_cover_metadata_and_skill_agree_for_all_attack_windows(
+    block: str,
+    source_phase: BattlePhase,
+) -> None:
+    from tests.phase13b_shooting_declaration_helpers import _phase17_post_shoot_cover_denial_effect
+
+    from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+    from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
+    from warhammer40k_core.engine.attack_sequence import HitRoll, WoundRoll
+    from warhammer40k_core.engine.attack_sequence_damage_resolution import (
+        _save_options_for_allocation,
+    )
+    from warhammer40k_core.engine.attack_sequence_model import AttackResolutionContextPayload
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",), catalog=_catalog_with_stealth_datasheet()
+    )
+    state = _state(lifecycle)
+    attacker, target = units["intercessor-1"], units["enemy"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    if block == "melee":
+        profile = replace(
+            profile,
+            range_profile=RangeProfile.melee(),
+            skill=CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 3),
+        )
+    elif block == "denial":
+        state.record_persisting_effect(
+            _phase17_post_shoot_cover_denial_effect(target.unit_instance_id)
+        )
+    pool = _attack_pool_for_test(
+        attacker=attacker, defender=target, weapon_profile=profile, attacks=1
+    )
+    sequence = AttackSequence(
+        sequence_id="order39:cover",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pool,),
+        source_phase=source_phase,
+    )
+    context: AttackResolutionContextPayload = {
+        "sequence_id": sequence.sequence_id,
+        "source_phase": source_phase.value,
+        "attack_context_id": sequence.attack_context_id(),
+        "pool_index": 0,
+        "attack_index": 0,
+        "generated_hit_index": 0,
+        "attacker_player_id": "player-a",
+        "defender_player_id": "player-b",
+        "attacking_unit_instance_id": attacker.unit_instance_id,
+        "weapon_instance_id": pool.weapon_instance_id,
+        "attacker_model_instance_id": pool.attacker_model_instance_id,
+        "target_unit_instance_id": target.unit_instance_id,
+        "weapon_profile_id": profile.profile_id,
+        "selected_weapon_ability_ids": [],
+        "is_psychic_attack": False,
+        "damage_profile": profile.damage_profile.to_payload(),
+        "hit_roll": HitRoll.auto_hit(target_number=3).to_payload(),
+        "wound_roll": WoundRoll.auto_wound(strength=4, toughness=4, target_number=4).to_payload(),
+        "allocation": None,
+        "save_options": [],
+    }
+    registry = RuntimeModifierRegistry()
+    snapshots = attack_modifier_snapshots(
+        state=state, pool=pool, source_phase=source_phase, runtime_modifier_registry=registry
+    )
+    options = _save_options_for_allocation(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        attack_context=context,
+        allocated_model_id=target.own_models[0].model_instance_id,
+        runtime_modifier_registry=registry,
+    )
+    assert len(snapshots) == int(block == "none")
+    assert options
+    assert any(
+        option.cover_result is not None and option.cover_result.has_benefit for option in options
+    ) is (block == "none")
+    assert not any(
+        option.cover_applied for option in options
+    )  # 11e Cover modifies BS, never saves.
+
+
+@pytest.mark.parametrize("retained", [False, True])
+def test_order39_conditional_leader_grant_survives_retention_until_removal(retained: bool) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+        CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
+    )
+    from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    lifecycle, _ = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    formation = _attached_formation_for_player(state=state, player_id="player-b")
+    view = rules_unit_view_by_id(state=state, unit_instance_id=formation.attached_unit_instance_id)
+    leader = next(component.unit for component in view.components if component.role == "leader")
+    bodyguard = next(
+        component.unit for component in view.components if component.role == "bodyguard"
+    )
+    effect = generic_effect(
+        effect_id="order39:conditional",
+        owner_player_id="player-b",
+        target_unit_instance_ids=(view.unit_instance_id,),
+        target_kind="this_unit",
+        effect_kind="grant_ability",
+        parameters={"ability": "stealth"},
+    )
+    payload = effect.effect_payload
+    assert isinstance(payload, dict)
+    context = payload["context"]
+    assert isinstance(context, dict)
+    state.record_persisting_effect(
+        replace(
+            effect,
+            effect_payload={
+                **payload,
+                "descriptor_id": CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
+                "required_bodyguard_keyword": bodyguard.keywords[0],
+                "context": {**context, "source_unit_instance_id": leader.unit_instance_id},
+            },
+        )
+    )
+    assert (
+        rules_unit_stealth_sources(state=state, target_unit_instance_id=view.unit_instance_id)
+        is not None
+    )
+    assert state.battlefield_state is not None
+    model = leader.own_models[0]
+    placement = state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=view.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    if retained:
+        retain_destroyed_model_for_fixture(
+            decisions=lifecycle.decision_controller,
+            state=state,
+            placement=placement,
+            effect_id="order39:conditional-retained",
+            source_rule_id="order39:retained-source",
+            source_phase=BattlePhase.SHOOTING,
+        )
+    assert (
+        rules_unit_stealth_sources(state=state, target_unit_instance_id=view.unit_instance_id)
+        is not None
+    ) is retained
 
 
 def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
