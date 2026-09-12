@@ -1,0 +1,208 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "U8-runbook",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/updates/U8_RUNBOOK.md",
+  "classification_document": "docs/factions/updates/U_CLASSIFICATION_SYSTEM.md",
+  "packet_schema_document": "docs/factions/updates/U_PACKET_SCHEMA.md",
+  "retention_document": "docs/factions/updates/U7_RETENTION.md",
+  "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
+  "delivered_to": "FM0 U1 capture, U5/U6 cadence, Q6 freshness CI, and release runbook (design only)",
+  "does_not_implement_tools": true,
+  "does_not_edit_adapter_contract": true,
+  "does_not_rewrite_live_agent_contract": true,
+  "does_not_amend_f00": true,
+  "does_not_change_catalog_ids": true,
+  "does_not_write_q1_current": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "from_app_data_version": "931",
+    "to_app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "closed_axes": {
+    "one_cadence_per_observed_app_data_version": true,
+    "stages_are_ordered": true,
+    "u1_is_offline_and_human_triggered": true,
+    "staging_audit_is_not_runtime_input": true,
+    "feed_line_is_not_a_packet": true,
+    "missing_feed_is_not_equivalence": true,
+    "u5_and_u6_run_inside_implement_prs": true,
+    "overlay_does_not_suppress_children": true,
+    "tombstone_does_not_unpackage_n_minus_one": true,
+    "regenerate_is_required_closing_step": true,
+    "guides_read_q1_only": true,
+    "changelog_reads_u2_u3": true,
+    "q6_acknowledgement_is_version_lag_only": true,
+    "q6_cannot_waive_guide_current_while_stale": true,
+    "u7a_is_not_a_u8_stage": true
+  },
+  "stages": [
+    "trigger_observation",
+    "u1_capture",
+    "staging_review",
+    "u2_diff",
+    "u3_classify_and_packets",
+    "u4_invalidate",
+    "implement_prs",
+    "u7_package",
+    "regenerate_artifacts",
+    "q6_freshness"
+  ],
+  "acknowledgement_kinds": [
+    "capture_in_progress",
+    "packets_open",
+    "blocked_provenance",
+    "implementation_open"
+  ],
+  "invalid_acknowledgement_kinds": [
+    "no_feed_so_equivalent",
+    "treat_as_current",
+    "carry_forward_without_review"
+  ],
+  "ack_hash_fields": [
+    "acknowledgement_kind",
+    "observed_content_set_version",
+    "owner_faction_id",
+    "packaged_content_set_version"
+  ],
+  "identity_recipe": {
+    "canonicalization": "RFC 8785 JCS",
+    "key_order": "UTF-16 code-unit lexicographic",
+    "python_restricted_ascii": "json.dumps(..., ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False)",
+    "ack_id_prefix": "q6ack_"
+  },
+  "worked_fixtures": {
+    "acknowledgement": {
+      "acknowledgement_kind": "packets_open",
+      "observed_content_set_version": "960",
+      "owner_faction_id": "orks",
+      "packaged_content_set_version": "946"
+    },
+    "acknowledgement_canonical_utf8": "{\"acknowledgement_kind\":\"packets_open\",\"observed_content_set_version\":\"960\",\"owner_faction_id\":\"orks\",\"packaged_content_set_version\":\"946\"}",
+    "ack_id": "q6ack_555c6f0d4c804c21528e3efa82af839346477ba1152c4d5f414d3004555541bd",
+    "display_label_does_not_change_ack_id": true,
+    "later_observation_requires_new_ack": true
+  },
+  "roles": [
+    "snapshot_operator",
+    "staging_reviewer",
+    "classifier",
+    "implementer",
+    "derived_artifact_generator",
+    "q6"
+  ],
+  "review_points": [
+    "after_capture_before_admission",
+    "after_packets_before_implementation",
+    "after_implementation_before_package",
+    "after_regenerate_before_q6_pass"
+  ],
+  "allow_deny_precedence": [
+    "missing_packaged_version_still_fails_load",
+    "guide_current_while_stale_is_not_acknowledgeable",
+    "missing_feed_is_not_equivalence",
+    "u4_demotion_still_wins",
+    "family_gap_before_dependent_content_packets"
+  ],
+  "acceptance_fixtures": [
+    "capture_requires_human_trigger",
+    "staging_audit_is_not_runtime_or_l0",
+    "feed_line_without_page_is_not_a_row",
+    "orks_946_versus_960_fails_q6_without_ack",
+    "one_feed_line_is_not_one_page_pr",
+    "more_dakka_tombstone_does_not_package_931",
+    "rewrite_overlay_does_not_suppress_children",
+    "certified_rewrite_keeps_first_certified_and_packages_n_minus_one",
+    "guide_current_while_stale_fails_despite_ack",
+    "changelog_reads_u2_u3_not_feed_prose",
+    "display_label_does_not_change_ack_id",
+    "packets_open_ack_covers_named_pair_only",
+    "no_feed_so_equivalent_kind_is_rejected",
+    "family_gap_before_dependent_content",
+    "content_packet_cannot_list_adapter_contract",
+    "python_referenced_by_packaged_previous_is_retained",
+    "versioned_path_931_is_not_a_current_cadence",
+    "operator_cannot_publish_packets",
+    "missing_structural_remove_fails_cadence",
+    "skipping_regenerate_is_unpublished"
+  ],
+  "mapping_samples": [
+    {
+      "label": "Orks 931 to 946 tooling",
+      "is_loadable_previous": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Orks v946 rewrite",
+      "first_certified_at_content_set": null,
+      "overlay_suppresses_children": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Orks packaged 946 observed 960",
+      "ack_id": "q6ack_555c6f0d4c804c21528e3efa82af839346477ba1152c4d5f414d3004555541bd",
+      "acknowledgement_kind": "packets_open",
+      "writes_q1_current": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Chaos Daemons certified rewrite",
+      "first_certified_unchanged": true,
+      "packages_n_minus_one": true,
+      "emitted_here": false
+    },
+    {
+      "label": "More Dakka at 946",
+      "current_mustering": "rejected",
+      "packages_931": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Blitz Brigade DP 2 to 1",
+      "page_pr": false,
+      "emitted_here": false
+    }
+  ],
+  "holds": [
+    {
+      "id": "U1 capture",
+      "hold": "Offline tool and staging audit",
+      "unblocks": "Cadence start"
+    },
+    {
+      "id": "Q6 CI",
+      "hold": "Version-lag gate and ledger",
+      "unblocks": "Freshness enforcement"
+    },
+    {
+      "id": "Live Track D D3",
+      "hold": "Adapter and agent contract rewrites",
+      "unblocks": "FM0 binding contracts"
+    }
+  ],
+  "not_in_this_pr": [
+    "src/ capture tool",
+    "S4 diff tool",
+    "packet generator",
+    "Q6 CI workflow",
+    "live acknowledgement ledger",
+    "ADAPTER_DECISION_CONTRACT.md edits",
+    "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
+    "F00 policy amendment",
+    "catalog.json rewrites",
+    "live Q1 content_status artifact"
+  ],
+  "reconciliation": {
+    "stage_count": 10,
+    "acknowledgement_kind_count": 4,
+    "acceptance_fixture_count": 20,
+    "mapping_sample_count": 6,
+    "ack_id": "q6ack_555c6f0d4c804c21528e3efa82af839346477ba1152c4d5f414d3004555541bd",
+    "note": "One cadence per observed App-data version. U1 cannot admit or classify. Q6 acknowledgements waive version lag only and never write Layer A current. Remaining FM-pre Track U design is closed."
+  }
+}

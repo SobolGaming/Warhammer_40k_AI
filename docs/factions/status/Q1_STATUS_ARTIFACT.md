@@ -1,6 +1,6 @@
 # Q1 status-artifact schema
 
-[Status index](README.md) · [Classification system](../updates/U_CLASSIFICATION_SYSTEM.md) · [Packet schema](../updates/U_PACKET_SCHEMA.md) · [Retention](../updates/U7_RETENTION.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Phase 17O capability manifest](../../ADAPTER_DECISION_CONTRACT.md#phase-17o-capability-manifest)
+[Status index](README.md) · [Classification system](../updates/U_CLASSIFICATION_SYSTEM.md) · [Packet schema](../updates/U_PACKET_SCHEMA.md) · [Retention](../updates/U7_RETENTION.md) · [Runbook](../updates/U8_RUNBOOK.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Phase 17O capability manifest](../../ADAPTER_DECISION_CONTRACT.md#phase-17o-capability-manifest)
 
 This document is Track Q item Q1 as **FM-pre planning evidence**. It closes
 the generated `content_status` schema FM0 must emit. It does not generate
@@ -39,7 +39,8 @@ while a layer is `stale`, count a staging observation as L0, copy a
 historical `Playable` component label into L7, or mint `catalog_id` from a
 display name. Retention packaging and the U7a record are designed in
 [U7_RETENTION.md](../updates/U7_RETENTION.md); their generators remain
-FM0. U8 cadence and Q6 CI remain later.
+FM0. Cadence and Q6 are designed in
+[U8_RUNBOOK.md](../updates/U8_RUNBOOK.md); their tools remain FM0.
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms cited inside a Layer A
 fingerprint. T4 still owns construction families cited by Layer B. T5 still
@@ -612,11 +613,11 @@ already exist. Q1 indexes them.
 - Q1 generator, loader, and live artifact
 - U4 runtime invalidation
 - D1 guide generation from Q1
-- Q6 freshness CI
+- Q6 freshness CI (cadence delivered in
+  [U8_RUNBOOK.md](../updates/U8_RUNBOOK.md))
 - Owner D3 / U7 / U7a packaging inventory, loaders, and live
   compatibility record (design delivered in
   [U7_RETENTION.md](../updates/U7_RETENTION.md))
-- U8 runbook
 - Live adapter-contract or agent-contract edits
 - Catalog ID allocation
 
@@ -641,7 +642,7 @@ already exist. Q1 indexes them.
 | U-HOLD-ORKS-S4-COUNTS | Exact 20/73 S4 integers | Per-entity Orks golden rows |
 | U-HOLD-RULES-UPDATED | Dual-version clauses | Attribution reviews becoming envelope/effect claims |
 | Owner D3 / U7a | Packaging N−1 and the compatibility record | design delivered in [U7_RETENTION.md](../updates/U7_RETENTION.md); `certified` coverage remains FM0 |
-| D1 / Q6 | Generated guides and freshness CI | F-DOC-01 implementation |
+| D1 / Q6 | Generated guides and freshness CI | Q6 cadence delivered in [U8_RUNBOOK.md](../updates/U8_RUNBOOK.md); generators remain FM0 |
 
 ## 15. What "Q1 schema delivered" means
 

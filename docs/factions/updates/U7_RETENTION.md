@@ -1,6 +1,6 @@
 # U7 / U7a — Retention and replay compatibility
 
-[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md)
+[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md)
 
 This document is Track U items **U7** (packaging coexistence) and **U7a**
 (replay compatibility) plus owner **D3** (content-set retention) as
@@ -41,8 +41,9 @@ hashed compatibility record, contract amendments, and the golden-artifact
 fixture.** It must not package N−1 because `first_certified_at_content_set`
 was written, claim `certified` from packaging alone, ignore
 `engine_build_id`, treat an S1 historical observation as loadable content,
-or apply U7a to Phase 18L operator recovery. U8 cadence, U1 capture, U5
-loaders, and U6 procedure remain later.
+or apply U7a to Phase 18L operator recovery. U1 capture, U5 loaders, and
+U6 runners remain FM0. Cadence is designed in
+[U8_RUNBOOK.md](U8_RUNBOOK.md).
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms. T4 still owns construction
 families. T5 still owns ledgers. T6 still owns decision shape. S2 still
@@ -609,8 +610,8 @@ document indexes them.
 - S3c catalog-generation switch (blocked on that U7a implementation)
 - Q1 generator and live artifact (schema already delivered)
 - U4 runtime invalidation
-- U1 capture, U5 tombstone loaders, U6 rewrite procedure
-- U8 runbook and Q6 freshness CI
+- U1 capture, U5 tombstone loaders, U6 rewrite runner, Q6 CI
+  (cadence delivered in [U8_RUNBOOK.md](U8_RUNBOOK.md))
 - Live adapter-contract or agent-contract edits
 - Catalog ID allocation
 
@@ -633,7 +634,7 @@ document indexes them.
 | U7 packaging | Inventory generator and version-aware loader | Loadable N−1 after the first post-certification transition |
 | U7a implementation | Record, contracts, goldens, conformance | Q1 `certified`; S3c |
 | U-HOLD-ORKS-S4-COUNTS | Exact 20/73 S4 integers | S1 fixture, then S4; still not a loadable 931 package |
-| U8 runbook | Capture → diff → classify → packets → regenerate | Per-release cadence |
+| U8 runbook | Capture → diff → classify → packets → regenerate | delivered in [U8_RUNBOOK.md](U8_RUNBOOK.md); tools remain FM0 |
 | D1 / Q6 | Generated guides and freshness CI | F-DOC-01 implementation |
 
 ## 14. What "U7 / U7a design delivered" means

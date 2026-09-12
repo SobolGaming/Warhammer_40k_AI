@@ -7,6 +7,7 @@
   "packet_schema_document": "docs/factions/updates/U_PACKET_SCHEMA.md",
   "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
   "retention_document": "docs/factions/updates/U7_RETENTION.md",
+  "runbook_document": "docs/factions/updates/U8_RUNBOOK.md",
   "delivered_to": "FM0 S4 diff grain, U3 classifier, U4 invalidation (design only)",
   "does_not_implement_s4": true,
   "does_not_emit_packets": true,

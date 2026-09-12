@@ -321,15 +321,15 @@ waves may run as parallel agent packets under the data-first contract (D3).
 
 | ID | Deliverable |
 | --- | --- |
-| U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00 |
+| U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00. **FM-pre capture contract delivered** in [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md); the tool remains FM0 |
 | U2 | Content-set diff (S4) between the packaged version and the staged version. **FM-pre grain delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md); the S4 tool remains FM0. Diff rows are S2 `catalog_id` plus `source_entry_binding` plus field path, not page URLs; the Orks 931→946 fixture still required at S4 |
 | U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format. **FM-pre classes delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md). **FM-pre packet schema delivered** in [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md); classifier, packet generator, emission, and the live agent-contract rewrite remain FM0. Closed class set includes `construction_constraint` and `composition_or_options`; one class per field path; one packet per classified row; `Rules Updated` is a `review` packet on `clause.unattributed` until S3a |
 | U4 | Automatic, layer-specific status invalidation (rules below): semantic execution, roster legality and certification claims are bound to separate evidence tuples; a changed transcription hash is provenance, not automatic semantic demotion, and requires impact classification plus a recorded carry-forward or a stale claim; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row. **FM-pre layers delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md). **FM-pre Q1 schema delivered** in [Q1_STATUS_ARTIFACT.md](factions/status/Q1_STATUS_ARTIFACT.md); runtime invalidation and the live artifact remain FM0 |
-| U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it |
-| U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
+| U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it. **FM-pre cadence delivered** in [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md); loaders remain FM0 |
+| U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated. **FM-pre procedure delivered** in [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md); the runner remains FM0 |
 | U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the engine build identity and the content-set version of every participating faction; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it. **FM-pre design delivered** in [U7_RETENTION.md](factions/updates/U7_RETENTION.md); inventory and loaders remain FM0 |
 | U7a | Replay compatibility contract (prerequisite of S3c and FM0 exit, owned jointly with the adapter/persistence contract owner): the mechanism below by which a retained previous content-set version remains replayable on a newer engine build without ignoring build identity; contract, conformance scenarios and regressions in the same PR. **FM-pre design delivered** in [U7_RETENTION.md](factions/updates/U7_RETENTION.md); live record, contracts, and golden fixture remain FM0 |
-| U8 | Runbook and cadence per App-data release: capture → diff → classify → packets → PRs → regenerate status, guides and changelog; roles and review points; CI freshness gate (Q6) |
+| U8 | Runbook and cadence per App-data release: capture → diff → classify → packets → PRs → regenerate status, guides and changelog; roles and review points; CI freshness gate (Q6). **FM-pre design delivered** in [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md); tools and CI remain FM0 |
 
 #### Replay compatibility across content-set versions (U7a)
 
@@ -478,7 +478,7 @@ packaged as loadable content.
 | Q3 | Hypothesis roster fuzzing per certified faction: generated legal rosters must muster; targeted illegal mutations (DP over budget, wrong disposition, retired unit, illegal bearer, over-cap ally, duplicate detachment) must be rejected with typed reasons |
 | Q4 | Headless full-game harness over the certified-faction pairing matrix through the shared facade with exact replay reproduction and zero unsupported diagnostics; feeds the standing 60 s mean / 300 s maximum targets in `docs/performance/PERFORMANCE_POLICY.md` |
 | Q5 | Performance evidence per policy for any hot-path family |
-| Q6 | CI freshness gate: packaged content-set version versus the latest retained observation; stale certified claims fail unless acknowledged in the ledger |
+| Q6 | CI freshness gate: packaged content-set version versus the latest retained observation; stale certified claims fail unless acknowledged in the ledger. **FM-pre cadence delivered** in [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md); CI workflow remains FM0 |
 
 ### Track D: documentation
 
@@ -592,11 +592,12 @@ Permitted in parallel with the remaining Core Rules orders:
   [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md);
 - Track U packet schema (draft Track D agent-contract packet half) is
   delivered: [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md);
-- remaining Track U design: the U8 runbook;
 - the Q1 status-artifact schema document is delivered:
   [Q1_STATUS_ARTIFACT.md](factions/status/Q1_STATUS_ARTIFACT.md);
 - owner D3 retention and U7/U7a replay-compatibility design are
   delivered: [U7_RETENTION.md](factions/updates/U7_RETENTION.md);
+- Track U runbook (U1 / U5 / U6 / U8 / Q6 cadence) is delivered:
+  [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md);
 - remaining draft Track D D3 work: live adapter-contract and live
   agent-contract rewrites, marked draft until FM0 makes them binding.
 
