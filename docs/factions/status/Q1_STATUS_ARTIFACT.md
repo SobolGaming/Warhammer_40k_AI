@@ -124,9 +124,11 @@ by S3a. A staging marker never becomes evidence by default.
 
 Q1 hashes **identity projections**, not display bindings and not the full
 row body. Canonical bytes follow the packet-schema recipe: RFC 8785 JCS;
-UTF-8; no BOM; no insignificant whitespace; keys sorted by Unicode code
-point; JSON `null` for nulls; integers in shortest decimal form; no
-trailing newline. Equivalent Python for this ASCII set:
+UTF-8; no BOM; no insignificant whitespace; object keys sorted by the
+lexicographic order of their names compared as UTF-16 code units (RFC 8785
+§3.2.3); JSON `null` for nulls; integers in shortest decimal form; no
+trailing newline. Equivalent Python for this restricted ASCII identity
+shape (Basic Multilingual Plane code points match UTF-16 code units):
 
 ```text
 json.dumps(identity, ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False).encode('utf-8')
@@ -166,9 +168,10 @@ must.
 
 ### 4.2 `review_id`
 
-A `review_record` persists here. Packet schema already permits an
-implementation packet to write it when `required_work` includes
-`layer_a_carry_forward_review`. A `status_claim` is not a substitute.
+A `review_record` persists here. An implementation packet may write the
+specific kinds its remaining `required_work` authorizes (packet schema
+§5 / §7.1), including Layer C re-attestation and Layer A recertification.
+A `status_claim` is not a substitute.
 
 Identity object (every key present):
 
@@ -249,17 +252,32 @@ Closed `review_kind` values:
 
 | Kind | Written by | Stores |
 | --- | --- | --- |
-| `layer_a_equivalence` | Implementation packet with `layer_a_carry_forward_review`, or `editorial_equivalent` review packet | Old/new transcription pins and fingerprint-unchanged result |
-| `handler_identity_confirmation` | Same packets when a named handler exists | Handler ID equality |
-| `layer_c_reattest` | Packet whose `required_work` includes `layer_c_reattest` | New content-set/build pins plus authorizing review or roster-validation citation |
-| `human_attribution` | `unclassified_clause` review packet | Attribution result; may unblock a later class, never auto-carries Layer A |
+| `layer_a_equivalence` | Implementation packet with `layer_a_carry_forward_review`, or `editorial_equivalent` review packet | Old/new transcription pins and fingerprint-**unchanged** result |
 | `recorded_equivalence` | `editorial_equivalent` review packet | Same pins as `layer_a_equivalence` when the class is editorial |
+| `handler_identity_confirmation` | Same packets when a named handler exists | Handler ID equality |
+| `layer_a_recertification` | Implementation packet whose remaining `required_work` includes `remap_envelope`, `remap_effect_ir`, or `recertify_l4_l8` | New transcription pin, **changed** fingerprint citations, mapping citation, and execution-evidence citation |
+| `layer_c_reattest` | Packet whose remaining `required_work` includes `layer_c_reattest` or `recertify_l4_l8` | New content-set/build pins plus authorizing review or roster-validation citation |
+| `human_attribution` | `unclassified_clause` review packet | Attribution result; may unblock a later class, never auto-carries Layer A |
 
-Sibling `unclassified_clause` still forbids `layer_a_equivalence` on the
-points or composition packet (Bannernob). Q1 must reject that write.
+**Two Layer A authorization routes** after a transcription change:
 
-Result values: `equivalent`, `not_equivalent`, `unclassified`. Only
-`equivalent` authorizes Layer A current after a transcription change.
+| Route | Review | Authorizes Layer A `current` when |
+| --- | --- | --- |
+| Carry-forward | `layer_a_equivalence` or `recorded_equivalence` with result `equivalent` | The semantic fingerprint is unchanged (points-only or editorial) |
+| Re-certification | `layer_a_recertification` with result `recertified` | Fresh mapping and execution evidence establish the **changed** fingerprint at the new source/build context |
+
+Re-certification must not claim fingerprint-unchanged and must not be
+written as `layer_a_equivalence`. Carry-forward must not be used when the
+classified class is `clause_envelope_changed` or `effect_ir_changed`.
+Sibling `unclassified_clause` still forbids carry-forward kinds on the
+points or composition packet (Bannernob). It also keeps Layer A `stale` on
+that `catalog_id` until the unclassified packet is resolved; a sibling
+points packet cannot recertify A to bypass that blocker.
+
+Result values: `equivalent`, `not_equivalent`, `unclassified`,
+`recertified`. Layer A `current` after a hash change requires `equivalent`
+(carry-forward) or `recertified` (new fingerprint). A `status_claim` is
+not either result.
 
 ### 5.4 `status_claims`
 
@@ -272,9 +290,10 @@ not the tuple.
 | `catalog_id` / `content_set_version` | Target row |
 | `layer` | `A`, `B`, `C`, or `freshness` |
 | `from_state` / `to_state` | `current`, `stale`, `none`, `retired` |
-| `authorizing_review_id` | Required when moving Layer A to `current` after a hash change |
+| `authorizing_review_id` | Required when moving Layer A to `current` after a hash change; the cited review must be an `equivalent` carry-forward or a `recertified` new fingerprint |
 
-Invalid claims (stale→current without review; current while U4 says stale;
+Invalid claims (stale→current without an authorizing review; current while
+U4 says stale; `equivalent` after a classified envelope or effect change;
 L7 current from a historical `Playable` label) are rejected and do not
 mutate the row.
 
@@ -284,7 +303,7 @@ Admitted rows only. Open blocker IDs are closed:
 
 | ID | Meaning |
 | --- | --- |
-| `layer_a_stale` | Fingerprint change, unclassified clause, or missing carry-forward |
+| `layer_a_stale` | Fingerprint change without recertification, unclassified clause, or missing carry-forward |
 | `layer_b_stale` | Roster-legality element changed |
 | `layer_c_stale` | Missing re-attestation on a new content-set or build identity |
 | `unsupported_clause` | Typed unsupported at L4 |
@@ -354,11 +373,16 @@ Semantic fingerprint citations (values owned elsewhere):
 - handler identity when a named handler exists.
 
 `claim_state`: `current`, `stale`, or `none`.
-`carry_forward_review_id`: a `review_id` or JSON `null`.
+`carry_forward_review_id`: a carry-forward `review_id`, or JSON `null`.
+`recertification_review_id`: a `layer_a_recertification` `review_id`, or
+JSON `null`. At most one of those two IDs authorizes a given transition.
 
-A new transcription hash without an `equivalent` `layer_a_equivalence` (or
-`recorded_equivalence`) review leaves Layer A `stale`. Equality of effect
-RuleIR alone never proves equivalence.
+A new transcription hash leaves Layer A `stale` until **one** of the §5.3
+routes authorizes it: an `equivalent` carry-forward of the unchanged
+fingerprint, or a `recertified` new fingerprint with mapping and execution
+evidence. Equality of effect RuleIR alone never proves equivalence. An
+`equivalent` result is invalid when the classified class changed the
+fingerprint (`clause_envelope_changed`, `effect_ir_changed`).
 
 ### 7.2 Layer B
 
@@ -376,9 +400,12 @@ Citations: digest of the current A and B tuples of every entity in the
 certified rosters and interactions; `content_set_version`;
 `engine_build_id`; `reattest_review_id`.
 
-Carry-forward of A, or preservation of A while refreshing B, never keeps
-L7/L8 `current` on a new content-set or build identity until a
-`layer_c_reattest` review exists.
+Carry-forward of A, preservation of A while refreshing B, or
+re-certification of A never keeps L7/L8 `current` on a new content-set or
+build identity until a `layer_c_reattest` review exists. Writing that
+review does not make Layer C `current` while Layer A or B is `stale`. The
+writer is the packet whose remaining `required_work` includes
+`layer_c_reattest` or `recertify_l4_l8` (packet schema §5).
 
 ## 8. Writers and precedence
 
@@ -387,7 +414,7 @@ L7/L8 `current` on a new content-set or build identity until a
 | Writer | May write | Must not |
 | --- | --- | --- |
 | U4 invalidation (engine, FM0) | Layer demotion to `stale`; freshness `stale` | Invent a carry-forward review; assert `current` |
-| Packet `review_record` | A review whose kind is on that packet's required work | Write Layer A current by status claim alone; write carry-forward when a sibling `unclassified_clause` forbids it |
+| Packet `review_record` | The review kinds mapped from that packet's remaining `required_work` (carry-forward, recertification, Layer C re-attest, attribution) | Write Layer A current by status claim alone; write carry-forward when a sibling `unclassified_clause` forbids it; write `layer_a_equivalence` after a classified fingerprint change |
 | Packet `status_claim` | A transition authorized by U4 plus any required review | Assert `current` while the tuple is `stale`; write Q1 schema; write `first_certified_at_content_set` |
 | Certification event (`-b` close) | `first_certified_at_content_set` | Package N−1; write `replay_compatibility: certified` |
 | U7a (later design) | `replay_compatibility: certified` plus a citation | Ignore `engine_build_id`; claim replayability from packaging alone |
@@ -398,9 +425,14 @@ L7/L8 `current` on a new content-set or build identity until a
 
 1. U4 demotion always wins over a packet `status_claim`.
 2. A Layer A `current` claim after a transcription change requires an
-   `equivalent` review on the same locator.
+   authorizing review on the same locator: `equivalent` carry-forward **or**
+   `recertified` new fingerprint. Missing authorization is rejected.
+   `equivalent` after `clause_envelope_changed` or `effect_ir_changed` is
+   rejected.
 3. Sibling `unclassified_clause` removes carry-forward permission; Q1
-   rejects that `review_record`.
+   rejects that `layer_a_equivalence` write. It does not let a sibling
+   points or composition packet recertify Layer A, and it does not make
+   Layer C `current` while A is `stale`.
 4. Historical coverage labels never win over a Q1 tuple.
 5. A derived capability-manifest dimension must not be true when the
    corresponding Q1 claim is `stale` or absent.
@@ -470,7 +502,8 @@ PR only defines them.
    sibling `unclassified_clause` packet is open. Layers A and C stay
    `stale`.
 4. Acts of Faith `clause_envelope_changed` on `clause.timing` sets Layer A
-   and C `stale` and caps `attained_level` at L3. Layer B is unchanged.
+   and C `stale` and caps `attained_level` at L2 (army-rule row; L3 is
+   not applicable). Layer B is unchanged.
 5. A guide or audit asserting `current` while the row is `stale` is
    invalid.
 6. `overall: Playable` on `datasheet_support_rows.json` must not write L7
@@ -489,10 +522,26 @@ PR only defines them.
 12. `faction_rewrite` on Orks v946 stale-marks owned and inherited entities
     without deleting per-entity rows.
 13. A `status_claim` of Layer A `current` after a transcription change
-    without an `equivalent` review is rejected.
+    without an authorizing review is rejected. An `equivalent` carry-forward
+    that asserts fingerprint-unchanged after `clause_envelope_changed` or
+    `effect_ir_changed` is also rejected. Either authorized route in §5.3
+    may succeed.
 14. Pre-allocation structural adds stay on staging or carry
     `catalog_id_allocation`; they must not appear as admitted rows with a
     display-name `catalog_id`.
+15. Acts of Faith after remapping to turn-start: a `layer_a_recertification`
+    review cites the changed timing fingerprint plus mapping and execution
+    evidence. Layer A becomes `current`. Layer C stays `stale` until its
+    own `layer_c_reattest`. The review must not store a fingerprint-unchanged
+    result.
+16. A `construction_constraint` packet (Blitz Brigade DP 2→1) writes
+    `layer_c_reattest` after mustering validation. Layer A stays `current`
+    without a carry-forward review. That write is not Layer A
+    recertification and does not restore carry-forward on a Bannernob
+    sibling.
+17. A datasheet row whose Layer A is `stale` caps `attained_level` at L3
+    even when earlier L4–L8 evidence exists (Eldrad without an authorizing
+    A review). This is the datasheet counterpart of fixture 4.
 
 ## 12. Mapping exercise (not a generated artifact)
 
@@ -501,10 +550,11 @@ Planning examples. FM0 emits the real `content_status`. This PR does not.
 | Sample | Q1 fact | Notes |
 | --- | --- | --- |
 | Eldrad 130→120 | Admitted row `000000568` @ 946; Layer A current only with `rev_77074d42…`; B/C stale until validation and re-attest | Coverage artifact `chaos-daemons-bridge-catalog` / `Playable` is input, not the row |
-| Eldrad Leader list | Same `catalog_id`, different field path on a **packet**; same Q1 row refreshes Layer B | Attachment is Layer B, not a second entity |
-| Bannernob | One row; A+B+C stale; no points-packet review | Union, not a merge |
+| Eldrad Leader list | Same `catalog_id`, different field path on a **packet**; same Q1 row refreshes Layer B | Attachment is Layer B; packet may write `layer_c_reattest` |
+| Bannernob | One row; A+B+C stale; no points-packet carry-forward | Union, not a merge; C review cannot make C current while A is stale |
 | Ghazghkull | One row; composition does not clear unclassified A | Three packets, one row |
-| Acts of Faith trigger | Army-rule row; A+C stale; B unchanged | F-ARMY-01 |
+| Acts of Faith trigger | Army-rule row; A+C stale; cap L2 | F-ARMY-01; later `layer_a_recertification` restores A only |
+| Blitz Brigade DP 2→1 | Layer A current; B then C after validation and `layer_c_reattest` | `construction_constraint`; no A remap |
 | Brute Bosses | Staging until official provenance and catalog ID | Not L0 |
 | More Dakka! @ 946 | `freshness: retired`; current-version mustering blocker | Historical 931 row is a different `content_set_version` |
 | Orks faction index @ FM0.5 | `first_certified_at_content_set: null` | Rewrite overlay does not certify |
@@ -563,10 +613,11 @@ FM0 status generation may be implemented. It has:
 - staging kept off the ladder;
 - locator-only `row_id` / `review_id` projections and canonical bytes;
 - stored U4 tuples with packet-written reviews;
-- writer precedence that rejects stale→current without evidence;
+- two Layer A routes (carry-forward vs recertification);
+- writer precedence that rejects stale→current without authorization;
 - the four coverage artifacts named as inputs, not authorities;
 - derived-output bounds for guides and the capability manifest;
-- fourteen acceptance fixtures;
+- seventeen acceptance fixtures;
 - a mapping exercise that does not emit `content_status`.
 
 This survey does not add a generator, live artifact, guide rewrite,

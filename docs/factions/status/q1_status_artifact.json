@@ -35,7 +35,10 @@
     "capability_manifest_must_not_exceed_q1": true,
     "row_id_and_review_id_hash_locator_projection": true,
     "display_label_does_not_change_row_or_review_id": true,
-    "unconditional_u4_demotion_wins": true
+    "unconditional_u4_demotion_wins": true,
+    "layer_a_has_carry_forward_and_recertification_routes": true,
+    "recertification_is_not_equivalence": true,
+    "implementation_review_kinds_follow_required_work": true
   },
   "collections": [
     "faction_index",
@@ -68,15 +71,17 @@
   "staging_is_not_a_ladder_level": true,
   "review_kinds": [
     "layer_a_equivalence",
+    "recorded_equivalence",
     "handler_identity_confirmation",
+    "layer_a_recertification",
     "layer_c_reattest",
-    "human_attribution",
-    "recorded_equivalence"
+    "human_attribution"
   ],
   "review_results": [
     "equivalent",
     "not_equivalent",
-    "unclassified"
+    "unclassified",
+    "recertified"
   ],
   "replay_compatibility_labels": [
     "certified",
@@ -122,6 +127,8 @@
   ],
   "identity_canonicalization": {
     "scheme": "RFC 8785 JCS",
+    "key_order": "UTF-16 code-unit lexicographic order of member names",
+    "python_equivalent_qualified_to": "restricted ASCII identity shape",
     "utf8": true,
     "bom": false,
     "insignificant_whitespace": false,
@@ -209,7 +216,8 @@
   },
   "allow_deny_precedence": [
     "u4_demotion_always_wins",
-    "layer_a_current_after_hash_change_requires_equivalent_review",
+    "layer_a_current_after_hash_change_requires_equivalent_or_recertified_review",
+    "equivalent_after_classified_fingerprint_change_is_rejected",
     "sibling_unclassified_rejects_carry_forward_review",
     "historical_coverage_labels_never_win",
     "derived_manifest_must_not_exceed_q1",
@@ -272,7 +280,7 @@
     "staging_observation_is_not_an_entity_row_or_l0_count",
     "eldrad_points_requires_review_record_before_layer_a_or_c_current",
     "bannernob_points_cannot_write_layer_a_equivalence",
-    "acts_of_faith_envelope_caps_at_l3",
+    "acts_of_faith_envelope_caps_at_l2",
     "guide_cannot_assert_current_while_stale",
     "historical_playable_must_not_write_l7",
     "orks_fm0_5_first_certified_remains_null",
@@ -281,9 +289,67 @@
     "manifest_must_not_exceed_stale_or_absent_q1_claim",
     "ghazghkull_union_keeps_layer_a_stale_after_composition_work",
     "faction_rewrite_does_not_delete_entity_rows",
-    "status_claim_without_equivalent_review_is_rejected",
-    "structural_add_without_catalog_id_is_not_an_admitted_row"
+    "status_claim_without_authorizing_review_is_rejected",
+    "structural_add_without_catalog_id_is_not_an_admitted_row",
+    "acts_of_faith_recertification_restores_layer_a_leaves_layer_c_stale",
+    "construction_constraint_may_write_layer_c_reattest",
+    "datasheet_layer_a_stale_caps_at_l3"
   ],
+  "layer_a_authorization_routes": {
+    "carry_forward": {
+      "review_kinds": [
+        "layer_a_equivalence",
+        "recorded_equivalence"
+      ],
+      "required_result": "equivalent",
+      "fingerprint": "unchanged"
+    },
+    "recertification": {
+      "review_kinds": [
+        "layer_a_recertification"
+      ],
+      "required_result": "recertified",
+      "fingerprint": "changed",
+      "must_cite": [
+        "new_transcription_sha256",
+        "changed_fingerprint",
+        "mapping_citation",
+        "execution_evidence_citation"
+      ],
+      "writers_required_work": [
+        "remap_envelope",
+        "remap_effect_ir",
+        "recertify_l4_l8"
+      ]
+    }
+  },
+  "required_work_review_kinds": {
+    "layer_a_carry_forward_review": [
+      "layer_a_equivalence",
+      "handler_identity_confirmation"
+    ],
+    "recorded_equivalence_review": [
+      "recorded_equivalence",
+      "layer_a_equivalence",
+      "handler_identity_confirmation"
+    ],
+    "layer_c_reattest": [
+      "layer_c_reattest"
+    ],
+    "remap_envelope": [
+      "layer_a_recertification"
+    ],
+    "remap_effect_ir": [
+      "layer_a_recertification"
+    ],
+    "recertify_l4_l8": [
+      "layer_a_recertification",
+      "layer_c_reattest"
+    ],
+    "human_attribution_review": [
+      "human_attribution"
+    ]
+  },
   "mapping_samples": [
     {
       "label": "Eldrad points",
@@ -323,8 +389,26 @@
       "label": "Acts of Faith trigger",
       "impact_class": "clause_envelope_changed",
       "field_path": "clause.timing",
-      "attained_level_cap": "L3",
+      "attained_level_cap": "L2",
+      "entity_kind": "army_rule",
       "finding_id": "F-ARMY-01",
+      "authorization_route_after_remap": "layer_a_recertification",
+      "emitted_here": false
+    },
+    {
+      "label": "Blitz Brigade DP 2 to 1",
+      "impact_class": "construction_constraint",
+      "layer_a": "current_without_carry_forward",
+      "permits_review_kinds": [
+        "layer_c_reattest"
+      ],
+      "emitted_here": false
+    },
+    {
+      "label": "datasheet Layer A stale cap",
+      "entity_kind": "datasheet",
+      "attained_level_cap": "L3",
+      "note": "Counterpart of the Acts of Faith L2 cap",
       "emitted_here": false
     },
     {
@@ -385,11 +469,11 @@
   ],
   "reconciliation": {
     "collection_count": 5,
-    "review_kind_count": 5,
+    "review_kind_count": 6,
     "open_blocker_count": 9,
     "coverage_input_count": 4,
-    "acceptance_fixture_count": 14,
-    "mapping_sample_count": 8,
-    "note": "One generated artifact is the only publishable denominator. Staging is not L0. Historical Playable is not L7. first_certified_at_content_set does not package the previous version. U7a remains the replay mechanism."
+    "acceptance_fixture_count": 17,
+    "mapping_sample_count": 10,
+    "note": "One generated artifact is the only publishable denominator. Staging is not L0. Historical Playable is not L7. Layer A has carry-forward and recertification routes. Implementation packets write the review kinds mapped from remaining required work. first_certified_at_content_set does not package the previous version. U7a remains the replay mechanism."
   }
 }

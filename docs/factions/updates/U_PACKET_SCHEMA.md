@@ -151,9 +151,11 @@ any other evidence field.
 
 **Canonical bytes.** Encode that object as RFC 8785 JSON Canonicalization
 Scheme (JCS): UTF-8, no BOM, no insignificant whitespace, object keys
-sorted by Unicode code point, JSON `null` for nulls, integers in shortest
+sorted by the lexicographic order of their names compared as UTF-16 code
+units (RFC 8785 §3.2.3), JSON `null` for nulls, integers in shortest
 decimal form, no trailing newline. Equivalent Python construction for this
-ASCII identity set:
+restricted ASCII identity set (Basic Multilingual Plane code points match
+UTF-16 code units):
 
 ```text
 json.dumps(identity, ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False).encode('utf-8')
@@ -234,14 +236,30 @@ overlay or family packets are extra rows, not substitutes.
 | `faction_rewrite` | `overlay` | `u6_rewrite_procedure` | suppressing per-entity packets | U6 runbook (later design) |
 
 `layer_c_reattest` never silently preserves L7/L8 on a new content-set or
-build identity. Until Q1 exists, packets still *require* that work item;
-they do not invent the Q1 artifact.
+build identity. Packets still *require* that work item; they write the
+review into Q1 rather than inventing a second store.
 
-When `required_work` includes `layer_a_carry_forward_review`, the same
-implementation packet may write a scoped `review_record` (old/new
-transcription-hash equivalence). That is not a second packet and is not a
-substitute `status_claim`. Sibling `unclassified_clause` removes that work
-item and that surface permission.
+An implementation packet may write a scoped `review_record` for the kinds
+its remaining `required_work` authorizes. That is not a second packet and
+is not a substitute `status_claim`. Closed mapping:
+
+| Remaining `required_work` | Permitted `review_kind` |
+| --- | --- |
+| `layer_a_carry_forward_review` | `layer_a_equivalence`; `handler_identity_confirmation` when a named handler exists |
+| `recorded_equivalence_review` | `recorded_equivalence`; `layer_a_equivalence`; `handler_identity_confirmation` when a named handler exists |
+| `layer_c_reattest` | `layer_c_reattest` |
+| `remap_envelope` or `remap_effect_ir` | `layer_a_recertification` (changed fingerprint plus mapping/execution citations) |
+| `recertify_l4_l8` | `layer_a_recertification` and `layer_c_reattest` (constituent writes; C cannot become current while A is stale) |
+| `human_attribution_review` | `human_attribution` |
+
+`recertify_l4_l8` is aggregate work. It authorizes those constituent
+reviews; it does not collapse them into one equivalence record and does
+not permit Layer A carry-forward.
+
+Sibling `unclassified_clause` removes `layer_a_carry_forward_review` and
+forbids Layer A equivalence kinds on the points or composition packet. It
+does not strip `layer_c_reattest`, and it does not grant
+`layer_a_recertification` to those packets.
 
 ## 6. Sibling, overlay, and family coupling
 
@@ -251,7 +269,9 @@ item and that surface permission.
 2. **Sibling unclassified forbids Layer A carry-forward** on every other
    packet for that `catalog_id` in the same from/to pair. The points or
    composition packet may still regenerate Layer B records. It must not
-   include `review_record` or `layer_a_carry_forward_review`.
+   include `layer_a_carry_forward_review` or write `layer_a_equivalence`.
+   It may still write `layer_c_reattest`; Q1 will not make Layer C current
+   while Layer A is stale.
 3. **Known structural change does not erase review.** Ghazghkull keeps
    three packets. Completing composition work must not mark
    `clause.unattributed` done.
@@ -278,7 +298,7 @@ item and that surface permission.
 | `content_set_record` | `implementation`, `overlay` | Runtime Python; parsing page text |
 | `tombstone_record` | `structural_remove` | Removing Python still referenced by a packaged version |
 | `observation_pin` | `observation_repin`, reviews that re-pin hashes | Treating a new hash as Layer A |
-| `review_record` | `review` packets; `implementation` packets whose `required_work` includes `layer_a_carry_forward_review` | Inventing a component path; carry-forward review when a sibling `unclassified_clause` forbids it |
+| `review_record` | `review` packets; `implementation` packets whose remaining `required_work` authorizes a closed review kind in §5 | Inventing a component path; Layer A carry-forward when a sibling `unclassified_clause` forbids it; `layer_a_equivalence` after a classified fingerprint change; a review kind not mapped from remaining work |
 | `status_claim` | any non-`observation_repin` packet | Writing a live Q1 schema in this PR; asserting `current` while `stale`; substituting for a required `review_record` |
 | `focused_test` | all kinds | Importing other `test_*.py` modules; replacing `lifecycle.decision_controller` |
 | `named_handler_module` | only `named_handler_justified` | Generic lifecycle branching on faction or display name |
@@ -328,10 +348,11 @@ valid `allowed_surfaces` on a data-first packet.
 3. The `family_gap` exceptions in §7.2 apply only when `packet_kind` is
    `family_gap`. They never attach to content, review, overlay, or
    re-pin packets.
-4. `review_record` on an `implementation` packet is permitted only while
-   `layer_a_carry_forward_review` remains in `required_work`. Sibling
-   unclassified moves that item to `forbidden_work` and removes the
-   surface.
+4. `review_record` on an `implementation` packet is permitted only for
+   the kinds mapped from remaining `required_work` in §5. Sibling
+   unclassified moves `layer_a_carry_forward_review` to `forbidden_work`
+   and forbids Layer A equivalence kinds; it does not remove
+   `layer_c_reattest`.
 
 ## 8. Draft Track D D3 relationship
 
@@ -355,8 +376,9 @@ This PR only defines them.
 2. One Blitz Brigade feed line emits many packets (DP, each Enhancement
    add/remove, each Stratagem add/remove), not one page packet.
 3. Bannernob emits two packets. The `points_only` packet forbids
-   `layer_a_carry_forward_review` and `review_record` while the
-   `unclassified_clause` packet is open.
+   `layer_a_carry_forward_review` and `layer_a_equivalence` while the
+   `unclassified_clause` packet is open. It may still write
+   `layer_c_reattest`.
 4. Ghazghkull emits three packets (`cost_rows`, `composition`,
    `clause.unattributed`). Completing the composition packet does not
    close the review packet.
@@ -385,6 +407,12 @@ This PR only defines them.
     bundle without manual injection. It still must not set
     `generic_lifecycle_content_branching`. A content packet still must not
     include `runtime_integration`.
+15. A `construction_constraint` packet may include `review_record` so it
+    can write `layer_c_reattest` after mustering validation. That write is
+    not Layer A carry-forward.
+16. `recertify_l4_l8` on a `clause_envelope_changed` or `effect_ir_changed`
+    packet authorizes `layer_a_recertification` and `layer_c_reattest`.
+    Those writes must not be stored as fingerprint-unchanged equivalence.
 
 ## 10. Mapping exercise (not emitted packets)
 
@@ -396,15 +424,15 @@ cross-faction samples. FM0 emits the real packets. This PR does not.
 | Orks v946 overlay | `overlay` | `faction_view` / `overlay` / `faction_rewrite` | Children still required |
 | More Dakka! | `implementation` | `existence` / `structural_remove` | Tombstone; not in the current-URL table |
 | Brute Bosses | `implementation` | `existence` / `structural_add` | `blocked_on` provenance and catalog ID |
-| Blitz Brigade 2DP → 1DP | `implementation` | `army_construction` / `construction_constraint` | Not points; Layer A not remapped |
+| Blitz Brigade 2DP → 1DP | `implementation` | `army_construction` / `construction_constraint` | Not points; Layer A not remapped; `layer_c_reattest` permitted |
 | Boss Boomer | `implementation` | `existence` / `structural_add` | Sibling Gizmos out of scope |
-| Bannernob | `implementation` + `review` | `cost_rows` and `clause.unattributed` | Two packets; A carry-forward and `review_record` forbidden |
+| Bannernob | `implementation` + `review` | `cost_rows` and `clause.unattributed` | Two packets; A carry-forward forbidden; C review cannot clear stale A |
 | Ghazghkull | `implementation` + `implementation` + `review` | `cost_rows`, `composition`, `clause.unattributed` | Three packets; union A/B/C is not a merge |
 | Dakkajet | `review` | `clause.unattributed` / `unclassified_clause` | No component guess |
-| Eldrad 130→120 | `implementation` | `cost_rows` / `points_only` | Carry-forward `review_record` permitted; no sibling unclassified in F-DATA-01 |
-| Eldrad Leader list | `implementation` | `leader_support` / `attachment_or_keyword` | |
-| Acts of Faith trigger | `implementation` | `clause.timing` / `clause_envelope_changed` | F-ARMY-01 |
-| Effect RuleIR with envelope unchanged | `implementation` | `clause.effect_ir` / `effect_ir_changed` | Class illustration, not a named corpus row |
+| Eldrad 130→120 | `implementation` | `cost_rows` / `points_only` | Carry-forward and C `review_record` permitted; no sibling unclassified in F-DATA-01 |
+| Eldrad Leader list | `implementation` | `leader_support` / `attachment_or_keyword` | `layer_c_reattest` permitted |
+| Acts of Faith trigger | `implementation` | `clause.timing` / `clause_envelope_changed` | F-ARMY-01; `layer_a_recertification` via `recertify_l4_l8`, not carry-forward |
+| Effect RuleIR with envelope unchanged | `implementation` | `clause.effect_ir` / `effect_ir_changed` | Class illustration; same recertification route |
 | Family-gap runtime integration | `family_gap` | `family` / generic family | May include `runtime_integration`; must not branch on faction or display name |
 | Content packet `runtime_integration` | invalid | n/a | Infrastructure exception is `family_gap` only |
 | Live War Horde Python triad | invalid | n/a | Failure mode this schema replaces |
@@ -462,10 +490,11 @@ FM0 packet generation may be implemented. It has:
 - five packet kinds and three Python policies;
 - a closed class-to-packet map, including sibling unclassified forbidding
   Layer A carry-forward;
-- closed allow/deny surfaces, with `review_record` on points-only
-  implementation packets and a narrow `family_gap` runtime-integration
+- closed allow/deny surfaces, with `review_record` kinds mapped from
+  remaining required work (including Layer C re-attest and Layer A
+  recertification) and a narrow `family_gap` runtime-integration
   exception;
-- fourteen acceptance fixtures;
+- sixteen acceptance fixtures;
 - an Orks mapping exercise that does not emit packets.
 
 This survey does not add a generator, live contract rewrite, adapter
