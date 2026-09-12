@@ -1,6 +1,6 @@
 # Q1 status-artifact schema
 
-[Status index](README.md) · [Classification system](../updates/U_CLASSIFICATION_SYSTEM.md) · [Packet schema](../updates/U_PACKET_SCHEMA.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Phase 17O capability manifest](../../ADAPTER_DECISION_CONTRACT.md#phase-17o-capability-manifest)
+[Status index](README.md) · [Classification system](../updates/U_CLASSIFICATION_SYSTEM.md) · [Packet schema](../updates/U_PACKET_SCHEMA.md) · [Retention](../updates/U7_RETENTION.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Phase 17O capability manifest](../../ADAPTER_DECISION_CONTRACT.md#phase-17o-capability-manifest)
 
 This document is Track Q item Q1 as **FM-pre planning evidence**. It closes
 the generated `content_status` schema FM0 must emit. It does not generate
@@ -10,9 +10,9 @@ F00, or live adapter/agent contracts.
 
 Machine-readable catalog: [`q1_status_artifact.json`](q1_status_artifact.json).
 
-Owner **D3** (content-set retention) and **U7a** (replay mechanism) are not
-this document. Q1 stores the certification event and the coverage *labels*
-those later designs consume.
+Owner **D3** (content-set retention) and **U7a** (replay mechanism) are
+designed in [U7_RETENTION.md](../updates/U7_RETENTION.md). Q1 stores the
+certification event and the coverage *labels* that design consumes.
 
 ## 1. Purpose and delivery contract
 
@@ -37,8 +37,9 @@ the F-EVID-01 / F-DOC-01 failure mode.
 not treat a new transcription hash as Layer A current, assert `current`
 while a layer is `stale`, count a staging observation as L0, copy a
 historical `Playable` component label into L7, or mint `catalog_id` from a
-display name. Retention packaging, the U7a record, U8 cadence, and Q6 CI
-remain later.
+display name. Retention packaging and the U7a record are designed in
+[U7_RETENTION.md](../updates/U7_RETENTION.md); their generators remain
+FM0. U8 cadence and Q6 CI remain later.
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms cited inside a Layer A
 fingerprint. T4 still owns construction families cited by Layer B. T5 still
@@ -417,7 +418,7 @@ writer is the packet whose remaining `required_work` includes
 | Packet `review_record` | The review kinds mapped from that packet's remaining `required_work` (carry-forward, recertification, Layer C re-attest, attribution) | Write Layer A current by status claim alone; write carry-forward when a sibling `unclassified_clause` forbids it; write `layer_a_equivalence` after a classified fingerprint change |
 | Packet `status_claim` | A transition authorized by U4 plus any required review | Assert `current` while the tuple is `stale`; write Q1 schema; write `first_certified_at_content_set` |
 | Certification event (`-b` close) | `first_certified_at_content_set` | Package N−1; write `replay_compatibility: certified` |
-| U7a (later design) | `replay_compatibility: certified` plus a citation | Ignore `engine_build_id`; claim replayability from packaging alone |
+| U7a ([retention design](../updates/U7_RETENTION.md); FM0 writes) | `replay_compatibility: certified` plus a citation | Ignore `engine_build_id`; claim replayability from packaging alone |
 | Guides, audits, capability manifest | nothing | Any Q1 field |
 | The four coverage artifacts | nothing as authority | L7/L8 `current`; Layer A `current` |
 
@@ -581,7 +582,9 @@ already exist. Q1 indexes them.
 - U4 runtime invalidation
 - D1 guide generation from Q1
 - Q6 freshness CI
-- Owner D3 / U7 / U7a retention and replay mechanism
+- Owner D3 / U7 / U7a packaging inventory, loaders, and live
+  compatibility record (design delivered in
+  [U7_RETENTION.md](../updates/U7_RETENTION.md))
 - U8 runbook
 - Live adapter-contract or agent-contract edits
 - Catalog ID allocation
@@ -594,7 +597,8 @@ already exist. Q1 indexes them.
 - Packet identity and surfaces remain the packet schema
 - F00 page retention remains S1
 - Extraction remains S3a
-- Replay compatibility mechanism remains U7a
+- Replay compatibility mechanism remains
+  [U7_RETENTION.md](../updates/U7_RETENTION.md)
 - Viewer redaction remains the shared adapters module
 
 ## 14. Open holds
@@ -605,7 +609,7 @@ already exist. Q1 indexes them.
 | U4 invalidation | Engine writer of demotion | FM0 U4 |
 | U-HOLD-ORKS-S4-COUNTS | Exact 20/73 S4 integers | Per-entity Orks golden rows |
 | U-HOLD-RULES-UPDATED | Dual-version clauses | Attribution reviews becoming envelope/effect claims |
-| Owner D3 / U7a | Packaging N−1 and the compatibility record | `certified` coverage and previous-version rows as loadable content |
+| Owner D3 / U7a | Packaging N−1 and the compatibility record | design delivered in [U7_RETENTION.md](../updates/U7_RETENTION.md); `certified` coverage remains FM0 |
 | D1 / Q6 | Generated guides and freshness CI | F-DOC-01 implementation |
 
 ## 15. What "Q1 schema delivered" means
