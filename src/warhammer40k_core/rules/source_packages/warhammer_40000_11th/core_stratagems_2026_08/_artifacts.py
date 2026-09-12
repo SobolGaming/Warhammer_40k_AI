@@ -48,8 +48,8 @@ EXPECTED_CATEGORY_12_AUDIT_FINGERPRINT: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "f69bb96a4248f8b14e9ec247ac88bee3855372cd1f40eee270402d2b4e3ed303"
-EXPECTED_PACKAGE_HASH: Final = "65110e9292beae53778b0d3955c7633c0c692d29925f892d1f1d73d03f9325a9"
+EXPECTED_ARTIFACT_SHA256: Final = "3f93f3c26def1e33abfc66801822463bc292ed578ab443c3bc314104a7b1be8c"
+EXPECTED_PACKAGE_HASH: Final = "64bee037ad180ad610a90b3813200f79a961386fa19108048c123e70ff1a8286"
 EXPECTED_ANOMALY_OBSERVATION_SHA256: Final = (
     "561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46"
 )
@@ -137,7 +137,7 @@ EXPECTED_SOURCE_OBSERVATION_SHA256_BY_RULE_ID: Final = {
 }
 EXPECTED_SEMANTIC_STATUS_BY_RULE_ID: Final = {
     "crushing-impact": "partial_engine_runtime",
-    "explosives": "partial_engine_runtime",
+    "explosives": "executable_engine_runtime",
     "rapid-ingress": "partial_engine_runtime",
     "fire-overwatch": "partial_engine_runtime",
     "snap-shooting": "partial_engine_runtime",

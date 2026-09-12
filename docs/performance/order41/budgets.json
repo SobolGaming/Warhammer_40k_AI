@@ -1,0 +1,7 @@
+{
+  "workload_id": "order41-explosives-options-v1",
+  "samples_per_case": 7,
+  "mean_base_multiplier": 2,
+  "mean_additive_seconds": 0.025,
+  "maximum_seconds": 0.05
+}

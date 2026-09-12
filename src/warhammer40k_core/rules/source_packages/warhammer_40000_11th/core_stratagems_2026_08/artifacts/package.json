@@ -119,7 +119,7 @@
         "warhammer40k_core.engine.stratagems_geometry:_explosives_context_error",
         "warhammer40k_core.engine.stratagems_effect_handlers:_apply_explosives_handler"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": null,
       "transcription_sha256": "c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f",
       "verification_status": "unverified"
@@ -136,7 +136,7 @@
         "warhammer40k_core.engine.stratagems_geometry:_explosives_context_error",
         "warhammer40k_core.engine.stratagems_effect_handlers:_apply_explosives_handler"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": "https://www.40k.app/rules/15-stratagems",
       "transcription_sha256": "c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f",
       "verification_status": "authoritative_app_mirror"
@@ -329,7 +329,7 @@
       "transcription_sha256": "b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff"
     }
   ],
-  "package_hash": "65110e9292beae53778b0d3955c7633c0c692d29925f892d1f1d73d03f9325a9",
+  "package_hash": "64bee037ad180ad610a90b3813200f79a961386fa19108048c123e70ff1a8286",
   "rules": [
     {
       "command_point_cost": 1,
@@ -377,7 +377,7 @@
       ],
       "runtime_rule_id": "core:explosives",
       "section_id": "15.06",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-stratagems:core:explosives",
       "source_observation_sha256": "45c1a404c497f2d3d1cb0feb00ce09371fd3520bce8af43214930bc474dd9c41",
       "source_text": "15.06 Explosives\nExplosives\nShooting Phase\nTARGET\nOne friendly unengaged EXPLOSIVES/GRENADES unit that is eligible to shoot and did not make an advance move this turn.\nWHEN\nYour Shooting phase.\nEFFECT\nResolve the following sequence: 1. Select one EXPLOSIVES/GRENADES model in your unit. 2. Select one unengaged enemy unit within 8\" of and visible to that model. 3. Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound (06.02).\n1 CP",

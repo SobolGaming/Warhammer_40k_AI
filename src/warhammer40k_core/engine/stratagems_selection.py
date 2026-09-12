@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.explosives_selection import ExplosivesSelection, SELECTION_KIND
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
@@ -123,6 +125,12 @@ def _stratagem_decision_option(
 
 
 def _effect_selection_token(effect_selection: JsonValue) -> str:
+    if (
+        isinstance(effect_selection, dict)
+        and effect_selection.get("effect_selection_kind") == SELECTION_KIND
+    ):
+        selection = ExplosivesSelection.from_payload(effect_selection)
+        return f"{SELECTION_KIND}:{selection.source_model_instance_id}:{selection.enemy_target_unit_instance_id}"
     hit_enemy_unit_id = _hit_enemy_unit_id_or_none(effect_selection)
     if hit_enemy_unit_id is not None:
         return f"{HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND}:{hit_enemy_unit_id}"
@@ -377,6 +385,12 @@ def _effect_selection_error(
     context: StratagemEligibilityContext,
     effect_selection: JsonValue,
 ) -> str | None:
+    if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID and effect_selection is not None:
+        try:
+            ExplosivesSelection.from_payload(effect_selection)
+        except GameLifecycleError as exc:
+            return f"malformed_explosives_selection: {exc}"
+        return None
     if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
         return _heroic_intervention_mode_error(
             definition=definition,

@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.explosives_selection import ExplosivesSelection
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
@@ -106,15 +108,17 @@ def _apply_explosives_handler(
     use_record: StratagemUseRecord,
 ) -> None:
     target_unit_id = rules_unit_view_by_id(
-        state=state, unit_instance_id=_explosives_target_unit_id(context)
+        state=state, unit_instance_id=_explosives_target_unit_id(use_record.effect_selection)
     ).unit_instance_id
     context_error = _explosives_context_error(
         state=state,
         context=context,
         target_binding=target_binding,
+        effect_selection=use_record.effect_selection,
     )
     if context_error is not None:
         raise GameLifecycleError("Prevalidated Explosives context failed.")
+    selection = ExplosivesSelection.from_payload(use_record.effect_selection)
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
@@ -135,6 +139,7 @@ def _apply_explosives_handler(
                     "source_kind": "explosives",
                     "stratagem_use": use_record.to_payload(),
                     "explosives_unit_instance_id": _require_target_unit_id(target_binding),
+                    "source_model_instance_id": selection.source_model_instance_id,
                     "target_unit_instance_id": target_unit_id,
                     "roll_state": roll_state.to_payload(),
                 }
@@ -150,7 +155,7 @@ def _apply_explosives_handler(
                 state=state,
                 destroying_player_id=use_record.player_id,
                 source_rules_unit_instance_id=_require_target_unit_id(target_binding),
-                source_model_instance_id=None,
+                source_model_instance_id=selection.source_model_instance_id,
                 destruction_source_kind=DestructionSourceKind.ABILITY,
                 action_phase=use_record.phase,
                 source_step="explosives_mortal_wounds",
@@ -260,6 +265,9 @@ def _emit_explosives_resolved(
             "phase": use_record.phase.value,
             "stratagem_use": use_record.to_payload(),
             "explosives_unit_instance_id": explosives_unit_instance_id,
+            "source_model_instance_id": ExplosivesSelection.from_payload(
+                use_record.effect_selection
+            ).source_model_instance_id,
             "target_unit_instance_id": target_unit_instance_id,
             "roll_state": roll_state,
             "mortal_wounds": mortal_wounds,

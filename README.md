@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 41 implements during-phase Explosives through finite rules-unit/model/enemy
+choices, model-specific range and visibility, shared shooting restrictions and
+mortal-wound continuations. See [scope and validation](docs/ORDER_41_SCOPE_PLAN.md).
+Verify its existing reviewed source with
+`uv run python tools/build_core_stratagem_app_source.py --check`.
+
 Order 40 moves Smokescreen to opponent Shooting-start sequencing and grants Cover
 through its selected rules unit and obscuring models, without a Hit-roll penalty.
 It uses generic RuleIR, shared causal visibility and the existing finite Stratagem

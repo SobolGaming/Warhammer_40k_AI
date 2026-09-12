@@ -2191,7 +2191,7 @@ def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
 
     assert hashlib.sha256(raw).hexdigest() == (core_stratagems_2026_08.EXPECTED_ARTIFACT_SHA256)
     assert core_stratagems_2026_08.PACKAGE_HASH == (
-        "65110e9292beae53778b0d3955c7633c0c692d29925f892d1f1d73d03f9325a9"
+        "64bee037ad180ad610a90b3813200f79a961386fa19108048c123e70ff1a8286"
     )
     assert [(rule.section_id, rule.title) for rule in rules] == [
         ("15.05", "Crushing Impact"),
@@ -2241,7 +2241,7 @@ def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
     )
     assert {rule.rule_id: rule.semantic_execution_status for rule in rules} == {
         "crushing-impact": "partial_engine_runtime",
-        "explosives": "partial_engine_runtime",
+        "explosives": "executable_engine_runtime",
         "rapid-ingress": "partial_engine_runtime",
         "fire-overwatch": "partial_engine_runtime",
         "snap-shooting": "partial_engine_runtime",
