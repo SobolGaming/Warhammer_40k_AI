@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_selected_to_move_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
     from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
-    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidates_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
     from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness, _interrupt_started_mission_actions_for_movement_activation
@@ -152,28 +152,45 @@ def _movement_action_options_for_selected_unit(
         raise GameLifecycleError("Unsupported movement unit location.")
     if candidate.transport_unit_instance_id is None:
         raise GameLifecycleError("Embarked movement candidate requires Transport identity.")
-    disembark_candidate = _disembark_candidate_for_movement_unit(
+    disembark_candidates = _disembark_candidates_for_movement_unit(
         state=state,
         movement_state=movement_state,
         unit_instance_id=unit_instance_id,
         transport_unit_instance_id=candidate.transport_unit_instance_id,
         ruleset_descriptor=ruleset_descriptor,
     )
-    if disembark_candidate is None:
-        return (remain_stationary,)
     return (
         remain_stationary,
-        DecisionOption(
-            option_id=MovementPhaseActionKind.DISEMBARK.value,
-            label="Disembark",
-            payload={
-                "movement_phase_action": MovementPhaseActionKind.DISEMBARK.value,
-                "unit_instance_id": unit_instance_id,
-                "unit_location": candidate.location.value,
-                "transport_unit_instance_id": disembark_candidate.transport_unit_instance_id,
-                "disembark_mode": disembark_candidate.disembark_mode.value,
-                "transport_movement_status": (disembark_candidate.transport_movement_status.value),
-            },
+        *(
+            DecisionOption(
+                option_id=(
+                    f"disembark:{disembark_candidate.disembark_mode.value}"
+                    if disembark_candidate.restriction_overrides
+                    else MovementPhaseActionKind.DISEMBARK.value
+                ),
+                label=disembark_candidate.disembark_mode.value.replace("_", " ").title(),
+                payload={
+                    "movement_phase_action": MovementPhaseActionKind.DISEMBARK.value,
+                    "unit_instance_id": unit_instance_id,
+                    "unit_location": candidate.location.value,
+                    "transport_unit_instance_id": disembark_candidate.transport_unit_instance_id,
+                    "disembark_mode": disembark_candidate.disembark_mode.value,
+                    "transport_movement_status": (
+                        disembark_candidate.transport_movement_status.value
+                    ),
+                    **(
+                        {
+                            "restriction_overrides": [
+                                validate_json_value(o.to_payload())
+                                for o in disembark_candidate.restriction_overrides
+                            ]
+                        }
+                        if disembark_candidate.restriction_overrides
+                        else {}
+                    ),
+                },
+            )
+            for disembark_candidate in disembark_candidates
         ),
     )
 
@@ -299,12 +316,23 @@ def _apply_movement_action_decision(
             or candidate.transport_unit_instance_id is None
         ):
             raise GameLifecycleError("Disembark is not currently legal for the selected unit.")
-        disembark_candidate = _disembark_candidate_for_movement_unit(
+        disembark_candidates = _disembark_candidates_for_movement_unit(
             state=state,
             movement_state=movement_state,
             unit_instance_id=active_selection.unit_instance_id,
             transport_unit_instance_id=candidate.transport_unit_instance_id,
             ruleset_descriptor=ruleset_descriptor,
+        )
+        selected_mode = disembark_mode_kind_from_token(
+            _payload_string(payload, key="disembark_mode")
+        )
+        disembark_candidate = next(
+            (
+                candidate
+                for candidate in disembark_candidates
+                if candidate.disembark_mode is selected_mode
+            ),
+            None,
         )
         if disembark_candidate is None:
             raise GameLifecycleError("Disembark is not currently legal for the selected unit.")

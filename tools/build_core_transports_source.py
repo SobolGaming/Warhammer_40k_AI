@@ -70,14 +70,14 @@ EMERGENCY_RUNTIME_CONSUMER_IDS = [
 ASSAULT_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.assault_disembark:assault_disembark_restriction_overrides",
     "warhammer40k_core.engine.phases.charge:_charge_unit_ineligibility_reason",
-    "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+    "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
     "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
     "warhammer40k_core.engine.transports:resolve_disembark",
 ]
 
 SHOCK_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
-    "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+    "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
     "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
     "warhammer40k_core.engine.transports:resolve_disembark",
     "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed",

@@ -55,7 +55,7 @@ def shock_disembark_restriction_overrides(
     return transport_disembark_restriction_overrides(
         state=state,
         effect_kind=SHOCK_DISEMBARK_PERMISSION_EFFECT_KIND,
-        override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE,
+        override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
         player_id=player_id,
         battle_round=battle_round,
         rules_unit_instance_id=rules_unit_instance_id,

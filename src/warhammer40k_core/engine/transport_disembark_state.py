@@ -33,8 +33,8 @@ class TransportMovementStatus(StrEnum):
 class TransportRestrictionOverrideKind(StrEnum):
     ALLOW_EMBARK_AFTER_DISEMBARK = "allow_embark_after_disembark"
     ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK = "allow_disembark_after_advance_or_fall_back"
-    ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE = "allow_assault_disembark_after_normal_move"
-    ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE = "allow_shock_disembark_after_advance"
+    ALLOW_ASSAULT_DISEMBARK = "allow_assault_disembark"
+    ALLOW_SHOCK_DISEMBARK = "allow_shock_disembark"
 
 
 class DisembarkModeKind(StrEnum):
@@ -267,7 +267,7 @@ class DisembarkedUnitState:
                 override
                 for override in overrides
                 if override.override_kind
-                is TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
+                is TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK
             ),
             None,
         )
@@ -275,8 +275,7 @@ class DisembarkedUnitState:
             (
                 override
                 for override in overrides
-                if override.override_kind
-                is TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE
+                if override.override_kind is TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK
             ),
             None,
         )
@@ -494,6 +493,14 @@ def disembark_mode_kind_from_token(token: object) -> DisembarkModeKind:
         raise GameLifecycleError(f"Unsupported DisembarkModeKind token: {token}.") from exc
 
 
+def assault_disembark_transport_movement_is_eligible(status: TransportMovementStatus) -> bool:
+    """Core 18.06 excludes Advance and Fall Back; the grant has its own conditions."""
+    return transport_movement_status_from_token(status) not in {
+        TransportMovementStatus.ADVANCE,
+        TransportMovementStatus.FALL_BACK,
+    }
+
+
 def validate_disembark_mode_status(
     *,
     disembark_mode: DisembarkModeKind,
@@ -520,12 +527,12 @@ def validate_disembark_mode_status(
             )
         return
     if mode is DisembarkModeKind.ASSAULT_DISEMBARK:
-        if status is not TransportMovementStatus.NORMAL_MOVE:
-            raise GameLifecycleError("Assault Disembark requires Normal Transport movement.")
+        if not assault_disembark_transport_movement_is_eligible(status):
+            raise GameLifecycleError(
+                "Assault Disembark forbids Advance or Fall Back Transport movement."
+            )
         return
     if mode is DisembarkModeKind.SHOCK_DISEMBARK:
-        if status is not TransportMovementStatus.ADVANCE:
-            raise GameLifecycleError("Shock Disembark requires an Advanced Transport.")
         return
     if mode is DisembarkModeKind.COMBAT_DISEMBARK:
         if status not in {

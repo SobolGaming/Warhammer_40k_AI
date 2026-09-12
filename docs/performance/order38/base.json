@@ -1,0 +1,277 @@
+{
+  "commit": "7800eac718c1b77ca1782f162cad2e10a8e3eb35",
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "hashes": {
+    "scripts/measure_disembark_eligibility.py": "27fa62a2be6945b7020e0a430becf1a4c34ef211d5835b71eaf299c171c6c297",
+    "tests/disembark_eligibility_helpers.py": "6aaf2518fa7623749e66b3f182ca59bc8e7526f7d0e290298aa5a19ba4dfcfe3",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 2.112693874980323,
+      "slice_seconds": 0.0016363749746233225
+    },
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 0.2727527499664575,
+      "slice_seconds": 0.0016862499760463834
+    },
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 0.2706684999866411,
+      "slice_seconds": 0.001623749965801835
+    },
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 0.30084841698408127,
+      "slice_seconds": 0.0016204999992623925
+    },
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 0.2689106659963727,
+      "slice_seconds": 0.001695666927844286
+    },
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 0.26871920796111226,
+      "slice_seconds": 0.0016670000040903687
+    },
+    {
+      "case": "ordinary",
+      "option_count": 2,
+      "setup_seconds": 0.26910616701934487,
+      "slice_seconds": 0.0017194999381899834
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.2687608749838546,
+      "slice_seconds": 0.0016392499674111605
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.26895370800048113,
+      "slice_seconds": 0.0017470840830355883
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.273267374956049,
+      "slice_seconds": 0.0020007500424981117
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.2740911660948768,
+      "slice_seconds": 0.001711208955384791
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.2712240000255406,
+      "slice_seconds": 0.00191687501501292
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.2737963330000639,
+      "slice_seconds": 0.0016564999241381884
+    },
+    {
+      "case": "assault",
+      "option_count": 2,
+      "setup_seconds": 0.2688055420294404,
+      "slice_seconds": 0.001654416904784739
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.26941558404359967,
+      "slice_seconds": 0.0017009580042213202
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.27073554194066674,
+      "slice_seconds": 0.0016492920694872737
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.27082074992358685,
+      "slice_seconds": 0.0016395830316469073
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.272786624962464,
+      "slice_seconds": 0.0016734580276533961
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.27170016698073596,
+      "slice_seconds": 0.0017962080892175436
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.2711625840747729,
+      "slice_seconds": 0.0016594999469816685
+    },
+    {
+      "case": "shock",
+      "option_count": 2,
+      "setup_seconds": 0.2707836659392342,
+      "slice_seconds": 0.0016537921037524939
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.2784847079310566,
+      "slice_seconds": 0.0018010420026257634
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.31316504103597254,
+      "slice_seconds": 0.0016770419897511601
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.2698892919579521,
+      "slice_seconds": 0.001609666971489787
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.27052516594994813,
+      "slice_seconds": 0.0017125420272350311
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.27256425004452467,
+      "slice_seconds": 0.0016535829054191709
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.2718821249436587,
+      "slice_seconds": 0.0018111250828951597
+    },
+    {
+      "case": "both",
+      "option_count": 2,
+      "setup_seconds": 0.2753176670521498,
+      "slice_seconds": 0.001673624967224896
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.27432704099919647,
+      "slice_seconds": 0.0016622500261291862
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.27350808307528496,
+      "slice_seconds": 0.0017587499460205436
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.2729387499857694,
+      "slice_seconds": 0.001652291975915432
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.2703736670082435,
+      "slice_seconds": 0.001709582982584834
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.26924391696229577,
+      "slice_seconds": 0.001643708092160523
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.2711355830542743,
+      "slice_seconds": 0.0016923339571803808
+    },
+    {
+      "case": "restricted",
+      "option_count": 2,
+      "setup_seconds": 0.27305558300577104,
+      "slice_seconds": 0.0017127080354839563
+    }
+  ],
+  "runtime_manifest_sha256": "a735e6fd78570eccc5288c8cca7c83120911dfefa2dda9917d6fa003c2eb256d",
+  "summaries": {
+    "assault": {
+      "completion_rate": 1.0,
+      "max": 0.0020007500424981117,
+      "mean": 0.0017608692703236426,
+      "median": 0.001711208955384791,
+      "p95": 0.0020007500424981117,
+      "queries_per_second": 567.9013296746344,
+      "samples": 7
+    },
+    "both": {
+      "completion_rate": 1.0,
+      "max": 0.0018111250828951597,
+      "mean": 0.0017055179923772812,
+      "median": 0.0016770419897511601,
+      "p95": 0.0018111250828951597,
+      "queries_per_second": 586.3321316277195,
+      "samples": 7
+    },
+    "ordinary": {
+      "completion_rate": 1.0,
+      "max": 0.0017194999381899834,
+      "mean": 0.0016641488265512244,
+      "median": 0.0016670000040903687,
+      "p95": 0.0017194999381899834,
+      "queries_per_second": 600.9077938494215,
+      "samples": 7
+    },
+    "restricted": {
+      "completion_rate": 1.0,
+      "max": 0.0017587499460205436,
+      "mean": 0.0016902321450678365,
+      "median": 0.0016923339571803808,
+      "p95": 0.0017587499460205436,
+      "queries_per_second": 591.6347070537258,
+      "samples": 7
+    },
+    "shock": {
+      "completion_rate": 1.0,
+      "max": 0.0017962080892175436,
+      "mean": 0.0016818273247086576,
+      "median": 0.0016594999469816685,
+      "p95": 0.0017962080892175436,
+      "queries_per_second": 594.5913622096904,
+      "samples": 7
+    }
+  },
+  "timing_boundary": "Facade select passenger submission through returned action request; setup separate",
+  "workload_id": "order38-disembark-options-v1"
+}

@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
     from warhammer40k_core.engine.phases.movement_reactions import _request_selected_to_move_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
     from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
-    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidates_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _apply_forced_desperate_escape_battle_shock_reroll_decision, _apply_desperate_escape_battle_shock_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move, _resume_desperate_escape_battle_shock_continuation, is_forced_desperate_escape_battle_shock_reroll_request, is_desperate_escape_battle_shock_reroll_request
@@ -506,53 +506,17 @@ class MovementPhaseHandler:
                 )
             return None
         if request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
-            placement_parsed = _parse_placement_proposal_submission_or_invalid(
+            from warhammer40k_core.engine.phases.movement_placement_proposals import (
+                invalid_placement_proposal_submission_status,
+            )
+
+            return invalid_placement_proposal_submission_status(
                 state=state,
                 request=request,
                 result=result,
                 decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
-            if isinstance(placement_parsed, LifecycleStatus):
-                return placement_parsed
-            proposal_request, placement_submission = placement_parsed
-            if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
-                missing = _missing_disembark_proposal_field(placement_submission)
-                if missing is not None:
-                    return _reject_invalid_proposal(
-                        state=state,
-                        decisions=decisions,
-                        result=result,
-                        proposal_validation=ProposalValidationResult.invalid(
-                            proposal_request_id=proposal_request.request_id,
-                            proposal_kind=proposal_request.proposal_kind,
-                            violation_code="proposal_payload_missing_field",
-                            message=f"Disembark placement proposal missing {missing}.",
-                            field=missing,
-                        ),
-                        event_type="placement_proposal_invalid",
-                        message="Disembark placement proposal is incomplete.",
-                    )
-            spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
-                state=state,
-                decisions=decisions,
-                request=request,
-                result=result,
-            )
-            if spatial_status is not None:
-                return spatial_status
-            proposal_validation = placement_submission.validation_result_for_request(
-                proposal_request
-            )
-            if not proposal_validation.is_valid:
-                return _reject_invalid_proposal(
-                    state=state,
-                    decisions=decisions,
-                    result=result,
-                    proposal_validation=proposal_validation,
-                    event_type="placement_proposal_invalid",
-                    message="Placement proposal does not match the pending request.",
-                )
-            return None
         raise GameLifecycleError("Movement proposal prevalidation received unsupported request.")
 
     def apply_decision(

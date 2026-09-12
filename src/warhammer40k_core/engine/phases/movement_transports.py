@@ -19,6 +19,9 @@ from warhammer40k_core.engine.physical_engagement import (
 from warhammer40k_core.engine.shock_disembark import (
     shock_disembark_restriction_overrides,
 )
+from warhammer40k_core.engine.transport_disembark_state import (
+    assault_disembark_transport_movement_is_eligible,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -41,21 +44,21 @@ if TYPE_CHECKING:
 
 __all__ = (
     "_allowed_disembark_modes_for_placement_request",
-    "_disembark_candidate_for_movement_unit",
+    "_disembark_candidates_for_movement_unit",
     "_request_disembark_placement",
     "_resolve_combat_disembark_placement_submission",
     "_resolve_disembark_placement_submission",
 )
 
 
-def _disembark_candidate_for_movement_unit(
+def _disembark_candidates_for_movement_unit(
     *,
     state: GameState,
     movement_state: MovementPhaseState,
     unit_instance_id: str,
     transport_unit_instance_id: str,
     ruleset_descriptor: RulesetDescriptor,
-) -> DisembarkCandidate | None:
+) -> tuple[DisembarkCandidate, ...]:
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Disembark candidate requires a RulesetDescriptor.")
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
@@ -65,7 +68,7 @@ def _disembark_candidate_for_movement_unit(
     )
     cargo_state = state.transport_cargo_state_for_transport(transport_id)
     if cargo_state is None or cargo_state.player_id != movement_state.active_player_id:
-        return None
+        return ()
     active_cargo = cargo_state.for_movement_phase(battle_round=state.battle_round)
     rules_unit = rules_unit_view_from_armies(
         armies=tuple(state.army_definitions),
@@ -77,11 +80,13 @@ def _disembark_candidate_for_movement_unit(
         component.unit.unit_instance_id for component in rules_unit.living_components
     )
     if not all(active_cargo.contains_unit(component_id) for component_id in component_ids):
-        return None
+        return ()
     if not all(
-        active_cargo.unit_started_phase_embarked(component_id) for component_id in component_ids
+        active_cargo.unit_started_phase_embarked(component_id)
+        and not active_cargo.unit_disembarked_this_phase(component_id)
+        for component_id in component_ids
     ):
-        return None
+        return ()
     if (
         state.disembarked_unit_state_for_unit(
             player_id=movement_state.active_player_id,
@@ -90,26 +95,22 @@ def _disembark_candidate_for_movement_unit(
         )
         is not None
     ):
-        return None
+        return ()
     if state.battlefield_state is None:
         raise GameLifecycleError("Disembark eligibility requires battlefield state.")
     if state.battlefield_state.unit_placement_or_none(transport_id) is None:
-        return None
+        return ()
 
     advanced_transport = state.advanced_unit_state_for_unit(
         player_id=movement_state.active_player_id,
         battle_round=state.battle_round,
         unit_instance_id=transport_id,
     )
-    if (
-        state.fell_back_unit_state_for_unit(
-            player_id=movement_state.active_player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=transport_id,
-        )
-        is not None
-    ):
-        return None
+    fell_back_transport = state.fell_back_unit_state_for_unit(
+        player_id=movement_state.active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=transport_id,
+    )
     normal_move_states = state.normal_move_states_for_unit_phase(
         player_id=movement_state.active_player_id,
         battle_round=state.battle_round,
@@ -122,60 +123,88 @@ def _disembark_candidate_for_movement_unit(
         and reserve_state.arrived_battle_round == state.battle_round
         and reserve_state.arrived_phase == BattlePhase.MOVEMENT.value
     )
-    start_engaged_enemy_unit_instance_ids: tuple[str, ...] = ()
-    if advanced_transport is not None:
+    if fell_back_transport is not None:
+        movement_status = TransportMovementStatus.FALL_BACK
+    elif advanced_transport is not None:
         movement_status = TransportMovementStatus.ADVANCE
-        restriction_overrides = shock_disembark_restriction_overrides(
-            state=state,
-            player_id=movement_state.active_player_id,
-            battle_round=state.battle_round,
-            rules_unit_instance_id=unit_id,
-            transport_unit_instance_id=transport_id,
-        )
-        if not restriction_overrides:
-            return None
-        disembark_mode = DisembarkModeKind.SHOCK_DISEMBARK
-        start_engaged_enemy_unit_instance_ids = scenario_physically_engaged_enemy_rules_unit_ids(
-            scenario=_battlefield_scenario(state),
-            ruleset_descriptor=ruleset_descriptor,
-            unit_instance_id=transport_id,
-        )
     elif normal_move_states:
         movement_status = TransportMovementStatus.NORMAL_MOVE
-        restriction_overrides = assault_disembark_restriction_overrides(
+    elif arrived_by_ingress:
+        movement_status = TransportMovementStatus.INGRESS_MOVE
+    elif transport_id in movement_state.moved_unit_ids:
+        movement_status = TransportMovementStatus.REMAIN_STATIONARY
+    else:
+        movement_status = TransportMovementStatus.NOT_MOVED
+
+    candidates: list[DisembarkCandidate] = []
+    if movement_status in (
+        TransportMovementStatus.NOT_MOVED,
+        TransportMovementStatus.REMAIN_STATIONARY,
+    ):
+        ordinary_mode = DisembarkModeKind.TACTICAL_DISEMBARK
+    elif movement_status in (
+        TransportMovementStatus.NORMAL_MOVE,
+        TransportMovementStatus.INGRESS_MOVE,
+    ):
+        ordinary_mode = DisembarkModeKind.RAPID_DISEMBARK
+    else:
+        ordinary_mode = None
+    if ordinary_mode is not None:
+        candidates.append(
+            DisembarkCandidate(
+                player_id=movement_state.active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_id,
+                transport_unit_instance_id=transport_id,
+                disembark_mode=ordinary_mode,
+                transport_movement_status=movement_status,
+            )
+        )
+    if assault_disembark_transport_movement_is_eligible(movement_status):
+        assault = assault_disembark_restriction_overrides(
             state=state,
             player_id=movement_state.active_player_id,
             battle_round=state.battle_round,
             rules_unit_instance_id=unit_id,
             transport_unit_instance_id=transport_id,
         )
-        disembark_mode = (
-            DisembarkModeKind.ASSAULT_DISEMBARK
-            if restriction_overrides
-            else DisembarkModeKind.RAPID_DISEMBARK
-        )
-    elif arrived_by_ingress:
-        movement_status = TransportMovementStatus.INGRESS_MOVE
-        disembark_mode = DisembarkModeKind.RAPID_DISEMBARK
-        restriction_overrides = ()
-    elif transport_id in movement_state.moved_unit_ids:
-        movement_status = TransportMovementStatus.REMAIN_STATIONARY
-        disembark_mode = DisembarkModeKind.TACTICAL_DISEMBARK
-        restriction_overrides = ()
-    else:
-        movement_status = TransportMovementStatus.NOT_MOVED
-        disembark_mode = DisembarkModeKind.TACTICAL_DISEMBARK
-        restriction_overrides = ()
-    return DisembarkCandidate(
+        if assault:
+            candidates.append(
+                DisembarkCandidate(
+                    player_id=movement_state.active_player_id,
+                    battle_round=state.battle_round,
+                    unit_instance_id=unit_id,
+                    transport_unit_instance_id=transport_id,
+                    disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+                    transport_movement_status=movement_status,
+                    restriction_overrides=assault,
+                )
+            )
+    shock = shock_disembark_restriction_overrides(
+        state=state,
         player_id=movement_state.active_player_id,
         battle_round=state.battle_round,
-        unit_instance_id=unit_id,
+        rules_unit_instance_id=unit_id,
         transport_unit_instance_id=transport_id,
-        disembark_mode=disembark_mode,
-        transport_movement_status=movement_status,
-        restriction_overrides=restriction_overrides,
-        start_engaged_enemy_unit_instance_ids=start_engaged_enemy_unit_instance_ids,
     )
+    if shock:
+        candidates.append(
+            DisembarkCandidate(
+                player_id=movement_state.active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_id,
+                transport_unit_instance_id=transport_id,
+                disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
+                transport_movement_status=movement_status,
+                restriction_overrides=shock,
+                start_engaged_enemy_unit_instance_ids=scenario_physically_engaged_enemy_rules_unit_ids(
+                    scenario=_battlefield_scenario(state),
+                    ruleset_descriptor=ruleset_descriptor,
+                    unit_instance_id=transport_id,
+                ),
+            )
+        )
+    return tuple(candidates)
 
 
 def _request_disembark_placement(
