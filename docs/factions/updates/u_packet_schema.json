@@ -41,7 +41,10 @@
     "display_label_does_not_change_packet_id": true,
     "review_record_permitted_on_implementation_when_required_work_authorizes_kind": true,
     "family_gap_may_authorize_runtime_integration": true,
-    "unconditional_denylist_wins": true
+    "unconditional_denylist_wins": true,
+    "family_gap_may_authorize_agent_contract_inventory": true,
+    "agent_contract_inventory_is_runtime_surfaces_only": true,
+    "adapter_contract_delta_covers_existing_surface_payload_and_visibility": true
   },
   "origin_kinds": [
     "update_classifier",
@@ -148,6 +151,7 @@
     "named_handler_module",
     "generic_family_module",
     "runtime_integration",
+    "agent_contract_inventory",
     "adapter_contract_delta"
   ],
   "forbidden_surfaces_unconditional": [
@@ -160,7 +164,8 @@
   ],
   "forbidden_surfaces_except_family_gap": [
     "runtime_loader_lifecycle_bundle_manifest",
-    "adapter_contract_except_cited_family_gap"
+    "adapter_contract_except_family_or_decision_kind",
+    "agent_contract_except_inventory_family_gap"
   ],
   "allow_deny_precedence": [
     "unconditional_denylist_always_wins",
@@ -378,14 +383,15 @@
     "inherited_listings_add_zero_packets",
     "acts_of_faith_is_envelope_on_clause_timing",
     "dakkajet_review_uses_clause_unattributed",
-    "content_packet_must_not_allow_adapter_contract_delta_or_runtime_integration",
+    "content_packet_must_not_allow_adapter_runtime_or_agent_inventory",
     "family_packet_must_not_use_faction_catalog_id",
     "named_handler_packet_requires_seven_justification_fields",
     "faction_rewrite_overlay_plus_remove_plus_add_are_three_identities",
     "packet_id_unchanged_for_display_only_binding_changes",
     "family_gap_may_include_runtime_integration",
     "construction_constraint_may_write_layer_c_reattest",
-    "recertify_l4_l8_authorizes_recertification_and_layer_c_reattest"
+    "recertify_l4_l8_authorizes_recertification_and_layer_c_reattest",
+    "family_gap_may_include_agent_contract_inventory"
   ],
   "required_work_review_kinds": {
     "layer_a_carry_forward_review": [
@@ -609,6 +615,34 @@
       "label": "Live War Horde Python triad",
       "valid": false,
       "reason": "Python scaffold allowlist is not a data-first packet"
+    },
+    {
+      "label": "family_gap new hook existing decision",
+      "packet_kind": "family_gap",
+      "python_policy": "generic_family",
+      "allowed_surfaces": [
+        "generic_family_module",
+        "runtime_integration",
+        "agent_contract_inventory",
+        "focused_test"
+      ],
+      "must_not_include": [
+        "generic_lifecycle_content_branching",
+        "adapter_contract_delta"
+      ],
+      "edits_agent_scope_or_task_format": false,
+      "valid": true,
+      "emitted_here": false
+    },
+    {
+      "label": "content packet agent_contract_inventory",
+      "packet_kind": "implementation",
+      "impact_class": "points_only",
+      "allowed_surfaces": [
+        "agent_contract_inventory"
+      ],
+      "valid": false,
+      "reason": "agent_contract_inventory is family_gap only"
     }
   ],
   "holds": [
@@ -654,11 +688,32 @@
     "origin_kind_count": 3,
     "packet_kind_count": 5,
     "python_policy_count": 3,
-    "allowed_surface_count": 10,
+    "allowed_surface_count": 11,
     "work_item_count": 20,
     "impact_class_map_count": 12,
-    "acceptance_fixture_count": 16,
+    "acceptance_fixture_count": 17,
     "named_handler_required_field_count": 7,
-    "note": "Twelve impact classes map one-to-one onto packet kinds. Packet identity hashes the locator projection. Sibling unclassified does not merge packets. Implementation packets may write the review kinds mapped from remaining required work, including layer_c_reattest and layer_a_recertification. family_gap may authorize runtime_integration. The live War Horde Python triad is recorded as invalid."
+    "note": "Twelve impact classes map one-to-one onto packet kinds. Packet identity hashes the locator projection. Sibling unclassified does not merge packets. Implementation packets may write the review kinds mapped from remaining required work, including layer_c_reattest and layer_a_recertification. family_gap may authorize runtime_integration and agent_contract_inventory. The live War Horde Python triad is recorded as invalid."
+  },
+  "family_gap_agent_contract_inventory_exception": {
+    "packet_kind": "family_gap",
+    "allowed_surface": "agent_contract_inventory",
+    "covers": "runtime_surfaces_inventory_section_only",
+    "does_not_cover": [
+      "scope",
+      "task_packet_format",
+      "python_policy",
+      "decision_and_mutation",
+      "required_tests",
+      "adapter_contract"
+    ],
+    "requires_new_contribution_surface": true,
+    "does_not_require_t6_delta": true,
+    "does_not_attach_to": [
+      "implementation",
+      "review",
+      "overlay",
+      "observation_repin"
+    ]
   }
 }

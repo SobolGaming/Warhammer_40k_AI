@@ -114,6 +114,7 @@ tree".
 | Sibling Enhancements on one page | One packet each (`structural_add` does not demote siblings) |
 | Inherited listing of the same binding | No extra packet |
 | T6 "new decision" | `generic_family` packet citing `t6_delta_id`; content packets do not edit the adapter contract |
+| New contribution surface, existing decision family | `family_gap` with `runtime_integration` plus `agent_contract_inventory`; not `adapter_contract_delta` unless an adapter surface also changes |
 | Missing RuleIR template | `generic_family_demand` packet first; content packet `blocked_on` that family |
 
 `pr_group` may help humans batch packets. It does not widen
@@ -308,7 +309,8 @@ does not strip `layer_c_reattest`, and it does not grant
 | `named_handler_module` | only `named_handler_justified` | Generic lifecycle branching on faction or display name |
 | `generic_family_module` | only `family_gap` | Faction catalog IDs as the packet identity |
 | `runtime_integration` | only `family_gap` | Content, review, overlay, or re-pin packets; faction or display-name branching |
-| `adapter_contract_delta` | only `family_gap` that cites a T6 delta | Content, review, overlay, or re-pin packets |
+| `agent_contract_inventory` | only `family_gap` that adds an approved runtime contribution surface | Content, review, overlay, or re-pin packets; Scope; Task Packet Format; Python policy; arbitrary agent-contract rewrites |
+| `adapter_contract_delta` | only `family_gap` that performs a `family_or_decision_kind` adapter update | Content, review, overlay, or re-pin packets; minting a new family or visibility class solely to obtain permission |
 
 Exact content-set paths remain S3a's layout. Packets name **record
 kinds** (`cost_rows`, `composition`, `army_construction`, clause
@@ -331,9 +333,12 @@ bindings), not speculative file trees.
 - `src/` runtime loader, lifecycle, bundle, or manifest machinery, except
   the narrow `runtime_integration` surface below
 - [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md),
-  except a `family_gap` packet that cites `t6_delta_ids`. U7a and the
-  Track D D3 writer-policy insert are not packet-path writers; see
+  except a `family_gap` packet that includes `adapter_contract_delta`
+  for a `family_or_decision_kind` update. U7a and the Track D D3
+  writer-policy insert are not packet-path writers; see
   [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md)
+- [FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md),
+  except a `family_gap` packet that includes `agent_contract_inventory`
 
 `runtime_integration` on a `family_gap` packet may register the new
 generic family's validator, applier, hook binding, or bundle/lifecycle
@@ -341,6 +346,22 @@ load path required by AGENTS.md and by a real source-backed consumer in
 the same PR. It must not branch generic modules on faction or display
 name, and it does not widen any content, review, overlay, or re-pin
 packet.
+
+`agent_contract_inventory` on that same `family_gap` packet may update
+only the live agent contract's **Runtime Surfaces** inventory so the
+new contribution surface is listed. It must not edit Scope, Task
+Packet Format, Python policy, Decision And Mutation, or Required
+Tests. It does not authorize an adapter-contract edit and does not
+require a T6 delta. A family packet that adds a contribution surface
+and omits this surface cannot perform that inventory update.
+
+`adapter_contract_delta` covers a new `decision_type`, finite option
+family, `proposal_kind`, visibility class, or nested-allowlist entry,
+and also an adapter-visible payload, interaction, or viewer-visibility
+behaviour change on an existing surface. A new visibility behaviour
+does not require a new visibility class. When a published T6 delta
+names that demand, the packet cites `t6_delta_ids`. Citing a delta is
+not applying it in a design PR.
 
 The live agent contract's War Horde example lists
 `rule.py` / `enhancements.py` / `stratagems.py`. Those paths are **not**
@@ -366,7 +387,7 @@ valid `allowed_surfaces` on a data-first packet.
 | --- | --- | --- |
 | This schema | Delivered as planning evidence | Packet generator consumes it |
 | [FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) | Unchanged | Rewrite drafted in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md); Task Packet Format becomes this schema |
-| [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md) | Unchanged | Writer policy drafted in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md); still updated in the same PR as any new family or decision kind; U7a remains a separate writer |
+| [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md) | Unchanged | Writer policy drafted in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md); still updated in the same PR as a new family or decision kind, or as a payload, interaction, or viewer-visibility change to an existing surface; U7a remains a separate writer |
 | Owner D3 retention / U7a | Unchanged | Design delivered in [U7_RETENTION.md](U7_RETENTION.md); FM0 implements inventory, contracts, and goldens |
 | Track D D3 rewrite draft | Delivered as planning evidence | FM0 applies the live files |
 
@@ -396,8 +417,9 @@ This PR only defines them.
 8. Dakkajet "Rules Updated" is a `review` packet on
    `clause.unattributed`. It must not set `field_path` to
    `clause.effect_ir`.
-9. A content packet with `adapter_contract_delta` or
-   `runtime_integration` in `allowed_surfaces` is invalid.
+9. A content packet with `adapter_contract_delta`,
+   `runtime_integration`, or `agent_contract_inventory` in
+   `allowed_surfaces` is invalid.
 10. A `family_gap` packet with a faction `catalog_id` as its identity is
     invalid. A content packet with `python_policy: generic_family` is
     invalid.
@@ -420,6 +442,12 @@ This PR only defines them.
 16. `recertify_l4_l8` on a `clause_envelope_changed` or `effect_ir_changed`
     packet authorizes `layer_a_recertification` and `layer_c_reattest`.
     Those writes must not be stored as fingerprint-unchanged equivalence.
+17. A `family_gap` packet that adds an approved runtime contribution
+    surface and reuses an existing decision family may include
+    `agent_contract_inventory` and must update only the Runtime
+    Surfaces inventory in that same PR. Omitting that update, or using
+    the surface to edit Scope or Task Packet Format, is unpublished.
+    A content packet still must not include `agent_contract_inventory`.
 
 ## 10. Mapping exercise (not emitted packets)
 
@@ -441,7 +469,9 @@ cross-faction samples. FM0 emits the real packets. This PR does not.
 | Acts of Faith trigger | `implementation` | `clause.timing` / `clause_envelope_changed` | F-ARMY-01; `layer_a_recertification` via `recertify_l4_l8`, not carry-forward |
 | Effect RuleIR with envelope unchanged | `implementation` | `clause.effect_ir` / `effect_ir_changed` | Class illustration; same recertification route |
 | Family-gap runtime integration | `family_gap` | `family` / generic family | May include `runtime_integration`; must not branch on faction or display name |
+| Family-gap new hook, existing decision | `family_gap` | `family` / generic family | `runtime_integration` plus `agent_contract_inventory`; no new adapter family |
 | Content packet `runtime_integration` | invalid | n/a | Infrastructure exception is `family_gap` only |
+| Content packet `agent_contract_inventory` | invalid | n/a | Inventory edit is `family_gap` only |
 | Live War Horde Python triad | invalid | n/a | Failure mode this schema replaces |
 
 Do not publish a histogram of all 53 datasheet URLs as packets here.
@@ -503,9 +533,9 @@ FM0 packet generation may be implemented. It has:
   Layer A carry-forward;
 - closed allow/deny surfaces, with `review_record` kinds mapped from
   remaining required work (including Layer C re-attest and Layer A
-  recertification) and a narrow `family_gap` runtime-integration
-  exception;
-- sixteen acceptance fixtures;
+  recertification) and narrow `family_gap` runtime-integration and
+  agent-inventory exceptions;
+- seventeen acceptance fixtures;
 - an Orks mapping exercise that does not emit packets.
 
 This survey does not add a generator, live contract rewrite, adapter

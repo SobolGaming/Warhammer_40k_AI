@@ -96,7 +96,7 @@ Closed writers of
 
 | Writer ID | When | Same PR must include | Must not |
 | --- | --- | --- | --- |
-| `family_or_decision_kind` | New `decision_type`, finite option family, `proposal_kind`, visibility class, or nested-allowlist entry | The real family or decision kind, a `family_gap` packet that cites `t6_delta_ids` when the work is packet-driven, conformance, and tests | Speculative families; content-packet work |
+| `family_or_decision_kind` | A new `decision_type`, finite option family, `proposal_kind`, visibility class, or nested-allowlist entry; **or** an adapter-visible payload, interaction, or viewer-visibility behaviour change on an existing surface. A new visibility behaviour does not require a new visibility class | The real implementation and consumer, a `family_gap` packet with `adapter_contract_delta` when the work is packet-driven (cite `t6_delta_ids` when a published T6 delta names the demand), conformance, and tests | Speculative families; content-packet work; minting a new family or class solely to obtain permission |
 | `u7a_compatibility` | FM0 U7a implementation | Record, verification, fail-closed behaviour, and conformance | A new gameplay family; packaging slots; Q1 `certified` invented by packaging |
 | `d3_writer_policy_binding` | FM0 application of §5.1 | This draft's writer-policy section and the agent-contract rewrite | T6 deltas; U7a mechanism; new payloads |
 
@@ -114,7 +114,8 @@ rule; it does not exclude `u7a_compatibility` or
 | "Update the adapter contract" | One of the three writers above, each with its same-PR obligation |
 | Live War Horde Python triad | Many packets; never a data-first `allowed_surfaces` list |
 | T6 delta ID | Demand citation; not an applied contract section |
-| "Ordinary PR may add a runtime surface if it updates this contract" | `family_gap` plus `runtime_integration` only |
+| "Ordinary PR may add a runtime surface if it updates this contract" | `family_gap` plus `runtime_integration` and `agent_contract_inventory` |
+| Hidden behaviour on an existing public surface | Writer `family_or_decision_kind` without minting a new visibility class |
 | Live file | Unchanged until the FM0 apply PR |
 
 ## 4. Agent-contract rewrite
@@ -171,8 +172,12 @@ and `observation_repin` packets. They modify only that packet's
 machinery stay out of scope for those packets.
 
 A `family_gap` packet is a different PR. It may use
-`runtime_integration` and, when it cites `t6_delta_ids`,
-`adapter_contract_delta`. It must carry a real source-backed consumer
+`runtime_integration`. If it adds an approved runtime contribution
+surface, it must also include `agent_contract_inventory` and update
+only the Runtime Surfaces inventory. If it performs a
+`family_or_decision_kind` adapter update, it includes
+`adapter_contract_delta` and cites `t6_delta_ids` when a published T6
+delta names the demand. It must carry a real source-backed consumer
 in the same PR.
 
 Do not parse raw rule text or import source-mirror, HTML sanitizer,
@@ -203,6 +208,10 @@ Required:
   authorizes.
 - Do not edit runtime loader, lifecycle, bundle, or manifest
   machinery from a content, review, overlay, or re-pin packet.
+- If this `family_gap` packet adds an approved runtime contribution
+  surface, include `agent_contract_inventory` and limit that edit to
+  the Runtime Surfaces inventory. Do not edit Scope or Task Packet
+  Format through that surface.
 
 The historical Task Packet Format that lists
 `orks/detachments/war_horde/rule.py`, `enhancements.py`,
@@ -215,17 +224,19 @@ Those paths are not `allowed_surfaces`.
 | --- | --- | --- |
 | `none` | Default for content, review, overlay, and re-pin | Forbidden. Tests are allowed |
 | `named_handler_justified` | `AGENTS.md` bespoke-subsystem rubric is met **and** the packet carries the seven justification fields | Only the named handler module listed on the packet |
-| `generic_family` | This packet **is** the Track G family PR | Generic engine modules, the packet's `runtime_integration` surface, plus tests; two-consumer rule applies |
+| `generic_family` | This packet **is** the Track G family PR | Generic engine modules, the packet's `runtime_integration` surface, `agent_contract_inventory` when a contribution surface is added, plus tests; two-consumer rule applies |
 
 A content packet must not set `generic_family`. A family packet must
 not bind a faction `catalog_id` as its identity. Missing any of the
 seven named-handler fields leaves the packet unpublished.
 
 If the family adds an approved runtime contribution surface, that
-`family_gap` PR updates the live agent-contract Runtime Surfaces
-inventory in the same change. If it also adds a decision family, it
-uses writer `family_or_decision_kind` on the adapter contract. Those
-are still not content-packet rights.
+`family_gap` PR lists `agent_contract_inventory` and updates only the
+live agent-contract Runtime Surfaces inventory in the same change.
+That surface does not authorize Scope, Task Packet Format, or
+Python-policy edits. If the family also performs a
+`family_or_decision_kind` adapter update, it lists
+`adapter_contract_delta`. Those are still not content-packet rights.
 
 ### 4.5 Runtime surfaces
 
@@ -241,10 +252,12 @@ FM0 deletes this live sentence:
 
 and replaces it with:
 
-> A new shared runtime surface is a `family_gap` packet. It updates
-> this inventory, lifecycle/bundle tests, and integration-plan
-> documentation in that family PR. Content, review, overlay, and
-> re-pin packets cannot introduce a surface by editing this contract.
+> A new shared runtime surface is a `family_gap` packet. It includes
+> `agent_contract_inventory` and updates this inventory,
+> lifecycle/bundle tests, and integration-plan documentation in that
+> family PR. The inventory edit is that surface only. Content, review,
+> overlay, and re-pin packets cannot introduce a surface by editing
+> this contract.
 
 ### 4.6 Decision and mutation
 
@@ -306,9 +319,12 @@ edit this file.
 
 A new `decision_type`, finite option family, `proposal_kind`,
 visibility class, or nested-allowlist entry updates this file in the
-same implementation PR as the real family or decision kind. Packet-
-driven family work uses a `family_gap` packet that cites
-`t6_delta_ids` and includes `adapter_contract_delta`.
+same implementation PR as the real family or decision kind. So does
+an adapter-visible payload, interaction, or viewer-visibility
+behaviour change on an existing surface. A new visibility behaviour
+does not require a new visibility class. Packet-driven family work
+uses a `family_gap` packet that includes `adapter_contract_delta` and
+cites `t6_delta_ids` when a published T6 delta names the demand.
 
 The FM0 U7a implementation amends this file for the compatibility
 record, verification, fail-closed behaviour, and conformance
@@ -357,7 +373,7 @@ record, hash the goldens, or certify a producer.
 | --- | --- | --- |
 | This draft | Planning evidence | Live files; `contracts/`; packets |
 | FM0 Track D D3 apply PR | Live agent Scope / Task Packet / Python policy; adapter §5.1 | T6 deltas; U7a; `src/` runtime families |
-| `family_gap` implementer | Agent Runtime Surfaces inventory when adding a surface; adapter contract when adding a decision family | Content-packet work in the same surfaces |
+| `family_gap` implementer | Agent Runtime Surfaces inventory via `agent_contract_inventory` when adding a surface; adapter contract via `adapter_contract_delta` for a new family or kind, or for a payload, interaction, or viewer-visibility change on an existing surface | Content-packet work; Scope or Task Packet Format edits; minting a class solely to obtain permission |
 | U7a implementer | Adapter compatibility section; `contracts/` record | Agent Task Packet Format; packaging slots |
 | Content / review / overlay / re-pin implementer | Packet `allowed_surfaces` only | Either live contract |
 | Owner D3 / U7 packager | Packaging slots | Either live contract |
@@ -415,6 +431,19 @@ This PR only defines them.
     visibility class.
 15. Citing a `t6_delta_id` on a content packet does not authorize an
     adapter-contract edit.
+16. A `family_gap` packet that adds an approved runtime contribution
+    surface and reuses an existing decision family includes
+    `agent_contract_inventory` and updates only the Runtime Surfaces
+    inventory in that same PR. Omitting that update, or editing Scope
+    or Task Packet Format through that surface, is unpublished. A
+    content packet still must not introduce a surface by editing the
+    agent contract.
+17. A source-backed change that adds hidden event or projection
+    behaviour to an existing decision or event surface, without
+    minting a new `decision_type` or visibility class, is still writer
+    `family_or_decision_kind`. Packet-driven work uses `family_gap`
+    plus `adapter_contract_delta`. A content packet cannot perform
+    that amendment. This fixture does not apply a T6 delta in this PR.
 
 ## 8. Mapping exercise (not a live rewrite)
 
@@ -426,7 +455,8 @@ Planning examples. FM0 applies the real files. This PR does not.
 | Blitz Brigade DP 2→1 | Content packet; no adapter edit | `construction_constraint` |
 | Orks v946 overlay | Overlay plus children; no contract rewrite | U8 rewrite path |
 | Acts of Faith remap | Envelope packet; adapter unchanged unless a new family is required | F-ARMY-01 |
-| T6 hidden Stratagem / hidden CP | Demand row only | Later Track G; not the apply PR |
+| T6 hidden Stratagem / hidden CP | Later Track G; writer `family_or_decision_kind` without a new visibility class | Fixture 17; not the apply PR |
+| New hook, existing decision family | `agent_contract_inventory` on `family_gap`; no adapter family mint | Fixture 16 |
 | Battle Focus manoeuvre | Existing `finite_mode_pick` unless the window cannot carry it | Not automatically a new `decision_type` |
 | U7a producer envelope | Writer `u7a_compatibility` | U7 §9; not this apply PR |
 | Real new decision family | Writer `family_or_decision_kind` | Same PR as the family |
@@ -484,10 +514,14 @@ FM0 may apply the live rewrites. It has:
   triad as a task format;
 - a closed Python policy matching the packet schema;
 - a closed three-writer adapter-contract table that keeps content
-  packets off that file without excluding U7a;
+  packets off that file without excluding U7a, and that covers
+  payload and viewer-visibility changes on existing surfaces without
+  minting a new class;
+- `agent_contract_inventory` as the family-only permission for the
+  Runtime Surfaces section;
 - an apply recipe that inserts writer policy and does not apply T6
   deltas;
-- fifteen acceptance fixtures;
+- seventeen acceptance fixtures;
 - a mapping exercise that does not edit live files.
 
 This survey does not add a live contract rewrite, `src/` files, a

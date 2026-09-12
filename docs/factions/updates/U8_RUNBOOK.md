@@ -193,10 +193,13 @@ A `family_gap` PR lands before the content PRs that require the new
 family. Content packets must not edit
 `ADAPTER_DECISION_CONTRACT.md`. A family or decision-kind
 implementation PR still updates that contract in the same PR as the new
-family or decision kind. That packet-path rule does not exclude the
-separately owned FM0 U7a amendment of the same contract (record,
-verification, fail-closed behaviour, and conformance). U7a remains
-outside the U8 stage list. The closed writer table is
+family or decision kind, or as an adapter-visible payload, interaction,
+or viewer-visibility behaviour change on an existing surface. A new
+visibility behaviour does not require a new visibility class. That
+packet-path rule does not exclude the separately owned FM0 U7a
+amendment of the same contract (record, verification, fail-closed
+behaviour, and conformance). U7a remains outside the U8 stage list.
+The closed writer table is
 [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md) §3.3.
 
 U5 and U6 implementation run here when their packets say so (§5 and
@@ -432,8 +435,9 @@ them.
     already merged.
 15. A content packet listing `ADAPTER_DECISION_CONTRACT.md` is invalid.
     A family or decision-kind PR still updates that contract in the
-    same PR. That packet-path rule does not exclude the separately
-    owned FM0 U7a amendment.
+    same PR as a new family or kind, or as a payload, interaction, or
+    viewer-visibility change on an existing surface. That packet-path
+    rule does not exclude the separately owned FM0 U7a amendment.
 16. Deleting Python still referenced by packaged previous 946 is
     invalid.
 17. A versioned-path 931 capture remains an S1 / S4 fixture. It does
