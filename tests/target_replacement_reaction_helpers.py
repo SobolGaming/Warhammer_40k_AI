@@ -96,6 +96,160 @@ def replacement_reaction_scene(
     return lifecycle, units, request
 
 
+def fidelity_retained_replacement_scene() -> tuple[
+    GameLifecycle, dict[str, UnitInstance], DecisionRequest
+]:
+    """Fight-phase Unending Fidelity shooting, paused before target revalidation."""
+    from tests.phase15c_fight_order_helpers import fight_lifecycle
+    from warhammer40k_core.engine.retained_destruction_state import retained_destructions
+    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+    profile = retained_sources.stratagem_profile()
+    catalog = unending_fidelity_catalog()
+    rifle = next(w for w in catalog.wargear if w.wargear_id == "core-bolt-rifle")
+    second = replace(
+        rifle,
+        wargear_id="order42:fidelity-second-rifle",
+        weapon_profiles=tuple(
+            replace(
+                p,
+                profile_id=f"order42:fidelity-second:{p.profile_id}",
+            )
+            for p in rifle.weapon_profiles
+        ),
+    )
+    weapon_ids = ("core-leader-blade", rifle.wargear_id, second.wargear_id)
+    catalog = replace(
+        catalog,
+        wargear=(*catalog.wargear, second),
+        datasheets=tuple(
+            replace(
+                sheet,
+                wargear_options=tuple(
+                    replace(
+                        option,
+                        default_wargear_ids=weapon_ids,
+                        allowed_wargear_ids=weapon_ids,
+                        min_selections=3,
+                        max_selections=3,
+                    )
+                    for option in sheet.wargear_options
+                ),
+            )
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    lifecycle, units = fight_lifecycle(
+        catalog=catalog,
+        game_id="order42-fidelity-retarget-1",
+        alpha_unit_ids=("old", "new", "unchanged"),
+        enemy_unit_ids=("source",),
+        model_count=1,
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        origins={
+            "old": Pose.at(10, 10),
+            "source": Pose.at(12, 10),
+            "new": Pose.at(20, 16),
+            "unchanged": Pose.at(20, 22),
+        },
+        fights_first_unit_keys=("old",),
+        alpha_detachment_ids=(profile.detachment_id,),
+        enemy_detachment_ids=(profile.detachment_id,),
+    )
+    state = lifecycle.state
+    assert state is not None
+    for player_id in ("player-a", "player-b"):
+        state.gain_command_points(
+            player_id=player_id,
+            amount=1,
+            source_id="order42:starting-cp",
+            source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+        )
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    for _ in range(30):
+        request = pending_request(session)
+        if request.decision_type == "select_destruction_reaction":
+            break
+        use_id = f"use-stratagem:{profile.stratagem_id}:target:{units['source'].unit_instance_id}"
+        if use_id in {o.option_id for o in request.options}:
+            session.submit_option(
+                request_id=request.request_id, option_id=use_id, result_id="order42:fidelity-source"
+            )
+        elif request.decision_type == "submit_stratagem_target_proposal":
+            session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"decline:{request.request_id}",
+                payload=stratagem_decline_payload(),
+            )
+        elif "decline_stratagem_window" in {o.option_id for o in request.options}:
+            session.submit_option(
+                request_id=request.request_id,
+                result_id=f"decline:{request.request_id}",
+                option_id="decline_stratagem_window",
+            )
+        else:
+            submit_fixture_request(session, request)
+    else:
+        raise AssertionError("Unending Fidelity did not reach its retained-shooting choice.")
+    state = session.lifecycle.state
+    assert state is not None
+    record = retained_destructions(state=state)[0]
+    source = record.eligible_sources[0]
+    assert source.source_rule_id == profile.source_id
+    # Establish the counterattack scene before the engine builds its declaration.
+    _replace_unit_poses(
+        state, unit_instance_id=units["old"].unit_instance_id, poses=(Pose.at(20, 10),)
+    )
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=f"{source.source_id}:shoot",
+            result_id="order42:fidelity-shoot",
+        )
+    )
+    assert request.decision_type == "submit_shooting_declaration"
+    first_proposal = _proposal_from_request(
+        request=request,
+        target_unit_id=units["old"].unit_instance_id,
+        weapon_profile_id=rifle.weapon_profiles[0].profile_id,
+    )
+    second_proposal = _proposal_from_request(
+        request=request,
+        target_unit_id=units["unchanged"].unit_instance_id,
+        weapon_profile_id=second.weapon_profiles[0].profile_id,
+    )
+    request = _decision_request(
+        session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="order42:fidelity-declaration",
+            payload=validate_json_value(
+                replace(
+                    first_proposal,
+                    declarations=(*first_proposal.declarations, *second_proposal.declarations),
+                ).to_payload()
+            ),
+        )
+    )
+    original_use_id = f"use-stratagem:{profile.stratagem_id}:target:{units['old'].unit_instance_id}"
+    if original_use_id in {option.option_id for option in request.options}:
+        request = _decision_request(
+            session.submit_option(
+                request_id=request.request_id,
+                result_id="order42:original-counterattack-defense",
+                option_id="decline_stratagem_window",
+            )
+        )
+    assert request.decision_type == "select_resolve_target_unit", request
+    _replace_unit_poses(
+        state, unit_instance_id=units["old"].unit_instance_id, poses=(Pose.at(90, 90),)
+    )
+    assert state.command_point_total("player-a") == 1
+    return session.lifecycle, units, request
+
+
 def _retained_replacement_scene() -> tuple[GameLifecycle, dict[str, UnitInstance], DecisionRequest]:
     """Reach unrestricted out-of-phase Shooting through a real destruction decision."""
     catalog = _compact_intercessor_catalog(lethal_retained_attack_catalog())

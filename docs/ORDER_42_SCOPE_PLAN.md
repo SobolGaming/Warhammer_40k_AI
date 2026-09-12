@@ -112,6 +112,28 @@ These repairs change four production modules within existing ownership
 boundaries. They introduce no new decision family, payload field, named handler,
 source semantics or content-specific reaction dispatch.
 
+### Out-of-phase reaction continuation follow-up
+
+Review at `72b4f781` confirmed that retained Shooting bypassed the shared
+selected-target service. `ShootingPhaseHandler.advance_out_of_phase_shooting_if_needed`
+now calls that service before the attack executor, passing the parent phase.
+The bug-class search checked ordinary Shooting and Fight, which already call
+the same owner, as well as all out-of-phase executor continuations. Completed
+sequence handling stays ahead of this check. A static audit enforces the call
+ordering and parent-phase binding.
+
+The regression starts with real Unending Fidelity in Fight, accepts its retained
+Shooting choice, declines the original defensive window, then moves that target
+out of range before resolving. Accepting a fresh replacement offers that target's
+Unending Fidelity window with 1 CP remaining and no intervening attack step.
+Pending-window and decline checkpoints restore and replay exactly.
+
+This follow-up changes one production module and reuses the existing decision
+contract. A separate diagnostic found a shared RuleIR effect-identity collision
+when both players use Unending Fidelity in the same phase: the second use raises
+`PersistingEffect already exists for effect_id`. That requires a broader identity
+repair and is not claimed resolved by the reaction-window change.
+
 ## Validation
 
 The focused replacement file has 29 passing regressions, including facade
@@ -133,7 +155,7 @@ rebuilding, and declaration validation reuses one complete pure geometry query.
 The key covers every input, including nested source mappings; runtime restrictions
 are evaluated separately. No budget is raised.
 
-Final behavioral validation passes all 7,488 tests with 85.06% coverage in
+At the previously published `72b4f781`, behavioral validation passed all 7,488 tests with 85.06% coverage in
 511.65 seconds, using xdist work stealing and the required Node.js PATH. The
 successful JUnit profile regenerates all eight shard manifests and
 `durations.json`; the exact fail-closed shard check passes.
@@ -147,3 +169,19 @@ resources and 27 schemas against runtime identity
 Pre-commit passes without changing production code. The final complete
 code-quality suite passes all 441 tests without coverage in 105.14 seconds,
 including the unchanged Order 33/34 budgets and the Order 42 evidence gate.
+
+For the out-of-phase continuation follow-up, all 7,490 behavioral tests pass with
+85.06% coverage in 571.68 seconds, using 18 xdist work-stealing workers and the
+required Node.js PATH. The successful JUnit profile regenerates the eight shards;
+the exact inventory check passes. The focused phase/replacement run passes 333
+checks, and both new pending-window/decline regressions pass.
+
+Ruff, formatting, mypy, pyright, import contracts and pre-commit pass. Runtime and
+source generators, external contract compatibility against merged main
+`1e6ab048`, TypeScript checks, five client tests, all 342 conformance assertions,
+and the installed-wheel smoke pass. The wheel verifies 2,768 resources and 27
+schemas at runtime fingerprint
+`a9fddc3459c8f12b859c9c37c3c13e71cbf822a7c65b57ed9f00cb33bbff9d75`.
+The retained out-of-phase component comparison passes unchanged numeric bounds.
+The final complete code-quality suite passes all 442 checks without coverage in
+114.26 seconds. No production code changed after aggregate validation.

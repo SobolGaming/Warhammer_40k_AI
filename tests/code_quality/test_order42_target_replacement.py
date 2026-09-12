@@ -9,6 +9,47 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_out_of_phase_replacement_reaction_cost_is_comparable_and_bounded() -> None:
+    directory = ROOT / "docs/performance/order42"
+    base = json.loads((directory / "out_of_phase_base.json").read_text())
+    head = json.loads((directory / "out_of_phase_head.json").read_text())
+    budget = json.loads((directory / "out_of_phase_budgets.json").read_text())
+    assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+    for field in (
+        "platform",
+        "python",
+        "cpu",
+        "cpu_allocation",
+        "memory_bytes",
+        "concurrency",
+        "model_count",
+        "terrain_count",
+        "timing_boundary",
+        "seed",
+        "decision_policy",
+    ):
+        assert base[field] == head[field]
+    for path, digest in base["file_hashes"].items():
+        if path != "src/warhammer40k_core/_engine_build_manifest.json":
+            assert head["file_hashes"][path] == digest
+    measured = head["summary"]
+    assert measured["completion_rate"] == base["summary"]["completion_rate"] == 1
+    assert measured["samples"] == base["summary"]["samples"] == budget["samples_per_case"]
+    assert (
+        measured["mean"]
+        <= base["summary"]["mean"] * budget["mean_base_multiplier"]
+        + budget["mean_additive_seconds"]
+    )
+    assert measured["maximum"] <= budget["maximum_seconds"]
+    assert {row["decision_type"] for row in base["rows"]} == {"select_resolve_target_unit"}
+    assert {row["decision_type"] for row in head["rows"]} == {"use_stratagem"}
+    for row in head["rows"]:
+        assert set(row["option_ids"]) == {
+            "decline_stratagem_window",
+            "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new",
+        }
+
+
 def test_target_replacement_component_cost_is_comparable_complete_and_bounded() -> None:
     directory = ROOT / "docs/performance/order42"
     base = json.loads((directory / "base.json").read_text())
@@ -106,6 +147,22 @@ def test_replacement_reactions_and_completion_keep_shared_authority() -> None:
         "stratagem_used_for_context",
         "stratagem_use_options_from_index",
     }.issubset(calls)
+    shooting = ast.parse((engine / "phases/shooting_handler.py").read_text())
+    advance = next(
+        node
+        for node in ast.walk(shooting)
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "advance_out_of_phase_shooting_if_needed"
+    )
+    advance_calls = {
+        node.func.id: node
+        for node in ast.walk(advance)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    reaction = advance_calls["request_after_unit_selected_as_target_stratagem_if_available"]
+    assert reaction.lineno < advance_calls["resolve_attack_sequence_until_blocked"].lineno
+    parent_phase = next(keyword.value for keyword in reaction.keywords if keyword.arg == "phase")
+    assert ast.unparse(parent_phase) == "out_of_phase_state.parent_phase"
     completion = ast.parse((engine / "retained_shooting_history.py").read_text())
     assert any(
         isinstance(node, ast.ImportFrom)

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.shooting_target_replacement import request_shooting_target_replacement
+from warhammer40k_core.engine.selected_target_stratagem_reactions import (
+    request_after_unit_selected_as_target_stratagem_if_available,
+)
 
 from typing import TYPE_CHECKING
 
@@ -363,6 +366,16 @@ class ShootingPhaseHandler:
                 )
             return None
         completed_candidate = out_of_phase_state.attack_sequence
+        target_stratagem_status = request_after_unit_selected_as_target_stratagem_if_available(
+            state=state,
+            decisions=decisions,
+            stratagem_index=self.stratagem_index,
+            stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
+            attack_sequence=out_of_phase_state.attack_sequence,
+            phase=out_of_phase_state.parent_phase,
+        )
+        if target_stratagem_status is not None:
+            return target_stratagem_status
         attack_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
             state=state,
             decisions=decisions,

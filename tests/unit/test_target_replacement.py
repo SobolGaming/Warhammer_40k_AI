@@ -431,6 +431,91 @@ def test_no_alternative_is_an_explicit_decline_and_stale_submission_keeps_queue(
     assert lifecycle.to_payload() == snapshot
 
 
+@pytest.mark.parametrize("decline_new", [False, True])
+def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
+    decline_new: bool,
+) -> None:
+    """R42-002: retained Shooting must consult the same defensive reaction owner."""
+    from tests.phase13b_shooting_declaration_helpers import _decision_request
+    from tests.target_replacement_reaction_helpers import fidelity_retained_replacement_scene
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.stratagems import stratagem_window_context_from_request
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        retained_attack_sources_2026_09 as retained_sources,
+    )
+
+    lifecycle, units, request = fidelity_retained_replacement_scene()
+    session = LocalGameSession(lifecycle=lifecycle)
+    initial = lifecycle.to_payload()
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id="order42:counterattack-resolution",
+        )
+    )
+    assert request.decision_type == "select_target_replacement"
+    checkpoint = session.lifecycle.to_payload()
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+    assert session.lifecycle.to_payload() == checkpoint
+    before_events = session.lifecycle.decision_controller.event_log.records
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=f"target:{units['new'].unit_instance_id}",
+            result_id="order42:counterattack-replacement",
+        )
+    )
+    profile = retained_sources.stratagem_profile()
+    expected_option = f"use-stratagem:{profile.stratagem_id}:target:{units['new'].unit_instance_id}"
+    assert expected_option in {option.option_id for option in request.options}, request
+    context = stratagem_window_context_from_request(request)
+    assert context.phase is BattlePhase.FIGHT
+    assert context.player_id == "player-a"
+    assert isinstance(context.trigger_payload, dict)
+    assert context.trigger_payload["selected_target_unit_instance_ids"] == [
+        units["new"].unit_instance_id
+    ]
+    new_events = session.lifecycle.decision_controller.event_log.records[len(before_events) :]
+    window_event = next(
+        e for e in new_events if e.event_type == "unit_selected_as_target_stratagem_window_opened"
+    )
+    assert isinstance(window_event.payload, dict)
+    assert window_event.payload["phase"] == BattlePhase.FIGHT.value
+    assert not any(e.event_type == "attack_sequence_step" for e in new_events)
+    checkpoint = session.lifecycle.to_payload()
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+    assert session.lifecycle.to_payload() == checkpoint
+    if decline_new:
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id="decline_stratagem_window",
+            result_id="order42:counterattack-defense",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        state = session.lifecycle.state
+        assert state is not None
+        assert state.command_point_total("player-a") == 1
+    checkpoint = session.lifecycle.to_payload()
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+    assert (
+        session.advance_until_decision_or_terminal().decision_request
+        == session.lifecycle.decision_controller.queue.peek_next()
+    )
+    assert session.lifecycle.to_payload() == checkpoint
+    artifact = ReplayArtifact.capture(
+        artifact_id="order42:fidelity-counterattack-replay",
+        final_lifecycle=session.lifecycle,
+        initial_lifecycle_payload=initial,
+    )
+    replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [

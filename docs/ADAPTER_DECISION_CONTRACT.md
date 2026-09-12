@@ -5628,6 +5628,9 @@ its recorded result ID, with only that selection's replacement targets in the
 trigger payload. The attack sequence ID stays unchanged. Repeated advances and
 checkpoint restoration reuse that window; declines create no target selection.
 Existing CP costs and phase/turn/game Stratagem usage restrictions still apply.
+Out-of-phase Shooting consults the same reaction service before resolving attacks,
+both after the original declaration and after replacement. These windows use the
+parent phase (including Fight) for status/event metadata and eligibility context.
 The existing opaque timing-window identity and selected-target payload schemas
 cover this behavior without new fields.
 The engine then resumes the normal action path. Stale, forged, malformed or

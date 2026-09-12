@@ -60,3 +60,35 @@ target averages 5.509 ms and no alternative averages 4.686 ms, because head stop
 at the replacement decision while the incorrect base proceeds into attacks.
 The maximum retained head sample is 68.148 ms. These latter cases measure
 different rules work and do not establish an attack-resolution speedup.
+
+## Out-of-phase reaction continuation
+
+`measure_out_of_phase_target_replacement.py` measures the R42-002 follow-up:
+four real models, no terrain, Unending Fidelity retained Shooting in Fight,
+original defense declined, and a fresh replacement accepted. The timed boundary
+is replacement submission to the next decision; all preparation is separate.
+Seven fresh scenes retain every sample with no warm-up discarded. The fixed
+`out_of_phase_budgets.json` uses the same 2x base plus 50 ms mean and 150 ms
+maximum limits and rationale as the original Order 42 workload.
+
+Base `72b4f781` incorrectly proceeds to target resolution. Head must stop at the
+fresh target's Unending Fidelity window. This is a cost comparison between
+different rules work, not an attack-resolution speedup. It measures the reaction
+window, not the separately documented RuleIR effect-identity collision when
+both players accept the same Stratagem in a phase.
+
+Reproduce head with `PYTHONPATH=.:src uv run --no-sync python
+scripts/measure_out_of_phase_target_replacement.py --output
+docs/performance/order42/out_of_phase_head.json`. Export `72b4f781` to a separate
+directory, copy the identical measurement script and
+`tests/target_replacement_reaction_helpers.py`, and run the same interpreter with
+that checkout's `.:src` first on `PYTHONPATH` to reproduce base. Retained reports
+include script/fixture/runtime hashes, provisional host and dependency identity,
+all samples, summary statistics, throughput and completion rate. The static
+quality gate checks comparable inputs, exact expected decisions and fixed costs.
+
+The retained follow-up reports pass these bounds: base averages 35.779 ms and
+head averages 24.675 ms, with a 24.927 ms maximum on head. Every head sample
+offers exactly the fresh target's Unending Fidelity option and decline. The head
+runtime fingerprint is
+`a9fddc3459c8f12b859c9c37c3c13e71cbf822a7c65b57ed9f00cb33bbff9d75`.
