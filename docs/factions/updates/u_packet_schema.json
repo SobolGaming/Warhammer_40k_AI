@@ -635,7 +635,7 @@
     {
       "id": "Live agent contract",
       "hold": "Rewrite Task Packet Format to this schema",
-      "unblocks": "FM0 Track D D3"
+      "unblocks": "docs/factions/contracts/D3_CONTRACT_REWRITES.md; live apply remains FM0"
     }
   ],
   "not_in_this_pr": [

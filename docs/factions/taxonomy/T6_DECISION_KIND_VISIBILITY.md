@@ -284,7 +284,9 @@ surfaces.
 A new `decision_type`, finite option family, `proposal_kind`, interaction
 kind, nested allowlist entry, or visibility class must update
 [the adapter contract](../../ADAPTER_DECISION_CONTRACT.md) in the **same**
-Track G implementation PR. This survey does not edit that file.
+Track G implementation PR. This survey does not edit that file. The
+closed writer table, including the U7a and Track D D3 exceptions, is
+[D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md) §3.3.
 
 | Delta ID | Demand | Why it is a delta |
 | --- | --- | --- |

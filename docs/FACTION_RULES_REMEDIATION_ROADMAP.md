@@ -486,7 +486,7 @@ packaged as loadable content.
 | --- | --- |
 | D1 | Guides and audits generated from Q1 only; no hand-edited status |
 | D2 | Per-content-set changelog generated from U2/U3 |
-| D3 | `ADAPTER_DECISION_CONTRACT.md` updated in the same PR as any new family or decision kind; `FACTION_AGENT_IMPLEMENTATION_CONTRACT.md` rewritten for data-first packets (records and bindings; Python only for a new family or a justified named handler). **FM-pre packet schema delivered** in [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md); this is the draft packet half of Track D D3. Live adapter-contract and live agent-contract files are unchanged until FM0. Owner D3 (content-set retention) is a different decision |
+| D3 | `ADAPTER_DECISION_CONTRACT.md` updated in the same PR as any new family or decision kind; `FACTION_AGENT_IMPLEMENTATION_CONTRACT.md` rewritten for data-first packets (records and bindings; Python only for a new family or a justified named handler). **FM-pre packet schema delivered** in [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md). **FM-pre rewrite draft delivered** in [D3_CONTRACT_REWRITES.md](factions/contracts/D3_CONTRACT_REWRITES.md); live adapter-contract and live agent-contract files stay unchanged until FM0 applies that draft. Owner D3 (content-set retention) is a different decision |
 
 ## Debt retired in FM0
 
@@ -598,8 +598,10 @@ Permitted in parallel with the remaining Core Rules orders:
   delivered: [U7_RETENTION.md](factions/updates/U7_RETENTION.md);
 - Track U runbook (U1 / U5 / U6 / U8 / Q6 cadence) is delivered:
   [U8_RUNBOOK.md](factions/updates/U8_RUNBOOK.md);
-- remaining draft Track D D3 work: live adapter-contract and live
-  agent-contract rewrites, marked draft until FM0 makes them binding.
+- Track D D3 live adapter-contract and live agent-contract rewrite
+  draft is delivered:
+  [D3_CONTRACT_REWRITES.md](factions/contracts/D3_CONTRACT_REWRITES.md);
+  marked draft until FM0 makes the live files binding.
 
 Not permitted before Gate 0: any change under `src/`, packaged data artifacts,
 generators, the source-authority registry, the F00 policy text, or catalog and

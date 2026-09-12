@@ -1,6 +1,6 @@
 # U3 packet schema — draft Track D agent contract
 
-[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Retention](U7_RETENTION.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T6 decision-kind taxonomy](../taxonomy/T6_DECISION_KIND_VISIBILITY.md) · [Live agent contract](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Retention](U7_RETENTION.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Track D D3 draft](../contracts/D3_CONTRACT_REWRITES.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T6 decision-kind taxonomy](../taxonomy/T6_DECISION_KIND_VISIBILITY.md) · [Live agent contract](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is the **FM-pre packet schema**: the data-first work-packet
 contract U3 will emit and Track C / Track G will reuse. It is the draft
@@ -19,8 +19,9 @@ Machine-readable catalog: [`u_packet_schema.json`](u_packet_schema.json).
 
 Owner **D3** (content-set retention) is designed in
 [U7_RETENTION.md](U7_RETENTION.md). Track **D** item D3 (adapter contract
-plus agent-contract rewrite) is. This document drafts only the packet half
-of Track D D3.
+plus agent-contract rewrite) is drafted in
+[D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md). This
+document remains the packet half of Track D D3.
 
 ## 1. Purpose and delivery contract
 
@@ -330,7 +331,9 @@ bindings), not speculative file trees.
 - `src/` runtime loader, lifecycle, bundle, or manifest machinery, except
   the narrow `runtime_integration` surface below
 - [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md),
-  except a `family_gap` packet that cites `t6_delta_ids`
+  except a `family_gap` packet that cites `t6_delta_ids`. U7a and the
+  Track D D3 writer-policy insert are not packet-path writers; see
+  [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md)
 
 `runtime_integration` on a `family_gap` packet may register the new
 generic family's validator, applier, hook binding, or bundle/lifecycle
@@ -362,9 +365,10 @@ valid `allowed_surfaces` on a data-first packet.
 | Document | This PR | FM0 |
 | --- | --- | --- |
 | This schema | Delivered as planning evidence | Packet generator consumes it |
-| [FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) | Unchanged | Rewritten so Task Packet Format is this schema (records and bindings; Python only for a new family or a justified named handler) |
-| [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md) | Unchanged | Still updated in the same PR as any new family or decision kind |
+| [FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) | Unchanged | Rewrite drafted in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md); Task Packet Format becomes this schema |
+| [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md) | Unchanged | Writer policy drafted in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md); still updated in the same PR as any new family or decision kind; U7a remains a separate writer |
 | Owner D3 retention / U7a | Unchanged | Design delivered in [U7_RETENTION.md](U7_RETENTION.md); FM0 implements inventory, contracts, and goldens |
+| Track D D3 rewrite draft | Delivered as planning evidence | FM0 applies the live files |
 
 A content-implementation PR that needs a new `decision_type` is invalid
 under this schema. Split a `family_gap` packet first.
@@ -453,8 +457,10 @@ exist. Packets index them.
 ### 11.2 Work that remains later (not this PR)
 
 - U3 packet generator and emission
-- Live agent-contract rewrite (Track D D3, FM0)
-- Adapter-contract edits (only with a real family consumer)
+- Live agent-contract rewrite (Track D D3 apply PR; draft in
+  [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md))
+- Adapter-contract edits (family/decision-kind PRs, U7a, or the D3
+  writer-policy insert)
 - Q1 generator, loader, and live artifact (schema delivered in
   [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md))
 - U7 / U7a implementation (design delivered in
@@ -482,7 +488,7 @@ exist. Packets index them.
 | U-HOLD-NAME-PUNCTUATION | Punctuation twins are not locators | S2 locators on retained pages |
 | Packet generator | Actual emission | FM0 U3 |
 | Q1 schema | Where `status_claim` and review records persist | delivered in [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md); generator remains FM0 |
-| Live agent contract | Rewrite Task Packet Format to this schema | FM0 Track D D3 |
+| Live agent contract | Rewrite Task Packet Format to this schema | draft in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md); live apply remains FM0 |
 | Owner D3 / U7a | Retention and replay compatibility | delivered in [U7_RETENTION.md](U7_RETENTION.md); packaging and contracts remain FM0 |
 
 ## 13. What "packet schema delivered" means
