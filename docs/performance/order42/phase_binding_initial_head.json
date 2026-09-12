@@ -1,0 +1,75 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "decision_policy": "both Fidelity uses accepted; fresh target destroyed; reaction pending",
+  "file_hashes": {
+    "scripts/measure_nested_death_checkpoint.py": "341049c5a2bceaa60569dfb16da9f1e7fd94668e3917b7c24dd188e5b206c04d",
+    "src/warhammer40k_core/_engine_build_manifest.json": "bc33f24ff51ebcf62c1a10084d6c510bfe00f26998c84bd558aa7499c895618e",
+    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/target_replacement_reaction_helpers.py": "8f2d04cc78f9aded9cc8fdccba14cb515afc6efb8f7fc5de42cac0cb67ec4ec6",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 4,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "outcome": "restored",
+      "query_seconds": 0.31403775000944734,
+      "sample": 0,
+      "setup_seconds": 2.7585502919973806
+    },
+    {
+      "outcome": "restored",
+      "query_seconds": 0.2758071250282228,
+      "sample": 1,
+      "setup_seconds": 0.8362010839628056
+    },
+    {
+      "outcome": "restored",
+      "query_seconds": 0.27558033389505,
+      "sample": 2,
+      "setup_seconds": 0.8352505000075325
+    },
+    {
+      "outcome": "restored",
+      "query_seconds": 0.2765836660983041,
+      "sample": 3,
+      "setup_seconds": 0.8398894589627162
+    },
+    {
+      "outcome": "restored",
+      "query_seconds": 0.276144832954742,
+      "sample": 4,
+      "setup_seconds": 0.8356725840130821
+    },
+    {
+      "outcome": "restored",
+      "query_seconds": 0.27303470799233764,
+      "sample": 5,
+      "setup_seconds": 0.8866252499865368
+    },
+    {
+      "outcome": "restored",
+      "query_seconds": 0.2772114590043202,
+      "sample": 6,
+      "setup_seconds": 0.8417919580824673
+    }
+  ],
+  "seed": "order42-fidelity-retarget-1",
+  "summary": {
+    "completion_rate": 1.0,
+    "maximum": 0.31403775000944734,
+    "mean": 0.2811999821403463,
+    "median": 0.276144832954742,
+    "p95": 0.31403775000944734,
+    "queries_per_second": 3.556187992575697,
+    "samples": 7
+  },
+  "terrain_count": 0,
+  "timing_boundary": "GameLifecycle.from_payload; scene construction and payload separate",
+  "workload_id": "order42-nested-death-checkpoint-v1"
+}

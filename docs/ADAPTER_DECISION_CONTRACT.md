@@ -5631,6 +5631,12 @@ Existing CP costs and phase/turn/game Stratagem usage restrictions still apply.
 Out-of-phase Shooting consults the same reaction service before resolving attacks,
 both after the original declaration and after replacement. These windows use the
 parent phase (including Fight) for status/event metadata and eligibility context.
+Pending destruction causes preserve a distinct attack source phase: restore binds
+that phase to the authenticated active or suspended attack sequence. Nested
+Shooting deaths inside Fight therefore restore through their death-reaction
+choices without rebinding the enclosing battle phase. Rule-effect destruction
+keeps its enclosing-phase authority. Existing source-context fields cover this
+behavior; no new client input or schema field is introduced.
 The existing opaque timing-window identity and selected-target payload schemas
 cover this behavior without new fields.
 Generic persisted effects use opaque, versioned activation IDs derived from the

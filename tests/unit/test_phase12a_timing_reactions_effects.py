@@ -1808,6 +1808,18 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         decision_records=checkpoint_decisions.records,
         pending_decision_requests=checkpoint_decisions.queue.pending_requests,
     )
+    wrong_phase_state = GameState.from_payload(state.to_payload())
+    _set_current_battle_phase(wrong_phase_state, BattlePhase.MOVEMENT)
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"(Pending destruction cause state binding|Retained destruction phase) drift",
+    ):
+        validate_model_destruction_cause_restore(
+            state=wrong_phase_state,
+            event_records=checkpoint_decisions.event_log.records,
+            decision_records=checkpoint_decisions.records,
+            pending_decision_requests=checkpoint_decisions.queue.pending_requests,
+        )
     orphan_logical_death = replace(
         root_authority.logical_death_event,
         event_id="event-999999",

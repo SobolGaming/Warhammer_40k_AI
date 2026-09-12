@@ -127,3 +127,53 @@ The retained R42-003 comparison on Apple M5 Pro / Python 3.14.5 passes: base mea
 20.155 microseconds, head mean 25.107 microseconds, head maximum 37.625
 microseconds. All seven samples on each side completed. Head runtime is
 `d2e570db112c7dc397dc95b2ca5647482a08c7c01cfcd7025d76c3de64d560c4`.
+
+## Approved nested-death checkpoint repair
+
+The shared destruction-cause validator distinguishes an attack's source phase
+from its enclosing battle phase. `measure_nested_death_checkpoint.py` uses four
+real models, no terrain, seed `order42-fidelity-retarget-1`, both players' accepted
+Unending Fidelity decisions and the fresh replacement target. The timed boundary
+is `GameLifecycle.from_payload`; scene construction and serialization are outside
+it, and the restored payload must equal the original. Seven fresh scenes retain
+all samples without warm-up, profiling, coverage or competing test workers.
+
+The initial full-restore comparison is retained as
+`phase_binding_initial_base.json` and `phase_binding_initial_head.json`. Base
+`ad15861a` rejects the nested checkpoint after 14.403 ms on average; the repair
+completes it in 281.200 ms. This exceeded the initial relative allowance of twice
+base plus 50 ms. It is not reported as a pass: the base aborts before most remaining
+lifecycle validation, so that comparison combines a short rejection path with
+successful complete restoration.
+
+The experiment was corrected explicitly by adding a matched successful control:
+`--control` stops immediately after both defenses are accepted, before the fresh
+target's attacks resolve. Both versions restore this same complete checkpoint.
+The numeric limits fixed before measurement remain unchanged: seven samples,
+mean <= twice base plus 50 ms, and a 500 ms maximum. The relative limit now applies
+to the matched successful control; the absolute maximum covers both the control
+and the newly valid nested checkpoint. The failing nested base and all initial
+samples remain committed. Final reports distinguish successful restoration rate
+from measurement completion, rather than treating an expected base rejection as
+a successful restore. The quality gate checks case coverage, comparable inputs,
+completion outcomes, every numeric bound and retention of the failed experiment.
+
+The final matched runner reports control means of 250.799 ms on base and
+273.986 ms on head. The nested checkpoint is rejected in all seven base samples
+and restored in all seven head samples; head mean is 275.893 ms, maximum
+307.918 ms. Both cases pass the corrected comparison criteria without changing
+numeric thresholds. The 50 ms additive allowance represents an estimated five
+seconds over 100 checkpoint restorations; this is an estimate against the
+standing game objective, not a measured full-game workload. The 500 ms absolute
+limit accommodates host variation for complete source/history restoration.
+
+Reproduce base by exporting `ad15861a`, copying the final measurement script and
+`tests/target_replacement_reaction_helpers.py`, and using the same interpreter
+with that checkout's `.:src` first on `PYTHONPATH`. Run with `--expect-rejection`
+for the nested base case and `--control` for the successful control. Head uses
+no flag for the nested case and `--control` for the control. Supply `--output` for
+each report. Reports pin the script, canonical helpers, dependency lock, runtime,
+actual Apple M5 Pro / Python 3.14.5 host metadata, all samples and timing boundary.
+The head runtime is
+`e796f7cb5a7d39a3cce3ececa4f3f9f94e9b101173fe02c9f35b40ea92701eee`.
+Hardware remains provisional, and complete-game/Order 32 targets are not certified.

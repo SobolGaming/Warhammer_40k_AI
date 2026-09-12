@@ -26,6 +26,7 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -262,6 +263,34 @@ def fidelity_retained_replacement_scene() -> tuple[
     )
     assert state.command_point_total("player-a") == 1
     return session.lifecycle, units, request
+
+
+def fidelity_nested_death_scene(*, advance_to_death: bool = True) -> LocalGameSession:
+    """Both defenses accepted, paused at the fresh target's nested death reaction."""
+    lifecycle, units, request = fidelity_retained_replacement_scene()
+    session = LocalGameSession(lifecycle=lifecycle)
+    profile = retained_sources.stratagem_profile()
+    for result_id, option_id in (
+        ("order42:counterattack-resolution", request.options[0].option_id),
+        ("order42:counterattack-replacement", f"target:{units['new'].unit_instance_id}"),
+        (
+            "order42:counterattack-defense",
+            f"use-stratagem:{profile.stratagem_id}:target:{units['new'].unit_instance_id}",
+        ),
+    ):
+        request = pending_request(session)
+        status = session.submit_option(
+            request_id=request.request_id, result_id=result_id, option_id=option_id
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+    if not advance_to_death:
+        return session
+    for _ in range(20):
+        request = pending_request(session)
+        if request.decision_type == "select_destruction_reaction":
+            return session
+        submit_fixture_request(session, request)
+    raise AssertionError("The accepted replacement defense did not open its death reaction.")
 
 
 def _retained_replacement_scene() -> tuple[GameLifecycle, dict[str, UnitInstance], DecisionRequest]:

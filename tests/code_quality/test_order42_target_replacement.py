@@ -9,6 +9,89 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_pending_destruction_phase_uses_each_authenticated_attack_owner() -> None:
+    source = (
+        ROOT / "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py"
+    ).read_text()
+    function = next(
+        node
+        for node in ast.parse(source).body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "validate_pending_model_destruction_cause_inventory"
+    )
+    body = ast.unparse(function)
+    assert "source_phase != source_sequence.source_phase.value" in body
+    assert "active_attack_sequence_for_state(state)" in body
+    assert "retained_attack_sequence_for_cause(" in body
+    non_attack = next(
+        node
+        for node in ast.walk(function)
+        if isinstance(node, ast.If)
+        and ast.unparse(node.test)
+        == "authority.cause_kind is not ModelDestructionCauseKind.ATTACK_DAMAGE"
+    )
+    assert "state.current_battle_phase.value != source_phase" in ast.unparse(non_attack)
+    assert "state.current_battle_phase is None" in body
+
+
+def test_nested_death_checkpoint_cost_is_comparable_and_bounded() -> None:
+    directory = ROOT / "docs/performance/order42"
+    budget = json.loads((directory / "phase_binding_budgets.json").read_text())
+    for case, prefix in (
+        ("nested_death", "phase_binding"),
+        ("accepted_defense", "phase_binding_control"),
+    ):
+        base = json.loads((directory / f"{prefix}_base.json").read_text())
+        head = json.loads((directory / f"{prefix}_head.json").read_text())
+        assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+        assert base["case"] == head["case"] == case
+        for field in (
+            "platform",
+            "python",
+            "cpu",
+            "cpu_allocation",
+            "memory_bytes",
+            "concurrency",
+            "model_count",
+            "terrain_count",
+            "timing_boundary",
+            "seed",
+            "decision_policy",
+        ):
+            assert base[field] == head[field]
+        for path, digest in base["file_hashes"].items():
+            if path != "src/warhammer40k_core/_engine_build_manifest.json":
+                assert head["file_hashes"][path] == digest
+        assert base["summary"]["measurement_completion_rate"] == 1
+        assert head["summary"]["measurement_completion_rate"] == 1
+        assert head["summary"]["completion_rate"] == 1
+        assert base["summary"]["completion_rate"] == (0 if case == "nested_death" else 1)
+        assert (
+            base["summary"]["samples"] == head["summary"]["samples"] == budget["samples_per_case"]
+        )
+        assert {row["outcome"] for row in base["rows"]} == {
+            "rejected" if case == "nested_death" else "restored"
+        }
+        assert {row["outcome"] for row in head["rows"]} == {"restored"}
+        if case == budget["relative_budget_case"]:
+            assert (
+                head["summary"]["mean"]
+                <= base["summary"]["mean"] * budget["mean_base_multiplier"]
+                + budget["mean_additive_seconds"]
+            )
+        assert case in budget["absolute_budget_cases"]
+        assert head["summary"]["maximum"] <= budget["maximum_seconds"]
+    # Preserve the initial failed comparison: base aborts before completing restore.
+    initial_base = json.loads((directory / "phase_binding_initial_base.json").read_text())
+    initial_head = json.loads((directory / "phase_binding_initial_head.json").read_text())
+    assert len(initial_base["rows"]) == len(initial_head["rows"]) == budget["samples_per_case"]
+    assert (
+        initial_head["summary"]["mean"]
+        > initial_base["summary"]["mean"] * budget["mean_base_multiplier"]
+        + budget["mean_additive_seconds"]
+    )
+
+
 def test_generic_persisted_identity_producers_and_restore_share_activation_and_slot() -> None:
     """R42-003: emitting and reconstructing a persisted ID share one typed owner."""
     engine = ROOT / "src/warhammer40k_core/engine"

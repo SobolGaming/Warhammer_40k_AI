@@ -176,26 +176,42 @@ no player-facing option or payload field changes. Runtime identity and generated
 external-contract examples are regenerated. The five production modules stay
 within existing engine ownership and introduce no named handler or content branch.
 
-### Additional checkpoint finding awaiting scope
+### Approved nested-death phase-binding follow-up
 
-Extending the fresh-replacement test through destruction of that fresh target
-exposes a separate pending-death restore invariant: attack `source_phase` is
-Shooting while the enclosing battle phase is Fight. At
-`model_destruction_cause_completion_restore.py`, the pending cause validator
-compares those phases directly and rejects the otherwise pending death-reaction
-checkpoint with `Pending destruction cause state binding drift`. The saved
-probe has both accepted Fidelity effects, zero CP for both owners, the outer
-Fight cause and inner Shooting cause. This is separate from ID derivation and
-requires shared destruction-cause phase ownership review. The R42-003 changes do
-not alter it; a scope decision was requested before broadening. The full
-both-acceptance regression completes and replays with the already-fought original
-attacker as the retained shot's target. The fresh-replacement regression covers
-acceptance and its immediate checkpoint/replay; it does not claim the additional
-nested-death checkpoint is valid.
+The owner approved the shared phase-binding repair on 2026-09-12. A pending
+attack's `source_phase` identifies its attack kind, while an out-of-phase action
+retains its enclosing battle phase. The old common restore check equated them,
+rejecting a real Shooting death-reaction checkpoint inside Fight after both
+players accepted Unending Fidelity.
+
+`model_destruction_cause_completion_restore.py` now authenticates each pending
+attack cause's phase against the same active or retained sequence that owns its
+sequence ID, attack context and attacking unit. The outer Fight cause and nested
+Shooting causes keep separate phase authority. All causes still require the
+current battle phase, correct physical/rules-unit identity and retained placement.
+Non-attack rule-effect causes still match the enclosing battle phase. Existing
+producer schemas, continuation-context validation, retained history and parent
+scope validation remain authoritative; there is no blanket out-of-phase exception.
+
+The bug-class trace covered active Shooting/Fight, suspended retained sequences,
+attack collateral, rule-effect destruction, finalized cause history and the other
+current/source-phase comparisons in lifecycle state, rule destruction and Fight
+selection. Those latter comparisons describe enclosing-phase ownership and stay
+unchanged. Mortal-wound causes are created with finalized source authority and do
+not enter this pending-cause phase path. One existing production module changes;
+no new decision, payload field, adapter path, named handler or source rule is added.
+
+The replacement regression now continues after both Fidelity uses, restores at
+every nested decision, exercises both decline and acceptance of the fresh
+model's retained Shooting, verifies both destroyed models are removed, completes
+the parent action and reproduces replay. Forged outer/inner attack phases still
+fail against their source/continuation authority. A rule-effect phase-drift control
+and existing nested retained-Shooting tests preserve the enclosing-phase checks.
+A static audit pins this distinction to the shared active/retained sequence owners.
 
 ## Validation
 
-The focused replacement file has 29 passing regressions, including facade
+The focused replacement file has 37 passing regressions, including facade
 submission, malformed/stale rejection without queue pop, pending restore,
 exact replay, both players and a spectator, Firing Deck, One Shot, random Attacks,
 out-of-phase Snap source restrictions and protection for gathered attacks.
@@ -264,6 +280,28 @@ The matched identity component assessment passes its unchanged fixed budgets.
 The final complete code-quality suite passes all 444 checks without coverage in
 118.17 seconds. Pre-commit passes for all committed and newly added files without
 changing production code. The runtime and exact eight-shard checks pass again
-before commit and publication. The additional pending-death phase-binding issue
-above remains a separately reported scope decision; it is not covered by a claim
-that every possible nested destruction checkpoint is fixed.
+before commit and publication. These results describe the published R42-003
+commit `ad15861a`; the approved phase-binding follow-up requires fresh final gates.
+
+For the approved nested-death phase repair, all 7,527 behavioral tests pass with
+85.07% coverage in 540.73 seconds, using 18 xdist work-stealing workers and the
+required Node.js PATH. The successful JUnit profile refreshes all eight shard
+manifests and durations; the exact inventory check passes. All 11 focused
+nested-reaction/phase-authority checks and nine Order 42 architecture/performance
+audits pass. Production code remained unchanged during final validation.
+
+Ruff, formatting, mypy (2,972 files), pyright and all 11 import contracts pass.
+Pre-commit passes including the newly added benchmark/evidence files without
+changing production identity. Build/source generators, external contract
+compatibility against main `051395d0`, TypeScript checks, five client tests, all
+342 live conformance assertions and the installed-wheel smoke pass. The wheel
+verifies 2,768 runtime resources and 27 schemas at runtime fingerprint
+`e796f7cb5a7d39a3cce3ececa4f3f9f94e9b101173fe02c9f35b40ea92701eee`.
+The matched completed-checkpoint comparison and absolute cost gates pass with
+unchanged numeric limits; the initial failed comparison and methodology correction
+remain explicit in the performance evidence. Full-game targets are not certified.
+
+The final complete code-quality suite passes all 446 checks without coverage in
+104.30 seconds. The source tree, generated runtime identity and exact shard
+inventory remain unchanged after the final gates. The approved nested-death
+checkpoint blocker is resolved, including accepted nested Shooting and replay.

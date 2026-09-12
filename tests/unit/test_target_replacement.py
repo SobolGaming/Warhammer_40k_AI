@@ -431,15 +431,19 @@ def test_no_alternative_is_an_explicit_decline_and_stale_submission_keeps_queue(
     assert lifecycle.to_payload() == snapshot
 
 
-@pytest.mark.parametrize("response", ["pending", "decline", "use"])
+@pytest.mark.parametrize("response", ["pending", "decline", "use", "use_and_shoot"])
 def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
     response: str,
 ) -> None:
     """R42-002: retained Shooting must consult the same defensive reaction owner."""
-    from tests.phase13b_shooting_declaration_helpers import _decision_request
+    from tests.phase13b_shooting_declaration_helpers import (
+        _decision_request,
+        _proposal_from_request,
+    )
     from tests.target_replacement_reaction_helpers import fidelity_retained_replacement_scene
 
     from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.event_log import validate_json_value
     from warhammer40k_core.engine.lifecycle import GameLifecycle
     from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
@@ -500,7 +504,7 @@ def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
         state = session.lifecycle.state
         assert state is not None
         assert state.command_point_total("player-a") == (1 if response == "decline" else 0)
-        if response == "use":
+        if response in {"use", "use_and_shoot"}:
             effects = [
                 e
                 for e in state.persisting_effects
@@ -512,6 +516,66 @@ def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
             assert len({e.effect_id for e in effects}) == 2
             assert {e.owner_player_id for e in effects} == {"player-a", "player-b"}
             assert state.command_point_total("player-b") == 0
+            from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+            for _ in range(30):
+                checkpoint = session.lifecycle.to_payload()
+                session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+                assert session.lifecycle.to_payload() == checkpoint
+                assert session.lifecycle.state is not None
+                if session.lifecycle.state.out_of_phase_shooting_state is None:
+                    break
+                continuation = pending_request(session)
+                if continuation.decision_type == "select_destruction_reaction":
+                    nested_option = (
+                        next(
+                            option.option_id
+                            for option in continuation.options
+                            if option.option_id.endswith(":shoot")
+                        )
+                        if response == "use_and_shoot"
+                        else "decline_destruction_reaction"
+                    )
+                    status = session.submit_option(
+                        request_id=continuation.request_id,
+                        result_id=f"order42:{response}-nested:{continuation.request_id}",
+                        option_id=nested_option,
+                    )
+                    assert status.status_kind is not LifecycleStatusKind.INVALID
+                elif continuation.decision_type == "submit_shooting_declaration":
+                    proposal = _proposal_from_request(
+                        request=continuation,
+                        target_unit_id=units["source"].unit_instance_id,
+                    )
+                    status = session.submit_parameterized_payload(
+                        request_id=continuation.request_id,
+                        result_id=f"order42:nested-shot:{continuation.request_id}",
+                        payload=validate_json_value(proposal.to_payload()),
+                    )
+                    assert status.status_kind is not LifecycleStatusKind.INVALID
+                else:
+                    submit_fixture_request(session, continuation)
+            else:
+                raise AssertionError("Accepted replacement defense did not complete Shooting.")
+            assert any(
+                event.event_type == "out_of_phase_shooting_completed"
+                for event in session.lifecycle.decision_controller.event_log.records
+            )
+            final_state = session.lifecycle.state
+            assert final_state is not None
+            assert final_state.current_battle_phase is BattlePhase.FIGHT
+            assert final_state.battlefield_state is not None
+            for key in ("source", "new"):
+                assert (
+                    units[key].own_models[0].model_instance_id
+                    in final_state.battlefield_state.removed_model_ids
+                )
+            starts = [
+                event
+                for event in session.lifecycle.decision_controller.event_log.records
+                if event.event_type == "retained_shooting_started"
+            ]
+            assert len(starts) == (2 if response == "use_and_shoot" else 1)
     checkpoint = session.lifecycle.to_payload()
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
     assert (
@@ -526,6 +590,41 @@ def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
     )
     replay = ReplayRunner.from_payload(artifact.to_payload()).run()
     assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+@pytest.mark.parametrize(
+    ("unit_id", "phase"),
+    [
+        ("army-beta:source", "shooting"),
+        ("army-beta:source", "movement"),
+        ("army-alpha:new", "fight"),
+        ("army-alpha:new", "movement"),
+    ],
+)
+def test_nested_attack_cause_phase_cannot_be_rebound_to_the_enclosing_phase(
+    unit_id: str, phase: str
+) -> None:
+    from tests.target_replacement_reaction_helpers import fidelity_nested_death_scene
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    checkpoint = fidelity_nested_death_scene().lifecycle.to_payload()
+    state = checkpoint["state"]
+    assert state is not None
+    cause = next(
+        cause
+        for cause in state["model_destruction_cause_authorities"]
+        if cause["physical_unit_instance_id"] == unit_id and not cause["source_authority_finalized"]
+    )
+    assert isinstance(cause["producer_context"], dict)
+    assert cause["producer_context"]["source_phase"] != phase
+    cause["producer_context"]["source_phase"] = phase
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"Pending attack destruction (source binding|continuation context) drift",
+    ):
+        GameLifecycle.from_payload(checkpoint)
 
 
 @pytest.mark.parametrize(
