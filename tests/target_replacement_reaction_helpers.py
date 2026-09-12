@@ -15,6 +15,9 @@ from tests.phase13b_shooting_declaration_helpers import (
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
 from tests.retained_attack_helpers import lethal_retained_attack_catalog, unending_fidelity_catalog
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.core.weapon_profiles import DamageProfile
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
@@ -96,15 +99,10 @@ def replacement_reaction_scene(
     return lifecycle, units, request
 
 
-def fidelity_retained_replacement_scene() -> tuple[
-    GameLifecycle, dict[str, UnitInstance], DecisionRequest
-]:
-    """Fight-phase Unending Fidelity shooting, paused before target revalidation."""
-    from tests.phase15c_fight_order_helpers import fight_lifecycle
-    from warhammer40k_core.engine.retained_destruction_state import retained_destructions
-    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
-
-    profile = retained_sources.stratagem_profile()
+def fidelity_replacement_catalog(
+    *, distinct_weapon_groups: bool = False
+) -> tuple[ArmyCatalog, Wargear, Wargear]:
+    """Canonical retained-shooting equipment, optionally requiring a weapon-group choice."""
     catalog = unending_fidelity_catalog()
     rifle = next(w for w in catalog.wargear if w.wargear_id == "core-bolt-rifle")
     second = replace(
@@ -114,6 +112,9 @@ def fidelity_retained_replacement_scene() -> tuple[
             replace(
                 p,
                 profile_id=f"order42:fidelity-second:{p.profile_id}",
+                damage_profile=DamageProfile.fixed(99)
+                if distinct_weapon_groups
+                else p.damage_profile,
             )
             for p in rifle.weapon_profiles
         ),
@@ -141,6 +142,19 @@ def fidelity_retained_replacement_scene() -> tuple[
             for sheet in catalog.datasheets
         ),
     )
+    return catalog, rifle, second
+
+
+def fidelity_retained_replacement_scene() -> tuple[
+    GameLifecycle, dict[str, UnitInstance], DecisionRequest
+]:
+    """Fight-phase Unending Fidelity shooting, paused before target revalidation."""
+    from tests.phase15c_fight_order_helpers import fight_lifecycle
+    from warhammer40k_core.engine.retained_destruction_state import retained_destructions
+    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+    profile = retained_sources.stratagem_profile()
+    catalog, rifle, second = fidelity_replacement_catalog()
     lifecycle, units = fight_lifecycle(
         catalog=catalog,
         game_id="order42-fidelity-retarget-1",

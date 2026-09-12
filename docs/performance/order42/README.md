@@ -74,8 +74,8 @@ maximum limits and rationale as the original Order 42 workload.
 Base `72b4f781` incorrectly proceeds to target resolution. Head must stop at the
 fresh target's Unending Fidelity window. This is a cost comparison between
 different rules work, not an attack-resolution speedup. It measures the reaction
-window, not the separately documented RuleIR effect-identity collision when
-both players accept the same Stratagem in a phase.
+window. The later R42-003 identity repair has a separate component assessment
+below; the historical reports retain their original runtime fingerprints.
 
 Reproduce head with `PYTHONPATH=.:src uv run --no-sync python
 scripts/measure_out_of_phase_target_replacement.py --output
@@ -92,3 +92,38 @@ head averages 24.675 ms, with a 24.927 ms maximum on head. Every head sample
 offers exactly the fresh target's Unending Fidelity option and decline. The head
 runtime fingerprint is
 `a9fddc3459c8f12b859c9c37c3c13e71cbf822a7c65b57ed9f00cb33bbff9d75`.
+
+## Shared recorded effect identity (R42-003)
+
+`measure_generic_effect_identity.py` measures one shared identity derivation from
+an authoritative recorded Unending Fidelity execution event. The committed
+`effect_identity_workload.json` carries the loaded source RuleIR, full clause,
+slot, execution context and targets. This isolates the changed identity owner;
+it does not measure an entire Stratagem submission or complete game.
+
+Base is PR head `28a9c6bc`, before R42-003. Export it to an isolated directory,
+copy the identical measurement script and workload, and use the same interpreter
+with that checkout's `.:src` first on `PYTHONPATH`. Run the script with `--base-api`
+only for that historical signature. Head uses the new API without that flag.
+Both write their report with `--output`. The two reports retain matching script,
+workload and dependency hashes, actual host metadata and every sample. Runtime
+manifest hashes differ deliberately. No coverage, profiling, concurrent test
+workers, discarded samples or warm-up are used.
+
+The pre-measurement `effect_identity_budgets.json` fixes seven samples, a head mean
+no greater than twice base plus 50 microseconds, and a 1 ms maximum. An estimated
+1,000 identity derivations would allow 50 ms of additive mean overhead; that call
+count is an estimate against the standing game objective, not a measured gameplay
+workload. The maximum accommodates host variation. The static gate checks exact
+comparability, complete sample counts, stable repeated identities and these
+unchanged bounds. Behavioral tests separately verify owner/activation/binding/
+slot separation, duplicate rejection, both-player acceptance and full replay.
+
+This component evidence does not certify complete-game targets or deferred
+Order 32 budgets. The previous target-resolution and reaction-window reports
+remain historical slice evidence at their explicitly recorded runtimes.
+
+The retained R42-003 comparison on Apple M5 Pro / Python 3.14.5 passes: base mean
+20.155 microseconds, head mean 25.107 microseconds, head maximum 37.625
+microseconds. All seven samples on each side completed. Head runtime is
+`d2e570db112c7dc397dc95b2ca5647482a08c7c01cfcd7025d76c3de64d560c4`.

@@ -431,9 +431,9 @@ def test_no_alternative_is_an_explicit_decline_and_stale_submission_keeps_queue(
     assert lifecycle.to_payload() == snapshot
 
 
-@pytest.mark.parametrize("decline_new", [False, True])
+@pytest.mark.parametrize("response", ["pending", "decline", "use"])
 def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
-    decline_new: bool,
+    response: str,
 ) -> None:
     """R42-002: retained Shooting must consult the same defensive reaction owner."""
     from tests.phase13b_shooting_declaration_helpers import _decision_request
@@ -490,16 +490,28 @@ def test_out_of_phase_fidelity_replacement_offers_defense_in_its_parent_phase(
     checkpoint = session.lifecycle.to_payload()
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
     assert session.lifecycle.to_payload() == checkpoint
-    if decline_new:
+    if response != "pending":
         status = session.submit_option(
             request_id=request.request_id,
-            option_id="decline_stratagem_window",
+            option_id="decline_stratagem_window" if response == "decline" else expected_option,
             result_id="order42:counterattack-defense",
         )
         assert status.status_kind is not LifecycleStatusKind.INVALID
         state = session.lifecycle.state
         assert state is not None
-        assert state.command_point_total("player-a") == 1
+        assert state.command_point_total("player-a") == (1 if response == "decline" else 0)
+        if response == "use":
+            effects = [
+                e
+                for e in state.persisting_effects
+                if e.source_rule_id == profile.source_id
+                and isinstance(e.effect_payload, dict)
+                and e.effect_payload.get("effect_kind") == "generic_rule_execution"
+            ]
+            assert len(effects) == 2
+            assert len({e.effect_id for e in effects}) == 2
+            assert {e.owner_player_id for e in effects} == {"player-a", "player-b"}
+            assert state.command_point_total("player-b") == 0
     checkpoint = session.lifecycle.to_payload()
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
     assert (

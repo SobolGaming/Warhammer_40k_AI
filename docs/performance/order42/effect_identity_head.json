@@ -1,0 +1,66 @@
+{
+  "base_api": false,
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "file_hashes": {
+    "docs/performance/order42/effect_identity_workload.json": "c22db8964c674e17e11b20746ef4c878902d250e35b6d3df1b9498c713a9d7ed",
+    "scripts/measure_generic_effect_identity.py": "f0037b82783b8c7a2bc418d5e679c59a5920d6d414d98a90c8e9cdbb1032e96c",
+    "src/warhammer40k_core/_engine_build_manifest.json": "ac440d478195a50d8a248f490893981eabf97f6d79d17b18393f87ccb36efddb",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 4,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 0,
+      "seconds": 3.7624966353178024e-05
+    },
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 1,
+      "seconds": 3.416708204895258e-05
+    },
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 2,
+      "seconds": 2.7125002816319466e-05
+    },
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 3,
+      "seconds": 2.1249987185001373e-05
+    },
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 4,
+      "seconds": 1.9458006136119366e-05
+    },
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 5,
+      "seconds": 1.820793841034174e-05
+    },
+    {
+      "identity": "rule-effect:activation-v1:sha256:f06c2cf9f2f54712f6bde0d0e13cedc8be79f42a7380446f23fbdd32c5c2b618",
+      "sample": 6,
+      "seconds": 1.791701652109623e-05
+    }
+  ],
+  "seed": "order42-fidelity-retarget-1",
+  "summary": {
+    "completion_rate": 1.0,
+    "maximum": 3.7624966353178024e-05,
+    "mean": 2.5107142781572683e-05,
+    "median": 2.1249987185001373e-05,
+    "p95": 3.7624966353178024e-05,
+    "queries_per_second": 39829.30310708024,
+    "samples": 7
+  },
+  "terrain_count": 0,
+  "timing_boundary": "one identity derivation; recorded context and RuleIR loaded first",
+  "workload_id": "order42-recorded-effect-identity-v1"
+}

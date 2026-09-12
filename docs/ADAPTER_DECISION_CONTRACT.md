@@ -5633,6 +5633,13 @@ both after the original declaration and after replacement. These windows use the
 parent phase (including Fight) for status/event metadata and eligibility context.
 The existing opaque timing-window identity and selected-target payload schemas
 cover this behavior without new fields.
+Generic persisted effects use opaque, versioned activation IDs derived from the
+source IR, full clause, effect slot, recorded execution context and bound targets.
+Separate owners and activations coexist; replaying the same activation and slot
+retains its ID and duplicate rejection. Live state and recording policy do not
+change identity. Producers and restore validators use the same builder. This
+changes runtime identity and generated examples, without adding payload fields,
+client choices or visibility rules.
 The engine then resumes the normal action path. Stale, forged, malformed or
 wrong-actor choices are invalid before queue pop and do not mutate state.
 Checkpoint restore authenticates the pending request and replacement history;

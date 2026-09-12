@@ -191,13 +191,11 @@ def _validate_direct_effect_identity(
     effect_index = _payload_non_negative_int(payload, key="effect_index")
     if effect_index >= len(clause.effects) or clause.duration is None:
         raise GameLifecycleError("Generic RuleIR persisted effect identity is invalid.")
-    effect_spec = clause.effects[effect_index]
     expected_effect_id = generic_rule_persisting_effect_id(
         rule_ir=rule_ir,
         clause=clause,
-        effect=effect_spec,
-        source_unit_instance_id=context.source_unit_instance_id,
-        source_model_instance_id=context.source_model_instance_id,
+        effect_index=effect_index,
+        context=context,
         target_unit_instance_ids=effect.target_unit_instance_ids,
     )
     expected_expiration = expiration_for_duration(

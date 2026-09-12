@@ -259,7 +259,7 @@ class RuleExecutionContext:
 
 
 RuleTemplateHandler = Callable[
-    [RuleIR, RuleClause, RuleEffectSpec | None, RuleExecutionContext],
+    [RuleIR, RuleClause, RuleEffectSpec | None, RuleExecutionContext, int | None],
     "RuleExecutionResult",
 ]
 RuleExecutionHandler = RuleTemplateHandler
@@ -828,22 +828,22 @@ def _execute_preflighted_rule_ir(
     for clause in rule_ir.clauses:
         if _is_aura_clause(clause):
             binding = _require_binding(registry.binding_for_clause(clause))
-            result = binding.handler(rule_ir, clause, None, context)
+            result = binding.handler(rule_ir, clause, None, context, None)
             if result.status is not RuleExecutionStatus.APPLIED:
                 return result
             results.append(result)
         elif clause.effects:
-            for effect in clause.effects:
+            for effect_index, effect in enumerate(clause.effects):
                 binding = _require_binding(
                     registry.binding_for_effect(clause=clause, effect=effect)
                 )
-                result = binding.handler(rule_ir, clause, effect, context)
+                result = binding.handler(rule_ir, clause, effect, context, effect_index)
                 if result.status is not RuleExecutionStatus.APPLIED:
                     return result
                 results.append(result)
         elif clause.target is not None:
             binding = _require_binding(registry.binding_for_clause(clause))
-            result = binding.handler(rule_ir, clause, None, context)
+            result = binding.handler(rule_ir, clause, None, context, None)
             if result.status is not RuleExecutionStatus.APPLIED:
                 return result
             results.append(result)
@@ -884,6 +884,7 @@ def _generic_effect_handler(
     clause: RuleClause,
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
+    effect_index: int | None,
 ) -> RuleExecutionResult:
     resolved_effect = _require_effect(effect)
     effect_payload = rule_effect_payload(
@@ -891,6 +892,7 @@ def _generic_effect_handler(
         clause=clause,
         effect=resolved_effect,
         context=context,
+        effect_index=effect_index,
     )
     created_effect = _persisting_effect_or_none(
         rule_ir=rule_ir,
@@ -919,6 +921,7 @@ def _victory_point_handler(
     clause: RuleClause,
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
+    effect_index: int | None,
 ) -> RuleExecutionResult:
     from warhammer40k_core.engine.secondary_rule_ir_scoring_authority import (
         apply_generic_rule_ir_victory_points,
@@ -937,6 +940,7 @@ def _command_point_handler(
     clause: RuleClause,
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
+    effect_index: int | None,
 ) -> RuleExecutionResult:
     resolved_effect = _require_effect(effect)
     state = require_execution_state(context)
@@ -968,6 +972,7 @@ def _command_point_handler(
                 clause=clause,
                 effect=resolved_effect,
                 context=context,
+                effect_index=effect_index,
             ),
         ),
         command_point_transactions=(payload,),
@@ -980,6 +985,7 @@ def _target_binding_handler(
     clause: RuleClause,
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
+    effect_index: int | None,
 ) -> RuleExecutionResult:
     if effect is not None:
         raise GameLifecycleError("Target binding handler does not accept an effect.")
@@ -1123,9 +1129,8 @@ def _persisting_effect_or_none(
         effect_id=generic_rule_persisting_effect_id(
             rule_ir=rule_ir,
             clause=clause,
-            effect=effect,
-            source_unit_instance_id=context.source_unit_instance_id,
-            source_model_instance_id=context.source_model_instance_id,
+            effect_index=cast(int, effect_payload["effect_index"]),
+            context=context,
             target_unit_instance_ids=target_unit_instance_ids,
         ),
         source_rule_id=rule_ir.source_id,

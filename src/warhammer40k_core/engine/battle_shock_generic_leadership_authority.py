@@ -280,9 +280,8 @@ def _effect_from_execution(
         effect_id=generic_rule_persisting_effect_id(
             rule_ir=rule_ir,
             clause=clause,
-            effect=clause.effects[index],
-            source_unit_instance_id=context.source_unit_instance_id,
-            source_model_instance_id=context.source_model_instance_id,
+            effect_index=index,
+            context=context,
             target_unit_instance_ids=target_ids,
         ),
         source_rule_id=source_id,

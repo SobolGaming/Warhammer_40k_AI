@@ -9,6 +9,73 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_generic_persisted_identity_producers_and_restore_share_activation_and_slot() -> None:
+    """R42-003: emitting and reconstructing a persisted ID share one typed owner."""
+    engine = ROOT / "src/warhammer40k_core/engine"
+    callers: set[str] = set()
+    for path in engine.rglob("*.py"):
+        for node in ast.walk(ast.parse(path.read_text())):
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "generic_rule_persisting_effect_id"
+            ):
+                callers.add(path.name)
+                assert {keyword.arg for keyword in node.keywords} == {
+                    "rule_ir",
+                    "clause",
+                    "effect_index",
+                    "context",
+                    "target_unit_instance_ids",
+                }
+    assert callers == {
+        "rule_execution.py",
+        "primary_mission_objective_control_source_authority.py",
+        "battle_shock_generic_leadership_authority.py",
+    }
+    execution = (engine / "rule_execution.py").read_text()
+    aura = (engine / "aura_execution.py").read_text()
+    assert "for effect_index, effect in enumerate(clause.effects)" in execution
+    assert "binding.handler(rule_ir, clause, effect, context, effect_index)" in execution
+    assert "for index, effect_spec in enumerate(clause.effects)" in aura
+    assert "effect_index=index" in aura
+
+
+def test_recorded_effect_identity_cost_is_comparable_and_bounded() -> None:
+    directory = ROOT / "docs/performance/order42"
+    base = json.loads((directory / "effect_identity_base.json").read_text())
+    head = json.loads((directory / "effect_identity_head.json").read_text())
+    budget = json.loads((directory / "effect_identity_budgets.json").read_text())
+    assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+    for field in (
+        "platform",
+        "python",
+        "cpu",
+        "cpu_allocation",
+        "memory_bytes",
+        "concurrency",
+        "model_count",
+        "terrain_count",
+        "timing_boundary",
+        "seed",
+    ):
+        assert base[field] == head[field]
+    for path, digest in base["file_hashes"].items():
+        if path != "src/warhammer40k_core/_engine_build_manifest.json":
+            assert head["file_hashes"][path] == digest
+    assert base["base_api"] is True
+    assert head["base_api"] is False
+    assert base["summary"]["completion_rate"] == head["summary"]["completion_rate"] == 1
+    assert base["summary"]["samples"] == head["summary"]["samples"] == budget["samples_per_case"]
+    assert (
+        head["summary"]["mean"]
+        <= base["summary"]["mean"] * budget["mean_base_multiplier"]
+        + budget["mean_additive_seconds"]
+    )
+    assert head["summary"]["maximum"] <= budget["maximum_seconds"]
+    assert len({row["identity"] for row in head["rows"]}) == 1
+
+
 def test_out_of_phase_replacement_reaction_cost_is_comparable_and_bounded() -> None:
     directory = ROOT / "docs/performance/order42"
     base = json.loads((directory / "out_of_phase_base.json").read_text())

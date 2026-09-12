@@ -129,10 +129,69 @@ Unending Fidelity window with 1 CP remaining and no intervening attack step.
 Pending-window and decline checkpoints restore and replay exactly.
 
 This follow-up changes one production module and reuses the existing decision
-contract. A separate diagnostic found a shared RuleIR effect-identity collision
-when both players use Unending Fidelity in the same phase: the second use raises
-`PersistingEffect already exists for effect_id`. That requires a broader identity
-repair and is not claimed resolved by the reaction-window change.
+contract. The demonstrated shared RuleIR effect-identity collision is addressed
+by the owner-approved R42-003 scope below.
+
+### R42-003: recorded activation and effect-slot identity
+
+The owner approved this bounded extension on 2026-09-12: separate legitimate
+activations must coexist, while repeating the same recorded activation/binding/
+slot remains a duplicate. Previously the shared builder hashed only effect
+content (and optional frequency bindings), truncated clause identity and collapsed
+identical effect slots. The second player's accepted Unending Fidelity spent CP
+and consumed its request before colliding with the first player's persisted ID.
+
+The shared `generic_rule_effect_identity.py` owner now hashes the full source IR,
+full clause ID, explicit effect slot, serialized activation context and canonical
+effect targets into a versioned full SHA-256 identity. The context supplies game,
+owner, source unit/model, round/phase/active player, timing window, target binding
+and recorded trigger/use identity. Live state, event-log objects and the recording
+policy do not affect the identity. Typed source, slot and target validation stays
+fail-closed. Execution passes explicit enumerated slots, including identical
+objects repeated in a clause and aura emission; it never guesses a slot by equal
+effect content.
+
+The bug-class inventory found three derivation consumers: generic execution,
+Objective Control restoration and historical Leadership reconstruction. All use
+the shared builder with the same context and slot. Permanent detachment and
+Enhancement installation IDs belong to separate owner/provider installation
+records; they do not represent repeated activations and are unchanged. Aura
+source deduplication, modifier stacking, expiration boundaries, Stratagem usage
+ledgers and state duplicate rejection retain their existing owners and policies.
+A static audit pins this producer/restore inventory and explicit slot propagation.
+
+Real domain regressions cover separate owners, recorded activations, source/target
+bindings, equal clause suffixes and identical slots, deterministic IR round-trip,
+malformed authority rejection and duplicate rejection without state mutation.
+The end-to-end Fight fixture accepts both players' real Unending Fidelity through
+the facade, checks both generic grants coexist and both CP balances reach zero,
+restores checkpoints, completes retained Shooting/removal and reproduces the full
+recorded replay. The fresh-replacement defense also accepts successfully.
+Effect IDs participate in deterministic replay/RNG history. The existing
+Pirate's Due wound-reroll regression therefore uses an updated fixed game ID;
+its successful-reroll and downstream-resolution assertions are unchanged.
+
+The existing adapter contract already covers opaque engine-generated effect IDs;
+no player-facing option or payload field changes. Runtime identity and generated
+external-contract examples are regenerated. The five production modules stay
+within existing engine ownership and introduce no named handler or content branch.
+
+### Additional checkpoint finding awaiting scope
+
+Extending the fresh-replacement test through destruction of that fresh target
+exposes a separate pending-death restore invariant: attack `source_phase` is
+Shooting while the enclosing battle phase is Fight. At
+`model_destruction_cause_completion_restore.py`, the pending cause validator
+compares those phases directly and rejects the otherwise pending death-reaction
+checkpoint with `Pending destruction cause state binding drift`. The saved
+probe has both accepted Fidelity effects, zero CP for both owners, the outer
+Fight cause and inner Shooting cause. This is separate from ID derivation and
+requires shared destruction-cause phase ownership review. The R42-003 changes do
+not alter it; a scope decision was requested before broadening. The full
+both-acceptance regression completes and replays with the already-fought original
+attacker as the retained shot's target. The fresh-replacement regression covers
+acceptance and its immediate checkpoint/replay; it does not claim the additional
+nested-death checkpoint is valid.
 
 ## Validation
 
@@ -185,3 +244,26 @@ schemas at runtime fingerprint
 The retained out-of-phase component comparison passes unchanged numeric bounds.
 The final complete code-quality suite passes all 442 checks without coverage in
 114.26 seconds. No production code changed after aggregate validation.
+
+For R42-003, the successful final behavioral run passes all 7,522 tests with
+85.07% coverage in 563.18 seconds, using 18 xdist work-stealing workers and the
+required Node.js PATH. An earlier run exposed the Pirate's Due fixture's changed
+reroll stream; only its fixed game ID was corrected before rerunning the coverage
+gate. The successful JUnit profile regenerates all eight shards and the exact
+inventory check passes. Production code remained unchanged during both runs.
+
+The focused identity/aura/historical-restoration subset passes 68 checks, and the
+replacement/static-audit subset passes 39. Ruff, formatting, mypy (2,972 files),
+pyright and all 11 import contracts pass. Source/build generators, external
+contract compatibility against main `051395d0`, TypeScript checks, five client
+tests, live conformance and installed-wheel smoke pass. The wheel verifies 2,768
+runtime resources and 27 schemas at runtime fingerprint
+`d2e570db112c7dc397dc95b2ca5647482a08c7c01cfcd7025d76c3de64d560c4`.
+The matched identity component assessment passes its unchanged fixed budgets.
+
+The final complete code-quality suite passes all 444 checks without coverage in
+118.17 seconds. Pre-commit passes for all committed and newly added files without
+changing production code. The runtime and exact eight-shard checks pass again
+before commit and publication. The additional pending-death phase-binding issue
+above remains a separately reported scope decision; it is not covered by a claim
+that every possible nested destruction checkpoint is fixed.
