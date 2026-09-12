@@ -39,7 +39,9 @@
     "unconditional_u4_demotion_wins": true,
     "layer_a_has_carry_forward_and_recertification_routes": true,
     "recertification_is_not_equivalence": true,
-    "implementation_review_kinds_follow_required_work": true
+    "implementation_review_kinds_follow_required_work": true,
+    "producer_coverage_is_per_producing_build": true,
+    "version_level_replay_label_is_summary_only": true
   },
   "collections": [
     "faction_index",
@@ -210,7 +212,8 @@
       "first_certified_at_content_set"
     ],
     "u7a_later": [
-      "replay_compatibility_certified_citation"
+      "producer_coverage_entry",
+      "derived_version_summary"
     ],
     "guides_audits_manifest": [],
     "four_coverage_artifacts": []
@@ -222,7 +225,9 @@
     "sibling_unclassified_rejects_carry_forward_review",
     "historical_coverage_labels_never_win",
     "derived_manifest_must_not_exceed_q1",
-    "blocked_provenance_never_on_entity_rows"
+    "blocked_provenance_never_on_entity_rows",
+    "uncovered_producer_does_not_clear_sibling_coverage",
+    "version_summary_does_not_authorize_triple_lookup"
   ],
   "coverage_inputs": [
     {
@@ -294,7 +299,8 @@
     "structural_add_without_catalog_id_is_not_an_admitted_row",
     "acts_of_faith_recertification_restores_layer_a_leaves_layer_c_stale",
     "construction_constraint_may_write_layer_c_reattest",
-    "datasheet_layer_a_stale_caps_at_l3"
+    "datasheet_layer_a_stale_caps_at_l3",
+    "two_producers_covered_third_fails_closed_without_erasing_siblings"
   ],
   "layer_a_authorization_routes": {
     "carry_forward": {
@@ -432,6 +438,13 @@
       "emitted_here": false
     },
     {
+      "label": "Chaos Daemons 946 two producers",
+      "producer_coverage_count": 2,
+      "replay_compatibility_summary": "certified",
+      "uncovered_producer_authorized_by_summary": false,
+      "emitted_here": false
+    },
+    {
       "label": "Orks faction index FM0.5",
       "first_certified_at_content_set": null,
       "emitted_here": false
@@ -481,8 +494,16 @@
     "review_kind_count": 6,
     "open_blocker_count": 9,
     "coverage_input_count": 4,
-    "acceptance_fixture_count": 17,
-    "mapping_sample_count": 10,
-    "note": "One generated artifact is the only publishable denominator. Staging is not L0. Historical Playable is not L7. Layer A has carry-forward and recertification routes. Implementation packets write the review kinds mapped from remaining required work. first_certified_at_content_set does not package the previous version. U7a remains the replay mechanism."
-  }
+    "acceptance_fixture_count": 18,
+    "mapping_sample_count": 11,
+    "note": "One generated artifact is the only publishable denominator. Staging is not L0. Historical Playable is not L7. Layer A has carry-forward and recertification routes. Implementation packets write the review kinds mapped from remaining required work. first_certified_at_content_set does not package the previous version. U7a coverage is per producing build; the version-level label is a summary only."
+  },
+  "producer_coverage_fields": [
+    "producing_engine_build_id",
+    "pair_id",
+    "replay_compatibility",
+    "u7a_record_citation"
+  ],
+  "version_summary_meaning": "certified_iff_at_least_one_producer_entry_is_certified",
+  "q1_has_no_version_level_citation": true
 }

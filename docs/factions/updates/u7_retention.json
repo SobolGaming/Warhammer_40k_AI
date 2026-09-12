@@ -46,7 +46,10 @@
     "packaging_alone_is_exact_build_only": true,
     "uncertified_faction_cannot_load_n_minus_one": true,
     "phase_18l_ignores_u7a": true,
-    "s3c_waits_on_u7a_implementation": true
+    "s3c_waits_on_u7a_implementation": true,
+    "q1_coverage_is_per_producing_build": true,
+    "version_level_label_is_summary_only": true,
+    "envelope_pins_golden_content_digest": true
   },
   "owner_d3": {
     "meaning": "content_set_retention",
@@ -85,7 +88,7 @@
   ],
   "envelope_hash_fields": [
     "consuming_engine_build_id",
-    "golden_artifact_ids",
+    "golden_artifacts",
     "pair_id",
     "result"
   ],
@@ -117,15 +120,53 @@
     "pair_id": "u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676",
     "envelope": {
       "consuming_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "golden_artifact_ids": [
-        "golden_chaos-daemons_946_retired_handler"
+      "golden_artifacts": [
+        {
+          "artifact_id": "golden_chaos-daemons_946_retired_handler",
+          "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "exported_by_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
       ],
       "pair_id": "u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676",
       "result": "certified"
     },
-    "envelope_canonical_utf8": "{\"consuming_engine_build_id\":\"warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"golden_artifact_ids\":[\"golden_chaos-daemons_946_retired_handler\"],\"pair_id\":\"u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676\",\"result\":\"certified\"}",
-    "u7a_record_citation": "u7aenv_f2c140ed0375a2e2a77f2f2d0bdcfa6a01eb88fa26635ff297e8e13b9a74d8ca",
+    "envelope_canonical_utf8": "{\"consuming_engine_build_id\":\"warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"golden_artifacts\":[{\"artifact_id\":\"golden_chaos-daemons_946_retired_handler\",\"artifact_sha256\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"exported_by_engine_build_id\":\"warhammer40k-core-v2:runtime-tree-sha256-v1:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}],\"pair_id\":\"u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676\",\"result\":\"certified\"}",
+    "u7a_record_citation": "u7aenv_8df530c606630106c66d2b02c40248574ad791bf3ff3a33ea997837cecb26913",
+    "second_producer_pair": {
+      "content_set_version": "946",
+      "owner_faction_id": "chaos-daemons",
+      "producing_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "second_producer_pair_id": "u7a_f0e6e4e4a7d4efb6a3fdf94588b6dab4d657520332549eaaa78ed8a8d1709920",
+    "second_producer_envelope": {
+      "consuming_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "golden_artifacts": [
+        {
+          "artifact_id": "golden_chaos-daemons_946_second_producer",
+          "artifact_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "exported_by_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        }
+      ],
+      "pair_id": "u7a_f0e6e4e4a7d4efb6a3fdf94588b6dab4d657520332549eaaa78ed8a8d1709920",
+      "result": "certified"
+    },
+    "second_producer_citation": "u7aenv_3029542e2b810f4b9bbe246b3303cc756d731cf5699c0f740f4734bef3c66b7a",
+    "uncovered_producing_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9999999999999999999999999999999999999999999999999999999999999999",
+    "mutated_golden_envelope": {
+      "consuming_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "golden_artifacts": [
+        {
+          "artifact_id": "golden_chaos-daemons_946_retired_handler",
+          "artifact_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "exported_by_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "pair_id": "u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676",
+      "result": "certified"
+    },
+    "mutated_golden_citation": "u7aenv_559afc6b1316d768a75f41406005a844367f04aca77644488c34b6837ca1b801",
     "display_label_does_not_change_ids": true,
+    "artifact_id_is_not_a_content_digest": true,
     "pins_are_fixture_bytes": true
   },
   "activation_table": [
@@ -164,13 +205,15 @@
     "tombstone_rejects_current_roster_not_historical_replay",
     "packaging_without_envelope_is_exact_build_only",
     "display_label_does_not_change_pair_or_envelope_id",
-    "envelope_requires_goldens_and_packaged_version",
+    "envelope_requires_content_bound_goldens_and_packaged_version",
     "v_golden_reproduces_on_v_plus_one_and_current_roster_rejects",
-    "uncovered_triple_fails_closed",
+    "uncovered_triple_fails_closed_without_erasing_siblings",
     "phase_18l_rejects_other_build_despite_envelope",
     "s3c_unpublished_before_u7a_implementation",
     "open_blocker_prevents_previous_slot",
-    "staging_never_in_inventory"
+    "staging_never_in_inventory",
+    "two_producers_covered_third_fails_closed",
+    "golden_byte_replacement_changes_envelope_citation"
   ],
   "mapping_samples": [
     {
@@ -196,6 +239,32 @@
       "current_content_set_version": "960",
       "previous_content_set_version": "946",
       "replay_compatibility": "exact_build_only",
+      "emitted_here": false,
+      "producer_coverage": [],
+      "replay_compatibility_is_summary": true
+    },
+    {
+      "label": "Chaos Daemons 946 two producers",
+      "owner_faction_id": "chaos-daemons",
+      "content_set_version": "946",
+      "consuming_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "producer_coverage": [
+        {
+          "producing_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "pair_id": "u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676",
+          "replay_compatibility": "certified",
+          "u7a_record_citation": "u7aenv_8df530c606630106c66d2b02c40248574ad791bf3ff3a33ea997837cecb26913"
+        },
+        {
+          "producing_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "pair_id": "u7a_f0e6e4e4a7d4efb6a3fdf94588b6dab4d657520332549eaaa78ed8a8d1709920",
+          "replay_compatibility": "certified",
+          "u7a_record_citation": "u7aenv_3029542e2b810f4b9bbe246b3303cc756d731cf5699c0f740f4734bef3c66b7a"
+        }
+      ],
+      "uncovered_producing_engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9999999999999999999999999999999999999999999999999999999999999999",
+      "replay_compatibility_summary": "certified",
+      "summary_authorizes_uncovered_producer": false,
       "emitted_here": false
     },
     {
@@ -261,10 +330,26 @@
     "F00 policy amendment"
   ],
   "reconciliation": {
-    "acceptance_fixture_count": 18,
-    "mapping_sample_count": 8,
+    "acceptance_fixture_count": 20,
+    "mapping_sample_count": 9,
     "pair_id": "u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676",
-    "u7a_record_citation": "u7aenv_f2c140ed0375a2e2a77f2f2d0bdcfa6a01eb88fa26635ff297e8e13b9a74d8ca",
-    "note": "Certification records the event; N-1 packages on the next content-set transition. Q1 stores certified and exact_build_only; this design owns the envelope those labels cite. Phase 18L stays exact-build."
-  }
+    "u7a_record_citation": "u7aenv_8df530c606630106c66d2b02c40248574ad791bf3ff3a33ea997837cecb26913",
+    "second_producer_pair_id": "u7a_f0e6e4e4a7d4efb6a3fdf94588b6dab4d657520332549eaaa78ed8a8d1709920",
+    "second_producer_citation": "u7aenv_3029542e2b810f4b9bbe246b3303cc756d731cf5699c0f740f4734bef3c66b7a",
+    "mutated_golden_citation": "u7aenv_559afc6b1316d768a75f41406005a844367f04aca77644488c34b6837ca1b801",
+    "note": "Certification records the event; N-1 packages on the next content-set transition. Q1 stores per-producer coverage entries; the version-level label is a summary only. Envelopes pin golden bytes. Phase 18L stays exact-build."
+  },
+  "q1_has_no_version_level_citation": true,
+  "producer_coverage_fields": [
+    "producing_engine_build_id",
+    "pair_id",
+    "replay_compatibility",
+    "u7a_record_citation"
+  ],
+  "version_summary_meaning": "certified_iff_at_least_one_producer_entry_is_certified",
+  "golden_binding_fields": [
+    "artifact_id",
+    "artifact_sha256",
+    "exported_by_engine_build_id"
+  ]
 }

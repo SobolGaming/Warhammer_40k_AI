@@ -339,7 +339,10 @@ Changing `content_set_version` or `owner_faction_id` must.
 
 The pair is not coverage. Coverage is a verification envelope regenerated
 and re-verified on **every consuming build that claims it**. A failed or
-absent envelope is not covered.
+absent envelope is not covered. Each envelope covers **one** pair (one
+producing build, one owner, one content-set version) on one consuming
+build. Two producing builds of the same owner/version are two envelopes
+and two Q1 `producer_coverage` entries (Q1 §5.1.1).
 
 Envelope identity (every key present):
 
@@ -348,22 +351,37 @@ Envelope identity (every key present):
 | `pair_id` | Pair digest from §7.2 |
 | `consuming_engine_build_id` | The claiming build |
 | `result` | Literal `certified` |
-| `golden_artifact_ids` | Sorted IDs of the producing-build goldens actually replayed |
+| `golden_artifacts` | Sorted content bindings of the goldens actually replayed |
 
-`u7a_record_citation` (the value Q1 stores) is `u7aenv_` plus the
-lowercase hex SHA-256 digest of that envelope.
+Each `golden_artifacts` element (every key present), sorted by
+`artifact_id`:
+
+| Key | Value |
+| --- | --- |
+| `artifact_id` | Human-readable retained-artifact name; not a content digest |
+| `artifact_sha256` | 64 lowercase hex SHA-256 of the retained golden bytes |
+| `exported_by_engine_build_id` | The producing `engine_build_id` that exported those bytes |
+
+`artifact_id` alone is not a content binding. Replacing retained bytes
+while keeping the same `artifact_id` must change `artifact_sha256` and
+therefore the envelope citation. `display_label` is excluded from
+envelope identity.
+
+`u7a_record_citation` (the value one Q1 `producer_coverage` entry stores)
+is `u7aenv_` plus the lowercase hex SHA-256 digest of that envelope. It
+is not a version-level scalar.
 
 Worked fixture. Canonical UTF-8:
 
 ```text
-{"consuming_engine_build_id":"warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","golden_artifact_ids":["golden_chaos-daemons_946_retired_handler"],"pair_id":"u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676","result":"certified"}
+{"consuming_engine_build_id":"warhammer40k-core-v2:runtime-tree-sha256-v1:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","golden_artifacts":[{"artifact_id":"golden_chaos-daemons_946_retired_handler","artifact_sha256":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","exported_by_engine_build_id":"warhammer40k-core-v2:runtime-tree-sha256-v1:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],"pair_id":"u7a_8efecd9dfdc697e40abfc69c95bd2878f1ba22861e28658384602e3332c08676","result":"certified"}
 ```
 
-`u7a_record_citation`: `u7aenv_f2c140ed0375a2e2a77f2f2d0bdcfa6a01eb88fa26635ff297e8e13b9a74d8ca`
+`u7a_record_citation`: `u7aenv_8df530c606630106c66d2b02c40248574ad791bf3ff3a33ea997837cecb26913`
 
-The `aaaa…` / `bbbb…` pins are fixture bytes. FM0 uses real
+The `aaaa…` / `bbbb…` / `cccc…` pins are fixture bytes. FM0 uses real
 `engine_build_id` values and goldens actually exported by the producing
-build. Storing `result: certified` without those goldens is invalid.
+build. Storing `result: certified` without those bindings is invalid.
 
 An envelope may exist only when the named `content_set_version` is
 packaged on the consuming build as current or previous for that owner.
@@ -380,6 +398,17 @@ with exact equality of:
 - RNG state;
 - viewer-scoped checkpoints for both players and the operator;
 - final state hash.
+
+Before comparing those results the verifier must:
+
+1. resolve each `artifact_id` to retained bytes;
+2. reject the envelope when `sha256(bytes)` is not the cited
+   `artifact_sha256`;
+3. reject the envelope when `exported_by_engine_build_id` is not the
+   pair's `producing_engine_build_id`;
+4. only then replay and compare.
+
+A symbolic ID with drifted bytes is not this evidence.
 
 Acceptance evidence for the FM0 U7a implementation, and for every later
 transition that packages a new content set:
@@ -403,8 +432,14 @@ typed error naming the producing `engine_build_id`, each missing
 has the exact producing build. The exact-build deployment is the only
 route for that artifact.
 
-Q1 must store `exact_build_only` and `u7a_record_citation: null` for that
-packaged previous version. Packaging alone must not write `certified`.
+Q1 records that miss on the **producer** entry: omit the producer, or
+store `replay_compatibility: exact_build_only` and
+`u7a_record_citation: null` for that `producing_engine_build_id` only.
+Sibling `producer_coverage` entries for other producing builds stay.
+The version-level summary stays `certified` when any other producer
+entry is `certified`; it becomes `exact_build_only` only when no
+producer entry is `certified`. Packaging alone must not write
+`certified` on a producer entry or on the summary.
 
 Until the FM0 U7a implementation merges, every packaged previous version
 is `exact_build_only` and no previous-version replayability is claimed.
@@ -425,8 +460,10 @@ following hold:
 1. Every named `content_set_version` is packaged for that owner (U7).
 2. Every participating pair has a `certified` envelope on this consuming
    `engine_build_id` (U7a).
-3. Q1 stores `replay_compatibility: certified` plus the envelope
-   citation for each such packaged previous version.
+3. Q1 stores a `producer_coverage` entry for that exact
+   `producing_engine_build_id` with `replay_compatibility: certified`
+   and that envelope's citation. The version-level summary must not
+   substitute for this lookup.
 4. The load is not Phase 18L recovery.
 
 Same-build replay skips (2) and (3) and still requires (1) and (4).
@@ -437,7 +474,7 @@ Same-build replay skips (2) and (3) and still requires (1) and (4).
 | --- | --- | --- |
 | Certification event (`-b` close) | Q1 `first_certified_at_content_set` | Package N−1; write `certified`; write an envelope |
 | U7 packaging (FM0) | Inventory current / previous / dropped tag | Write Q1 labels; load staging; package N−1 while first-certified is null |
-| U7a verification (FM0) | Envelope; Q1 `certified` plus citation | Ignore `engine_build_id`; certify an unpackaged version; certify without goldens |
+| U7a verification (FM0) | Envelope; one Q1 `producer_coverage` entry plus the derived version summary | Ignore `producing_engine_build_id`; certify an unpackaged version; certify without content-bound goldens; collapse two producers into one citation |
 | U5 tombstone | Current-version mustering rejection | Unpackage a still-retained previous version; delete referenced Python |
 | U4 / packets / Q1 status claims | Layer tuples and reviews | Package content; write envelopes |
 | Guides, audits, capability manifest | nothing | Any packaging slot or U7a result |
@@ -476,8 +513,8 @@ This PR only defines them.
 2. Writing `first_certified_at_content_set` for Chaos Daemons at 946
    leaves `previous_content_set_version` JSON `null`. 931 is not packaged.
 3. After a later Chaos Daemons 960 transition, current is 960 and
-   previous is 946. Q1 stores `exact_build_only` until an envelope
-   citation exists.
+   previous is 946. Q1 `producer_coverage` is empty and the version
+   summary is `exact_build_only` until a producer entry exists.
 4. After a later 970 transition, current is 970 and previous is 960.
    946 is dropped. A replay naming Chaos Daemons 946 fails closed and
    names `available_at_git_tag`.
@@ -495,16 +532,19 @@ This PR only defines them.
    in a packaged previous-version replay once such a window exists. The
    tombstone does not package 931 by itself.
 10. Packaging 946 as previous without a verified envelope must not write
-    Q1 `certified`.
+    a `certified` producer entry or a `certified` version summary.
 11. The worked `pair_id` and `u7a_record_citation` must match across
     implementations of the published canonical bytes. Changing only
     `display_label` leaves both digests unchanged.
-12. An envelope that omits golden-artifact IDs, names an unpackaged
-    version, or stores `certified` after a failed replay is rejected.
+12. An envelope that omits `artifact_sha256`, names an unpackaged
+    version, stores `certified` after a failed replay, or cites
+    `exported_by_engine_build_id` other than the pair's producer is
+    rejected.
 13. A V golden containing a rule retired at V+1 reproduces under the V+1
     build; the V+1 current roster rejects that rule with a typed reason.
 14. A deliberately uncovered triple fails closed naming the producing
-    build and the tag that has it.
+    build and the tag that has it. That miss must not erase or borrow a
+    sibling producer entry.
 15. Phase 18L recovery of a snapshot from producing build `aaaa…` on
     consuming build `bbbb…` is rejected even when fixture 13's envelope
     exists.
@@ -515,6 +555,19 @@ This PR only defines them.
     inventory previous slot stays JSON `null`.
 18. Staging `blocked_provenance` never appears in the packaging
     inventory and never becomes a participating `content_set_version`.
+19. On consuming build `bbbb…`, Chaos Daemons 946 has certified
+    envelopes for producers `aaaa…` (`u7a_8efecd9d…` /
+    `u7aenv_8df530c6…`) and `eeee…` (`u7a_f0e6e4e4…` /
+    `u7aenv_3029542e…`). Producer `9999…` has no entry. Loads from
+    `aaaa…` and `eeee…` succeed by those citations. A load from
+    `9999…` fails closed. Both certified entries remain. The version
+    summary is `certified` and must not authorize the `9999…` load.
+20. Replacing the retained bytes of
+    `golden_chaos-daemons_946_retired_handler` so the digest becomes
+    `dddd…` while the `artifact_id` is unchanged yields citation
+    `u7aenv_559afc6b…`, not `u7aenv_8df530c6…`. The verifier rejects
+    the original envelope against the new bytes. Changing only
+    `display_label` leaves both published citations unchanged.
 
 ## 11. Mapping exercise (not packaged content)
 
@@ -525,7 +578,8 @@ does not.
 | --- | --- | --- |
 | Orks @ FM0.5 | Current 946; previous null; first-certified null | 931 is S1 / S4 tooling, not loadable |
 | Chaos Daemons @ FM1-b | Current 946; previous null; first-certified 946 | Event is not N−1 |
-| Chaos Daemons after 960 | Current 960; previous 946; default `exact_build_only` | Envelope may later write `certified` |
+| Chaos Daemons after 960 | Current 960; previous 946; empty `producer_coverage`; summary `exact_build_only` | A later envelope writes one producer entry |
+| Chaos Daemons 946 two producers | Entries for `aaaa…` and `eeee…`; `9999…` absent | Fixture 19; summary `certified` is not a load key |
 | Chaos Daemons after 970 | Current 970; previous 960; 946 dropped | Fail-closed names the 946 tag |
 | Mixed Aeldari 946 + Orks 960 | Both versions named on the config | Cannot infer Orks from Aeldari |
 | Ynnari shared page | `aeldari` window | Listing view is not the window |
@@ -594,9 +648,10 @@ FM0 packaging and compatibility work may be implemented. It has:
 - Q2 handler union over packaged versions;
 - tombstones limited to current-version mustering;
 - pair and envelope identity projections with published canonical bytes;
-- Q1 `certified` only via a regenerated envelope citation;
+- Q1 `certified` only via per-producer envelope citations;
+- golden bindings pin retained bytes, not symbolic IDs alone;
 - Phase 18L kept on exact `engine_build_id`;
-- eighteen acceptance fixtures;
+- twenty acceptance fixtures;
 - a mapping exercise that does not package content.
 
 This survey does not add a loader, live inventory, live compatibility

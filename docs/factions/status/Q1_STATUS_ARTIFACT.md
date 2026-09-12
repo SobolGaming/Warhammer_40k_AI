@@ -26,8 +26,8 @@ One generated artifact is the only denominator for:
 - per-layer U4 evidence tuples;
 - `blocked_provenance` staging observations, kept off admitted rows;
 - per-faction `first_certified_at_content_set`;
-- replay-compatibility coverage of every packaged version (`certified` or
-  `exact_build_only`).
+- replay-compatibility coverage of every packaged version: per-producer
+  entries plus a version-level summary (`certified` or `exact_build_only`).
 
 Guides, audits, and the Phase 17O capability manifest **derive** from it.
 They do not write it. Hand-maintained status and mixed coverage labels are
@@ -119,7 +119,7 @@ by S3a. A staging marker never becomes evidence by default.
 | Union A/B/C demotion | One row with three layer tuples, not one merged packet |
 | `faction_rewrite` | Overlay freshness on the faction index **plus** per-entity rows |
 | Packaged previous version | A second `content_set_version` of the same `catalog_id` |
-| `certified` replay coverage | U7a record citation; default remains `exact_build_only` |
+| `certified` replay coverage | Per-producer U7a envelope citation; version-level label is a summary; default remains `exact_build_only` |
 
 ## 4. Identity projections
 
@@ -229,12 +229,32 @@ Each packaged version carries:
 | --- | --- |
 | `content_set_version` | App-data version |
 | `packaged` | Whether that version is in the current package |
-| `replay_compatibility` | `certified` or `exact_build_only` |
-| `u7a_record_citation` | Hash of the U7a record when `certified`; JSON `null` otherwise |
+| `producer_coverage` | Zero or more producer-specific coverage entries (§5.1.1) |
+| `replay_compatibility` | Version-level **summary** only: `certified` iff at least one `producer_coverage` entry is `certified`; otherwise `exact_build_only` |
+
+The version-level summary must not authorize a load and must not replace
+the exact `(producing_engine_build_id, owner, content_set_version)`
+lookup. There is no version-level `u7a_record_citation`.
 
 Writing `first_certified_at_content_set` records the certification event. It
 does not package N−1 and does not create a U7a record. Until U7a certifies
-a pair, every packaged previous version is `exact_build_only`.
+at least one producer entry, the version summary is `exact_build_only`.
+
+#### 5.1.1 `producer_coverage` entry
+
+One entry per producing `engine_build_id` that this consuming artifact
+has evaluated for that owner/version:
+
+| Field | Role |
+| --- | --- |
+| `producing_engine_build_id` | Exact producing build |
+| `pair_id` | U7a pair digest for that triple |
+| `replay_compatibility` | `certified` or `exact_build_only` for **this producer only** |
+| `u7a_record_citation` | Envelope citation when this producer is `certified`; JSON `null` otherwise |
+
+An uncovered producer has no certified entry. Absence is not
+`certified`. Writing `exact_build_only` for one producer must not clear
+or overwrite another producer's certified entry or citation.
 
 ### 5.2 `staging_observations`
 
@@ -417,8 +437,8 @@ writer is the packet whose remaining `required_work` includes
 | U4 invalidation (engine, FM0) | Layer demotion to `stale`; freshness `stale` | Invent a carry-forward review; assert `current` |
 | Packet `review_record` | The review kinds mapped from that packet's remaining `required_work` (carry-forward, recertification, Layer C re-attest, attribution) | Write Layer A current by status claim alone; write carry-forward when a sibling `unclassified_clause` forbids it; write `layer_a_equivalence` after a classified fingerprint change |
 | Packet `status_claim` | A transition authorized by U4 plus any required review | Assert `current` while the tuple is `stale`; write Q1 schema; write `first_certified_at_content_set` |
-| Certification event (`-b` close) | `first_certified_at_content_set` | Package N−1; write `replay_compatibility: certified` |
-| U7a ([retention design](../updates/U7_RETENTION.md); FM0 writes) | `replay_compatibility: certified` plus a citation | Ignore `engine_build_id`; claim replayability from packaging alone |
+| Certification event (`-b` close) | `first_certified_at_content_set` | Package N−1; write a `certified` producer entry or summary |
+| U7a ([retention design](../updates/U7_RETENTION.md); FM0 writes) | One `producer_coverage` entry plus the derived version summary | Ignore `producing_engine_build_id`; claim replayability from packaging alone; collapse two producers into one citation |
 | Guides, audits, capability manifest | nothing | Any Q1 field |
 | The four coverage artifacts | nothing as authority | L7/L8 `current`; Layer A `current` |
 
@@ -438,6 +458,9 @@ writer is the packet whose remaining `required_work` includes
 5. A derived capability-manifest dimension must not be true when the
    corresponding Q1 claim is `stale` or absent.
 6. `blocked_provenance` never appears on `entity_rows`.
+7. An uncovered producing build does not clear sibling `producer_coverage`
+   entries. The version-level `replay_compatibility` summary does not
+   authorize a triple that has no certified producer entry.
 
 ## 9. Four coverage artifacts
 
@@ -511,8 +534,9 @@ PR only defines them.
    or `FULL_GAME_SUPPORTED`.
 7. Orks at FM0.5 keep `first_certified_at_content_set` null. No previous
    Orks version is listed as packaged loadable content.
-8. A packaged previous version without a U7a citation is
-   `exact_build_only`. Packaging alone must not write `certified`.
+8. A packaged previous version with empty `producer_coverage` has
+   summary `exact_build_only`. Packaging alone must not write a
+   `certified` producer entry or a `certified` summary.
 9. Changing only `display_label` leaves `row_id` and `review_id`
    unchanged. The Eldrad worked-fixture digests must match across
    implementations of the published canonical bytes.
@@ -547,6 +571,12 @@ PR only defines them.
 17. A datasheet row whose Layer A is `stale` caps `attained_level` at L3
     even when earlier L4–L8 evidence exists (Eldrad without an authorizing
     A review). This is the datasheet counterpart of fixture 4.
+18. Chaos Daemons 946 stores certified `producer_coverage` entries for
+    producing builds `aaaa…` and `eeee…` with their distinct envelope
+    citations. Producer `9999…` has no certified entry. The version
+    summary is `certified`. A replay from `9999…` is rejected without
+    erasing or borrowing the `aaaa…` / `eeee…` citations. The summary
+    must not authorize that load.
 
 ## 12. Mapping exercise (not a generated artifact)
 
@@ -563,6 +593,7 @@ Planning examples. FM0 emits the real `content_status`. This PR does not.
 | Brute Bosses | Staging until official provenance and catalog ID | Not L0 |
 | More Dakka! @ 946 | `freshness: retired`; current-version mustering blocker | Historical 931 row is a different `content_set_version` |
 | Orks faction index @ FM0.5 | `first_certified_at_content_set: null` | Rewrite overlay does not certify |
+| Chaos Daemons 946 two producers | Two `producer_coverage` entries; summary `certified`; `9999…` absent | Fixture 18; summary is not a load key |
 | Chaos Daemons heights | Open `missing_geometry` blockers | Known FM1-a→FM1-b obligations stay on the row |
 | Autarch `overall: Playable` | Not written into Q1 | Fixture 6 |
 
@@ -625,7 +656,8 @@ FM0 status generation may be implemented. It has:
 - writer precedence that rejects stale→current without authorization;
 - the four coverage artifacts named as inputs, not authorities;
 - derived-output bounds for guides and the capability manifest;
-- seventeen acceptance fixtures;
+- producer-specific U7a coverage entries under each packaged version;
+- eighteen acceptance fixtures;
 - a mapping exercise that does not emit `content_status`.
 
 This survey does not add a generator, live artifact, guide rewrite,
