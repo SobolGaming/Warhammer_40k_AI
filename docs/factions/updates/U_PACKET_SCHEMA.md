@@ -1,6 +1,6 @@
 # U3 packet schema — draft Track D agent contract
 
-[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T6 decision-kind taxonomy](../taxonomy/T6_DECISION_KIND_VISIBILITY.md) · [Live agent contract](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T6 decision-kind taxonomy](../taxonomy/T6_DECISION_KIND_VISIBILITY.md) · [Live agent contract](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is the **FM-pre packet schema**: the data-first work-packet
 contract U3 will emit and Track C / Track G will reuse. It is the draft
@@ -8,9 +8,12 @@ replacement for the "Task Packet Format" section of
 [FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
 It does not rewrite that live contract, edit
 [ADAPTER_DECISION_CONTRACT.md](../../ADAPTER_DECISION_CONTRACT.md), emit
-packets, implement the U3 generator, or change `src/`, catalogs, F00, or
-Q1. FM0 generates packets from retained pages and reconciles them with
-this document; FM0 rewrites the live agent contract to consume it.
+packets, implement the U3 generator, or change `src/`, catalogs, or F00.
+Q1 storage is designed in
+[Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md); this document
+does not generate that artifact. FM0 generates packets from retained pages
+and reconciles them with this document; FM0 rewrites the live agent
+contract to consume it.
 
 Machine-readable catalog: [`u_packet_schema.json`](u_packet_schema.json).
 
@@ -421,7 +424,8 @@ exist. Packets index them.
 - U3 packet generator and emission
 - Live agent-contract rewrite (Track D D3, FM0)
 - Adapter-contract edits (only with a real family consumer)
-- Q1 status-artifact schema
+- Q1 generator, loader, and live artifact (schema delivered in
+  [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md))
 - U7 / U7a retention draft
 - U8 runbook (U1, U5, U6, Q6)
 - S4 tool and Orks 20/73 fixture
@@ -434,7 +438,7 @@ exist. Packets index them.
 - Diff grain, classes, and layers remain U2–U4
 - F00 page retention remains S1
 - Extraction remains S3a
-- Q1 storage remains Q1
+- Q1 storage remains [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md)
 
 ## 12. Open holds
 
@@ -444,7 +448,7 @@ exist. Packets index them.
 | U-HOLD-RULES-UPDATED | Dual-version clauses | S3a, then review packets can become envelope/effect packets |
 | U-HOLD-NAME-PUNCTUATION | Punctuation twins are not locators | S2 locators on retained pages |
 | Packet generator | Actual emission | FM0 U3 |
-| Q1 schema | Where `status_claim` and review records persist | next remaining design after this schema, or with U4 implementation |
+| Q1 schema | Where `status_claim` and review records persist | delivered in [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md); generator remains FM0 |
 | Live agent contract | Rewrite Task Packet Format to this schema | FM0 Track D D3 |
 | Owner D3 / U7a | Retention and replay compatibility | later design PR |
 

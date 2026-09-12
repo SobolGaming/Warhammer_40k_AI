@@ -1,0 +1,395 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "Q1-status-artifact",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
+  "delivered_to": "FM0 Q1 content_status generator and U4 invalidation (design only)",
+  "does_not_generate_live_artifact": true,
+  "does_not_edit_adapter_contract": true,
+  "does_not_rewrite_live_agent_contract": true,
+  "does_not_rewrite_guides": true,
+  "does_not_change_catalog_ids": true,
+  "owner_d3_retention_is_not_this_document": true,
+  "u7a_mechanism_is_not_this_document": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "from_app_data_version": "931",
+    "to_app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "closed_axes": {
+    "one_artifact_is_the_only_publishable_denominator": true,
+    "admitted_row_is_catalog_id_plus_content_set_version": true,
+    "page_url_is_not_a_status_row": true,
+    "display_name_is_not_a_join_key": true,
+    "staging_is_not_l0": true,
+    "historical_playable_is_not_l7": true,
+    "status_claim_is_not_a_review_record": true,
+    "guides_and_manifest_do_not_write_q1": true,
+    "first_certified_does_not_package_previous_version": true,
+    "packaging_does_not_write_certified_replay_coverage": true,
+    "capability_manifest_must_not_exceed_q1": true,
+    "row_id_and_review_id_hash_locator_projection": true,
+    "display_label_does_not_change_row_or_review_id": true,
+    "unconditional_u4_demotion_wins": true
+  },
+  "collections": [
+    "faction_index",
+    "entity_rows",
+    "staging_observations",
+    "review_records",
+    "status_claims"
+  ],
+  "freshness_values": [
+    "current",
+    "stale",
+    "retired"
+  ],
+  "layer_claim_states": [
+    "current",
+    "stale",
+    "none"
+  ],
+  "ladder_levels": [
+    "L0",
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L7",
+    "L8"
+  ],
+  "staging_is_not_a_ladder_level": true,
+  "review_kinds": [
+    "layer_a_equivalence",
+    "handler_identity_confirmation",
+    "layer_c_reattest",
+    "human_attribution",
+    "recorded_equivalence"
+  ],
+  "review_results": [
+    "equivalent",
+    "not_equivalent",
+    "unclassified"
+  ],
+  "replay_compatibility_labels": [
+    "certified",
+    "exact_build_only"
+  ],
+  "open_blocker_ids": [
+    "layer_a_stale",
+    "layer_b_stale",
+    "layer_c_stale",
+    "unsupported_clause",
+    "missing_geometry",
+    "official_provenance",
+    "catalog_id_allocation",
+    "family_gap",
+    "retired_current_mustering"
+  ],
+  "row_id_hash_fields": [
+    "catalog_id",
+    "content_set_version",
+    "entity_kind"
+  ],
+  "review_id_hash_fields": [
+    "catalog_id",
+    "new_transcription_sha256",
+    "old_transcription_sha256",
+    "packet_id",
+    "review_kind",
+    "source_entry_locator"
+  ],
+  "review_id_locator_fields": [
+    "ordinal_in_section",
+    "parent_source_document_id",
+    "section_kind"
+  ],
+  "identity_excluded_from_hash": [
+    "display_label",
+    "parent_app_canonical_url",
+    "listing_role",
+    "file_paths",
+    "github_numbers",
+    "historical_coverage_labels",
+    "capability_manifest_dimensions"
+  ],
+  "identity_canonicalization": {
+    "scheme": "RFC 8785 JCS",
+    "utf8": true,
+    "bom": false,
+    "insignificant_whitespace": false,
+    "sort_keys": true,
+    "separators": [
+      ",",
+      ":"
+    ],
+    "ensure_ascii": false,
+    "allow_nan": false,
+    "trailing_newline": false,
+    "null_keys_present": true,
+    "ordinal_in_section_json_type": "number",
+    "python_equivalent": "json.dumps(identity, ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False).encode('utf-8')",
+    "row_id_prefix": "row_",
+    "review_id_prefix": "rev_",
+    "digest": "sha256 lowercase hex"
+  },
+  "worked_fixtures": {
+    "eldrad_row": {
+      "identity": {
+        "catalog_id": "000000568",
+        "content_set_version": "946",
+        "entity_kind": "datasheet"
+      },
+      "canonical_utf8": "{\"catalog_id\":\"000000568\",\"content_set_version\":\"946\",\"entity_kind\":\"datasheet\"}",
+      "row_id": "row_f3250e6e9c7c833315474ee8add92facd629910a922cf9c50848977eddadabb7"
+    },
+    "eldrad_points_packet": {
+      "note": "Planning packet from the published packet-schema recipe. FM0 emits the real packet.",
+      "identity": {
+        "catalog_id": "000000568",
+        "field_path": "cost_rows",
+        "from_content_set": "931",
+        "impact_class": "points_only",
+        "origin_kind": "update_classifier",
+        "packet_kind": "implementation",
+        "source_entry_locator": {
+          "ordinal_in_section": 1,
+          "parent_source_document_id": "faction-app:aeldari:datasheet:eldrad-ulthran",
+          "section_kind": "datasheet"
+        },
+        "to_content_set": "946"
+      },
+      "canonical_utf8": "{\"catalog_id\":\"000000568\",\"field_path\":\"cost_rows\",\"from_content_set\":\"931\",\"impact_class\":\"points_only\",\"origin_kind\":\"update_classifier\",\"packet_kind\":\"implementation\",\"source_entry_locator\":{\"ordinal_in_section\":1,\"parent_source_document_id\":\"faction-app:aeldari:datasheet:eldrad-ulthran\",\"section_kind\":\"datasheet\"},\"to_content_set\":\"946\"}",
+      "packet_id": "pkt_8c8f0a3a436b71a0c8800da378fef5d0c4c3e53c57e853044c736171896961c7"
+    },
+    "eldrad_layer_a_review": {
+      "note": "Synthetic transcription pins. Display label Eldrad Ulthran versus ELDRAD ULTHRAN must not change this digest.",
+      "identity": {
+        "catalog_id": "000000568",
+        "new_transcription_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "old_transcription_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "packet_id": "pkt_8c8f0a3a436b71a0c8800da378fef5d0c4c3e53c57e853044c736171896961c7",
+        "review_kind": "layer_a_equivalence",
+        "source_entry_locator": {
+          "ordinal_in_section": 1,
+          "parent_source_document_id": "faction-app:aeldari:datasheet:eldrad-ulthran",
+          "section_kind": "datasheet"
+        }
+      },
+      "canonical_utf8": "{\"catalog_id\":\"000000568\",\"new_transcription_sha256\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"old_transcription_sha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"packet_id\":\"pkt_8c8f0a3a436b71a0c8800da378fef5d0c4c3e53c57e853044c736171896961c7\",\"review_kind\":\"layer_a_equivalence\",\"source_entry_locator\":{\"ordinal_in_section\":1,\"parent_source_document_id\":\"faction-app:aeldari:datasheet:eldrad-ulthran\",\"section_kind\":\"datasheet\"}}",
+      "review_id": "rev_77074d425e6d6b87e6862a47457d3006d1025b9d1146fd0c1fec550a9615a38f"
+    }
+  },
+  "writers": {
+    "u4_invalidation": [
+      "layer_demotion_to_stale",
+      "freshness_stale"
+    ],
+    "packet_review_record": [
+      "review_records_required_by_packet_work"
+    ],
+    "packet_status_claim": [
+      "authorized_transitions_only"
+    ],
+    "certification_event": [
+      "first_certified_at_content_set"
+    ],
+    "u7a_later": [
+      "replay_compatibility_certified_citation"
+    ],
+    "guides_audits_manifest": [],
+    "four_coverage_artifacts": []
+  },
+  "allow_deny_precedence": [
+    "u4_demotion_always_wins",
+    "layer_a_current_after_hash_change_requires_equivalent_review",
+    "sibling_unclassified_rejects_carry_forward_review",
+    "historical_coverage_labels_never_win",
+    "derived_manifest_must_not_exceed_q1",
+    "blocked_provenance_never_on_entity_rows"
+  ],
+  "coverage_inputs": [
+    {
+      "path": "data/generated/ability_coverage/datasheet_support_rows.json",
+      "input_fact": "historical component rollup",
+      "retired_as_authority_for": [
+        "L6",
+        "L7",
+        "L8",
+        "fieldable",
+        "playable"
+      ]
+    },
+    {
+      "path": "data/generated/ability_coverage/ability_coverage_rows.json",
+      "input_fact": "per-ability consumers and stages",
+      "retired_as_authority_for": [
+        "layer_a_current",
+        "L5"
+      ]
+    },
+    {
+      "path": "data/generated/ability_coverage/runtime_content_semantic_coverage.json",
+      "input_fact": "module and execution classification",
+      "retired_as_authority_for": [
+        "entity_ladder",
+        "freshness"
+      ]
+    },
+    {
+      "path": "data/source_manifests/faction_pack_datasheet_review_v1.json",
+      "input_fact": "reviewed official PDF scope",
+      "retired_as_authority_for": [
+        "execution",
+        "certification"
+      ]
+    }
+  ],
+  "additional_input_stream": "faction_coverage_2026_27.coverage_rows()",
+  "manifest_upper_bounds": {
+    "LOADABLE": "L1_current",
+    "MUSTERABLE": "L6_current",
+    "PHYSICALLY_PLAYABLE": "L3_satisfied_and_L6_current",
+    "SEMANTICALLY_EXECUTABLE": "L5_current",
+    "FULL_GAME_SUPPORTED": "L7_current",
+    "REPLAY_VERIFIED": "L7_current_plus_this_build_replay_evidence",
+    "DISPLAYABLE": "phase_17o_owned",
+    "NETWORK_SAFE": "phase_17o_owned"
+  },
+  "attained_level_caps": {
+    "layer_a_stale_or_none_when_l4_claimed": "L3_or_L2_if_geometry_not_applicable",
+    "layer_b_stale": "L5",
+    "layer_c_stale": "L6"
+  },
+  "acceptance_fixtures": [
+    "staging_observation_is_not_an_entity_row_or_l0_count",
+    "eldrad_points_requires_review_record_before_layer_a_or_c_current",
+    "bannernob_points_cannot_write_layer_a_equivalence",
+    "acts_of_faith_envelope_caps_at_l3",
+    "guide_cannot_assert_current_while_stale",
+    "historical_playable_must_not_write_l7",
+    "orks_fm0_5_first_certified_remains_null",
+    "packaged_previous_version_without_u7a_is_exact_build_only",
+    "display_label_does_not_change_row_or_review_id",
+    "manifest_must_not_exceed_stale_or_absent_q1_claim",
+    "ghazghkull_union_keeps_layer_a_stale_after_composition_work",
+    "faction_rewrite_does_not_delete_entity_rows",
+    "status_claim_without_equivalent_review_is_rejected",
+    "structural_add_without_catalog_id_is_not_an_admitted_row"
+  ],
+  "mapping_samples": [
+    {
+      "label": "Eldrad points",
+      "catalog_id": "000000568",
+      "content_set_version": "946",
+      "impact_class": "points_only",
+      "allows_review_record": true,
+      "layer_a": "current_only_with_review",
+      "layer_b": "stale_until_roster_validation",
+      "layer_c": "stale_until_reattest",
+      "coverage_artifact_catalog_id_is_not_authority": "chaos-daemons-bridge-catalog",
+      "emitted_here": false
+    },
+    {
+      "label": "Bannernob",
+      "layers_stale": [
+        "A",
+        "B",
+        "C"
+      ],
+      "points_packet_forbids_reviews": [
+        "layer_a_equivalence"
+      ],
+      "emitted_here": false
+    },
+    {
+      "label": "Ghazghkull Thraka",
+      "layers_stale": [
+        "A",
+        "B",
+        "C"
+      ],
+      "note": "Composition work does not clear unclassified Layer A",
+      "emitted_here": false
+    },
+    {
+      "label": "Acts of Faith trigger",
+      "impact_class": "clause_envelope_changed",
+      "field_path": "clause.timing",
+      "attained_level_cap": "L3",
+      "finding_id": "F-ARMY-01",
+      "emitted_here": false
+    },
+    {
+      "label": "Brute Bosses",
+      "collection": "staging_observations",
+      "blocker": "blocked_provenance",
+      "emitted_here": false
+    },
+    {
+      "label": "More Dakka at 946",
+      "freshness": "retired",
+      "emitted_here": false
+    },
+    {
+      "label": "Orks faction index FM0.5",
+      "first_certified_at_content_set": null,
+      "emitted_here": false
+    },
+    {
+      "label": "Autarch overall Playable",
+      "valid_as_q1_l7": false,
+      "reason": "historical component label is not L7"
+    }
+  ],
+  "holds": [
+    {
+      "id": "Q1 generator",
+      "hold": "Actual emission and loader",
+      "unblocks": "FM0 Q1"
+    },
+    {
+      "id": "U4 invalidation",
+      "hold": "Engine writer of demotion",
+      "unblocks": "FM0 U4"
+    },
+    {
+      "id": "Owner D3 / U7a",
+      "hold": "Packaging N-1 and the compatibility record",
+      "unblocks": "certified coverage and previous-version rows as loadable content"
+    },
+    {
+      "id": "D1 / Q6",
+      "hold": "Generated guides and freshness CI",
+      "unblocks": "F-DOC-01 implementation"
+    }
+  ],
+  "not_in_this_pr": [
+    "src/ status generator or loader",
+    "live content_status artifact",
+    "guide or audit rewrites",
+    "ADAPTER_DECISION_CONTRACT.md edits",
+    "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
+    "capability-manifest.schema.json edits",
+    "U7 U7a retention",
+    "U8 runbook",
+    "catalog.json rewrites",
+    "F00 policy amendment"
+  ],
+  "reconciliation": {
+    "collection_count": 5,
+    "review_kind_count": 5,
+    "open_blocker_count": 9,
+    "coverage_input_count": 4,
+    "acceptance_fixture_count": 14,
+    "mapping_sample_count": 8,
+    "note": "One generated artifact is the only publishable denominator. Staging is not L0. Historical Playable is not L7. first_certified_at_content_set does not package the previous version. U7a remains the replay mechanism."
+  }
+}

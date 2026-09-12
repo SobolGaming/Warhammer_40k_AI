@@ -11,6 +11,7 @@
   "does_not_emit_packets": true,
   "does_not_implement_generator": true,
   "does_not_change_catalog_ids": true,
+  "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
   "owner_d3_retention_is_not_this_document": true,
   "snapshot": {
     "observed_on": "2026-09-05",
@@ -532,7 +533,7 @@
     {
       "id": "Q1 schema",
       "hold": "Where status_claim and review records persist",
-      "unblocks": "next remaining design after this schema, or with U4 implementation"
+      "unblocks": "docs/factions/status/Q1_STATUS_ARTIFACT.md; generator remains FM0"
     },
     {
       "id": "Live agent contract",
@@ -545,7 +546,7 @@
     "emitted packets",
     "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
     "ADAPTER_DECISION_CONTRACT.md edits",
-    "Q1 status artifact",
+    "live Q1 content_status artifact",
     "U7 U7a retention",
     "U8 runbook",
     "catalog.json rewrites",
