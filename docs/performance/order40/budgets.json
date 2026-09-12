@@ -1,0 +1,7 @@
+{
+  "workload_id": "order40-smokescreen-cover-v1",
+  "samples_per_case": 7,
+  "mean_base_multiplier": 1.5,
+  "mean_additive_seconds": 0.01,
+  "maximum_seconds": 0.02
+}

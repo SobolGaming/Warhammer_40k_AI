@@ -6699,7 +6699,7 @@
       "battle_shock_hook_ids": [
         "catalog-ir:selected-target-test-roll-modifier"
       ],
-      "bundle_summary_hash": "c2523efe7464b130f155b0da150e89cf51d7bf18f4c9002db48ab498baaa97c7",
+      "bundle_summary_hash": "a1d9ba89bdd8db5e86d0bfb2103d2915ee5843c2c7b6f3d323aae3362c76aff3",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -6737,7 +6737,9 @@
       "selected_execution_record_ids": [],
       "selected_module_paths": [],
       "shooting_end_surge_hook_ids": [],
-      "shooting_phase_start_hook_ids": [],
+      "shooting_phase_start_hook_ids": [
+        "core-rules:shooting-start-stratagems"
+      ],
       "shooting_target_restriction_hook_ids": [
         "generic_rule_ir:persisted-shooting-target-range-restriction"
       ],

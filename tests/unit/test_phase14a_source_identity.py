@@ -1351,7 +1351,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 24
+    assert len(scope.source_packages) == 25
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 

@@ -491,7 +491,9 @@ def _record_generic_smokescreen_target_restriction_effect(
     rule_result: RuleExecutionResult,
     effect_payload: dict[str, JsonValue],
 ) -> None:
-    from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
+    from warhammer40k_core.engine.core_stratagem_effects import (
+        SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
+    )
 
     unit_id = _single_target_unit_id(use_record)
     effect = PersistingEffect(
@@ -507,7 +509,7 @@ def _record_generic_smokescreen_target_restriction_effect(
             use_record=use_record,
         ),
         effect_payload={
-            "effect_kind": SMOKESCREEN_EFFECT_KIND,
+            "effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
             "source_effect_kind": _required_rule_effect_string_parameter(
                 effect_payload,
                 "source_effect_kind",

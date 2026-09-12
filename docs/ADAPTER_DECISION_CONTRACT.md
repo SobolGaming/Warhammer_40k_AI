@@ -2131,7 +2131,7 @@ Defender shooting decisions include:
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
 - finite optional destruction-reaction choices when a destroyed model has registered optional shoot-on-death, fight-on-death, or equivalent destruction sources;
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
-- shooting-coupled reactive Stratagem choices such as Smokescreen through the existing `use_stratagem` or Stratagem target-proposal contract.
+- shooting-coupled reactive Stratagem choices through the existing `use_stratagem` or Stratagem target-proposal contract.
 
 For a model destroyed by an attack, registered destruction reactions use the shared
 `05.04.04 Destroyed` end-of-attacks boundary. Logical death records zero wounds
@@ -2457,7 +2457,7 @@ Shooting decision records, attack-resolution events, line-of-sight witnesses, co
 
 Phase 13D supports these shooting-coupled Core Stratagem target proposals:
 
-- `core:smokescreen`: opponent Shooting phase `after_unit_selected_as_target` proposal for a friendly `SMOKE` unit listed in `trigger_payload.selected_target_unit_instance_ids`. Accepted use grants Benefit of Cover and the structured hit-roll modifier effect that expires at the active shooting player's end-of-phase boundary.
+- Smokescreen uses stable source `gw-11e-core-stratagems:core:smokescreen` and `generic:rule-ir` execution. At the opponent Shooting phase start, `use_stratagem` enumerates friendly SMOKE rules units through `friendly_smoke_unit`. Accepted use grants Cover to that rules unit and to attack targets whose incomplete visibility is caused by its present models. Cover expires at the active shooting player's phase end and does not modify Hit rolls.
 - `core:explosives`: active-player Shooting phase proposal for a friendly `GRENADES` unit plus `trigger_payload.enemy_target_unit_instance_id`. Submissions are rejected before queue pop and CP spend if the source unit Advanced, Fell Back, already shot, is within Engagement Range, or if the enemy target is friendly, unknown, engaged with friendly units, not visible, or not within 8". Accepted use records both the friendly `GRENADES` unit and the enemy target in `StratagemUseRecord.affected_unit_instance_ids`, canonicalizing attached-unit components to their attached-unit rules identity, and emits `explosives_resolved` with `explosives_unit_instance_id`, `target_unit_instance_id`, deterministic roll state, mortal-wound count, and any routed mortal-wound application.
 - `core:fire-overwatch`: opponent Movement phase `end_phase` proposal emitted from the End of Opponent's Movement phase reaction window for one friendly non-`TITANIC` unit that is unengaged, within 24" of a triggering enemy unit, and would be eligible to shoot if it were that player's Shooting phase. The triggering enemy unit must have been set up or started/ended a Normal Move, Advance, or Fall Back during that Movement phase. The trigger payload identifies that enemy unit with `moved_unit_instance_id`, uses `trigger_window: "end_opponent_movement_phase"`, and includes the eligible trigger classes under `eligible_trigger_kinds`. Target-proposal validation rejects out-of-range friendly units, engaged friendly units, `TITANIC` friendly units, shooting-ineligible friendly units, and friendly units without a legal constrained declaration before CP spend or Stratagem-use recording. Accepted use spends CP, records the Stratagem use, creates an out-of-phase shooting state with the parent phase and trigger payload, and emits a `submit_shooting_declaration` proposal whose legal targets are constrained to the triggering enemy unit. The resulting attack pools carry `core:fire-overwatch`; non-automatic hit rolls default to succeeding only on unmodified 6s regardless of BS or modifiers, while Torrent weapons still auto-hit. Source-backed generic RuleIR can lower that unmodified hit-success threshold through an engine-owned `minimum_unmodified_hit_success` contextual status; emitted hit-roll payloads set `unmodified_success_threshold_active: true` when that threshold itself scores a hit, and adapters must read both that flag and `minimum_unmodified_success` instead of applying local Fire Overwatch exceptions. Declaration and attack-sequence decisions are submitted through `GameLifecycle.submit_decision(...)`, and the Phase 12A reaction frame resumes only after the out-of-phase shooting state completes. Phase 14B emits Fire Overwatch before Rapid Ingress when both are available in the same End of Opponent's Movement phase window.
 
@@ -2474,7 +2474,7 @@ Required Phase 13 adapter-contract tests:
 - defender allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, current-group damage-model choice through finite decisions, wounded-model forced choice inside current groups, pooled save sorting, grouped failed-save transition to the next ordered group, pool-of-one convergence through the grouped resolver, and ordered InSv-then-armour Save resolution with no save-kind adapter choice;
 - Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, grouped priority-group promotion, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
-- Smokescreen, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
+- Fire Overwatch and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
 - replay/payload round-trip with no Python object reprs or memory addresses;
 - viewer-scoped projection/event redaction for any hidden target, allocation, defensive ability, or reaction-window information.
 
@@ -5555,3 +5555,30 @@ schemas and visibility classes suffice; no contract-version change is required.
 Both viewers use the shared public projection and event redaction path. Adapters
 must submit the pending engine choices and must not calculate or apply Stealth
 or Cover themselves. Persistence and replay remain exact-runtime-bound.
+
+
+## Order 40 — source-owned Smokescreen timing and Cover
+
+The engine offers the existing finite `use_stratagem` family during owner-tiered
+Shooting-start sequencing, before ShootingPhaseState opens. Each option is an
+engine-enumerated canonical friendly SMOKE rules unit; the existing decline option
+closes that occurrence. Adapters submit `FiniteOptionSubmission`, never a target
+proposal or an invented option ID. The catalog record and stable source rule ID
+are unchanged; the named `core:smokescreen` executor and old selected-target
+proposal have been retired. No compatibility alias is retained.
+
+The existing finite payload, timing participant, CP cost, source validation and
+record contracts cover this option family. Target/keyword/CP changes are rejected
+before consuming the pending decision. A generic RuleIR grant owns persistence
+and active-player phase-end expiry. Physical source models, including attached
+and retained models, participate through shared causal visibility. Cover remains
+a single Ballistic Skill consequence, suppressed by Ignores Cover and Cover
+denial; it never becomes an additional Hit modifier. Skill-source commitments
+include effect and causal-geometry fingerprints, so same-total source replacement
+cannot consume a pending Psychic selection.
+
+Selections, CP use and normal effect/attack events retain their existing public
+viewer scope. Geometry commitments are opaque hashes, not a new public battlefield
+projection. This changes catalog values and the chosen existing finite interaction;
+no JSON schema or envelope changes are necessary. Runtime identity and contract
+examples are regenerated and checked against the PR base.

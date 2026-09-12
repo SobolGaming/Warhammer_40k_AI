@@ -1,0 +1,257 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "dice_calls": 0,
+  "file_hashes": {
+    "scripts/measure_smokescreen_cover.py": "8415d724b6efe2bf6452eaad09ad0d6c2c4185342b8f9cff0f541e05dce29ee9",
+    "src/warhammer40k_core/_engine_build_manifest.json": "f4aae2e62c3311c4e0f015c671d057529c93215174699867234825e741ac90bc",
+    "tests/generic_modifier_helpers.py": "03e2c0fc9376229b6ba2cd399a2de3d0f62a520e2ebedaaa66876ef6bcd2e2dd",
+    "tests/phase13b_shooting_declaration_helpers.py": "6d8d4ec8f51b4e96e485a23b993168b8f2ace7c269959658466ebf9d73f10839",
+    "tests/smokescreen_helpers.py": "1f3f9d145c3ddcc93359a412e4a393e046aff8ca4da15dc529851b2e882855f8",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 3,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "case": "plain",
+      "query_seconds": 0.00022520419443026186,
+      "sample": 0,
+      "setup_seconds": 1.534636833006516,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 4.693750524893403e-05,
+      "sample": 1,
+      "setup_seconds": 0.00599729095119983,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 4.749170038849115e-05,
+      "sample": 2,
+      "setup_seconds": 0.005555916926823556,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 4.902500659227371e-05,
+      "sample": 3,
+      "setup_seconds": 0.005683167022652924,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 4.8212497495114805e-05,
+      "sample": 4,
+      "setup_seconds": 0.005626917001791298,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 4.6912499237805604e-05,
+      "sample": 5,
+      "setup_seconds": 0.005638916045427322,
+      "snapshot_count": 0
+    },
+    {
+      "case": "plain",
+      "query_seconds": 4.6116695739328864e-05,
+      "sample": 6,
+      "setup_seconds": 0.005585207953117788,
+      "snapshot_count": 0
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00020988750038668512,
+      "sample": 0,
+      "setup_seconds": 0.005695958039723337,
+      "snapshot_count": 1
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00020064170239493252,
+      "sample": 1,
+      "setup_seconds": 0.006414999952539802,
+      "snapshot_count": 1
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00021408339962363242,
+      "sample": 2,
+      "setup_seconds": 0.005532040959224105,
+      "snapshot_count": 1
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00020520410034805537,
+      "sample": 3,
+      "setup_seconds": 0.005694833933375776,
+      "snapshot_count": 1
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00020487920846790075,
+      "sample": 4,
+      "setup_seconds": 0.005541207967326045,
+      "snapshot_count": 1
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00020355000160634517,
+      "sample": 5,
+      "setup_seconds": 0.0054749579867348075,
+      "snapshot_count": 1
+    },
+    {
+      "case": "direct",
+      "query_seconds": 0.00020737500162795186,
+      "sample": 6,
+      "setup_seconds": 0.005545041989535093,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.00212034999858588,
+      "sample": 0,
+      "setup_seconds": 0.005658666021190584,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.0018977041938342154,
+      "sample": 1,
+      "setup_seconds": 0.005624750046990812,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.0018807833082973957,
+      "sample": 2,
+      "setup_seconds": 0.00550645892508328,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.0018655958003364504,
+      "sample": 3,
+      "setup_seconds": 0.005599583964794874,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.001858733396511525,
+      "sample": 4,
+      "setup_seconds": 0.005558541044592857,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.0018621250055730343,
+      "sample": 5,
+      "setup_seconds": 0.005625916994176805,
+      "snapshot_count": 1
+    },
+    {
+      "case": "obscured",
+      "query_seconds": 0.0018702499917708337,
+      "sample": 6,
+      "setup_seconds": 0.006435750052332878,
+      "snapshot_count": 1
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.0004518833942711353,
+      "sample": 0,
+      "setup_seconds": 0.005548208020627499,
+      "snapshot_count": 0
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.0004461792064830661,
+      "sample": 1,
+      "setup_seconds": 0.005542875034734607,
+      "snapshot_count": 0
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.0004374208045192063,
+      "sample": 2,
+      "setup_seconds": 0.005639249924570322,
+      "snapshot_count": 0
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.0004471624968573451,
+      "sample": 3,
+      "setup_seconds": 0.005554083036258817,
+      "snapshot_count": 0
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.00044721669983118775,
+      "sample": 4,
+      "setup_seconds": 0.005594167043454945,
+      "snapshot_count": 0
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.00044090419542044403,
+      "sample": 5,
+      "setup_seconds": 0.005536791984923184,
+      "snapshot_count": 0
+    },
+    {
+      "case": "clear",
+      "query_seconds": 0.00043665419798344374,
+      "sample": 6,
+      "setup_seconds": 0.005466124974191189,
+      "snapshot_count": 0
+    }
+  ],
+  "summaries": {
+    "clear": {
+      "completion_rate": 1.0,
+      "max": 0.0004518833942711353,
+      "mean": 0.0004439172850522612,
+      "median": 0.0004461792064830661,
+      "p95": 0.0004518833942711353,
+      "queries_per_second": 2252.671913602717,
+      "samples": 7
+    },
+    "direct": {
+      "completion_rate": 1.0,
+      "max": 0.00021408339962363242,
+      "mean": 0.00020651727349364332,
+      "median": 0.00020520410034805537,
+      "p95": 0.00021408339962363242,
+      "queries_per_second": 4842.209966667899,
+      "samples": 7
+    },
+    "obscured": {
+      "completion_rate": 1.0,
+      "max": 0.00212034999858588,
+      "mean": 0.0019079345278441907,
+      "median": 0.0018702499917708337,
+      "p95": 0.00212034999858588,
+      "queries_per_second": 524.1269998556595,
+      "samples": 7
+    },
+    "plain": {
+      "completion_rate": 1.0,
+      "max": 0.00022520419443026186,
+      "mean": 7.284287130460143e-05,
+      "median": 4.749170038849115e-05,
+      "p95": 0.00022520419443026186,
+      "queries_per_second": 13728.179327505872,
+      "samples": 7
+    }
+  },
+  "terrain_count": 0,
+  "timing_boundary": "10 attack_modifier_snapshots queries per sample; setup separate",
+  "workload_id": "order40-smokescreen-cover-v1"
+}

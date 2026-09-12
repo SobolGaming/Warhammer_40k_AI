@@ -1749,15 +1749,18 @@ class RuntimeContentBundle:
                 catalog_rules.failed_save_damage_replacement_bindings()
             ),
         )
-        from warhammer40k_core.engine.movement_phase_end_sequencing import with_movement_end_rules
+        from warhammer40k_core.engine.stratagem_boundary_registries import (
+            with_stratagem_boundary_rules,
+        )
 
         stratagem_indexes = _catalog_indexes.stratagem_indexes_by_player_id(
             armies=validated_armies,
             catalog=catalog,
             records=stratagem_records,
         )
-        turn_end_hook_registry = with_movement_end_rules(
+        turn_end_hook_registry, shooting_phase_start_hook_registry = with_stratagem_boundary_rules(
             turn_end_hook_registry,
+            shooting_phase_start_hook_registry,
             abilities=ability_indexes_by_player_id,
             stratagems=stratagem_indexes,
             costs=stratagem_cost_modifier_registry,

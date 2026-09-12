@@ -114,6 +114,8 @@ def _save_options_for_allocation(
     allocated_model_id: str,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[SaveOption, ...]:
+    from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_sources
+
     pool = attack_sequence.current_pool()
     cover_result = _cover_for_allocated_model(
         state=state,
@@ -138,6 +140,13 @@ def _save_options_for_allocation(
             current_cover_result=cover_result,
             source_rule_id=GO_TO_GROUND_EFFECT_KIND,
             los_cache_key=f"{attack_context['attack_context_id']}:effect-cover",
+        )
+    elif obscuring_model_cover_sources(state=state, pool=pool) is not None:
+        cover_result = _cover_result_with_effect_source(
+            ruleset_descriptor=ruleset_descriptor,
+            current_cover_result=cover_result,
+            source_rule_id="generic:cover_from_obscuring_models",
+            los_cache_key=f"{attack_context['attack_context_id']}:obscuring-model-cover",
         )
     elif INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
         cover_result = _cover_result_with_effect_source(

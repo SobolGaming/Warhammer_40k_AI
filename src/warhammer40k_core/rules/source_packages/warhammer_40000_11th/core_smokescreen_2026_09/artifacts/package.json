@@ -1,0 +1,148 @@
+{
+  "artifact_schema": "core-v2-core-smokescreen-source-v1",
+  "source_package_id": "gw-11e-core-smokescreen",
+  "source_version": "maintained-app-mirrors-observed-2026-09-12",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-stratagems:core:smokescreen",
+      "section_id": "15.10",
+      "source_text": "WHEN: Start of your opponent’s Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+      "transcription_sha256": "982800bbc28dae25715347aacbec4dd865440383fa26a5d8f7cf0fce880baf6a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.obscuring_model_cover:obscuring_model_cover_sources",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-stratagems:core:smokescreen",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "982800bbc28dae25715347aacbec4dd865440383fa26a5d8f7cf0fce880baf6a",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "db2ed22d96b3e2b711acbe0e69f54365e9813c474094714c6939c346d249289a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.obscuring_model_cover:obscuring_model_cover_sources",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+      ],
+      "evidence_id": "core-smokescreen-review:smokescreen",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P15A 15.10 smokescreen",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-stratagems:core:smokescreen",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "982800bbc28dae25715347aacbec4dd865440383fa26a5d8f7cf0fce880baf6a",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "c00ea3418f646c2f30056ce7696ac2de5161afe72359c92488d7b466fffe710b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.obscuring_model_cover:obscuring_model_cover_sources",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+      ],
+      "evidence_id": "core-smokescreen-mirror:smokescreen:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-smokescreen-maintained-app-mirrors-2026-09-12",
+      "review_audit_row_id": "smokescreen:40k-app",
+      "review_audit_source_observation_sha256": "d1197fb81ad3ad6288763e46708f391370b2cda8ac58f1b962321257fa84c6f3",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 15.10 smokescreen",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/15-stratagems",
+      "observed_at": "2026-09-12T11:17:25Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "82c82d6344cf717e2df6d9348b0232d325b3e975c73cdb3fc5028bc538220e97",
+  "execution_payload": {
+    "rule_ir": {
+      "rule_id": "gw-11e-core-stratagems:core:smokescreen:rule",
+      "source_id": "gw-11e-core-stratagems:core:smokescreen",
+      "normalized_text": "WHEN: Start of your opponent's Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+      "parser_version": "reviewed-core-smokescreen-v1",
+      "schema_version": "phase17c-rule-ir-v1",
+      "clauses": [
+        {
+          "clause_id": "gw-11e-core-stratagems:core:smokescreen:cover",
+          "template_id": null,
+          "source_span": {
+            "text": "WHEN: Start of your opponent's Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+            "start": 0,
+            "end": 341
+          },
+          "trigger": null,
+          "conditions": [],
+          "target": {
+            "kind": "this_unit",
+            "source_span": {
+              "text": "WHEN: Start of your opponent's Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+              "start": 0,
+              "end": 341
+            },
+            "parameters": []
+          },
+          "effects": [
+            {
+              "kind": "grant_ability",
+              "source_span": {
+                "text": "WHEN: Start of your opponent's Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+                "start": 0,
+                "end": 341
+              },
+              "parameters": [
+                {
+                  "key": "ability",
+                  "value": "cover_from_obscuring_models"
+                }
+              ]
+            }
+          ],
+          "duration": {
+            "kind": "until_timing_endpoint",
+            "source_span": {
+              "text": "WHEN: Start of your opponent's Shooting phase. TARGET: One friendly SMOKE unit. EFFECT: Until the end of the phase, each time an attack targets either your SMOKE unit, or a unit that is not fully visible to the attacking model because of one or more models in your SMOKE unit, the target has the benefit of cover against that attack (13.08).",
+              "start": 0,
+              "end": 341
+            },
+            "parameters": [
+              {
+                "key": "endpoint",
+                "value": "phase"
+              }
+            ]
+          },
+          "unsupported_reason": null,
+          "diagnostics": []
+        }
+      ],
+      "diagnostics": [],
+      "ir_hash": "cad83dbb6097bf73df4cd1baf21e9867e623eb02a69cdc68a084644d5a10b713"
+    },
+    "requires_opponent_turn": true
+  }
+}

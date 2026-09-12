@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 40 moves Smokescreen to opponent Shooting-start sequencing and grants Cover
+through its selected rules unit and obscuring models, without a Hit-roll penalty.
+It uses generic RuleIR, shared causal visibility and the existing finite Stratagem
+contract. See [scope and validation](docs/ORDER_40_SCOPE_PLAN.md). Verify its reviewed
+source with `uv run python tools/build_core_smokescreen_source.py --check`.
+
 Order 39 makes Stealth grant Benefit of Cover only when every present model in
 the target rules unit has the ability. Native, attached, Aura, selected-target
 and Darkness grants share one source-aware engine query. See the

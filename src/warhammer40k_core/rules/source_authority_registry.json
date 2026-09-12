@@ -620,6 +620,16 @@
           "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-12T02:06:45Z"
+        },
+        {
+          "audit_id": "core-smokescreen-maintained-app-mirrors-2026-09-12",
+          "row_id": "smokescreen:40k-app",
+          "source_observation_sha256": "d1197fb81ad3ad6288763e46708f391370b2cda8ac58f1b962321257fa84c6f3",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/15-stratagems",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-12T11:17:25Z"
         }
       ],
       "legacy_observations": [
@@ -1058,6 +1068,15 @@
             "gw-11e-core-stealth:stealth"
           ],
           "catalog_sha256": "5f0bc9b93f64d7b3a39bed442c3fc54b81350e419f5d14d459b07134fd1cfe55"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-smokescreen",
+          "version": "maintained-app-mirrors-observed-2026-09-12",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-stratagems:core:smokescreen"
+          ],
+          "catalog_sha256": "f5b55c15d38956fa0662bcaf7ad0ef40414440e330f61b86c75cd1d9ff745c62"
         }
       ]
     },

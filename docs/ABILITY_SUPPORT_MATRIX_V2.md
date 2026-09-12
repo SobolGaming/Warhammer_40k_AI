@@ -130,7 +130,8 @@ Core Stratagem rows are source-backed and route through the shared Stratagem con
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Command Re-roll, Insane Bravery, New Orders, Rapid Ingress | Named handlers | Adapter contract and architecture | Focused decision/CP/replay tests | Full | Core Command/Movement Stratagem slice. |
-| Fire Overwatch, Smokescreen, Explosives | Named handlers | Adapter contract and architecture | Focused Shooting and reaction-window tests | Full | Shooting-coupled Core Stratagem slice. |
+| Smokescreen | Source-backed generic RuleIR and shared model-obscuration Cover query | Order 40 source package, adapter contract and scope record | Phase-start facade, geometry, source-drift, expiry and replay regressions | Full | Start of opponent Shooting phase; Cover for the selected SMOKE rules unit and targets obscured by its present models. No Hit-roll penalty. |
+| Fire Overwatch, Explosives | Named handlers | Adapter contract and architecture | Focused Shooting and reaction-window tests | Full | Shooting-coupled Core Stratagem slice. |
 | Heroic Intervention, Counteroffensive, Crushing Impact, Epic Challenge | Named handlers | Adapter contract and architecture | Focused Charge/Fight Stratagem tests | Full | Charge/Fight Core Stratagem slice. |
 
 ## Faction Army Rules
@@ -417,7 +418,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `core:insane-bravery` | Insane Bravery |
 | `core:new-orders` | New Orders |
 | `core:rapid-ingress` | Rapid Ingress |
-| `core:smokescreen` | Smokescreen |
 | `core:stealth` | Stealth |
 | `descriptor:army-mustering:leader-attachment` | Leader |
 | `descriptor:destruction-reaction:deadly-demise-resolution` | Deadly Demise |
@@ -430,7 +430,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:prebattle:scouts` | Scouts |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `descriptor:shooting-target:lone-operative` | Lone Operative |
-| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>Fluxmaster<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>One Head Looks Back<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
+| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>Fluxmaster<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>One Head Looks Back<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Smokescreen<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |

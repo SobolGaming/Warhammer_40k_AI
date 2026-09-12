@@ -80,14 +80,12 @@ from warhammer40k_core.engine.charge_required_targets import (
     required_charge_target_unit_instance_ids,
 )
 from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
-from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
-    PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import (
@@ -975,26 +973,10 @@ def test_phase17k_datasheet_post_shoot_cover_denial_suppresses_save_cover() -> N
     assert denial_payload["benefit_of_cover_denied"] is True
     assert denial_payload["rule_ir_hash"] == rule_ir.ir_hash()
 
+    from tests.smokescreen_helpers import smoke_grant
+
     state.record_persisting_effect(
-        PersistingEffect(
-            effect_id="phase17k-target-cover-grant",
-            source_rule_id=SMOKESCREEN_EFFECT_KIND,
-            owner_player_id=enemy_army.player_id,
-            target_unit_instance_ids=(target_unit.unit_instance_id,),
-            started_battle_round=state.battle_round,
-            started_phase=BattlePhase.SHOOTING,
-            expiration=EffectExpiration.end_phase(
-                battle_round=state.battle_round,
-                phase=BattlePhase.SHOOTING,
-                player_id=army.player_id,
-            ),
-            effect_payload=validate_json_value(
-                {
-                    "effect_kind": SMOKESCREEN_EFFECT_KIND,
-                    "benefit_of_cover": True,
-                }
-            ),
-        )
+        replace(smoke_grant(target_unit.unit_instance_id), owner_player_id=enemy_army.player_id)
     )
     weapon_profile = replace(
         completed_sequence.attack_pools[0].weapon_profile,

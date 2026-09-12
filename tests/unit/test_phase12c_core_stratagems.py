@@ -177,7 +177,6 @@ from warhammer40k_core.engine.stratagems import (
     JUST_SHOT_UNIT_TARGET_POLICY_ID,
     NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID,
     NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID,
-    SELECTED_TARGET_UNIT_CONTEXT_KEY,
     SELECTED_TO_FIGHT_CHARGED_TARGET_POLICY_ID,
     SELECTED_TO_FIGHT_TARGET_POLICY_ID,
     SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY,
@@ -3868,68 +3867,6 @@ def test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons() ->
     assert {weapon["weapon_profile_id"] for weapon in available_weapons} == {
         assault_profile.profile_id
     }
-
-
-def test_phase13d_smokescreen_registers_defensive_effects() -> None:
-    smoke_lifecycle = _battle_lifecycle(active_player_id="player-b")
-    smoke_state = _state(smoke_lifecycle)
-    _set_current_battle_phase(smoke_state, BattlePhase.SHOOTING)
-    _replace_unit_keywords(
-        smoke_state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("Infantry", "Battleline", "Smoke"),
-    )
-    _grant_cp(smoke_state, player_id="player-a", amount=1)
-
-    smoke_status = _submit_source_stratagem_target(
-        smoke_lifecycle,
-        stratagem_id="smokescreen",
-        player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
-        result_id="phase13d-smokescreen",
-        trigger_payload={
-            SELECTED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
-        },
-    )
-
-    smoke_event = _last_event_payload(
-        smoke_lifecycle.decision_controller,
-        "smokescreen_effect_registered",
-    )
-    smoke_effect = cast(
-        dict[str, JsonValue],
-        cast(dict[str, JsonValue], smoke_event["persisting_effect"])["effect_payload"],
-    )
-    smoke_persisting_effect = cast(dict[str, JsonValue], smoke_event["persisting_effect"])
-    smoke_expiration = cast(dict[str, JsonValue], smoke_persisting_effect["expiration"])
-    assert smoke_status.status_kind is not LifecycleStatusKind.INVALID
-    assert smoke_state.stratagem_use_records[-1].command_point_cost == 1
-    assert smoke_state.stratagem_use_records[-1].command_point_transaction_id is not None
-    assert smoke_effect["effect_kind"] == "core_stratagem:smokescreen"
-    assert smoke_effect["benefit_of_cover"] is True
-    assert smoke_effect["hit_roll_modifier"] == -1
-    assert smoke_expiration["player_id"] == "player-b"
-
-    invalid_lifecycle = _battle_lifecycle(active_player_id="player-b")
-    invalid_state = _state(invalid_lifecycle)
-    _set_current_battle_phase(invalid_state, BattlePhase.SHOOTING)
-    _grant_cp(invalid_state, player_id="player-a", amount=1)
-
-    invalid_status = _submit_source_stratagem_target(
-        invalid_lifecycle,
-        stratagem_id="smokescreen",
-        player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
-        result_id="phase13d-smokescreen-wrong-target",
-        trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: ["army-beta:enemy-unit"]},
-    )
-
-    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
-    assert invalid_status.payload == {"invalid_reason": "unit_not_selected_as_target"}
-    assert invalid_state.command_point_total("player-a") == 1
-    assert invalid_state.stratagem_use_records == []
 
 
 def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context() -> None:
