@@ -1,6 +1,6 @@
 # U2 / U3 / U4 — Classification system
 
-[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is Track U items U2 (diff grain), U3 (impact classes), and U4
 (layer demotion) as **FM-pre planning evidence**. It closes the classification
@@ -25,10 +25,11 @@ faction view. Lifting any of those over S2 `catalog_id` plus
 **FM0 implements the S4 tool, the classifier, and U4 invalidation.** It
 must not classify by display name, emit one class per page, treat a new
 transcription hash as a Layer A demotion, or carry Layer A forward without
-a recorded equivalence review. Packet *emission*, capture tooling, and
-retention remain later. The packet *schema* is delivered in
+a recorded equivalence review. Packet *emission* and capture tooling
+remain later. The packet *schema* is delivered in
 [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md). The Q1 *schema* is delivered in
-[Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md).
+[Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md). Retention
+*design* is delivered in [U7_RETENTION.md](U7_RETENTION.md).
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms used inside the semantic
 fingerprint. T4 still owns construction families this grain binds as
@@ -278,7 +279,9 @@ indexes them.
   delivered in [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md))
 - Status invalidation (U4 implementation). Q1 *schema* is delivered in
   [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md)
-- U1 capture, U5 tombstone loaders, U6 rewrite runbook, U7/U7a, U8, Q6
+- U1 capture, U5 tombstone loaders, U6 rewrite runbook, U8, Q6
+- U7 / U7a implementation (design delivered in
+  [U7_RETENTION.md](U7_RETENTION.md))
 - Orks 20/73 fixture reproduction
 - Catalog ID allocation for new Orks entities
 
