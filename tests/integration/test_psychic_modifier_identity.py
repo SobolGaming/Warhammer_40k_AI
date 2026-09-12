@@ -235,6 +235,7 @@ def test_order39_facade_stealth_cover_preserves_source_restore_and_replay(native
         (BattlePhase.FIGHT, "a-hit"),
         (BattlePhase.FIGHT, "c-skill"),
         (BattlePhase.SHOOTING, "stealth"),
+        (BattlePhase.SHOOTING, "cover_from_obscuring_models"),
     ],
 )
 def test_same_total_source_swap_is_rejected_before_pop(phase: BattlePhase, effect_id: str) -> None:
@@ -246,7 +247,7 @@ def test_same_total_source_swap_is_rejected_before_pop(phase: BattlePhase, effec
     session = psychic_session(phase)
     state = session.lifecycle.state
     assert state is not None
-    if effect_id == "stealth":
+    if effect_id in {"stealth", "cover_from_obscuring_models"}:
         state.record_persisting_effect(
             generic_effect(
                 effect_id=effect_id,
@@ -254,7 +255,7 @@ def test_same_total_source_swap_is_rejected_before_pop(phase: BattlePhase, effec
                 target_unit_instance_ids=("army-beta:enemy",),
                 target_kind="this_unit",
                 effect_kind="grant_ability",
-                parameters={"ability": "stealth"},
+                parameters={"ability": effect_id},
             )
         )
     request = reach_psychic_request(session)

@@ -24,7 +24,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
-from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
+from warhammer40k_core.engine.core_stratagem_effects import SHOOTING_TARGET_RESTRICTION_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationProgress,
@@ -495,7 +495,7 @@ def apply_cloak_and_shadow(context: StratagemHandlerContext) -> StratagemHandler
             player_id=_active_player_id(context),
         ),
         effect_payload={
-            "effect_kind": SMOKESCREEN_EFFECT_KIND,
+            "effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
             "source_effect_kind": CLOAK_AND_SHADOW_EFFECT_KIND,
             "stratagem_id": CLOAK_AND_SHADOW_STRATAGEM_ID,
             "stratagem_use_id": context.use_record.use_id,

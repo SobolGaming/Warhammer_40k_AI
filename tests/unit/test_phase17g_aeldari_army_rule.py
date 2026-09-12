@@ -1904,7 +1904,13 @@ def _aspect_shrine_lifecycle_override_request() -> tuple[GameLifecycle, Decision
     _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.SHOOTING)
     lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
 
-    unit_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    unit_request = _decision_request(
+        _decline_stratagem_window_if_present(
+            lifecycle,
+            lifecycle.advance_until_decision_or_terminal(),
+            result_id="aspect-token-decline-shooting-start-window",
+        )
+    )
     assert unit_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
     type_status = lifecycle.submit_decision(
         DecisionResult.for_request(

@@ -86,7 +86,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
-from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
+from warhammer40k_core.engine.core_stratagem_effects import SHOOTING_TARGET_RESTRICTION_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -765,7 +765,7 @@ def test_cloak_and_shadow_records_stealth_effect_and_blocks_distant_attacking_mo
     effect_payload = _json_object(
         state.persisting_effects_for_unit(_CORSAIR_UNIT_ID)[0].effect_payload
     )
-    assert effect_payload["effect_kind"] == SMOKESCREEN_EFFECT_KIND
+    assert effect_payload["effect_kind"] == SHOOTING_TARGET_RESTRICTION_EFFECT_KIND
     assert effect_payload["source_effect_kind"] == stratagems.CLOAK_AND_SHADOW_EFFECT_KIND
     restrictions = _corsair_runtime_bundle_for_state(
         state
@@ -1630,21 +1630,27 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
 
     _replace_first_persisting_effect_payload(
         state,
-        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": True},
+        {
+            "effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
+            "targeting_max_range_inches": True,
+        },
     )
     with pytest.raises(GameLifecycleError, match="max range must be numeric"):
         generic_persisted_shooting_target_range_restriction(restriction_context)
 
     _replace_first_persisting_effect_payload(
         state,
-        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": 0.0},
+        {"effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND, "targeting_max_range_inches": 0.0},
     )
     with pytest.raises(GameLifecycleError, match="max range must be positive"):
         generic_persisted_shooting_target_range_restriction(restriction_context)
 
     _replace_first_persisting_effect_payload(
         state,
-        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": 18.0},
+        {
+            "effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
+            "targeting_max_range_inches": 18.0,
+        },
     )
     restriction = generic_persisted_shooting_target_range_restriction(restriction_context)
     assert restriction is not None
@@ -1680,7 +1686,7 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
     _replace_first_persisting_effect_payload(
         state,
         {
-            "effect_kind": SMOKESCREEN_EFFECT_KIND,
+            "effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
             "targeting_max_range_inches": 18.0,
             "source_effect_kind": 1,
         },
@@ -1690,7 +1696,10 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
 
     _replace_first_persisting_effect_payload(
         state,
-        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": 18.0},
+        {
+            "effect_kind": SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
+            "targeting_max_range_inches": 18.0,
+        },
     )
     battlefield = state.battlefield_state
     assert battlefield is not None

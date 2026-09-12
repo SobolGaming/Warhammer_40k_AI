@@ -52,8 +52,6 @@ from warhammer40k_core.engine.command_points import (
 from warhammer40k_core.engine.core_stratagem_effects import (
     GO_TO_GROUND_EFFECT_KIND,
     GO_TO_GROUND_INVULNERABLE_SAVE,
-    SMOKESCREEN_EFFECT_KIND,
-    SMOKESCREEN_HIT_ROLL_MODIFIER,
 )
 from warhammer40k_core.engine.cult_ambush import reserve_state_is_cult_ambush
 from warhammer40k_core.engine.damage_allocation import (
@@ -250,8 +248,6 @@ __all__ = (
     "rules_unit_view_by_id",
     "RulesetDescriptor",
     "SELECT_FEEL_NO_PAIN_DECISION_TYPE",
-    "SMOKESCREEN_EFFECT_KIND",
-    "SMOKESCREEN_HIT_ROLL_MODIFIER",
     "SecondaryMissionCardMode",
     "SecondaryMissionCardState",
     "SecondaryMissionCardStatus",

@@ -6223,7 +6223,16 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Core Command/Movement Stratagem slice.",
                 ),
                 SupportSectionRow(
-                    "Fire Overwatch, Smokescreen, Explosives",
+                    "Smokescreen",
+                    "Source-backed generic RuleIR and shared model-obscuration Cover query",
+                    "Order 40 source package, adapter contract and scope record",
+                    "Phase-start facade, geometry, source-drift, expiry and replay regressions",
+                    "Full",
+                    "Start of opponent Shooting phase; Cover for the selected SMOKE rules unit "
+                    "and targets obscured by its present models. No Hit-roll penalty.",
+                ),
+                SupportSectionRow(
+                    "Fire Overwatch, Explosives",
                     "Named handlers",
                     "Adapter contract and architecture",
                     "Focused Shooting and reaction-window tests",

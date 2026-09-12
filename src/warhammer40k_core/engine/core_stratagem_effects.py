@@ -7,11 +7,10 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 GO_TO_GROUND_EFFECT_KIND = "core_stratagem:go_to_ground"
-SMOKESCREEN_EFFECT_KIND = "core_stratagem:smokescreen"
 FIRE_OVERWATCH_EFFECT_KIND = "core_stratagem:fire_overwatch"
 
 GO_TO_GROUND_INVULNERABLE_SAVE = 6
-SMOKESCREEN_HIT_ROLL_MODIFIER = -1
+SHOOTING_TARGET_RESTRICTION_EFFECT_KIND = "generic_stratagem:shooting_target_restriction"
 
 
 def effect_kind(effect: PersistingEffect) -> str:
@@ -42,10 +41,17 @@ def effect_payload_int(effect: PersistingEffect, key: str, default: int) -> int:
     return value
 
 
+def effect_payload_required_int(effect: PersistingEffect, key: str) -> int:
+    value = _effect_payload(effect).get(key)
+    if type(value) is not int:
+        raise GameLifecycleError(f"Stratagem effect payload {key} must be an int.")
+    return value
+
+
 def unit_effects_grant_benefit_of_cover(effects: tuple[PersistingEffect, ...]) -> bool:
     _validate_effect_tuple(effects)
     return any(
-        effect_kind(effect) in {GO_TO_GROUND_EFFECT_KIND, SMOKESCREEN_EFFECT_KIND}
+        effect_kind(effect) == GO_TO_GROUND_EFFECT_KIND
         and effect_payload_bool(effect, "benefit_of_cover")
         for effect in effects
     )
@@ -60,13 +66,9 @@ def unit_effect_hit_roll_modifier(effects: tuple[PersistingEffect, ...]) -> int:
     _validate_effect_tuple(effects)
     modifier = 0
     for effect in effects:
-        if effect_kind(effect) != SMOKESCREEN_EFFECT_KIND:
+        if effect_kind(effect) != SHOOTING_TARGET_RESTRICTION_EFFECT_KIND:
             continue
-        modifier += effect_payload_int(
-            effect,
-            "hit_roll_modifier",
-            SMOKESCREEN_HIT_ROLL_MODIFIER,
-        )
+        modifier += effect_payload_required_int(effect, "hit_roll_modifier")
     return modifier
 
 

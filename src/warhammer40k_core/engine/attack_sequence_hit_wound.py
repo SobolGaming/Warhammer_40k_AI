@@ -687,6 +687,10 @@ def _benefit_of_cover_ballistic_skill_penalty(
         is not None
     ):
         return 1
+    from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_sources
+
+    if obscuring_model_cover_sources(state=state, pool=pool) is not None:
+        return 1
     if BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
         return 1
     if INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:

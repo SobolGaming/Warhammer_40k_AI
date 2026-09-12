@@ -7,10 +7,9 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.engine.core_stratagem_effects import (
-    SMOKESCREEN_EFFECT_KIND,
-    SMOKESCREEN_HIT_ROLL_MODIFIER,
+    SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
     effect_kind,
-    effect_payload_int,
+    effect_payload_required_int,
     unit_effects_grant_benefit_of_cover,
 )
 from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
@@ -34,6 +33,7 @@ def attack_modifier_snapshots(
         _benefit_of_cover_ballistic_skill_penalty,
         _unit_instance_id_for_model,
     )
+    from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_sources
     from warhammer40k_core.engine.runtime_modifiers import HitRollModifierContext
     from warhammer40k_core.engine.shooting_targets import (
         BENEFIT_OF_COVER_RULE_ID,
@@ -74,6 +74,9 @@ def attack_modifier_snapshots(
                                                         (effect,)
                                                     )
                                                 ],
+                                                'obscuring_models': obscuring_model_cover_sources(
+                                                    state=state, pool=pool
+                                                ),
                                                 'stealth': rules_unit_stealth_sources(
                                                     state=state,
                                                     target_unit_instance_id=pool.target_unit_instance_id,
@@ -99,13 +102,11 @@ def attack_modifier_snapshots(
             RollModifier(
                 modifier_id=f"persisting:{effect.effect_id}:hit",
                 source_id=effect.source_rule_id,
-                operand=effect_payload_int(
-                    effect, "hit_roll_modifier", SMOKESCREEN_HIT_ROLL_MODIFIER
-                ),
+                operand=effect_payload_required_int(effect, "hit_roll_modifier"),
             ),
         )
         for effect in state.persisting_effects_for_unit(pool.target_unit_instance_id)
-        if effect_kind(effect) == SMOKESCREEN_EFFECT_KIND
+        if effect_kind(effect) == SHOOTING_TARGET_RESTRICTION_EFFECT_KIND
     )
     snapshots.extend(
         AttackModifierSnapshot("hit_roll", item)

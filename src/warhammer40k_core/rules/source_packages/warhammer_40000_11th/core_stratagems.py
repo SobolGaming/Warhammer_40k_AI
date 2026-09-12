@@ -5,6 +5,9 @@ import json
 from dataclasses import dataclass
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_smokescreen_2026_09 as smoke_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_stratagems_2026_08 as app_source,
 )
 
@@ -319,16 +322,17 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:smokescreen",
-            when_descriptor="opponent shooting phase after an enemy unit selects targets",
-            target_descriptor="one smoke unit from the player's army selected as a target",
-            effect_descriptor="the target unit gains stealth and benefit of cover",
+            when_descriptor="start of the opponent Shooting phase",
+            target_descriptor="one friendly SMOKE rules unit",
+            effect_descriptor=smoke_source.source_rules()[0].source_text,
             restrictions_descriptor="matched play same stratagem per phase",
-            trigger_kind="after_unit_selected_as_target",
+            trigger_kind="start_phase",
             phase="shooting",
             target_kind="friendly_unit",
-            enumerable=False,
-            target_policy_id="selected_target_smoke_unit",
-            handler_id="core:smokescreen",
+            enumerable=True,
+            target_policy_id="friendly_smoke_unit",
+            handler_id="generic:rule-ir",
+            effect_payload=smoke_source.execution_payload(),
         ),
         SourceStratagemRow(
             stratagem_id="crushing-impact",

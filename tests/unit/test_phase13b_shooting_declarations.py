@@ -195,7 +195,6 @@ from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatas
 from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_feel_no_pain_sources_for_unit,
 )
-from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -8615,18 +8614,9 @@ def test_phase17_post_shoot_cover_denial_suppresses_cover_save_eligibility() -> 
     assert cover_armour_option.cover_applied is True
     assert cover_armour_option.target_number == cover_armour_option.characteristic_target_number
 
-    state.record_persisting_effect(
-        replace(
-            _phase13f_cover_effect(defender.unit_instance_id),
-            effect_id="phase17-save-cover-only",
-            source_rule_id="core-stratagem:smokescreen",
-            effect_payload={
-                "effect_kind": SMOKESCREEN_EFFECT_KIND,
-                "benefit_of_cover": True,
-                "hit_roll_modifier": 0,
-            },
-        )
-    )
+    from tests.smokescreen_helpers import smoke_grant
+
+    state.record_persisting_effect(smoke_grant(defender.unit_instance_id))
     state.record_persisting_effect(
         _phase17_post_shoot_cover_denial_effect(defender.unit_instance_id)
     )

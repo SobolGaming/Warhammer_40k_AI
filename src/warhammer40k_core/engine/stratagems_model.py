@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.stratagems_core_handlers import _stratagem_use_from_proposal_context, _apply_supported_stratagem_handler, _validate_supported_stratagem_handler_available, _validate_supported_stratagem_handler_preflight, _generic_rule_ir_from_stratagem_payload, _apply_generic_rule_ir_stratagem_handler, _apply_command_reroll_handler, is_command_reroll_decision_request, invalid_command_reroll_decision_status, apply_command_reroll_decision, _command_reroll_request_context, _apply_insane_bravery_handler, _apply_rapid_ingress_handler, _apply_ingress_move_handler, _ingress_move_effect_payload, _apply_force_desperate_escape_handler
     from warhammer40k_core.engine.stratagems_tactical_secondaries import _apply_new_orders_handler
     from warhammer40k_core.engine.stratagems_fire_overwatch import _apply_fire_overwatch_handler
-    from warhammer40k_core.engine.stratagems_effect_handlers import _apply_go_to_ground_handler, _apply_smokescreen_handler, _apply_explosives_handler, apply_explosives_mortal_wound_feel_no_pain_decision, _emit_explosives_resolved, _apply_counteroffensive_handler, _apply_crushing_impact_handler, _apply_epic_challenge_handler, _apply_heroic_intervention_handler, _apply_stratagem_mortal_wounds, _heroic_intervention_reachable_target_distances, _enemy_unit_ids_for_player, _closest_unit_distance_inches, _unit_made_charge_move
+    from warhammer40k_core.engine.stratagems_effect_handlers import _apply_go_to_ground_handler, _apply_explosives_handler, apply_explosives_mortal_wound_feel_no_pain_decision, _emit_explosives_resolved, _apply_counteroffensive_handler, _apply_crushing_impact_handler, _apply_epic_challenge_handler, _apply_heroic_intervention_handler, _apply_stratagem_mortal_wounds, _heroic_intervention_reachable_target_distances, _enemy_unit_ids_for_player, _closest_unit_distance_inches, _unit_made_charge_move
     from warhammer40k_core.engine.stratagems_validation import _apply_command_point_effects, _stratagem_handler_is_unsupported, _next_stratagem_use_id, _target_binding_token, _require_target_unit_id, _target_secondary_mission_id, _validate_catalog_records, _require_decline_event_fields, _invalid, _validate_identifier, _validate_optional_identifier, _validate_identifier_tuple, _validate_stratagem_affected_unit_ids, _validate_optional_phase, _validate_target_policy_id, _validate_positive_int, _validate_non_negative_int, _validate_bool
 # fmt: on
 
@@ -40,7 +40,6 @@ __all__ = (
     "CORE_INSANE_BRAVERY_HANDLER_ID",
     "CORE_NEW_ORDERS_HANDLER_ID",
     "CORE_RAPID_INGRESS_HANDLER_ID",
-    "CORE_SMOKESCREEN_HANDLER_ID",
     "COUNTEROFFENSIVE_TARGET_POLICY_ID",
     "CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY",
     "CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT",
@@ -150,7 +149,6 @@ CORE_NEW_ORDERS_HANDLER_ID = "core:new-orders"
 CORE_FIRE_OVERWATCH_HANDLER_ID = FIRE_OVERWATCH_RULE_ID
 CORE_GO_TO_GROUND_HANDLER_ID = "core:go-to-ground"
 CORE_EXPLOSIVES_HANDLER_ID = "core:explosives"
-CORE_SMOKESCREEN_HANDLER_ID = "core:smokescreen"
 CORE_HEROIC_INTERVENTION_HANDLER_ID = "core:heroic-intervention"
 CORE_COUNTEROFFENSIVE_HANDLER_ID = "core:counteroffensive"
 CORE_CRUSHING_IMPACT_HANDLER_ID = "core:crushing-impact"
@@ -172,7 +170,7 @@ SELECTED_TARGET_CONTROLLED_OBJECTIVE_INFANTRY_TARGET_POLICY_ID = (
     "selected_target_controlled_objective_infantry_unit"
 )
 EXPLOSIVES_TARGET_POLICY_ID = "explosives_unit_and_enemy_target"
-SMOKESCREEN_TARGET_POLICY_ID = "selected_target_smoke_unit"
+SMOKESCREEN_TARGET_POLICY_ID = "friendly_smoke_unit"
 HEROIC_INTERVENTION_TARGET_POLICY_ID = "heroic_intervention_unit"
 COUNTEROFFENSIVE_TARGET_POLICY_ID = "counteroffensive_unit"
 CRUSHING_IMPACT_TARGET_POLICY_ID = "crushing_impact_unit"

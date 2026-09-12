@@ -22,8 +22,7 @@ from warhammer40k_core.engine.core_stratagem_effects import (
     FIRE_OVERWATCH_EFFECT_KIND,
     GO_TO_GROUND_EFFECT_KIND,
     GO_TO_GROUND_INVULNERABLE_SAVE,
-    SMOKESCREEN_EFFECT_KIND,
-    SMOKESCREEN_HIT_ROLL_MODIFIER,
+    SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
     effect_kind,
     effect_payload_bool,
     effect_payload_int,
@@ -517,10 +516,10 @@ def test_phase13d_core_stratagem_effect_helpers_read_typed_payloads() -> None:
     )
     smokescreen = _effect(
         effect_id="phase13d-effect-smokescreen",
-        effect_kind_value=SMOKESCREEN_EFFECT_KIND,
+        effect_kind_value=SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
         payload={
             "benefit_of_cover": True,
-            "hit_roll_modifier": SMOKESCREEN_HIT_ROLL_MODIFIER,
+            "hit_roll_modifier": -1,
         },
     )
     overwatch = _effect(
@@ -549,7 +548,7 @@ def test_phase13d_core_stratagem_effect_helpers_read_typed_payloads() -> None:
 def test_phase13d_core_stratagem_effect_helpers_fail_fast_on_bad_payloads() -> None:
     smokescreen = _effect(
         effect_id="phase13d-effect-bad-smokescreen",
-        effect_kind_value=SMOKESCREEN_EFFECT_KIND,
+        effect_kind_value=SHOOTING_TARGET_RESTRICTION_EFFECT_KIND,
         payload={"hit_roll_modifier": "minus-one"},
     )
     missing_kind = PersistingEffect(

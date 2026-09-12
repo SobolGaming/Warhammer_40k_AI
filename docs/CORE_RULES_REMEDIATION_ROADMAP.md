@@ -4661,3 +4661,12 @@ are regenerated with the new Core source overlay; historical GW artifacts and
 source IDs remain preserved. The [scope record](ORDER_39_SCOPE_PLAN.md) contains
 the source and owner trace, acceptance matrix, bug-class search, performance
 evidence and publication gates. Category 24 and Order 40 remain separate work.
+
+## Order 40 implementation evidence — P15A / C15-01
+
+Smokescreen now uses the opponent Shooting-start timing batch and finite friendly
+SMOKE rules-unit selection. Source-backed generic RuleIR persists the grant; shared
+model-group causal visibility applies Cover to obscured targets. The retired Core
+Hit penalty and named executor are removed. Source identity, expiry, restore,
+viewer projections, exact replay, and publication gates are tracked in
+[the Order 40 scope and acceptance record](ORDER_40_SCOPE_PLAN.md).

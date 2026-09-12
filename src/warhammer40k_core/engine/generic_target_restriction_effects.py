@@ -5,7 +5,7 @@ from typing import cast
 
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
-from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
+from warhammer40k_core.engine.core_stratagem_effects import SHOOTING_TARGET_RESTRICTION_EFFECT_KIND
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -117,7 +117,7 @@ def _target_range_restriction_effects(
 
 def _targeting_max_range_inches_or_none(payload: dict[str, JsonValue]) -> float | None:
     if "targeting_max_range_inches" in payload:
-        if payload.get("effect_kind") != SMOKESCREEN_EFFECT_KIND:
+        if payload.get("effect_kind") != SHOOTING_TARGET_RESTRICTION_EFFECT_KIND:
             raise GameLifecycleError(
                 "Generic persisted shooting target range restriction requires smokescreen "
                 "effect_kind for top-level range payloads."
