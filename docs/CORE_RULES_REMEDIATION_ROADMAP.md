@@ -4628,6 +4628,8 @@ Other category 02 and Stratagem findings retain their own owners.
 
 ## Order 38 — P18G Core disembark eligibility
 
+Status: implemented, locally validated and published in [PR #454](https://github.com/SobolGaming/Warhammer_40k_AI/pull/454); awaiting review and merge.
+
 C18-08 separates the granting rule from Core 18.06/18.07 movement eligibility.
 Assault excludes only Advance and Fall Back; Shock has no Core movement gate.
 Every eligible permitted mode is selectable alongside ordinary disembarkation,

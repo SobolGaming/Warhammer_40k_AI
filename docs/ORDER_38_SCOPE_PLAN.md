@@ -118,4 +118,4 @@ with head means 1.817–1.897 ms and observed maximum 2.306 ms. Complete-game
 performance certification remains outstanding. The final immutable runtime
 fingerprint is `456524fb59fc190d602999e2db97633b1c40dcee311f408e1d961df95ea93b10`.
 
-PR URL and merge commit: pending publication and review; no merge is authorized.
+PR URL and merge commit: [PR #454](https://github.com/SobolGaming/Warhammer_40k_AI/pull/454); merge pending owner review.
