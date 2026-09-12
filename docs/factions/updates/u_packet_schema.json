@@ -11,6 +11,7 @@
   "does_not_emit_packets": true,
   "does_not_implement_generator": true,
   "does_not_change_catalog_ids": true,
+  "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
   "owner_d3_retention_is_not_this_document": true,
   "snapshot": {
     "observed_on": "2026-09-05",
@@ -36,7 +37,7 @@
     "bare_clause_is_not_a_field_path": true,
     "packet_id_hashes_locator_projection_not_full_binding": true,
     "display_label_does_not_change_packet_id": true,
-    "review_record_permitted_on_implementation_when_carry_forward_required": true,
+    "review_record_permitted_on_implementation_when_required_work_authorizes_kind": true,
     "family_gap_may_authorize_runtime_integration": true,
     "unconditional_denylist_wins": true
   },
@@ -97,6 +98,8 @@
   ],
   "packet_id_canonicalization": {
     "scheme": "RFC 8785 JCS",
+    "key_order": "UTF-16 code-unit lexicographic order of member names",
+    "python_equivalent_qualified_to": "restricted ASCII identity shape",
     "utf8": true,
     "bom": false,
     "insignificant_whitespace": false,
@@ -161,7 +164,7 @@
     "unconditional_denylist_always_wins",
     "allowed_surfaces_only_for_listed_packet_kinds",
     "family_gap_exceptions_do_not_attach_to_content_review_overlay_or_repin",
-    "implementation_review_record_only_while_layer_a_carry_forward_review_is_required"
+    "implementation_review_record_kinds_mapped_from_remaining_required_work"
   ],
   "work_item_ids": [
     "regenerate_cost_records",
@@ -209,8 +212,14 @@
         "layer_a_carry_forward_review"
       ],
       "permits_review_record": true,
-      "sibling_unclassified_removes_surfaces": [
-        "review_record"
+      "permits_review_kinds": [
+        "layer_a_equivalence",
+        "handler_identity_confirmation",
+        "layer_c_reattest"
+      ],
+      "sibling_unclassified_forbids_review_kinds": [
+        "layer_a_equivalence",
+        "recorded_equivalence"
       ]
     },
     {
@@ -228,6 +237,12 @@
       "required_work": [
         "recorded_equivalence_review",
         "layer_c_reattest"
+      ],
+      "permits_review_kinds": [
+        "recorded_equivalence",
+        "layer_a_equivalence",
+        "handler_identity_confirmation",
+        "layer_c_reattest"
       ]
     },
     {
@@ -237,6 +252,14 @@
       "required_work": [
         "remap_envelope",
         "recertify_l4_l8"
+      ],
+      "permits_review_kinds": [
+        "layer_a_recertification",
+        "layer_c_reattest"
+      ],
+      "forbids_review_kinds": [
+        "layer_a_equivalence",
+        "recorded_equivalence"
       ]
     },
     {
@@ -246,6 +269,14 @@
       "required_work": [
         "remap_effect_ir",
         "recertify_l4_l8"
+      ],
+      "permits_review_kinds": [
+        "layer_a_recertification",
+        "layer_c_reattest"
+      ],
+      "forbids_review_kinds": [
+        "layer_a_equivalence",
+        "recorded_equivalence"
       ]
     },
     {
@@ -292,6 +323,10 @@
         "regenerate_attachment_or_keyword",
         "fieldability_regression",
         "layer_c_reattest"
+      ],
+      "permits_review_record": true,
+      "permits_review_kinds": [
+        "layer_c_reattest"
       ]
     },
     {
@@ -302,6 +337,10 @@
         "regenerate_t4_constraints",
         "mustering_regression",
         "layer_c_reattest"
+      ],
+      "permits_review_record": true,
+      "permits_review_kinds": [
+        "layer_c_reattest"
       ]
     },
     {
@@ -311,6 +350,10 @@
       "required_work": [
         "regenerate_composition_or_options",
         "fieldability_regression",
+        "layer_c_reattest"
+      ],
+      "permits_review_record": true,
+      "permits_review_kinds": [
         "layer_c_reattest"
       ]
     },
@@ -338,11 +381,46 @@
     "named_handler_packet_requires_seven_justification_fields",
     "faction_rewrite_overlay_plus_remove_plus_add_are_three_identities",
     "packet_id_unchanged_for_display_only_binding_changes",
-    "family_gap_may_include_runtime_integration"
+    "family_gap_may_include_runtime_integration",
+    "construction_constraint_may_write_layer_c_reattest",
+    "recertify_l4_l8_authorizes_recertification_and_layer_c_reattest"
   ],
+  "required_work_review_kinds": {
+    "layer_a_carry_forward_review": [
+      "layer_a_equivalence",
+      "handler_identity_confirmation"
+    ],
+    "recorded_equivalence_review": [
+      "recorded_equivalence",
+      "layer_a_equivalence",
+      "handler_identity_confirmation"
+    ],
+    "layer_c_reattest": [
+      "layer_c_reattest"
+    ],
+    "remap_envelope": [
+      "layer_a_recertification"
+    ],
+    "remap_effect_ir": [
+      "layer_a_recertification"
+    ],
+    "recertify_l4_l8": [
+      "layer_a_recertification",
+      "layer_c_reattest"
+    ],
+    "human_attribution_review": [
+      "human_attribution"
+    ]
+  },
   "review_record_on_implementation": {
-    "when_required_work_includes": "layer_a_carry_forward_review",
-    "removed_by": "sibling_unclassified_clause",
+    "when_required_work_authorizes_kind": true,
+    "sibling_unclassified_forbids_review_kinds": [
+      "layer_a_equivalence",
+      "recorded_equivalence"
+    ],
+    "sibling_unclassified_does_not_remove": [
+      "layer_c_reattest"
+    ],
     "status_claim_is_not_a_substitute": true
   },
   "family_gap_runtime_integration_exception": {
@@ -390,6 +468,10 @@
       "packet_kind": "implementation",
       "impact_class": "construction_constraint",
       "field_path": "army_construction",
+      "allows_review_record": true,
+      "permits_review_kinds": [
+        "layer_c_reattest"
+      ],
       "emitted_here": false
     },
     {
@@ -419,8 +501,11 @@
       "points_packet_forbids": [
         "layer_a_carry_forward_review"
       ],
-      "points_packet_forbids_surfaces": [
-        "review_record"
+      "points_packet_forbids_review_kinds": [
+        "layer_a_equivalence"
+      ],
+      "points_packet_permits_review_kinds": [
+        "layer_c_reattest"
       ],
       "emitted_here": false
     },
@@ -464,6 +549,10 @@
       "packet_kind": "implementation",
       "impact_class": "attachment_or_keyword",
       "field_path": "leader_support",
+      "allows_review_record": true,
+      "permits_review_kinds": [
+        "layer_c_reattest"
+      ],
       "emitted_here": false
     },
     {
@@ -472,6 +561,13 @@
       "impact_class": "clause_envelope_changed",
       "field_path": "clause.timing",
       "finding_id": "F-ARMY-01",
+      "permits_review_kinds": [
+        "layer_a_recertification",
+        "layer_c_reattest"
+      ],
+      "forbids_review_kinds": [
+        "layer_a_equivalence"
+      ],
       "emitted_here": false
     },
     {
@@ -532,7 +628,7 @@
     {
       "id": "Q1 schema",
       "hold": "Where status_claim and review records persist",
-      "unblocks": "next remaining design after this schema, or with U4 implementation"
+      "unblocks": "docs/factions/status/Q1_STATUS_ARTIFACT.md; generator remains FM0"
     },
     {
       "id": "Live agent contract",
@@ -545,7 +641,7 @@
     "emitted packets",
     "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
     "ADAPTER_DECISION_CONTRACT.md edits",
-    "Q1 status artifact",
+    "live Q1 content_status artifact",
     "U7 U7a retention",
     "U8 runbook",
     "catalog.json rewrites",
@@ -559,8 +655,8 @@
     "allowed_surface_count": 10,
     "work_item_count": 20,
     "impact_class_map_count": 12,
-    "acceptance_fixture_count": 14,
+    "acceptance_fixture_count": 16,
     "named_handler_required_field_count": 7,
-    "note": "Twelve impact classes map one-to-one onto packet kinds. Packet identity hashes the locator projection. Sibling unclassified does not merge packets. Implementation packets may write review_record when carry-forward is required. family_gap may authorize runtime_integration. The live War Horde Python triad is recorded as invalid."
+    "note": "Twelve impact classes map one-to-one onto packet kinds. Packet identity hashes the locator projection. Sibling unclassified does not merge packets. Implementation packets may write the review kinds mapped from remaining required work, including layer_c_reattest and layer_a_recertification. family_gap may authorize runtime_integration. The live War Horde Python triad is recorded as invalid."
   }
 }

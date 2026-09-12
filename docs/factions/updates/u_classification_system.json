@@ -5,6 +5,7 @@
   "not_a_content_set_record": true,
   "survey_document": "docs/factions/updates/U_CLASSIFICATION_SYSTEM.md",
   "packet_schema_document": "docs/factions/updates/U_PACKET_SCHEMA.md",
+  "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
   "delivered_to": "FM0 S4 diff grain, U3 classifier, U4 invalidation (design only)",
   "does_not_implement_s4": true,
   "does_not_emit_packets": true,
@@ -364,7 +365,7 @@
   "not_in_this_pr": [
     "src/ S4 tool or classifier",
     "task packets",
-    "Q1 status artifact",
+    "live Q1 content_status artifact",
     "U1 capture tool",
     "U5 tombstone loaders",
     "U6 rewrite procedure",

@@ -1,6 +1,6 @@
 # Faction audit: source and evidence register
 
-[Faction directory](FACTION_SUPPORT.md) · [Remediation roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) · [Track U classification](factions/updates/U_CLASSIFICATION_SYSTEM.md) · [Track U packet schema](factions/updates/U_PACKET_SCHEMA.md)
+[Faction directory](FACTION_SUPPORT.md) · [Remediation roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) · [Track U classification](factions/updates/U_CLASSIFICATION_SYSTEM.md) · [Track U packet schema](factions/updates/U_PACKET_SCHEMA.md) · [Q1 status artifact](factions/status/Q1_STATUS_ARTIFACT.md)
 
 ## Observation boundary
 
@@ -77,7 +77,7 @@ Integration was rechecked after merging `main` at **`94972c20`** (Order 18, PR #
 | [data/generated/ability_coverage/runtime_content_semantic_coverage.json](../data/generated/ability_coverage/runtime_content_semantic_coverage.json) | Faction/detachment module classifications | `8aea32168c72dce6c56c7171b370da2174495fbc73533c79f861c5470353acbc` |
 | [data/source_manifests/faction_pack_datasheet_review_v1.json](../data/source_manifests/faction_pack_datasheet_review_v1.json) | Reviewed current-PDF source scope | `c285b35718ac59c031423378bd0410fd749d117f62d109e3262e71a74485b94b` |
 
-The source/execution comparison additionally reads `faction_coverage_2026_27.coverage_rows()` and its exact execution records through the same helpers used by [the ability support generator](../tools/generate_ability_support_matrix.py). It preserves execution classification separately from source `runtime_support_status` and consumer IDs. The source package remains the authority for those baseline fields.
+The source/execution comparison additionally reads `faction_coverage_2026_27.coverage_rows()` and its exact execution records through the same helpers used by [the ability support generator](../tools/generate_ability_support_matrix.py). It preserves execution classification separately from source `runtime_support_status` and consumer IDs. The source package remains the authority for those baseline fields. The [Q1 status-artifact schema](factions/status/Q1_STATUS_ARTIFACT.md) names these four files as inputs, not as the publishable ladder.
 
 July costs in the unit audits come from the per-faction JSON artifacts in `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_07/artifacts/factions/`. A missing or ambiguous candidate is explicitly unresolved. No current cost is silently filled from the July record.
 
