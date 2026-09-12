@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.shooting_eligibility_state import shooting_state_restriction_reason
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.shooting_imports import *
@@ -684,32 +686,19 @@ def _rules_unit_can_select_to_shoot(
     player_id: str | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
-    if mission_action_prevents_rules_unit_from_shooting_this_phase(
-        state=state,
-        player_id=actor_id,
-        unit_instance_id=rules_unit.unit_instance_id,
+    if (
+        shooting_state_restriction_reason(state=state, rules_unit=rules_unit, player_id=actor_id)
+        is not None
     ):
         return False
-    if _rules_unit_advanced_is_restricted_to_assault_weapons(
-        state=state,
-        rules_unit=rules_unit,
-        player_id=actor_id,
-    ) and not _rules_unit_has_assault_ranged_weapon(
-        state=state,
-        rules_unit=rules_unit,
-        army_catalog=army_catalog,
-        player_id=actor_id,
-    ):
-        return False
-    for unit_id in _rules_unit_state_unit_ids(rules_unit):
-        fell_back_state = state.fell_back_unit_state_for_unit(
-            player_id=actor_id,
-            battle_round=state.battle_round,
-            unit_instance_id=unit_id,
+    return not (
+        _rules_unit_advanced_is_restricted_to_assault_weapons(
+            state=state, rules_unit=rules_unit, player_id=actor_id
         )
-        if fell_back_state is not None and not fell_back_state.can_shoot:
-            return False
-    return True
+        and not _rules_unit_has_assault_ranged_weapon(
+            state=state, rules_unit=rules_unit, army_catalog=army_catalog, player_id=actor_id
+        )
+    )
 
 
 def _advanced_unit_is_restricted_to_assault_weapons(

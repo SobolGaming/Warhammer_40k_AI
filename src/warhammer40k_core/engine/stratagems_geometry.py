@@ -1,8 +1,10 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+
+from warhammer40k_core.engine.explosives_selection import ExplosivesSelection, KEYWORDS
+from warhammer40k_core.engine.shooting_eligibility_state import shooting_state_restriction_reason
 from warhammer40k_core.engine.mission_action_eligibility import (
-    mission_action_prevents_rules_unit_from_shooting_this_phase,
     rules_unit_started_mission_action_this_turn,
 )
 
@@ -420,121 +422,144 @@ def _epic_challenge_character_model_id_or_none(
     )
 
 
-def _explosives_context_error(
+def explosives_source_error(
     *,
     state: GameState,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
 ) -> str | None:
-    if not _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="GRENADES"):
-        return "unit_not_grenades"
-    explosives_unit_id = _require_target_unit_id(target_binding)
-    if mission_action_prevents_rules_unit_from_shooting_this_phase(
-        state=state,
-        player_id=context.player_id,
-        unit_instance_id=explosives_unit_id,
-    ):
-        return "explosives_unit_started_action"
-    if (
+    source_id = target_binding.target_unit_instance_id
+    if source_id is None or _rules_unit_owner(state=state, unit_instance_id=source_id) is None:
+        return "unknown_target_unit"
+    source = rules_unit_view_by_id(state=state, unit_instance_id=source_id)
+    if source.owner_player_id != context.player_id:
+        return "target_not_friendly"
+    if not KEYWORDS.intersection(source.keywords):
+        return "unit_not_explosives_or_grenades"
+    if state.battlefield_state is None or state.mission_setup is None:
+        return "explosives_requires_battlefield"
+    present_models = tuple(
+        m
+        for m in source.alive_models()
+        if model_is_present_on_battlefield(state=state, model_instance_id=m.model_instance_id)
+    )
+    if not present_models:
+        return "explosives_unit_not_on_battlefield"
+    unit_ids = (source.unit_instance_id, *source.component_unit_instance_ids)
+    if any(
         state.advanced_unit_state_for_unit(
-            player_id=context.player_id,
-            battle_round=context.battle_round,
-            unit_instance_id=explosives_unit_id,
+            player_id=context.player_id, battle_round=context.battle_round, unit_instance_id=uid
         )
         is not None
+        for uid in unit_ids
     ):
         return "explosives_unit_advanced"
-    if (
-        state.fell_back_unit_state_for_unit(
-            player_id=context.player_id,
-            battle_round=context.battle_round,
-            unit_instance_id=explosives_unit_id,
-        )
-        is not None
-    ):
-        return "explosives_unit_fell_back"
-    shooting_state = state.shooting_phase_state
-    if shooting_state is not None and explosives_unit_id in shooting_state.shot_unit_ids:
+    restriction = shooting_state_restriction_reason(
+        state=state, rules_unit=source, player_id=context.player_id
+    )
+    if restriction is not None:
+        return f"explosives_unit_{restriction}"
+    shooting = state.shooting_phase_state
+    if shooting is not None and any(uid in shooting.shot_unit_ids for uid in unit_ids):
         return "explosives_unit_already_shot"
-    target_unit_id = _explosives_target_unit_id_or_none(context)
-    if target_unit_id is None:
-        return "missing_explosives_target"
-    target_owner = _unit_owner(state=state, unit_instance_id=target_unit_id)
+    if current_physically_engaged_enemy_rules_unit_ids(
+        state=state, unit_instance_id=source.unit_instance_id
+    ):
+        return "explosives_unit_in_engagement_range"
+    return None
+
+
+def _explosives_context_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    effect_selection: JsonValue,
+) -> str | None:
+    error = explosives_source_error(state=state, context=context, target_binding=target_binding)
+    if error is not None:
+        return error
+    try:
+        selection = ExplosivesSelection.from_payload(effect_selection)
+    except GameLifecycleError as exc:
+        return f"malformed_explosives_selection: {exc}"
+    source = rules_unit_view_by_id(
+        state=state, unit_instance_id=_require_target_unit_id(target_binding)
+    )
+    models = {m.model_instance_id: m for m in source.alive_models()}
+    model = models.get(selection.source_model_instance_id)
+    if model is None or not model_is_present_on_battlefield(
+        state=state, model_instance_id=model.model_instance_id
+    ):
+        return "explosives_model_not_alive_and_placed_in_source"
+    if not KEYWORDS.intersection(model.keywords):
+        return "explosives_model_missing_keyword"
+    target_id = selection.enemy_target_unit_instance_id
+    target_owner = _rules_unit_owner(state=state, unit_instance_id=target_id)
     if target_owner is None:
         return "unknown_explosives_target"
     if target_owner == context.player_id:
         return "explosives_target_not_enemy"
-    if state.battlefield_state is None:
-        return "explosives_requires_battlefield"
-    if state.mission_setup is None:
-        return "explosives_requires_mission_setup"
-    if _unit_is_within_enemy_engagement_range(
-        state=state,
-        player_id=context.player_id,
-        unit_instance_id=explosives_unit_id,
+    target = rules_unit_view_by_id(state=state, unit_instance_id=target_id)
+    if not any(
+        model_is_present_on_battlefield(state=state, model_instance_id=m.model_instance_id)
+        for m in target.alive_models()
     ):
-        return "explosives_unit_in_engagement_range"
-    if _enemy_unit_is_within_friendly_engagement_range(
-        state=state,
-        player_id=context.player_id,
-        target_unit_instance_id=target_unit_id,
+        return "explosives_target_not_on_battlefield"
+    if current_physically_engaged_enemy_rules_unit_ids(
+        state=state, unit_instance_id=target.unit_instance_id
     ):
         return "explosives_target_engaged_with_friendly_unit"
     if not _explosives_target_is_visible_and_in_range(
         state=state,
-        explosives_unit_instance_id=explosives_unit_id,
-        target_unit_instance_id=target_unit_id,
+        explosives_unit_instance_id=source.unit_instance_id,
+        source_model_instance_id=model.model_instance_id,
+        target_unit_instance_id=target.unit_instance_id,
     ):
         return "explosives_target_not_visible_and_within_range"
     return None
 
 
-def _explosives_target_unit_id(context: StratagemEligibilityContext) -> str:
-    target_unit_id = _explosives_target_unit_id_or_none(context)
-    if target_unit_id is None:
-        raise GameLifecycleError("Explosives trigger payload requires enemy target unit id.")
-    return target_unit_id
+def _explosives_target_unit_id(effect_selection: JsonValue) -> str:
+    return ExplosivesSelection.from_payload(effect_selection).enemy_target_unit_instance_id
 
 
-def _explosives_target_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
-    trigger_payload = context.trigger_payload
-    if not isinstance(trigger_payload, dict):
-        return None
-    target_unit_id = trigger_payload.get(EXPLOSIVES_TARGET_CONTEXT_KEY)
-    if type(target_unit_id) is not str:
-        return None
-    return _validate_identifier("Explosives target unit id", target_unit_id)
+def _explosives_target_unit_id_or_none(effect_selection: JsonValue) -> str | None:
+    if effect_selection is None:
+        return None  # An unbound affordability query has no selected enemy.
+    return _explosives_target_unit_id(effect_selection)
 
 
 def _explosives_target_is_visible_and_in_range(
     *,
     state: GameState,
     explosives_unit_instance_id: str,
+    source_model_instance_id: str,
     target_unit_instance_id: str,
 ) -> bool:
-    scenario = _battlefield_scenario_for_stratagem(state)
-    unit = _unit_by_id(state=state, unit_instance_id=explosives_unit_instance_id)
-    terrain_features = _stratagem_terrain_features(state)
-    profile = _explosives_visibility_profile()
-    for model in unit.own_models:
-        if not model_is_present_on_battlefield(
-            state=state,
-            model_instance_id=model.model_instance_id,
-        ):
-            continue
-        candidate = shooting_target_candidate_for_model(
-            scenario=scenario,
-            ruleset_descriptor=_stratagem_ruleset_descriptor(),
-            attacker_unit=unit,
-            attacker_model_instance_id=model.model_instance_id,
-            weapon_profile=profile,
-            target_unit_id=target_unit_instance_id,
-            terrain_features=terrain_features,
-            terrain_areas=shooting_terrain_areas_for_state(state),
+    source = rules_unit_view_by_id(state=state, unit_instance_id=explosives_unit_instance_id)
+    target = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+    observer = _geometry_model_for_model_id(state=state, model_instance_id=source_model_instance_id)
+    if not any(
+        observer.range_to(
+            _geometry_model_for_model_id(state=state, model_instance_id=m.model_instance_id)
         )
-        if candidate.is_legal:
-            return True
-    return False
+        <= 8
+        for m in target.alive_models()
+        if model_is_present_on_battlefield(state=state, model_instance_id=m.model_instance_id)
+    ):
+        return False
+    return unit_has_line_of_sight_to_target(
+        state=state,
+        scenario=_battlefield_scenario_for_stratagem(state),
+        ruleset_descriptor=_stratagem_ruleset_descriptor(),
+        observing_unit=source.component_unit_for_model(source_model_instance_id),
+        observer_model_instance_id=source_model_instance_id,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=_stratagem_terrain_features(state),
+        terrain_areas=shooting_terrain_areas_for_state(state),
+        placed_alive_models_only=True,
+    )
 
 
 def visible_enemy_unit_ids_for_source(

@@ -452,6 +452,12 @@ def _effect_selections_for_binding(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
 ) -> tuple[JsonValue, ...]:
+    if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID:
+        from warhammer40k_core.engine.explosives_selection import explosives_effect_selections
+
+        return explosives_effect_selections(
+            state=state, context=context, target_binding=target_binding
+        )
     payload = definition.effect_payload
     if not isinstance(payload, dict):
         return (None,)
