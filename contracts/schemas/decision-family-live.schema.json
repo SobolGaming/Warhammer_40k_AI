@@ -159,6 +159,7 @@
                   {"$ref": "#/$defs/moving_action_option"},
                   {"$ref": "#/$defs/remain_stationary_option"},
                   {"$ref": "#/$defs/disembark_option"},
+                  {"$ref": "#/$defs/permitted_disembark_option"},
                   {"$ref": "#/$defs/ingress_option"}
                 ]
               },
@@ -269,6 +270,82 @@
         }
       },
       "required": ["option_id", "label", "payload"],
+      "type": "object"
+    },
+    "permitted_disembark_option": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/identifier"
+        },
+        "option_id": {
+          "enum": [
+            "disembark:assault_disembark",
+            "disembark:shock_disembark"
+          ]
+        },
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "disembark_mode": {
+              "$ref": "#/$defs/identifier"
+            },
+            "restriction_overrides": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "override_kind": {
+                    "enum": [
+                      "allow_assault_disembark",
+                      "allow_shock_disembark"
+                    ]
+                  },
+                  "source_rule_id": {
+                    "$ref": "#/$defs/identifier"
+                  }
+                },
+                "required": [
+                  "override_kind",
+                  "source_rule_id"
+                ]
+              }
+            },
+            "movement_phase_action": {
+              "const": "disembark"
+            },
+            "transport_movement_status": {
+              "$ref": "#/$defs/identifier"
+            },
+            "transport_unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_location": {
+              "const": "embarked"
+            }
+          },
+          "required": [
+            "movement_phase_action",
+            "unit_instance_id",
+            "unit_location",
+            "transport_unit_instance_id",
+            "disembark_mode",
+            "transport_movement_status",
+            "restriction_overrides"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "option_id",
+        "label",
+        "payload"
+      ],
       "type": "object"
     },
     "ingress_option": {

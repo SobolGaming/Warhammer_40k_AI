@@ -366,7 +366,7 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     shared_permission_source = source_for(TRANSPORT_DISEMBARK_PERMISSIONS_PATH)
     candidate_source = function_source_for(
         (MOVEMENT_TRANSPORTS_PATH,),
-        "_disembark_candidate_for_movement_unit",
+        "_disembark_candidates_for_movement_unit",
     )
     proposal_validation_source = source_for(MOVEMENT_PROPOSALS_PATH)
     charge_eligibility_source = function_source_for(
@@ -394,7 +394,7 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
 
     assert "ASSAULT_DISEMBARK_MOVE_SOURCE_ID" in transport_source
     assert 'ASSAULT_DISEMBARK = "assault_disembark"' in disembark_state_source
-    assert "ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE" in disembark_state_source
+    assert "ALLOW_ASSAULT_DISEMBARK" in disembark_state_source
     assert "ASSAULT_DISEMBARK_PERMISSION_REQUIRED" in transport_source
     assert "permission_source_rule_id" in disembark_state_source
     assert "_DISEMBARK_DISTANCE_INCHES" in transport_source
@@ -436,7 +436,7 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     shared_permission_source = source_for(TRANSPORT_DISEMBARK_PERMISSIONS_PATH)
     candidate_source = function_source_for(
         (MOVEMENT_TRANSPORTS_PATH,),
-        "_disembark_candidate_for_movement_unit",
+        "_disembark_candidates_for_movement_unit",
     )
     proposal_source = source_for(MOVEMENT_PROPOSALS_PATH)
     placement_source = source_for(MOVEMENT_PLACEMENT_PROPOSALS_PATH)
@@ -451,7 +451,7 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
 
     assert "SHOCK_DISEMBARK_MOVE_SOURCE_ID" in transport_source
     assert 'SHOCK_DISEMBARK = "shock_disembark"' in disembark_state_source
-    assert "ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE" in disembark_state_source
+    assert "ALLOW_SHOCK_DISEMBARK" in disembark_state_source
     assert "SHOCK_DISEMBARK_PERMISSION_REQUIRED" in transport_source
     assert "SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT" in transport_source
     assert "SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED" in transport_source
@@ -598,3 +598,38 @@ def test_p12_consolidation_shares_objective_model_and_forced_fight_owners() -> N
     )
     for forbidden in ("_unit_distance_to_objective_marker", "_objective_markers_within_distance"):
         assert forbidden not in source_for(engine / "fight_resolution.py")
+
+
+def test_order38_eligibility_has_one_owner_and_bounded_permission_work() -> None:
+    candidate = function_source_for(
+        (MOVEMENT_TRANSPORTS_PATH,), "_disembark_candidates_for_movement_unit"
+    )
+    calls = [
+        node.func.id
+        for node in ast.walk(ast.parse(candidate))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    ]
+    for name in (
+        "assault_disembark_restriction_overrides",
+        "shock_disembark_restriction_overrides",
+        "scenario_physically_engaged_enemy_rules_unit_ids",
+    ):
+        assert calls.count(name) == 1
+    assert "assault_disembark_transport_movement_is_eligible" in candidate
+    assert "unit_disembarked_this_phase" in candidate
+    assert "unit_placement_or_none" in candidate
+    state_source = source_for(TRANSPORT_DISEMBARK_STATE_PATH)
+    assert "assault_disembark_transport_movement_is_eligible(status)" in state_source
+    assert "AFTER_NORMAL_MOVE" not in state_source
+    assert "AFTER_ADVANCE" not in state_source.replace(
+        "ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK", ""
+    )
+    validator = source_for(ENGINE_ROOT / "transport_disembark_validation.py")
+    assert "unit_disembarked_this_phase" in validator
+    assert "unit_placement_or_none" in validator
+    assert "append_disembark_eligibility_violations" in source_for(TRANSPORTS_PATH)
+    prevalidation = function_source_for(
+        (MOVEMENT_PLACEMENT_PROPOSALS_PATH,), "invalid_placement_proposal_submission_status"
+    )
+    assert "_disembark_candidates_for_movement_unit" in prevalidation
+    assert "proposal_disembark_eligibility_drift" in prevalidation

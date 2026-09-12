@@ -1304,9 +1304,7 @@ def test_disembark_placement_binds_transport_and_permission_to_pending_request()
                 base_payload,
                 restriction_overrides=(
                     TransportRestrictionOverride(
-                        override_kind=(
-                            TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
-                        ),
+                        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK),
                         source_rule_id="test:forged-assault-disembark-permission",
                     ),
                 ),

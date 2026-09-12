@@ -5495,3 +5495,39 @@ the source commitments from both alternatives. Providers are evaluated once.
 Declined and inapplicable sources remain absent. No new choice, visibility class
 or payload field is introduced; existing viewer-scoped projections and events
 remain authoritative.
+
+
+## Order 38 — independent Core disembark eligibility
+
+Contract 15.1 adds finite `select_movement_action` options
+`disembark:assault_disembark` and `disembark:shock_disembark`. The ordinary
+`disembark` option retains its schema. All applicable modes are enumerated;
+a grant never silently replaces another legal move. Permitted options include
+`restriction_overrides`, carrying the permitting source ID and the source-neutral
+`allow_assault_disembark` or `allow_shock_disembark` token. Adapters select the
+emitted option ID and echo its engine-authored placement context.
+
+Core Assault eligibility excludes only Advance and Fall Back Transport movement.
+Core Shock eligibility adds no Transport movement restriction. Both require a
+current battlefield Transport, the exact embarked rules unit, and no embark into
+that Transport this phase, including re-embarkation. Grants remain independently
+restricted by their source's eligible passengers, Transport identity and lifetime;
+source-specific RuleIR/hook conditions remain the granting rule's responsibility.
+
+The existing public placement proposal, grouped placement, accepted state and
+events retain mode, actual Transport movement status, permission source, and Shock
+engagement snapshot. Ordinary, permitted and Combat-alternative proposals all
+revalidate live eligibility before recording a result or popping the request.
+`proposal_disembark_eligibility_drift` reports a stale mode, movement status,
+permission or engagement snapshot. Spatial, malformed and echoed-context errors
+retain their existing typed diagnostics. Rejection preserves cargo and placement.
+The resolver reports `transport_placement_drift` when its Transport placement is
+absent or stale, before querying unavailable geometry. With a current Transport,
+invalid placements retain the existing combined eligibility/geometry diagnostics.
+
+The renamed permission tokens have no compatibility aliases. Replay/persistence
+remain bound to the exact runtime build and reject older builds. No decision type,
+proposal kind or visibility classification changes: both players observe these
+public decisions and events through the shared redaction owner. Shock engagement
+ownership and forced Fight behavior remain outside C18-08; this section supersedes
+older Normal-only/Advance-only eligibility descriptions, not those other semantics.

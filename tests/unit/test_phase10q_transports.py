@@ -3042,9 +3042,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
     forged_disembark_event_payload = cast(dict[str, JsonValue], forged_disembark_event["payload"])
     forged_disembark_event_payload["restriction_overrides"] = [
         {
-            "override_kind": (
-                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
-            ),
+            "override_kind": (TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK.value),
             "source_rule_id": "phase10q:forged-assault-permission",
         }
     ]
@@ -3067,9 +3065,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
     forged_proposal_context = cast(dict[str, JsonValue], forged_proposal_request["context"])
     forged_proposal_context["restriction_overrides"] = [
         {
-            "override_kind": (
-                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
-            ),
+            "override_kind": (TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK.value),
             "source_rule_id": "phase10q:forged-assault-permission",
         }
     ]
@@ -3143,7 +3139,7 @@ def test_assault_disembark_permission_flows_through_decision_event_and_replay() 
     )
     action_payload = cast(
         dict[str, JsonValue],
-        post_move_disembark_request.option_by_id(MovementPhaseActionKind.DISEMBARK.value).payload,
+        post_move_disembark_request.option_by_id("disembark:assault_disembark").payload,
     )
     assert action_payload["disembark_mode"] == DisembarkModeKind.ASSAULT_DISEMBARK.value
     placement_request = _decision_request(
@@ -3152,7 +3148,7 @@ def test_assault_disembark_permission_flows_through_decision_event_and_replay() 
             state=state,
             decisions=decisions,
             request=post_move_disembark_request,
-            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            option_id="disembark:assault_disembark",
             result_id="phase18d-select-assault-disembark",
         )
     )
@@ -3161,9 +3157,7 @@ def test_assault_disembark_permission_flows_through_decision_event_and_replay() 
     assert proposal.context["disembark_mode"] == DisembarkModeKind.ASSAULT_DISEMBARK.value
     assert proposal.context["restriction_overrides"] == [
         {
-            "override_kind": (
-                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
-            ),
+            "override_kind": (TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK.value),
             "source_rule_id": permission_source_rule_id,
         }
     ]
@@ -3205,6 +3199,551 @@ def test_assault_disembark_permission_flows_through_decision_event_and_replay() 
     assert restored.to_payload() == lifecycle_payload
 
 
+@pytest.mark.parametrize(
+    "mode", [DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK]
+)
+@pytest.mark.parametrize("movement_status", tuple(TransportMovementStatus))
+def test_order38_core_disembark_move_eligibility(
+    mode: DisembarkModeKind, movement_status: TransportMovementStatus
+) -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    scenario = _without_unit(scenario, passenger.unit_instance_id)
+    cargo = _cargo_state(
+        transport=transport,
+        embarked_unit_ids=(passenger.unit_instance_id,),
+        started_unit_ids=(passenger.unit_instance_id,),
+        battle_round=1,
+    )
+    override = TransportRestrictionOverride(
+        override_kind=(
+            TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK
+            if mode is DisembarkModeKind.ASSAULT_DISEMBARK
+            else TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK
+        ),
+        source_rule_id="test:order38:grant",
+    )
+
+    def selection_for_status() -> DisembarkSelection:
+        return DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=_unit_placement_at(
+                passenger, army_id="army-alpha", player_id="player-a", poses=_disembark_poses()
+            ),
+            disembark_mode=mode,
+            transport_movement_status=movement_status,
+            restriction_overrides=(override,),
+        )
+
+    if mode is DisembarkModeKind.ASSAULT_DISEMBARK and movement_status in (
+        TransportMovementStatus.ADVANCE,
+        TransportMovementStatus.FALL_BACK,
+    ):
+        with pytest.raises(GameLifecycleError):
+            selection_for_status()
+        return
+    selection = selection_for_status()
+    resolution = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo,
+        selection=selection,
+        unit=passenger,
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+    assert resolution.is_valid, resolution.violations
+    assert resolution.disembarked_unit_state is not None
+    assert resolution.disembarked_unit_state.permission_source_rule_id == override.source_rule_id
+    transport_placement = scenario.battlefield_state.unit_placement_by_id(
+        transport.unit_instance_id
+    )
+    for invalid_cargo in (
+        replace(cargo, started_phase_embarked_unit_instance_ids=()),
+        cargo.with_disembarked_unit(passenger.unit_instance_id).with_embarked_unit(
+            passenger.unit_instance_id
+        ),
+    ):
+        denied = resolve_disembark(
+            scenario=scenario,
+            ruleset_descriptor=_ruleset(),
+            cargo_state=invalid_cargo,
+            selection=selection,
+            unit=passenger,
+            transport_placement=transport_placement,
+        )
+        assert not denied.is_valid
+        assert TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED in {
+            v.violation_code for v in denied.violations
+        }
+    absent = resolve_disembark(
+        scenario=_without_unit(scenario, transport.unit_instance_id),
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo,
+        selection=selection,
+        unit=passenger,
+        transport_placement=transport_placement,
+    )
+    assert not absent.is_valid
+    assert TransportOperationViolationCode.TRANSPORT_PLACEMENT_DRIFT in {
+        v.violation_code for v in absent.violations
+    }
+
+
+@pytest.mark.parametrize(
+    "mode", [DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK]
+)
+@pytest.mark.parametrize("stationary", [False, True])
+@pytest.mark.parametrize(
+    "drift", ["none", "expired", "movement", "grant", "malformed", "wrong_permission"]
+)
+def test_order38_facade_disembark_options_placement_restore_and_replay(
+    mode: DisembarkModeKind, stationary: bool, drift: str
+) -> None:
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID, disembark_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    session = disembark_session(
+        (DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK)
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    request = pending_request(session)
+    initial = session.lifecycle.to_payload()
+    if stationary:
+        transport_action = session.submit_option(
+            request_id=request.request_id, result_id="order38:transport", option_id=TRANSPORT_ID
+        )
+        assert transport_action.decision_request is not None
+        session.submit_option(
+            request_id=transport_action.decision_request.request_id,
+            result_id="order38:stationary",
+            option_id="remain_stationary",
+        )
+        request = pending_request(session)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="order38:passenger", option_id=PASSENGER_ID
+    )
+    action = status.decision_request
+    assert action is not None
+    assert {o.option_id for o in action.options} == {
+        "remain_stationary",
+        "disembark",
+        "disembark:assault_disembark",
+        "disembark:shock_disembark",
+    }
+    status = session.submit_option(
+        request_id=action.request_id,
+        result_id="order38:select-mode",
+        option_id=f"disembark:{mode.value}",
+    )
+    assert status.decision_request is not None
+    request = status.decision_request
+    restored_pending = LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload())
+    )
+    for viewer in state.player_ids:
+        assert session.view(viewer_player_id=viewer) == restored_pending.view(
+            viewer_player_id=viewer
+        )
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert proposal.context is not None
+    passenger = unit_by_id(state=state, unit_instance_id=PASSENGER_ID)
+    submission = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=PASSENGER_ID,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=_unit_placement_at(
+            passenger, army_id="army-alpha", player_id="player-a", poses=_disembark_poses()
+        ),
+        transport_unit_instance_id=TRANSPORT_ID,
+        disembark_mode=mode,
+        transport_movement_status=TransportMovementStatus.REMAIN_STATIONARY
+        if stationary
+        else TransportMovementStatus.NOT_MOVED,
+        restriction_overrides=(
+            TransportRestrictionOverride(
+                override_kind=TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK
+                if mode is DisembarkModeKind.ASSAULT_DISEMBARK
+                else TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
+                source_rule_id=f"test:order38:grant:{mode.value}",
+            ),
+        ),
+        start_engaged_enemy_unit_instance_ids=()
+        if mode is DisembarkModeKind.SHOCK_DISEMBARK
+        else None,
+    )
+    submitted_payload = validate_json_value(submission.to_payload())
+    if drift != "none":
+        if drift == "expired":
+            from warhammer40k_core.engine.effects import EffectExpirationBoundary
+
+            state.expire_persisting_effects_at_boundary(
+                EffectExpirationBoundary.phase_end(
+                    battle_round=1, phase=BattlePhase.MOVEMENT, player_id="player-a"
+                )
+            )
+        elif drift == "movement":
+            state.record_fell_back_unit_state(
+                FellBackUnitState(
+                    player_id="player-a", battle_round=1, unit_instance_id=TRANSPORT_ID
+                )
+            )
+        elif drift == "grant":
+            effect = next(
+                e
+                for e in state.persisting_effects
+                if e.source_rule_id == f"test:order38:grant:{mode.value}"
+            )
+            state.remove_persisting_effects_by_id((effect.effect_id,))
+            state.record_persisting_effect(
+                replace(effect, source_rule_id="test:order38:changed-source")
+            )
+        else:
+            assert isinstance(submitted_payload, dict)
+            if drift == "malformed":
+                del submitted_payload["disembark_mode"]
+            else:
+                submitted_payload["restriction_overrides"] = []
+        before = state.to_payload()
+        records = tuple(session.lifecycle.decision_controller.records)
+        rejected = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="order38:stale-placement",
+            payload=submitted_payload,
+        )
+        assert rejected.status_kind is LifecycleStatusKind.INVALID, rejected
+        assert tuple(session.lifecycle.decision_controller.records) == records
+        assert session.lifecycle.pending_decision_request() == request
+        assert state.to_payload() == before
+        return
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order38:place",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    recorded = state.disembarked_unit_state_for_unit(
+        player_id="player-a", battle_round=1, unit_instance_id=PASSENGER_ID
+    )
+    assert recorded is not None
+    assert recorded.disembark_mode is mode
+    assert recorded.can_declare_charge == (mode is DisembarkModeKind.ASSAULT_DISEMBARK)
+    assert not recorded.can_move_further
+    restored = LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload())
+    )
+    for viewer in state.player_ids:
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order38",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay
+    serialized = json.dumps(session.lifecycle.to_payload(), sort_keys=True)
+    assert "object at 0x" not in serialized
+
+
+@pytest.mark.parametrize(
+    "mode", [DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK]
+)
+@pytest.mark.parametrize("movement_status", list(TransportMovementStatus))
+@pytest.mark.parametrize("grant", ["valid", "absent", "restricted"])
+def test_order38_candidate_grant_and_movement_matrix(
+    mode: DisembarkModeKind, movement_status: TransportMovementStatus, grant: str
+) -> None:
+    from warhammer40k_core.engine.normal_move_history import NormalMoveSourceKind, NormalMoveState
+    from warhammer40k_core.engine.phases.movement_transports import (
+        _disembark_candidates_for_movement_unit,
+    )
+
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(_without_unit(scenario, passenger.unit_instance_id))
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+    if movement_status is TransportMovementStatus.ADVANCE:
+        state.record_advanced_unit_state(_advanced_unit_state(transport.unit_instance_id))
+    elif movement_status is TransportMovementStatus.FALL_BACK:
+        state.record_fell_back_unit_state(
+            FellBackUnitState(
+                player_id="player-a",
+                battle_round=1,
+                unit_instance_id=transport.unit_instance_id,
+            )
+        )
+    elif movement_status is TransportMovementStatus.NORMAL_MOVE:
+        state.record_normal_move_state(
+            NormalMoveState(
+                player_id="player-a",
+                battle_round=1,
+                phase=BattlePhase.MOVEMENT,
+                unit_instance_id=transport.unit_instance_id,
+                source_rule_id="test:order38:normal",
+                source_kind=NormalMoveSourceKind.MOVEMENT_PHASE_ACTION,
+                request_id="order38:normal-request",
+                result_id="order38:normal-result",
+            )
+        )
+    elif movement_status is TransportMovementStatus.INGRESS_MOVE:
+        state.record_reserve_state(
+            ReserveState.declared_before_battle(
+                player_id="player-a",
+                unit_instance_id=transport.unit_instance_id,
+                reserve_kind=ReserveKind.RESERVES,
+                destruction_deadline_policy=reposition_destruction_policy(
+                    mission_setup=state.mission_setup,
+                    destruction_deadline_policy=None,
+                ),
+            ).mark_arrived(
+                battle_round=1,
+                phase=BattlePhase.MOVEMENT,
+                large_model_exception_used=False,
+                post_arrival_restrictions=(),
+            )
+        )
+    if grant != "absent":
+        factory = (
+            assault_disembark_permission_effect
+            if mode is DisembarkModeKind.ASSAULT_DISEMBARK
+            else shock_disembark_permission_effect
+        )
+        state.record_persisting_effect(
+            factory(
+                effect_id="order38:grant",
+                source_rule_id="test:order38:restricted-grant",
+                owner_player_id="player-a",
+                transport_unit_instance_id=transport.unit_instance_id,
+                eligible_rules_unit_instance_ids=(
+                    passenger.unit_instance_id if grant == "valid" else "other-passenger",
+                ),
+                started_battle_round=1,
+                expiration=EffectExpiration.end_phase(
+                    battle_round=1, phase=BattlePhase.MOVEMENT, player_id="player-a"
+                ),
+            )
+        )
+    moved = movement_status is not TransportMovementStatus.NOT_MOVED
+    movement_state = MovementPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+        selected_unit_ids=(transport.unit_instance_id,) if moved else (),
+        moved_unit_ids=(transport.unit_instance_id,) if moved else (),
+    )
+    candidates = _disembark_candidates_for_movement_unit(
+        state=state,
+        movement_state=movement_state,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        ruleset_descriptor=_ruleset(),
+    )
+    matching = [c for c in candidates if c.disembark_mode is mode]
+    permitted = grant == "valid" and (
+        mode is DisembarkModeKind.SHOCK_DISEMBARK
+        or movement_status
+        not in (TransportMovementStatus.ADVANCE, TransportMovementStatus.FALL_BACK)
+    )
+    assert bool(matching) is permitted
+    assert all(c.transport_movement_status is movement_status for c in candidates)
+    if matching:
+        assert (
+            matching[0].restriction_overrides[0].source_rule_id == "test:order38:restricted-grant"
+        )
+
+
+@pytest.mark.parametrize(
+    "mode", [DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK]
+)
+@pytest.mark.parametrize("blocker", ["off_battlefield", "newly_embarked", "reembarked"])
+def test_order38_candidate_requires_battlefield_transport_and_no_embark_this_phase(
+    mode: DisembarkModeKind, blocker: str
+) -> None:
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID, disembark_session
+
+    from warhammer40k_core.engine.phases.movement_transports import (
+        _disembark_candidates_for_movement_unit,
+    )
+
+    session = disembark_session((mode,))
+    state = session.lifecycle.state
+    assert state is not None
+    cargo = state.transport_cargo_state_for_transport(TRANSPORT_ID)
+    assert cargo is not None
+    if blocker == "off_battlefield":
+        assert state.battlefield_state is not None
+        state.battlefield_state = state.battlefield_state.without_unit_placement(TRANSPORT_ID)
+    else:
+        state.replace_transport_cargo_state(
+            replace(
+                cargo,
+                started_phase_embarked_unit_instance_ids=()
+                if blocker == "newly_embarked"
+                else (PASSENGER_ID,),
+                disembarked_this_phase_unit_instance_ids=(PASSENGER_ID,)
+                if blocker == "reembarked"
+                else (),
+            )
+        )
+    assert (
+        _disembark_candidates_for_movement_unit(
+            state=state,
+            movement_state=MovementPhaseState(battle_round=1, active_player_id="player-a"),
+            unit_instance_id=PASSENGER_ID,
+            transport_unit_instance_id=TRANSPORT_ID,
+            ruleset_descriptor=session.lifecycle.config.ruleset_descriptor,
+        )
+        == ()
+    )
+
+
+@pytest.mark.parametrize(
+    ("mode", "status"),
+    [
+        (mode, status)
+        for mode in (DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK)
+        for status in (
+            TransportMovementStatus.NORMAL_MOVE,
+            TransportMovementStatus.INGRESS_MOVE,
+            TransportMovementStatus.ADVANCE,
+            TransportMovementStatus.FALL_BACK,
+        )
+        if mode is DisembarkModeKind.SHOCK_DISEMBARK
+        or status not in (TransportMovementStatus.ADVANCE, TransportMovementStatus.FALL_BACK)
+    ],
+)
+def test_order38_other_movement_states_facade_replay(
+    mode: DisembarkModeKind, status: TransportMovementStatus
+) -> None:
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID, disembark_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.normal_move_history import NormalMoveSourceKind, NormalMoveState
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    session = disembark_session((mode,))
+    state = session.lifecycle.state
+    assert state is not None
+    if status is TransportMovementStatus.ADVANCE:
+        state.record_advanced_unit_state(_advanced_unit_state(TRANSPORT_ID))
+    elif status is TransportMovementStatus.FALL_BACK:
+        state.record_fell_back_unit_state(
+            FellBackUnitState(player_id="player-a", battle_round=1, unit_instance_id=TRANSPORT_ID)
+        )
+    elif status is TransportMovementStatus.NORMAL_MOVE:
+        state.record_normal_move_state(
+            NormalMoveState(
+                player_id="player-a",
+                battle_round=1,
+                phase=BattlePhase.MOVEMENT,
+                unit_instance_id=TRANSPORT_ID,
+                source_rule_id="test:order38:normal",
+                source_kind=NormalMoveSourceKind.MOVEMENT_PHASE_ACTION,
+                request_id="order38:normal",
+                result_id="order38:normal-result",
+            )
+        )
+    if status is TransportMovementStatus.INGRESS_MOVE:
+        # Start at a typed post-arrival snapshot. The P20 carrier-arrival driver
+        # currently rejects embarked cargo and is not part of this certification.
+        declared = ReserveState.declared_before_battle(
+            player_id="player-a",
+            unit_instance_id=TRANSPORT_ID,
+            reserve_kind=ReserveKind.RESERVES,
+            embarked_unit_instance_ids=(PASSENGER_ID,),
+            destruction_deadline_policy=reposition_destruction_policy(
+                mission_setup=state.mission_setup,
+                destruction_deadline_policy=None,
+            ),
+        )
+        state.record_reserve_state(
+            declared.mark_arrived(
+                battle_round=1,
+                phase=BattlePhase.MOVEMENT,
+                large_model_exception_used=False,
+                post_arrival_restrictions=(),
+            )
+        )
+        session.lifecycle.decision_controller.event_log.append(
+            "reserve_unit_declared",
+            {
+                "game_id": state.game_id,
+                "player_id": "player-a",
+                "unit_instance_id": TRANSPORT_ID,
+                "reserve_state": declared.to_payload(),
+            },
+        )
+    request = pending_request(session)
+    initial = session.lifecycle.to_payload()
+    action_status = session.submit_option(
+        request_id=request.request_id, result_id="order38:passenger", option_id=PASSENGER_ID
+    )
+    assert action_status.decision_request is not None
+    proposal_status = session.submit_option(
+        request_id=action_status.decision_request.request_id,
+        result_id="order38:mode",
+        option_id=f"disembark:{mode.value}",
+    )
+    assert proposal_status.decision_request is not None
+    proposal_request = proposal_status.decision_request
+    passenger = unit_by_id(state=state, unit_instance_id=PASSENGER_ID)
+    submission = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=PASSENGER_ID,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=_unit_placement_at(
+            passenger, army_id="army-alpha", player_id="player-a", poses=_disembark_poses()
+        ),
+        transport_unit_instance_id=TRANSPORT_ID,
+        disembark_mode=mode,
+        transport_movement_status=status,
+        restriction_overrides=(
+            TransportRestrictionOverride(
+                override_kind=TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK
+                if mode is DisembarkModeKind.ASSAULT_DISEMBARK
+                else TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
+                source_rule_id=f"test:order38:grant:{mode.value}",
+            ),
+        ),
+        start_engaged_enemy_unit_instance_ids=()
+        if mode is DisembarkModeKind.SHOCK_DISEMBARK
+        else None,
+    )
+    accepted = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
+        result_id="order38:place",
+        payload=validate_json_value(submission.to_payload()),
+    )
+    assert accepted.status_kind is not LifecycleStatusKind.INVALID
+    GameLifecycle.from_payload(session.lifecycle.to_payload())
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id=f"order38:{status.value}",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay
+
+
 def test_assault_disembark_resolver_requires_permission_start_state_and_three_inches() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     scenario = _without_unit(scenario, passenger.unit_instance_id)
@@ -3215,7 +3754,7 @@ def test_assault_disembark_resolver_requires_permission_start_state_and_three_in
         battle_round=1,
     )
     permission = TransportRestrictionOverride(
-        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE),
+        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK),
         source_rule_id="test:assault-disembark-permitting-rule",
     )
     attempted_placement = _unit_placement_at(
@@ -3301,7 +3840,7 @@ def test_assault_disembark_resolver_requires_permission_start_state_and_three_in
     assert valid.is_valid, valid.violations
     assert valid.disembarked_unit_state is not None
     assert valid.disembarked_unit_state.can_declare_charge
-    with pytest.raises(GameLifecycleError, match="requires Normal Transport movement"):
+    with pytest.raises(GameLifecycleError, match="forbids Advance or Fall Back"):
         replace(
             valid.selection,
             transport_movement_status=TransportMovementStatus.ADVANCE,
@@ -3333,7 +3872,7 @@ def test_shock_disembark_resolver_requires_permission_and_preserves_start_engage
         battle_round=1,
     )
     permission = TransportRestrictionOverride(
-        override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE,
+        override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
         source_rule_id="test:shock-disembark-permitting-rule",
     )
     valid_selection = DisembarkSelection(
@@ -3500,7 +4039,7 @@ def test_shock_disembark_candidate_uses_configured_engagement_descriptor() -> No
             state=state,
             decisions=decisions,
             request=action_request,
-            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            option_id="disembark:shock_disembark",
             result_id="phase18e-configured-engagement-select",
         )
     )
@@ -3592,7 +4131,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
         transport_unit_instance_id=transport.unit_instance_id,
     ) == (
         TransportRestrictionOverride(
-            override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE,
+            override_kind=TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
             source_rule_id=permission_source_rule_id,
         ),
     )
@@ -3602,7 +4141,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     )
     action_payload = cast(
         dict[str, JsonValue],
-        action_request.option_by_id(MovementPhaseActionKind.DISEMBARK.value).payload,
+        action_request.option_by_id("disembark:shock_disembark").payload,
     )
     assert action_payload["disembark_mode"] == DisembarkModeKind.SHOCK_DISEMBARK.value
     placement_request = _decision_request(
@@ -3611,7 +4150,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
             state=state,
             decisions=decisions,
             request=action_request,
-            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            option_id="disembark:shock_disembark",
             result_id="phase18e-select-shock-disembark",
         )
     )
@@ -4524,7 +5063,7 @@ def test_shock_disembark_without_start_engagements_records_a_skipped_fight_queue
             state=state,
             decisions=decisions,
             request=action_request,
-            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            option_id="disembark:shock_disembark",
             result_id="phase18e-select-shock-no-engagement",
         )
     )
@@ -4832,7 +5371,7 @@ def test_assault_disembark_permission_and_state_payloads_fail_closed() -> None:
         )
 
     override = TransportRestrictionOverride(
-        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE),
+        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK),
         source_rule_id=permission.source_rule_id,
     )
     assault_state = DisembarkedUnitState.for_mode(
@@ -4873,7 +5412,19 @@ def test_assault_disembark_permission_and_state_payloads_fail_closed() -> None:
         )
 
 
-def test_assault_disembark_places_attached_rules_unit_atomically() -> None:
+@pytest.mark.parametrize(
+    ("mode", "movement_status"),
+    [
+        (mode, status)
+        for mode in (DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK)
+        for status in TransportMovementStatus
+        if mode is DisembarkModeKind.SHOCK_DISEMBARK
+        or status not in (TransportMovementStatus.ADVANCE, TransportMovementStatus.FALL_BACK)
+    ],
+)
+def test_assault_disembark_places_attached_rules_unit_atomically(
+    mode: DisembarkModeKind, movement_status: TransportMovementStatus
+) -> None:
     scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
     attached_id = "attached-unit:army-alpha:attached-transport-passengers"
     component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
@@ -4882,7 +5433,9 @@ def test_assault_disembark_places_attached_rules_unit_atomically() -> None:
         leader.unit_instance_id,
     )
     permission = TransportRestrictionOverride(
-        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE),
+        override_kind=TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK
+        if mode is DisembarkModeKind.ASSAULT_DISEMBARK
+        else TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK,
         source_rule_id="test:attached-assault-disembark-permitting-rule",
     )
     grouped_placement = RulesUnitPlacement(
@@ -4929,8 +5482,8 @@ def test_assault_disembark_places_attached_rules_unit_atomically() -> None:
             unit_instance_id=attached_id,
             transport_unit_instance_id=transport.unit_instance_id,
             attempted_placement=grouped_placement,
-            disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
-            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+            disembark_mode=mode,
+            transport_movement_status=movement_status,
             restriction_overrides=(permission,),
         ),
         rules_unit=rules_unit,
@@ -5280,9 +5833,7 @@ def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
         transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
         restriction_overrides=(
             TransportRestrictionOverride(
-                override_kind=(
-                    TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
-                ),
+                override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK),
                 source_rule_id="test:assault-disembark-permitting-rule",
             ),
         ),
@@ -5385,10 +5936,10 @@ def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
             disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
         )
-    with pytest.raises(GameLifecycleError, match="Assault Disembark requires Normal"):
+    with pytest.raises(GameLifecycleError, match="Assault Disembark forbids Advance or Fall Back"):
         replace(
             assault_selection,
-            transport_movement_status=TransportMovementStatus.INGRESS_MOVE,
+            transport_movement_status=TransportMovementStatus.FALL_BACK,
         )
 
 

@@ -4624,3 +4624,22 @@ All existing option, target, spending, increased-cost failure, event and replay
 consumers share that result. See the [scope and validation record](ORDER_37_SCOPE_PLAN.md)
 for the source observation, consumer audit, acceptance matrix and publication gates.
 Other category 02 and Stratagem findings retain their own owners.
+
+
+## Order 38 — P18G Core disembark eligibility
+
+Status: implemented, locally validated and published in [PR #454](https://github.com/SobolGaming/Warhammer_40k_AI/pull/454); awaiting review and merge.
+
+C18-08 separates the granting rule from Core 18.06/18.07 movement eligibility.
+Assault excludes only Advance and Fall Back; Shock has no Core movement gate.
+Every eligible permitted mode is selectable alongside ordinary disembarkation,
+and placement revalidates current cargo, battlefield presence and permission.
+The retained v931 operative source rows and observation fingerprints are unchanged;
+their runtime consumer inventory and package hashes are regenerated.
+
+The [scope and validation record](ORDER_38_SCOPE_PLAN.md) contains the source
+provenance, owner trace, full six-state acceptance matrix, same-class search,
+contract impact, performance evidence and publication gates. It supersedes the
+Normal-only P18D and Advance-only P18E eligibility claims above. Their engagement
+and forced-Fight claims are not recertified here; the engagement-owner conflict
+remains assigned to its existing finding. Category 18 remains incomplete.

@@ -1,0 +1,8 @@
+{
+  "workload_id": "order38-disembark-options-v1",
+  "reference_mean_ratio": 1.5,
+  "reference_mean_allowance_seconds": 0.01,
+  "maximum_seconds": 0.25,
+  "maximum_permission_scans_per_enumeration": 2,
+  "maximum_engagement_queries_per_enumeration": 1
+}

@@ -536,14 +536,12 @@ def _validate_disembarked_unit_state_history(
     assault_permission_sources = tuple(
         override.source_rule_id
         for override in proposal.restriction_overrides
-        if override.override_kind
-        is TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
+        if override.override_kind is TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK
     )
     shock_permission_sources = tuple(
         override.source_rule_id
         for override in proposal.restriction_overrides
-        if override.override_kind
-        is TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE
+        if override.override_kind is TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK
     )
     if disembarked_state.disembark_mode is DisembarkModeKind.ASSAULT_DISEMBARK:
         if assault_permission_sources != (disembarked_state.permission_source_rule_id,):

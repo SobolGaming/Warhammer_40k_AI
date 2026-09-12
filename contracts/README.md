@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `15.0.0`
+Contract version: `15.1.0`
+
+Contract 15.1 adds independent Assault/Shock Disembark finite options while
+preserving the ordinary disembark schema. See the Order 38 section of the
+[adapter contract](../docs/ADAPTER_DECISION_CONTRACT.md).
 
 Contract 15 implements owner-controlled Rules Sequencing, deferred triggers,
 temporary active-player authority and per-owner Primary scoring commits. Replay

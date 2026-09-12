@@ -148,6 +148,7 @@ class TransportOperationViolationCode(StrEnum):
     SHOCK_DISEMBARK_PERMISSION_REQUIRED = "shock_disembark_permission_required"
     SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED = "shock_disembark_engagement_not_preserved"
     SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT = "shock_disembark_engagement_snapshot_drift"
+    TRANSPORT_PLACEMENT_DRIFT = "transport_placement_drift"
     UNIT_PLACEMENT_DRIFT = "unit_placement_drift"
     MODEL_OVERLAP = "model_overlap"
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
@@ -2591,73 +2592,34 @@ def _resolve_disembark(
                 blocker_id=active_cargo.transport_unit_instance_id,
             )
         )
-    if require_started_phase_embarked and not active_cargo.unit_started_phase_embarked(
-        unit.unit_instance_id
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED,
-                message="Disembark requires the unit to have started the phase embarked.",
-                unit_instance_id=unit.unit_instance_id,
-                source_rule_id=_CORE_TRANSPORT_RULE_ID,
-            )
-        )
-    shock_advance_is_permitted = (
-        selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
-        and selection.transport_movement_status is TransportMovementStatus.ADVANCE
-        and selection.has_override(
-            TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE
-        )
+    from warhammer40k_core.engine.transport_disembark_validation import (
+        append_disembark_eligibility_violations,
     )
-    if (
-        selection.transport_movement_status
-        in {
-            TransportMovementStatus.ADVANCE,
-            TransportMovementStatus.FALL_BACK,
-        }
-        and not selection.has_override(
-            TransportRestrictionOverrideKind.ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK
-        )
-        and not shock_advance_is_permitted
+
+    append_disembark_eligibility_violations(
+        scenario=scenario,
+        violations=violations,
+        active_cargo=active_cargo,
+        selection=selection,
+        unit=unit,
+        transport_placement=transport_placement,
+        require_started_phase_embarked=require_started_phase_embarked,
+    )
+    if any(
+        violation.violation_code is TransportOperationViolationCode.TRANSPORT_PLACEMENT_DRIFT
+        for violation in violations
     ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.TRANSPORT_ADVANCED_OR_FELL_BACK,
-                message="Units cannot Disembark after their Transport Advanced or Fell Back.",
-                unit_instance_id=unit.unit_instance_id,
-                blocker_id=transport_placement.unit_instance_id,
-                source_rule_id=_CORE_TRANSPORT_RULE_ID,
-            )
-        )
-    if selection.disembark_mode is DisembarkModeKind.ASSAULT_DISEMBARK and not (
-        selection.has_override(
-            TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
-        )
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=(
-                    TransportOperationViolationCode.ASSAULT_DISEMBARK_PERMISSION_REQUIRED
-                ),
-                message="Assault Disembark requires a source-backed permitting rule.",
-                unit_instance_id=unit.unit_instance_id,
-                blocker_id=transport_placement.unit_instance_id,
-                source_rule_id=ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
-            )
-        )
-    if selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK and not (
-        selection.has_override(TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE)
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=(
-                    TransportOperationViolationCode.SHOCK_DISEMBARK_PERMISSION_REQUIRED
-                ),
-                message="Shock Disembark requires a source-backed permitting rule.",
-                unit_instance_id=unit.unit_instance_id,
-                blocker_id=transport_placement.unit_instance_id,
-                source_rule_id=_transport_disembark_state.SHOCK_DISEMBARK_MOVE_SOURCE_ID,
-            )
+        return DisembarkResolution(
+            selection=selection,
+            violations=tuple(violations),
+            coherency_result=unit_placement_coherency_result(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_placement=selection.attempted_placement,
+            ),
+            updated_cargo_state=None,
+            disembarked_unit_state=None,
+            transition_batch=None,
         )
     _append_unit_placement_drift_violations(
         violations=violations,

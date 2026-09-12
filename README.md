@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 38 separates source-permitted Assault and Shock Disembark eligibility from
+Transport movement history. Every legal mode has its own finite option; stale
+grants are rejected before placement. See the [scope and validation record](docs/ORDER_38_SCOPE_PLAN.md)
+and the [adapter contract](docs/ADAPTER_DECISION_CONTRACT.md#order-38--independent-core-disembark-eligibility).
+
 Order 36 implements source-backed Rules Sequencing: each player orders their
 mandatory and optional rules in the applicable tier, while new triggers wait for
 the original timing batch. Movement, attacks and mission scoring share that

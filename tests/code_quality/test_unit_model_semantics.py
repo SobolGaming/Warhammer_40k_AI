@@ -510,7 +510,7 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
         (
             MOVEMENT_TRANSPORTS,
             (
-                "_disembark_candidate_for_movement_unit",
+                "_disembark_candidates_for_movement_unit",
                 "_request_disembark_placement",
             ),
         ),

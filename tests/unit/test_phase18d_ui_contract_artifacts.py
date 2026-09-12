@@ -404,6 +404,34 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
+def test_order38_live_permitted_disembark_options_require_source_commitments() -> None:
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, disembark_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.transports import DisembarkModeKind
+
+    session = disembark_session(
+        (DisembarkModeKind.ASSAULT_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK)
+    )
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id, result_id="order38:contract", option_id=PASSENGER_ID
+    )
+    validator = _schema_validator("decision-family-live.schema.json", registry=_schema_registry())
+    for viewer in (PLAYER_A, PLAYER_B):
+        view = session.view(viewer_player_id=viewer)["pending_decision"]
+        assert view is not None
+        validator.validate(view)
+        for option in view["options"]:
+            if option["option_id"].startswith("disembark:"):
+                invalid = json.loads(json.dumps(view))
+                for invalid_option in invalid["options"]:
+                    if invalid_option["option_id"] == option["option_id"]:
+                        invalid_option["payload"].pop("restriction_overrides")
+                with pytest.raises(ValidationError):
+                    validator.validate(invalid)
+
+
 def test_session_metadata_contract_version_accepts_current_major_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)

@@ -87,7 +87,7 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.assault_disembark:assault_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.charge:_charge_unit_ineligibility_reason",
-        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
         "warhammer40k_core.engine.transports:resolve_disembark"
       ],
@@ -120,7 +120,7 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.assault_disembark:assault_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.charge:_charge_unit_ineligibility_reason",
-        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
         "warhammer40k_core.engine.transports:resolve_disembark"
       ],
@@ -152,7 +152,7 @@
       "rule_source_id": "gw-11e-core-rules:transports:shock-disembark-move",
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
-        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
         "warhammer40k_core.engine.transports:resolve_disembark",
         "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"
@@ -185,7 +185,7 @@
       "rule_source_id": "gw-11e-core-rules:transports:shock-disembark-move",
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
-        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
         "warhammer40k_core.engine.transports:resolve_disembark",
         "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"
@@ -198,7 +198,7 @@
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "62c267ae792834ddd371541f177e78056492656db964cfdcaaa1a3de6581472f",
+  "package_hash": "7babbcbef60eeeaf3821a91b97eb0f84a93ad5131a0049a0d8e0deab48e53368",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -222,7 +222,7 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.assault_disembark:assault_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.charge:_charge_unit_ineligibility_reason",
-        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
         "warhammer40k_core.engine.transports:resolve_disembark"
       ],
@@ -238,7 +238,7 @@
       "rule_id": "shock-disembark-move",
       "runtime_consumer_ids": [
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
-        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+        "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
         "warhammer40k_core.engine.transports:resolve_disembark",
         "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed"

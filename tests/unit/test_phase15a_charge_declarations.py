@@ -3122,9 +3122,7 @@ def test_charge_phase_consumes_disembark_charge_eligibility_state() -> None:
             transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
             restriction_overrides=(
                 TransportRestrictionOverride(
-                    override_kind=(
-                        TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
-                    ),
+                    override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK),
                     source_rule_id="test:assault-disembark-permitting-rule",
                 ),
             ),
