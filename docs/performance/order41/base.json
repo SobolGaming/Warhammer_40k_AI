@@ -1,0 +1,198 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "dice_calls": 0,
+  "file_hashes": {
+    "scripts/measure_explosives_options.py": "e9eff7c6f41b656b362ada536f1fb92bd58887e921e5c58e85de6d55dfc67c49",
+    "src/warhammer40k_core/_engine_build_manifest.json": "f4aae2e62c3311c4e0f015c671d057529c93215174699867234825e741ac90bc",
+    "tests/explosives_helpers.py": "c3758ede551d3e81dc7f111d3b9b48bc40c1085867d7d5d97fd178ddb905f720",
+    "tests/phase13b_shooting_declaration_helpers.py": "6d8d4ec8f51b4e96e485a23b993168b8f2ace7c269959658466ebf9d73f10839",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 4,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 6.665941327810287e-07,
+      "sample": 0,
+      "setup_seconds": 2.112120500067249
+    },
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 4.041939973831177e-07,
+      "sample": 1,
+      "setup_seconds": 0.24060987506527454
+    },
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 3.6670826375484467e-07,
+      "sample": 2,
+      "setup_seconds": 0.2386447909520939
+    },
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 3.9170263335108755e-07,
+      "sample": 3,
+      "setup_seconds": 0.2382590000052005
+    },
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 3.7080608308315275e-07,
+      "sample": 4,
+      "setup_seconds": 0.23743537499103695
+    },
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 3.708992153406143e-07,
+      "sample": 5,
+      "setup_seconds": 0.26791112509090453
+    },
+    {
+      "case": "grenades",
+      "option_count": 0,
+      "query_seconds": 3.374996595084667e-07,
+      "sample": 6,
+      "setup_seconds": 0.23900683305691928
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.583962097764015e-07,
+      "sample": 0,
+      "setup_seconds": 0.23906375002115965
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.8340222090482713e-07,
+      "sample": 1,
+      "setup_seconds": 0.23835074994713068
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.7079444155097007e-07,
+      "sample": 2,
+      "setup_seconds": 0.2391396249877289
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.749970346689224e-07,
+      "sample": 3,
+      "setup_seconds": 0.23846200003754348
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.875000402331352e-07,
+      "sample": 4,
+      "setup_seconds": 0.23942966700997204
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.4999102354049684e-07,
+      "sample": 5,
+      "setup_seconds": 0.23898575000930578
+    },
+    {
+      "case": "explosives",
+      "option_count": 0,
+      "query_seconds": 3.708992153406143e-07,
+      "sample": 6,
+      "setup_seconds": 0.23979404103010893
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 3.5830307751894e-07,
+      "sample": 0,
+      "setup_seconds": 0.23851808393374085
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 3.7909485399723054e-07,
+      "sample": 1,
+      "setup_seconds": 0.23923758405726403
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 4.1249440982937815e-07,
+      "sample": 2,
+      "setup_seconds": 0.24099674995522946
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 3.5420525819063186e-07,
+      "sample": 3,
+      "setup_seconds": 0.240224750014022
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 3.458000719547272e-07,
+      "sample": 4,
+      "setup_seconds": 0.23876095900777727
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 3.6249402910470965e-07,
+      "sample": 5,
+      "setup_seconds": 0.2389461670536548
+    },
+    {
+      "case": "out_of_range",
+      "option_count": 0,
+      "query_seconds": 4.4170301407575605e-07,
+      "sample": 6,
+      "setup_seconds": 0.23884333297610283
+    }
+  ],
+  "summaries": {
+    "explosives": {
+      "completion_rate": 1.0,
+      "max": 3.875000402331352e-07,
+      "mean": 3.7085431228790966e-07,
+      "median": 3.708992153406143e-07,
+      "p95": 3.875000402331352e-07,
+      "queries_per_second": 2696476.6671599555,
+      "samples": 7
+    },
+    "grenades": {
+      "completion_rate": 1.0,
+      "max": 6.665941327810287e-07,
+      "mean": 4.1548628360033035e-07,
+      "median": 3.708992153406143e-07,
+      "p95": 6.665941327810287e-07,
+      "queries_per_second": 2406818.322219109,
+      "samples": 7
+    },
+    "out_of_range": {
+      "completion_rate": 1.0,
+      "max": 4.4170301407575605e-07,
+      "mean": 3.791563878101962e-07,
+      "median": 3.6249402910470965e-07,
+      "p95": 4.4170301407575605e-07,
+      "queries_per_second": 2637434.135754545,
+      "samples": 7
+    }
+  },
+  "terrain_count": 0,
+  "timing_boundary": "10 active Shooting option queries per sample; setup separate",
+  "workload_id": "order41-explosives-options-v1"
+}

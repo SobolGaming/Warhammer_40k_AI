@@ -395,10 +395,10 @@ def test_phase14k_core_stratagem_source_package_uses_current_names() -> None:
         explosives.handler_id,
     ) == (
         "gw-11e-core-stratagems:core:explosives",
-        "start_phase",
+        "during_phase",
         "shooting",
         "friendly_unit",
-        False,
+        True,
         "explosives_unit_and_enemy_target",
         "core:explosives",
     )

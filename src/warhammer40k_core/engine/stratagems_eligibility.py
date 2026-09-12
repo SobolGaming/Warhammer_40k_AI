@@ -236,12 +236,15 @@ def _handler_unavailable_reason(
             return selected_context_error
         return None
     if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID:
+        if context.active_player_id != context.player_id:
+            return "explosives_requires_own_shooting_phase"
         if target_binding is None:
             return None
         return _explosives_context_error(
             state=state,
             context=context,
             target_binding=target_binding,
+            effect_selection=effect_selection,
         )
     if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
         if context.trigger_kind is not TimingTriggerKind.END_PHASE:
@@ -418,7 +421,7 @@ def _stratagem_affected_unit_ids(
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
         raw_unit_ids.append(_command_reroll_affected_unit_id(context))
     if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID and target_binding is not None:
-        explosives_target_id = _explosives_target_unit_id_or_none(context)
+        explosives_target_id = _explosives_target_unit_id_or_none(effect_selection)
         if explosives_target_id is not None:
             raw_unit_ids.append(explosives_target_id)
     if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID and target_binding is not None:

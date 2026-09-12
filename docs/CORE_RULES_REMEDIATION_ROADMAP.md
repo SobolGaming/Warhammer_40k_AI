@@ -4670,3 +4670,16 @@ model-group causal visibility applies Cover to obscured targets. The retired Cor
 Hit penalty and named executor are removed. Source identity, expiry, restore,
 viewer projections, exact replay, and publication gates are tracked in
 [the Order 40 scope and acceptance record](ORDER_40_SCOPE_PLAN.md).
+
+## Order 41 / P15B — Explosives completion
+
+C15-02 is implemented through the existing Shooting `during_phase` finite
+Stratagem path. The engine commits one eligible friendly rules unit, matching
+EXPLOSIVES/GRENADES model and visible unengaged enemy within 8 inches of that
+model. Shared Action/Fall Back eligibility, absolute Advance exclusion, CP and
+stale-state checks precede mutation. Selected model identity survives attached
+units, mortal wounds, Feel No Pain, restore and exact replay. The retained P15D
+source text/observations remain unchanged; only Explosives execution status and
+derived package hashes advance. See [scope, acceptance and validation](ORDER_41_SCOPE_PLAN.md)
+and [component assessment](performance/order41/README.md). Orders 42 onward are
+not included in this change.

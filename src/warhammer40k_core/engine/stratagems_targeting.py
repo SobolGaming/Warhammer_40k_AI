@@ -330,13 +330,12 @@ def _target_binding_error(
             return "unit_not_smoke"
         return None
     if target_spec.target_policy_id == EXPLOSIVES_TARGET_POLICY_ID:
-        if not _target_unit_has_keyword(
-            state=state,
-            target_binding=target_binding,
-            keyword="GRENADES",
-        ):
-            return "unit_not_grenades"
-        return None
+        from warhammer40k_core.engine.explosives_selection import KEYWORDS
+
+        unit = rules_unit_view_by_id(
+            state=state, unit_instance_id=_require_target_unit_id(target_binding)
+        )
+        return None if KEYWORDS.intersection(unit.keywords) else "unit_not_explosives_or_grenades"
     if target_spec.target_policy_id == FIRE_OVERWATCH_TARGET_POLICY_ID:
         if context is None:
             return None
