@@ -1,6 +1,6 @@
 # U7 / U7a — Retention and replay compatibility
 
-[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md)
+[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Track D D3 draft](../contracts/D3_CONTRACT_REWRITES.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Adapter decision contract](../../ADAPTER_DECISION_CONTRACT.md)
 
 This document is Track U items **U7** (packaging coexistence) and **U7a**
 (replay compatibility) plus owner **D3** (content-set retention) as
@@ -17,7 +17,9 @@ implement U4 invalidation, generate Q1, or change `src/`, catalogs, or F00.
 Machine-readable catalog: [`u7_retention.json`](u7_retention.json).
 
 Owner **D3** is content-set retention. Track **D** item D3 (live adapter
-contract plus agent-contract rewrite) is not this document. Q1 already
+contract plus agent-contract rewrite) is drafted in
+[D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md) and is
+not this document. Q1 already
 stores the certification event and the coverage *labels* `certified` /
 `exact_build_only`. This document owns packaging activation and the
 compatibility *mechanism* those labels cite.
@@ -501,7 +503,9 @@ prerequisite of S3c.
 This design PR does not edit those live files. A content packet still must
 not list the adapter contract as an allowed file (packet schema §6).
 
-Track D D3's live agent-contract rewrite remains a separate FM0 PR. It
+Track D D3's live agent-contract rewrite remains a separate FM0 PR.
+The rewrite draft is
+[D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md). It
 consumes the packet schema; it does not consume this inventory.
 
 ## 10. Acceptance fixtures
@@ -612,7 +616,8 @@ document indexes them.
 - U4 runtime invalidation
 - U1 capture, U5 tombstone loaders, U6 rewrite runner, Q6 CI
   (cadence delivered in [U8_RUNBOOK.md](U8_RUNBOOK.md))
-- Live adapter-contract or agent-contract edits
+- Live adapter-contract or agent-contract apply (draft in
+  [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md))
 - Catalog ID allocation
 
 ### 12.3 Families this design must not steal

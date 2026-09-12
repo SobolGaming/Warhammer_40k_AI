@@ -194,9 +194,9 @@
       "unblocks": "Freshness enforcement"
     },
     {
-      "id": "Live Track D D3",
-      "hold": "Adapter and agent contract rewrites",
-      "unblocks": "FM0 binding contracts"
+      "id": "Live Track D D3 apply",
+      "hold": "Adapter and agent live-file rewrites",
+      "unblocks": "Binding contracts; draft in docs/factions/contracts/D3_CONTRACT_REWRITES.md"
     }
   ],
   "not_in_this_pr": [

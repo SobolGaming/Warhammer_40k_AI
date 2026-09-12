@@ -1,6 +1,6 @@
 # U8 — Update-pipeline runbook
 
-[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Track D D3 draft](../contracts/D3_CONTRACT_REWRITES.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is Track U item **U8** (release cadence) plus the FM-pre
 contracts for **U1** (offline capture), **U5** (tombstones in that
@@ -40,7 +40,8 @@ a human trigger, treat a staging audit as runtime input, treat a missing
 feed line as equivalence when the package is older than the observation,
 publish one PR per page, regenerate guides from anything but Q1, or let
 a Q6 acknowledgement write Layer A `current`. Live contract rewrites
-remain the Track D D3 FM0 PRs.
+remain the Track D D3 FM0 apply PRs. The rewrite draft is
+[D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md).
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms. T4 still owns
 construction. T5 still owns ledgers. T6 still owns decision shape. S2
@@ -192,10 +193,14 @@ A `family_gap` PR lands before the content PRs that require the new
 family. Content packets must not edit
 `ADAPTER_DECISION_CONTRACT.md`. A family or decision-kind
 implementation PR still updates that contract in the same PR as the new
-family or decision kind. That packet-path rule does not exclude the
-separately owned FM0 U7a amendment of the same contract (record,
-verification, fail-closed behaviour, and conformance). U7a remains
-outside the U8 stage list.
+family or decision kind, or as an adapter-visible payload, interaction,
+or viewer-visibility behaviour change on an existing surface. A new
+visibility behaviour does not require a new visibility class. That
+packet-path rule does not exclude the separately owned FM0 U7a
+amendment of the same contract (record, verification, fail-closed
+behaviour, and conformance). U7a remains outside the U8 stage list.
+The closed writer table is
+[D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md) §3.3.
 
 U5 and U6 implementation run here when their packets say so (§5 and
 §6).
@@ -430,8 +435,9 @@ them.
     already merged.
 15. A content packet listing `ADAPTER_DECISION_CONTRACT.md` is invalid.
     A family or decision-kind PR still updates that contract in the
-    same PR. That packet-path rule does not exclude the separately
-    owned FM0 U7a amendment.
+    same PR as a new family or kind, or as a payload, interaction, or
+    viewer-visibility change on an existing surface. That packet-path
+    rule does not exclude the separately owned FM0 U7a amendment.
 16. Deleting Python still referenced by packaged previous 946 is
     invalid.
 17. A versioned-path 931 capture remains an S1 / S4 fixture. It does
@@ -489,7 +495,8 @@ them.
 - Q1 / D1 / D2 generators
 - Q6 CI workflow and live ledger
 - U7 inventory and U7a contracts
-- Live adapter-contract or agent-contract edits
+- Live adapter-contract or agent-contract apply (draft in
+  [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md))
 - Catalog ID allocation
 
 ### 12.3 Families this runbook must not steal
@@ -513,7 +520,7 @@ them.
 | U5 / U6 runners | Tombstones and rewrite execution | FM0.5 Orks pilot |
 | Q6 CI | Version-lag gate and ledger | Freshness enforcement |
 | U-HOLD-ORKS-S4-COUNTS | Exact 20/73 S4 integers | S1 fixture, then S4 |
-| Live Track D D3 | Adapter and agent contract rewrites | FM0 binding contracts |
+| Live Track D D3 apply | Adapter and agent live-file rewrites | Binding contracts; draft in [D3_CONTRACT_REWRITES.md](../contracts/D3_CONTRACT_REWRITES.md) |
 
 ## 14. What "U8 runbook delivered" means
 
