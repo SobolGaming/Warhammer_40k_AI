@@ -398,7 +398,15 @@
     {
       "label": "Blitz Brigade DP 2 to 1",
       "impact_class": "construction_constraint",
-      "layer_a": "current_without_carry_forward",
+      "layer_a": "already_authorized_at_new_provenance_pin",
+      "layer_a_authorization": "existing_equivalent_carry_forward",
+      "construction_packet_writes": [
+        "layer_c_reattest"
+      ],
+      "construction_packet_does_not_write": [
+        "layer_a_equivalence",
+        "layer_a_recertification"
+      ],
       "permits_review_kinds": [
         "layer_c_reattest"
       ],

@@ -535,9 +535,13 @@ PR only defines them.
     own `layer_c_reattest`. The review must not store a fingerprint-unchanged
     result.
 16. A `construction_constraint` packet (Blitz Brigade DP 2→1) writes
-    `layer_c_reattest` after mustering validation. Layer A stays `current`
-    without a carry-forward review. That write is not Layer A
-    recertification and does not restore carry-forward on a Bannernob
+    `layer_c_reattest` after mustering validation. Precondition: Layer A
+    is already `current` at the new transcription pin through an existing
+    `equivalent` carry-forward review (DP/disposition text is in the F00
+    suffix, so the hash changed even though the semantic fingerprint did
+    not). The construction packet does not write a second Layer A review
+    and does not recertify A. That C write is not a construction-change
+    exemption from §7.1 and does not restore carry-forward on a Bannernob
     sibling.
 17. A datasheet row whose Layer A is `stale` caps `attained_level` at L3
     even when earlier L4–L8 evidence exists (Eldrad without an authorizing
@@ -554,7 +558,7 @@ Planning examples. FM0 emits the real `content_status`. This PR does not.
 | Bannernob | One row; A+B+C stale; no points-packet carry-forward | Union, not a merge; C review cannot make C current while A is stale |
 | Ghazghkull | One row; composition does not clear unclassified A | Three packets, one row |
 | Acts of Faith trigger | Army-rule row; A+C stale; cap L2 | F-ARMY-01; later `layer_a_recertification` restores A only |
-| Blitz Brigade DP 2→1 | Layer A current; B then C after validation and `layer_c_reattest` | `construction_constraint`; no A remap |
+| Blitz Brigade DP 2→1 | Layer A already authorized at the new pin; construction packet writes C re-attest only | `construction_constraint`; fingerprint unchanged, so A uses carry-forward, not recertification |
 | Brute Bosses | Staging until official provenance and catalog ID | Not L0 |
 | More Dakka! @ 946 | `freshness: retired`; current-version mustering blocker | Historical 931 row is a different `content_set_version` |
 | Orks faction index @ FM0.5 | `first_certified_at_content_set: null` | Rewrite overlay does not certify |
