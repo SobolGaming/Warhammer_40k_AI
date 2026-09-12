@@ -5622,6 +5622,14 @@ recorded, then interrupted before gathering; the engine emits
 `target_replacement_interrupts_resolution_choice` and asks for replacement.
 `target_replacement_resolved` records the controlling decision, source context,
 replacement targets (null for decline), resulting pools and used pool indices.
+Out-of-phase owners update their sequence and active pools atomically. An accepted
+replacement creates a distinct selected-as-target reaction window identified by
+its recorded result ID, with only that selection's replacement targets in the
+trigger payload. The attack sequence ID stays unchanged. Repeated advances and
+checkpoint restoration reuse that window; declines create no target selection.
+Existing CP costs and phase/turn/game Stratagem usage restrictions still apply.
+The existing opaque timing-window identity and selected-target payload schemas
+cover this behavior without new fields.
 The engine then resumes the normal action path. Stale, forged, malformed or
 wrong-actor choices are invalid before queue pop and do not mutate state.
 Checkpoint restore authenticates the pending request and replacement history;

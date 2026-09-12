@@ -1,8 +1,9 @@
 # Order 42 — shared target invalidation and replacement
 
 P04 / C04-01, developed against `b3186efa6de212f98f146d0e2099ebffbf622fa5`
-and merged with main `58905502` before PR publication. The latter adds only
-faction status documentation; the runtime identity is unchanged by that merge.
+and merged with main `58905502` before PR publication and `d070210f` for the
+review fixes. Both main updates add faction documentation; they leave the
+runtime identity unchanged.
 
 ## Invariant and source
 
@@ -84,9 +85,36 @@ identity/contract artifacts, regression/architecture tests and timing evidence.
 The existing Charge movement budget, Fire Overwatch timing repair (Order 45),
 critical-hit/Snap hit resolver (Order 43), and faction support remain separate.
 
+## Review invariants
+
+R42-001 requires the active out-of-phase owner's pools to equal its sequence's
+pools. `OutOfPhaseShootingState.with_attack_sequence_update` now updates both
+together, including retained shoot-on-death execution. The bug-class search
+covered ordinary Shooting's intentionally cumulative declaration history,
+out-of-phase active and completed state, retained hosts, and the shared sequence
+update callers. Retained completion authenticates changed pools against executor
+completion evidence and the same declaration/replacement-history validator used
+by active sequences. Missing declaration or replacement decisions/events remain
+errors. A facade-driven retained-shooting regression accepts replacement, restores
+before and after the choice and through completion, then reproduces exact replay.
+
+R42-002 requires each accepted replacement selection to have its own defensive
+reaction window. The shared selected-target service derives the window from the
+recorded replacement result and scopes its targets to that selection. It preserves
+the original attack sequence ID and existing CP and Stratagem usage ledgers.
+Unending Fidelity regressions cover original-window decline, use or decline of
+the fresh target's window, unchanged targets excluded from the new window,
+restoration/replay, and prevention of a second phase use with 1 CP remaining.
+The static audit keeps the shared decline, usage and eligibility checks on the
+reaction path and the shared replacement validator on the completion path.
+
+These repairs change four production modules within existing ownership
+boundaries. They introduce no new decision family, payload field, named handler,
+source semantics or content-specific reaction dispatch.
+
 ## Validation
 
-The focused replacement file has 25 passing regressions, including facade
+The focused replacement file has 29 passing regressions, including facade
 submission, malformed/stale rejection without queue pop, pending restore,
 exact replay, both players and a spectator, Firing Deck, One Shot, random Attacks,
 out-of-phase Snap source restrictions and protection for gathered attacks.
@@ -105,17 +133,17 @@ rebuilding, and declaration validation reuses one complete pure geometry query.
 The key covers every input, including nested source mappings; runtime restrictions
 are evaluated separately. No budget is raised.
 
-Final behavioral validation passes all 7,484 tests with 85.05% coverage in
-577.57 seconds, using xdist work stealing and the required Node.js PATH. The
+Final behavioral validation passes all 7,488 tests with 85.06% coverage in
+511.65 seconds, using xdist work stealing and the required Node.js PATH. The
 successful JUnit profile regenerates all eight shard manifests and
 `durations.json`; the exact fail-closed shard check passes.
 
-Ruff, formatting, mypy (2,970 files), pyright and all 11 import contracts pass.
+Ruff, formatting, mypy (2,971 files), pyright and all 11 import contracts pass.
 Source generation and runtime identity are verified. Contract regeneration
-matches merged main `58905502`; TypeScript checks, five client unit tests and all
+matches merged main `d070210f`; TypeScript checks, five client unit tests and all
 342 conformance assertions pass. The installed-wheel smoke verifies 2,768 runtime
 resources and 27 schemas against runtime identity
-`84b0a9d3d5b7e305b8766394ec6a75c2ff84121f9b5a60fc395cafe62b3f23b8`.
+`5aa34244db47285239dc384b5b8addaeefdfc3705efa77350f0242ce6f25e647`.
 Pre-commit passes without changing production code. The final complete
-code-quality suite passes all 440 tests without coverage in 115.54 seconds,
+code-quality suite passes all 441 tests without coverage in 105.14 seconds,
 including the unchanged Order 33/34 budgets and the Order 42 evidence gate.

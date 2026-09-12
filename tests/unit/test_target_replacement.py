@@ -108,6 +108,228 @@ def test_shooting_replaces_a_moved_target_through_the_facade_and_replays() -> No
     assert replay.status is ReplayRunStatus.REPRODUCED, replay
 
 
+def test_out_of_phase_replacement_keeps_owner_pools_through_completion_restore_and_replay() -> None:
+    """R42-001: the active out-of-phase action owns one consistent pool tuple."""
+    from tests.core_stratagem_helpers import _replace_unit_poses
+    from tests.phase13b_shooting_declaration_helpers import _decision_request
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+    from tests.target_replacement_reaction_helpers import replacement_reaction_scene
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.geometry.pose import Pose
+
+    lifecycle, units, request = replacement_reaction_scene(out_of_phase=True)
+    assert request.decision_type == "select_resolve_target_unit"
+    state = lifecycle.state
+    assert state is not None
+    _replace_unit_poses(
+        state,
+        unit_instance_id=units["old"].unit_instance_id,
+        poses=tuple(Pose.at(90 + i, 90) for i in range(len(units["old"].own_models))),
+    )
+    initial = lifecycle.to_payload()
+    session = LocalGameSession(lifecycle=lifecycle)
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id="order42:resolution",
+        )
+    )
+    assert request.decision_type == "select_target_replacement"
+    checkpoint = session.lifecycle.to_payload()
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+    assert session.lifecycle.to_payload() == checkpoint
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=f"target:{units['new'].unit_instance_id}",
+        result_id="order42:replacement",
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    owner = state.out_of_phase_shooting_state
+    assert owner is not None
+    assert owner.attack_sequence is not None
+    assert owner.attack_pools == owner.attack_sequence.attack_pools
+    assert {pool.target_unit_instance_id for pool in owner.attack_pools} == {
+        units["new"].unit_instance_id,
+        units["unchanged"].unit_instance_id,
+    }
+    replacement_pools = owner.attack_pools
+    for _ in range(30):
+        checkpoint = session.lifecycle.to_payload()
+        session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+        assert session.lifecycle.to_payload() == checkpoint
+        state = session.lifecycle.state
+        assert state is not None
+        owner = state.out_of_phase_shooting_state
+        if owner is None:
+            break
+        assert owner.attack_pools == replacement_pools
+        submit_fixture_request(session, pending_request(session))
+    else:
+        raise AssertionError("The replaced out-of-phase attack did not complete.")
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.retained_shooting_history import (
+        validate_retained_shooting_history,
+    )
+
+    events = session.lifecycle.decision_controller.event_log.records
+    completion = next(e for e in events if e.event_type == "retained_shooting_attacks_completed")
+    assert isinstance(completion.payload, dict)
+    assert completion.payload["attack_pools"] == [p.to_payload() for p in replacement_pools]
+    for removed_type, result_id in (
+        ("target_replacement_resolved", None),
+        ("decision_recorded", "order42:replacement"),
+        ("decision_recorded", "order42:declaration"),
+    ):
+        removed = next(
+            e
+            for e in events
+            if e.event_type == removed_type
+            and (
+                result_id is None
+                or (
+                    isinstance(e.payload, dict)
+                    and "result" in e.payload
+                    and isinstance(e.payload["result"], dict)
+                    and e.payload["result"].get("result_id") == result_id
+                )
+            )
+        )
+        with pytest.raises(GameLifecycleError, match=r"[Rr]eplacement"):
+            validate_retained_shooting_history(
+                state=state, event_records=tuple(e for e in events if e != removed)
+            )
+    artifact = ReplayArtifact.capture(
+        artifact_id="order42:out-of-phase-replay",
+        final_lifecycle=session.lifecycle,
+        initial_lifecycle_payload=initial,
+    )
+    replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+@pytest.mark.parametrize(
+    ("use_original", "decline_new"), [(False, False), (False, True), (True, False)]
+)
+def test_replacement_opens_a_fresh_defensive_window_without_resetting_usage(
+    use_original: bool,
+    decline_new: bool,
+) -> None:
+    """R42-002: selection windows are distinct; phase-wide usage stays authoritative."""
+    from tests.core_stratagem_helpers import _replace_unit_poses
+    from tests.phase13b_shooting_declaration_helpers import _decision_request
+    from tests.target_replacement_reaction_helpers import replacement_reaction_scene
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.stratagems import stratagem_window_context_from_request
+    from warhammer40k_core.geometry.pose import Pose
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        retained_attack_sources_2026_09 as retained_sources,
+    )
+
+    profile = retained_sources.stratagem_profile()
+    lifecycle, units, request = replacement_reaction_scene(command_points=2 if use_original else 1)
+    original_window = stratagem_window_context_from_request(request)
+    session = LocalGameSession(lifecycle=lifecycle)
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=f"use-stratagem:{profile.stratagem_id}:target:{units['old'].unit_instance_id}"
+            if use_original
+            else "decline_stratagem_window",
+            result_id="order42:original-defense",
+        )
+    )
+    assert request.decision_type == "select_resolve_target_unit"
+    state = lifecycle.state
+    assert state is not None
+    assert state.command_point_total("player-b") == 1
+    _replace_unit_poses(
+        state,
+        unit_instance_id=units["old"].unit_instance_id,
+        poses=tuple(Pose.at(90 + i, 90) for i in range(len(units["old"].own_models))),
+    )
+    initial = lifecycle.to_payload()
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id="order42:resolution",
+        )
+    )
+    assert request.decision_type == "select_target_replacement"
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=f"target:{units['new'].unit_instance_id}",
+            result_id="order42:replacement",
+        )
+    )
+    checkpoint = session.lifecycle.to_payload()
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+    assert session.lifecycle.to_payload() == checkpoint
+    if use_original:
+        assert request.decision_type == "select_resolve_target_unit"
+        assert (
+            len(
+                [
+                    e
+                    for e in session.lifecycle.decision_controller.event_log.records
+                    if e.event_type == "unit_selected_as_target_stratagem_window_opened"
+                ]
+            )
+            == 1
+        )
+    else:
+        replacement_window = stratagem_window_context_from_request(request)
+        assert replacement_window.timing_window_id != original_window.timing_window_id
+        assert replacement_window.trigger_payload == {
+            "selected_target_unit_instance_ids": [units["new"].unit_instance_id],
+            "attacking_unit_instance_id": units["source"].unit_instance_id,
+            "attacking_player_id": "player-a",
+            "attack_sequence_id": "attack-sequence:order42:declaration",
+        }
+        assert {option.option_id for option in request.options} == {
+            f"use-stratagem:{profile.stratagem_id}:target:{units['new'].unit_instance_id}",
+            "decline_stratagem_window",
+        }
+        request = _decision_request(
+            session.submit_option(
+                request_id=request.request_id,
+                option_id="decline_stratagem_window"
+                if decline_new
+                else f"use-stratagem:{profile.stratagem_id}:target:{units['new'].unit_instance_id}",
+                result_id="order42:new-defense",
+            )
+        )
+        assert request.decision_type == "select_resolve_target_unit"
+        state = session.lifecycle.state
+        assert state is not None
+        assert state.command_point_total("player-b") == (1 if decline_new else 0)
+        assert [
+            effect.target_unit_instance_ids
+            for effect in state.persisting_effects
+            if effect.source_rule_id == profile.source_id
+        ] == ([] if decline_new else [(units["new"].unit_instance_id,)])
+        checkpoint = session.lifecycle.to_payload()
+        session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+        assert session.advance_until_decision_or_terminal().decision_request == request
+        assert session.lifecycle.to_payload() == checkpoint
+    artifact = ReplayArtifact.capture(
+        artifact_id="order42:defensive-window-replay",
+        final_lifecycle=session.lifecycle,
+        initial_lifecycle_payload=initial,
+    )
+    replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
 @pytest.mark.parametrize(
     ("mode", "decline"),
     [(mode, decline) for mode in ("normal", "one_shot", "random") for decline in (False, True)]

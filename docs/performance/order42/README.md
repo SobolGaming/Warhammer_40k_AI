@@ -51,9 +51,12 @@ Order 32 budgets. Full-game 60-second mean / 300-second observed maximum targets
 remain outstanding under the versioned performance policy.
 
 
-The retained Apple M5 Pro / Python 3.14.5 head run passes the fixed bounds.
-Eligible-target resolution averages 31.368 ms versus 17.717 ms on base. A moved
-target averages 5.279 ms and no alternative averages 4.478 ms, because head stops
+The revised Apple M5 Pro / Python 3.14.5 head run after R42-001/002 passes
+the fixed bounds. Runtime identity is
+`5aa34244db47285239dc384b5b8addaeefdfc3705efa77350f0242ce6f25e647`.
+The same committed workload and base evidence remain unchanged.
+Eligible-target resolution averages 33.611 ms versus 17.717 ms on base. A moved
+target averages 5.509 ms and no alternative averages 4.686 ms, because head stops
 at the replacement decision while the incorrect base proceeds into attacks.
-The maximum retained head sample is 58.402 ms. These latter cases measure
+The maximum retained head sample is 68.148 ms. These latter cases measure
 different rules work and do not establish an attack-resolution speedup.

@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:84b0a9d3d5b7e305b8766394ec6a75c2ff84121f9b5a60fc395cafe62b3f23b8",
-  "fingerprint": "84b0a9d3d5b7e305b8766394ec6a75c2ff84121f9b5a60fc395cafe62b3f23b8",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5aa34244db47285239dc384b5b8addaeefdfc3705efa77350f0242ce6f25e647",
+  "fingerprint": "5aa34244db47285239dc384b5b8addaeefdfc3705efa77350f0242ce6f25e647",
   "resource_count": 2768,
   "resources": [
     {
@@ -10625,9 +10625,9 @@
       "sha256": "f48fe89a9f899c0ae3d7220a4b36891691a5bc1b766300bf2485f6e8b94bffe1"
     },
     {
-      "byte_length": 48859,
+      "byte_length": 48944,
       "path": "warhammer40k_core/engine/phases/shooting_model.py",
-      "sha256": "cc314acf49cab0bd7c2396e262784900eec66637911b79a61e672de1bbe86d11"
+      "sha256": "a08fb4469ffe22ad2241601ba7455b3e0f02a4beb86e76bda64fbe86eb40200f"
     },
     {
       "byte_length": 42368,
@@ -11290,9 +11290,9 @@
       "sha256": "2626daf5550ae92f079110351a72fe809e270a282c2cb916173c23649ddd8708"
     },
     {
-      "byte_length": 13633,
+      "byte_length": 14335,
       "path": "warhammer40k_core/engine/retained_shooting_history.py",
-      "sha256": "82c6de25ae68aefd78cc899ce0f49d88e919e7b2397e76723bd63673f0167546"
+      "sha256": "f6f77b13a0a8ada92b7e2ae962f8268b509cc25445f9edf979734ff8021f1e5a"
     },
     {
       "byte_length": 38985,
@@ -11570,9 +11570,9 @@
       "sha256": "d82f177dd4a258dcd9e4d2c023000de348c8b0ddacfcd21046b201d3019688a2"
     },
     {
-      "byte_length": 7642,
+      "byte_length": 8882,
       "path": "warhammer40k_core/engine/selected_target_stratagem_reactions.py",
-      "sha256": "b9163d085ff9fa2e5e25848926cf41f7fd1477a0556090d7792dd0f2219faa33"
+      "sha256": "ccbed5dfdc078f22753e62130b3e0ac2effe366d47a2825bad1a19f91aa59e1f"
     },
     {
       "byte_length": 32395,
@@ -11640,9 +11640,9 @@
       "sha256": "5cb479678acb9e48ff2b142ace0c95def361f9e90d665a79e067e97755be3f72"
     },
     {
-      "byte_length": 10399,
+      "byte_length": 11677,
       "path": "warhammer40k_core/engine/shooting_target_replacement_authority.py",
-      "sha256": "747e817e3158760392f01af755dfa91839136773cfae5e659750592314d4ee62"
+      "sha256": "a53a44b5429af30e91ceb06014265160f6816f91c3393fb3d1c8082cfd418c18"
     },
     {
       "byte_length": 59474,

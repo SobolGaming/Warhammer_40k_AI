@@ -83,3 +83,33 @@ def test_target_replacement_source_generator_is_reproducible() -> None:
         check=True,
         cwd=ROOT,
     )
+
+
+def test_replacement_reactions_and_completion_keep_shared_authority() -> None:
+    """R42-001/002: replacement cannot substitute local usage/history policies."""
+    engine = ROOT / "src/warhammer40k_core/engine"
+    reactions = ast.parse((engine / "selected_target_stratagem_reactions.py").read_text())
+    request = next(
+        node
+        for node in reactions.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "request_after_unit_selected_as_target_stratagem_if_available"
+    )
+    calls = {
+        node.func.id
+        for node in ast.walk(request)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert {
+        "_latest_target_selection",
+        "stratagem_window_declined_for_context",
+        "stratagem_used_for_context",
+        "stratagem_use_options_from_index",
+    }.issubset(calls)
+    completion = ast.parse((engine / "retained_shooting_history.py").read_text())
+    assert any(
+        isinstance(node, ast.ImportFrom)
+        and node.module == "warhammer40k_core.engine.shooting_target_replacement_authority"
+        and any(alias.name == "validate_completed_replacement_authority" for alias in node.names)
+        for node in ast.walk(completion)
+    )

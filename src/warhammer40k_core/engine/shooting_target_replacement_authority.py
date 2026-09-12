@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, cast
 
 import msgspec
 
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.target_replacement import (
     SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
@@ -19,7 +20,6 @@ from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, Ranged
 if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence import AttackSequence
     from warhammer40k_core.engine.decision_controller import DecisionController
-    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phases.shooting_handler import ShootingPhaseHandler
 
@@ -51,9 +51,15 @@ def accepted_pools(
     decisions: DecisionController,
     record: DecisionRecord,
 ) -> tuple[RangedAttackPool, ...]:
+    return _accepted_pools(decisions.event_log.records, record)
+
+
+def _accepted_pools(
+    event_records: tuple[EventRecord, ...], record: DecisionRecord
+) -> tuple[RangedAttackPool, ...]:
     events = [
         event
-        for event in decisions.event_log.records
+        for event in event_records
         if event.event_type
         in (
             "shooting_declaration_accepted",
@@ -75,10 +81,40 @@ def validate_sequence_authority(
     record: DecisionRecord,
     sequence: AttackSequence,
 ) -> None:
-    expected = accepted_pools(decisions, record)
+    _validate_sequence_history(
+        decisions.event_log.records, tuple(decisions.records), record, sequence
+    )
+
+
+def validate_completed_replacement_authority(
+    *, event_records: tuple[EventRecord, ...], sequence: AttackSequence
+) -> None:
+    """Completion consumers authenticate the same pool changes as active owners."""
+    records = tuple(
+        DecisionRecord.from_payload(cast(DecisionRecordPayload, event.payload))
+        for event in event_records
+        if event.event_type == "decision_recorded"
+    )
+    declarations = tuple(
+        record
+        for record in records
+        if sequence.sequence_id == f"out-of-phase-attack-sequence:{record.result.result_id}"
+    )
+    if len(declarations) != 1:
+        raise GameLifecycleError("Completed replacement requires one declaration decision.")
+    _validate_sequence_history(event_records, records, declarations[0], sequence)
+
+
+def _validate_sequence_history(
+    event_records: tuple[EventRecord, ...],
+    records: tuple[DecisionRecord, ...],
+    record: DecisionRecord,
+    sequence: AttackSequence,
+) -> None:
+    expected = _accepted_pools(event_records, record)
     forgone: set[int] = set()
-    records_by_result_id = {r.result.result_id: r for r in decisions.records}
-    for event in decisions.event_log.records:
+    records_by_result_id = {r.result.result_id: r for r in records}
+    for event in event_records:
         if event.event_type != "target_replacement_resolved":
             continue
         payload = event.payload

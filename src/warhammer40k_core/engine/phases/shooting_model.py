@@ -900,7 +900,9 @@ class OutOfPhaseShootingState:
             selected_unit_instance_id=self.selected_unit_instance_id,
             target_unit_ids=self.target_unit_ids,
             grant_effect_ids=self.grant_effect_ids,
-            attack_pools=self.attack_pools,
+            attack_pools=self.attack_pools
+            if attack_sequence is None
+            else attack_sequence.attack_pools,
             pending_completed_attack_sequence=attack_completion_continuation(
                 previous=self.attack_sequence,
                 updated=attack_sequence,

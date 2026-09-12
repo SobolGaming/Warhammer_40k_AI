@@ -7,6 +7,11 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.target_replacement import (
+    SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
+    TargetReplacementContext,
+    replacement_selection,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -55,7 +60,9 @@ def request_after_unit_selected_as_target_stratagem_if_available(
         raise GameLifecycleError("Selected-as-target trigger requires an AttackSequence.")
     if type(phase) is not BattlePhase:
         raise GameLifecycleError("Selected-as-target trigger requires BattlePhase.")
-    target_unit_ids = target_unit_ids_for_attack_sequence(attack_sequence)
+    selection_id, target_unit_ids = _latest_target_selection(
+        decisions=decisions, attack_sequence=attack_sequence
+    )
     if not target_unit_ids:
         return None
     attacking_player_id = attack_sequence.attacker_player_id
@@ -67,7 +74,7 @@ def request_after_unit_selected_as_target_stratagem_if_available(
             player_id=reacting_player_id,
             trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
             timing_window_id=selected_as_target_timing_window_id(
-                sequence_id=attack_sequence.sequence_id,
+                sequence_id=selection_id,
                 player_id=reacting_player_id,
             ),
             trigger_payload={
@@ -128,6 +135,30 @@ def request_after_unit_selected_as_target_stratagem_if_available(
             },
         )
     return None
+
+
+def _latest_target_selection(
+    *, decisions: DecisionController, attack_sequence: AttackSequence
+) -> tuple[str, tuple[str, ...]]:
+    """A replacement is a new selection; a decline selects no targets.
+
+    Use the authoritative decision history so restoration and repeated advances
+    identify the same window without another mutable per-sequence counter.
+    """
+    for record in reversed(decisions.records):
+        if record.request.decision_type != SELECT_TARGET_REPLACEMENT_DECISION_TYPE:
+            continue
+        context = TargetReplacementContext.from_payload(record.request.payload)
+        if context.action_id != attack_sequence.sequence_id:
+            continue
+        targets = replacement_selection(
+            request=record.request, result=record.result, current=context
+        )
+        return (
+            f"target-replacement:{record.result.result_id}",
+            () if targets is None else targets,
+        )
+    return attack_sequence.sequence_id, target_unit_ids_for_attack_sequence(attack_sequence)
 
 
 def selected_as_target_timing_window_id(*, sequence_id: str, player_id: str) -> str:
