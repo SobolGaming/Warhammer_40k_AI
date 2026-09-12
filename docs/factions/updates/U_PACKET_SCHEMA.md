@@ -1,6 +1,6 @@
 # U3 packet schema — draft Track D agent contract
 
-[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Retention](U7_RETENTION.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T6 decision-kind taxonomy](../taxonomy/T6_DECISION_KIND_VISIBILITY.md) · [Live agent contract](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Classification system](U_CLASSIFICATION_SYSTEM.md) · [Retention](U7_RETENTION.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T6 decision-kind taxonomy](../taxonomy/T6_DECISION_KIND_VISIBILITY.md) · [Live agent contract](../../FACTION_AGENT_IMPLEMENTATION_CONTRACT.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is the **FM-pre packet schema**: the data-first work-packet
 contract U3 will emit and Track C / Track G will reuse. It is the draft
@@ -38,10 +38,11 @@ packets).
 **FM0 implements the packet generator and the live agent-contract
 rewrite.** It must not emit one packet per page, one packet per scaffold
 directory, or a content packet that lists the adapter contract as an
-allowed file. U8, capture tooling, and the S4 tool remain later. Q1
-schema is delivered in
+allowed file. Capture tooling and the S4 tool remain later. Q1 schema
+is delivered in
 [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md). Retention
-design is delivered in [U7_RETENTION.md](U7_RETENTION.md).
+design is delivered in [U7_RETENTION.md](U7_RETENTION.md). Cadence
+design is delivered in [U8_RUNBOOK.md](U8_RUNBOOK.md).
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms. T4 still owns construction
 families. T5 still owns ledgers. T6 still owns submission kind and
@@ -235,7 +236,7 @@ overlay or family packets are extra rows, not substitutes.
 | `attachment_or_keyword` | `implementation` | `regenerate_attachment_or_keyword`, `fieldability_regression`, `layer_c_reattest` | Layer A remap | none unless clauses also changed |
 | `construction_constraint` | `implementation` | `regenerate_t4_constraints`, `mustering_regression`, `layer_c_reattest` | treating DP as `points_only`; Layer A remap | Core P25C surfaces |
 | `composition_or_options` | `implementation` | `regenerate_composition_or_options`, `fieldability_regression`, `layer_c_reattest` | treating size removal as `points_only` | none |
-| `faction_rewrite` | `overlay` | `u6_rewrite_procedure` | suppressing per-entity packets | U6 runbook (later design) |
+| `faction_rewrite` | `overlay` | `u6_rewrite_procedure` | suppressing per-entity packets | [U8 runbook](U8_RUNBOOK.md) §6 |
 
 `layer_c_reattest` never silently preserves L7/L8 on a new content-set or
 build identity. Packets still *require* that work item; they write the
@@ -458,7 +459,8 @@ exist. Packets index them.
   [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md))
 - U7 / U7a implementation (design delivered in
   [U7_RETENTION.md](U7_RETENTION.md))
-- U8 runbook (U1, U5, U6, Q6)
+- U1 / U5 / U6 / Q6 implementation (cadence delivered in
+  [U8_RUNBOOK.md](U8_RUNBOOK.md))
 - S4 tool and Orks 20/73 fixture
 - Catalog ID allocation
 

@@ -5,6 +5,7 @@
   "not_a_content_set_record": true,
   "survey_document": "docs/factions/updates/U7_RETENTION.md",
   "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
+  "runbook_document": "docs/factions/updates/U8_RUNBOOK.md",
   "packet_schema_document": "docs/factions/updates/U_PACKET_SCHEMA.md",
   "classification_document": "docs/factions/updates/U_CLASSIFICATION_SYSTEM.md",
   "delivered_to": "FM0 U7 packaging inventory, version-aware loaders, and U7a compatibility record (design only)",
@@ -314,7 +315,7 @@
     {
       "id": "U8 runbook",
       "hold": "Capture through regenerate cadence",
-      "unblocks": "Per-release runbook"
+      "unblocks": "docs/factions/updates/U8_RUNBOOK.md; tools remain FM0"
     }
   ],
   "not_in_this_pr": [
@@ -324,7 +325,7 @@
     "ADAPTER_DECISION_CONTRACT.md edits",
     "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
     "live Q1 content_status artifact",
-    "U8 runbook",
+    "U8 cadence implementation",
     "catalog.json rewrites",
     "army-list ID changes",
     "F00 policy amendment"

@@ -1,6 +1,6 @@
 # Faction audit: source and evidence register
 
-[Faction directory](FACTION_SUPPORT.md) · [Remediation roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) · [Track U classification](factions/updates/U_CLASSIFICATION_SYSTEM.md) · [Track U packet schema](factions/updates/U_PACKET_SCHEMA.md) · [Retention](factions/updates/U7_RETENTION.md) · [Q1 status artifact](factions/status/Q1_STATUS_ARTIFACT.md)
+[Faction directory](FACTION_SUPPORT.md) · [Remediation roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](factions/identity/S2_IDENTITY_MODEL.md) · [Track U classification](factions/updates/U_CLASSIFICATION_SYSTEM.md) · [Track U packet schema](factions/updates/U_PACKET_SCHEMA.md) · [Retention](factions/updates/U7_RETENTION.md) · [Runbook](factions/updates/U8_RUNBOOK.md) · [Q1 status artifact](factions/status/Q1_STATUS_ARTIFACT.md)
 
 ## Observation boundary
 
