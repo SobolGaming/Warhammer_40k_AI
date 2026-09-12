@@ -1,0 +1,82 @@
+{
+  "artifact_schema": "core-v2-core-target-replacement-source-v1",
+  "source_package_id": "gw-11e-core-target-replacement",
+  "source_version": "maintained-app-mirrors-observed-2026-09-12",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-target-replacement:target-no-longer-eligible-or-viable",
+      "section_id": "04.03.03",
+      "source_text": "Target No Longer Eligible Or Viable\nIf a unit that was an eligible target for a rule or attack when it was selected stops being an eligible target (for example, because a rule enables it to make an out-of-phase move that takes it out of range), the controlling player can select new targets.",
+      "transcription_sha256": "79602f3c84d99ea65d29f823d93e5959d8af3ea3b87cc026e7f3d3ce01ae3b91",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.target_replacement:replacement_selection",
+        "warhammer40k_core.engine.shooting_target_replacement:next_shooting_target_replacement"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-target-replacement-review:target-no-longer-eligible-or-viable",
+      "rule_source_id": "gw-11e-core-target-replacement:target-no-longer-eligible-or-viable",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 04.03.03 target-no-longer-eligible-or-viable",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "79602f3c84d99ea65d29f823d93e5959d8af3ea3b87cc026e7f3d3ce01ae3b91",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "370116c8e72635604d1c06b577d40a180a4b860b6fbfbb0cfb400078f569d96e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.target_replacement:replacement_selection",
+        "warhammer40k_core.engine.shooting_target_replacement:next_shooting_target_replacement"
+      ]
+    },
+    {
+      "evidence_id": "core-target-replacement-mirror:target-no-longer-eligible-or-viable",
+      "rule_source_id": "gw-11e-core-target-replacement:target-no-longer-eligible-or-viable",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-target-replacement-maintained-app-mirrors-2026-09-12",
+      "review_audit_row_id": "target-no-longer-eligible-or-viable",
+      "review_audit_source_observation_sha256": "353f37876d9d0c350816ce148aff18738a5477e0de6abf773f9e48760aecd2d8",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 04.03.03 target-no-longer-eligible-or-viable",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/04-making-attacks",
+      "observed_at": "2026-09-12T14:47:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "79602f3c84d99ea65d29f823d93e5959d8af3ea3b87cc026e7f3d3ce01ae3b91",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "4da420ae75a0d869e9a4671facb0919d94179e45a0efc6608e223e28b24d0946",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.target_replacement:replacement_selection",
+        "warhammer40k_core.engine.shooting_target_replacement:next_shooting_target_replacement"
+      ]
+    }
+  ],
+  "package_hash": "9a32847668ff15c3b8be04c777e3c92e72b8e4895b34041f9015f9e598442881"
+}

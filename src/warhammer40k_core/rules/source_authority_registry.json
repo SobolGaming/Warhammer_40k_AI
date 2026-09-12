@@ -630,6 +630,16 @@
           "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-12T11:17:25Z"
+        },
+        {
+          "audit_id": "core-target-replacement-maintained-app-mirrors-2026-09-12",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-12T14:47:00+00:00",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "provider_name": "40k.app",
+          "row_id": "target-no-longer-eligible-or-viable",
+          "source_observation_sha256": "353f37876d9d0c350816ce148aff18738a5477e0de6abf773f9e48760aecd2d8",
+          "source_url": "https://www.40k.app/rules/04-making-attacks"
         }
       ],
       "legacy_observations": [
@@ -1077,6 +1087,15 @@
             "gw-11e-core-stratagems:core:smokescreen"
           ],
           "catalog_sha256": "f5b55c15d38956fa0662bcaf7ad0ef40414440e330f61b86c75cd1d9ff745c62"
+        },
+        {
+          "allowed_rule_source_ids": [
+            "gw-11e-core-target-replacement:target-no-longer-eligible-or-viable"
+          ],
+          "catalog_sha256": "7950519230872ac982cee490834a5e41b6797923ad4fdfcae9f19aa763fc8668",
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-target-replacement",
+          "version": "maintained-app-mirrors-observed-2026-09-12"
         }
       ]
     },

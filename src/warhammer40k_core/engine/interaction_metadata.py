@@ -271,6 +271,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         "select_shooting_unit_grant": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "select_stratagem_cost_modifier_option": InteractionSpec(InteractionKind.CONFIRMATION),
         "select_tempting_target_objective": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
+        "select_target_replacement": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_tracked_target": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("target_unit",),

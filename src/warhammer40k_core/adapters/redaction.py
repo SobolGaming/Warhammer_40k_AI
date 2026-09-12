@@ -93,6 +93,7 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
 _INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset(
     {"effect_snapshot_sha256", "psychic_modifier_history_origin"}
 )
+_INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS = frozenset({"target_replacement_authority_sha256"})
 
 
 class RedactedLifecycleStatusPayload(TypedDict):
@@ -806,7 +807,11 @@ def _without_internal_authority_commitments(value: JsonValue) -> JsonValue:
             key: _without_internal_authority_commitments(nested)
             for key, nested in value.items()
             if key
-            not in _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS | _INTERNAL_PSYCHIC_AUTHORITY_KEYS
+            not in (
+                _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS
+                | _INTERNAL_PSYCHIC_AUTHORITY_KEYS
+                | _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS
+            )
         }
     if isinstance(value, list):
         return [_without_internal_authority_commitments(nested) for nested in value]

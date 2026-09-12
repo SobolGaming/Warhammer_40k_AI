@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.shooting_target_replacement import request_shooting_target_replacement
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.shooting_imports import *
@@ -177,6 +179,12 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 attack_sequence=shooting_state.attack_sequence,
+                before_gathering=lambda sequence: request_shooting_target_replacement(
+                    handler=self,
+                    state=state,
+                    decisions=decisions,
+                    sequence=sequence,
+                ),
                 already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
                 stratagem_index=self.stratagem_index,
                 runtime_modifier_registry=self.runtime_modifier_registry,
@@ -360,6 +368,12 @@ class ShootingPhaseHandler:
             decisions=decisions,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             attack_sequence=out_of_phase_state.attack_sequence,
+            before_gathering=lambda sequence: request_shooting_target_replacement(
+                handler=self,
+                state=state,
+                decisions=decisions,
+                sequence=sequence,
+            ),
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
             stratagem_index=self.stratagem_index,
             runtime_modifier_registry=self.runtime_modifier_registry,
@@ -882,6 +896,29 @@ class ShootingPhaseHandler:
             )
             return None
         if result.decision_type in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
+            from warhammer40k_core.engine.shooting_target_replacement import (
+                active_shooting_sequence,
+            )
+
+            replacement_status = request_shooting_target_replacement(
+                handler=self,
+                state=state,
+                decisions=decisions,
+                sequence=active_shooting_sequence(state),
+            )
+            if replacement_status is not None:
+                replacement_request = replacement_status.decision_request
+                if replacement_request is None:
+                    raise GameLifecycleError("Target replacement must request a decision.")
+                decisions.event_log.append(
+                    "target_replacement_interrupts_resolution_choice",
+                    {
+                        "source_decision_request_id": result.request_id,
+                        "source_decision_result_id": result.result_id,
+                        "replacement_request_id": replacement_request.request_id,
+                    },
+                )
+                return replacement_status
             _apply_attack_sequence_selection_decision(
                 state=state,
                 result=result,

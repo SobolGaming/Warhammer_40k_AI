@@ -600,6 +600,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "select_target_replacement",
+      "example_path": null,
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "select_tempting_target_objective",
       "example_path": null,
       "interaction_kinds": [
@@ -801,9 +811,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 80,
+  "known_external_token_count": 81,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 78,
+  "registered_decision_type_count": 79,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",

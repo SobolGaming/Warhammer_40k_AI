@@ -4683,3 +4683,17 @@ source text/observations remain unchanged; only Explosives execution status and
 derived package hashes advance. See [scope, acceptance and validation](ORDER_41_SCOPE_PLAN.md)
 and [component assessment](performance/order41/README.md). Orders 42 onward are
 not included in this change.
+
+
+## Order 42 / P04 — shared target replacement
+
+C04-01 is implemented as an action-neutral finite target-replacement service,
+with canonical Shooting eligibility and engine-owned continuation. Invalidated
+unresolved targets require a fresh controlling-player choice or explicit decline.
+Committed physical weapons, One Shot uses, random Attacks, original Shooting
+mode and out-of-phase restrictions are preserved. Gathered attacks cannot be
+redirected. Checkpoint/decision/event authority and shared viewer redaction
+cover the new contract 15.3 family. Real Charge queries exercise the reusable
+service; its later-modifier action integration remains Order 46 / C11-03.
+See [scope and validation](ORDER_42_SCOPE_PLAN.md) and
+[component/small-slice evidence](performance/order42/README.md).

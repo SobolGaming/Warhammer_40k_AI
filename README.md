@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 42 adds shared target invalidation/replacement choices and the Shooting
+consumer, preserving committed weapons, dice, source restrictions, restore,
+replay and adapter visibility. See the [scope and validation](docs/ORDER_42_SCOPE_PLAN.md).
+Charge's later-modifier continuation remains Order 46.
+
 Order 41 implements during-phase Explosives through finite rules-unit/model/enemy
 choices, model-specific range and visibility, shared shooting restrictions and
 mortal-wound continuations. See [scope and validation](docs/ORDER_41_SCOPE_PLAN.md).
