@@ -1,6 +1,6 @@
 # U2 / U3 / U4 — Classification system
 
-[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is Track U items U2 (diff grain), U3 (impact classes), and U4
 (layer demotion) as **FM-pre planning evidence**. It closes the classification
@@ -279,7 +279,8 @@ indexes them.
   delivered in [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md))
 - Status invalidation (U4 implementation). Q1 *schema* is delivered in
   [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md)
-- U1 capture, U5 tombstone loaders, U6 rewrite runbook, U8, Q6
+- U1 capture, U5 tombstone loaders, U6 rewrite runner, Q6 CI
+  (cadence designed in [U8_RUNBOOK.md](U8_RUNBOOK.md))
 - U7 / U7a implementation (design delivered in
   [U7_RETENTION.md](U7_RETENTION.md))
 - Orks 20/73 fixture reproduction

@@ -13,6 +13,7 @@
   "does_not_change_catalog_ids": true,
   "q1_schema_document": "docs/factions/status/Q1_STATUS_ARTIFACT.md",
   "retention_document": "docs/factions/updates/U7_RETENTION.md",
+  "runbook_document": "docs/factions/updates/U8_RUNBOOK.md",
   "owner_d3_retention_is_not_this_document": true,
   "snapshot": {
     "observed_on": "2026-09-05",
@@ -644,7 +645,7 @@
     "ADAPTER_DECISION_CONTRACT.md edits",
     "live Q1 content_status artifact",
     "U7 U7a implementation",
-    "U8 runbook",
+    "U8 cadence implementation",
     "catalog.json rewrites",
     "army-list ID changes",
     "F00 policy amendment"
