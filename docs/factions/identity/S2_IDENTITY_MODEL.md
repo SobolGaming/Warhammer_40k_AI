@@ -1,6 +1,6 @@
 # S2 — Identity model
 
-[Identity index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Source policy (F00)](../../FACTION_RULES_SOURCE_POLICY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Track T taxonomy](../taxonomy/README.md) · [Track U classification](../updates/U_CLASSIFICATION_SYSTEM.md) · [Track U packet schema](../updates/U_PACKET_SCHEMA.md)
+[Identity index](README.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [Source policy (F00)](../../FACTION_RULES_SOURCE_POLICY.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Track T taxonomy](../taxonomy/README.md) · [Track U classification](../updates/U_CLASSIFICATION_SYSTEM.md) · [Track U packet schema](../updates/U_PACKET_SCHEMA.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md)
 
 This document is Track S item S2 as **FM-pre planning evidence**. It closes the
 identity axes FM0 must implement. It does not allocate catalog IDs, rewrite

@@ -1,6 +1,6 @@
 # U2 / U3 / U4 — Classification system
 
-[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is Track U items U2 (diff grain), U3 (impact classes), and U4
 (layer demotion) as **FM-pre planning evidence**. It closes the classification
@@ -25,9 +25,10 @@ faction view. Lifting any of those over S2 `catalog_id` plus
 **FM0 implements the S4 tool, the classifier, and U4 invalidation.** It
 must not classify by display name, emit one class per page, treat a new
 transcription hash as a Layer A demotion, or carry Layer A forward without
-a recorded equivalence review. Packet *emission*, Q1 schema, capture
-tooling, and retention remain later. The packet *schema* is delivered in
-[U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md).
+a recorded equivalence review. Packet *emission*, capture tooling, and
+retention remain later. The packet *schema* is delivered in
+[U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md). The Q1 *schema* is delivered in
+[Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md).
 
 T1–T3 still own WHEN, EFFECT, and TARGET atoms used inside the semantic
 fingerprint. T4 still owns construction families this grain binds as
@@ -136,8 +137,9 @@ under F00, including points rows. A new hash is not a Layer A demotion.
 | B: roster legality | L6 | cost rows hash; composition hash; wargear/options hash; keywords hash; Leader/Support and attachment hash; army-construction constraint hash; geometry evidence IDs | Any of those elements change |
 | C: certification | L7, L8 | Current Layer A and B of every entity in the certified rosters and interactions, plus content-set version and packaged build identity | Any contributing Layer A or B change, or content-set/build identity change without re-attestation |
 
-Provenance is not a fourth layer. Q1 will store these tuples; this document
-does not design that artifact.
+Provenance is not a fourth layer. Q1 stores these tuples in
+[Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md). This document does
+not design that artifact.
 
 **Carry-forward.** A changed transcription requires classification first.
 Layer A may move to the new observation only through a recorded equivalence
@@ -274,7 +276,8 @@ indexes them.
 - S4 version ledger and dual-run diff tool (U2 implementation)
 - Classifier and generated packets (U3 implementation; packet *schema*
   delivered in [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md))
-- Status invalidation and Q1 artifact (U4 implementation + Q1 design)
+- Status invalidation (U4 implementation). Q1 *schema* is delivered in
+  [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md)
 - U1 capture, U5 tombstone loaders, U6 rewrite runbook, U7/U7a, U8, Q6
 - Orks 20/73 fixture reproduction
 - Catalog ID allocation for new Orks entities
@@ -297,7 +300,7 @@ indexes them.
 | U-HOLD-NAME-PUNCTUATION | Feed punctuation twins are not locators | S2 locators on retained pages |
 | F-ORK-01 | Waaagh! / Da Boss / "riled up" may be new tokens as well as a rewrite | FM0.5 after classification |
 | Packet generator | Actual emission of work packets | FM0 U3; schema delivered in [U_PACKET_SCHEMA.md](U_PACKET_SCHEMA.md) |
-| Q1 schema | Where U4 tuples are stored | after this schema, or with U4 implementation design |
+| Q1 schema | Where U4 tuples are stored | delivered in [Q1_STATUS_ARTIFACT.md](../status/Q1_STATUS_ARTIFACT.md); generator remains FM0 |
 
 ## 9. What "U2/U3/U4 classification delivered" means
 
@@ -312,6 +315,6 @@ FM0 classifier work may be implemented. It has:
   and inherited-listing fixtures;
 - an Orks 931→946 mapping exercise that does not claim S4 counts.
 
-This survey does not add S4, packets, Q1, `src/` files, or catalog IDs.
+This survey does not add S4, packets, a live Q1 artifact, `src/` files, or catalog IDs.
 FM0 implements those from retained pages and reconciles them with this
 document.
