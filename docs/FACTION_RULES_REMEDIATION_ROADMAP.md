@@ -327,8 +327,8 @@ waves may run as parallel agent packets under the data-first contract (D3).
 | U4 | Automatic, layer-specific status invalidation (rules below): semantic execution, roster legality and certification claims are bound to separate evidence tuples; a changed transcription hash is provenance, not automatic semantic demotion, and requires impact classification plus a recorded carry-forward or a stale claim; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row. **FM-pre layers delivered** in [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md). **FM-pre Q1 schema delivered** in [Q1_STATUS_ARTIFACT.md](factions/status/Q1_STATUS_ARTIFACT.md); runtime invalidation and the live artifact remain FM0 |
 | U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it |
 | U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
-| U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the engine build identity and the content-set version of every participating faction; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it |
-| U7a | Replay compatibility contract (prerequisite of S3c and FM0 exit, owned jointly with the adapter/persistence contract owner): the mechanism below by which a retained previous content-set version remains replayable on a newer engine build without ignoring build identity; contract, conformance scenarios and regressions in the same PR |
+| U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the engine build identity and the content-set version of every participating faction; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it. **FM-pre design delivered** in [U7_RETENTION.md](factions/updates/U7_RETENTION.md); inventory and loaders remain FM0 |
+| U7a | Replay compatibility contract (prerequisite of S3c and FM0 exit, owned jointly with the adapter/persistence contract owner): the mechanism below by which a retained previous content-set version remains replayable on a newer engine build without ignoring build identity; contract, conformance scenarios and regressions in the same PR. **FM-pre design delivered** in [U7_RETENTION.md](factions/updates/U7_RETENTION.md); live record, contracts, and golden fixture remain FM0 |
 | U8 | Runbook and cadence per App-data release: capture → diff → classify → packets → PRs → regenerate status, guides and changelog; roles and review points; CI freshness gate (Q6) |
 
 #### Replay compatibility across content-set versions (U7a)
@@ -592,12 +592,13 @@ Permitted in parallel with the remaining Core Rules orders:
   [U_CLASSIFICATION_SYSTEM.md](factions/updates/U_CLASSIFICATION_SYSTEM.md);
 - Track U packet schema (draft Track D agent-contract packet half) is
   delivered: [U_PACKET_SCHEMA.md](factions/updates/U_PACKET_SCHEMA.md);
-- remaining Track U design: retention policy and the U8 runbook;
+- remaining Track U design: the U8 runbook;
 - the Q1 status-artifact schema document is delivered:
   [Q1_STATUS_ARTIFACT.md](factions/status/Q1_STATUS_ARTIFACT.md);
-- remaining draft D3 work: live adapter-contract and live agent-contract
-  rewrites, marked draft until FM0 makes them binding. Owner D3 retention
-  is a later design PR.
+- owner D3 retention and U7/U7a replay-compatibility design are
+  delivered: [U7_RETENTION.md](factions/updates/U7_RETENTION.md);
+- remaining draft Track D D3 work: live adapter-contract and live
+  agent-contract rewrites, marked draft until FM0 makes them binding.
 
 Not permitted before Gate 0: any change under `src/`, packaged data artifacts,
 generators, the source-authority registry, the F00 policy text, or catalog and
