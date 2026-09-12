@@ -1,0 +1,213 @@
+{
+  "artifact_kind": "planning_evidence",
+  "track_id": "D3-contract-rewrites",
+  "not_a_runtime_artifact": true,
+  "not_a_content_set_record": true,
+  "survey_document": "docs/factions/contracts/D3_CONTRACT_REWRITES.md",
+  "packet_schema_document": "docs/factions/updates/U_PACKET_SCHEMA.md",
+  "retention_document": "docs/factions/updates/U7_RETENTION.md",
+  "runbook_document": "docs/factions/updates/U8_RUNBOOK.md",
+  "t6_document": "docs/factions/taxonomy/T6_DECISION_KIND_VISIBILITY.md",
+  "live_agent_contract": "docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md",
+  "live_adapter_contract": "docs/ADAPTER_DECISION_CONTRACT.md",
+  "delivered_to": "FM0 live agent-contract rewrite and adapter-contract writer-policy insert (design only)",
+  "does_not_edit_adapter_contract": true,
+  "does_not_rewrite_live_agent_contract": true,
+  "does_not_edit_contracts": true,
+  "does_not_apply_t6_deltas": true,
+  "does_not_implement_u7a": true,
+  "does_not_emit_packets": true,
+  "does_not_change_catalog_ids": true,
+  "does_not_amend_f00": true,
+  "owner_d3_retention_is_not_this_document": true,
+  "packet_schema_remains_packet_half": true,
+  "draft_is_not_binding_on_live_files": true,
+  "snapshot": {
+    "observed_on": "2026-09-05",
+    "app_data_version": "946",
+    "from_app_data_version": "931",
+    "to_app_data_version": "946",
+    "admitted_views": 40,
+    "directory_fingerprint_sha256": "8b9c6ab5fe8e80d4082ef2ddb800a15453e719fe89da36b507e2b1a8124c0a11",
+    "updates_fingerprint_sha256": "9ffcc106cd467b418a3ac862efbd05c8ab64c730e6601f0fa3ba331b2f2c5202"
+  },
+  "closed_axes": {
+    "draft_is_not_binding": true,
+    "live_files_unchanged_in_this_pr": true,
+    "agent_rewrite_replaces_task_packet_format": true,
+    "agent_rewrite_does_not_add_surfaces": true,
+    "content_packets_cannot_edit_adapter_contract": true,
+    "family_or_decision_kind_updates_adapter_in_same_pr": true,
+    "u7a_amendment_is_not_a_gameplay_family": true,
+    "t6_deltas_are_demand_not_this_rewrite": true,
+    "owner_d3_is_not_this_document": true,
+    "writer_policy_insert_adds_no_family": true,
+    "scaffold_triad_is_not_a_packet": true,
+    "content_cannot_introduce_runtime_surface_via_contract_note": true,
+    "apply_pr_does_not_implement_u7a": true,
+    "apply_pr_rewrites_relative_links_for_live_paths": true,
+    "family_gap_uses_agent_contract_inventory_for_runtime_surfaces": true,
+    "agent_contract_inventory_excludes_scope_and_task_format": true,
+    "family_or_decision_kind_covers_existing_surface_payload_and_visibility": true,
+    "new_visibility_behaviour_does_not_require_new_class": true
+  },
+  "adapter_writers": [
+    "family_or_decision_kind",
+    "u7a_compatibility",
+    "d3_writer_policy_binding"
+  ],
+  "agent_rewrite_replaces": [
+    "scope",
+    "task_packet_format",
+    "python_policy",
+    "shared_surface_escape_hatch"
+  ],
+  "agent_rewrite_keeps": [
+    "runtime_surfaces_inventory",
+    "decision_and_mutation",
+    "required_tests"
+  ],
+  "fm0_apply_pr": {
+    "rewrites_live_agent_contract": true,
+    "inserts_adapter_writer_policy": true,
+    "applies_t6_deltas": false,
+    "implements_u7a": false,
+    "edits_src_runtime_families": false
+  },
+  "allow_deny_precedence": [
+    "packet_denylist_still_wins",
+    "overlay_does_not_authorize_contract_edit",
+    "guide_current_while_stale_is_not_waived",
+    "missing_packaged_version_still_fails_load",
+    "family_gap_before_dependent_content_packets",
+    "u7a_may_amend_adapter_without_gameplay_family",
+    "content_packet_t6_citation_is_not_a_writer"
+  ],
+  "acceptance_fixtures": [
+    "copying_draft_before_apply_is_unpublished",
+    "content_packet_cannot_list_adapter_contract",
+    "family_gap_decision_kind_requires_adapter_update",
+    "family_gap_adapter_update_requires_real_consumer",
+    "u7a_may_amend_adapter_without_gameplay_family",
+    "war_horde_triad_is_invalid_after_apply",
+    "apply_pr_must_not_apply_t6_deltas",
+    "content_cannot_introduce_runtime_surface",
+    "rewrite_implementation_cannot_edit_contracts",
+    "packaging_pr_cannot_rewrite_agent_contract",
+    "apply_pr_must_not_implement_u7a",
+    "no_speculative_hook_family",
+    "apply_pr_must_replace_war_horde_task_format",
+    "writer_policy_insert_adds_no_family",
+    "content_packet_t6_citation_is_not_authorization",
+    "family_gap_inventory_update_required_when_adding_surface",
+    "existing_surface_visibility_change_is_family_or_decision_kind"
+  ],
+  "mapping_samples": [
+    {
+      "label": "Live War Horde Python triad",
+      "valid_packet_after_apply": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Blitz Brigade DP 2 to 1",
+      "adapter_edit": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Orks v946 overlay",
+      "contract_rewrite": false,
+      "emitted_here": false
+    },
+    {
+      "label": "T6 hidden Stratagem",
+      "applied_in_d3_apply_pr": false,
+      "emitted_here": false,
+      "writer": "family_or_decision_kind",
+      "mints_new_visibility_class": false
+    },
+    {
+      "label": "U7a producer envelope",
+      "writer": "u7a_compatibility",
+      "emitted_here": false
+    },
+    {
+      "label": "Real new decision family",
+      "writer": "family_or_decision_kind",
+      "emitted_here": false
+    },
+    {
+      "label": "New hook existing decision family",
+      "writer": null,
+      "agent_contract_inventory": true,
+      "mints_adapter_family": false,
+      "emitted_here": false
+    },
+    {
+      "label": "Hidden behaviour on existing public surface",
+      "writer": "family_or_decision_kind",
+      "mints_new_decision_type": false,
+      "mints_new_visibility_class": false,
+      "emitted_here": false
+    }
+  ],
+  "holds": [
+    {
+      "id": "Live agent-contract apply",
+      "hold": "FM0 copies Scope, Task Packet Format, and Python policy",
+      "unblocks": "Binding agent packets"
+    },
+    {
+      "id": "Live adapter writer-policy apply",
+      "hold": "FM0 inserts the writer-policy section",
+      "unblocks": "Binding writer table"
+    },
+    {
+      "id": "U7a contract amendment",
+      "hold": "Record, verification, fail-closed, conformance",
+      "unblocks": "Writer u7a_compatibility"
+    },
+    {
+      "id": "T6 deltas",
+      "hold": "Real Track G consumer per delta",
+      "unblocks": "Hidden, spend, and nested families"
+    }
+  ],
+  "not_in_this_pr": [
+    "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md rewrite",
+    "ADAPTER_DECISION_CONTRACT.md edits",
+    "contracts/ amendments",
+    "T6 delta application",
+    "U7a record or goldens",
+    "src/ runtime families",
+    "packet generator",
+    "catalog.json rewrites",
+    "F00 policy amendment"
+  ],
+  "reconciliation": {
+    "adapter_writer_count": 3,
+    "acceptance_fixture_count": 17,
+    "mapping_sample_count": 8,
+    "note": "Track D D3 draft only. Live files stay unchanged. Family packets use agent_contract_inventory for the Runtime Surfaces section only. family_or_decision_kind covers existing-surface payload and visibility changes without minting a new class. Content packets cannot edit either live contract."
+  },
+  "agent_contract_inventory_surface": {
+    "id": "agent_contract_inventory",
+    "packet_kind": "family_gap",
+    "section": "Runtime Surfaces",
+    "does_not_edit": [
+      "scope",
+      "task_packet_format",
+      "python_policy"
+    ],
+    "does_not_require_t6_delta": true
+  },
+  "family_or_decision_kind_covers": [
+    "new_decision_type",
+    "new_finite_option_family",
+    "new_proposal_kind",
+    "new_visibility_class",
+    "new_nested_allowlist_entry",
+    "existing_surface_payload_change",
+    "existing_surface_interaction_change",
+    "existing_surface_viewer_visibility_change"
+  ]
+}

@@ -1,6 +1,6 @@
 # Q1 status-artifact schema
 
-[Status index](README.md) · [Classification system](../updates/U_CLASSIFICATION_SYSTEM.md) · [Packet schema](../updates/U_PACKET_SCHEMA.md) · [Retention](../updates/U7_RETENTION.md) · [Runbook](../updates/U8_RUNBOOK.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Phase 17O capability manifest](../../ADAPTER_DECISION_CONTRACT.md#phase-17o-capability-manifest)
+[Status index](README.md) · [Classification system](../updates/U_CLASSIFICATION_SYSTEM.md) · [Packet schema](../updates/U_PACKET_SCHEMA.md) · [Retention](../updates/U7_RETENTION.md) · [Runbook](../updates/U8_RUNBOOK.md) · [Track D D3 draft](../contracts/D3_CONTRACT_REWRITES.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md) · [Phase 17O capability manifest](../../ADAPTER_DECISION_CONTRACT.md#phase-17o-capability-manifest)
 
 This document is Track Q item Q1 as **FM-pre planning evidence**. It closes
 the generated `content_status` schema FM0 must emit. It does not generate

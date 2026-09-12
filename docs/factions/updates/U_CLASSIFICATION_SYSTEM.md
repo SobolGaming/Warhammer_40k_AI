@@ -1,6 +1,6 @@
 # U2 / U3 / U4 — Classification system
 
-[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
+[Update-pipeline index](README.md) · [Packet schema](U_PACKET_SCHEMA.md) · [Retention](U7_RETENTION.md) · [Runbook](U8_RUNBOOK.md) · [Q1 status artifact](../status/Q1_STATUS_ARTIFACT.md) · [Track D D3 draft](../contracts/D3_CONTRACT_REWRITES.md) · [Faction roadmap](../../FACTION_RULES_REMEDIATION_ROADMAP.md) · [S2 identity model](../identity/S2_IDENTITY_MODEL.md) · [T4 army-construction grammar](../taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md) · [Observation register](../../FACTION_AUDIT_SOURCES.md)
 
 This document is Track U items U2 (diff grain), U3 (impact classes), and U4
 (layer demotion) as **FM-pre planning evidence**. It closes the classification
