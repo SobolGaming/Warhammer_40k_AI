@@ -4647,7 +4647,7 @@ remains assigned to its existing finding. Category 18 remains incomplete.
 
 ## Order 39 — P24A Stealth
 
-Status: implementation and required local validation complete; PR publication in progress.
+Status: implemented, locally validated and published in [PR #455](https://github.com/SobolGaming/Warhammer_40k_AI/pull/455); awaiting review and merge.
 
 C24-01 now requires every living or retained-present model in the complete
 rules unit to have Stealth and grants Benefit of Cover against ranged attacks.

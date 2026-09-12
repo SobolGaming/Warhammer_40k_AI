@@ -169,4 +169,5 @@ All four versioned component performance cases pass, with final query means
 certify complete-game performance. Final runtime fingerprint:
 `eb908777d82d4cd0512ad368b8a6a6820993ea39d6419ed61c09016264e3617a`.
 
-PR URL will be recorded after publication; remote CI is not claimed as passed locally.
+PR URL and merge commit: [PR #455](https://github.com/SobolGaming/Warhammer_40k_AI/pull/455); merge pending owner review.
+Remote CI is not claimed as passed locally.
