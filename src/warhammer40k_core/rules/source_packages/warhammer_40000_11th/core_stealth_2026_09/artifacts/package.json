@@ -1,0 +1,82 @@
+{
+  "artifact_schema": "core-v2-core-stealth-source-v1",
+  "source_package_id": "gw-11e-core-stealth",
+  "source_version": "maintained-app-mirrors-observed-2026-09-12",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-stealth:stealth",
+      "section_id": "24.33",
+      "source_text": "If every model in a unit has this ability, each time a ranged attack targets that unit, that unit has the benefit of cover against that attack (13.08).",
+      "transcription_sha256": "f10c66ca0215b0893d5385bd13b4064640f23182cdaef342715a87e68c8d4f85",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stealth:rules_unit_stealth_sources",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-stealth:stealth",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f10c66ca0215b0893d5385bd13b4064640f23182cdaef342715a87e68c8d4f85",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "383912b4f2591f032c034aa09a52bef13b4c470faf20cbbc0fb1417ae2d4445b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stealth:rules_unit_stealth_sources",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+      ],
+      "evidence_id": "core-stealth-review:stealth",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P24A 24.33 stealth",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-stealth:stealth",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f10c66ca0215b0893d5385bd13b4064640f23182cdaef342715a87e68c8d4f85",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "38d242c0a1d8c32303bcb764f33b9fe329683b52f34266ebed51d254ab601d18",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stealth:rules_unit_stealth_sources",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_benefit_of_cover_ballistic_skill_penalty"
+      ],
+      "evidence_id": "core-stealth-mirror:stealth:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-stealth-maintained-app-mirrors-2026-09-12",
+      "review_audit_row_id": "stealth:40k-app",
+      "review_audit_source_observation_sha256": "f0e3ecd64cf432c5c7768b6c0ed4eb2f4e9624ac2e6a74176a6e42afdab9aef1",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 24.33 stealth",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-09-12T02:06:45Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "b1a1b218d4b61a490817d3e5c60a91a3ad207e9a53ab789aedeb180d4da45a9a"
+}

@@ -39,6 +39,7 @@ def attack_modifier_snapshots(
         BENEFIT_OF_COVER_RULE_ID,
         PLUNGING_FIRE_RULE_ID,
     )
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
 
     snapshots = [
         AttackModifierSnapshot("skill", item) for item in pool.weapon_profile.skill_modifiers
@@ -46,7 +47,9 @@ def attack_modifier_snapshots(
     skill_deltas = (
         (
             BENEFIT_OF_COVER_RULE_ID,
-            _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool),
+            _benefit_of_cover_ballistic_skill_penalty(
+                state=state, pool=pool, runtime_modifier_registry=runtime_modifier_registry
+            ),
         ),
         (PLUNGING_FIRE_RULE_ID, -1 if PLUNGING_FIRE_RULE_ID in pool.targeting_rule_ids else 0),
     )
@@ -61,13 +64,22 @@ def attack_modifier_snapshots(
                                 sha256(
                                     canonical_json(
                                         validate_json_value(
-                                            [
-                                                effect.to_payload()
-                                                for effect in state.persisting_effects_for_unit(
-                                                    pool.target_unit_instance_id
-                                                )
-                                                if unit_effects_grant_benefit_of_cover((effect,))
-                                            ]
+                                            {
+                                                'effects': [
+                                                    effect.to_payload()
+                                                    for effect in state.persisting_effects_for_unit(
+                                                        pool.target_unit_instance_id
+                                                    )
+                                                    if unit_effects_grant_benefit_of_cover(
+                                                        (effect,)
+                                                    )
+                                                ],
+                                                'stealth': rules_unit_stealth_sources(
+                                                    state=state,
+                                                    target_unit_instance_id=pool.target_unit_instance_id,
+                                                    runtime_modifier_registry=runtime_modifier_registry,
+                                                ),
+                                            }
                                         )
                                     ).encode()
                                 ).hexdigest()

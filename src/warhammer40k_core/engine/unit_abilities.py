@@ -79,7 +79,7 @@ FIGHTS_FIRST_ABILITY_IDS = frozenset(
 LONE_OPERATIVE_ABILITY_IDS = frozenset(
     {CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID, "core-lone-operative", "lone-operative"}
 )
-STEALTH_ABILITY_IDS = frozenset({"core-stealth", "stealth"})
+STEALTH_ABILITY_IDS = frozenset({"000008337", "core-stealth", "stealth"})
 
 _DEEP_STRIKE_SPEC = CoreKeywordAbilitySpec(
     keyword="DEEP_STRIKE",
@@ -134,7 +134,7 @@ _LONE_OPERATIVE_SPEC = CoreKeywordAbilitySpec(
 _STEALTH_SPEC = CoreKeywordAbilitySpec(
     keyword="STEALTH",
     ability_ids=STEALTH_ABILITY_IDS,
-    name_words=("STEALTH",),
+    name_words=(),
 )
 
 
@@ -192,10 +192,6 @@ def unit_has_fights_first(unit: UnitInstance) -> bool:
 
 def unit_has_lone_operative(unit: UnitInstance) -> bool:
     return lone_operative_profile_for_unit(unit) is not None
-
-
-def unit_has_stealth(unit: UnitInstance) -> bool:
-    return _unit_has_core_keyword_ability(unit=unit, spec=_STEALTH_SPEC)
 
 
 def scouts_ability_descriptors_for_unit(

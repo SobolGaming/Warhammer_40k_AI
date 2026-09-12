@@ -7,7 +7,6 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
 )
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
-from warhammer40k_core.core.weapon_profiles import RangeProfileKind
 from warhammer40k_core.engine.effects import EffectExpirationKind, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
@@ -18,7 +17,6 @@ from warhammer40k_core.engine.rules_units import (
     current_rules_unit_views_for_identity,
     rules_unit_view_by_id,
 )
-from warhammer40k_core.engine.runtime_modifiers import HitRollModifierContext
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -139,31 +137,6 @@ def conditional_granted_ability_effects_for_rules_unit(
     return tuple(sorted(effects, key=lambda effect: effect.effect_id))
 
 
-def catalog_granted_stealth_hit_roll_modifier(context: HitRollModifierContext) -> int:
-    if type(context) is not HitRollModifierContext:
-        raise GameLifecycleError("Catalog granted Stealth requires HitRollModifierContext.")
-    if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
-        return 0
-    target = rules_unit_view_by_id(
-        state=context.state,
-        unit_instance_id=context.target_unit_instance_id,
-    )
-    generic_grant = any(
-        isinstance(effect.effect_payload, dict)
-        and generic_rule_effect_payload_grants_ability(
-            effect.effect_payload,
-            ability="stealth",
-        )
-        for effect in context.state.persisting_effects_for_unit(target.unit_instance_id)
-    )
-    conditional_grant = conditional_granted_ability_effects_for_rules_unit(
-        state=context.state,
-        rules_unit_instance_id=target.unit_instance_id,
-        ability="stealth",
-    )
-    return -1 if generic_grant or conditional_grant else 0
-
-
 def conditional_leader_grant_effect_applies(
     *,
     state: GameState,
@@ -187,10 +160,8 @@ def conditional_leader_grant_effect_applies(
     required_bodyguard_keyword = _required_bodyguard_keyword(payload)
     view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
     return any(
-        component.role == "bodyguard"
-        and any(model.is_alive for model in component.unit.own_models)
-        and required_bodyguard_keyword in component.unit.keywords
-        for component in view.components
+        component.role == "bodyguard" and required_bodyguard_keyword in component.unit.keywords
+        for component in view.rules_present_components
     )
 
 
@@ -363,18 +334,14 @@ def conditional_leading_source_unit_applies(
         return False
     source_components = tuple(
         component
-        for component in view.components
+        for component in view.rules_present_components
         if source_unit_id
         in {component.unit.unit_instance_id, component.unit.source_unit_instance_id}
         and component.role in {"leader", "support"}
-        and any(model.is_alive for model in component.unit.own_models)
     )
     if len(source_components) != 1:
         return False
-    return any(
-        component.role == "bodyguard" and any(model.is_alive for model in component.unit.own_models)
-        for component in view.components
-    )
+    return any(component.role == "bodyguard" for component in view.rules_present_components)
 
 
 def _source_unit_instance_id(payload: dict[str, JsonValue]) -> str:

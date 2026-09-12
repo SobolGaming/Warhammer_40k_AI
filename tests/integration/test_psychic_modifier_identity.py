@@ -178,17 +178,86 @@ def test_facade_individual_subset_preserves_sources_restore_and_replay(phase: Ba
     assert replay.run().status is ReplayRunStatus.REPRODUCED
 
 
-@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
-@pytest.mark.parametrize("effect_id", ["a-hit", "c-skill"])
+@pytest.mark.parametrize("native", [False, True])
+def test_order39_facade_stealth_cover_preserves_source_restore_and_replay(native: bool) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+    from tests.psychic_modifier_helpers import (
+        complete_psychic_attack,
+        psychic_session,
+        reach_psychic_request,
+    )
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.attack_sequence_psychic_modifiers import selection_from_payload
+    from warhammer40k_core.engine.event_log import canonical_json
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session = psychic_session(BattlePhase.SHOOTING, native_stealth=native)
+    state = session.lifecycle.state
+    assert state is not None
+    if not native:
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id="order39:facade-stealth",
+                owner_player_id="player-b",
+                target_unit_instance_ids=("army-beta:enemy",),
+                target_kind="this_unit",
+                effect_kind="grant_ability",
+                parameters={"ability": "stealth"},
+            )
+        )
+    request = reach_psychic_request(session)
+    selected = selection_from_payload(request.payload)
+    assert len(selected.modifiers) == 5
+    assert selected.hit_roll_modifier == 0
+    assert selected.skill_modifier == 1
+    snapshot = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(snapshot)
+    assert restored.to_persistence_payload() == snapshot
+    for viewer in ("player-a", "player-b"):
+        view = canonical_json(restored.view(viewer_player_id=viewer))
+        assert "effect_snapshot_sha256" not in view
+        assert "object at 0x" not in view
+    complete_psychic_attack(restored)
+    assert (
+        ReplayRunner.from_payload(restored.replay_artifact(artifact_id="order39-stealth"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+@pytest.mark.parametrize(
+    ("phase", "effect_id"),
+    [
+        (BattlePhase.SHOOTING, "a-hit"),
+        (BattlePhase.SHOOTING, "c-skill"),
+        (BattlePhase.FIGHT, "a-hit"),
+        (BattlePhase.FIGHT, "c-skill"),
+        (BattlePhase.SHOOTING, "stealth"),
+    ],
+)
 def test_same_total_source_swap_is_rejected_before_pop(phase: BattlePhase, effect_id: str) -> None:
+    from tests.generic_modifier_helpers import generic_effect
     from tests.psychic_modifier_helpers import psychic_session, reach_psychic_request
 
     from warhammer40k_core.engine.phase import LifecycleStatusKind
 
     session = psychic_session(phase)
-    request = reach_psychic_request(session)
     state = session.lifecycle.state
     assert state is not None
+    if effect_id == "stealth":
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id=effect_id,
+                owner_player_id="player-b",
+                target_unit_instance_ids=("army-beta:enemy",),
+                target_kind="this_unit",
+                effect_kind="grant_ability",
+                parameters={"ability": "stealth"},
+            )
+        )
+    request = reach_psychic_request(session)
     (effect,) = state.remove_persisting_effects_by_id((effect_id,))
     state.record_persisting_effect(replace(effect, effect_id=f"{effect_id}:replacement"))
     before = session.lifecycle.to_payload()

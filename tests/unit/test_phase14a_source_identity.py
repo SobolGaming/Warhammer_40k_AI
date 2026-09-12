@@ -79,6 +79,47 @@ CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH = Path(
 )
 
 
+def test_order39_stealth_source_is_pinned_reproducible_and_executable() -> None:
+    from tools.build_core_stealth_source import build_payloads
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_stealth_2026_09 as package,
+    )
+
+    raw = Path(package.__file__).with_name("artifacts").joinpath("package.json").read_bytes()
+    expected, audit = build_payloads()
+    assert json.loads(raw) == expected
+    assert (
+        json.loads(
+            Path(
+                "data/source_audits/maintained_app_mirrors/stealth_2026_09_12.audit.json"
+            ).read_bytes()
+        )
+        == audit
+    )
+    artifact = package.validate_source_artifact_bytes(raw)
+    assert (
+        artifact.package_hash
+        == hashlib.sha256(
+            json.dumps(
+                {**expected, "package_hash": ""}, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest()
+    )
+    assert sorted(
+        package.source_package().source_evidence_catalog.records, key=lambda row: row.evidence_id
+    ) == sorted(package.source_evidence_records(), key=lambda row: row.evidence_id)
+    (rule,) = package.source_rules()
+    assert rule.source_id == package.STEALTH_SOURCE_ID
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    for consumer in rule.runtime_consumer_ids:
+        module, attribute = consumer.split(":")
+        assert callable(vars(importlib.import_module(module))[attribute])
+    with pytest.raises(package.StealthSourceError, match="source bytes drifted"):
+        package.validate_source_artifact_bytes(raw + b"\n")
+
+
 def test_order_30_source_package_is_pinned_reproducible_and_executable() -> None:
     package = core_fight_on_death_2026_09
     raw = Path(package.__file__).with_name("artifacts").joinpath("package.json").read_bytes()
@@ -1310,7 +1351,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 23
+    assert len(scope.source_packages) == 24
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 

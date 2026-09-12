@@ -4643,3 +4643,21 @@ contract impact, performance evidence and publication gates. It supersedes the
 Normal-only P18D and Advance-only P18E eligibility claims above. Their engagement
 and forced-Fight claims are not recertified here; the engagement-owner conflict
 remains assigned to its existing finding. Category 18 remains incomplete.
+
+
+## Order 39 — P24A Stealth
+
+Status: implementation and required local validation complete; PR publication in progress.
+
+C24-01 now requires every living or retained-present model in the complete
+rules unit to have Stealth and grants Benefit of Cover against ranged attacks.
+The query unifies native, attached-component, model, Aura, conditional-leader,
+selected-target and Darkness grants without stacking Cover or adding a Hit
+modifier. Ignores Cover and Cover denial use the existing attack authority.
+
+Core 24.33 is retained in a hash-pinned maintained-App observation and typed
+source package. Both in-scope catalogs containing obsolete Stealth descriptions
+are regenerated with the new Core source overlay; historical GW artifacts and
+source IDs remain preserved. The [scope record](ORDER_39_SCOPE_PLAN.md) contains
+the source and owner trace, acceptance matrix, bug-class search, performance
+evidence and publication gates. Category 24 and Order 40 remain separate work.

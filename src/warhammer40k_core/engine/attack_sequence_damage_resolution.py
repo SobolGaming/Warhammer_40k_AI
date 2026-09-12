@@ -146,6 +146,23 @@ def _save_options_for_allocation(
             source_rule_id=INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
             los_cache_key=f"{attack_context['attack_context_id']}:indirect-cover",
         )
+    elif pool.weapon_profile.range_profile.kind is RangeProfileKind.DISTANCE:
+        from warhammer40k_core.engine.stealth import STEALTH_SOURCE_ID, rules_unit_stealth_sources
+
+        if (
+            rules_unit_stealth_sources(
+                state=state,
+                target_unit_instance_id=pool.target_unit_instance_id,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+            is not None
+        ):
+            cover_result = _cover_result_with_effect_source(
+                ruleset_descriptor=ruleset_descriptor,
+                current_cover_result=cover_result,
+                source_rule_id=STEALTH_SOURCE_ID,
+                los_cache_key=f"{attack_context['attack_context_id']}:stealth-cover",
+            )
     no_saves_allowed = (
         _devastating_wounds_resolution_for_attack(
             pool=pool,

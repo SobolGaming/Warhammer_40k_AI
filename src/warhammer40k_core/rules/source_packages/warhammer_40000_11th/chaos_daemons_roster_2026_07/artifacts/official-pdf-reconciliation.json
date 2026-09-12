@@ -1,5 +1,5 @@
 {
-  "artifact_hash": "a72f04e5f68d902029cccdab2eaebb1b989950d57413cda6e3fafe6da59ea758",
+  "artifact_hash": "323f9da51c447ccf01b38d4632b91762fd357bf325b1e306267a87c5d70a56e4",
   "datasheets": [
     {
       "catalog_gameplay_hash": "597cc8a97e6d3f49cd5e5f6143979630bdc71eb2198bfb2c5f75aecdc36d4e9a",
@@ -15,11 +15,11 @@
         "KHORNE",
         "MOUNTED"
       ],
+      "generator_input_payload_hash": "35fe32dde066ca2a6937c38e615d83c745f55bde2ad50e79a48ab15890747c5a",
       "name": "Bloodcrushers",
       "official_source_id": "gw-11e-chaos-daemons-faction-pack-2026-07:datasheet:000001115:pages-30-31",
       "page_end": 31,
       "page_start": 30,
-      "generator_input_payload_hash": "35fe32dde066ca2a6937c38e615d83c745f55bde2ad50e79a48ab15890747c5a",
       "reviewed_field_families": [
         "abilities",
         "composition",
@@ -49,11 +49,11 @@
         "PSYKER",
         "TZEENTCH"
       ],
+      "generator_input_payload_hash": "0485cdf0191a3e2c2d499dfcaa8e028988e4f91845f1e157b68ac054b6527a16",
       "name": "Lord of Change",
       "official_source_id": "gw-11e-chaos-daemons-faction-pack-2026-07:datasheet:000001120:pages-40-41",
       "page_end": 41,
       "page_start": 40,
-      "generator_input_payload_hash": "0485cdf0191a3e2c2d499dfcaa8e028988e4f91845f1e157b68ac054b6527a16",
       "reviewed_field_families": [
         "abilities",
         "composition",
@@ -81,11 +81,11 @@
         "NURGLE",
         "PLAGUEBEARERS"
       ],
+      "generator_input_payload_hash": "e27bcb0dac0e0c9f9a5f958327db1f5fc552b8a44c7f319a4c8b73eb5b871952",
       "name": "Plaguebearers",
       "official_source_id": "gw-11e-chaos-daemons-faction-pack-2026-07:datasheet:000001132:pages-78-79",
       "page_end": 79,
       "page_start": 78,
-      "generator_input_payload_hash": "e27bcb0dac0e0c9f9a5f958327db1f5fc552b8a44c7f319a4c8b73eb5b871952",
       "reviewed_field_families": [
         "abilities",
         "composition",
@@ -99,7 +99,7 @@
       ]
     },
     {
-      "catalog_gameplay_hash": "db77cc7aeed88a2cdc0c2aaddab026d780f0639eef3e696b514e4ee80d037ecd",
+      "catalog_gameplay_hash": "a9a80990b8d0174b9cf98d588bcefb4a5196ea8bc44391973c642b289a6de32b",
       "datasheet_id": "000001148",
       "expected_damaged_wounds_max": 7,
       "expected_faction_keywords": [
@@ -115,11 +115,11 @@
         "MONSTER",
         "PSYKER"
       ],
+      "generator_input_payload_hash": "c3ef65b0e994ffad1d96f90d9cbbd5b5a0a876cd9c67031733b754b990f1ca55",
       "name": "Be'lakor",
       "official_source_id": "gw-11e-chaos-daemons-faction-pack-2026-07:datasheet:000001148:pages-112-113",
       "page_end": 113,
       "page_start": 112,
-      "generator_input_payload_hash": "c3ef65b0e994ffad1d96f90d9cbbd5b5a0a876cd9c67031733b754b990f1ca55",
       "reviewed_field_families": [
         "abilities",
         "composition",
@@ -148,11 +148,11 @@
         "KHORNE",
         "MONSTER"
       ],
+      "generator_input_payload_hash": "5bf884bd458168a6e9a41932a57c27ad7cf8cb87d02aa12c107fa5ddcf35b7c6",
       "name": "Bloodthirster",
       "official_source_id": "gw-11e-chaos-daemons-faction-pack-2026-07:datasheet:000002582:pages-16-17",
       "page_end": 17,
       "page_start": 16,
-      "generator_input_payload_hash": "5bf884bd458168a6e9a41932a57c27ad7cf8cb87d02aa12c107fa5ddcf35b7c6",
       "reviewed_field_families": [
         "abilities",
         "composition",
@@ -166,12 +166,6 @@
       ]
     }
   ],
-  "official_pdf": {
-    "local_pdf": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
-    "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
-    "source_package_id": "gw-11e-chaos-daemons-faction-pack-2026-07"
-  },
-  "package_id": "data-package:core-v2:chaos-daemons-exact-roster-pdf-reconciliation:2026-07",
   "generator_inputs": {
     "artifact_hashes": {
       "Abilities": "5d2718402066eecc33195e14f98d44900e374e8450ef246c2b766dd08e833990",
@@ -187,5 +181,11 @@
       "Factions": "3677d904916c2ebf57a2369995b8ee2a6d35e25d8026f958cc35f4e699995646"
     }
   },
+  "official_pdf": {
+    "local_pdf": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+    "sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+    "source_package_id": "gw-11e-chaos-daemons-faction-pack-2026-07"
+  },
+  "package_id": "data-package:core-v2:chaos-daemons-exact-roster-pdf-reconciliation:2026-07",
   "schema_version": "chaos-daemons-exact-roster-pdf-reconciliation-v2"
 }

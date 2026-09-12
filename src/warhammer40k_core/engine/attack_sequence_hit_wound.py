@@ -664,7 +664,13 @@ def _benefit_of_cover_ballistic_skill_penalty(
     *,
     state: GameState,
     pool: RangedAttackPool,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> int:
+    from warhammer40k_core.core.weapon_profiles import RangeProfileKind
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
+    if pool.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
+        return 0
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER):
         return 0
     if _target_has_effect_cover_denial(
@@ -672,6 +678,15 @@ def _benefit_of_cover_ballistic_skill_penalty(
         target_unit_instance_id=pool.target_unit_instance_id,
     ):
         return 0
+    if (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        is not None
+    ):
+        return 1
     if BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
         return 1
     if INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:

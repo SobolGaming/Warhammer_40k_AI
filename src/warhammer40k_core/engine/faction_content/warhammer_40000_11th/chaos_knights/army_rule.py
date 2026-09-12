@@ -51,6 +51,10 @@ from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
     FactionRuleStatePayload,
 )
+from warhammer40k_core.engine.model_ability_grants import (
+    ModelAbilityGrantBinding,
+    ModelAbilityGrantContext,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -81,8 +85,6 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
-    HitRollModifierBinding,
-    HitRollModifierContext,
     UnitCharacteristicModifierBinding,
     UnitCharacteristicModifierContext,
     WoundRollModifierBinding,
@@ -101,7 +103,7 @@ HOOK_ID = "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread"
 CONTRIBUTION_ID = HOOK_ID
 BATTLE_SHOCK_HOOK_ID: str = f"{HOOK_ID}:battle-shock"
 LEADERSHIP_MODIFIER_ID = f"{HOOK_ID}:leadership"
-DARKNESS_HIT_MODIFIER_ID = f"{HOOK_ID}:darkness:hit-roll"
+DARKNESS_ABILITY_GRANT_ID = f"{HOOK_ID}:darkness:ability-grant"
 DOOM_WOUND_MODIFIER_ID = f"{HOOK_ID}:doom:wound-roll"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-knights:army-rule"
 CHAOS_KNIGHTS_FACTION_ID = "chaos-knights"
@@ -266,11 +268,12 @@ def runtime_contribution() -> RuntimeContentContribution:
                 historical_leadership_handler=historical_harbingers_leadership,
             ),
         ),
-        hit_roll_modifier_bindings=(
-            HitRollModifierBinding(
-                modifier_id=DARKNESS_HIT_MODIFIER_ID,
+        model_ability_grant_bindings=(
+            ModelAbilityGrantBinding(
+                modifier_id=DARKNESS_ABILITY_GRANT_ID,
                 source_id=SOURCE_RULE_ID,
-                handler=harbingers_darkness_hit_roll_modifier,
+                ability_id="core-stealth",
+                handler=harbingers_darkness_model_ability_grant,
             ),
         ),
         wound_roll_modifier_bindings=(
@@ -565,31 +568,25 @@ def historical_harbingers_leadership(
     return (ModifierTerm(ModifierOperation.ADD, modified),)
 
 
-def harbingers_darkness_hit_roll_modifier(context: HitRollModifierContext) -> int:
-    if type(context) is not HitRollModifierContext:
-        raise GameLifecycleError("Harbingers of Dread Darkness hit modifier requires context.")
-    if context.source_phase is not BattlePhase.SHOOTING:
-        return 0
-    _attacker, attacker_army = _unit_and_army_by_id(
-        context.state,
-        unit_instance_id=context.attacking_unit_instance_id,
+def harbingers_darkness_model_ability_grant(context: ModelAbilityGrantContext) -> tuple[str, ...]:
+    if type(context) is not ModelAbilityGrantContext:
+        raise GameLifecycleError("Harbingers of Dread Darkness requires a model grant context.")
+    _target, army = _unit_and_army_by_id(
+        context.state, unit_instance_id=context.target.components[0].unit.unit_instance_id
     )
-    target_unit, target_army = _unit_and_army_by_id(
-        context.state,
-        unit_instance_id=context.target_unit_instance_id,
-    )
-    if attacker_army.player_id == target_army.player_id:
-        return 0
-    if not _unit_has_harbingers(target_unit):
-        return 0
-    if _chaos_knights_army_for_player(context.state, player_id=target_army.player_id) is None:
-        return 0
+    if _chaos_knights_army_for_player(context.state, player_id=army.player_id) is None:
+        return ()
     if DreadAbility.DARKNESS not in active_dread_abilities_for_player(
-        context.state,
-        player_id=target_army.player_id,
+        context.state, player_id=army.player_id
     ):
-        return 0
-    return -1
+        return ()
+    return tuple(
+        model.model_instance_id
+        for component in context.target.components
+        if _unit_has_harbingers(component.unit)
+        for model in component.unit.own_models
+        if model.is_alive or model.model_instance_id in context.target.retained_model_ids
+    )
 
 
 def harbingers_doom_wound_roll_modifier(context: WoundRollModifierContext) -> int:

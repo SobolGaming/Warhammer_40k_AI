@@ -7,10 +7,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING or __package__:
+    from tools.core_stealth_catalog_overlay import with_current_stealth
     from tools.generate_ability_support_matrix import (
         _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
     )
 else:
+    from core_stealth_catalog_overlay import with_current_stealth
     from generate_ability_support_matrix import (  # pyright: ignore[reportMissingImports]
         _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
     )
@@ -146,6 +148,7 @@ def build_catalog_package() -> CanonicalCatalogPackage:
         ),
     )
     package = _promote_runtime_source_identities(package)
+    package = with_current_stealth(package)
     roster_catalog.validate_catalog_package(package)
     return package
 

@@ -7035,3 +7035,21 @@ Exit criteria:
 | Observability and rule tracing | 19F |
 | Full-game certification and adversarial soak | 20A-20D |
 | 11th Edition migration/revalidation | 14A-14K, 17J |
+
+
+## Order 39: model-complete Stealth
+
+Stealth grants Benefit of Cover against ranged attacks when every present model
+in a rules unit has the ability. `engine/stealth.py` owns the complete model and
+source inventory, including retained Fight On Death models. Catalog descriptors
+and canonical model keywords supply native grants; source-linked
+`ModelAbilityGrantBinding` providers supply current Aura, self and Darkness grants.
+Persisting RuleIR grants preserve component/model target footprints and lineage.
+
+The existing attack Cover owner consumes this query once as a Ballistic Skill
+modifier, after Ignores Cover and Cover denial. Duplicate Cover sources do not
+stack. Psychic decisions commit the source inventory, preserving stale-source
+validation, restore, replay and public viewer redaction. Catalog/faction-specific
+providers remain outside generic lifecycle code. No named handler is added.
+The frozen runtime registry's strict identity validation was extracted before
+adding the model-grant field. See [Order 39](docs/ORDER_39_SCOPE_PLAN.md).

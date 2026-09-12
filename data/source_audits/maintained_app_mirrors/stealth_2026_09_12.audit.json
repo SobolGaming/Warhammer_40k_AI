@@ -1,0 +1,23 @@
+{
+  "audit_id": "core-stealth-maintained-app-mirrors-2026-09-12",
+  "observed_at": "2026-09-12T02:06:45Z",
+  "rows": [
+    {
+      "row_id": "stealth:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-09-12T02:06:45Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-stealth:stealth",
+      "transcription_sha256": "f10c66ca0215b0893d5385bd13b4064640f23182cdaef342715a87e68c8d4f85",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "f0e3ecd64cf432c5c7768b6c0ed4eb2f4e9624ac2e6a74176a6e42afdab9aef1"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "24.33 retained from the 40k.app search-index observation. The direct fetch returned 403. No App-data version or co-version comparison is asserted."
+}

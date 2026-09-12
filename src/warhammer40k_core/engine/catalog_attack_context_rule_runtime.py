@@ -127,23 +127,6 @@ def defensive_strength_toughness_wound_handler(
     return handler
 
 
-def passive_self_stealth_hit_handler(
-    source: CatalogDatasheetClauseSource,
-) -> Callable[[HitRollModifierContext], int]:
-    def handler(context: HitRollModifierContext) -> int:
-        if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
-            return 0
-        if not source_applies_to_rules_unit(
-            source=source,
-            context_unit_id=context.target_unit_instance_id,
-            state=context.state,
-        ):
-            return 0
-        return -1
-
-    return handler
-
-
 def passive_self_defensive_hit_handler(
     source: CatalogDatasheetClauseSource,
 ) -> Callable[[HitRollModifierContext], int]:

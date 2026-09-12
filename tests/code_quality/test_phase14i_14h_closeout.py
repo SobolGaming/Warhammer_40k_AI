@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 from tests.code_quality.source_index import (
@@ -197,6 +198,58 @@ def test_phase14i_core_ability_source_rows_have_no_unsupported_handlers() -> Non
     )
 
     assert tuple((row.ability_id, row.handler_id) for row in unsupported_rows) == ()
+
+
+def test_order39_stealth_uses_one_cover_owner_and_no_legacy_hit_consumers() -> None:
+    assert "STEALTH_RULE_ID" not in source_for(ENGINE_ROOT / "attack_hit_modifiers.py")
+    runtime = source_for(ENGINE_ROOT / "catalog_datasheet_rule_runtime.py")
+    assert "catalog_granted_stealth_hit_roll_modifier" not in runtime
+    assert "passive_self_stealth_hit_handler" not in runtime
+    assert "catalog_stealth_grant_bindings" in runtime
+    for path in ("attack_sequence_hit_wound.py", "attack_sequence_damage_resolution.py"):
+        assert "rules_unit_stealth_sources" in source_for(ENGINE_ROOT / path)
+    query = source_for(ENGINE_ROOT / "stealth.py")
+    assert "retained_model_ids" in query
+    assert "covered != set(native)" in query
+    rows = [row for row in ability_rows() if row.ability_id == "core-stealth"]
+    assert len(rows) == 1
+    assert "benefit of cover" in rows[0].effect_descriptor
+
+
+def test_order39_stealth_query_retains_comparable_bounded_performance_evidence() -> None:
+    directory = ROOT / "docs/performance/order39"
+    base = json.loads((directory / "base.json").read_text())
+    head = json.loads((directory / "head.json").read_text())
+    budget = json.loads((directory / "budgets.json").read_text())
+    assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+    for field in (
+        "platform",
+        "python",
+        "cpu",
+        "cpu_allocation",
+        "memory_bytes",
+        "concurrency",
+        "model_count",
+        "terrain_count",
+        "timing_boundary",
+    ):
+        assert base[field] == head[field]
+    for path, digest in base["file_hashes"].items():
+        if path != "src/warhammer40k_core/_engine_build_manifest.json":
+            assert head["file_hashes"][path] == digest
+    assert (
+        set(base["summaries"])
+        == set(head["summaries"])
+        == {"plain", "native", "grant", "duplicate_grants"}
+    )
+    for name, measured in head["summaries"].items():
+        assert measured["completion_rate"] == 1
+        assert measured["samples"] == budget["samples_per_case"]
+        assert measured["mean"] <= (
+            base["summaries"][name]["mean"] * budget["mean_base_multiplier"]
+            + budget["mean_additive_seconds"]
+        )
+        assert measured["max"] <= budget["maximum_seconds"]
 
 
 def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> None:

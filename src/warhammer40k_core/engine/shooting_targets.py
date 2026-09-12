@@ -78,8 +78,8 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
     shooting_visibility_cache_key as shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
+from warhammer40k_core.engine.stealth import rules_unit_has_native_stealth
 from warhammer40k_core.engine.terrain_hidden import terrain_hidden_model_ids
-from warhammer40k_core.engine.unit_abilities import unit_has_stealth
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
@@ -980,7 +980,6 @@ def _target_candidate(
     ):
         targeting_rule_ids.append(BENEFIT_OF_COVER_RULE_ID)
     if _rules_unit_has_stealth(target_rules_unit):
-        hit_roll_modifier -= 1
         targeting_rule_ids.append(STEALTH_RULE_ID)
     if _plunging_fire_applies(
         attacker_unit=attacker_unit,
@@ -1380,7 +1379,7 @@ def _shooting_types_for_target_candidate(
 def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Stealth target lookup requires a rules unit.")
-    return any(unit_has_stealth(component.unit) for component in rules_unit.components)
+    return rules_unit_has_native_stealth(rules_unit)
 
 
 def _rules_unit_has_fortification_keyword(rules_unit: RulesUnitView) -> bool:

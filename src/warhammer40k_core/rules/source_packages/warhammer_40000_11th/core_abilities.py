@@ -7,6 +7,9 @@ from dataclasses import dataclass
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities_2026_09 as app_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_stealth_2026_09 as stealth_source,
+)
 
 EDITION_ID = "warhammer_40000_11th"
 SOURCE_PACKAGE_ID = app_source.SOURCE_PACKAGE_ID
@@ -301,12 +304,14 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     ability_id="core-stealth",
                     name="Stealth",
                     source_kind="core",
-                    source_id=f"{source_prefix}:stealth",
-                    when_descriptor="opponent shooting phase when resolving ranged attacks",
-                    effect_descriptor="subtract from hit rolls against this unit",
-                    restrictions_descriptor="ranged attack timing restrictions apply",
+                    source_id=stealth_source.STEALTH_SOURCE_ID,
+                    when_descriptor="each time a ranged attack targets this unit",
+                    effect_descriptor=(
+                        "the target unit has the benefit of cover against that attack"
+                    ),
+                    restrictions_descriptor="every model in the rules unit must have Stealth",
                     trigger_kind="after_unit_selected_as_target",
-                    phase="shooting",
+                    phase=None,
                     handler_id="core:stealth",
                     required_keywords=("STEALTH",),
                 ),

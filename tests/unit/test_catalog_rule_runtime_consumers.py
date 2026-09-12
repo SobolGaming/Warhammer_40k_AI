@@ -2866,6 +2866,8 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
 
 
 def test_july_fluxmaster_passive_defences_use_generic_catalog_runtime() -> None:
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+
     source_army, enemy_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     enemy_unit = enemy_army.units[0]
@@ -2897,6 +2899,7 @@ def test_july_fluxmaster_passive_defences_use_generic_catalog_runtime() -> None:
     )
     registry = RuntimeModifierRegistry.from_bindings(
         hit_roll_modifier_bindings=runtime.hit_roll_modifier_bindings(),
+        model_ability_grant_bindings=runtime.model_ability_grant_bindings(),
     )
     ranged_profile = WeaponProfile(
         profile_id="july-fluxmaster-ranged",
@@ -2920,7 +2923,15 @@ def test_july_fluxmaster_passive_defences_use_generic_catalog_runtime() -> None:
         source_phase=BattlePhase.SHOOTING,
     )
 
-    assert registry.hit_roll_modifier(context) == -1
+    assert registry.hit_roll_modifier(context) == 0
+    assert (
+        rules_unit_stealth_sources(
+            state=state,
+            target_unit_instance_id=source_unit.unit_instance_id,
+            runtime_modifier_registry=registry,
+        )
+        is not None
+    )
     assert (
         registry.hit_roll_modifier(
             replace(

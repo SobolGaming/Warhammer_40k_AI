@@ -2,6 +2,13 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 39 makes Stealth grant Benefit of Cover only when every present model in
+the target rules unit has the ability. Native, attached, Aura, selected-target
+and Darkness grants share one source-aware engine query. See the
+[scope and validation record](docs/ORDER_39_SCOPE_PLAN.md). Regenerate its reviewed
+source with `uv run python tools/build_core_stealth_source.py`; the two catalog
+overlays, support reports, runtime identity and contract are described there.
+
 Order 38 separates source-permitted Assault and Shock Disembark eligibility from
 Transport movement history. Every legal mode has its own finite option; stale
 grants are rejected before placement. See the [scope and validation record](docs/ORDER_38_SCOPE_PLAN.md)
@@ -517,7 +524,7 @@ Current status:
   save through shared runtime hooks. Chaos Knights Harbingers of Dread supports
   battle-round Dread selections/rolls, Deathly Terror/Despair Leadership auras,
   Dismay forced below-starting Battle-shock tests, Delirium D3 mortal wounds,
-  Doom wound modifiers, and the Darkness Stealth hit modifier through shared
+  Doom wound modifiers, and the Darkness Stealth model grant through shared
   runtime hooks. Delirium mortal-wound Feel No Pain continuation is deferred
   and emits a typed unsupported event without applying wounds. Thousand Sons
   Cabal of Sorcerers supports Shooting-start Ritual selection, Psychic tests
