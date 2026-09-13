@@ -238,6 +238,8 @@ class HitRollPayload(TypedDict):
     final_roll: int | None
     successful: bool
     critical: bool
+    critical_threshold: int
+    threshold_source_ids: list[str]
     skipped: bool
     generated_hits: int
 
@@ -447,6 +449,8 @@ class HitRoll:
     final_roll: int | None
     successful: bool
     critical: bool
+    critical_threshold: int = 6
+    threshold_source_ids: tuple[str, ...] = ()
     minimum_unmodified_success: int = 2
     unmodified_success_threshold_active: bool = False
     skipped: bool = False
@@ -464,6 +468,10 @@ class HitRoll:
                 self.minimum_unmodified_success,
             ),
         )
+        _validate_d6_minimum_success("HitRoll critical_threshold", self.critical_threshold)
+        _validate_identifier_tuple("HitRoll threshold_source_ids", self.threshold_source_ids)
+        if self.critical_threshold < self.minimum_unmodified_success:
+            raise GameLifecycleError("HitRoll critical threshold is below its failure floor.")
         if type(self.modifier) is not int:
             raise GameLifecycleError("HitRoll modifier must be an integer.")
         if type(self.capped_modifier) is not int:
@@ -502,14 +510,21 @@ class HitRoll:
             raise GameLifecycleError("HitRoll unmodified_roll must be a D6 value.")
         if type(self.final_roll) is not int:
             raise GameLifecycleError("HitRoll final_roll must be an integer.")
+        if self.unmodified_roll != self.roll_state.current_total:
+            raise GameLifecycleError("HitRoll raw face does not match its dice state.")
+        if self.final_roll != max(1, self.unmodified_roll + self.capped_modifier):
+            raise GameLifecycleError("HitRoll final roll does not match its modifier trace.")
+        expected_critical = self.unmodified_roll >= self.critical_threshold
         unmodified_meets_minimum = self.unmodified_roll >= self.minimum_unmodified_success
         threshold_success = threshold_flag and unmodified_meets_minimum
         target_success = unmodified_meets_minimum and self.final_roll >= self.target_number
-        expected_success = self.unmodified_roll == 6 or threshold_success or target_success
+        expected_success = expected_critical or threshold_success or target_success
         if self.successful != expected_success:
             raise GameLifecycleError("HitRoll success flag does not match roll semantics.")
-        if self.critical != (self.unmodified_roll == 6):
-            raise GameLifecycleError("HitRoll critical flag must track unmodified 6.")
+        if self.critical != expected_critical:
+            raise GameLifecycleError(
+                "HitRoll critical flag does not match its unmodified threshold."
+            )
 
     @classmethod
     def auto_hit(cls, *, target_number: int, generated_hits: int = 1) -> Self:
@@ -538,6 +553,8 @@ class HitRoll:
             "final_roll": self.final_roll,
             "successful": self.successful,
             "critical": self.critical,
+            "critical_threshold": self.critical_threshold,
+            "threshold_source_ids": list(self.threshold_source_ids),
             "skipped": self.skipped,
             "generated_hits": self.generated_hits,
         }
@@ -555,6 +572,8 @@ class HitRoll:
             final_roll=payload["final_roll"],
             successful=payload["successful"],
             critical=payload["critical"],
+            critical_threshold=payload["critical_threshold"],
+            threshold_source_ids=tuple(payload["threshold_source_ids"]),
             minimum_unmodified_success=payload["minimum_unmodified_success"],
             unmodified_success_threshold_active=payload["unmodified_success_threshold_active"],
             skipped=payload["skipped"],

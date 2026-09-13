@@ -35,7 +35,7 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "6287d78a7ca59f0fd1d684b378c9a41410689b62cd102c575747957dfb97f535",
+  "package_hash": "593ca6f4eb27c57e9c6c5baa3ac55e9817134b2964b6a99a3dc4f44bb4e82711",
   "shard_id": "aeldari",
   "source_packages": {
     "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14": {
@@ -1307,7 +1307,7 @@
         "000000594": "Howling Banshees",
         "000003909": "Lhykhis"
       },
-      "package_hash": "5a7ce021398b87a25afc09d09caa88899a1a02ced42800e0ebb948dd98f922f3",
+      "package_hash": "df1dd1d49bf8eb52a90b141fe0c54dd8883d498471728268a516de51cde3815f",
       "records": {
         "000000572:4": {
           "ability_name": "Whirling Death",
@@ -2680,7 +2680,7 @@
                         "value": "attacker"
                       },
                       {
-                        "key": "minimum_unmodified_success",
+                        "key": "critical_threshold",
                         "value": 5
                       },
                       {
@@ -2689,7 +2689,7 @@
                       },
                       {
                         "key": "status",
-                        "value": "minimum_unmodified_hit_success"
+                        "value": "critical_hit_threshold"
                       }
                     ],
                     "source_span": {
@@ -2741,7 +2741,7 @@
               }
             ],
             "diagnostics": [],
-            "ir_hash": "3e6adfc6fb966ce3b44d81abb09fbf4df2e1a38eaa34b8cb791bba1fa0ea383b",
+            "ir_hash": "02b5c11d47776e8a050dd004db3f1d725c8ec1828e1624017c439bc0fa1c2219",
             "normalized_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
             "parser_version": "phase17c-rule-parser-v4",
             "rule_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5",

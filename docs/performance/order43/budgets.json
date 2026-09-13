@@ -1,0 +1,9 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "samples_per_case": 7,
+  "mean_base_multiplier": 2,
+  "mean_additive_seconds": 0.05,
+  "maximum_seconds": 1.0,
+  "effect_match_passes_per_hit": 1,
+  "full_game_certified": false
+}

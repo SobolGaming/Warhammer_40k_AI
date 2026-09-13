@@ -640,6 +640,26 @@
           "row_id": "target-no-longer-eligible-or-viable",
           "source_observation_sha256": "353f37876d9d0c350816ce148aff18738a5477e0de6abf773f9e48760aecd2d8",
           "source_url": "https://www.40k.app/rules/04-making-attacks"
+        },
+        {
+          "row_id": "critical-hit-success-faq",
+          "source_observation_sha256": "53c91f5a6737b46ff549e6b76f185a0ee609c6027a778a330e9a445a14350dbc",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "snap-critical-hit-faq",
+          "source_observation_sha256": "80fa7ff7cca2ee2c5a61d79fdcc2ca145a5df93a3a7cfb8ae9254f930f0d7466",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
+          "identity_kind": "app_version",
+          "identity_value": "931"
         }
       ],
       "legacy_observations": [
@@ -1096,6 +1116,16 @@
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-target-replacement",
           "version": "maintained-app-mirrors-observed-2026-09-12"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-critical-hits",
+          "version": "maintained-app-mirrors-observed-2026-09-13",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-critical-hits:critical-hit-success-faq",
+            "gw-11e-core-critical-hits:snap-critical-hit-faq"
+          ],
+          "catalog_sha256": "060e96c0dc1d23bd3de4a64733ff24843caafaf49229d4c76c7155188133b036"
         }
       ]
     },

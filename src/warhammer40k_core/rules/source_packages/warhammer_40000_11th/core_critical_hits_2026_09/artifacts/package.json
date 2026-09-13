@@ -1,0 +1,154 @@
+{
+  "artifact_schema": "core-v2-core-critical-hits-source-v1",
+  "source_package_id": "gw-11e-core-critical-hits",
+  "source_version": "maintained-app-mirrors-observed-2026-09-13",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-critical-hits:critical-hit-success-faq",
+      "section_id": "04 FAQ v931",
+      "source_text": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?\nYes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "transcription_sha256": "35a614564523f4d385f1b42290caf85293f62d5bdb55f10b5d5eea34b4c4120b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-critical-hits:snap-critical-hit-faq",
+      "section_id": "04 FAQ v931",
+      "source_text": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?\nUnless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "transcription_sha256": "b5df271c18783405b0a70abc938ce0efcb4b7c5b9a02e63bfebd2b16416cd1ea",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-critical-hits-review:critical-hit-success-faq",
+      "rule_source_id": "gw-11e-core-critical-hits:critical-hit-success-faq",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "Game Datamissions 04 FAQ v931 critical-hit-success-faq",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "35a614564523f4d385f1b42290caf85293f62d5bdb55f10b5d5eea34b4c4120b",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "3160416dda6ff87342b87b44d989d6294e264983f020285116493d1ceff95cdc",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    },
+    {
+      "evidence_id": "core-critical-hits-mirror:critical-hit-success-faq",
+      "rule_source_id": "gw-11e-core-critical-hits:critical-hit-success-faq",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
+      "review_audit_row_id": "critical-hit-success-faq",
+      "review_audit_source_observation_sha256": "53c91f5a6737b46ff549e6b76f185a0ee609c6027a778a330e9a445a14350dbc",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 04 FAQ v931 critical-hit-success-faq",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "35a614564523f4d385f1b42290caf85293f62d5bdb55f10b5d5eea34b4c4120b",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "05b7377a6b3484c7bb26152f1959743b5785f43b8d68f6b34c673ca0102939bf",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    },
+    {
+      "evidence_id": "core-critical-hits-review:snap-critical-hit-faq",
+      "rule_source_id": "gw-11e-core-critical-hits:snap-critical-hit-faq",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "Game Datamissions 04 FAQ v931 snap-critical-hit-faq",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "b5df271c18783405b0a70abc938ce0efcb4b7c5b9a02e63bfebd2b16416cd1ea",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "37a46e81ab14b769143df314f2b5d958590d4f8a96aadd96191764eb69ea8a57",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    },
+    {
+      "evidence_id": "core-critical-hits-mirror:snap-critical-hit-faq",
+      "rule_source_id": "gw-11e-core-critical-hits:snap-critical-hit-faq",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
+      "review_audit_row_id": "snap-critical-hit-faq",
+      "review_audit_source_observation_sha256": "80fa7ff7cca2ee2c5a61d79fdcc2ca145a5df93a3a7cfb8ae9254f930f0d7466",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 04 FAQ v931 snap-critical-hit-faq",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "b5df271c18783405b0a70abc938ce0efcb4b7c5b9a02e63bfebd2b16416cd1ea",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "af7a3e8c3ac6090a9caaccb17cd5d5287103d3890c968f900a71bf4f1a9eb71e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hit_thresholds:resolve_hit_thresholds",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    }
+  ],
+  "package_hash": "823333e2eaf3fe1f4521c1213561448091cff83f6feea171066b6d859d2a6cd2"
+}

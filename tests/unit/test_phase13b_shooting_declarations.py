@@ -19098,7 +19098,7 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="critical flag"):
         HitRoll(
             target_number=3,
-            roll_state=hit_roll_state,
+            roll_state=DiceRollManager("phase13c-invalid-critical").roll_fixed(hit_spec, [6]),
             unmodified_roll=6,
             modifier=0,
             capped_modifier=0,

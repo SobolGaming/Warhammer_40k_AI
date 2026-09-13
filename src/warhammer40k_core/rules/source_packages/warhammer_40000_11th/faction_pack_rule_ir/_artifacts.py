@@ -310,7 +310,7 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
         "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14": (
             _SourcePackageDescriptor(
                 artifact_schema=("core-v2-aeldari-banshees-phoenix-lords-spiritseer-rule-ir-v1"),
-                package_hash=("5a7ce021398b87a25afc09d09caa88899a1a02ced42800e0ebb948dd98f922f3"),
+                package_hash=("df1dd1d49bf8eb52a90b141fe0c54dd8883d498471728268a516de51cde3815f"),
                 wire_type=_SnapshotMultiDatasheetSourcePackageWire,
             )
         ),

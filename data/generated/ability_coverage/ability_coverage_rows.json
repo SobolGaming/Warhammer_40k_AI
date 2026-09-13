@@ -800,7 +800,7 @@
     "datasheet_name": "Striking Scorpions",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "catalog-ir:minimum-unmodified-hit-success"
+      "catalog-ir:critical-hit-threshold"
     ],
     "semantic_categories": [
       "datasheet.rule_ir.set_contextual_status.this_unit"
@@ -3813,7 +3813,7 @@
     "datasheet_name": "Lhykhis",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "catalog-ir:minimum-unmodified-hit-success"
+      "catalog-ir:critical-hit-threshold"
     ],
     "semantic_categories": [
       "datasheet.rule_ir.set_contextual_status.friendly_unit"

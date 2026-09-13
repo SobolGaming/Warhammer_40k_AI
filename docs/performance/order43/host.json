@@ -1,0 +1,8 @@
+{
+  "hardware_role": "provisional",
+  "cpu": "Apple M5 Pro",
+  "logical_cpus": 18,
+  "memory_bytes": 68719476736,
+  "measurement_concurrency": 1,
+  "metadata_observation_date": "2026-09-13"
+}

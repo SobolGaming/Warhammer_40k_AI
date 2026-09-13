@@ -3795,12 +3795,12 @@ def test_phase17c_leader_lethal_hits_with_critical_hit_threshold_compiles() -> N
     assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
     assert parameter_payload(minimum_hit_effect.parameters) == {
         "attack_role": "attacker",
-        "minimum_unmodified_success": 5,
+        "critical_threshold": 5,
         "roll_type": "hit",
-        "status": "minimum_unmodified_hit_success",
+        "status": "critical_hit_threshold",
     }
     assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= {
-        CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
+        "catalog-ir:critical-hit-threshold",
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     }
 

@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-package-v1",
   "edition": 11,
-  "package_hash": "96da4b016a58c2160b6ab4c6448acd4d345be15deb1facb99ecc54e60b6fab02",
+  "package_hash": "4d0b9b983dc94cb6c4495c19256195591d5cbbd403cf3ec89121a8f62db7a8d6",
   "registry_id": "warhammer-40000-11th-faction-pack-rule-ir",
   "shard_artifacts": {
     "aeldari": {
@@ -35,7 +35,7 @@
         "000004196"
       ],
       "path": "shards/aeldari.json",
-      "sha256": "662cb24c61e66c507b304f6363a24ccd08612bbfedee15ee151392376cf9b7ff",
+      "sha256": "8268084a49d76572bc468a63a032a917eba95dc14fb3e6d8c5e303ed948b3a27",
       "source_package_ids": [
         "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14",
         "gw-11e-aeldari-autarchs-datasheets-2026-06-14",

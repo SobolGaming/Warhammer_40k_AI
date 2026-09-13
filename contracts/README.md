@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `15.3.0`
+Contract version: `16.0.0`
+
+Contract 16 requires effective critical-hit thresholds and source IDs in hit
+records, and versions critical-hit success and Snap Shooting semantics. See
+[15-to-16.md](migrations/15-to-16.md) for the replay and persistence boundary.
 
 Contract 15.3 adds the finite `select_target_replacement` decision family,
 including explicit decline and current-context validation. See Order 42 in the
@@ -149,7 +153,7 @@ family as the standalone submission schema; it is not an unrestricted JSON
 value. The generated TypeScript gate constructs and schema-validates every
 published interaction case.
 
-Replay exports use `replay-artifact-v9-sequencing`. Their embedded mission
+Replay exports use `replay-artifact-v10-critical-hits`. Their embedded mission
 setup requires both directed player Primary Mission assignments and explicit
 logical terrain-area identities; their game state requires group-aware
 turn-start position history, typed destruction attribution, and battlefield

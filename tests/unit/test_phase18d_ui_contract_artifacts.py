@@ -438,7 +438,7 @@ def test_session_metadata_contract_version_accepts_current_major_releases() -> N
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "15.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "16.0.0"}
     incompatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
 
     validator.validate(compatible)
@@ -453,7 +453,7 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     properties = _json_object(schema["properties"])
     definitions = _json_object(schema["$defs"])
     assert schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v15/session-persistence.schema.json"
+        "https://warhammer40k-core.local/contracts/v16/session-persistence.schema.json"
     )
     assert schema["additionalProperties"] is False
     assert _json_object(properties["schema_version"])["const"] == (
@@ -505,28 +505,28 @@ def test_current_contract_preserves_model_projections_and_advances_visibility_wr
     )
 
     assert metadata["$id"] == (
-        "https://warhammer40k-core.local/contracts/v15/session-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v16/session-metadata.schema.json"
     )
     assert result["$id"] == (
-        "https://warhammer40k-core.local/contracts/v15/session-command-result.schema.json"
+        "https://warhammer40k-core.local/contracts/v16/session-command-result.schema.json"
     )
     assert outcome["$id"] == (
-        "https://warhammer40k-core.local/contracts/v15/session-command-outcome.schema.json"
+        "https://warhammer40k-core.local/contracts/v16/session-command-outcome.schema.json"
     )
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v15-contract"
+        == "session-metadata-v16-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v15-contract"
+        == "session-command-result-v16-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v15-contract"
+        == "session-command-outcome-v16-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]
@@ -552,7 +552,7 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
         _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
     )
     assert replay_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v9/replay-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v10/replay-metadata.schema.json"
     )
     validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
     replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))

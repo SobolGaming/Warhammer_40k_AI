@@ -15924,7 +15924,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v9-sequencing",
+  "schema_version": "replay-artifact-v10-critical-hits",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",
