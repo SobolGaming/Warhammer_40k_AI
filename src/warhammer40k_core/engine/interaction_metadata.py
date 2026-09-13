@@ -203,6 +203,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         ),
         "select_destruction_reaction": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "select_dice_reroll": InteractionSpec(InteractionKind.DICE_SELECTION, ("die",)),
+        "select_lethal_hit_wound": InteractionSpec(InteractionKind.CONFIRMATION),
         "select_dice_result_override": InteractionSpec(
             InteractionKind.DICE_SELECTION,
             ("die",),

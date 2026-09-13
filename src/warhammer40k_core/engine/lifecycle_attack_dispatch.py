@@ -12,6 +12,10 @@ from warhammer40k_core.engine.dice_result_overrides import (
     DICE_RESULT_OVERRIDE_DECISION_TYPE,
     apply_dice_result_override_decision,
 )
+from warhammer40k_core.engine.lethal_hits import (
+    SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
+    apply_lethal_hit_wound_decision,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.retained_destruction_selection import (
     apply_retention_selection,
@@ -109,9 +113,9 @@ def apply_attack_sequence_decision(
     )
 
     active_retained = active_retained_attack_destruction(state=state)
-    if (
-        active_retained is not None
-        and record.request.decision_type != DICE_RESULT_OVERRIDE_DECISION_TYPE
+    if active_retained is not None and record.request.decision_type not in (
+        DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
     ):
         from warhammer40k_core.engine.retained_destruction_dispatch import (
             apply_retained_attack_destruction_decision,
@@ -126,10 +130,18 @@ def apply_attack_sequence_decision(
             runtime_modifier_registry=context.runtime_modifier_registry(),
         )
         return context.advance() if status is None else status
-    if record.request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE:
+    if record.request.decision_type in (
+        DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
+    ):
         resolves_reaction_frame = context.resolves_reaction_frame
         fight_owned = context.fight_owned
-        apply_dice_result_override_decision(
+        applier = (
+            apply_lethal_hit_wound_decision
+            if record.request.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE
+            else apply_dice_result_override_decision
+        )
+        applier(
             state=state,
             decisions=context.decisions,
             request=record.request,

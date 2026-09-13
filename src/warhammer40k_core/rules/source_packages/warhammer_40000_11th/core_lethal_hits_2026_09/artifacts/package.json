@@ -1,0 +1,79 @@
+{
+  "artifact_schema": "core-v2-core-lethal-hits-source-v1",
+  "source_package_id": "gw-11e-core-lethal-hits",
+  "source_version": "maintained-app-mirrors-observed-2026-09-13",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-lethal-hits:lethal-hits",
+      "section_id": "24.23",
+      "source_text": "Each time an attack made with a [LETHAL HITS] weapon results in a critical hit, you can choose for that attack to automatically wound the target.\nDesigner’s Note: Choosing to automatically wound the target means that no wound roll is made for that attack. You may decide against this, as it means that attack cannot result in a critical wound and so cannot trigger other abilities such as [DEVASTATING WOUNDS].",
+      "transcription_sha256": "5862c427e3682a38d219004e3b03ad7c5a2f8c09bb4175ce3f90e6f917f3bd5e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.lethal_hits:lethal_hit_wound_choice"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-lethal-hits:lethal-hits",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "5862c427e3682a38d219004e3b03ad7c5a2f8c09bb4175ce3f90e6f917f3bd5e",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "ea86deb62bca5d863a89c73c712082b97949dd5c1e1ac1efd861eeea2404010b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.lethal_hits:lethal_hit_wound_choice"
+      ],
+      "evidence_id": "core-lethal-hits-review:lethal-hits",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P24H 24.23 lethal-hits",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-lethal-hits:lethal-hits",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "5862c427e3682a38d219004e3b03ad7c5a2f8c09bb4175ce3f90e6f917f3bd5e",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "5f860dbb36bacf34e36441942897d44be746b8cb41a2792b984e823f5601311a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.lethal_hits:lethal_hit_wound_choice"
+      ],
+      "evidence_id": "core-lethal-hits-mirror:lethal-hits:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-lethal-hits-maintained-app-mirrors-2026-09-13",
+      "review_audit_row_id": "lethal-hits:40k-app",
+      "review_audit_source_observation_sha256": "727c6dfecd7f96bce067e8ade4c724cbd5b9371bf1c4742e636291274eaa7c2d",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 24.23 lethal-hits",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-09-13T15:00:34Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "7b21dc60a9c008ccb79fd40182a287b7f66b87560cd9077bc1778039ba75e597"
+}

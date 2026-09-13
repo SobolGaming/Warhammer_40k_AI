@@ -1,6 +1,12 @@
 # CORE V2 external contract
 
-Contract version: `16.0.0`
+Contract version: `16.1.0`
+
+Contract 16.1 adds the finite `select_lethal_hit_wound` decision family, with
+`auto-wound` and `roll-to-wound` options bound to the recorded critical hit.
+The finite submission envelope and persistence schema remain unchanged; exact
+engine build identity continues to guard replay and persistence. See Order 44
+in the [adapter contract](../docs/ADAPTER_DECISION_CONTRACT.md).
 
 Contract 16 requires effective critical-hit thresholds and source IDs in hit
 records, and versions critical-hit success and Snap Shooting semantics. See

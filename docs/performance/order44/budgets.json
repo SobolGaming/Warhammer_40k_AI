@@ -1,0 +1,9 @@
+{
+  "samples_per_case": 7,
+  "mean_base_multiplier": 2,
+  "mean_additive_seconds": 0.1,
+  "maximum_seconds": 1.0,
+  "lethal_mean_base_multiplier": 3,
+  "lethal_mean_additive_seconds": 0.15,
+  "lethal_maximum_seconds": 2.0
+}

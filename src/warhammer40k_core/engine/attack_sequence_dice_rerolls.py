@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.attack_sequence_imports import *
 from warhammer40k_core.engine.objective_geometry import measure_rules_unit_to_objective
 from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
+from warhammer40k_core.engine.lethal_hits import lethal_hit_wound_choice
 from warhammer40k_core.engine.dice_result_overrides import (
     DICE_RESULT_OVERRIDE_EVENT_TYPE,
     request_dice_result_override_if_available,
@@ -240,11 +241,12 @@ def _roll_hit_and_wound(
         target_unit_instance_id=pool.target_unit_instance_id,
         runtime_modifier_registry=runtime_modifier_registry,
     )
-    if (
-        attack_sequence.generated_hit_index == 0
-        and hit_roll.critical
-        and lethal_hits_applies(pool.weapon_profile, target_keywords=target_rules_unit.keywords)
-    ):
+    auto_wound, status = lethal_hit_wound_choice(
+        state=state, decisions=decisions, sequence=attack_sequence, hit=hit_roll
+    )
+    if status is not None:
+        return None, status
+    if auto_wound:
         wound_roll = WoundRoll.auto_wound(
             strength=pool.weapon_profile.strength.final,
             toughness=toughness,

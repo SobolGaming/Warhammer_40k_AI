@@ -2292,6 +2292,7 @@ def _continue_damage_model_choices(
             return _stored_shooting_attack_sequence(lifecycle), current_status
         request = _decision_request(current_status)
         if request.decision_type not in {
+            "select_lethal_hit_wound",
             SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
             SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
         }:

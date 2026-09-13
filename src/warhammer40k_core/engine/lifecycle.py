@@ -36,10 +36,6 @@ from warhammer40k_core.engine import unit_split_dispatch as _unit_split_dispatch
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
-    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-    SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-    SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
-    SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     invalid_destroyed_transport_disembark_proposal_status,
     is_destroyed_transport_disembark_proposal_request,
@@ -88,13 +84,6 @@ from warhammer40k_core.engine.cult_ambush import (
     invalid_cult_ambush_resurgence_status,
     is_cult_ambush_placement_request,
 )
-from warhammer40k_core.engine.damage_allocation import (
-    SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-    SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-)
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
@@ -115,9 +104,6 @@ from warhammer40k_core.engine.deployment import (
     is_deployment_placement_request,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
-from warhammer40k_core.engine.dice_result_overrides import (
-    DICE_RESULT_OVERRIDE_DECISION_TYPE,
-)
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import (
     EventRecord,
@@ -451,17 +437,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
-        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
-        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-        SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
-        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-        _mw_model.SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
-        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        *_asdf.ATTACK_SEQUENCE_DECISION_TYPES,
         DICE_REROLL_DECISION_TYPE,
         SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE,
         *HEALING_DECISION_TYPES,

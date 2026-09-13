@@ -34,6 +34,11 @@ from warhammer40k_core.engine.dice_result_overrides import (
 from warhammer40k_core.engine.finite_decision_validation import (
     invalid_finite_decision_status as _invalid_finite_decision_status,
 )
+from warhammer40k_core.engine.lethal_hits import (
+    SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
+    invalid_lethal_hit_wound_status,
+    validate_lethal_hit_history,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.fight import invalid_fight_attack_sequence_selection_status
 from warhammer40k_core.engine.psychic_modifier_validation import invalid_psychic_modifier_status
@@ -64,6 +69,11 @@ def pre_validate_attack_sequence_decision(
     )
 
     try:
+        validate_lethal_hit_history(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+        )
         validate_attack_hit_authority(
             state=state,
             event_records=decisions.event_log.records,
@@ -74,6 +84,10 @@ def pre_validate_attack_sequence_decision(
             stage=state.stage,
             message=str(exc),
             payload={"invalid_reason": "attack_hit_authority_drift", "field": "hit_roll"},
+        )
+    if request.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE:
+        return invalid_lethal_hit_wound_status(
+            state=state, decisions=decisions, request=request, result=result
         )
     if is_hazardous_request(request):
         try:

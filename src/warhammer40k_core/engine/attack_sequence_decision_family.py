@@ -14,6 +14,7 @@ from warhammer40k_core.engine.damage_allocation import (
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.dice_result_overrides import DICE_RESULT_OVERRIDE_DECISION_TYPE
+from warhammer40k_core.engine.lethal_hits import SELECT_LETHAL_HIT_WOUND_DECISION_TYPE
 from warhammer40k_core.engine.mortal_wound_model_allocation import (
     SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
 )
@@ -23,6 +24,7 @@ ATTACK_SEQUENCE_CONTEXT_BOUND_DECISION_TYPES = frozenset(
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
         SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
+        SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
     )
 )
 ATTACK_SEQUENCE_ACTIVE_CONTINUATION_DECISION_TYPES = frozenset(

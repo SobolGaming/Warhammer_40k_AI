@@ -25,11 +25,13 @@ from tests.phase13b_shooting_declaration_helpers import (
     _attack_step_payloads,
     _benefit_of_cover_result,
     _blocking_ruin,
+    _canonical_catalog,
     _catalog_with_core_feel_no_pain_datasheet,
     _catalog_with_deadly_demise_datasheet,
     _catalog_with_extra_bolt_profile,
     _catalog_with_same_profile_id_target_cache_collision_weapons,
     _command_reroll_use_option_id,
+    _compact_intercessor_catalog,
     _compact_shooting_lifecycle,
     _compact_test_unit_poses,
     _continue_damage_model_choices,
@@ -2008,6 +2010,14 @@ def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> No
             ),
         ),
         stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    _remaining, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=_remaining,
+        allocated_ids=_allocated,
+        status=status,
+        result_id_prefix="phase18b-damage-lethal-choice",
     )
 
     _assert_command_reroll_request(
@@ -5424,7 +5434,7 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
         attack_sequence=remaining_sequence,
         allocated_ids=allocated_ids,
         status=status,
-        result_id_prefix="phase14e-grouped-lethal-sustained-model",
+        result_id_prefix="phase14e-grouped-lethal-sustained-model-3",
     )
     events = _event_payloads(lifecycle, "attack_sequence_step")
     grouped_allocation = next(
@@ -5711,15 +5721,14 @@ def test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard
 
 
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1),
+        catalog=_compact_intercessor_catalog(_canonical_catalog()),
+    )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
-    )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         profile_id="phase13d-lethal-sustained",
@@ -5772,12 +5781,19 @@ def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
         dice_manager=dice_manager,
     )
 
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=_allocated_ids,
+        status=status,
+        result_id_prefix="phase13d-sustained-choice-0",
+    )
     events = _event_payloads(lifecycle, "attack_sequence_step")
     hit_payload = _attack_step_payload(events, AttackSequenceStep.HIT)
     wound_events = [event for event in events if event["step"] == AttackSequenceStep.WOUND.value]
     damage_events = [event for event in events if event["step"] == AttackSequenceStep.DAMAGE.value]
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert cast(dict[str, object], hit_payload["payload"])["generated_hits"] == 2
     assert len(wound_events) == 2
     assert wound_events[0]["attack_context_id"] == first_context_id
@@ -5788,16 +5804,15 @@ def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
 
 
 def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1),
+        catalog=_compact_intercessor_catalog(_canonical_catalog()),
+    )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = with_unit_keywords(units["enemy"], keywords=("VEHICLE",))
     _replace_unit_instance_in_state(state=state, replacement=defender)
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
-    )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         profile_id="phase14i-lethal-hits-vehicle-gate",
@@ -5844,6 +5859,13 @@ def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
             ),
         ),
     )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=_allocated_ids,
+        status=status,
+        result_id_prefix="phase14i-vehicle-choice",
+    )
     wound_events = [
         event
         for event in _event_payloads(lifecycle, "attack_sequence_step")
@@ -5851,7 +5873,7 @@ def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
     ]
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert len(wound_events) == 1
     assert cast(dict[str, object], wound_events[0]["payload"])["skipped"] is True
 

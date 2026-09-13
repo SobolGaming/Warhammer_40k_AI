@@ -157,7 +157,11 @@ def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registe
         (ATTACK_SEQUENCE_PATH, "_legal_model_ids_for_allocation_group_damage"),
         (ATTACK_SEQUENCE_PATH, "current_legal_damage_allocation_model_ids"),
         (SHOOTING_PHASE_PATH, "apply_damage_allocation_model_decision"),
-        (LIFECYCLE_PATH, "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE"),
+        (LIFECYCLE_PATH, "*_asdf.ATTACK_SEQUENCE_DECISION_TYPES"),
+        (
+            LIFECYCLE_PATH.with_name("attack_sequence_decision_family.py"),
+            "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE",
+        ),
         (
             LIFECYCLE_PATH.with_name("lifecycle_attack_prevalidation.py"),
             "_invalid_damage_allocation_model_status",
