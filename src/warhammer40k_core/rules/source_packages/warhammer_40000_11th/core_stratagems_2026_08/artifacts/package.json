@@ -190,7 +190,7 @@
         "warhammer40k_core.engine.stratagems_targeting:_fire_overwatch_target_binding_error",
         "warhammer40k_core.engine.stratagems_fire_overwatch:_apply_fire_overwatch_handler"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": null,
       "transcription_sha256": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
       "verification_status": "unverified"
@@ -208,7 +208,7 @@
         "warhammer40k_core.engine.stratagems_targeting:_fire_overwatch_target_binding_error",
         "warhammer40k_core.engine.stratagems_fire_overwatch:_apply_fire_overwatch_handler"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": "https://www.40k.app/rules/15-stratagems",
       "transcription_sha256": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
       "verification_status": "authoritative_app_mirror"
@@ -227,7 +227,7 @@
         "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
         "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": null,
       "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
       "verification_status": "unverified"
@@ -246,7 +246,7 @@
         "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
         "warhammer40k_core.engine.activity_restrictions:record_completed_shooting_restriction"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": "https://www.40k.app/rules/15-stratagems",
       "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
       "verification_status": "authoritative_app_mirror"
@@ -329,7 +329,7 @@
       "transcription_sha256": "b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff"
     }
   ],
-  "package_hash": "64bee037ad180ad610a90b3813200f79a961386fa19108048c123e70ff1a8286",
+  "package_hash": "fa049c003103adc70fe32fb22cecc23524a2e301e7c94e8e7879237609ad83e0",
   "rules": [
     {
       "command_point_cost": 1,
@@ -433,7 +433,7 @@
       ],
       "runtime_rule_id": "core:fire-overwatch",
       "section_id": "15.08",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-stratagems:core:fire-overwatch",
       "source_observation_sha256": "6cfdfa59d51b3bc1302101ac70a142bc3926ac2f532fb035254f4cc08eb6f9a1",
       "source_text": "15.08 Fire Overwatch\nFire Overwatch\nMovement Phase\nTARGET\nOne friendly unengaged unit (excluding TITANIC units).\nWHEN\nEnd of your opponent\u2019s Movement phase.\nEFFECT\nYour unit shoots using Snap Shooting (15.09).\n1 CP",
@@ -462,7 +462,7 @@
       ],
       "runtime_rule_id": "core:snap-shooting",
       "section_id": "15.09",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-stratagems:rule:snap-shooting",
       "source_observation_sha256": "b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26",
       "source_text": "15.09 Snap Shooting\nWHEN ELIGIBLE\nAs stated in the rule allowing this shooting type.\nEFFECT\nYour unit shoots as described in Making Attacks (04).\nWHILE SHOOTING\nYou can only target one visible enemy unit within 24\" of your unit (and only if it is an eligible target).\nEach attack only hits on an unmodified hit roll of 6 (irrespective of the attacking weapon\u2019s BS characteristic or any modifiers).\nYou cannot re\u2011roll hit rolls.\nAFTER SHOOTING\nUntil the end of the phase, your unit is not eligible to start an action.",

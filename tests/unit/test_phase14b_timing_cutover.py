@@ -224,7 +224,16 @@ def test_phase14b_effective_active_player_scope_restores_after_selected_unit_con
 @pytest.mark.parametrize("first_rule", ["fire-overwatch", "rapid-ingress"])
 def test_phase14b_opponent_orders_end_movement_reactions(first_rule: str) -> None:
     lifecycle = _battle_lifecycle(beta_unit_selection_ids=("enemy-unit", "reserve-unit"))
+    from tests.core_stratagem_helpers import _clear_terrain, _replace_unit_poses
+
+    from warhammer40k_core.geometry.pose import Pose
+
     state = _require_state(lifecycle)
+    _clear_terrain(state)
+    for unit_id, origin in (("army-alpha:intercessor-unit-1", 10), ("army-beta:enemy-unit", 20)):
+        _replace_unit_poses(
+            state, unit_instance_id=unit_id, poses=tuple(Pose.at(origin + i, 10) for i in range(5))
+        )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     state.battle_round = 2
     state.gain_command_points(
@@ -274,9 +283,7 @@ def test_phase14b_opponent_orders_end_movement_reactions(first_rule: str) -> Non
     )
     second_rule = "rapid-ingress" if first_rule == "fire-overwatch" else "fire-overwatch"
     expected_windows = {
-        "fire-overwatch": (
-            "fire-overwatch-end-movement-round-02-unit-army-alpha:intercessor-unit-1-player-player-b"
-        ),
+        "fire-overwatch": ("fire-overwatch-end-movement-round-02-player-player-b"),
         "rapid-ingress": "rapid-ingress-end-movement-round-02-player-player-b",
     }
     for rule in (first_rule, second_rule):

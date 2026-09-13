@@ -1764,6 +1764,7 @@ class RuntimeContentBundle:
             abilities=ability_indexes_by_player_id,
             stratagems=stratagem_indexes,
             costs=stratagem_cost_modifier_registry,
+            shooting_target_restriction_hooks=shooting_target_restriction_hook_registry,
         )
         return cls(
             activation=activation,

@@ -1341,6 +1341,13 @@ def test_phase14i_new_orders_is_not_offered_after_first_use_in_same_game() -> No
             selected_movement_option_id = movement_request.options[0].option_id
         elif movement_request.decision_type == "select_movement_action":
             selected_movement_option_id = "remain_stationary"
+        elif movement_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            from tests.fire_overwatch_helpers import decline_overwatch
+
+            from warhammer40k_core.adapters.local_session import LocalGameSession
+
+            status = decline_overwatch(LocalGameSession(lifecycle=lifecycle), movement_request)
+            continue
         else:
             raise AssertionError(
                 "New Orders round-advance fixture encountered an unexpected decision type: "
@@ -3444,7 +3451,7 @@ def test_phase13d_fire_overwatch_rejects_unit_more_than_24_before_cp_spend() -> 
 
     assert status.status_kind is LifecycleStatusKind.INVALID
     assert status.payload == {
-        "invalid_reason": "fire_overwatch_unit_not_within_24",
+        "invalid_reason": "fire_overwatch_no_legal_shooting_declaration",
     }
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
     assert state.command_point_total("player-a") == 1
@@ -3579,7 +3586,7 @@ def test_phase13d_fire_overwatch_rejects_engaged_selected_unit_before_cp_spend()
     assert state.out_of_phase_shooting_state is None
 
 
-def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> None:
+def test_phase13d_fire_overwatch_declaration_can_choose_another_enemy() -> None:
     lifecycle = _battle_lifecycle(
         config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2")),
         active_player_id="player-b",
@@ -3627,11 +3634,12 @@ def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> N
     proposal_request = cast(dict[str, object], request_payload["proposal_request"])
     target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
     assert {candidate["target_unit_instance_id"] for candidate in target_candidates} == {
-        "army-beta:enemy-unit"
+        "army-beta:enemy-unit",
+        "army-beta:enemy-unit-2",
     }
     available_weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
     selected_weapon = available_weapons[0]
-    invalid_declaration = ShootingDeclarationProposal(
+    declaration = ShootingDeclarationProposal(
         proposal_request_id=cast(str, proposal_request["request_id"]),
         proposal_kind="shooting_declaration",
         player_id=cast(str, proposal_request["active_player_id"]),
@@ -3659,19 +3667,18 @@ def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> N
             decision_type=shooting_request.decision_type,
             actor_id=shooting_request.actor_id,
             selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-            payload=validate_json_value(invalid_declaration.to_payload()),
+            payload=validate_json_value(declaration.to_payload()),
         )
     )
 
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    validation = cast(dict[str, object], status.payload)["proposal_validation"]
-    violations = cast(list[dict[str, object]], cast(dict[str, object], validation)["violations"])
-    assert violations[0]["violation_code"] == "out_of_phase_target_unit_drift"
-    assert lifecycle.decision_controller.queue.pending_requests == (shooting_request,)
+    assert status.status_kind is not LifecycleStatusKind.INVALID
     assert state.command_point_total("player-a") == 0
     assert len(state.stratagem_use_records) == 1
-    assert state.out_of_phase_shooting_state is not None
-    assert state.out_of_phase_shooting_state.attack_sequence is None
+    accepted = _last_event_payload(
+        lifecycle.decision_controller, "out_of_phase_shooting_declaration_accepted"
+    )
+    pools = cast(list[dict[str, object]], accepted["attack_pools"])
+    assert {pool["target_unit_instance_id"] for pool in pools} == {"army-beta:enemy-unit-2"}
 
 
 def test_phase13d_fire_overwatch_rejects_fell_back_unit_before_cp_spend() -> None:
@@ -5332,14 +5339,11 @@ def test_engaged_fall_back_policy_can_target_fight_on_death_only_unit_from_snaps
 @pytest.mark.parametrize(
     ("scenario", "expected_reason"),
     [
-        ("missing_trigger", "missing_fire_overwatch_trigger_unit"),
-        ("unknown_trigger", "unknown_fire_overwatch_trigger_unit"),
-        ("friendly_trigger", "fire_overwatch_trigger_unit_not_enemy"),
-        ("forbidden_trigger", "fire_overwatch_target_forbidden"),
+        ("forbidden_target", "fire_overwatch_no_legal_shooting_declaration"),
         ("missing_battlefield", "fire_overwatch_requires_battlefield"),
     ],
 )
-def test_fire_overwatch_policy_rejects_invalid_triggering_unit_state(
+def test_fire_overwatch_policy_rejects_unavailable_enemy_or_battlefield(
     scenario: str,
     expected_reason: str,
 ) -> None:
@@ -5348,13 +5352,7 @@ def test_fire_overwatch_policy_rejects_invalid_triggering_unit_state(
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     triggering_unit_id = "army-beta:enemy-unit"
     trigger_payload: JsonValue = _fire_overwatch_trigger_payload(triggering_unit_id)
-    if scenario == "missing_trigger":
-        trigger_payload = {}
-    elif scenario == "unknown_trigger":
-        trigger_payload = _fire_overwatch_trigger_payload("army-beta:unknown-unit")
-    elif scenario == "friendly_trigger":
-        trigger_payload = _fire_overwatch_trigger_payload("army-alpha:intercessor-unit-1")
-    elif scenario == "forbidden_trigger":
+    if scenario == "forbidden_target":
         state.record_persisting_effect(
             PersistingEffect(
                 effect_id="phase12c-fire-overwatch-forbidden",
@@ -6804,6 +6802,12 @@ def test_order35_mixed_reserve_target_rejects_before_mutation_and_legal_target_a
         result_id="order35:placement",
         payload=validate_json_value(proposal.to_payload()),
     )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    # Arrival creates the first on-board shooter, so the source's next phase-end
+    # batch now offers Overwatch independently of any movement-trigger identity.
+    from tests.fire_overwatch_helpers import decline_overwatch
+
+    status = decline_overwatch(session, _decision_request(status))
     assert status.status_kind is not LifecycleStatusKind.INVALID
     assert session.lifecycle.reaction_queue.frames == ()
     reserve = state.reserve_state_for_unit("army-beta:reserve-1")

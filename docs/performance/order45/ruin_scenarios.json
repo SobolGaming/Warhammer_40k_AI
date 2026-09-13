@@ -1,0 +1,41 @@
+{
+  "workload_id": "order45-cavalcade-boundaries-v1",
+  "samples_per_case": 1,
+  "mode": "uninstrumented_focused_pytest",
+  "base_revision": "a178a9e1ff5cac93c0c79e61499b2ce45f402012",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f6a3f25877be161bc188e1e3c52a6bbf4187f529645b8084f56c04607671eef1",
+  "test_file": "tests/unit/test_phase17g_chaos_daemons_cavalcade_of_chaos.py",
+  "full_game_certified": false,
+  "base": {
+    "test_file_sha256": "e03edae3c504d2507da8e5d61f8b7cdf30d6cefaafb718f03cf127d90481988f",
+    "junit_sha256": "63cffda0dd32d9ce1c6ea10b9f62bf004f0f0e9aa2094e7fc93a9afdf61645f1",
+    "cases": [
+      {
+        "name": "test_cavalcade_warp_riders_moves_bloodcrushers_through_exact_event_ruin",
+        "seconds": 5.447,
+        "status": "passed"
+      },
+      {
+        "name": "test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_one",
+        "seconds": 0.963,
+        "status": "passed"
+      }
+    ]
+  },
+  "head": {
+    "test_file_sha256": "e03edae3c504d2507da8e5d61f8b7cdf30d6cefaafb718f03cf127d90481988f",
+    "junit_sha256": "39c70c1182522d0f7f847f9a436ff11bb156f7c498c7768e9d12b418b6419781",
+    "cases": [
+      {
+        "name": "test_cavalcade_warp_riders_moves_bloodcrushers_through_exact_event_ruin",
+        "seconds": 5.873,
+        "status": "passed"
+      },
+      {
+        "name": "test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_one",
+        "seconds": 1.038,
+        "status": "passed"
+      }
+    ]
+  }
+}

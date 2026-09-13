@@ -204,8 +204,6 @@ __all__ = (
     "_explosives_visibility_profile",
     "_fall_back_unit_id_or_none",
     "_fire_overwatch_target_binding_error",
-    "_fire_overwatch_triggering_enemy_unit_id",
-    "_fire_overwatch_triggering_enemy_unit_id_or_none",
     "_friendly_unit_within_enemy_range",
     "_generic_rule_ir_from_stratagem_payload",
     "_geometry_model_for_model_id",

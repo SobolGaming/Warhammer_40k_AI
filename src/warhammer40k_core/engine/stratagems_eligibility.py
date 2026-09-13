@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
+
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 
 from collections.abc import Callable
@@ -43,7 +45,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.stratagems_apply import invalid_stratagem_use_status, apply_stratagem_decision, _apply_stratagem_use, invalid_stratagem_target_proposal_status, apply_stratagem_target_proposal, is_stratagem_placement_proposal_request, invalid_stratagem_placement_proposal_status, apply_stratagem_placement_proposal, is_heroic_intervention_charge_move_request, invalid_heroic_intervention_charge_move_status, apply_heroic_intervention_charge_move, _request_heroic_intervention_charge_move_retry
     from warhammer40k_core.engine.stratagems_selection import stratagem_availability_kind_from_token, stratagem_category_from_token, stratagem_target_kind_from_token, _stratagem_decision_option, _effect_selection_token, _stratagem_selection_from_result_payload, _require_stratagem_selection, stratagem_selection_from_decision_result, stratagem_selection_from_target_proposal_result, _record_is_available_for_context, _stratagem_unavailable_reason, _context_state_drift, _detachment_gate_allows, _effect_selection_error, _selected_command_point_cost, _selected_command_point_cost_result, _heroic_intervention_mode_error, _heroic_intervention_mode, _heroic_intervention_mode_additional_cost, _heroic_intervention_mode_costs, _required_effect_selection_fields_error, _effect_selection_string_or_none
     from warhammer40k_core.engine.stratagems_targeting import _target_binding_error, _target_unit_owner, _target_unit_has_keyword, _target_unit_within_controlled_objective_range, _objective_control_result_has_unit, _target_unit_satisfies_required_keywords, _target_unit_satisfies_required_keywords_any, _target_unit_satisfies_required_faction_keywords, _unit_has_keyword, _canonical_keyword, _active_tactical_secondary_cards, _battle_shock_test_unit_ids, _rapid_ingress_unit_ids, _strategic_reserves_ingress_unit_ids, _command_reroll_context_error, _command_reroll_roll_class, _command_reroll_state, _command_reroll_affected_unit_id, _command_reroll_permission, _selected_target_context_error, _selected_target_unit_ids_or_none, _selected_to_fight_target_context_error, _selected_to_fight_unit_id_or_none, _selected_to_move_target_context_error, _selected_to_move_unit_id_or_none, _selected_to_shoot_target_context_error, _selected_to_shoot_unit_id_or_none, _just_fell_back_target_context_error, _just_fell_back_unit_id_or_none, _just_shot_target_context_error, _just_shot_unit_id_or_none, _hit_target_unit_ids_or_empty, _engaged_enemy_unit_ids_or_empty, _effect_selection_required_target_keywords, _target_unit_has_all_keywords, destroyed_target_unit_ids_from_context, destroyed_enemy_unit_ids_from_context, _identifier_list_from_trigger_payload, _hit_enemy_unit_id_or_none, _engaged_enemy_unit_id_or_none, _engaged_with_fall_back_unit_target_context_error, _fall_back_unit_id_or_none, _engaged_fall_back_target_unit_ids, _fire_overwatch_target_binding_error
-    from warhammer40k_core.engine.stratagems_geometry import _fire_overwatch_triggering_enemy_unit_id, _fire_overwatch_triggering_enemy_unit_id_or_none, _heroic_intervention_target_binding_error, _crushing_impact_context_error, _counteroffensive_target_context_error, _epic_challenge_context_error, _units_are_within_range_inches, _friendly_unit_within_enemy_range, _units_are_engaged, _model_engaged_with_unit, _geometry_model_for_model_id, _model_is_alive_and_placed, _model_toughness, _crushing_impact_enemy_target_id_or_none, _crushing_impact_model_id_or_none, _epic_challenge_character_model_id_or_none, _explosives_context_error, _explosives_target_unit_id, _explosives_target_unit_id_or_none, _explosives_target_is_visible_and_in_range, _unit_is_within_enemy_engagement_range, _enemy_unit_is_within_friendly_engagement_range, _any_models_within_engagement_range, _geometry_models_for_unit, _battlefield_scenario_for_stratagem, _stratagem_terrain_features, _stratagem_ruleset_descriptor, _explosives_visibility_profile, _unit_owner, _unit_by_id, _unit_by_id_or_none, _reserve_state_for_target, _unit_for_reserve_state, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _unit_has_deep_strike_keyword, _battlefield_scenario, _proposal_from_request_payload, _proposal_from_result_payload, _proposal_context_error, _movement_proposal_request_from_payload, _heroic_intervention_charge_move_from_result_payload, _heroic_intervention_charge_move_request_error, _heroic_intervention_maximum_distance, _heroic_intervention_mode_from_request, _heroic_intervention_requested_reachable_distances, _heroic_intervention_request_context, _placement_proposal_from_result_payload, _proposal_request_is_rapid_ingress
+    from warhammer40k_core.engine.stratagems_geometry import _heroic_intervention_target_binding_error, _crushing_impact_context_error, _counteroffensive_target_context_error, _epic_challenge_context_error, _units_are_within_range_inches, _friendly_unit_within_enemy_range, _units_are_engaged, _model_engaged_with_unit, _geometry_model_for_model_id, _model_is_alive_and_placed, _model_toughness, _crushing_impact_enemy_target_id_or_none, _crushing_impact_model_id_or_none, _epic_challenge_character_model_id_or_none, _explosives_context_error, _explosives_target_unit_id, _explosives_target_unit_id_or_none, _explosives_target_is_visible_and_in_range, _unit_is_within_enemy_engagement_range, _enemy_unit_is_within_friendly_engagement_range, _any_models_within_engagement_range, _geometry_models_for_unit, _battlefield_scenario_for_stratagem, _stratagem_terrain_features, _stratagem_ruleset_descriptor, _explosives_visibility_profile, _unit_owner, _unit_by_id, _unit_by_id_or_none, _reserve_state_for_target, _unit_for_reserve_state, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _unit_has_deep_strike_keyword, _battlefield_scenario, _proposal_from_request_payload, _proposal_from_result_payload, _proposal_context_error, _movement_proposal_request_from_payload, _heroic_intervention_charge_move_from_result_payload, _heroic_intervention_charge_move_request_error, _heroic_intervention_maximum_distance, _heroic_intervention_mode_from_request, _heroic_intervention_requested_reachable_distances, _heroic_intervention_request_context, _placement_proposal_from_result_payload, _proposal_request_is_rapid_ingress
     from warhammer40k_core.engine.stratagems_ingress import _apply_rapid_ingress_placement, _strategic_reserve_rule_for_ingress_request, _proposal_request_marks_movement_phase_arrival, _request_rapid_ingress_placement_retry
     from warhammer40k_core.engine.stratagems_core_handlers import _stratagem_use_from_proposal_context, _apply_supported_stratagem_handler, _validate_supported_stratagem_handler_available, _validate_supported_stratagem_handler_preflight, _generic_rule_ir_from_stratagem_payload, _apply_generic_rule_ir_stratagem_handler, _apply_command_reroll_handler, is_command_reroll_decision_request, invalid_command_reroll_decision_status, apply_command_reroll_decision, _command_reroll_request_context, _apply_insane_bravery_handler, _apply_rapid_ingress_handler, _apply_ingress_move_handler, _ingress_move_effect_payload, _apply_force_desperate_escape_handler
     from warhammer40k_core.engine.stratagems_tactical_secondaries import _apply_new_orders_handler
@@ -219,8 +221,6 @@ def _handler_unavailable_reason(
             return "fire_overwatch_requires_movement_phase"
         if context.active_player_id == context.player_id:
             return "fire_overwatch_requires_opponent_turn"
-        if _fire_overwatch_triggering_enemy_unit_id_or_none(context) is None:
-            return "missing_fire_overwatch_trigger_unit"
         return None
     if definition.handler_id in {
         CORE_GO_TO_GROUND_HANDLER_ID,
@@ -905,6 +905,9 @@ def _enumerated_target_bindings(
     player_id: str,
     definition: StratagemDefinition,
     context: StratagemEligibilityContext | None = None,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[StratagemTargetBinding, ...]:
     target_spec = definition.target_spec
     if target_spec.target_kind is StratagemTargetKind.NONE:
@@ -941,8 +944,9 @@ def _enumerated_target_bindings(
                 policy=definition.restriction_policy,
                 target_binding=binding,
                 context=context,
-                ruleset_descriptor=None,
-                army_catalog=None,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
             is None
             else ()
@@ -970,8 +974,9 @@ def _enumerated_target_bindings(
                 policy=definition.restriction_policy,
                 target_binding=binding,
                 context=context,
-                ruleset_descriptor=None,
-                army_catalog=None,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
             is None
             else ()
@@ -1002,8 +1007,9 @@ def _enumerated_target_bindings(
                 policy=definition.restriction_policy,
                 target_binding=binding,
                 context=context,
-                ruleset_descriptor=None,
-                army_catalog=None,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
             is None
             else ()
@@ -1031,8 +1037,9 @@ def _enumerated_target_bindings(
                 policy=definition.restriction_policy,
                 target_binding=binding,
                 context=context,
-                ruleset_descriptor=None,
-                army_catalog=None,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
             is None
             else ()
@@ -1058,8 +1065,9 @@ def _enumerated_target_bindings(
                     policy=definition.restriction_policy,
                     target_binding=binding,
                     context=context,
-                    ruleset_descriptor=None,
-                    army_catalog=None,
+                    ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
+                    shooting_target_restriction_hooks=shooting_target_restriction_hooks,
                 )
                 is None
             ):
@@ -1098,8 +1106,9 @@ def _enumerated_target_bindings(
                 policy=definition.restriction_policy,
                 target_binding=binding,
                 context=context,
-                ruleset_descriptor=None,
-                army_catalog=None,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
             is None
             else ()
@@ -1123,8 +1132,9 @@ def _enumerated_target_bindings(
                 policy=definition.restriction_policy,
                 target_binding=binding,
                 context=context,
-                ruleset_descriptor=None,
-                army_catalog=None,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
             is None
         )
@@ -1149,8 +1159,9 @@ def _enumerated_target_bindings(
                     policy=definition.restriction_policy,
                     target_binding=binding,
                     context=context,
-                    ruleset_descriptor=None,
-                    army_catalog=None,
+                    ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
+                    shooting_target_restriction_hooks=shooting_target_restriction_hooks,
                 )
                 is None
             ):

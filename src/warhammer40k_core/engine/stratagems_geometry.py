@@ -70,8 +70,6 @@ __all__ = (
     "_explosives_target_unit_id",
     "_explosives_target_unit_id_or_none",
     "_explosives_visibility_profile",
-    "_fire_overwatch_triggering_enemy_unit_id",
-    "_fire_overwatch_triggering_enemy_unit_id_or_none",
     "_friendly_unit_within_enemy_range",
     "_geometry_model_for_model_id",
     "_geometry_models_for_unit",
@@ -106,27 +104,6 @@ __all__ = (
     "_units_are_within_range_inches",
     "visible_enemy_unit_ids_for_source",
 )
-
-
-def _fire_overwatch_triggering_enemy_unit_id(
-    context: StratagemEligibilityContext,
-) -> str:
-    unit_id = _fire_overwatch_triggering_enemy_unit_id_or_none(context)
-    if unit_id is None:
-        raise GameLifecycleError("Fire Overwatch trigger payload requires moved unit id.")
-    return unit_id
-
-
-def _fire_overwatch_triggering_enemy_unit_id_or_none(
-    context: StratagemEligibilityContext,
-) -> str | None:
-    trigger_payload = context.trigger_payload
-    if not isinstance(trigger_payload, dict):
-        return None
-    unit_id = trigger_payload.get(FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY)
-    if type(unit_id) is not str:
-        return None
-    return _validate_identifier("Fire Overwatch moved unit id", unit_id)
 
 
 def _heroic_intervention_target_binding_error(
@@ -869,7 +846,8 @@ def _proposal_context_error(
     if submitted_proposal.phase is not request_proposal.phase:
         return "stale_phase"
     if (
-        request_proposal.catalog_record.definition.handler_id == CORE_RAPID_INGRESS_HANDLER_ID
+        request_proposal.catalog_record.definition.handler_id
+        in (CORE_RAPID_INGRESS_HANDLER_ID, CORE_FIRE_OVERWATCH_HANDLER_ID)
         and submitted_proposal.context != request_proposal.context
     ):
         return "wrong_context"

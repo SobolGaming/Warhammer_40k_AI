@@ -20,6 +20,7 @@ from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratage
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagem_timing_candidates import stratagem_timing_candidates
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex, StratagemEligibilityContext
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import TurnEndHookRegistry
@@ -32,6 +33,7 @@ def with_stratagem_boundary_rules(
     abilities: Mapping[str, AbilityCatalogIndex],
     stratagems: Mapping[str, StratagemCatalogIndex],
     costs: StratagemCostModifierRegistry,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[TurnEndHookRegistry, ShootingPhaseStartHookRegistry]:
     indexes = {
         player: combine_stratagem_indexes_with_runtime_overrides(
@@ -41,7 +43,13 @@ def with_stratagem_boundary_rules(
         for player, index in stratagems.items()
     }
     return (
-        with_movement_end_rules(end, abilities=abilities, stratagems=stratagems, costs=costs),
+        with_movement_end_rules(
+            end,
+            abilities=abilities,
+            stratagems=stratagems,
+            costs=costs,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        ),
         ShootingPhaseStartHookRegistry.from_bindings(
             (
                 *start.bindings,

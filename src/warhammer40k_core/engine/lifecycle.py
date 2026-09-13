@@ -2523,6 +2523,7 @@ class GameLifecycle:
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
                 decisions=self.decision_controller,
+                shooting_target_restriction_hooks=self._require_runtime_content_bundle().shooting_target_restriction_hook_registry,
                 stratagem_cost_modifier_registry=(
                     self._require_runtime_content_bundle().stratagem_cost_modifier_registry
                 ),
@@ -3003,6 +3004,7 @@ class GameLifecycle:
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             army_catalog=self._require_config().army_catalog,
             decisions=self.decision_controller,
+            shooting_target_restriction_hooks=runtime_content_bundle.shooting_target_restriction_hook_registry,
             stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
         )
         cost_increase_unaffordable = invalid_status_is_unaffordable_cost_increase(

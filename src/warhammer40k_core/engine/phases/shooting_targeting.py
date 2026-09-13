@@ -38,7 +38,6 @@ if TYPE_CHECKING:
 
 __all__ = (
     "_declaration_source_unit",
-    "_declaration_target_within_max_range",
     "_heavy_hit_roll_modifier_applies",
     "_rules_unit_remained_stationary",
     "_rules_unit_set_up_this_turn",
@@ -101,35 +100,6 @@ def _snap_shooting_type_allowed_for_unit_target(
         target_unit_id=target_unit_id,
         range_inches=24,
     )
-
-
-def _declaration_target_within_max_range(
-    *,
-    scenario: BattlefieldScenario,
-    declaration: WeaponDeclaration,
-    target_in_range_model_ids: tuple[str, ...],
-    range_inches: int,
-) -> bool:
-    if not target_in_range_model_ids:
-        return False
-    battlefield = scenario.battlefield_state
-    attacker_placement = battlefield.model_placement_by_id(declaration.attacker_model_instance_id)
-    attacker_model = geometry_model_for_placement(
-        model=scenario.model_instance_for_placement(attacker_placement),
-        placement=attacker_placement,
-    )
-    for target_model_id in target_in_range_model_ids:
-        target_placement = battlefield.model_placement_by_id(target_model_id)
-        target_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(target_placement),
-            placement=target_placement,
-        )
-        if DistanceMeasurementContext.from_models(
-            attacker_model,
-            target_model,
-        ).closest_distance_inches() <= float(range_inches):
-            return True
-    return False
 
 
 def _unit_target_within_max_range(
