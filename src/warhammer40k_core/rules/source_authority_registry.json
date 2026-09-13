@@ -660,6 +660,16 @@
           "audit_id": "core-critical-hits-maintained-app-mirrors-2026-09-13",
           "identity_kind": "app_version",
           "identity_value": "931"
+        },
+        {
+          "row_id": "lethal-hits:40k-app",
+          "source_observation_sha256": "727c6dfecd7f96bce067e8ade4c724cbd5b9371bf1c4742e636291274eaa7c2d",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-lethal-hits-maintained-app-mirrors-2026-09-13",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-13T15:00:34Z"
         }
       ],
       "legacy_observations": [
@@ -1126,6 +1136,15 @@
             "gw-11e-core-critical-hits:snap-critical-hit-faq"
           ],
           "catalog_sha256": "060e96c0dc1d23bd3de4a64733ff24843caafaf49229d4c76c7155188133b036"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-lethal-hits",
+          "version": "maintained-app-mirrors-observed-2026-09-13",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-lethal-hits:lethal-hits"
+          ],
+          "catalog_sha256": "ba47fa058cd10dd39be8148446626843d230ea6274d60da0d59ffcb812d3d0b4"
         }
       ]
     },

@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 44 adds the controlling player's per-critical-hit Lethal Hits choice in
+Shooting, Fight and reaction attacks. Automatic wounds and ordinary wound rolls
+share validation, restore and replay. See [scope and validation](docs/ORDER_44_SCOPE_PLAN.md)
+and [performance evidence](docs/performance/order44/README.md).
+
 Order 43 implements source-backed critical-hit success and the Snap Shooting
 unmodified-six requirement, with shared critical effects, restore and replay.
 See [scope and validation](docs/ORDER_43_SCOPE_PLAN.md) and the

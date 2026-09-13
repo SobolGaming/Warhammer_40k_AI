@@ -351,6 +351,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_lethal_hit_wound",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_mortal_wound_model",
         "interaction_kinds": [
           "entity_selection"
@@ -1078,13 +1085,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "16.0.0",
+        "contract_version": "16.1.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "29668c1c922f2811c72b25022a032981cd2bbc341537c8609765ac832b27f746",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f85d25f40e110567bbc17150cd3971be423cb2de0784eda7ccc8c9fcc009728d"
+        "identity_hash": "3983b1494a920ef27fa41e96b83c785c1b9ca180d326430bf97cf3eada3df4f4",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a9501dcb68ef021c48d21b10bd17fe4ee6c1ab5ae1e91f052e26bee2228e8031"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -3727,6 +3734,13 @@
       "decision_type": "select_healing_model",
       "interaction_kinds": [
         "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_lethal_hit_wound",
+      "interaction_kinds": [
+        "confirmation"
       ],
       "submission_kind": "finite"
     },

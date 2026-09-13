@@ -17,6 +17,10 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.lethal_hits import (
+    validate_lethal_hit_history,
+    validate_pending_lethal_hit_requests,
+)
 from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
     state_allows_battlefield_state as _state_allows_battlefield_state,
 )
@@ -60,6 +64,17 @@ def validate_payload_consistency(
     validate_attack_hit_authority(
         state=state,
         event_records=event_records,
+        pending_decision_requests=pending_decision_requests,
+    )
+    validate_pending_lethal_hit_requests(
+        state=state,
+        event_records=event_records,
+        pending_decision_requests=pending_decision_requests,
+    )
+    validate_lethal_hit_history(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
     )
     validate_activity_restriction_inventory(

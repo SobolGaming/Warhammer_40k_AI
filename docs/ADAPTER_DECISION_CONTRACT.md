@@ -5694,3 +5694,36 @@ profile replacements preserve the recorded hit source. Historical thresholds
 are not recomputed from later effects or model presence. This enforces the
 existing contract 16 shape;
 no decision, visibility or persistence schema changes are introduced.
+
+## Order 44 — optional Lethal Hits
+
+`select_lethal_hit_wound` is a public finite attack decision owned by the attacking
+player, shared by Shooting, Fight, retained and out-of-phase attack hosts. Every
+eligible original critical hit exposes exactly `auto-wound` and `roll-to-wound`.
+Additional Sustained Hits and automatic hits never expose this choice. The first
+option accepts a non-critical automatic wound; the second uses the ordinary wound,
+reroll and critical-wound path, including Devastating Wounds.
+
+The request binds its source rule, phase, sequence, pool, attack, original hit,
+attacking rules unit/model, target and complete structured weapon profile. The
+engine reconstructs the canonical request from current attack ownership and its
+recorded Hit before accepting any submission or restoring a pending choice.
+Unknown choices, wrong actors, stale identities, changed payloads/options, changed
+weapons/target gates and forged hit authority fail before queue pop or mutation.
+The finite option payload is `{ "choice": "auto-wound" }` or
+`{ "choice": "roll-to-wound" }`; adapters copy the selected engine option through
+`FiniteOptionSubmission`. A recorded result resumes exactly its owning attack.
+
+Existing viewer-scoped finite projections, event deltas and replay records carry
+this public decision. No adapter mutates attacks or supplies a default answer.
+This additive finite family preserves the existing generic submission envelope.
+
+
+R44-001 additionally authenticates historical Lethal Hits choices against their
+complete issued requests and recorded decision events, in both directions. Every
+issued choice must remain answered or currently pending, including a declined
+choice paused before its Wound event at a Command Re-roll window. Hit, request,
+answer and Wound evidence must retain their causal order. Historical target and
+weapon metadata are authenticated from the issued request; restoration does not
+re-evaluate a target that may subsequently have changed. This tightens validation
+within the existing finite contract and adds no adapter-visible payload fields.

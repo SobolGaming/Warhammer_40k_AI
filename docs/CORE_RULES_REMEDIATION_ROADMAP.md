@@ -4712,3 +4712,19 @@ source IDs through persistence, events and replay. See the [source, scope and
 validation record](ORDER_43_SCOPE_PLAN.md) and [retained performance
 evidence](performance/order43/README.md). This does not certify other faction
 activation paths or the separately owned Overwatch timing and Charge findings.
+
+
+## Order 44 / P24H — optional Lethal Hits
+
+C24-08 now offers the attacking player a canonical finite choice for each original
+critical hit with applicable Lethal Hits. Automatic wounds skip the wound roll
+and cannot be critical; declining permits an ordinary wound roll and Devastating
+Wounds. Additional Sustained Hits roll independently and receive no inherited
+Lethal Hits choice.
+
+Shooting, Fight and out-of-phase attacks consume one shared resolver and decision
+family. Pending context and historical choice/wound consistency are checked before
+mutation and on restore. Contract 16.1 exposes the two finite options through the
+existing adapter submission path. See the [source, scope and validation
+record](ORDER_44_SCOPE_PLAN.md) and [performance evidence](performance/order44/README.md).
+This closure does not change the separately owned Overwatch timing finding.

@@ -1,0 +1,132 @@
+{
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a9501dcb68ef021c48d21b10bd17fe4ee6c1ab5ae1e91f052e26bee2228e8031",
+  "full_game_certified": false,
+  "hashes": {
+    "scripts/measure_lethal_hits_restore.py": "65f8b9baf3c41c9c1ac7ec01b2f6073017391fff136d10c3ddce77b9fc85eb85",
+    "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "mode": "uninstrumented_timing",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "results": {
+    "fight": {
+      "completion_rate": 1,
+      "continuation_seconds": {
+        "maximum_seconds": 0.01384537504054606,
+        "mean_seconds": 0.013643881173006125,
+        "median_seconds": 0.013692750013433397
+      },
+      "restore_seconds": {
+        "maximum_seconds": 1.4705161669990048,
+        "mean_seconds": 1.4568005415577707,
+        "median_seconds": 1.4658858749317005
+      },
+      "samples": [
+        {
+          "continuation_seconds": 0.013610542053356767,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.4658858749317005
+        },
+        {
+          "continuation_seconds": 0.013709209044463933,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.4332406659377739
+        },
+        {
+          "continuation_seconds": 0.013692750013433397,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.4654305409640074
+        },
+        {
+          "continuation_seconds": 0.01384537504054606,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.467516041942872
+        },
+        {
+          "continuation_seconds": 0.013720124959945679,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.4669611670542508
+        },
+        {
+          "continuation_seconds": 0.013462375034578145,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.4280533330747858
+        },
+        {
+          "continuation_seconds": 0.013466792064718902,
+          "decision_count": 20,
+          "event_count": 109,
+          "restore_seconds": 1.4705161669990048
+        }
+      ],
+      "setup_seconds": 1.1477581670042127
+    },
+    "shooting": {
+      "completion_rate": 1,
+      "continuation_seconds": {
+        "maximum_seconds": 0.006104832980781794,
+        "mean_seconds": 0.005974255984516016,
+        "median_seconds": 0.006012416910380125
+      },
+      "restore_seconds": {
+        "maximum_seconds": 1.3094624590594321,
+        "mean_seconds": 1.2872119347365307,
+        "median_seconds": 1.2769496249966323
+      },
+      "samples": [
+        {
+          "continuation_seconds": 0.00601879192981869,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.272197375074029
+        },
+        {
+          "continuation_seconds": 0.006013042060658336,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.2769496249966323
+        },
+        {
+          "continuation_seconds": 0.006012416910380125,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.303713250090368
+        },
+        {
+          "continuation_seconds": 0.005920458002947271,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.2693547919625416
+        },
+        {
+          "continuation_seconds": 0.006104832980781794,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.3094624590594321
+        },
+        {
+          "continuation_seconds": 0.005908958031795919,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.2707822499796748
+        },
+        {
+          "continuation_seconds": 0.0058412919752299786,
+          "decision_count": 10,
+          "event_count": 45,
+          "restore_seconds": 1.3080237919930369
+        }
+      ],
+      "setup_seconds": 2.64895470906049
+    }
+  },
+  "revision": "de17df8f2319dcb2c6c124bcf81589bed212abf7",
+  "workload_id": "r44-lethal-choice-wound-checkpoint-v1"
+}

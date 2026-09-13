@@ -1,0 +1,136 @@
+{
+  "workload_id": "order44-lethal-hits-slice-v1",
+  "revision": "0a54e432aa9517e79ef60ea129a14c747aef7ff1",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "8c86bf18e6fc6df52f59249159f0d192e76fbd210996b88e383ec4739c3c3111",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "uninstrumented_timing",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/lethal_hits_helpers.py": "b24be3d45beec8f516a17af279928bf9d0a705306134df17dffd196c777a4e01",
+    "tests/phase13b_shooting_declaration_helpers.py": "695ea0a50c082630b25c2cdbc53f5a90c3b75e7645a2137ccb2306bc2d6f5491",
+    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473",
+    "tests/psychic_modifier_helpers.py": "64bd3f5977170151081dd89edc083c2d7ded5b96b6686771d240b044ea66ede0",
+    "scripts/measure_lethal_hits.py": "0a68cdeebfddd1ba2bb4a4480f2feb68fe69dc672d7849f02ef7bbf7ebe3805e"
+  },
+  "results": {
+    "shooting": {
+      "samples": [
+        {
+          "setup_seconds": 2.3211860000155866,
+          "slice_seconds": 0.16158129193354398,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.2594847501022741,
+          "slice_seconds": 0.18795874994248152,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.2649910830659792,
+          "slice_seconds": 0.14348633296322078,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.2663638750091195,
+          "slice_seconds": 0.1445542499423027,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.2628942090086639,
+          "slice_seconds": 0.1430585830239579,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.26390562497545034,
+          "slice_seconds": 0.1426635420648381,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.26596658292692155,
+          "slice_seconds": 0.14936991699505597,
+          "decision_count": 5,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        }
+      ],
+      "mean_seconds": 0.153238952409343,
+      "median_seconds": 0.1445542499423027,
+      "p95_seconds": 0.18795874994248152,
+      "maximum_seconds": 0.18795874994248152,
+      "completion_rate": 1
+    },
+    "fight": {
+      "samples": [
+        {
+          "setup_seconds": 0.5213052500039339,
+          "slice_seconds": 0.11792695801705122,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.5198069999460131,
+          "slice_seconds": 0.11341833299957216,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.5200189999304712,
+          "slice_seconds": 0.11491574998944998,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.5214224169030786,
+          "slice_seconds": 0.1149515830911696,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.5208445830503479,
+          "slice_seconds": 0.11307483294513077,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.5708442080067471,
+          "slice_seconds": 0.11340020899660885,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        },
+        {
+          "setup_seconds": 0.5216358329635113,
+          "slice_seconds": 0.11370104202069342,
+          "decision_count": 6,
+          "hit_count": 18,
+          "lethal_choice_count": 0
+        }
+      ],
+      "mean_seconds": 0.11448410115138229,
+      "median_seconds": 0.11370104202069342,
+      "p95_seconds": 0.11792695801705122,
+      "maximum_seconds": 0.11792695801705122,
+      "completion_rate": 1
+    }
+  },
+  "full_game_certified": false
+}
