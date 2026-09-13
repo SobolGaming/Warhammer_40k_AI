@@ -1,0 +1,66 @@
+{
+  "base_api": true,
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "file_hashes": {
+    "docs/performance/order42/effect_identity_workload.json": "c22db8964c674e17e11b20746ef4c878902d250e35b6d3df1b9498c713a9d7ed",
+    "scripts/measure_generic_effect_identity.py": "f0037b82783b8c7a2bc418d5e679c59a5920d6d414d98a90c8e9cdbb1032e96c",
+    "src/warhammer40k_core/_engine_build_manifest.json": "31ca58b5b291902ee2e93567a55af1fb272710babbb9ba99cd6d40b38e944708",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 4,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 0,
+      "seconds": 2.8250040486454964e-05
+    },
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 1,
+      "seconds": 2.1999934688210487e-05
+    },
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 2,
+      "seconds": 1.920794602483511e-05
+    },
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 3,
+      "seconds": 1.795799471437931e-05
+    },
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 4,
+      "seconds": 1.862493809312582e-05
+    },
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 5,
+      "seconds": 1.7666956409811974e-05
+    },
+    {
+      "identity": "rule-effect:345e316c906de999:grant:bd980846",
+      "sample": 6,
+      "seconds": 1.737498678267002e-05
+    }
+  ],
+  "seed": "order42-fidelity-retarget-1",
+  "summary": {
+    "completion_rate": 1.0,
+    "maximum": 2.8250040486454964e-05,
+    "mean": 2.0154685314212528e-05,
+    "median": 1.862493809312582e-05,
+    "p95": 2.8250040486454964e-05,
+    "queries_per_second": 49616.254702564256,
+    "samples": 7
+  },
+  "terrain_count": 0,
+  "timing_boundary": "one identity derivation; recorded context and RuleIR loaded first",
+  "workload_id": "order42-recorded-effect-identity-v1"
+}

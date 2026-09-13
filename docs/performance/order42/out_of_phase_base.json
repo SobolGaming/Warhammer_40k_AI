@@ -1,0 +1,103 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "decision_policy": "decline original defense; accept fresh target; stop at next decision",
+  "file_hashes": {
+    "scripts/measure_out_of_phase_target_replacement.py": "4630a8c1f03d7b004d3aed29bbb63b0116c494b5126360dad3ec09b1afe87ef4",
+    "src/warhammer40k_core/_engine_build_manifest.json": "a69a3f1c7f244034bd6497974335d061300faac96889194e45a479f2e913961a",
+    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/target_replacement_reaction_helpers.py": "490e2c5ea3a3f0a694c6677dbc2c2e9b114b6420f48f1be056b7e0f1d2c517fc",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 4,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.03546891699079424,
+      "sample": 0,
+      "setup_seconds": 2.691693124943413
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.035802625003270805,
+      "sample": 1,
+      "setup_seconds": 0.6967416669940576
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.035945790936239064,
+      "sample": 2,
+      "setup_seconds": 0.6619840000057593
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.03596770798321813,
+      "sample": 3,
+      "setup_seconds": 0.6628138750093058
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.03591220802627504,
+      "sample": 4,
+      "setup_seconds": 0.6668394999578595
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.03583175002131611,
+      "sample": 5,
+      "setup_seconds": 0.6684050000039861
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "option_ids": [
+        "resolve-target:army-alpha:new",
+        "resolve-target:army-alpha:unchanged"
+      ],
+      "query_seconds": 0.035524833016097546,
+      "sample": 6,
+      "setup_seconds": 0.6587878339923918
+    }
+  ],
+  "seed": "order42-fidelity-retarget-1",
+  "summary": {
+    "completion_rate": 1.0,
+    "maximum": 0.03596770798321813,
+    "mean": 0.03577911885388728,
+    "median": 0.03583175002131611,
+    "p95": 0.03596770798321813,
+    "queries_per_second": 27.949262922984293,
+    "samples": 7
+  },
+  "terrain_count": 0,
+  "timing_boundary": "replacement selection submission to next decision; setup separate",
+  "workload_id": "order42-out-of-phase-replacement-v1"
+}

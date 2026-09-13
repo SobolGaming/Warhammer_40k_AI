@@ -64,8 +64,9 @@ another build are rejected rather than upgraded by inferred fields.
 Charge movement consumes the final bounded result. Further source-defined move
 distance effects and Into the Fray's separate cap belong to their respective
 movement/Stratagem owners; they must not alter raw faces or reapply roll modifiers.
-Order 43 still owns target replacement/declaration sequencing, and Order 28
-still owns individual Psychic modifier choices. No new choice is introduced.
+Order 42 owns shared target invalidation/replacement; Order 46 owns Charge
+post-selection maximum-distance changes. Order 43 owns critical-hit and Snap-hit
+resolution. This earlier roll-modifier change introduced no new choice.
 
 Hidden detection and Lone Operative targeting use the same 9–30 inch terminal
 range limits. Detection combines source bonuses and Gone to Ground penalties
@@ -5593,3 +5594,68 @@ path. Source-model or target changes invalidate a pending choice before mutation
 clients must never infer a replacement source model. External contract 15.2
 advertises this additive finite-option family; exact engine identity prevents
 restoring earlier start-phase Explosives records under this runtime.
+
+
+## Order 42: target invalidation and replacement
+
+External contract 15.3.0 adds `select_target_replacement`, a finite option list.
+The source-backed 04.03.03 service binds the actor, action, selected models/weapons,
+original and invalid target IDs, and current legal alternatives. Action owners
+supply eligibility and continuation; the shared service performs no dice, hit
+resolution, geometry mutation or Charge movement.
+
+Shooting checks unresolved weapons before gathering attacks and before applying
+a pending resolution choice, including out-of-phase Shooting. Clients select one
+engine option ID using `FiniteOptionSubmission`; they never author target IDs or
+attack pools. Options identify replacement target sets and their exact weapon
+plans, including weapons forgone because they cannot attack that target. Snap
+options keep all remaining Snap weapons on the selected enemy. Target-dependent
+duplicate Anti choices, when needed, are included in deterministic option variants.
+`decline_target_replacement` explicitly forgoes the affected unresolved weapons;
+it is still offered when no replacement is legal. Completed/gathered attacks,
+physical weapon identities, One Shot uses and committed random Attacks rolls
+cannot be reselected or rolled again. New target-dependent range, visibility,
+profile and attack-count modifiers use the existing Shooting validator.
+
+A previously selected resolution choice that encounters invalid targets is
+recorded, then interrupted before gathering; the engine emits
+`target_replacement_interrupts_resolution_choice` and asks for replacement.
+`target_replacement_resolved` records the controlling decision, source context,
+replacement targets (null for decline), resulting pools and used pool indices.
+Out-of-phase owners update their sequence and active pools atomically. An accepted
+replacement creates a distinct selected-as-target reaction window identified by
+its recorded result ID, with only that selection's replacement targets in the
+trigger payload. The attack sequence ID stays unchanged. Repeated advances and
+checkpoint restoration reuse that window; declines create no target selection.
+Existing CP costs and phase/turn/game Stratagem usage restrictions still apply.
+Out-of-phase Shooting consults the same reaction service before resolving attacks,
+both after the original declaration and after replacement. These windows use the
+parent phase (including Fight) for status/event metadata and eligibility context.
+Pending destruction causes preserve a distinct attack source phase: restore binds
+that phase to the authenticated active or suspended attack sequence. Nested
+Shooting deaths inside Fight therefore restore through their death-reaction
+choices without rebinding the enclosing battle phase. Rule-effect destruction
+keeps its enclosing-phase authority. Existing source-context fields cover this
+behavior; no new client input or schema field is introduced.
+The existing opaque timing-window identity and selected-target payload schemas
+cover this behavior without new fields.
+Generic persisted effects use opaque, versioned activation IDs derived from the
+source IR, full clause, effect slot, recorded execution context and bound targets.
+Separate owners and activations coexist; replaying the same activation and slot
+retains its ID and duplicate rejection. Live state and recording policy do not
+change identity. Producers and restore validators use the same builder. This
+changes runtime identity and generated examples, without adding payload fields,
+client choices or visibility rules.
+The engine then resumes the normal action path. Stale, forged, malformed or
+wrong-actor choices are invalid before queue pop and do not mutate state.
+Checkpoint restore authenticates the pending request and replacement history;
+exact replay is bound to the regenerated runtime identity.
+
+Battlefield target choices remain public. The shared adapters redaction module
+removes `target_replacement_authority_sha256` recursively from pending requests,
+options, records, domain events and status metadata for every viewer. That hash
+commits internal state and is never client input. Public geometry/rules witnesses
+and weapon plans retain their existing viewer semantics. Existing finite
+submission and projection schemas cover the new family; no parameterized payload
+or persistence schema is introduced. Charge can supply its own target sets to the
+same service; Order 46 remains responsible for its later-modifier continuation.

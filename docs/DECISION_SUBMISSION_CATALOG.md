@@ -33,6 +33,15 @@ outcome decision and the next Battle-shock reroll.
 
 ## Finite
 
+`select_target_replacement` uses an engine-enumerated legal target plan or
+`decline_target_replacement` before unresolved Shooting attacks are gathered,
+including out-of-phase Shooting. Each plan preserves committed weapon identities
+and explicitly lists forgone weapons. The shared target-set service is reusable
+by Charge; its later-modifier consumer is Order 46. Facade, stale/malformed,
+checkpoint, replay and viewer-redaction regressions live in
+`tests/unit/test_target_replacement.py`; the complete payload contract is in
+`ADAPTER_DECISION_CONTRACT.md`.
+
 | Decision Description | Decision Options | Phase (or Phases the Decision can be made in) | List of Tests that verify implementation |
 |---|---|---|---|
 | Source-authorized unit splitting, `select_unit_split_membership`. | `split` and source-permitted `decline`, followed by one recorded model-assignment choice per model: `successor:0` or `successor:1` within the remaining strength limits. The engine preserves original model IDs and attached roles, installs two independent successors atomically, and rejects repeated subdivision, source/request/model drift or malformed submissions before queue pop. Membership, decisions and events remain owner-secret until declarations are revealed. | Setup, start of `DECLARE_BATTLE_FORMATIONS`, before placements and reserve/cargo declarations; requires a supported source-backed permission. | `tests/unit/test_unit_splitting.py::test_split_choices_use_session_and_checkpoint_round_trip`; `tests/unit/test_unit_splitting.py::test_invalid_split_submission_does_not_pop_or_mutate`; `tests/unit/test_unit_splitting.py::test_ten_model_source_and_attached_leader_support_balancing`; `tests/unit/test_unit_splitting.py::test_split_checkpoint_authenticates_partition_and_application`. |

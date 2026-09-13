@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `15.2.0`
+Contract version: `15.3.0`
+
+Contract 15.3 adds the finite `select_target_replacement` decision family,
+including explicit decline and current-context validation. See Order 42 in the
+[adapter contract](../docs/ADAPTER_DECISION_CONTRACT.md).
 
 Contract 15.2 adds finite Explosives source-model/enemy selections during the
 owner's Shooting phase. The finite submission envelope is unchanged. See Order 41

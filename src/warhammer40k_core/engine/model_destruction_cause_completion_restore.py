@@ -251,7 +251,6 @@ def validate_pending_model_destruction_cause_inventory(
             or placement is None
             or placement.unit_instance_id != authority.physical_unit_instance_id
             or state.current_battle_phase is None
-            or state.current_battle_phase.value != source_phase
             or rules_unit_view_by_id(
                 state=state,
                 unit_instance_id=authority.physical_unit_instance_id,
@@ -260,7 +259,11 @@ def validate_pending_model_destruction_cause_inventory(
         ):
             raise GameLifecycleError("Pending destruction cause state binding drift.")
         if authority.cause_kind is not ModelDestructionCauseKind.ATTACK_DAMAGE:
+            if state.current_battle_phase.value != source_phase:
+                raise GameLifecycleError("Pending destruction cause state binding drift.")
             continue
+        # Attack kind can differ from the enclosing phase. Its authenticated
+        # active or suspended sequence owns the source phase for each cause.
         context = authority.producer_context
         retained_sequence = retained_attack_sequence_for_cause(
             state=state, records=retained, cause_id=authority.cause_id
@@ -268,6 +271,7 @@ def validate_pending_model_destruction_cause_inventory(
         source_sequence = active_attack_sequence if retained_sequence is None else retained_sequence
         if source_sequence is None or (
             context.get("sequence_id") != source_sequence.sequence_id
+            or source_phase != source_sequence.source_phase.value
             or context.get("attack_context_id")
             not in active_attack_destruction_context_ids(source_sequence)
             or context.get("attacker_player_id") != source_sequence.attacker_player_id

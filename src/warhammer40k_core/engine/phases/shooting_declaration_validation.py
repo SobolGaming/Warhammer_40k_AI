@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.weapon_profiles import AttackProfile
+from warhammer40k_core.engine.shooting_target_cache import cached_target_candidate_for_model
+
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
@@ -222,6 +225,10 @@ def _attack_pools_or_validation(
     out_of_phase_state: OutOfPhaseShootingState | None = None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    committed_weapon: _AvailableWeapon | None = None,
+    committed_base_attacks: int | None = None,
+    committed_attack_profile: AttackProfile | None = None,
+    validate_only: bool = False,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
@@ -239,14 +246,34 @@ def _attack_pools_or_validation(
         player_id=player_id,
         selected_shooting_type=selected_shooting_type,
     )
-    firing_deck_validation = _validate_firing_deck_selection(
-        state=state,
-        proposal=proposal,
-        army_catalog=army_catalog,
-    )
-    if isinstance(firing_deck_validation, ShootingProposalValidationResult):
-        return firing_deck_validation
-    ineligible_unit_ids = firing_deck_validation
+    if committed_weapon is not None:
+        if (
+            len(proposal.declarations) != 1
+            or committed_base_attacks is None
+            or committed_attack_profile is None
+        ):
+            raise GameLifecycleError(
+                "Committed retargeting requires one weapon and its dice result."
+            )
+        if _available_weapon_key(committed_weapon) != _declaration_available_weapon_key(
+            proposal.declarations[0]
+        ):
+            raise GameLifecycleError("Committed retargeting weapon identity drift.")
+        available_weapon_by_key[_available_weapon_key(committed_weapon)] = committed_weapon
+        selected_shooting_type = proposal.declarations[0].shooting_type
+    if committed_weapon is None:
+        firing_deck_validation = _validate_firing_deck_selection(
+            state=state,
+            proposal=proposal,
+            army_catalog=army_catalog,
+        )
+        if isinstance(firing_deck_validation, ShootingProposalValidationResult):
+            return firing_deck_validation
+        ineligible_unit_ids = firing_deck_validation
+    else:
+        # The accepted declaration already committed cargo shooting eligibility.
+        # Retargeting does not select cargo or consume another weapon use.
+        ineligible_unit_ids = ()
     allowed_out_of_phase_target_ids = _out_of_phase_allowed_target_unit_ids(
         state,
         out_of_phase_state,
@@ -315,7 +342,7 @@ def _attack_pools_or_validation(
         )
         if pistol_validation is not None:
             return pistol_validation
-        candidate = shooting_target_candidate_for_model(
+        candidate = cached_target_candidate_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             attacker_unit=source_unit,
@@ -414,7 +441,22 @@ def _attack_pools_or_validation(
             )
         if declaration.shooting_type is ShootingType.SNAP:
             snap_target_unit_ids.add(declaration.target_unit_instance_id)
-        if attack_count_manager is None:
+        if validate_only:
+            continue
+        if committed_base_attacks is not None:
+            if committed_weapon is None:
+                raise GameLifecycleError("Committed attack count requires its selected weapon.")
+            fixed_attacks = weapon_profile.attack_profile.fixed_attacks
+            if fixed_attacks is None and (
+                committed_attack_profile is None
+                or weapon_profile.attack_profile.dice_expression
+                != committed_attack_profile.dice_expression
+            ):
+                raise GameLifecycleError(
+                    "Replacement cannot invent a new random Attacks expression."
+                )
+            attacks = committed_base_attacks if fixed_attacks is None else fixed_attacks
+        elif attack_count_manager is None:
             attacks = unresolved_attacks_for_validation(weapon_profile)
         else:
             if attack_count_scope_prefix is None:
@@ -475,6 +517,10 @@ def _attack_pools_or_validation(
             violation_code="snap_shooting_multiple_targets",
             message="Snap Shooting declarations must target one enemy unit.",
             field="declarations",
+        )
+    if validate_only:
+        return ShootingProposalValidationResult.valid(
+            proposal_request_id=proposal.proposal_request_id
         )
     return (tuple(attack_pools), ineligible_unit_ids)
 
@@ -687,10 +733,22 @@ def _out_of_phase_allowed_target_unit_ids(
     state: GameState,
     out_of_phase_state: OutOfPhaseShootingState | None,
 ) -> tuple[str, ...] | None:
-    if not _out_of_phase_uses_fire_overwatch(out_of_phase_state):
-        return None
     if out_of_phase_state is None:
-        raise GameLifecycleError("Fire Overwatch out-of-phase state is missing.")
+        return None
+    if not _out_of_phase_uses_fire_overwatch(out_of_phase_state):
+        target_ids = out_of_phase_state.target_unit_ids
+        if target_ids is None:
+            return None
+        return tuple(
+            sorted(
+                {
+                    rules_unit_id_for_unit_id(
+                        armies=tuple(state.army_definitions), unit_instance_id=target_id
+                    )
+                    for target_id in target_ids
+                }
+            )
+        )
     source_context = out_of_phase_state.source_context
     if not isinstance(source_context, dict):
         raise GameLifecycleError("Fire Overwatch source context must be an object.")

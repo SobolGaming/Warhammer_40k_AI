@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.engine.attack_completion_authority import completed_attack_sequence
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -13,6 +14,9 @@ from warhammer40k_core.engine.retained_shooting import (
     RetainedShootingExecution,
     current_retained_shooter,
     retained_shooting_executions,
+)
+from warhammer40k_core.engine.shooting_target_replacement_authority import (
+    validate_completed_replacement_authority,
 )
 
 if TYPE_CHECKING:
@@ -101,15 +105,23 @@ def validate_retained_shooting_history(
             if not isinstance(pools, list):
                 raise GameLifecycleError("Retained shooting completion pools are invalid.")
             if pools:
-                if (
-                    len(declarations) != 1
-                    or _object(declarations[0].payload)["attack_pools"] != pools
-                ):
+                if len(declarations) != 1:
                     raise GameLifecycleError(
                         "Retained shooting completion lacks its exact declaration."
                     )
                 declaration = _object(declarations[0].payload)
                 sequence_id = f"out-of-phase-attack-sequence:{_string(declaration, 'result_id')}"
+                if declaration["attack_pools"] != pools:
+                    completed = completed_attack_sequence(
+                        event_records=prior, sequence_id=sequence_id
+                    )
+                    if [pool.to_payload() for pool in completed.attack_pools] != pools:
+                        raise GameLifecycleError(
+                            "Retained shooting completion lacks its exact declaration."
+                        )
+                    validate_completed_replacement_authority(
+                        event_records=prior, sequence=completed
+                    )
                 if (
                     sum(
                         event.event_type == "attack_sequence_completed"

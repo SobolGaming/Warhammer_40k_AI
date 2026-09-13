@@ -1,0 +1,9 @@
+{
+  "workload_id": "order42-nested-death-checkpoint-v1",
+  "samples_per_case": 7,
+  "relative_budget_case": "accepted_defense",
+  "absolute_budget_cases": ["accepted_defense", "nested_death"],
+  "mean_base_multiplier": 2,
+  "mean_additive_seconds": 0.05,
+  "maximum_seconds": 0.5
+}

@@ -1,0 +1,7 @@
+{
+  "workload_id": "order42-shooting-revalidation-v1",
+  "samples_per_case": 7,
+  "mean_base_multiplier": 2,
+  "mean_additive_seconds": 0.05,
+  "maximum_seconds": 0.15
+}

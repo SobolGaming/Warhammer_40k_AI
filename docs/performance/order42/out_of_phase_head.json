@@ -1,0 +1,103 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "decision_policy": "decline original defense; accept fresh target; stop at next decision",
+  "file_hashes": {
+    "scripts/measure_out_of_phase_target_replacement.py": "4630a8c1f03d7b004d3aed29bbb63b0116c494b5126360dad3ec09b1afe87ef4",
+    "src/warhammer40k_core/_engine_build_manifest.json": "31ca58b5b291902ee2e93567a55af1fb272710babbb9ba99cd6d40b38e944708",
+    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/target_replacement_reaction_helpers.py": "490e2c5ea3a3f0a694c6677dbc2c2e9b114b6420f48f1be056b7e0f1d2c517fc",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 4,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.024801500025205314,
+      "sample": 0,
+      "setup_seconds": 2.635215541929938
+    },
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.0249272920191288,
+      "sample": 1,
+      "setup_seconds": 0.7068258749786764
+    },
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.024792333017103374,
+      "sample": 2,
+      "setup_seconds": 0.6690122919389978
+    },
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.024363040924072266,
+      "sample": 3,
+      "setup_seconds": 0.6721329170977697
+    },
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.02476862503681332,
+      "sample": 4,
+      "setup_seconds": 0.6735685829771683
+    },
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.02456745901145041,
+      "sample": 5,
+      "setup_seconds": 0.6721584579208866
+    },
+    {
+      "decision_type": "use_stratagem",
+      "option_ids": [
+        "decline_stratagem_window",
+        "use-stratagem:grey-knights-hallowed-conclave-unending-fidelity:target:army-alpha:new"
+      ],
+      "query_seconds": 0.024502500076778233,
+      "sample": 6,
+      "setup_seconds": 0.6696135839447379
+    }
+  ],
+  "seed": "order42-fidelity-retarget-1",
+  "summary": {
+    "completion_rate": 1.0,
+    "maximum": 0.0249272920191288,
+    "mean": 0.024674678587221673,
+    "median": 0.02476862503681332,
+    "p95": 0.0249272920191288,
+    "queries_per_second": 40.527376940904595,
+    "samples": 7
+  },
+  "terrain_count": 0,
+  "timing_boundary": "replacement selection submission to next decision; setup separate",
+  "workload_id": "order42-out-of-phase-replacement-v1"
+}

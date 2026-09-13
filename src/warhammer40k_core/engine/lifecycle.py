@@ -39,6 +39,7 @@ from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity a
 from warhammer40k_core.engine import psychic_modifier_history_origin as _pmh
 from warhammer40k_core.engine import reserve_state_integrity as _rsi
 from warhammer40k_core.engine import rule_model_destruction
+from warhammer40k_core.engine import target_replacement_dispatch as _target_replacement_dispatch
 from warhammer40k_core.engine import transport_state_integrity as _tsi
 from warhammer40k_core.engine import unit_split_dispatch as _unit_split_dispatch
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
@@ -1004,6 +1005,15 @@ class GameLifecycle:
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered(
             preserve_existing_bundle=runtime_content_bundle is not None,
         )
+        from warhammer40k_core.engine.shooting_target_replacement_authority import (
+            validate_restored_replacements,
+        )
+
+        validate_restored_replacements(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            handler=lifecycle._shooting_phase_handler,
+        )
         refreshed_bundle = lifecycle._runtime_content_bundle
         validate_pending_battlefield_request_consistency(
             state=lifecycle._require_state(),
@@ -1277,6 +1287,7 @@ class GameLifecycle:
                 ),
                 *_cmmd.decision_dispatch_handlers(self),
                 *_unit_split_dispatch.decision_dispatch_handlers(self),
+                *_target_replacement_dispatch.decision_dispatch_handlers(self),
                 *(
                     DecisionDispatchHandler(
                         decision_type=decision_type,

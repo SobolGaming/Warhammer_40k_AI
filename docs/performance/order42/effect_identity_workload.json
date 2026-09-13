@@ -1,0 +1,137 @@
+{
+  "clause_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity:grant",
+  "context": {
+    "active_player_id": "player-a",
+    "battle_round": 1,
+    "game_id": "order42-fidelity-retarget-1",
+    "phase": "fight",
+    "player_id": "player-b",
+    "record_persisting_effects": true,
+    "source_keywords": [],
+    "source_model_instance_id": null,
+    "source_unit_instance_id": "army-beta:source",
+    "target_player_id": "player-b",
+    "target_unit_instance_ids": [
+      "army-beta:source"
+    ],
+    "timing_window_id": "selected-as-target:melee-sequence:order42-fidelity-retarget-1:round-01:army-alpha:old:decision-request-000005:fixture-choice:player-player-b",
+    "trigger_payload": {
+      "attack_sequence_id": "melee-sequence:order42-fidelity-retarget-1:round-01:army-alpha:old:decision-request-000005:fixture-choice",
+      "attacking_player_id": "player-a",
+      "attacking_unit_instance_id": "army-alpha:old",
+      "effect_selection": null,
+      "selected_target_unit_instance_ids": [
+        "army-beta:source"
+      ],
+      "stratagem_context": {
+        "active_player_id": "player-a",
+        "battle_round": 1,
+        "game_id": "order42-fidelity-retarget-1",
+        "phase": "fight",
+        "player_id": "player-b",
+        "timing_window_id": "selected-as-target:melee-sequence:order42-fidelity-retarget-1:round-01:army-alpha:old:decision-request-000005:fixture-choice:player-player-b",
+        "trigger_kind": "after_unit_selected_as_target",
+        "trigger_payload": {
+          "attack_sequence_id": "melee-sequence:order42-fidelity-retarget-1:round-01:army-alpha:old:decision-request-000005:fixture-choice",
+          "attacking_player_id": "player-a",
+          "attacking_unit_instance_id": "army-alpha:old",
+          "selected_target_unit_instance_ids": [
+            "army-beta:source"
+          ]
+        }
+      },
+      "stratagem_id": "grey-knights-hallowed-conclave-unending-fidelity",
+      "stratagem_use_id": "stratagem-use:player-b:round-01:000001"
+    }
+  },
+  "effect_index": 0,
+  "rule_ir": {
+    "clauses": [
+      {
+        "clause_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity:grant",
+        "conditions": [],
+        "diagnostics": [],
+        "duration": {
+          "kind": "until_timing_endpoint",
+          "parameters": [
+            {
+              "key": "endpoint",
+              "value": "phase"
+            }
+          ],
+          "source_span": {
+            "end": 553,
+            "start": 0,
+            "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP"
+          }
+        },
+        "effects": [
+          {
+            "kind": "grant_ability",
+            "parameters": [
+              {
+                "key": "ability",
+                "value": "retained_destruction_attack"
+              },
+              {
+                "key": "actions",
+                "value": [
+                  "shoot",
+                  "fight"
+                ]
+              },
+              {
+                "key": "optional",
+                "value": true
+              },
+              {
+                "key": "requires_not_shot_or_fought_this_phase",
+                "value": true
+              },
+              {
+                "key": "shooting_hazardous_tests_automatically_pass",
+                "value": false
+              },
+              {
+                "key": "trigger_roll_threshold",
+                "value": 4
+              }
+            ],
+            "source_span": {
+              "end": 553,
+              "start": 0,
+              "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP"
+            }
+          }
+        ],
+        "source_span": {
+          "end": 553,
+          "start": 0,
+          "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP"
+        },
+        "target": {
+          "kind": "selected_unit",
+          "parameters": [],
+          "source_span": {
+            "end": 553,
+            "start": 0,
+            "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP"
+          }
+        },
+        "template_id": "retained-attack:timed-unit-grant",
+        "trigger": null,
+        "unsupported_reason": null
+      }
+    ],
+    "diagnostics": [],
+    "ir_hash": "345e316c906de9993e5fb435bc4c08010f134985b7e2669bfb68f4c0d811d443",
+    "normalized_text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+    "parser_version": "reviewed-retained-attack-v1",
+    "rule_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity:rule-ir",
+    "schema_version": "phase17c-rule-ir-v1",
+    "source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity"
+  },
+  "target_unit_instance_ids": [
+    "army-beta:source"
+  ]
+}

@@ -19,6 +19,7 @@ def aura_handler(
     clause: RuleClause,
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
+    effect_index: int | None,
 ) -> RuleExecutionResult:
     from warhammer40k_core.engine.rule_execution import (
         RuleExecutionResult,
@@ -28,7 +29,7 @@ def aura_handler(
         rule_execution_event_id,
     )
 
-    if effect is not None:
+    if effect is not None or effect_index is not None:
         raise GameLifecycleError("Aura handler does not accept a single effect.")
     source_unit_instance_id = context.source_unit_instance_id
     if source_unit_instance_id is None:
@@ -57,8 +58,9 @@ def aura_handler(
             effect=effect_spec,
             context=context,
             target_unit_instance_ids=affected_unit_ids,
+            effect_index=index,
         )
-        for effect_spec in clause.effects
+        for index, effect_spec in enumerate(clause.effects)
     )
     event = emit_rule_execution_event(
         context=context,

@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -67,6 +69,7 @@ def resolve_attack_sequence_until_blocked(
     dice_manager: DiceRollManager | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    before_gathering: Callable[[AttackSequence], LifecycleStatus | None] | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     active_hooks = AttackSequenceHooks.empty() if hooks is None else hooks
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
@@ -114,6 +117,10 @@ def resolve_attack_sequence_until_blocked(
             current = next_current
             continue
         if current.current_gathered_group is None:
+            if before_gathering is not None:
+                replacement_status = before_gathering(current)
+                if replacement_status is not None:
+                    return current, allocated_model_ids, replacement_status
             current, status = _select_or_request_next_gathered_group(
                 state=state,
                 decisions=decisions,

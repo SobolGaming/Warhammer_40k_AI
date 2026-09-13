@@ -1,0 +1,241 @@
+{
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "cpu_allocation": 18,
+  "decision_policy": "first engine resolution option; stop at next decision",
+  "file_hashes": {
+    "scripts/measure_target_replacement.py": "87ba450ee498b777dbb6e8e96bc0b685e2d66d0470e9261ea3d3d3ef0c9d9bd3",
+    "src/warhammer40k_core/_engine_build_manifest.json": "a69a3f1c7f244034bd6497974335d061300faac96889194e45a479f2e913961a",
+    "tests/phase13b_shooting_declaration_helpers.py": "6d8d4ec8f51b4e96e485a23b993168b8f2ace7c269959658466ebf9d73f10839",
+    "tests/target_replacement_helpers.py": "13b3b1432260144bd8a0eff9d3462830be65d8592aa91e89598d2200dc6a3d35",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "memory_bytes": 68719476736,
+  "model_count": 15,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "rows": [
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.03181375004351139,
+      "sample": 0,
+      "setup_seconds": 2.246235084021464,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.06814841693267226,
+      "sample": 1,
+      "setup_seconds": 0.31084345804993063,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.027308415970765054,
+      "sample": 2,
+      "setup_seconds": 0.3094107920769602,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.027761041070334613,
+      "sample": 3,
+      "setup_seconds": 0.3100933339446783,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.026677208952605724,
+      "sample": 4,
+      "setup_seconds": 0.30938804103061557,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.0270780420396477,
+      "sample": 5,
+      "setup_seconds": 0.3060686669778079,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "eligible",
+      "decision_type": "select_damage_allocation_model",
+      "option_count": 5,
+      "query_seconds": 0.026491833035834134,
+      "sample": 6,
+      "setup_seconds": 0.3055738339899108,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.005713582970201969,
+      "sample": 0,
+      "setup_seconds": 0.30645533301867545,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.005491500021889806,
+      "sample": 1,
+      "setup_seconds": 0.30996962497010827,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.005264249979518354,
+      "sample": 2,
+      "setup_seconds": 0.311219000024721,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.005466583999805152,
+      "sample": 3,
+      "setup_seconds": 0.3077601660043001,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.005538917030207813,
+      "sample": 4,
+      "setup_seconds": 0.313094790908508,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.00566841708496213,
+      "sample": 5,
+      "setup_seconds": 0.3546638749539852,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "moved_target",
+      "decision_type": "select_target_replacement",
+      "option_count": 2,
+      "query_seconds": 0.0054207079811021686,
+      "sample": 6,
+      "setup_seconds": 0.31356179201975465,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.0046872919192537665,
+      "sample": 0,
+      "setup_seconds": 0.3136238750303164,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.004874582984484732,
+      "sample": 1,
+      "setup_seconds": 0.3120336669962853,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.004568584030494094,
+      "sample": 2,
+      "setup_seconds": 0.3077654578955844,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.004748540930449963,
+      "sample": 3,
+      "setup_seconds": 0.3082123340573162,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.00467062508687377,
+      "sample": 4,
+      "setup_seconds": 0.30704795790370554,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.004605500027537346,
+      "sample": 5,
+      "setup_seconds": 0.3130567920161411,
+      "status_kind": "waiting_for_decision"
+    },
+    {
+      "case": "no_alternative",
+      "decision_type": "select_target_replacement",
+      "option_count": 1,
+      "query_seconds": 0.004645916051231325,
+      "sample": 6,
+      "setup_seconds": 0.312658833921887,
+      "status_kind": "waiting_for_decision"
+    }
+  ],
+  "seed": "phase13b-game",
+  "summaries": {
+    "eligible": {
+      "completion_rate": 1.0,
+      "max": 0.06814841693267226,
+      "mean": 0.03361124400648156,
+      "median": 0.027308415970765054,
+      "p95": 0.06814841693267226,
+      "queries_per_second": 29.751948479120887,
+      "samples": 7
+    },
+    "moved_target": {
+      "completion_rate": 1.0,
+      "max": 0.005713582970201969,
+      "mean": 0.005509137009669628,
+      "median": 0.005491500021889806,
+      "p95": 0.005713582970201969,
+      "queries_per_second": 181.516632867326,
+      "samples": 7
+    },
+    "no_alternative": {
+      "completion_rate": 1.0,
+      "max": 0.004874582984484732,
+      "mean": 0.0046858630043321425,
+      "median": 0.00467062508687377,
+      "p95": 0.004874582984484732,
+      "queries_per_second": 213.40786085198965,
+      "samples": 7
+    }
+  },
+  "terrain_count": 0,
+  "timing_boundary": "one finite resolution submission to next decision; setup separate",
+  "workload_id": "order42-shooting-revalidation-v1"
+}

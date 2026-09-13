@@ -863,6 +863,23 @@ def test_aura_explicit_source_exclusion_survives_compilation_and_round_trip(targ
     assert "army-alpha:intercessor-unit-1" not in affected
 
 
+def test_aura_emission_preserves_identical_effect_slots() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    rule_ir = _compiled(
+        'Aura: while a friendly unit is within 6" of this unit, add 1 to hit rolls.'
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    rule_ir = replace(rule_ir, clauses=(replace(clause, effects=clause.effects * 2),))
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            state=state, source_unit_instance_id="army-alpha:intercessor-unit-1"
+        ),
+    )
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert [payload["effect_index"] for payload in result.effect_payloads] == [0, 1]
+
+
 def test_aura_overlap_across_attached_aliases_keeps_distinct_sources_and_effect_slots() -> None:
     state = _battle_state_with_attached_leader_support()
     state.battlefield_state = create_deterministic_battlefield_scenario(
@@ -4988,8 +5005,9 @@ def _noop_rule_handler(
     clause: RuleClause,
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
+    effect_index: int | None,
 ) -> RuleExecutionResult:
-    del effect, context
+    del effect, context, effect_index
     return RuleExecutionResult.applied(rule_ir, applied_clause_ids=(clause.clause_id,))
 
 
