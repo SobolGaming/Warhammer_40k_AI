@@ -72,7 +72,10 @@ def validate_payload_consistency(
         pending_decision_requests=pending_decision_requests,
     )
     validate_lethal_hit_history(
-        state=state, event_records=event_records, decision_records=decision_records
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
     )
     validate_activity_restriction_inventory(
         state=state, event_records=event_records, decision_records=decision_records

@@ -5717,3 +5717,13 @@ The finite option payload is `{ "choice": "auto-wound" }` or
 Existing viewer-scoped finite projections, event deltas and replay records carry
 this public decision. No adapter mutates attacks or supplies a default answer.
 This additive finite family preserves the existing generic submission envelope.
+
+
+R44-001 additionally authenticates historical Lethal Hits choices against their
+complete issued requests and recorded decision events, in both directions. Every
+issued choice must remain answered or currently pending, including a declined
+choice paused before its Wound event at a Command Re-roll window. Hit, request,
+answer and Wound evidence must retain their causal order. Historical target and
+weapon metadata are authenticated from the issued request; restoration does not
+re-evaluate a target that may subsequently have changed. This tightens validation
+within the existing finite contract and adds no adapter-visible payload fields.

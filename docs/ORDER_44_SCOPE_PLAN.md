@@ -50,7 +50,7 @@ prevalidation and restore integration, one reviewed source package, and Contract
 contract generator records envelope conformance separately from the real
 facade-driven gameplay tests, without claiming extra live conformance scenarios.
 
-## Final validation
+## Initial implementation validation (de17df8f)
 
 - Complete behavioral suite: **7,719 passed**, **85.08% coverage**, 18 xdist
   workers with work stealing, Python 3.14.5 and bundled Node 24.19.0. The run
@@ -72,5 +72,52 @@ facade-driven gameplay tests, without claiming extra live conformance scenarios.
 
 The five matched performance workloads pass their fixed budgets with all samples
 retained. See [measurements and workload limits](performance/order44/README.md).
-Complete-game performance remains uncertified. The final engine runtime identity
+Complete-game performance remains uncertified. The initial engine runtime identity
 is `29f3f0ce86f4b093d94c0d90b161414bd0329bbcd0a2f85d4a50e946853d1652`.
+
+## R44-001: historical choice authority
+
+The violated invariant is that every accepted Lethal Hits answer, including a
+decline, must retain its issued request and recorded decision before a checkpoint
+can restore. Absence of an answer cannot mean an ordinary wound roll. A wound's
+Command Re-roll window can pause before a Wound event exists, so wound-event
+consistency alone cannot establish that the choice was answered.
+
+The scoped repair authenticates the complete historical request and answer against
+`decision_requested` and `decision_recorded` evidence, accounts for every issued
+Lethal Hits request as answered or currently pending, and binds their ordering to
+the existing recorded Hit and Wound context. Historical target metadata comes from
+the issued request rather than re-evaluating a target that may since have changed.
+The existing shared Hit authority still validates the recorded roll and source.
+
+The bug-class search covers missing declines in completed Shooting/Fight histories,
+changed target metadata and decision copies, missing journal evidence, and reordered
+hit/request/answer evidence. The fix remains in the shared Lethal Hits history
+validator used by restoration and attack prevalidation. It does not redesign the
+general DecisionController journal or alter the adapter's finite payload shape.
+Real Shooting and Fight controls exercise decline, wound Command Re-roll,
+persistence and resumed completion. The focused matrix now contains 98 cases,
+including 48 regressions for this repair. No behavioral test file was added,
+removed or renamed; the existing shard inventory remains complete.
+
+### Repair validation
+
+- Complete behavioral suite: **7,767 passed**, **85.08% coverage**, 18 xdist
+  workers with work stealing, Python 3.14.5 and bundled Node 24.19.0. The run
+  took 557.63 seconds and retained ten SQLite resource warnings; no tests failed
+  or were skipped. The behavioral suite ran once with coverage.
+- Complete code-quality suite: **458 passed** in 104.71 seconds, 18 xdist
+  workers with work stealing and no coverage, run once after the behavioral suite.
+- Ruff check and format, mypy (2,984 files), Pyright, import-linter (11 contracts),
+  pre-commit and the exact eight-shard inventory check: passed.
+- Source generator and final runtime build identity checks: passed.
+- Generated contract compatibility against base
+  `0a54e432aa9517e79ef60ea129a14c747aef7ff1` and installed-wheel smoke: passed.
+- TypeScript generated-client/type checks, five unit tests and 342 live HTTP
+  conformance assertions for Contract 16.1: passed.
+- Seven matched samples per phase pass the fixed restore and continuation
+  budgets with identical decision and event counts. These are component
+  measurements; complete-game performance remains uncertified.
+
+The repaired runtime identity is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a9501dcb68ef021c48d21b10bd17fe4ee6c1ab5ae1e91f052e26bee2228e8031`.

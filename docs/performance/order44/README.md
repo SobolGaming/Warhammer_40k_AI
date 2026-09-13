@@ -46,3 +46,34 @@ uncertified. No threshold was raised after observing head.
 Every sample completed. The retained head measurements pass the fixed budgets.
 Lethal Hits adds 3 choices in shooting, 1 choices in fight per slice. Ordinary workload hit and decision counts are unchanged.
 The measured runtime tree SHA-256 is `29f3f0ce86f4b093d94c0d90b161414bd0329bbcd0a2f85d4a50e946853d1652`.
+
+
+## R44-001 historical decline validation
+
+`restore-base.json` and `restore-head.json` compare commit `de17df8f` with the
+repair using identical driver, fixture and lock hashes on the same provisional
+host above. Each phase uses real compact rosters and eighteen Lethal/Sustained
+attacks, grants one CP before the initial replay snapshot, declines optional
+Stratagems, and pauses after declining Lethal Hits at its wound's Command Re-roll
+window. The unchanged control resumes through `LocalGameSession`.
+
+Reproduce with `uv run python -m scripts.measure_lethal_hits_restore --samples 7 --output docs/performance/order44/restore-head.json`.
+Seven uninstrumented samples per phase measure persistence restore and the next
+finite Command Re-roll decline independently. Fixture setup and initial persistence
+capture are outside those intervals. No other test workers competed with either
+measurement. All samples, setup costs, runtime identity, decision/event counts,
+completion, mean, median and maximum are retained.
+
+The budgets were fixed before measuring head: restore mean at most 1.25 times
+base plus 50 ms, with a 2.5-second observed maximum; continuation mean at most
+1.5 times base plus 25 ms, with a 500 ms observed maximum. Twenty uses of the larger
+additive allowance total one second against the 60-second mean game objective;
+that estimate is not a measured game or certification of the deferred budgets.
+
+| Phase | Base restore mean (ms) | Head restore mean (ms) | Base continuation mean (ms) | Head continuation mean (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| fight | 1567.6 | 1456.8 | 15.1 | 13.6 |
+| shooting | 1375.1 | 1287.2 | 6.7 | 6.0 |
+
+Every sample completed with identical decision and event counts. The repaired
+runtime is `warhammer40k-core-v2:runtime-tree-sha256-v1:a9501dcb68ef021c48d21b10bd17fe4ee6c1ab5ae1e91f052e26bee2228e8031`.

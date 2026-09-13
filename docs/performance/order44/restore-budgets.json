@@ -1,0 +1,9 @@
+{
+  "samples_per_case": 7,
+  "restore_mean_base_multiplier": 1.25,
+  "restore_mean_additive_seconds": 0.05,
+  "restore_maximum_seconds": 2.5,
+  "continuation_mean_base_multiplier": 1.5,
+  "continuation_mean_additive_seconds": 0.025,
+  "continuation_maximum_seconds": 0.5
+}

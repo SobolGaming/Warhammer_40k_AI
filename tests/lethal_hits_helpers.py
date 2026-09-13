@@ -99,7 +99,7 @@ def reach_lethal_choice(session: LocalGameSession) -> DecisionRequest:
         if request.decision_type == "select_lethal_hit_wound":
             return request
         assert not attack_completed(session), "Attack completed without the Lethal Hits choice."
-        submit_fixture_request(session, request)
+        _submit_lethal_fixture_request(session, request)
     raise AssertionError("Did not reach a Lethal Hits choice.")
 
 
@@ -116,5 +116,43 @@ def complete_attack(session: LocalGameSession, *, choice: str = "auto-wound") ->
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status
         else:
-            submit_fixture_request(session, request)
+            _submit_lethal_fixture_request(session, request)
     raise AssertionError("Attack did not complete.")
+
+
+def lethal_wound_checkpoint(*, phase: BattlePhase) -> LocalGameSession:
+    """An accepted decline paused before its wound's Command Re-roll choice."""
+    from warhammer40k_core.engine.command_points import CommandPointSourceKind
+
+    session = lethal_session(phase)
+    state = session.lifecycle.state
+    assert state is not None
+    state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id="r44-fixture",
+        source_kind=CommandPointSourceKind.OTHER,
+    )
+    request = reach_lethal_choice(session)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r44:decline", option_id="roll-to-wound"
+    )
+    assert isinstance(status.payload, dict)
+    assert status.payload["phase_body_status"] == "attack_wound_command_reroll_pending", status
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "use_stratagem"
+    return session
+
+
+def _submit_lethal_fixture_request(session: LocalGameSession, request: DecisionRequest) -> None:
+    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+    if request.decision_type == "submit_stratagem_target_proposal":
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:fixture-choice",
+            payload=stratagem_decline_payload(),
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    else:
+        submit_fixture_request(session, request)

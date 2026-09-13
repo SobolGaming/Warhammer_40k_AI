@@ -128,8 +128,9 @@ def validate_lethal_hit_history(
     state: GameState,
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
-    """A restored automatic wound must retain its controlling player's answer."""
+    """Every issued choice must retain its answer or its owning pending request."""
     from warhammer40k_core.engine.attack_hit_authority import validate_attack_hit_authority
 
     choices: dict[str, DecisionRecord] = {}
@@ -155,13 +156,18 @@ def validate_lethal_hit_history(
         ):
             raise GameLifecycleError("Lethal Hits history has a duplicate or drifted choice.")
         choices[attack_id] = record
+    answer_positions = _validate_lethal_decision_evidence(
+        choices=choices,
+        event_records=event_records,
+        pending_decision_requests=pending_decision_requests,
+    )
     if choices:
         validate_attack_hit_authority(
             state=state,
             event_records=event_records,
             pending_decision_requests=tuple(record.request for record in choices.values()),
         )
-    for event in event_records:
+    for position, event in enumerate(event_records):
         if event.event_type != "attack_sequence_step" or not isinstance(event.payload, dict):
             continue
         if event.payload.get("step") != "wound":
@@ -173,11 +179,90 @@ def validate_lethal_hit_history(
         if type(wound_attack_id) is not str:
             raise GameLifecycleError("Lethal Hits wound history requires attack identity.")
         choice = choices.get(wound_attack_id)
+        if choice is not None and answer_positions[wound_attack_id] >= position:
+            raise GameLifecycleError("Lethal Hits wound precedes its recorded answer.")
         automatic = choice is not None and choice.result.selected_option_id == AUTO_WOUND_OPTION_ID
         if wound.get("skipped") is not automatic:
             raise GameLifecycleError(
                 "Lethal Hits wound differs from the controlling player's choice."
             )
+
+
+def _validate_lethal_decision_evidence(
+    *,
+    choices: dict[str, DecisionRecord],
+    event_records: tuple[EventRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
+) -> dict[str, int]:
+    """Authenticate both directions of the request/answer journal, before Wound exists.
+
+    The issued request freezes the historical target and weapon context. Comparing
+    only HitRoll, or re-evaluating today's target, cannot authenticate those fields.
+    """
+    issued: dict[str, tuple[int, dict[str, JsonValue]]] = {}
+    answered: dict[str, tuple[int, dict[str, JsonValue]]] = {}
+    hit_positions: dict[str, int] = {}
+    for position, event in enumerate(event_records):
+        payload = event.payload
+        if not isinstance(payload, dict):
+            continue
+        if event.event_type == "attack_sequence_step" and payload.get("step") == "hit":
+            attack_id = payload.get("attack_context_id")
+            if type(attack_id) is str:
+                hit_positions[attack_id] = position
+        if event.event_type not in ("decision_requested", "decision_recorded"):
+            continue
+        raw_request = (
+            payload if event.event_type == "decision_requested" else payload.get("request")
+        )
+        if (
+            not isinstance(raw_request, dict)
+            or raw_request.get("decision_type") != SELECT_LETHAL_HIT_WOUND_DECISION_TYPE
+        ):
+            continue
+        request_id = raw_request.get("request_id")
+        inventory = issued if event.event_type == "decision_requested" else answered
+        if type(request_id) is not str or request_id in inventory:
+            raise GameLifecycleError(
+                "Lethal Hits journal has missing or duplicate request identity."
+            )
+        inventory[request_id] = (position, payload)
+
+    answers = {f"{attack_id}:lethal-hit-wound": record for attack_id, record in choices.items()}
+    requests = {request_id: record.request for request_id, record in answers.items()}
+    for request in pending_decision_requests:
+        if request.decision_type != SELECT_LETHAL_HIT_WOUND_DECISION_TYPE:
+            continue
+        request_id = request.request_id
+        if type(request_id) is not str or request_id in requests:
+            raise GameLifecycleError("Lethal Hits request cannot be both pending and answered.")
+        requests[request_id] = request
+    if issued.keys() != requests.keys() or answered.keys() != answers.keys():
+        raise GameLifecycleError("Lethal Hits issued choices and recorded answers are incomplete.")
+
+    answer_positions: dict[str, int] = {}
+    for request_id, request in requests.items():
+        issued_position, issued_payload = issued[request_id]
+        if canonical_json(issued_payload) != canonical_json(request.to_payload()):
+            raise GameLifecycleError("Lethal Hits history differs from its issued attack context.")
+        payload = request.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Lethal Hits issued request requires an attack context.")
+        attack_id = payload.get("attack_context_id")
+        if (
+            type(attack_id) is not str
+            or attack_id not in hit_positions
+            or hit_positions[attack_id] >= issued_position
+        ):
+            raise GameLifecycleError("Lethal Hits issued choice must follow its recorded Hit.")
+        if request_id in answers:
+            answered_position, answered_payload = answered[request_id]
+            if issued_position >= answered_position or canonical_json(
+                answered_payload
+            ) != canonical_json(answers[request_id].to_payload()):
+                raise GameLifecycleError("Lethal Hits history differs from its recorded decision.")
+            answer_positions[attack_id] = answered_position
+    return answer_positions
 
 
 def validate_lethal_hit_request(

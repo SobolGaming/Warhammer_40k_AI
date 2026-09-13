@@ -362,3 +362,160 @@ def test_lethal_hits_source_is_pinned_and_executable() -> None:
     assert artifact.rules[0].semantic_execution_status == "executable_engine_runtime"
     with pytest.raises(source.LethalHitsSourceError, match="drifted"):
         source.validate_source_artifact_bytes(raw + b" ")
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def test_r44_001_declined_wound_checkpoint_continues_without_drift(phase: BattlePhase) -> None:
+    from tests.lethal_hits_helpers import lethal_wound_checkpoint
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = lethal_wound_checkpoint(phase=phase)
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    for current in (session, restored):
+        request = pending_request(current)
+        status = current.submit_option(
+            request_id=request.request_id,
+            result_id="r44:continue-wound",
+            option_id="decline_stratagem_window",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        complete_attack(current, choice="roll-to-wound")
+    assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()
+    completed = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(completed).to_payload() == completed
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+@pytest.mark.parametrize("checkpoint", ["wound-reroll", "completed"])
+@pytest.mark.parametrize(
+    "forgery",
+    [
+        "missing-choice",
+        "target",
+        "target-keywords",
+        "mirrored-target",
+        "missing-recorded",
+        "orphan-issued",
+        "missing-issued",
+        "duplicate-issued",
+        "duplicate-recorded",
+        "answer-before-request",
+        "request-before-hit",
+    ],
+)
+def test_r44_001_historical_choices_are_authenticated_before_restore(
+    phase: BattlePhase,
+    checkpoint: str,
+    forgery: str,
+) -> None:
+    from copy import deepcopy
+    from typing import cast
+
+    from tests.lethal_hits_helpers import lethal_wound_checkpoint
+
+    from warhammer40k_core.engine.event_log import JsonValue
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session = lethal_wound_checkpoint(phase=phase)
+    if checkpoint == "completed":
+        complete_attack(session, choice="roll-to-wound")
+    payload = deepcopy(session.lifecycle.to_payload())
+    records = payload["decisions"]["records"]
+    events = payload["decisions"]["event_log"]
+    choice = next(r for r in records if r["request"]["decision_type"] == "select_lethal_hit_wound")
+    issued = next(
+        e
+        for e in events
+        if e["event_type"] == "decision_requested" and e["payload"] == choice["request"]
+    )
+    recorded = next(
+        e for e in events if e["event_type"] == "decision_recorded" and e["payload"] == choice
+    )
+    if forgery in ("missing-choice", "orphan-issued"):
+        records.remove(choice)
+        if forgery == "orphan-issued":
+            events.remove(recorded)
+    elif forgery == "target-keywords":
+        cast(dict[str, JsonValue], choice["request"]["payload"])["target_keywords"] = ["INVENTED"]
+    elif forgery in ("target", "mirrored-target"):
+        cast(dict[str, JsonValue], choice["request"]["payload"])["target_unit_instance_id"] = (
+            "invented-target"
+        )
+        if forgery == "mirrored-target":
+            # Agreement between the record and its decision_recorded copy is
+            # insufficient: the issued request remains the original authority.
+            recorded["payload"] = cast(JsonValue, deepcopy(choice))
+    elif forgery == "missing-recorded":
+        events.remove(recorded)
+    elif forgery == "missing-issued":
+        events.remove(issued)
+    elif forgery in ("duplicate-issued", "duplicate-recorded"):
+        events.append(deepcopy(issued if forgery == "duplicate-issued" else recorded))
+    elif forgery == "answer-before-request":
+        issued_index, recorded_index = events.index(issued), events.index(recorded)
+        events[issued_index], events[recorded_index] = recorded, issued
+    else:
+        attack_id = cast(dict[str, JsonValue], choice["request"]["payload"])["attack_context_id"]
+        hit = next(
+            e
+            for e in events
+            if e["event_type"] == "attack_sequence_step"
+            and isinstance(e["payload"], dict)
+            and e["payload"].get("step") == "hit"
+            and e["payload"].get("attack_context_id") == attack_id
+        )
+        events.remove(issued)
+        events.insert(events.index(hit), issued)
+    for index, record in enumerate(records, 1):
+        record["record_id"] = f"decision-record-{index:06d}"
+    for index, event in enumerate(events, 1):
+        event["event_id"] = f"event-{index:06d}"
+    before = deepcopy(payload)
+    with pytest.raises(GameLifecycleError, match="Lethal Hits"):
+        GameLifecycle.from_payload(payload)
+    assert payload == before
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def test_r44_001_wound_cannot_precede_its_recorded_answer(phase: BattlePhase) -> None:
+    from copy import deepcopy
+    from typing import cast
+
+    from warhammer40k_core.engine.event_log import JsonValue
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session = lethal_session(phase)
+    complete_attack(session, choice="roll-to-wound")
+    payload = deepcopy(session.lifecycle.to_payload())
+    choice = next(
+        r
+        for r in payload["decisions"]["records"]
+        if r["request"]["decision_type"] == "select_lethal_hit_wound"
+    )
+    attack_id = cast(dict[str, JsonValue], choice["request"]["payload"])["attack_context_id"]
+    events = payload["decisions"]["event_log"]
+    recorded = next(
+        e for e in events if e["event_type"] == "decision_recorded" and e["payload"] == choice
+    )
+    wound = next(
+        e
+        for e in events
+        if e["event_type"] == "attack_sequence_step"
+        and isinstance(e["payload"], dict)
+        and e["payload"].get("step") == "wound"
+        and e["payload"].get("attack_context_id") == attack_id
+    )
+    events.remove(recorded)
+    events.insert(events.index(wound) + 1, recorded)
+    for index, event in enumerate(events, 1):
+        event["event_id"] = f"event-{index:06d}"
+    with pytest.raises(GameLifecycleError, match="Lethal Hits wound precedes"):
+        GameLifecycle.from_payload(payload)

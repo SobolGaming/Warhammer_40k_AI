@@ -73,6 +73,7 @@ def pre_validate_attack_sequence_decision(
             state=state,
             event_records=decisions.event_log.records,
             decision_records=decisions.records,
+            pending_decision_requests=decisions.queue.pending_requests,
         )
         validate_attack_hit_authority(
             state=state,
