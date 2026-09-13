@@ -141,9 +141,9 @@ def _roll_hit(
         )
     else:
         base_minimum_success = 2
-    minimum_success = _runtime_modifier_registry(
-        runtime_modifier_registry
-    ).minimum_unmodified_hit_success(
+    from warhammer40k_core.engine.hit_thresholds import resolve_hit_thresholds
+
+    thresholds = resolve_hit_thresholds(
         HitRollMinimumUnmodifiedSuccessContext(
             state=state,
             source_phase=source_phase,
@@ -158,13 +158,15 @@ def _roll_hit(
             current_minimum_unmodified_success=base_minimum_success,
         )
     )
+    minimum_success = thresholds.minimum_success
+    critical = unmodified >= thresholds.critical_threshold
     unmodified_success_threshold_active = minimum_success < base_minimum_success
     target_keywords = rules_unit_view_by_id(
         state=state,
         unit_instance_id=pool.target_unit_instance_id,
     ).keywords
     sustained_hits_d3_value: int | None = None
-    if unmodified == 6 and (
+    if critical and (
         weapon_ability_value(
             pool.weapon_profile,
             AbilityKind.SUSTAINED_HITS,
@@ -182,7 +184,7 @@ def _roll_hit(
         ).value
     generated_hits = sustained_hits_generated_hits(
         pool.weapon_profile,
-        critical_hit=unmodified == 6,
+        critical_hit=critical,
         target_keywords=target_keywords,
         d3_value=sustained_hits_d3_value,
     )
@@ -194,11 +196,13 @@ def _roll_hit(
         capped_modifier=capped_modifier,
         final_roll=final_roll,
         successful=(
-            unmodified == 6
+            critical
             or (unmodified_success_threshold_active and unmodified >= minimum_success)
             or (unmodified >= minimum_success and final_roll >= skill)
         ),
-        critical=unmodified == 6,
+        critical=critical,
+        critical_threshold=thresholds.critical_threshold,
+        threshold_source_ids=thresholds.source_ids,
         minimum_unmodified_success=minimum_success,
         unmodified_success_threshold_active=unmodified_success_threshold_active,
         generated_hits=generated_hits,

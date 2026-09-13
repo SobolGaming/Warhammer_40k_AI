@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 43 implements source-backed critical-hit success and the Snap Shooting
+unmodified-six requirement, with shared critical effects, restore and replay.
+See [scope and validation](docs/ORDER_43_SCOPE_PLAN.md) and the
+[Contract 16 migration](contracts/migrations/15-to-16.md).
+
 Order 42 adds shared target invalidation/replacement choices and the Shooting
 consumer, preserving committed weapons, dice, source restrictions, restore,
 replay and adapter visibility. See the [scope and validation](docs/ORDER_42_SCOPE_PLAN.md).

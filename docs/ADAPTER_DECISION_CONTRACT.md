@@ -2460,7 +2460,7 @@ Phase 13D supports these shooting-coupled Core Stratagem target proposals:
 
 - Smokescreen uses stable source `gw-11e-core-stratagems:core:smokescreen` and `generic:rule-ir` execution. At the opponent Shooting phase start, `use_stratagem` enumerates friendly SMOKE rules units through `friendly_smoke_unit`. Accepted use grants Cover to that rules unit and to attack targets whose incomplete visibility is caused by its present models. Cover expires at the active shooting player's phase end and does not modify Hit rolls.
 - `core:explosives`: during the owner's Shooting phase, finite `use_stratagem` options bind a friendly unengaged `EXPLOSIVES`/`GRENADES` rules unit and an `effect_selection` object with exactly `effect_selection_kind: "source_model_and_enemy_unit"`, `source_model_instance_id`, and `enemy_target_unit_instance_id`. Each option commits all three choices; the model must be a living, placed member with either keyword, and the enemy rules unit must be unengaged, within 8 inches of and visible to that model. Advance always excludes use; Fall Back excludes it unless shooting is permitted. Shared Action shooting restrictions, already-shot state, target permission, timing and affordability are revalidated before queue pop or CP spend. The selected model is preserved in `StratagemUseRecord.effect_selection`, `explosives_resolved.source_model_instance_id`, and destruction/mortal-wound continuation evidence. The friendly unit alone is targeted; both canonical rules units are affected. Six D6 cause one mortal wound per 4+, using ordinary defender allocation and Feel No Pain decisions, then the same Shooting phase resumes. Explosives does not itself mark either unit as having shot. Declining a window allows later opportunities after another unit is selected/resolved. The obsolete start-phase parameterized trigger-target path is removed; clients select the engine-emitted option ID without supplying choice payloads.
-- `core:fire-overwatch`: opponent Movement phase `end_phase` proposal emitted from the End of Opponent's Movement phase reaction window for one friendly non-`TITANIC` unit that is unengaged, within 24" of a triggering enemy unit, and would be eligible to shoot if it were that player's Shooting phase. The triggering enemy unit must have been set up or started/ended a Normal Move, Advance, or Fall Back during that Movement phase. The trigger payload identifies that enemy unit with `moved_unit_instance_id`, uses `trigger_window: "end_opponent_movement_phase"`, and includes the eligible trigger classes under `eligible_trigger_kinds`. Target-proposal validation rejects out-of-range friendly units, engaged friendly units, `TITANIC` friendly units, shooting-ineligible friendly units, and friendly units without a legal constrained declaration before CP spend or Stratagem-use recording. Accepted use spends CP, records the Stratagem use, creates an out-of-phase shooting state with the parent phase and trigger payload, and emits a `submit_shooting_declaration` proposal whose legal targets are constrained to the triggering enemy unit. The resulting attack pools carry `core:fire-overwatch`; non-automatic hit rolls default to succeeding only on unmodified 6s regardless of BS or modifiers, while Torrent weapons still auto-hit. Source-backed generic RuleIR can lower that unmodified hit-success threshold through an engine-owned `minimum_unmodified_hit_success` contextual status; emitted hit-roll payloads set `unmodified_success_threshold_active: true` when that threshold itself scores a hit, and adapters must read both that flag and `minimum_unmodified_success` instead of applying local Fire Overwatch exceptions. Declaration and attack-sequence decisions are submitted through `GameLifecycle.submit_decision(...)`, and the Phase 12A reaction frame resumes only after the out-of-phase shooting state completes. Phase 14B emits Fire Overwatch before Rapid Ingress when both are available in the same End of Opponent's Movement phase window.
+- `core:fire-overwatch`: opponent Movement phase `end_phase` proposal emitted from the End of Opponent's Movement phase reaction window for one friendly non-`TITANIC` unit that is unengaged, within 24" of a triggering enemy unit, and would be eligible to shoot if it were that player's Shooting phase. The triggering enemy unit must have been set up or started/ended a Normal Move, Advance, or Fall Back during that Movement phase. The trigger payload identifies that enemy unit with `moved_unit_instance_id`, uses `trigger_window: "end_opponent_movement_phase"`, and includes the eligible trigger classes under `eligible_trigger_kinds`. Target-proposal validation rejects out-of-range friendly units, engaged friendly units, `TITANIC` friendly units, shooting-ineligible friendly units, and friendly units without a legal constrained declaration before CP spend or Stratagem-use recording. Accepted use spends CP, records the Stratagem use, creates an out-of-phase shooting state with the parent phase and trigger payload, and emits a `submit_shooting_declaration` proposal whose legal targets are constrained to the triggering enemy unit. The resulting attack pools carry `core:fire-overwatch`; non-automatic hit rolls default to succeeding only on unmodified 6s regardless of BS or modifiers, while Torrent weapons still auto-hit. Only source-backed RuleIR explicitly gated to Snap Shooting or Fire Overwatch can lower that unmodified hit-success threshold through an engine-owned `minimum_unmodified_hit_success` or `critical_hit_threshold` contextual status; emitted hit-roll payloads set `unmodified_success_threshold_active: true` when that threshold itself scores a hit, and adapters must read both that flag and `minimum_unmodified_success` instead of applying local Fire Overwatch exceptions. Declaration and attack-sequence decisions are submitted through `GameLifecycle.submit_decision(...)`, and the Phase 12A reaction frame resumes only after the out-of-phase shooting state completes. Phase 14B emits Fire Overwatch before Rapid Ingress when both are available in the same End of Opponent's Movement phase window.
 
 Fire Overwatch is not emitted from the active player's normal Shooting phase and is not represented by a persisting marker. It uses a dedicated out-of-phase shooting state so adapters see the same declaration, Precision, allocation, save, Feel No Pain, and attack-resolution decisions as normal shooting without mutating the active Shooting phase state.
 
@@ -5659,3 +5659,38 @@ and weapon plans retain their existing viewer semantics. Existing finite
 submission and projection schemas cover the new family; no parameterized payload
 or persistence schema is introduced. Charge can supply its own target sets to the
 same service; Order 46 remains responsible for its later-modifier continuation.
+
+
+## Order 43: critical-hit thresholds (contract 16)
+
+The shared hit resolver records required `critical_threshold` and
+`threshold_source_ids` fields on every HitRoll, including nested attack-step
+events, checkpoints and replay payloads. A raw face meeting the effective
+critical threshold is successful regardless of ordinary skill or the capped
+hit modifier. Lethal Hits and Sustained Hits use that same critical flag; extra
+Sustained hits do not inherit Lethal Hits. Automatic hits have no critical roll.
+
+Snap Shooting and Fire Overwatch retain an unmodified-six floor unless the
+applicable descriptor expressly requires that targeting mode. A generic lowered
+critical threshold or ordinary hit-success threshold is insufficient. Explicit
+hit-success permission alone does not make a four or five critical. Indirect
+Shooting's existing failed-face floor also bounds the effective critical
+threshold. Source IDs and raw/final roll values are deterministic public combat
+evidence; adapters render the engine result and never recalculate hit success.
+
+The existing finite/proposal decision families and shared viewer-redaction path
+cover this work. There is no new player choice. Contract 16 versions the changed
+nested hit-record requirements, replay and operator persistence; see
+`contracts/migrations/15-to-16.md`. Old records are not supplied inferred
+thresholds or a compatibility fallback.
+
+R43-001 restoration and pre-submission validation bind every resumable hit copy
+to the owning recorded Hit step, including its complete roll payload, effective
+threshold, threshold source IDs and the recorded weapon/dice specification. This
+includes grouped damage, generated hits, post-roll pools, retained attack
+continuations and nested pending requests. Missing, duplicate or mismatched
+owning Hit evidence fails closed. Gathered weapon copies and valid post-roll
+profile replacements preserve the recorded hit source. Historical thresholds
+are not recomputed from later effects or model presence. This enforces the
+existing contract 16 shape;
+no decision, visibility or persistence schema changes are introduced.

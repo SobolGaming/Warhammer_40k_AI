@@ -4205,8 +4205,9 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
         "expected_gain_status",
     ),
     [
-        ("icon-lifecycle-p02-1", False, True, "applied"),
-        ("icon-order36-failed-0", False, False, None),
+        # Order 43 hit-record evidence changes the later leadership RNG history.
+        ("order43-icon-0", False, True, "applied"),
+        ("order43-icon-4", False, False, None),
         ("icon-order36-capped-0", True, True, "capped"),
     ],
 )

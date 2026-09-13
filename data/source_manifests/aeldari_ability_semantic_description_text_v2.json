@@ -1,5 +1,4 @@
 {
-  "schema_version": "2",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -214,7 +213,7 @@
     {
       "ability_id": "000000595:mandiblasters",
       "description": "The charge-conditioned Critical Hit threshold is consumed.",
-      "evidence_sha256": "7f2fe1894d40584d7067c2e405ea61f0f084bd6f93aacbacc457913e3cd48a04"
+      "evidence_sha256": "bc2a7cdc76be3eb1293f316db2200d851e980990a061075b6c34407930124768"
     },
     {
       "ability_id": "000000595:aspect-shrine-token",
@@ -569,7 +568,7 @@
     {
       "ability_id": "000003909:whispering-web",
       "description": "Post-shoot target tracking and the Critical Hit threshold are consumed.",
-      "evidence_sha256": "0f907ed4c79d6ef073d23d4f72ae08a1871c55db3028677099dcb6bf06959392"
+      "evidence_sha256": "3102732958645b5bd9cd1a336950b040aff960edd197b2f50e29266a3faa36a6"
     },
     {
       "ability_id": "000003910:structural-collapse",
@@ -726,5 +725,6 @@
       "description": "Fight-end eligibility and D3+3-inch Normal/Fall Back movement are consumed through the shared triggered-movement path.",
       "evidence_sha256": "61f92ededd0ac64c9391aa660baec4c332cacc494a052549bbf3a2c27f1fd4b9"
     }
-  ]
+  ],
+  "schema_version": "2"
 }

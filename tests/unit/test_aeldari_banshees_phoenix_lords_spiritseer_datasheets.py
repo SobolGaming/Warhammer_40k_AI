@@ -185,7 +185,7 @@ def test_exact_rules_route_to_generic_runtime_consumers() -> None:
             "catalog-ir:can-fallback-and-charge",
         ),
         "000003909:4": ("catalog-ir:conditional-leading-charge-after-movement-action",),
-        "000003909:5": ("catalog-ir:minimum-unmodified-hit-success",),
+        "000003909:5": ("catalog-ir:critical-hit-threshold",),
     }
 
     assert {

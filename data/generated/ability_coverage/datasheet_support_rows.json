@@ -534,7 +534,7 @@
       "corsair-coterie",
       "path-of-the-outcast"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:conditional-leading-charge-after-movement-action`, `catalog-ir:minimum-unmodified-hit-success`, `descriptor:army-mustering:leader-attachment`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:conditional-leading-charge-after-movement-action`, `catalog-ir:critical-hit-threshold`, `descriptor:army-mustering:leader-attachment`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },
@@ -912,7 +912,7 @@
       "corsair-coterie",
       "path-of-the-outcast"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:dice-result-override`, `catalog-ir:minimum-unmodified-hit-success`, `core:stealth`, `descriptor:prebattle:infiltrators`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:critical-hit-threshold`, `catalog-ir:dice-result-override`, `core:stealth`, `descriptor:prebattle:infiltrators`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

@@ -135,7 +135,8 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        game_id="order34-own-hazard-True-16" if with_feel_no_pain else "order36-own-hazard-False-3",
+        # Preserve the own-Hazardous death with Order 43 hit-record RNG history.
+        game_id="order34-own-hazard-True-16" if with_feel_no_pain else "order43-ownhazard-14",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -252,7 +253,8 @@ def test_order_30_for_the_chapter_loads_from_source_backed_catalog() -> None:
 def test_order_30_for_the_chapter_executes_with_automatic_hazardous_success() -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        game_id="order-30-chapter-hazardous",
+        # Order 43 hit evidence participates in subsequent Hazardous/reaction RNG history.
+        game_id="order43-chapter-0",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )
@@ -544,7 +546,8 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
     profile = retained_sources.stratagem_profile()
     lifecycle, units = fight_lifecycle(
         catalog=unending_fidelity_catalog(),
-        game_id="order-30-fidelity",
+        # Preserve the first-pool casualty with Order 43 hit-record RNG history.
+        game_id="order43-fidelity-4",
         alpha_unit_ids=("alpha",),
         enemy_unit_ids=("enemy", "leader") if attached else ("enemy",),
         enemy_unit_specs={"enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1)}
@@ -1391,7 +1394,8 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
         )
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
-        game_id="review-r34-nested-5",
+        # Preserve the nested casualty with Order 43 hit-record RNG history.
+        game_id="order43-nested-0",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

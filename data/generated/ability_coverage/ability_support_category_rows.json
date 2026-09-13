@@ -3988,7 +3988,7 @@
       "Lhykhis"
     ],
     "runtime_consumer_ids": [
-      "catalog-ir:minimum-unmodified-hit-success"
+      "catalog-ir:critical-hit-threshold"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -4134,9 +4134,9 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:command-end-sticky-objective-control",
+      "catalog-ir:critical-hit-threshold",
       "catalog-ir:fight-end-failed-activation-model-destruction",
       "catalog-ir:fight-selected-critical-wound-threshold",
-      "catalog-ir:minimum-unmodified-hit-success",
       "catalog-ir:shadow-form-choice"
     ],
     "source_kind_counts": {

@@ -195,6 +195,13 @@ def test_lifecycle_authenticates_complete_activity_inventory() -> None:
     assert any(
         isinstance(node, ast.Call)
         and isinstance(node.func, ast.Name)
+        and node.func.id == "validate_payload_consistency"
+        for node in ast.walk(tree)
+    )
+    tree = ast.parse((ENGINE / "lifecycle_restore_consistency.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
         and node.func.id == "validate_activity_restriction_inventory"
         for node in ast.walk(tree)
     )

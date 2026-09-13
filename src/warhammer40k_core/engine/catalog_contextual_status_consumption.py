@@ -10,6 +10,7 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
 )
 
+CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID = "catalog-ir:critical-hit-threshold"
 CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
 CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = "catalog-ir:shadow-of-chaos-aura"
@@ -36,6 +37,7 @@ _BATTLE_SHOCK_REROLL_ROLL_TYPES = frozenset(
 
 def registered_hook_ids() -> tuple[str, ...]:
     return (
+        CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
@@ -52,6 +54,18 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog contextual status consumer requires RuleClause values.")
     consumer_ids: set[str] = set()
+    if (
+        clause.target is not None
+        and clause.target.kind
+        in {
+            RuleTargetKind.FRIENDLY_UNIT,
+            RuleTargetKind.SELECTED_UNIT,
+            RuleTargetKind.THIS_MODEL,
+            RuleTargetKind.THIS_UNIT,
+        }
+        and any(_effect_is_critical_hit_threshold(effect) for effect in clause.effects)
+    ):
+        consumer_ids.add(CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID)
     if _clause_targets_shadow_of_chaos_aura(clause):
         consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
     if _clause_is_shadow_form_choice(clause):
@@ -77,6 +91,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
 def hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError(_RULE_EFFECT_SPEC_ERROR)
+    if _effect_is_critical_hit_threshold(effect):
+        return (CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID,)
     if _effect_is_shadow_of_chaos_status(effect):
         return (CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,)
     if _effect_is_shadow_form_choice(effect):
@@ -298,3 +314,17 @@ def _attack_roll_reroll_consumer_id_for_effect(effect: RuleEffectSpec) -> str | 
 
 def _lookup_token(value: str) -> str:
     return "_".join(value.casefold().replace(".", "_").replace("-", "_").split())
+
+
+def _effect_is_critical_hit_threshold(effect: RuleEffectSpec) -> bool:
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    threshold = parameters.get("critical_threshold")
+    return (
+        parameters.get("status") == "critical_hit_threshold"
+        and parameters.get("roll_type") == "hit"
+        and parameters.get("attack_role") == "attacker"
+        and type(threshold) is int
+        and 2 <= threshold <= 6
+    )

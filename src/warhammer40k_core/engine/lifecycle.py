@@ -6,7 +6,6 @@ from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine import attack_sequence_decision_family as _asdf
-from warhammer40k_core.engine import attack_sequence_hazardous as _ash
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
 from warhammer40k_core.engine import battle_shock_continuation_restore as _bs_restore
@@ -22,25 +21,17 @@ from warhammer40k_core.engine import (
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
-from warhammer40k_core.engine import destroyed_transport_pending as _destroyed_transport_pending
 from warhammer40k_core.engine import fight_activation_abilities as _fa
-from warhammer40k_core.engine import fight_activation_history_integrity as _fahi
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
-from warhammer40k_core.engine import lifecycle_state_queries as _lsq
-from warhammer40k_core.engine import model_destruction_cause_producers as _mdcp
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
-from warhammer40k_core.engine import primary_historical_event_integrity as _phei
 from warhammer40k_core.engine import primary_mission_pending_request_integrity as _pmpri
 from warhammer40k_core.engine import primary_mission_restore_integrity as _pmri
-from warhammer40k_core.engine import primary_mission_state_validation as _pmsv
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
 from warhammer40k_core.engine import psychic_modifier_history_origin as _pmh
-from warhammer40k_core.engine import reserve_state_integrity as _rsi
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine import target_replacement_dispatch as _target_replacement_dispatch
-from warhammer40k_core.engine import transport_state_integrity as _tsi
 from warhammer40k_core.engine import unit_split_dispatch as _unit_split_dispatch
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -57,8 +48,6 @@ from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battle_shock_test_service import (
     is_stratagem_battle_shock_reroll_request,
 )
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
-from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     invalid_any_phase_once_per_battle_status,
@@ -173,28 +162,16 @@ from warhammer40k_core.engine.healing_decision_dispatch import (
 from warhammer40k_core.engine.lifecycle_attack_prevalidation import (
     fight_attack_sequence_is_active_for_request,
 )
-from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
-    state_allows_battlefield_state as _state_allows_battlefield_state,
-)
-from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
-    state_is_before_deploy_armies as _state_is_before_deploy_armies,
-)
-from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
-    state_requires_battlefield_state as _state_requires_battlefield_state,
-)
-from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
-    state_requires_deployed_battlefield_state as _state_requires_deployed_battlefield_state,
-)
 from warhammer40k_core.engine.lifecycle_heroic_intervention import (
     apply_heroic_intervention_charge_move_lifecycle_decision,
 )
 from warhammer40k_core.engine.lifecycle_payload_consistency import (
-    validate_config_state_payload_consistency,
     validate_pending_battlefield_request_consistency,
 )
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
 )
+from warhammer40k_core.engine.lifecycle_restore_consistency import validate_payload_consistency
 from warhammer40k_core.engine.lifecycle_runtime_payloads import (
     payload_bool as _payload_bool,
 )
@@ -205,12 +182,6 @@ from warhammer40k_core.engine.lifecycle_setup_reactive import (
     apply_setup_reactive_lifecycle_decision_if_applicable,
     invalid_setup_reactive_lifecycle_status,
     is_setup_reactive_lifecycle_request,
-)
-from warhammer40k_core.engine.lifecycle_state_validation import (
-    canonical_rules_unit_identity_matches_physical_units,
-    validate_disembarked_unit_state_consistency,
-    validate_fight_phase_state_consistency,
-    validate_movement_phase_state_consistency,
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
@@ -226,9 +197,6 @@ from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
     required_movement_proposal_context_string,
-)
-from warhammer40k_core.engine.normal_move_history import (
-    validate_normal_move_state_consistency,
 )
 from warhammer40k_core.engine.opportunity_windows import (
     OPPORTUNITY_REQUEST_FAMILY,
@@ -291,9 +259,6 @@ from warhammer40k_core.engine.prebattle import (
     invalid_prebattle_proposal_status,
     is_prebattle_proposal_request,
 )
-from warhammer40k_core.engine.prebattle_integrity import (
-    validate_prebattle_alternation_restore,
-)
 from warhammer40k_core.engine.primary_mission_choices import (
     locate_and_deny_start_battle_binding,
 )
@@ -313,7 +278,6 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     invalid_return_on_death_placement_status,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.runtime_rule_ir_authority import (
     runtime_rule_ir_authority_index_from_bundle,
 )
@@ -383,7 +347,6 @@ from warhammer40k_core.engine.triggered_movement import (
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
 )
-from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 
 class GameLifecyclePayload(TypedDict):
@@ -989,7 +952,7 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
         )
-        _validate_payload_consistency(
+        validate_payload_consistency(
             state=lifecycle._require_state(),
             config=lifecycle._config,
             event_records=lifecycle.decision_controller.event_log.records,
@@ -3355,321 +3318,3 @@ def _fight_decision_owns_request(
     if _is_fight_movement_proposal_request(request):
         return True
     return fight_attack_sequence_is_active_for_request(state=state, request=request)
-
-
-def _validate_payload_consistency(
-    *,
-    state: GameState,
-    config: GameConfig | None,
-    event_records: tuple[EventRecord, ...],
-    decision_records: tuple[DecisionRecord, ...],
-    pending_decision_requests: tuple[DecisionRequest, ...],
-) -> None:
-    from warhammer40k_core.engine.activity_restriction_restore import (
-        validate_activity_restriction_inventory,
-    )
-
-    validate_activity_restriction_inventory(
-        state=state, event_records=event_records, decision_records=decision_records
-    )
-    _rsi.validate_reserve_state_consistency(state=state)
-    _tsi.validate_transport_cargo_state_consistency(state=state)
-    validate_prebattle_alternation_restore(
-        state=state,
-        army_catalog=None if config is None else config.army_catalog,
-        decision_records=decision_records,
-        pending_decision_requests=pending_decision_requests,
-    )
-    _mdcp.validate_model_destruction_cause_restore(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-        pending_decision_requests=pending_decision_requests,
-    )
-    _validate_battlefield_state_consistency(state=state, config=config)
-    _rsi.validate_initial_reserve_destruction_policy_authority(
-        state=state,
-        event_records=event_records,
-    )
-    validate_movement_phase_state_consistency(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-    )
-    _validate_shooting_phase_state_consistency(state=state)
-    _validate_charge_phase_state_consistency(state=state)
-    validate_fight_phase_state_consistency(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-    )
-    _ash.validate_pending_hazardous_mortal_wound_requests(
-        state=state,
-        event_records=event_records,
-        pending_decision_requests=pending_decision_requests,
-    )
-    _destroyed_transport_pending.validate_pending_destroyed_transport_restore(
-        state=state,
-        event_records=event_records,
-        pending_decision_requests=pending_decision_requests,
-    )
-    _bsa.validate_restore(state, event_records, decision_records, pending_decision_requests)
-    _fahi.validate_restore(state, event_records, decision_records, pending_decision_requests)
-    validate_disembarked_unit_state_consistency(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-    )
-    _validate_advanced_unit_state_consistency(state=state)
-    _validate_fell_back_unit_state_consistency(state=state)
-    validate_normal_move_state_consistency(state=state)
-    validate_config_state_payload_consistency(
-        state=state,
-        config=config,
-        event_records=event_records,
-        decision_records=decision_records,
-    )
-    _phei.validate_primary_historical_event_integrity(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-        require_muster_event_provenance=config is not None,
-    )
-    _pmsv.validate_primary_mission_progress_state(
-        state,
-        event_records=event_records,
-        decision_records=decision_records,
-        pending_decision_requests=pending_decision_requests,
-    )
-
-
-def _validate_battlefield_state_consistency(
-    *,
-    state: GameState,
-    config: GameConfig | None,
-) -> None:
-    if state.battlefield_state is None:
-        if _state_requires_battlefield_state(state):
-            raise GameLifecycleError("Lifecycle state is missing battlefield_state.")
-        return
-    if not _state_allows_battlefield_state(state):
-        raise GameLifecycleError(
-            "Lifecycle state battlefield_state must be absent before DEPLOY_ARMIES."
-        )
-    if _state_is_before_deploy_armies(state) and (
-        state.battlefield_state.placed_armies or state.battlefield_state.removed_model_ids
-    ):
-        raise GameLifecycleError(
-            "Lifecycle state battlefield_state must not contain placed or removed models "
-            "before DEPLOY_ARMIES."
-        )
-    try:
-        scenario = battlefield_scenario_for_state(state=state)
-        if _state_requires_deployed_battlefield_state(state):
-            scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
-        if config is not None and _state_requires_deployed_battlefield_state(state):
-            assert_battlefield_units_in_coherency(
-                scenario=_fahi.battlefield_scenario_for_living_model_coherency(
-                    scenario=scenario,
-                    state=state,
-                ),
-                ruleset_descriptor=config.ruleset_descriptor,
-            )
-    except PlacementError as exc:
-        raise GameLifecycleError("Lifecycle state battlefield_state is invalid.") from exc
-
-
-def _validate_shooting_phase_state_consistency(*, state: GameState) -> None:
-    shooting_state = state.shooting_phase_state
-    if shooting_state is None:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("shooting_phase_state requires battle stage.")
-    if state.current_battle_phase is not BattlePhase.SHOOTING:
-        raise GameLifecycleError("shooting_phase_state requires SHOOTING phase.")
-    if state.active_player_id is None:
-        raise GameLifecycleError("shooting_phase_state requires active player.")
-    if shooting_state.active_player_id != state.active_player_id:
-        raise GameLifecycleError("shooting_phase_state active player drift.")
-    if shooting_state.battle_round != state.battle_round:
-        raise GameLifecycleError("shooting_phase_state battle round drift.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("shooting_phase_state requires battlefield_state.")
-    unit_owner_by_id = {
-        rules_unit.unit_instance_id: rules_unit.owner_player_id
-        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
-    }
-    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
-        state=state,
-        player_id=state.active_player_id,
-    )
-    active_player_unit_ids = {
-        unit_id
-        for unit_id, player_id in unit_owner_by_id.items()
-        if player_id == state.active_player_id
-    }
-    for unit_id in (
-        *shooting_state.selected_unit_ids,
-        *shooting_state.shot_unit_ids,
-        *shooting_state.skipped_unit_ids,
-    ):
-        if unit_id not in active_player_unit_ids and unit_id not in active_player_embarked_unit_ids:
-            raise GameLifecycleError(
-                "shooting_phase_state selected unit is not active player's unit."
-            )
-    active_selection = shooting_state.active_selection
-    if active_selection is None:
-        return
-    if active_selection.unit_instance_id not in shooting_state.selected_unit_ids:
-        raise GameLifecycleError("shooting_phase_state active selection drift.")
-    if active_selection.unit_instance_id not in active_player_unit_ids:
-        raise GameLifecycleError(
-            "shooting_phase_state active selection is not active player's unit."
-        )
-
-
-def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
-    charge_state = state.charge_phase_state
-    if charge_state is None:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("charge_phase_state requires battle stage.")
-    if state.current_battle_phase is not BattlePhase.CHARGE:
-        raise GameLifecycleError("charge_phase_state requires CHARGE phase.")
-    if state.active_player_id is None:
-        raise GameLifecycleError("charge_phase_state requires active player.")
-    if charge_state.active_player_id != state.active_player_id:
-        raise GameLifecycleError("charge_phase_state active player drift.")
-    if charge_state.battle_round != state.battle_round:
-        raise GameLifecycleError("charge_phase_state battle round drift.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("charge_phase_state requires battlefield_state.")
-    unit_owner_by_id = {
-        rules_unit.unit_instance_id: rules_unit.owner_player_id
-        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
-    }
-    active_player_unit_ids = {
-        unit_id
-        for unit_id, player_id in unit_owner_by_id.items()
-        if player_id == state.active_player_id
-    }
-    for unit_id in charge_state.selected_unit_ids:
-        if unit_id not in active_player_unit_ids:
-            raise GameLifecycleError(
-                "charge_phase_state selected unit is not active player's unit."
-            )
-    active_selection = charge_state.active_selection
-    if active_selection is not None:
-        if active_selection.unit_instance_id not in charge_state.selected_unit_ids:
-            raise GameLifecycleError("charge_phase_state active selection drift.")
-        if active_selection.unit_instance_id not in active_player_unit_ids:
-            raise GameLifecycleError(
-                "charge_phase_state active selection is not active player's unit."
-            )
-    for distance_state in charge_state.distance_states:
-        roll_result = distance_state.roll_result
-        charging_unit_id = roll_result.request.unit_instance_id
-        if charging_unit_id not in charge_state.selected_unit_ids:
-            raise GameLifecycleError("charge_phase_state roll unit was not selected.")
-        if charging_unit_id not in active_player_unit_ids:
-            raise GameLifecycleError("charge_phase_state roll unit is not active player's unit.")
-        for target_unit_id in roll_result.reachable_target_distances_inches:
-            target_owner = unit_owner_by_id.get(target_unit_id)
-            if target_owner is None:
-                raise GameLifecycleError("charge_phase_state target unit is unknown.")
-            if target_owner == state.active_player_id:
-                raise GameLifecycleError("charge_phase_state target unit is not an enemy.")
-
-
-def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:
-    if not state.advanced_unit_states:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("advanced_unit_states require battle stage.")
-    if state.active_player_id is None:
-        raise GameLifecycleError("advanced_unit_states require active player.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("advanced_unit_states require battlefield_state.")
-    try:
-        scenario = BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=state.battlefield_state,
-        )
-        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Lifecycle state advanced_unit_states are invalid.") from exc
-
-    active_player_unit_ids = {
-        placement.unit_instance_id for placement in placed_army.unit_placements
-    }
-    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
-        state=state,
-        player_id=state.active_player_id,
-    )
-    fully_removed_active_player_unit_ids = _lsq.fully_removed_unit_ids_for_player(
-        state=state,
-        player_id=state.active_player_id,
-    )
-    for advanced_state in state.advanced_unit_states:
-        if advanced_state.player_id != state.active_player_id:
-            raise GameLifecycleError("advanced_unit_states player drift.")
-        if advanced_state.battle_round != state.battle_round:
-            raise GameLifecycleError("advanced_unit_states battle round drift.")
-        if not canonical_rules_unit_identity_matches_physical_units(
-            state=state,
-            player_id=state.active_player_id,
-            unit_instance_id=advanced_state.unit_instance_id,
-            physical_unit_ids=(
-                active_player_unit_ids
-                | active_player_embarked_unit_ids
-                | fully_removed_active_player_unit_ids
-            ),
-        ):
-            raise GameLifecycleError("advanced_unit_states unit is not active player's unit.")
-
-
-def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
-    if not state.fell_back_unit_states:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("fell_back_unit_states require battle stage.")
-    if state.active_player_id is None:
-        raise GameLifecycleError("fell_back_unit_states require active player.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("fell_back_unit_states require battlefield_state.")
-    try:
-        scenario = BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=state.battlefield_state,
-        )
-        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Lifecycle state fell_back_unit_states are invalid.") from exc
-
-    active_player_unit_ids = {
-        placement.unit_instance_id for placement in placed_army.unit_placements
-    }
-    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
-        state=state,
-        player_id=state.active_player_id,
-    )
-    fully_removed_active_player_unit_ids = _lsq.fully_removed_unit_ids_for_player(
-        state=state,
-        player_id=state.active_player_id,
-    )
-    for fell_back_state in state.fell_back_unit_states:
-        if fell_back_state.player_id != state.active_player_id:
-            raise GameLifecycleError("fell_back_unit_states player drift.")
-        if fell_back_state.battle_round != state.battle_round:
-            raise GameLifecycleError("fell_back_unit_states battle round drift.")
-        if not canonical_rules_unit_identity_matches_physical_units(
-            state=state,
-            player_id=state.active_player_id,
-            unit_instance_id=fell_back_state.unit_instance_id,
-            physical_unit_ids=(
-                active_player_unit_ids
-                | active_player_embarked_unit_ids
-                | fully_removed_active_player_unit_ids
-            ),
-        ):
-            raise GameLifecycleError("fell_back_unit_states unit is not active player's unit.")

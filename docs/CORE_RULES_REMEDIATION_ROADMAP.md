@@ -4697,3 +4697,18 @@ cover the new contract 15.3 family. Real Charge queries exercise the reusable
 service; its later-modifier action integration remains Order 46 / C11-03.
 See [scope and validation](ORDER_42_SCOPE_PLAN.md) and
 [component/small-slice evidence](performance/order42/README.md).
+
+## Order 43 / P04B — critical-hit success and Snap Shooting
+
+C04-02 and C04-03 use one shared hit-threshold resolver. A qualifying raw critical
+roll succeeds despite worse ordinary skill, and drives both Lethal and Sustained
+Hits. Snap Shooting and Fire Overwatch retain their raw-six requirement unless
+the granting source explicitly overrides that mode. Modifiers do not change raw
+critical qualification, and Indirect Shooting retains its failed-face floor.
+
+The compiler and affected generated consumers distinguish critical thresholds
+from ordinary hit permission. Contract 16 records the effective threshold and
+source IDs through persistence, events and replay. See the [source, scope and
+validation record](ORDER_43_SCOPE_PLAN.md) and [retained performance
+evidence](performance/order43/README.md). This does not certify other faction
+activation paths or the separately owned Overwatch timing and Charge findings.

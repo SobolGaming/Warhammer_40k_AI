@@ -1,0 +1,132 @@
+{
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:37524380e842308bfa49e69b479b9a4d7fe6fd8d48cf0daca45f8d11dbd48d5d",
+  "full_game_certified": false,
+  "hashes": {
+    "scripts/measure_hit_checkpoint_restore.py": "dbbf5040c370a85fc82cd502ac1476043f4407d69691be1412063efccc0b6e2e",
+    "tests/critical_hit_helpers.py": "bf34d456fb8840ec4c0bb409075b3a959eaf091be75f4980341c1166adf6a7f4",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "mode": "uninstrumented_timing",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "results": {
+    "fight": {
+      "completion_rate": 1,
+      "continuation_seconds": {
+        "maximum_seconds": 0.05948479089420289,
+        "mean_seconds": 0.059058041694307964,
+        "median_seconds": 0.05898091697599739
+      },
+      "restore_seconds": {
+        "maximum_seconds": 1.3343066670931876,
+        "mean_seconds": 1.3024221785931982,
+        "median_seconds": 1.2937284159706905
+      },
+      "samples": [
+        {
+          "continuation_seconds": 0.05889608303550631,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.2891127499751747
+        },
+        {
+          "continuation_seconds": 0.05948479089420289,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.3343066670931876
+        },
+        {
+          "continuation_seconds": 0.05898091697599739,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.2937284159706905
+        },
+        {
+          "continuation_seconds": 0.05909629201050848,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.2863688330398872
+        },
+        {
+          "continuation_seconds": 0.05909966700710356,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.327492875047028
+        },
+        {
+          "continuation_seconds": 0.058909624931402504,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.2945617920486256
+        },
+        {
+          "continuation_seconds": 0.05893891700543463,
+          "decision_count": 7,
+          "event_count": 97,
+          "restore_seconds": 1.291383916977793
+        }
+      ],
+      "setup_seconds": 1.0664680419722572
+    },
+    "shooting": {
+      "completion_rate": 1,
+      "continuation_seconds": {
+        "maximum_seconds": 0.06204958294983953,
+        "mean_seconds": 0.060499642842582295,
+        "median_seconds": 0.06016274995636195
+      },
+      "restore_seconds": {
+        "maximum_seconds": 1.317484375089407,
+        "mean_seconds": 1.2914287323032372,
+        "median_seconds": 1.2820756249129772
+      },
+      "samples": [
+        {
+          "continuation_seconds": 0.06204958294983953,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.2854824590031058
+        },
+        {
+          "continuation_seconds": 0.06015141704119742,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.2798842920456082
+        },
+        {
+          "continuation_seconds": 0.06020724994596094,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.317484375089407
+        },
+        {
+          "continuation_seconds": 0.06002779200207442,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.281875375076197
+        },
+        {
+          "continuation_seconds": 0.06016274995636195,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.3134427920449525
+        },
+        {
+          "continuation_seconds": 0.06086600001435727,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.2820756249129772
+        },
+        {
+          "continuation_seconds": 0.06003270798828453,
+          "decision_count": 6,
+          "event_count": 100,
+          "restore_seconds": 1.2797562079504132
+        }
+      ],
+      "setup_seconds": 2.683777166996151
+    }
+  },
+  "revision": "76da5f2daa3efbf2280594271ee71f7c6e416cd6",
+  "workload_id": "r43-hit-authority-fnp-v1"
+}

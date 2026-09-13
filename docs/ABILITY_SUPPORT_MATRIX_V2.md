@@ -297,6 +297,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:conditional-leading-fixed-advance` | Whirling Death |
 | `catalog-ir:conditional-leading-weapon-range-modifier` | Burning Lance |
 | `catalog-ir:conditional-not-leading-ability:fights-first` | Duellist's Hubris |
+| `catalog-ir:critical-hit-threshold` | Mandiblasters<br>Whispering Web |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
@@ -332,7 +333,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
-| `catalog-ir:minimum-unmodified-hit-success` | Mandiblasters<br>Whispering Web |
+| `catalog-ir:minimum-unmodified-hit-success` | No current generated rows |
 | `catalog-ir:model-materialization` | No current generated rows |
 | `catalog-ir:modifier-ignore-permission` | Siege Crawler |
 | `catalog-ir:movement-action-grant` | Blitz<br>Flickerjump |

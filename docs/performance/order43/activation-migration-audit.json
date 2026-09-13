@@ -1,0 +1,74 @@
+{
+  "base_commit": "15856aca9550bf9296ebfbf74e165e889301e705",
+  "profile_count": 1025,
+  "metadata_identical": true,
+  "changed_profiles": [
+    {
+      "profile_id": "phase17s:stratagem:adepta-sororitas:penitent-host:000009030004",
+      "critical_clauses": 1,
+      "old_hash": "f716ffce1469c9484272def36ae7ce57a9b62d2f596e6d1829d8565092f139f6",
+      "new_hash": "bcc322d1e47f2282224f5e39c320c6f20265cdddb90e067001414d478b63d240"
+    },
+    {
+      "profile_id": "phase17s:stratagem:adeptus-mechanicus:haloscreed-battle-clade:000009746003",
+      "critical_clauses": 1,
+      "old_hash": "c843ffca6ad3a949f1d9bdfe7014c15de7e78d21010a5e144bf84213b7c0182e",
+      "new_hash": "f22f7a7e3c01200903a7123b2595185117461984d583510356add8fa4d04c561"
+    },
+    {
+      "profile_id": "phase17s:stratagem:chaos-daemons:plague-legion:000009820002",
+      "critical_clauses": 1,
+      "old_hash": "09fdfaea42f2591da5bdf4f4283e8c6e902aeccc40e95455c7ca87ba0788b373",
+      "new_hash": "877dd71dcf932c99baabe8c509ee9d07dd9811129d49f9a06856b4ba76291970"
+    },
+    {
+      "profile_id": "phase17s:stratagem:chaos-space-marines:fellhammer-siege-host:000008977004",
+      "critical_clauses": 1,
+      "old_hash": "1d686daf79b9fb8979c489bcca2985fc6f711d93c4a78063f2bbda782553305a",
+      "new_hash": "39411a547e5ee2966400689c3660f7b8f2b9d0561d163b3336fe91c6b7ba49e2"
+    },
+    {
+      "profile_id": "phase17s:stratagem:death-guard:champions-of-contagion:000010132002",
+      "critical_clauses": 1,
+      "old_hash": "0df7dbcc5d7d8b4838738ff6a51b50cc204c831bcba9d39b10fbb36a9e121fb6",
+      "new_hash": "b05e3907ca55f9937f9f7661c80aab81c377a89322a67f374fd77515adc3dde0"
+    },
+    {
+      "profile_id": "phase17s:stratagem:drukhari:kabalite-cartel:000010589004",
+      "critical_clauses": 1,
+      "old_hash": "e7cf3e01984c5336c5d4ea8eacb2fec8e154b2c8340d79bdb90119cff2038839",
+      "new_hash": "63d2be7f417c9e444f281c922b96554a1d52344d86bac07463e753cc22ff3278"
+    },
+    {
+      "profile_id": "phase17s:stratagem:grey-knights:augurium-task-force:000010365003",
+      "critical_clauses": 1,
+      "old_hash": "75b84a70ebdfe6a427d3f852e258ae81656f8a6c39922b7f95037e654c054a65",
+      "new_hash": "95ae1e47f745f4093a108b38bec45d181135436946c6426582dd038ba010955a"
+    },
+    {
+      "profile_id": "phase17s:stratagem:imperial-knights:gate-warden-lance:000010498002",
+      "critical_clauses": 1,
+      "old_hash": "076aad21eaf03f1fadceb8896d5b90279843402254cb4e58c49543a26b1cf8f3",
+      "new_hash": "7db8db6d10f2a25473fef1077fb6cafb74a9b188cf50430bcdb3b79315a2ad68"
+    },
+    {
+      "profile_id": "phase17s:stratagem:necrons:obeisance-phalanx:000008551003",
+      "critical_clauses": 1,
+      "old_hash": "0f36bdbd121c302c6274b044639d93982c2c763e9c86567ec8caee719b5bddbf",
+      "new_hash": "059111609f2446a3ea061192a0b9045d6f1e20e17b57063f8b565b715a69f534"
+    },
+    {
+      "profile_id": "phase17s:stratagem:orks:war-horde:000008366004",
+      "critical_clauses": 1,
+      "old_hash": "73f54bb08d1a566f10283b3e9799c215830d9b8a038e23c53360083d39545a4b",
+      "new_hash": "856157f8e22464950b2e0ac3dda2a02ed97461d6d5bb1fbb6b4de541f08f8744"
+    },
+    {
+      "profile_id": "phase17s:stratagem:tyranids:invasion-fleet:000008349003",
+      "critical_clauses": 1,
+      "old_hash": "b5ffc2683d1414ca70f70f3751fc1d9df3a08882ccd2a118fd812a16986e0cd7",
+      "new_hash": "47653584d7fee452d057ac76650e20525ae1856ea0da6261790448fb67c2341c"
+    }
+  ],
+  "unchanged_profiles": 1014
+}

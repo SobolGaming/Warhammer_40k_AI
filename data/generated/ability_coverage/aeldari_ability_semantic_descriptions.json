@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "c1cc85945a239f2ac648620a01a8c5a03817aada251605824e295d0427218c32",
-  "description_text_sha256": "5c01df8837c316ce75d116cdc53ede06e550591e844d73bfa2f906119b0c577b",
+  "coverage_sha256": "6966d27c80a9ac0a0eb4f11ecd53de7f68b6636797af55807c76c3e435e2f1b0",
+  "description_text_sha256": "11aecb7f4401baf9203720f4664dbe07a6ebb663ea0b3bd684a963c3bd5117ed",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -1292,16 +1292,16 @@
       "description": "The charge-conditioned Critical Hit threshold is consumed.",
       "diagnostic_reasons": [],
       "documentation_bucket": "supported",
-      "evidence_sha256": "7f2fe1894d40584d7067c2e405ea61f0f084bd6f93aacbacc457913e3cd48a04",
+      "evidence_sha256": "bc2a7cdc76be3eb1293f316db2200d851e980990a061075b6c34407930124768",
       "normalized_text_sha256": "55f674f20930c259e3ac194a3e71069fe0bcabaf4aea9d71445fce561e76044d",
       "raw_text_sha256": "55f674f20930c259e3ac194a3e71069fe0bcabaf4aea9d71445fce561e76044d",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_consumers": [
         {
           "runtime_consumer_ids": [
-            "catalog-ir:minimum-unmodified-hit-success"
+            "catalog-ir:critical-hit-threshold"
           ],
           "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:5:description:clause:001:effect:0",
           "semantic_kind": "set_contextual_status"
@@ -3425,16 +3425,16 @@
       "description": "Post-shoot target tracking and the Critical Hit threshold are consumed.",
       "diagnostic_reasons": [],
       "documentation_bucket": "supported",
-      "evidence_sha256": "0f907ed4c79d6ef073d23d4f72ae08a1871c55db3028677099dcb6bf06959392",
+      "evidence_sha256": "3102732958645b5bd9cd1a336950b040aff960edd197b2f50e29266a3faa36a6",
       "normalized_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
       "raw_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_consumers": [
         {
           "runtime_consumer_ids": [
-            "catalog-ir:minimum-unmodified-hit-success"
+            "catalog-ir:critical-hit-threshold"
           ],
           "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002:effect:0",
           "semantic_kind": "set_contextual_status"

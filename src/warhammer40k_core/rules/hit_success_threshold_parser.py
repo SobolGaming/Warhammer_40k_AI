@@ -27,6 +27,11 @@ _CRITICAL_HIT_THRESHOLD_RE = re.compile(
     r"(?:\s+as\s+well)?(?=\s*(?:\.|,|;|$))",
     re.IGNORECASE,
 )
+_SNAP_SHOOTING_RE = re.compile(
+    r"^\s*(?:when|while)\s+(?:(?:this|that)\s+(?:model|unit)\s+is\s+)?"
+    r"Snap\s+Shooting\s*,",
+    re.IGNORECASE,
+)
 _FIRE_OVERWATCH_STRATAGEM_RE = re.compile(
     r"\bFire\s+Overwatch\s+Stratagem\b",
     re.IGNORECASE,
@@ -75,10 +80,11 @@ def hit_success_threshold_effects(
             ),
             parameters=parameters_from_pairs(
                 (
-                    ("status", "minimum_unmodified_hit_success"),
+                    ("status", "critical_hit_threshold"),
                     ("roll_type", "hit"),
                     ("attack_role", "attacker"),
-                    ("minimum_unmodified_success", int(match.group("threshold"))),
+                    ("critical_threshold", int(match.group("threshold"))),
+                    *_targeting_parameters(clause_text),
                 )
             ),
         )
@@ -99,8 +105,7 @@ def _hit_success_threshold_parameter_pairs(
         ("attack_role", "attacker"),
         ("minimum_unmodified_success", int(match.group("threshold"))),
     ]
-    if _FIRE_OVERWATCH_STRATAGEM_RE.search(clause_text) is not None:
-        pairs.append(("required_targeting_rule_id", "core:fire-overwatch"))
+    pairs.extend(_targeting_parameters(clause_text))
     if match.group("proximity_prefix") is not None:
         pairs.extend(
             (
@@ -138,3 +143,11 @@ def _distance_number(value: str) -> int | float:
     if "." in value:
         return float(value)
     return int(value)
+
+
+def _targeting_parameters(text: str) -> tuple[tuple[str, RuleParameterValue], ...]:
+    if _FIRE_OVERWATCH_STRATAGEM_RE.search(text) is not None:
+        return (("required_targeting_rule_id", "core:fire-overwatch"),)
+    if _SNAP_SHOOTING_RE.search(text) is not None:
+        return (("required_targeting_rule_id", "core:snap-shooting"),)
+    return ()

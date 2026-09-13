@@ -1283,28 +1283,6 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "3765b242a5eb1818f06e91e64abb49d6703cf2e308c7ea3d8932f9f8a2c66b88",
-      "execution_statuses": [
-        "engine_consumed"
-      ],
-      "faction_ids": [
-        "black-templars",
-        "chaos-daemons"
-      ],
-      "group_id": "semantic-equivalence:3765b242a5eb1818f06e91e64abb49d6703cf2e308c7ea3d8932f9f8a2c66b88",
-      "member_ids": [
-        "datasheet-ability:000001467:5",
-        "datasheet-ability:000002796:3"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
-      ],
-      "support_transfer": "content_neutral_generic_ir"
-    },
-    {
-      "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "3902d0c774b96ac227aa5c0696dd5e86586746aa24781c05318ffada89f1c96d",
       "execution_statuses": [
@@ -5059,6 +5037,28 @@
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
       "support_transfer": "none"
+    },
+    {
+      "content_kind": "datasheet_ability",
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "c4bb7cdd3163d7499613c34f055ef1c44ddca0ffab558a645943dd2ab9a66517",
+      "execution_statuses": [
+        "engine_consumed"
+      ],
+      "faction_ids": [
+        "black-templars",
+        "chaos-daemons"
+      ],
+      "group_id": "semantic-equivalence:c4bb7cdd3163d7499613c34f055ef1c44ddca0ffab558a645943dd2ab9a66517",
+      "member_ids": [
+        "datasheet-ability:000001467:5",
+        "datasheet-ability:000002796:3"
+      ],
+      "rules_surface": "datasheet",
+      "runtime_consumer_ids": [
+        "catalog-ir:critical-hit-threshold"
+      ],
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -17391,7 +17391,7 @@
       "rule_name": "Atavistic Instigation",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
       "semantic_hash": null,
@@ -18981,7 +18981,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "cdd503d678639f5e3ebdc462248311a2ed86e40d243d683ad0a2b50164fb66bf",
+      "equivalence_hash": "1a22e58b2ff7d9aa4d963ac449b6dd3d79fcafb9e2a36801b727a1eb6aa8a6e3",
       "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
@@ -18993,10 +18993,10 @@
       "rule_name": "Mandiblasters",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "018fdd67ec77c3adeb4bf16c5430cd5121f06def1ed15b817fbb974c9ac3e5b6",
+      "semantic_hash": "2bcb313972d36c2f812773efdb22c9ac860add9c3d2e10d5aab305c35ecca2c9",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:5"
       ],
@@ -31171,7 +31171,7 @@
       "rule_name": "Inflamed Infections",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
       "semantic_hash": null,
@@ -32633,7 +32633,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "3765b242a5eb1818f06e91e64abb49d6703cf2e308c7ea3d8932f9f8a2c66b88",
+      "equivalence_hash": "c4bb7cdd3163d7499613c34f055ef1c44ddca0ffab558a645943dd2ab9a66517",
       "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
@@ -32645,10 +32645,10 @@
       "rule_name": "Poxbringer",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "9c7db40341614fd15d6d38503e279e3dc081da3595750584e7659cd2f211f568",
+      "semantic_hash": "cf30e2bba17cf6c22f4956603f5b359b7caad4e6702bbb4a938eea84cedac303",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001467:5"
       ],
@@ -48500,7 +48500,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "3765b242a5eb1818f06e91e64abb49d6703cf2e308c7ea3d8932f9f8a2c66b88",
+      "equivalence_hash": "c4bb7cdd3163d7499613c34f055ef1c44ddca0ffab558a645943dd2ab9a66517",
       "execution_status": "engine_consumed",
       "faction_id": "black-templars",
       "faction_name": "Black Templars",
@@ -48512,10 +48512,10 @@
       "rule_name": "Inspirational Exemplar",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "9c7db40341614fd15d6d38503e279e3dc081da3595750584e7659cd2f211f568",
+      "semantic_hash": "cf30e2bba17cf6c22f4956603f5b359b7caad4e6702bbb4a938eea84cedac303",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002796:3"
       ],
@@ -52808,7 +52808,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "2c6bad24255b05ae70a5824e3e9dacd170aff10725349cd12f8fc25d59199253",
+      "equivalence_hash": "557ac47c9ef569db4b2a3f4e2f84d51194113793f609fb05725291a36a336a91",
       "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
@@ -52820,10 +52820,10 @@
       "rule_name": "Whispering Web",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:minimum-unmodified-hit-success"
+        "catalog-ir:critical-hit-threshold"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "d2c57bd9e7dbd1c15ad239d9377b762cf676d09abeceedab677eea7cdb36e9f6",
+      "semantic_hash": "44e6d83ef3307a66f4d50531915b4c2fdc7b33cb3eb447992bad2866e2ff5ba5",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:5"
       ],
@@ -76833,7 +76833,7 @@
       "content_kind": "enhancement",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "4d2a6a370538cd121fec2043f893ba9d8066b058e8ec2d0378349e02cd9f3e8e",
+      "equivalence_hash": "5b865cf80a09154655d5335d418149da6d159741152ea5e74f77a2137b3431e7",
       "execution_status": "blocked_structured_semantics",
       "faction_id": "death-guard",
       "faction_name": "Death Guard",
@@ -76846,7 +76846,7 @@
       "rules_surface": "enhancement",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "3c40f8b20f5f268aacf351339803f9d01f99a4100f655683b29fbc7c657e48f4",
-      "semantic_hash": "fa4306d603918d1f01c6b97083f0c88ed80c3e6b116343af03dea3c2c7ec85fd",
+      "semantic_hash": "3d59d5577698634b9d24c9ff5906c98f07fcbe96c3498bf175135783ba9bd24e",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Enhancements:000010123002"
       ],
@@ -121988,7 +121988,7 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "ae1291b22e8a9a4f1ff7ebae0bd1e30bd0130316ea4c47b2d093ef6fe12ef34e",
+  "source_payload_checksum_sha256": "4bcc61688b7ec32015b08a5863a94fa86217fe496136f36dd418c55c8c3a43ce",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 807,
   "upstream_execution_checksum_sha256": "91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de"
