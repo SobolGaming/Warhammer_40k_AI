@@ -95,7 +95,7 @@
     "examples/support-profile.json": "support-profile.schema.json"
   },
   "file_sha256": {
-    "README.md": "d1520489c4a76ceb8d505d21c9809c675958402a206cb770da51076c35de29b7",
+    "README.md": "616846aa724800fa0114174eb1badeaf9186e7f9049c9220a23d51a6d30dc107",
     "compatibility-policy.md": "2a9980cdfe04b8d95fd21171bd1e6c10ab3271d235f6e8b3d35698ef356993b9",
     "compatibility/1.0.0-shape.json": "a2fb7d57f0677dbc1583f4ec5c3bc0b32b3c9db80594cefb55bb90fe3c949d96",
     "compatibility/10.0.0-shape.json": "c61f72db9c0a5f0635a2c4cf0b14f6fa13e663449c6813e37b49bea6f4ea4b8a",

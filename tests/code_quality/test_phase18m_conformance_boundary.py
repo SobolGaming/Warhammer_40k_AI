@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -96,6 +97,19 @@ def test_external_contract_check_regenerates_into_an_isolated_tree_before_valida
     assert "_prepare_regenerated_contract_root(" in builder
     assert "_contract_tree_drift(" in builder
     assert "External contract generated files drifted" in builder
+
+
+def test_external_contract_manifest_hashes_current_files_and_all_documentation() -> None:
+    contract_root = REPO_ROOT / "contracts"
+    manifest = json.loads((contract_root / "manifest.json").read_text(encoding="utf-8"))
+    hashes = manifest["file_sha256"]
+    assert {name for name in hashes if name.endswith(".md")} == {
+        path.relative_to(contract_root).as_posix() for path in contract_root.rglob("*.md")
+    }
+    for name, expected in hashes.items():
+        canonical_text = (contract_root / name).read_text(encoding="utf-8")
+        actual = hashlib.sha256(canonical_text.encode("utf-8")).hexdigest()
+        assert actual == expected, f"Contract manifest hash drifted: {name}"
 
 
 def test_external_contract_regeneration_discards_orphan_generated_fixtures(

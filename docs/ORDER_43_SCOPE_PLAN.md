@@ -122,3 +122,19 @@ Subsequent edits only correct the quality inventory assertion and update shard
 inventory/documentation. No production change follows the final behavioral gate;
 the generated runtime identity, contract conformance and measured implementation
 remain the finalized contract 16 version described above.
+
+## CI manifest follow-up
+
+The first GitHub run passed all eight behavioral shards, coverage, both type
+checks, code quality and the macOS semantic audit, but contract conformance
+rejected the stale `contracts/README.md` hash in `contracts/manifest.json`.
+A late migration-note edit had invalidated the earlier local contract check.
+
+Regenerating the complete bundle after the final contract documentation edit
+changes only that manifest checksum. A new quality regression independently
+checks every listed file hash and the complete contract Markdown inventory; it
+reproduced the README failure before regeneration. The exact-base contract check,
+all **452 code-quality tests**, Ruff, mypy, Pyright, import contracts, engine
+identity, pre-commit and the exact eight-shard check pass after the repair.
+No runtime, schema, client or behavioral fixture changed, so the existing
+behavioral coverage and performance results remain applicable.

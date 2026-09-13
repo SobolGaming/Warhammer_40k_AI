@@ -387,6 +387,11 @@ uv run python scripts/build_external_contract.py
 The build-identity generator runs first because session/support-profile examples
 publish its verified immutable runtime-tree ID.
 
+The manifest also hashes every Markdown file under `contracts/`, including this
+README and migration notes. Regenerate the contract bundle after the final
+documentation edit, then run the exact-base check before pushing. Documentation
+changes outside the packaged runtime do not require a new engine build identity.
+
 `--write-baseline --base-ref <sha>` writes the first baseline of an explicitly
 reviewed compatibility major. It may refresh that baseline until it appears on
 the base commit, then refuses to overwrite it or add another baseline within
