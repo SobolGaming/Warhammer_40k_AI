@@ -37,6 +37,33 @@ def test_attack_hit_resolution_has_one_threshold_authority() -> None:
     assert "required_targeting_rule_id" in resolver
 
 
+def test_restoration_and_pre_submission_share_hit_authority() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    for filename, function in (
+        ("lifecycle_restore_consistency.py", "validate_payload_consistency"),
+        ("lifecycle_attack_prevalidation.py", "pre_validate_attack_sequence_decision"),
+    ):
+        tree = ast.parse((engine / filename).read_text())
+        owner = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == function
+        )
+        assert any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "validate_attack_hit_authority"
+            for node in ast.walk(owner)
+        )
+    lifecycle = ast.parse((engine / "lifecycle.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "validate_payload_consistency"
+        for node in ast.walk(lifecycle)
+    )
+
+
 def test_activation_generator_emits_json_and_loader_validates_eagerly() -> None:
     generator = (ROOT / "tools/generate_faction_stratagem_activation_support.py").read_text()
     assert "_module_text" not in generator
@@ -75,4 +102,30 @@ def test_critical_hit_slice_evidence_is_comparable_and_within_budget() -> None:
         assert measured["maximum_seconds"] <= budget["maximum_seconds"]
         assert [(row["decision_count"], row["hit_count"]) for row in measured["samples"]] == [
             (row["decision_count"], row["hit_count"]) for row in original["samples"]
+        ]
+
+
+def test_hit_restore_and_continuation_stay_within_fixed_budgets() -> None:
+    import json
+
+    directory = ROOT / "docs/performance/order43"
+    base = json.loads((directory / "restore-base.json").read_text())
+    head = json.loads((directory / "restore-head.json").read_text())
+    budget = json.loads((directory / "restore-budgets.json").read_text())
+    assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+    for key in ("platform", "python", "hashes", "mode"):
+        assert base[key] == head[key]
+    assert set(base["results"]) == set(head["results"]) == {"shooting", "fight"}
+    for name, measured in head["results"].items():
+        original = base["results"][name]
+        assert len(measured["samples"]) == len(original["samples"]) == budget["samples_per_case"]
+        assert measured["completion_rate"] == original["completion_rate"] == 1
+        for metric in ("restore_seconds", "continuation_seconds"):
+            assert measured[metric]["mean_seconds"] <= (
+                original[metric]["mean_seconds"] * budget["mean_base_multiplier"]
+                + budget["mean_additive_seconds"]
+            )
+            assert measured[metric]["maximum_seconds"] <= budget[f"maximum_{metric}"]
+        assert [(row["decision_count"], row["event_count"]) for row in measured["samples"]] == [
+            (row["decision_count"], row["event_count"]) for row in original["samples"]
         ]

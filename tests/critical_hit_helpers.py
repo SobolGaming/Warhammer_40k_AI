@@ -253,3 +253,72 @@ def critical_hit_session(*, phase: BattlePhase = BattlePhase.SHOOTING) -> LocalG
         source_kind=CommandPointSourceKind.OTHER,
     )
     return LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+
+
+def hit_authority_checkpoint(*, phase: BattlePhase) -> LocalGameSession:
+    """Facade-driven attacks with ordinary fives paused at optional Feel No Pain."""
+    from tests.phase13b_shooting_declaration_helpers import (
+        _canonical_catalog,
+        _compact_intercessor_catalog,
+        _compact_shooting_lifecycle,
+    )
+    from tests.phase15c_fight_order_helpers import fight_lifecycle
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.core.weapon_profiles import AttackProfile, DamageProfile
+    from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.geometry.pose import Pose
+
+    catalog = _compact_intercessor_catalog(_canonical_catalog())
+    catalog = replace(
+        catalog,
+        wargear=tuple(
+            replace(
+                row,
+                weapon_profiles=tuple(
+                    replace(
+                        weapon,
+                        skill=CharacteristicValue.from_raw(weapon.skill.characteristic, 2),
+                        attack_profile=AttackProfile.fixed(12),
+                        damage_profile=DamageProfile.fixed(1),
+                        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 12),
+                        keywords=(WeaponKeyword.SUSTAINED_HITS,),
+                        abilities=(AbilityDescriptor.sustained_hits(1),),
+                    )
+                    for weapon in row.weapon_profiles
+                ),
+            )
+            for row in catalog.wargear
+        ),
+    )
+    if phase is BattlePhase.SHOOTING:
+        lifecycle, units = _compact_shooting_lifecycle(
+            catalog=catalog, game_id="r43-hit-authority-1"
+        )
+    else:
+        lifecycle, units = fight_lifecycle(
+            alpha_unit_ids=("intercessor-1",),
+            enemy_unit_ids=("enemy",),
+            origins={"intercessor-1": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
+            game_id="r43-hit-authority-fight",
+            model_count=1,
+            catalog=catalog,
+            datasheet_id="core-character-leader",
+            model_profile_id="core-character-leader",
+            fights_first_unit_keys=("intercessor-1",),
+        )
+    assert lifecycle.state is not None
+    for model in units["enemy"].own_models:
+        lifecycle.state.record_model_feel_no_pain_sources(
+            model_instance_id=model.model_instance_id,
+            sources=(FeelNoPainSource(source_id="r43-fnp", threshold=5),),
+            decline_allowed=True,
+        )
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    for _ in range(100):
+        request = pending_request(session)
+        if request.decision_type == "select_feel_no_pain":
+            return session
+        submit_fixture_request(session, request)
+    raise AssertionError("Hit authority fixture did not reach Feel No Pain.")

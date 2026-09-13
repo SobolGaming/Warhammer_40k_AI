@@ -65,6 +65,117 @@ def test_hit_restore_rejects_critical_and_face_drift() -> None:
 
 
 @pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+@pytest.mark.parametrize(
+    "forgery",
+    ["critical", "source", "missing_event", "wrong_attack", "duplicate_event", "wrong_weapon"],
+)
+def test_hit_restore_requires_owning_recorded_hit(phase: BattlePhase, forgery: str) -> None:
+    from typing import cast
+
+    from tests.critical_hit_helpers import hit_authority_checkpoint
+
+    from warhammer40k_core.engine.attack_sequence_model import AttackSequencePayload
+    from warhammer40k_core.engine.event_log import JsonValue
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+
+    session = hit_authority_checkpoint(phase=phase)
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    state = checkpoint["state"]
+    assert state is not None
+    host = (
+        state["shooting_phase_state"]
+        if phase is BattlePhase.SHOOTING
+        else state["fight_phase_state"]
+    )
+    assert host is not None
+    sequence = cast(AttackSequencePayload, host["attack_sequence"])
+    pending = sequence["pending_grouped_damage"]
+    assert pending is not None
+    context = next(
+        die["attack_context"]
+        for die in pending["sorted_save_dice"]
+        if die["attack_context"]["hit_roll"]["unmodified_roll"] == 5
+    )
+    hit = context["hit_roll"]
+    assert not hit["critical"]
+    assert hit["successful"]
+    if forgery == "critical":
+        hit["critical_threshold"] = 5
+        hit["critical"] = True
+    elif forgery == "source":
+        hit["threshold_source_ids"].append("invented:critical-source")
+    else:
+        event = next(
+            event
+            for event in checkpoint["decisions"]["event_log"]
+            if event["event_type"] == "attack_sequence_step"
+            and cast(dict[str, JsonValue], event["payload"])["step"] == "hit"
+            and cast(dict[str, JsonValue], event["payload"])["attack_context_id"]
+            == context["attack_context_id"]
+        )
+        if forgery == "missing_event":
+            cast(dict[str, JsonValue], event["payload"])["step"] = "critical_hit"
+        elif forgery == "wrong_attack":
+            cast(dict[str, JsonValue], event["payload"])["attack_context_id"] = "another-attack"
+        elif forgery == "wrong_weapon":
+            recorded = cast(dict[str, JsonValue], event["payload"])
+            cast(dict[str, JsonValue], recorded["payload"])["weapon_profile_id"] = "another-weapon"
+        else:
+            from copy import deepcopy
+
+            wound_event = next(
+                row
+                for row in checkpoint["decisions"]["event_log"]
+                if row["event_type"] == "attack_sequence_step"
+                and cast(dict[str, JsonValue], row["payload"])["step"] == "wound"
+                and cast(dict[str, JsonValue], row["payload"])["attack_context_id"]
+                == context["attack_context_id"]
+            )
+            wound_event["payload"] = deepcopy(event["payload"])
+    with pytest.raises(GameLifecycleError, match=r"[Hh]it.*(authority|recorded|context)"):
+        GameLifecycle.from_payload(checkpoint)
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+@pytest.mark.parametrize("forgery", ["threshold", "source"])
+def test_pending_hit_drift_rejected_before_restore_and_submission(
+    phase: BattlePhase, forgery: str
+) -> None:
+    from typing import cast
+
+    from tests.critical_hit_helpers import hit_authority_checkpoint
+
+    from warhammer40k_core.engine.event_log import JsonValue
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = hit_authority_checkpoint(phase=phase)
+    controller = session.lifecycle.decision_controller
+    request = controller.queue.pending_requests[0]
+    payload = cast(dict[str, JsonValue], request.payload)
+    lost_wound = cast(dict[str, JsonValue], payload["lost_wound_context"])
+    context = cast(dict[str, JsonValue], lost_wound["attack_context"])
+    hit = cast(dict[str, JsonValue], context["hit_roll"])
+    if forgery == "threshold":
+        hit["critical_threshold"] = 5
+        hit["critical"] = cast(int, hit["unmodified_roll"]) >= 5
+    else:
+        cast(list[JsonValue], hit["threshold_source_ids"]).append("invented:critical-source")
+    before = session.lifecycle.to_payload()
+    with pytest.raises(GameLifecycleError, match="Hit authority"):
+        GameLifecycle.from_payload(before)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r43:forged-hit", option_id="decline"
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(dict[str, JsonValue], status.payload)["invalid_reason"] == "attack_hit_authority_drift"
+    )
+    assert session.lifecycle.to_payload() == before
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
 def test_critical_consumers_through_facade_restore_and_replay(
     phase: BattlePhase,
 ) -> None:

@@ -8,6 +8,7 @@ from warhammer40k_core.engine import battle_shock_lifecycle_authority as _bsa
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import rule_model_destruction
+from warhammer40k_core.engine.attack_hit_authority import validate_attack_hit_authority
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
@@ -62,6 +63,18 @@ def pre_validate_attack_sequence_decision(
         is_hazardous_request,
     )
 
+    try:
+        validate_attack_hit_authority(
+            state=state,
+            event_records=decisions.event_log.records,
+            pending_decision_requests=(request,),
+        )
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message=str(exc),
+            payload={"invalid_reason": "attack_hit_authority_drift", "field": "hit_roll"},
+        )
     if is_hazardous_request(request):
         try:
             hazardous_sequence_for_progress(

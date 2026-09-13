@@ -1,0 +1,9 @@
+{
+  "workload_id": "r43-hit-authority-fnp-v1",
+  "samples_per_case": 7,
+  "mean_base_multiplier": 1.25,
+  "mean_additive_seconds": 0.05,
+  "maximum_restore_seconds": 2.5,
+  "maximum_continuation_seconds": 1.0,
+  "rationale": "Provisional same-host regression limits fixed before the head measurement. The 25% plus 50 ms mean allowance accounts for runtime identity and checkpoint validation noise; it does not certify complete-game targets."
+}

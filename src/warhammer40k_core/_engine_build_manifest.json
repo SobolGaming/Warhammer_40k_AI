@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1a8d5d1e8216f4842d66af0de630b512c6c437f757454566ab7769523624ffc",
-  "fingerprint": "b1a8d5d1e8216f4842d66af0de630b512c6c437f757454566ab7769523624ffc",
-  "resource_count": 2772,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f85d25f40e110567bbc17150cd3971be423cb2de0784eda7ccc8c9fcc009728d",
+  "fingerprint": "f85d25f40e110567bbc17150cd3971be423cb2de0784eda7ccc8c9fcc009728d",
+  "resource_count": 2774,
   "resources": [
     {
       "byte_length": 113,
@@ -713,6 +713,11 @@
       "byte_length": 4749,
       "path": "warhammer40k_core/engine/attack_destruction_reactions.py",
       "sha256": "02257a69dd33f81e109ee28bbddf1293db39c57e3275060ccbf0d386a0a1e853"
+    },
+    {
+      "byte_length": 8039,
+      "path": "warhammer40k_core/engine/attack_hit_authority.py",
+      "sha256": "a0be32ea85edd0626c1d6de3ec3803067bdc4dfc9f79f35e4a147b63ea76513d"
     },
     {
       "byte_length": 1991,
@@ -9980,9 +9985,9 @@
       "sha256": "59456c32309081ab254edb7da934854fc03f7d1a974709c2272031bdea084379"
     },
     {
-      "byte_length": 161238,
+      "byte_length": 144847,
       "path": "warhammer40k_core/engine/lifecycle.py",
-      "sha256": "11ef8ed127ada5970807065018e85210de3f67820466b42b9c46ce553da1cce8"
+      "sha256": "c5c987413a55908137692a2191f186f0333ac378431319885e7fd3c1b74759bd"
     },
     {
       "byte_length": 7053,
@@ -9990,9 +9995,9 @@
       "sha256": "8dbc77c30aea32f692b1a59db0aa05d1052a78b9550002e9eb12c75bb8003eb4"
     },
     {
-      "byte_length": 13240,
+      "byte_length": 13756,
       "path": "warhammer40k_core/engine/lifecycle_attack_prevalidation.py",
-      "sha256": "ab279fff7bb662a76e88d65d69c195109a70678061cc780829ddcee34e3a1496"
+      "sha256": "863c78b315bd66df1ddba0fa502273f85731c2b7c7604d098cbf526df56d865b"
     },
     {
       "byte_length": 2130,
@@ -10033,6 +10038,11 @@
       "byte_length": 3455,
       "path": "warhammer40k_core/engine/lifecycle_reaction_queue.py",
       "sha256": "25b7b484d830edf2ad283f71908506cb73e908ae1e6f80387650573cdcfdd663"
+    },
+    {
+      "byte_length": 17262,
+      "path": "warhammer40k_core/engine/lifecycle_restore_consistency.py",
+      "sha256": "8b1b18b4c11674411e919a616a3b9b8545c73d33dfab5528188d5065ed0462cf"
     },
     {
       "byte_length": 1162,

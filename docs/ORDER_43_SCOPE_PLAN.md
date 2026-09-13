@@ -3,6 +3,51 @@
 P04B / C04-02 and C04-03, against main
 `15856aca9550bf9296ebfbf74e165e889301e705`.
 
+## R43-001 review correction
+
+The violated invariant was historical hit authority: a restored HitRoll could
+declare its own critical threshold and source IDs, so a successful ordinary five
+could become an invented Critical Hit while the owning event and dice remained
+unchanged. A real facade-driven Shooting checkpoint paused for Feel No Pain
+reproduced the acceptance before the fix; the matching Fight case is covered too.
+
+`attack_hit_authority` now compares complete resumable hit payloads with exactly
+the owning recorded Hit and its recorded weapon/dice context. Gathered weapon
+copies and valid post-roll profile replacements preserve that historical source.
+The bug-class search covered
+current generated hits, grouped save/damage contexts, post-roll pools, pending
+destruction/transport contexts, retained parent continuations and nested pending
+requests. Restore and attack-decision prevalidation share this authority. Forged
+thresholds/source IDs and missing, duplicate or wrong-attack evidence fail closed;
+pending-request drift is rejected before queue pop or state mutation. Existing
+source-backed lowered thresholds and exact replay continue to pass.
+
+The oversized lifecycle module's six restore checks were extracted into
+`lifecycle_restore_consistency`; an AST comparison confirms their bodies are
+unchanged except for the new shared authority call. No runtime payload, decision
+family, visibility class, source package or contract version changes. Contract 16
+artifacts and the build manifest are regenerated for the corrected runtime.
+
+The seven-sample matched base/head checkpoint and continuation assessment passes
+its fixed budgets. See
+[the performance record](performance/order43/README.md#r43-001-checkpoint-authority).
+
+R43-001 final behavioral validation: **7,669 passed**, **85.08% branch-aware
+coverage**, 475.98 seconds on 18 work-stealing workers. Pytest completed every
+behavioral test but its initial report step encountered a transient SQLite
+open error. The same collected database passed `PRAGMA integrity_check` and
+`uv run coverage report --fail-under=85 --format=total --precision=2`; coverage
+was recovered without another behavioral run. The final runtime is
+`f85d25f40e110567bbc17150cd3971be423cb2de0784eda7ccc8c9fcc009728d`.
+
+Final code-quality validation: **454 passed**, 100.95 seconds, 18 work-stealing
+workers without coverage. Ruff check/format, mypy, Pyright, all 11 import
+contracts, pre-commit and the exact eight-shard inventory check pass. Exact-base
+contract generation/checks, generated TypeScript client checks, five client unit
+tests, **342 live conformance assertions**, installed-wheel smoke (2,774 resources,
+27 schemas), and fixed performance budgets pass for the same runtime. No
+production changes follow these final results.
+
 ## Invariant and source
 
 An unmodified hit roll meeting a source-backed critical threshold must be both
@@ -90,7 +135,7 @@ history-neutral metadata policy are unchanged. The first aggregate run exposed
 21 stale fixtures/assertions while reaching 85.04% coverage; it is retained as a
 diagnostic and does not count as a passing final gate.
 
-## Final validation and publication gates
+## Initial implementation validation and publication gates
 
 Final local validation on 2026-09-13 UTC, against the unchanged base above:
 

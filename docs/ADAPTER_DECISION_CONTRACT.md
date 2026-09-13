@@ -5683,3 +5683,14 @@ cover this work. There is no new player choice. Contract 16 versions the changed
 nested hit-record requirements, replay and operator persistence; see
 `contracts/migrations/15-to-16.md`. Old records are not supplied inferred
 thresholds or a compatibility fallback.
+
+R43-001 restoration and pre-submission validation bind every resumable hit copy
+to the owning recorded Hit step, including its complete roll payload, effective
+threshold, threshold source IDs and the recorded weapon/dice specification. This
+includes grouped damage, generated hits, post-roll pools, retained attack
+continuations and nested pending requests. Missing, duplicate or mismatched
+owning Hit evidence fails closed. Gathered weapon copies and valid post-roll
+profile replacements preserve the recorded hit source. Historical thresholds
+are not recomputed from later effects or model presence. This enforces the
+existing contract 16 shape;
+no decision, visibility or persistence schema changes are introduced.
