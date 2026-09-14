@@ -8,6 +8,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _compact_intercessor_catalog,
     _shooting_lifecycle,
 )
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
@@ -21,8 +22,9 @@ def explosives_scene(
     target_x: float = 17,
     attached: bool = False,
     extra_friendly: bool = False,
+    catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
-    catalog = _compact_intercessor_catalog(_canonical_catalog())
+    catalog = _compact_intercessor_catalog(_canonical_catalog() if catalog is None else catalog)
     catalog = replace(
         catalog,
         datasheets=tuple(

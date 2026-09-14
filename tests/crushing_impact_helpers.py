@@ -34,8 +34,9 @@ def crushing_session(
     game_id: str = "order48-crushing-impact",
     enemy_attached: bool = False,
     leader_toughness: int | None = None,
+    catalog: ArmyCatalog | None = None,
 ) -> LocalGameSession:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     catalog = replace(
         catalog,
         datasheets=tuple(

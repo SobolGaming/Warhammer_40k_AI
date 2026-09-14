@@ -64,6 +64,35 @@ def test_crushing_impact_support_and_completion_hooks_are_source_linked() -> Non
     assert all(binding.completion_handler is not None for binding in bindings)
 
 
+def test_packet_restore_consumes_authenticated_retention_without_reloading_state() -> None:
+    # The existing restore owner authenticates retention once, including exact
+    # pending/accepted decisions. Packet validation must consume that result.
+    assert (
+        _calls("model_destruction_cause_completion_restore.py").count(
+            "validate_retained_destruction_history"
+        )
+        == 1
+    )
+    assert "retained_destructions" not in _calls("mortal_wound_destruction_routing.py")
+    for filename, function in (
+        ("model_destruction_cause_producers.py", "validate_model_logical_death_inventory"),
+        (
+            "model_destruction_cause_completion_restore.py",
+            "pending_rule_mortal_wound_logical_deaths",
+        ),
+    ):
+        tree = ast.parse((ENGINE / filename).read_text())
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, (ast.Name, ast.Attribute))
+            and (node.func.id if isinstance(node.func, ast.Name) else node.func.attr) == function
+        ]
+        assert len(calls) == 1
+        assert "authenticated_retained_destructions" in {arg.arg for arg in calls[0].keywords}
+
+
 def test_order48_matched_charge_and_new_capability_meet_versioned_budgets() -> None:
     directory = ROOT / "docs/performance/order48"
     base = json.loads((directory / "base.json").read_text())
@@ -115,3 +144,55 @@ def test_order48_matched_charge_and_new_capability_meet_versioned_budgets() -> N
             assert sample["event_count"] <= limits["maximum_events"]
             for side in ("source", "enemy"):
                 assert sample[f"{side}_mortal_wounds"] <= limits["maximum_mortal_wounds_per_side"]
+
+
+def test_r48_001_restore_cost_and_retained_checkpoint_results() -> None:
+    directory = ROOT / "docs/performance/order48/r48-001"
+    base = json.loads((directory / "base.json").read_text())
+    head = json.loads((directory / "head.json").read_text())
+    budget = json.loads((directory / "budgets.json").read_text())
+    assert base["revision"] == budget["base_revision"]
+    for field in (
+        "workload_id",
+        "platform",
+        "python",
+        "cpu",
+        "memory_bytes",
+        "cpu_allocation",
+        "concurrency",
+        "mode",
+        "timing_boundary",
+        "policy",
+        "hashes",
+    ):
+        assert base[field] == head[field], field
+    assert head["workload_id"] == budget["workload_id"]
+    assert not base["full_game_certified"]
+    assert not head["full_game_certified"]
+    expected = {
+        (stratagem, boundary)
+        for stratagem in ("crushing-impact", "explosives")
+        for boundary in ("offered", "accepted", "completed")
+    }
+    previous = {(row["stratagem"], row["boundary"]): row for row in base["scenarios"]}
+    current = {(row["stratagem"], row["boundary"]): row for row in head["scenarios"]}
+    assert set(previous) == set(current) == expected
+    for key, row in current.items():
+        old = previous[key]
+        assert len(row["samples"]) == len(old["samples"]) == budget["samples"]
+        assert row["completion_rate"] == 1
+        assert row["maximum_seconds"] <= budget["maximum_restore_seconds"]
+        for field in ("model_count", "terrain_count", "decision_count", "event_count", "game_id"):
+            assert row[field] == old[field]
+        if row["boundary"] == "completed" or key == ("explosives", "accepted"):
+            assert old["completion_rate"] == 1
+            assert row["mean_seconds"] <= (
+                old["mean_seconds"] * budget["completed_mean_ratio"]
+                + budget["completed_mean_allowance_seconds"]
+            )
+        else:
+            assert old["completion_rate"] == 0
+            assert all(
+                "lacks its pending continuation" in sample["diagnostic"]
+                for sample in old["samples"]
+            )

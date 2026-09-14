@@ -121,9 +121,9 @@ Matched Charge means are 0.021779 s base and 0.021814 s head. The 21 new-capabil
 samples completed with a 1.386167 s maximum, within all predeclared budgets.
 See [performance evidence](performance/order48/README.md).
 
-## Final validation
+## Original PR validation (a6ab86f7)
 
-The final runtime identity is
+The original runtime identity was
 `warhammer40k-core-v2:runtime-tree-sha256-v1:155186145754959fc00dbdb3bec0aa0fe4e144a2a39ae32caaa833ba04ccb6c0`.
 
 | Required gate | Result |
@@ -155,3 +155,66 @@ five TypeScript unit tests; and 342 conformance assertions. Public schema versio
 19.0.0 is unchanged because its existing finite options and private engine
 payloads cover this change. All versioned performance budgets passed within the
 measured scope above; full-game certification remains outstanding.
+
+## R48-001 — authenticated retained-reaction continuation
+
+Review of `a6ab86f7` reproduced untouched `LocalGameSession` checkpoints failing
+at `select_destruction_reaction` for source-backed For the Chapter! after both
+Crushing Impact and Explosives. The packet validator incorrectly required its ID
+inside a pending request, while the retained request names a separate retention
+record. The violated invariant is that every legitimate continuation must restore
+through its actual authority owner, without bypassing ownership authentication.
+
+The existing retained-history validator already checks the cause, logical death,
+source context, event history and exact offered request or accepted decision.
+Its typed result now flows through producer and logical-death restore to packet
+validation. A retained owner must match the packet ID, source rule and one of its
+logical deaths, and remain offered or actively retained. This avoids reloading
+unauthenticated state or repeating the history validation.
+
+Completing accepted reactions exposed the same ownership-transfer issue in the
+receipt ledger: the packet can hand a casualty to retention before that casualty
+finishes shooting and removal. The ledger now admits its later completion once,
+only for the exact packet/model pair transferred at that boundary. Duplicate,
+unrelated and premature completions still fail. No public payload or schema
+changes were needed; the adapter contract records this existing ownership path.
+
+The bug-class search covered direct packet references, retained request hashes,
+accepted reaction history, Hazardous retention, pending logical-death claims and
+packet/casualty completion ordering. The production scope is three existing
+restore/routing modules. No new handler, decision family, semantic rule or
+architecture edge was added. New real-domain tests cover both Stratagems through
+offered/accepted/declined and completed checkpoints, uninterrupted equivalence,
+exact replay and altered ownership/receipts. A static audit guards the single
+authentication path. This scope audit precedes the new aggregate gates.
+
+The original performance artifacts above remain historical. New matched restore
+measurements and the previously rejected offered/accepted checkpoints are in
+`performance/order48/r48-001`; failed base checkpoints are recorded as failures,
+not timing passes. The revised runtime identity is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:fed68d40c0b0c5a06e7ee8875c55b28c778438776a0ef5ff00feb13d165542dc`.
+R48-001 final validation:
+
+| Gate | Result |
+| --- | --- |
+| Ruff check and format check | Passed |
+| `uv run mypy src tests` | Passed, 3,018 source files |
+| `uv run pyright` | Passed, no errors or warnings |
+| Complete behavioral suite with coverage and xdist work stealing | 7,958 passed; 85.11% coverage; 665.56 s |
+| `uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov` | 477 passed; 136.40 s |
+| Eight-shard inventory regeneration and exact fail-closed check | Passed |
+| Import boundaries | Passed, 11 contracts kept |
+| `uv run pre-commit run --all-files` | Passed without file changes |
+| Source artifact, engine identity and exact-base external contract checks | Passed |
+| Installed-wheel contract smoke | Passed, 27 schemas and 2,796 engine resources |
+| TypeScript generated client and unit tests | Passed, 5 unit tests |
+| Phase 18M-A client conformance | Passed, 342 assertions |
+| Matched restore and retained-checkpoint measurements | All 42 head samples restored; all versioned bounds passed |
+
+The behavioral command is the required command above with
+`--junitxml=/private/tmp/r48-001-behavior.xml`. Its ten existing SQLite resource
+warnings are unchanged. The successful full JUnit profile generated all eight
+shards and their duration inventory, including the new regression file. No
+production code changed after this coverage run. The [restore measurements](performance/order48/r48-001/README.md)
+separate valid matched costs from the base's rejected checkpoints; full-game
+certification remains outstanding. PR #468 remains open and unmerged.

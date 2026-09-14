@@ -37,7 +37,12 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
     resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.retained_destruction_state import retained_destruction_for_model
+from warhammer40k_core.engine.retained_destruction_state import (
+    DestructionOwnerKind,
+    RetainedDestructionStage,
+    RetainedModelDestruction,
+    retained_destruction_for_model,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -231,6 +236,7 @@ def pending_rule_mortal_wound_destructions(
     pending: dict[str, MortalWoundApplicationProgress] = {}
     seen: set[str] = set()
     model_completions: set[tuple[str, str]] = set()
+    retained_completions: set[tuple[str, str]] = set()
     retained_logical_events: set[str] = set()
     for event in events:
         if event.event_type == MODEL_COMPLETED:
@@ -241,7 +247,10 @@ def pending_rule_mortal_wound_destructions(
             model_id = payload.get("model_instance_id")
             if not isinstance(application_id, str) or not isinstance(model_id, str):
                 raise GameLifecycleError("Rule mortal wound casualty completion IDs are malformed.")
-            if application_id not in pending or (application_id, model_id) in model_completions:
+            if (
+                application_id not in pending
+                and (application_id, model_id) not in retained_completions
+            ) or (application_id, model_id) in model_completions:
                 raise GameLifecycleError("Rule mortal wound casualty completion order drifted.")
             model_completions.add((application_id, model_id))
         elif event.event_type == "fight_on_death_retention_opened":
@@ -272,13 +281,14 @@ def pending_rule_mortal_wound_destructions(
 
             for logical_event in progress.logical_death_events:
                 record = model_logical_death_record_from_event(logical_event)
-                if (
-                    (application_id, record.model_instance_id) not in model_completions
-                    and logical_event.event_id not in retained_logical_events
-                ):
-                    raise GameLifecycleError(
-                        "Rule mortal wound destruction completed before its casualties."
-                    )
+                if (application_id, record.model_instance_id) not in model_completions:
+                    if logical_event.event_id not in retained_logical_events:
+                        raise GameLifecycleError(
+                            "Rule mortal wound destruction completed before its casualties."
+                        )
+                    # Retention now owns this casualty. Its completion receipt
+                    # may follow the packet's handoff, once its reaction finishes.
+                    retained_completions.add((application_id, record.model_instance_id))
             del pending[application_id]
     return tuple(reversed(pending.values()))
 
@@ -362,6 +372,7 @@ def pending_rule_mortal_wound_logical_deaths(
     state: GameState,
     event_records: tuple[EventRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
+    authenticated_retained_destructions: tuple[RetainedModelDestruction, ...],
 ) -> tuple[EventRecord, ...]:
     from warhammer40k_core.engine.damage_allocation import model_by_id
     from warhammer40k_core.engine.model_logical_death import (
@@ -383,7 +394,19 @@ def pending_rule_mortal_wound_logical_deaths(
     )
     result: list[EventRecord] = []
     for progress in pending:
-        if not any(
+        # Retained requests identify a retention record, not their damage packet.
+        # Its owning restore service has authenticated the cause, source context,
+        # event history and exact offered request or accepted reaction decision.
+        retained_owner = any(
+            record.owner_kind is DestructionOwnerKind.RULE
+            and (record.stage is RetainedDestructionStage.OFFERED or record.is_retained)
+            and record.owner_context.get("source_result_id") == progress.application_id
+            and record.owner_context.get("source_rule_id") == progress.source_rule_id
+            and record.logical_death_event_id
+            in {event.event_id for event in progress.logical_death_events}
+            for record in authenticated_retained_destructions
+        )
+        if not retained_owner and not any(
             _has_source_result_reference(request.payload, progress.application_id)
             for request in pending_decision_requests
         ):

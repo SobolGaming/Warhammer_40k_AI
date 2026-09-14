@@ -1,0 +1,9 @@
+{
+  "workload_id": "r48-001-retained-checkpoint-v1",
+  "base_revision": "a6ab86f764527c59bcd1039b27b4221f931ce8e6",
+  "samples": 7,
+  "completed_mean_ratio": 2.0,
+  "completed_mean_allowance_seconds": 0.05,
+  "maximum_restore_seconds": 10.0,
+  "full_game_certified": false
+}

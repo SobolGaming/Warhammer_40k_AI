@@ -5880,6 +5880,12 @@ bindings in the existing mortal-wound continuation registry. Private
 packet; the `rule_mortal_wound_destruction_evidence` context field is internal.
 The single adapters redaction owner excludes these from public projections and
 event deltas. Restore rejects missing, changed or premature packet receipts and
-requires any pending packet to reference its pending destruction decision.
+requires any pending packet to have an authenticated continuation owner. Direct
+destruction requests carry the packet reference. Retained-reaction requests instead
+identify their separate retention record; restore authenticates that record's
+cause, source context, event history and offered request or accepted decision,
+then matches its source rule, packet ID and logical death to the suspended packet.
+This covers both offered and accepted retained reactions without changing their
+public request payloads (R48-001).
 These changes reuse existing finite allocation/FNP and destruction decisions;
 contract version 19's generic schemas already cover their public payloads.
