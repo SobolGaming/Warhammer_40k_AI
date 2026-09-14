@@ -291,6 +291,14 @@ def validate_restored_charge_targets(
                 or replacement_request(request_id=request.request_id, context=context) != request
             ):
                 raise GameLifecycleError("Restored Charge replacement request drift.")
+    from warhammer40k_core.engine.charge_endpoint_history import validate_charge_endpoint_history
+
+    validate_charge_endpoint_history(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        ability_index_for_player=handler.ability_index_for_player,
+    )
     # Every recorded target is checked above, including completed phases and declines.
 
 

@@ -1,5 +1,5 @@
 # ruff: noqa: E501
-"""Reproduce the reviewed P11A source package and observation audit offline."""
+"""Reproduce the reviewed P11A/P11B source package and observation audit offline."""
 
 from __future__ import annotations
 
@@ -19,12 +19,25 @@ PACKAGE_ID = "gw-11e-core-charge"
 VERSION = "maintained-app-mirrors-observed-2026-09-14"
 OBSERVED_AT = "2026-09-14T09:54:47+00:00"
 AUDIT_ID = "core-charge-maintained-app-mirrors-2026-09-14"
+ENDPOINT_OBSERVED_AT = "2026-09-14T14:09:27.140Z"
+ENDPOINT_REVIEW = (
+    "Every charging model must reduce its distance to at least one selected target.",
+    "A model must finish within one inch of a selected target whenever a legal Charge path permits it.",
+    "A model must finish engaged with a selected target whenever a legal Charge path permits it.",
+    "The complete rules unit must engage every selected target and no unselected enemy unit.",
+)
 RULES = (
     (
         "modified-charge-targets-faq",
         "11 FAQ v931",
         "11-charge-phase",
         'How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?\nA charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03).\nExample: A unit\'s charge roll is 7", and that unit has a datasheet ability which adds 1 to charge rolls: that charge\'s maximum distance is 8", so you can select charge targets within 8".\nExample: A FLYING unit chooses to take to the skies and rolls a charge roll of 9"; that charge\'s maximum distance is 7" (9" minus the 2" from taking to the skies), so you can select charge targets within 7".',
+    ),
+    (
+        "model-endpoints",
+        "11.04",
+        "11-charge-phase",
+        "Each model must end its move closer to one or more charge targets.",
     ),
 )
 
@@ -42,11 +55,26 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
     for slug, section, _page, source_text in RULES:
         source_id = f"{PACKAGE_ID}:{slug}"
         text_hash = hashlib.sha256(source_text.encode()).hexdigest()
-        url = "https://game-datamissions.com/11th/rules/changelog"
-        consumers = [
-            "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget",
-            "warhammer40k_core.engine.charge_target_continuation:continue_charge_move",
-        ]
+        is_endpoint = slug == "model-endpoints"
+        url = (
+            "https://www.40k.app/rules/11-charge-phase"
+            if is_endpoint
+            else "https://game-datamissions.com/11th/rules/changelog"
+        )
+        provider = "40k.app" if is_endpoint else "Game Datamissions"
+        observed_at = ENDPOINT_OBSERVED_AT if is_endpoint else None
+        app_version = None if is_endpoint else "931"
+        consumers = (
+            [
+                "warhammer40k_core.engine.charge_move_resolution:resolve_charge_move",
+                "warhammer40k_core.engine.charge_model_endpoints:charge_model_endpoint_witness",
+            ]
+            if is_endpoint
+            else [
+                "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget",
+                "warhammer40k_core.engine.charge_target_continuation:continue_charge_move",
+            ]
+        )
         rules.append(
             {
                 "source_id": source_id,
@@ -60,15 +88,20 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         )
         audit: dict[str, object] = {
             "row_id": slug,
-            "provider_name": "Game Datamissions",
+            "provider_name": provider,
             "source_url": url,
-            "observed_at": None,
-            "app_version": "931",
+            "observed_at": observed_at,
+            "app_version": app_version,
             "policy_id": POLICY,
             "rule_source_id": source_id,
             "transcription_sha256": text_hash,
             "provider_non_affiliation_recorded": True,
         }
+        if is_endpoint:
+            audit["transcription_scope"] = (
+                "Short excerpt; all five endpoint obligations reviewed on the complete page."
+            )
+            audit["reviewed_obligations"] = list(ENDPOINT_REVIEW)
         audit_hash = _hash(audit)
         audits.append({**audit, "source_observation_sha256": audit_hash})
         row: dict[str, object] = {
@@ -80,12 +113,12 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "review_audit_id": AUDIT_ID,
             "review_audit_row_id": slug,
             "review_audit_source_observation_sha256": audit_hash,
-            "provider_name": "Game Datamissions",
-            "source_title": f"Game Datamissions {section} {slug}",
+            "provider_name": provider,
+            "source_title": f"{provider} {section} {slug}",
             "source_platform": "Web",
             "source_url": url,
-            "observed_at": None,
-            "app_version": "931",
+            "observed_at": observed_at,
+            "app_version": app_version,
             "app_build": None,
             "capture_artifact_path": None,
             "capture_sha256": None,
@@ -154,6 +187,14 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         },
         "co_version_comparison": "Read the complete Charge-distance FAQ entry directly in the browser with App-data 931 selected. No co-versioned observation from a second provider is asserted.",
         "observed_browser_url": "https://game-datamissions.com/11th/rules/changelog?v=931",
+        "endpoint_review": {
+            "observed_at": ENDPOINT_OBSERVED_AT,
+            "observed_browser_url": "https://www.40k.app/rules/11-charge-phase",
+            "section_id": "11.04",
+            "reviewed_obligations": list(ENDPOINT_REVIEW),
+            "transcription_scope": "Short excerpt; this record does not reproduce the complete page.",
+            "co_version_comparison": "No second-provider or App build identity asserted.",
+        },
     }
 
 
@@ -165,7 +206,7 @@ def main() -> None:
         raw = (json.dumps(payload, indent=2, ensure_ascii=False) + "\n").encode()
         if args.check:
             if path.read_bytes() != raw:
-                raise SystemExit(f"P11A source artifact drift: {path.relative_to(ROOT)}")
+                raise SystemExit(f"P11A/P11B source artifact drift: {path.relative_to(ROOT)}")
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(raw)

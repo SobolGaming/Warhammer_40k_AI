@@ -2,6 +2,11 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.charge_movement_source import (
+    charge_movement_placement,
+    validate_charge_witness_for_proposal,
+    battlefield_with_charge_placement,
+)
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
 from warhammer40k_core.engine.rapid_ingress_authority import rapid_ingress_placement_error
@@ -561,6 +566,15 @@ def invalid_heroic_intervention_charge_move_status(
             message="Heroic Intervention proposal context drift.",
             payload={"proposal_validation": validate_json_value(validation.to_payload())},
         )
+    path_validation = validate_charge_witness_for_proposal(
+        state=state, request=proposal_request, witness=submitted.witness
+    )
+    if path_validation is not None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Heroic Intervention Charge path is stale.",
+            payload={"proposal_validation": validate_json_value(path_validation.to_payload())},
+        )
     request_error = _heroic_intervention_charge_move_request_error(
         state=state,
         proposal_request=proposal_request,
@@ -608,7 +622,9 @@ def apply_heroic_intervention_charge_move(
     use_record = _stratagem_use_from_proposal_context(proposal_request)
     maximum_distance = _heroic_intervention_maximum_distance(proposal_request)
     scenario = _battlefield_scenario_for_stratagem(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    unit_placement = charge_movement_placement(
+        scenario=scenario, unit_instance_id=proposal.unit_instance_id
+    )
     resolution = resolve_charge_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -677,7 +693,7 @@ def apply_heroic_intervention_charge_move(
     if battlefield_state is None:
         raise GameLifecycleError("Heroic Intervention requires battlefield_state.")
     state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(resolution.attempted_placement)
+        battlefield_with_charge_placement(battlefield_state, resolution.attempted_placement)
     )
     effect = PersistingEffect(
         effect_id=f"{result.result_id}:heroic-intervention:fights-first",

@@ -1,0 +1,41 @@
+{
+  "workload_id": "r47-001-charge-endpoint-restore-v1",
+  "revision": "cd46c143fcfa0706c03ead8752175edf2ea44ecd",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:acfbaffb34da0cb3ed0bf5364dfd98469c28c4da23938877af32ec6c0f846e0a",
+  "runtime_diff_sha256": "845e10ff416ca3252f0011c2c3a69816855ee405ba5d2f927ffeb571e01b9c24",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "concurrency": 1,
+  "warmup_restores": 1,
+  "model_count": 16,
+  "terrain_count": 0,
+  "checkpoint_sha256": "5f0ea27d846b582b568f9e493e2ce99349836d8ddb63ad345d075635aa827f10",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/phase15a_charge_declaration_helpers.py": "fc112519ae794d0eedb601f49591313e5fc36ea3ccb1fe60cbde534c9d477d14",
+    "tests/charge_endpoint_helpers.py": "7a74293f9c41953d05f7bc7d33a130e93f6d78d3636f815794f49ee76d16ad00",
+    "scripts/measure_charge_endpoint_restore.py": "22ea4f7e23c67650451e218bf73de17f38c7df3f6de53bb5277b93944e4c5fee"
+  },
+  "timing_boundary": "GameLifecycle.from_payload; setup and payload equality assertion excluded",
+  "scenario": "Completed attached Charge with source-backed FLY, an elevated leader and an unreachable preferred-distance proof; before any casualty",
+  "samples_seconds": [
+    0.09010650007985532,
+    0.08961145905777812,
+    0.08875933301169425,
+    0.09034891694318503,
+    0.09120575000997633,
+    0.09093212499283254,
+    0.0908447919646278
+  ],
+  "mean_seconds": 0.09025841086570706,
+  "median_seconds": 0.09034891694318503,
+  "p95_seconds": 0.09120575000997633,
+  "maximum_seconds": 0.09120575000997633,
+  "completion_rate": 1,
+  "restores_per_second": 11.07929987253899,
+  "full_game_certified": false,
+  "budget_status": "diagnostic_only_order32_component_gates_deferred"
+}

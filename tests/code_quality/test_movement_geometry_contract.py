@@ -10,7 +10,11 @@ MOVEMENT_PHASE_FILES = (
     *sorted(MOVEMENT_PHASE.parent.glob("movement_*.py")),
 )
 CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
-CHARGE_PHASE_FILES = (CHARGE_PHASE, *sorted(CHARGE_PHASE.parent.glob("charge_*.py")))
+CHARGE_PHASE_FILES = (
+    CHARGE_PHASE,
+    *sorted(CHARGE_PHASE.parent.glob("charge_*.py")),
+    *sorted(CHARGE_PHASE.parent.parent.glob("charge_*.py")),
+)
 FIGHT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
 FIGHT_PHASE_FILES = (FIGHT_PHASE, *sorted(FIGHT_PHASE.parent.glob("fight_*.py")))
 FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"

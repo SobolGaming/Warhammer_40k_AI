@@ -713,8 +713,45 @@ def _validate_result_summary(
         or not set(engaged_ids) <= set(selected_ids)
         or not set(preferred_ids) <= set(selected_ids)
         or set(non_target_ids) & set(selected_ids)
+        or (
+            ruleset_descriptor.charge_policy.must_end_engaged_with_every_selected_target
+            and engaged_ids != selected_ids
+        )
+        or (ruleset_descriptor.charge_policy.forbids_non_target_engagement and non_target_ids)
     ):
         raise GameLifecycleError("Charge move-completed endpoint authority drifted.")
+    from warhammer40k_core.engine.charge_model_endpoints import (
+        validate_charge_model_endpoint_inventory,
+    )
+
+    model_rows = validate_charge_model_endpoint_inventory(
+        value=endpoint.get("model_endpoints"),
+        witness=witness,
+        selected_ids=selected_ids,
+        ruleset=ruleset_descriptor,
+        maximum_distance_inches=maximum_distance,
+    )
+    if (
+        before_distances
+        != {
+            target: min(row.target_distances_before_inches[target] for row in model_rows)
+            for target in selected_ids
+        }
+        or after_distances
+        != {
+            target: min(row.target_distances_after_inches[target] for row in model_rows)
+            for target in selected_ids
+        }
+        or set(engaged_ids)
+        != {target for row in model_rows for target in row.engaged_target_unit_instance_ids}
+        or set(preferred_ids)
+        != {
+            target
+            for row in model_rows
+            for target in row.preferred_distance_target_unit_instance_ids
+        }
+    ):
+        raise GameLifecycleError("Charge model and rules-unit endpoint summaries disagree.")
     fly_policy = _object(payload.get("fly_charge_policy"), "FLY policy")
     if frozenset(fly_policy) != CHARGE_MOVE_FLY_POLICY_PAYLOAD_KEYS or any(
         type(fly_policy[key]) is not bool for key in CHARGE_MOVE_FLY_POLICY_PAYLOAD_KEYS

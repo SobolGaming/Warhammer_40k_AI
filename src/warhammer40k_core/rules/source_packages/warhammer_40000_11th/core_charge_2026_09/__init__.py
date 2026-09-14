@@ -23,10 +23,11 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "fd0f12effda5705a00aba5655afe1fd3d54225fcdca60b8eccf18ded34680384"
+EXPECTED_ARTIFACT_SHA256: Final = "315ae2049fffdfc5ee913002190d7a1c0345f785fbbc0b4e19575322fdaa77a9"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-charge"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-14"
 CHARGE_TARGET_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:modified-charge-targets-faq"
+CHARGE_ENDPOINT_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:model-endpoints"
 
 
 class ChargeSourceError(ValueError):
@@ -63,7 +64,8 @@ def validate_source_artifact_bytes(raw: bytes) -> ChargeSourceArtifact:
         artifact.artifact_schema != "core-v2-core-charge-source-v1"
         or artifact.source_package_id != SOURCE_PACKAGE_ID
         or artifact.source_version != SOURCE_VERSION
-        or tuple(rule.source_id for rule in artifact.rules) != (CHARGE_TARGET_SOURCE_ID,)
+        or tuple(rule.source_id for rule in artifact.rules)
+        != (CHARGE_TARGET_SOURCE_ID, CHARGE_ENDPOINT_SOURCE_ID)
     ):
         raise ChargeSourceError("Charge distance source identity drifted.")
     for rule in artifact.rules:

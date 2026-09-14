@@ -23,7 +23,10 @@ from tests.phase15a_charge_config_helpers import (
 from tests.phase15a_charge_config_helpers import (
     _unit_selection as _unit_selection,
 )
-from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.setup_completion_helpers import (
+    ensure_army_mustered_events_for_fixture,
+    record_current_battlefield_placements_for_fixture,
+)
 from tests.support.selected_target_charge_fixtures import (
     selected_target_charge_persisting_effect,
 )
@@ -223,6 +226,7 @@ def _charge_lifecycle(
     state.active_player_id = "player-a"
     decision_controller = GameLifecycle().decision_controller
     ensure_army_mustered_events_for_fixture(state, decisions=decision_controller)
+    record_current_battlefield_placements_for_fixture(state, decisions=decision_controller)
     if enemy_attached_unit_ids is not None:
         if selected_attached_target_effect_id is None:
             raise AssertionError("Attached Charge target fixture requires a selected effect ID.")

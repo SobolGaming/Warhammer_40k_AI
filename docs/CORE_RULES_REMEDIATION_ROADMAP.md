@@ -4762,3 +4762,18 @@ these commitments through decisions, events, restore and replay. See the
 [scope and source record](ORDER_46_SCOPE_PLAN.md),
 [contract migration](../contracts/migrations/17-to-18.md), and
 [component/slice evidence](performance/order46/README.md).
+
+
+## Order 47 / P11B — per-model Charge endpoints
+
+C11-04 now evaluates closer progress, within-one-inch feasibility and engagement
+feasibility for every living charging model. The shared validated-path search
+preserves coherency, all selected targets and non-target exclusion, and rejects
+unresolved feasibility explicitly. The owner-approved attached-actor prerequisite
+selects one canonical rules unit and moves all living components atomically.
+Ordinary, setup-reactive and Heroic Charge share endpoint and stale-path authority.
+Contract 19 requires source-linked per-model evidence and authenticates it against
+physical history on restore. See [scope and validation](ORDER_47_SCOPE_PLAN.md),
+[contract migration](../contracts/migrations/18-to-19.md) and
+[matched slice measurements](performance/order47/README.md). Command Re-roll,
+Heroic orchestration and Take to the Skies choices retain their later orders.

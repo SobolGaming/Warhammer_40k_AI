@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`17.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`19.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,11 +27,11 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/17.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `17`, preserving the
+   its current major, currently `compatibility/19.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `19`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
    2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, 10.0.0, 11.0.0, 12.0.0,
-   13.0.0, 14.0.0, 15.0.0 and 16.0.0 baselines
+   13.0.0, 14.0.0, 15.0.0, 16.0.0, 17.0.0 and 18.0.0 baselines
    remain committed as historical compatibility anchors.
 3. Every released baseline present on the base commit must retain the exact
    decoded UTF-8 text after line-ending normalization.
@@ -47,6 +47,11 @@ payload-family version changes, migration notes, and old-client support window
 must be reviewed in the same change.
 
 ## Support window
+
+Contract 19 implements canonical attached Charge actors and required per-model
+endpoint evidence. It supports major 19 only; see [18-to-19.md](migrations/18-to-19.md).
+Earlier deployment retention obligations below remain in force.
+
 
 The reference server supports one contract major at a time. Contract 17 changes
 Fire Overwatch to one opponent Movement phase-end opportunity with an independent

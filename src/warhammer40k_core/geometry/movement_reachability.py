@@ -37,6 +37,7 @@ class MovementGoal:
     horizontal_inches: float = 0.0
     vertical_inches: float = 0.0
     z_inches: float = 0.0
+    range_inches: float | None = None
 
     def __post_init__(self) -> None:
         if sum((bool(self.models), bool(self.polygons), self.disk is not None)) != 1:
@@ -45,11 +46,17 @@ class MovementGoal:
             if validate_finite_number("movement goal range", value) < 0:
                 raise GeometryError("Movement goal ranges must be non-negative.")
         validate_finite_number("movement goal z", self.z_inches)
+        if self.range_inches is not None and (
+            not self.models or validate_finite_number("movement goal range", self.range_inches) < 0
+        ):
+            raise GeometryError("A spatial range goal requires models and nonnegative range.")
         for polygon in self.polygons:
             triangulate_polygon(polygon)
 
     def contains(self, model: Model) -> bool:
         if self.models:
+            if self.range_inches is not None:
+                return any(model.range_to(target) <= self.range_inches for target in self.models)
             return any(
                 model.is_within_engagement_range(
                     target,
@@ -80,6 +87,27 @@ class MovementGoal:
         # region cannot exceed the translation needed by any rotated footprint.
         radius = model.base.max_radius()
         if self.models:
+            if self.range_inches is not None:
+                return min(
+                    max(
+                        0.0,
+                        math.hypot(
+                            max(
+                                0.0,
+                                model.pose.distance_2d_to(target.pose)
+                                - radius
+                                - target.base.max_radius(),
+                            ),
+                            0.0
+                            if ignores_vertical_distance
+                            else model.volume.vertical_gap_to(
+                                model.pose, target.volume, target.pose
+                            ),
+                        )
+                        - self.range_inches,
+                    )
+                    for target in self.models
+                )
             return min(
                 math.hypot(
                     max(
@@ -153,6 +181,7 @@ class MovementReachabilityQuery:
     coherency_neighbor_count: int = 1
     coherency_max_span_inches: float | None = None
     coherency_all_models_distance_inches: float | None = None
+    closer_target_groups: tuple[tuple[Model, ...], ...] = ()
 
     def __post_init__(self) -> None:
         if self.path_context.moving_model != self.terrain_context.moving_model:
@@ -167,6 +196,8 @@ class MovementReachabilityQuery:
             raise GeometryError("Target range constraint requires models and nonnegative range.")
         if self.coherency_neighbor_count < 1:
             raise GeometryError("Reachability coherency requires positive neighbor count.")
+        if any(not group for group in self.closer_target_groups):
+            raise GeometryError("Closer target groups must contain target geometry.")
         if any(
             model.model_id == self.path_context.moving_model.model_id
             for model in self.coherent_models
@@ -273,10 +304,21 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
 
 
 def _goal_satisfied(query: MovementReachabilityQuery, model: Model) -> bool:
-    return query.goal.contains(model) and (
-        query.maximum_target_range_inches is None
-        or min(model.range_to(target) for target in query.goal.models)
-        < query.maximum_target_range_inches
+    return (
+        query.goal.contains(model)
+        and (
+            query.maximum_target_range_inches is None
+            or min(model.range_to(target) for target in query.goal.models)
+            < query.maximum_target_range_inches
+        )
+        and (
+            not query.closer_target_groups
+            or any(
+                min(model.range_to(target) for target in group)
+                < min(query.path_context.moving_model.range_to(target) for target in group)
+                for group in query.closer_target_groups
+            )
+        )
     )
 
 

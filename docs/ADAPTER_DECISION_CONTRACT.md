@@ -2562,6 +2562,58 @@ budget validation. Contract 18 does not change Heroic Intervention (Order 50),
 Command Re-roll availability (Order 49), per-model endpoint semantics (Order 47)
 or Take to the Skies selection (Order 51).
 
+### Order 47: per-model Charge endpoints (contract 19)
+
+Charging actors now use one canonical rules-unit identity. An Attached Unit is
+one `select_charging_unit` option; physical component aliases are invalid actor
+IDs. The Charge path must include every living placed model in every component,
+with its current starting pose. Retained destroyed models keep their physical
+presence but do not acquire a movement path. Eligibility considers movement
+restrictions on the canonical actor and its components, and the engine validates
+component movement permissions and whole-group coherency before replacing all
+component placements atomically.
+
+Every charging model must finish closer to at least one committed target. Every
+model that can legally reach within one inch of a committed target must do so;
+every model that can legally engage a committed target must do so. A leading
+model cannot satisfy these obligations for another model. The rules unit must
+still engage every selected target and no unselected enemy.
+
+`endpoint_witness.model_endpoints` is required in ordinary, Heroic Intervention
+and setup-reactive Charge results. Its deterministic model-ID-sorted rows carry
+`source_rule_id`, `model_instance_id`, `component_unit_instance_id`, per-target
+before/after distances, engaged/preferred target ID lists, and
+`preferred_reachability` / `engagement_reachability`. Each reachability object
+contains `status`, `distance_lower_bound_inches` and `alternative_witness`.
+Statuses are `satisfied`, `not_required`, `not_evaluated`, `reachable`,
+`unreachable` and `unresolved`. A searched result has a finite lower bound;
+`reachable` also has a complete alternative PathWitness. Unsearched results have
+null bounds and paths. `not_evaluated` is diagnostic evidence for proposals
+already invalid on mandatory physical or endpoint constraints.
+
+The engine uses the shared mandatory-endpoint search with the model's actual
+movement budget, terrain and collision permissions. Candidate alternatives hold
+other submitted model endpoints fixed and must preserve whole-unit coherency,
+closer progress, all-target engagement and non-target exclusion. A validated
+alternative proves an omitted obligation is possible. Only a conservative
+geometric distance proof establishes impossibility; exhausting the finite search
+returns `charge_reachability_unresolved` and never grants an exemption.
+`charge_model_not_engaged_target` identifies an omitted possible engagement;
+`charge_preferred_distance_not_reached` and `charge_not_closer_to_target` now
+apply per model. Well-formed rule-invalid paths retain the existing recorded
+rejection/fresh-request behavior without mutation. Wrong inventories, aliases,
+stale starts and stale target authority reject before consuming the decision.
+
+Existing aggregate endpoint fields are derived summaries. Restore checks model
+inventory, physical ownership, source identity, distances, target sets and
+feasibility evidence against the exact physical event boundary. Public Charge
+visibility and the shared adapter redaction policy are unchanged; clients never
+supply or mutate engine-derived endpoint evidence. Persistence uses
+`session-persistence-v11-charge-model-endpoints`; replay uses
+`replay-artifact-v13-charge-model-endpoints`. See
+[the migration](../contracts/migrations/18-to-19.md). Orders 49–51 retain their
+separately scheduled orchestration work.
+
 The Phase 15B Charge Move request uses the shared parameterized proposal wrapper:
 
 - `decision_type: "submit_movement_proposal"`;

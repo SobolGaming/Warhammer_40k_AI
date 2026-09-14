@@ -29,7 +29,8 @@ from warhammer40k_core.engine.modifier_ignore import (
     options_with_modifier_ignore_choices,
     record_modifier_ignore_selection,
 )
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     RuntimeModifierRegistry,
@@ -54,7 +55,7 @@ class _ChargeUnitLookup(Protocol):
         *,
         state: GameState,
         unit_instance_id: str,
-    ) -> UnitInstance: ...
+    ) -> RulesUnitView: ...
 
 
 class _ChargeTargetCandidateProvider(Protocol):
@@ -98,7 +99,7 @@ def charging_unit_options_with_modifier_ignore_choices(
         )
         option = DecisionOption(
             option_id=unit_id,
-            label=unit.name,
+            label=" + ".join(component.unit.name for component in unit.living_components),
             payload=validate_json_value(
                 {
                     "submission_kind": SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -111,11 +112,16 @@ def charging_unit_options_with_modifier_ignore_choices(
                 }
             ),
         )
-        current_model_ids = current_model_instance_ids_for_charge_unit(state=state, unit=unit)
-        permissions = catalog_modifier_ignore_permissions_for_unit(
-            ability_index=ability_index,
-            unit=unit,
-            current_model_instance_ids=current_model_ids,
+        permissions = tuple(
+            permission
+            for component in unit.living_components
+            for permission in catalog_modifier_ignore_permissions_for_unit(
+                ability_index=ability_index,
+                unit=component.unit,
+                current_model_instance_ids=current_model_instance_ids_for_charge_unit(
+                    state=state, unit=component.unit
+                ),
+            )
         )
         roll_modifiers = charge_roll_modifiers_for_unit(
             state=state,
@@ -162,22 +168,29 @@ def charge_roll_modifiers_for_unit(
     *,
     state: GameState,
     ability_index: AbilityCatalogIndex,
-    unit: UnitInstance,
+    unit: UnitInstance | RulesUnitView,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[RollModifier, ...]:
-    roll_modifiers = catalog_charge_roll_modifiers_for_unit(
-        state=state,
-        ability_index=ability_index,
-        unit=unit,
-        current_model_instance_ids=current_model_instance_ids_for_charge_unit(
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
+    by_id: dict[str, RollModifier] = {}
+    for component in view.living_components:
+        modifiers = catalog_charge_roll_modifiers_for_unit(
             state=state,
-            unit=unit,
-        ),
-    )
+            ability_index=ability_index,
+            unit=component.unit,
+            current_model_instance_ids=current_model_instance_ids_for_charge_unit(
+                state=state, unit=component.unit
+            ),
+        )
+        for modifier in modifiers:
+            if modifier.modifier_id in by_id and by_id[modifier.modifier_id] != modifier:
+                raise GameLifecycleError("Charge rules-unit modifier identity drift.")
+            by_id[modifier.modifier_id] = modifier
+    roll_modifiers = tuple(by_id[key] for key in sorted(by_id))
     return runtime_modifier_registry.charge_roll_modifiers(
         ChargeRollModifierContext(
             state=state,
-            unit_instance_id=unit.unit_instance_id,
+            unit_instance_id=view.unit_instance_id,
             current_roll_modifiers=roll_modifiers,
         )
     )

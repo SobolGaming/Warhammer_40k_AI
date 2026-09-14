@@ -1424,7 +1424,7 @@ def test_mandatory_endpoint_search_never_treats_unresolved_search_as_impossible(
 
 @pytest.mark.parametrize("base", [CircularBase(0.5), OvalBase(2.0, 1.0), RectangularBase(2.0, 1.0)])
 @pytest.mark.parametrize("ignores_vertical", [False, True])
-@pytest.mark.parametrize("goal_kind", ["model", "disk", "polygon"])
+@pytest.mark.parametrize("goal_kind", ["model", "disk", "polygon", "spatial_range"])
 @pytest.mark.parametrize("target_x", [6.0, 12.0])
 def test_mandatory_endpoint_distance_proofs_cover_all_bases_and_distance_policies(
     base: BaseShape, ignores_vertical: bool, goal_kind: str, target_x: float
@@ -1438,7 +1438,9 @@ def test_mandatory_endpoint_distance_proofs_cover_all_bases_and_distance_policie
     query = _mandatory_endpoint_query(target_x=target_x)
     moving = replace(query.path_context.moving_model, base=base)
     goal = query.goal
-    if goal_kind == "disk":
+    if goal_kind == "spatial_range":
+        goal = MovementGoal(models=goal.models, range_inches=1.0)
+    elif goal_kind == "disk":
         goal = MovementGoal(
             disk=(Pose.at(target_x, 2.0), CircularBase(0.5)),
             horizontal_inches=1.0,
@@ -1528,3 +1530,37 @@ def test_mandatory_endpoint_witness_cannot_break_vertical_unit_span() -> None:
     # The chain has neighbors, but the ground model and upper peer exceed the
     # descriptor's vertical whole-unit span. That cannot prove a legal endpoint.
     assert movement_reachability(query).witness is None
+
+
+def test_charge_spatial_range_goals_preserve_height_and_strict_per_target_progress() -> None:
+    from warhammer40k_core.geometry.movement_reachability import (
+        MovementGoal,
+        MovementReachabilityStatus,
+        movement_reachability,
+    )
+
+    query = _mandatory_endpoint_query(budget=3)
+    elevated = replace(query.goal.models[0], pose=Pose.at(6, 2, 12))
+    spatial = MovementGoal(models=(elevated,), range_inches=1)
+    source = query.path_context.moving_model
+    assert not spatial.contains(source)
+    assert spatial.distance_lower_bound(source) > 3
+    assert spatial.distance_lower_bound(source, ignores_vertical_distance=True) == 2
+    assert (
+        movement_reachability(replace(query, goal=spatial)).status
+        is MovementReachabilityStatus.UNREACHABLE
+    )
+    # Another selected target may get farther away; getting closer to any one is sufficient.
+    opposite = _model("opposite-target", 0, 2)
+    result = movement_reachability(
+        replace(query, closer_target_groups=((opposite,), query.goal.models))
+    )
+    assert result.status is MovementReachabilityStatus.REACHABLE
+    assert result.witness is not None
+    assert result.witness.final_pose_for_model(source.model_id).position.x > source.pose.position.x
+    with pytest.raises(GeometryError, match="Closer target groups"):
+        replace(query, closer_target_groups=((),))
+    with pytest.raises(GeometryError, match="spatial range"):
+        MovementGoal(disk=(Pose.at(6, 2), CircularBase(0.5)), range_inches=1)
+    with pytest.raises(GeometryError, match="nonnegative"):
+        MovementGoal(models=query.goal.models, range_inches=-1)
