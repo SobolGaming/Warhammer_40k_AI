@@ -139,6 +139,6 @@ def _validate_charge_target_choice(
         budget=budget,
         reachable=reachable,
     )
-    if expected != request:
+    if expected is None or expected != request:
         raise GameLifecycleError("Charge target selection context drift.")
     result.validate_for_request(expected)

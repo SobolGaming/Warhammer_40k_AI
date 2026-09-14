@@ -41,7 +41,6 @@ def is_charge_target_replacement_request(*, state: GameState, request: DecisionR
         state.current_battle_phase is not BattlePhase.CHARGE
         or state.out_of_phase_shooting_state is not None
         or phase is None
-        or phase.target_selection is None
     ):
         return False
     distance = phase.move_pending_distance_state()
@@ -125,12 +124,16 @@ def charge_target_selection_request(
     request_id: str,
     budget: ChargeMovementBudget,
     reachable: dict[str, float],
-) -> DecisionRequest:
+) -> DecisionRequest | None:
+    """No legal nonempty target set means a failed continuation, not a choice."""
     phase = pending_charge(state)
     distance = phase.move_pending_distance_state()
     if distance is None:
         raise GameLifecycleError("Charge continuation lost its rolled action.")
     roll = distance.roll_result
+    target_sets = legal_charge_target_sets(state=state, target_ids=tuple(reachable))
+    if not target_sets:
+        return None
     payload = validate_json_value(
         {
             "source_rule_id": CHARGE_TARGET_SOURCE_ID,
@@ -157,9 +160,7 @@ def charge_target_selection_request(
                     label=", ".join(targets),
                     payload={"context": payload, "target_ids": list(targets)},
                 )
-                for index, targets in enumerate(
-                    legal_charge_target_sets(state=state, target_ids=tuple(reachable))
-                )
+                for index, targets in enumerate(target_sets)
             ),
             *(
                 (
@@ -193,6 +194,28 @@ def request_charge_targets(
         budget=budget,
         reachable=reachable,
     )
+    if request is None:
+        phase = pending_charge(state)
+        distance = phase.move_pending_distance_state()
+        if distance is None:
+            raise GameLifecycleError("Failed Charge continuation lost its rolled action.")
+        roll = distance.roll_result
+        state.replace_charge_phase_state(
+            phase.with_charge_move_resolved(roll.request.unit_instance_id)
+        )
+        payload = validate_json_value(
+            {
+                "source_rule_id": CHARGE_TARGET_SOURCE_ID,
+                "action_id": roll.request.request_id,
+                "unit_instance_id": roll.request.unit_instance_id,
+                "charge_roll": roll.to_payload(),
+                "movement_budget": budget.to_payload(),
+                "reachable_target_distances_inches": reachable,
+                "reason": "no_legal_charge_target_sets",
+            }
+        )
+        decisions.event_log.append("charge_continuation_failed", payload)
+        return LifecycleStatus.advanced(stage=state.stage, payload=payload)
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
         stage=state.stage,

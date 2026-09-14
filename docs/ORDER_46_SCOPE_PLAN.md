@@ -65,6 +65,24 @@ the distance-effect surface consumed by that later choice without prebuilding it
 
 ## Validation
 
+Review corrections R46-001/R46-002 preserve two additional invariants: absence
+of a legal target set must resolve an uncommitted Charge instead of constructing
+an empty decision, and restored commitment presence must agree with the active
+action's recorded history and pending movement authority. The shared request
+builder reports legal absence explicitly; initial issue, refresh, submission
+validation and restoration consume that result. A failed continuation preserves
+the original dice and placement, records its current budget and reason, and
+leaves the unit selected so it cannot charge again. Restoration rejects an
+erased commitment even without a pending request, and rejects missing commitment
+or roll context on an ordinary Charge movement request. Replacement ownership
+depends on the action ID even when commitment state is malformed.
+
+The bug-class search covered all target-request builder callers, P04 replacement
+dispatch/restore, required-target constraints, and setup-reactive Charge and Heroic
+Intervention's separate authority. No new decision family, schema shape, named handler or
+architecture boundary is needed. Contract 18 documents the failure event and
+strengthened restore checks; the exact runtime build identity is regenerated.
+
 Focused real-domain regressions cover cap ordering, zero/fractional/above-12
 movement budgets, exact source modifier terms, current modifier reevaluation,
 finite target commitment, stale requests, later roll/distance changes,

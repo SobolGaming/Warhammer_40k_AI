@@ -4,6 +4,7 @@ import ast
 import json
 from pathlib import Path
 
+import pytest
 from tools.build_core_charge_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +39,15 @@ def test_charge_consumers_share_current_budget_and_target_authority() -> None:
     assert "replacement_request(" in continuation
     assert "charge_target_candidates(" in continuation
     assert "charge_target_constraints_satisfied(" in continuation
+    replacement_owner = next(
+        node
+        for node in ast.parse(continuation).body
+        if isinstance(node, ast.FunctionDef) and node.name == "is_charge_target_replacement_request"
+    )
+    assert not any(
+        isinstance(node, ast.Attribute) and node.attr == "target_selection"
+        for node in ast.walk(replacement_owner)
+    ), "Replacement ownership must survive an erased target commitment."
     lifecycle = (ENGINE / "lifecycle.py").read_text()
     assert "validate_restored_charge_targets(" in lifecycle
     assert "refresh_pending_charge_move(" in lifecycle
@@ -53,10 +63,11 @@ def test_charge_consumers_share_current_budget_and_target_authority() -> None:
     assert "current_battle_phase is BattlePhase.CHARGE" not in dispatch
 
 
-def test_charge_slice_evidence_is_comparable_and_within_versioned_budgets() -> None:
+@pytest.mark.parametrize("prefix", ["", "review-"])
+def test_charge_slice_evidence_is_comparable_and_within_versioned_budgets(prefix: str) -> None:
     directory = ROOT / "docs/performance/order46"
-    base = json.loads((directory / "base.json").read_text())
-    head = json.loads((directory / "head.json").read_text())
+    base = json.loads((directory / f"{prefix}base.json").read_text())
+    head = json.loads((directory / f"{prefix}head.json").read_text())
     budget = json.loads((directory / "budgets.json").read_text())
     assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
     for field in (

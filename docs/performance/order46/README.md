@@ -24,6 +24,15 @@ are unchanged: mean no greater than twice base plus 0.05 seconds, maximum no
 greater than 0.5 seconds, at most three decisions and 75 events. All samples
 complete and these slice limits pass.
 
+The R46-001/R46-002 review correction retains a second matched comparison in
+`review-base.json` and `review-head.json`, using `cdf2b1a9` as the baseline and
+the unchanged workload and budgets above. Seven samples on each revision
+measured means of 0.033202 s / 0.032262 s and maxima of 0.040496 s / 0.035405 s
+(base/head). Both record three decisions, 51 events and complete every sample.
+The existing slice gate checks both evidence pairs. These measurements cover the
+ordinary Charge path; the failure and restoration corrections have separate
+behavioral regressions. They do not establish complete-game performance.
+
 Reproduce in each checkout after copying the identical benchmark script and
 `tests/phase15a_charge_declaration_helpers.py` to the base:
 

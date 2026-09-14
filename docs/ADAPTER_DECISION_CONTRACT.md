@@ -2534,10 +2534,24 @@ withdraws stale pending authority and emits a fresh target, replacement or path
 request. `charge_movement_request_withdrawn` contains request ID, source unit ID,
 nullable prior target-selection result ID, and the context-change reason.
 
+If no legal nonempty target set remains before commitment, including when a
+source-required target becomes unreachable, the engine closes that Charge as
+failed and continues to the next charging-unit choice. It never issues an empty
+decision or drops a required target. `charge_continuation_failed` records the
+source rule, original action and roll, source unit, current movement budget,
+reachable distances, and `no_legal_charge_target_sets` reason. No target choice,
+movement, Fights First grant, or new roll is invented. Previously committed
+targets still use P04 replacement and its explicit decline option.
+
 `ChargePhaseState.target_selection` is required and nullable; `ChargeRollResult`
 requires its initial `movement_budget`. Restore checks target commitments against
 accepted decision/event history and rejects missing or superseded replacement
-mutations. The original roll remains replay evidence even if later modifiers
+mutations. A null commitment is valid only before any surviving commitment for
+the active action; pending ordinary Charge movement must carry that same
+commitment and original roll. Erasing the commitment alone, or also removing
+the pending request, cannot erase its recorded authority. Setup-reactive Charge
+and Heroic Intervention keep their separately validated target contexts.
+The original roll remains replay evidence even if later modifiers
 change the current budget. Internal `charge_target_authority_sha256` and P04
 source hashes are removed by the one shared viewer-redaction module from pending
 requests, options, recorded decisions, projections and event deltas.

@@ -23,6 +23,11 @@ from warhammer40k_core.engine.charge_target_continuation import (
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
+)
 from warhammer40k_core.engine.mutation_decision_authority import validate_mutation_decision_closure
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.target_replacement import (
@@ -221,12 +226,26 @@ def validate_charge_selection_reference(
 def validate_restored_charge_targets(
     *, state: GameState, decisions: DecisionController, handler: ChargePhaseHandler
 ) -> None:
-    charge_selection_history(
+    from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
+        is_catalog_setup_reactive_charge_move_request,
+    )
+    from warhammer40k_core.engine.stratagems import is_heroic_intervention_charge_move_request
+
+    history = charge_selection_history(
         event_records=decisions.event_log.records, decision_records=decisions.records
     )
     phase = state.charge_phase_state
+    distance = None if phase is None else phase.move_pending_distance_state()
+    if (
+        phase is not None
+        and distance is not None
+        and phase.target_selection is None
+        and any(
+            row.action_id == distance.roll_result.request.request_id for row in history.values()
+        )
+    ):
+        raise GameLifecycleError("Charge target commitment is missing from its recorded action.")
     if phase is not None and phase.target_selection is not None:
-        distance = phase.move_pending_distance_state()
         if distance is None:
             raise GameLifecycleError("Charge targets have no pending roll.")
         validate_charge_selection_reference(
@@ -237,7 +256,24 @@ def validate_restored_charge_targets(
             decision_records=decisions.records,
         )
     for request in decisions.queue.pending_requests:
-        if request.decision_type == SELECT_CHARGE_TARGETS_DECISION_TYPE:
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+            if (
+                proposal.proposal_kind is ProposalKind.CHARGE_MOVE
+                and not is_catalog_setup_reactive_charge_move_request(request)
+                and not is_heroic_intervention_charge_move_request(request)
+                and (
+                    phase is None
+                    or phase.target_selection is None
+                    or distance is None
+                    or proposal.context is None
+                    or proposal.context.get("target_selection")
+                    != phase.target_selection.to_payload()
+                    or proposal.context.get("charge_roll") != distance.roll_result.to_payload()
+                )
+            ):
+                raise GameLifecycleError("Charge movement target commitment authority drift.")
+        elif request.decision_type == SELECT_CHARGE_TARGETS_DECISION_TYPE:
             budget, reachable = current_charge_targets(state=state, handler=handler)
             if (
                 phase is None

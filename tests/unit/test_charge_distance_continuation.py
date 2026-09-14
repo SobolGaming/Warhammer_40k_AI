@@ -102,6 +102,8 @@ def test_charge_targets_are_committed_before_movement_and_restore() -> None:
     session = charge_session()
     request = select_source(session)
     assert request.decision_type == "select_charge_targets"
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
     request = select_targets(session, request, (NEW,))
     checkpoint = session.lifecycle.to_payload()
     assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
@@ -231,6 +233,145 @@ def test_restored_charge_targets_require_the_exact_recorded_choice(field: str) -
     selection = phase["target_selection"]
     assert selection is not None
     selection[field] = ["invented-target"] if field == "target_ids" else "invented"
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize("reduction", [-6, -12])
+def test_unreachable_required_target_fails_charge_continuation(reduction: int) -> None:
+    """R46-001: no legal target set must finish the action without an empty decision."""
+    from tests.charge_distance_helpers import (
+        OLD,
+        SOURCE,
+        add_modifier,
+        charge_session,
+        request_from,
+        select_source,
+    )
+    from tests.support.selected_target_charge_fixtures import (
+        selected_target_charge_persisting_effect,
+    )
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = charge_session()
+    request = select_source(session)
+    state = session.lifecycle.state
+    assert state is not None
+    state.record_persisting_effect(
+        selected_target_charge_persisting_effect(
+            state=state,
+            effect_id="required-original-target",
+            owner_player_id="player-a",
+            source_rules_unit_instance_id=SOURCE,
+            source_component_unit_instance_id=SOURCE,
+            selected_target_unit_instance_id=OLD,
+        )
+    )
+    add_modifier(
+        state, effect_id="unreachable-target", kind="modify_move_distance", delta=reduction
+    )
+    before = session.lifecycle.to_payload()
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[0].option_id,
+        result_id="stale-required-target",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == before
+    next_request = request_from(session.advance_until_decision_or_terminal())
+    assert next_request.request_id != request.request_id
+    assert next_request.decision_type == "select_charging_unit"
+    assert SOURCE not in {option.option_id for option in next_request.options}
+    phase = state.charge_phase_state
+    assert phase is not None
+    assert phase.active_selection is None
+    assert phase.target_selection is None
+    assert phase.declared_target_unit_instance_ids_by_unit[SOURCE] == ()
+    assert (
+        session.lifecycle.to_payload()["state"]["battlefield_state"]
+        == before["state"]["battlefield_state"]
+    )
+    events = session.lifecycle.decision_controller.event_log.records
+    assert sum(e.event_type == "charge_roll_resolved" for e in events) == 1
+    assert sum(e.event_type == "charge_continuation_failed" for e in events) == 1
+    failure = next(e.payload for e in events if e.event_type == "charge_continuation_failed")
+    assert isinstance(failure, dict)
+    assert failure["reason"] == "no_legal_charge_target_sets"
+    assert isinstance(request.payload, dict)
+    assert failure["charge_roll"] == request.payload["charge_roll"]
+    budget = failure["movement_budget"]
+    assert isinstance(budget, dict)
+    assert budget["maximum_distance_inches"] == 12 + reduction
+    assert not any(e.event_type == "charge_move_completed" for e in events)
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    assert request_from(session.advance_until_decision_or_terminal()) == next_request
+
+
+@pytest.mark.parametrize("pending_kind", ["movement", "replacement", "none"])
+def test_restore_rejects_erased_charge_target_commitment(pending_kind: str) -> None:
+    """R46-002: absence must agree with historical and pending action authority."""
+    from tests.charge_distance_helpers import (
+        OLD,
+        add_modifier,
+        charge_session,
+        select_source,
+        select_targets,
+    )
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session = charge_session()
+    select_targets(session, select_source(session), (OLD,))
+    if pending_kind == "replacement":
+        state = session.lifecycle.state
+        assert state is not None
+        add_modifier(state, effect_id="replacement-pending", kind="modify_move_distance", delta=-6)
+        session.advance_until_decision_or_terminal()
+    payload = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
+    phase = payload["state"]["charge_phase_state"]
+    assert phase is not None
+    phase["target_selection"] = None
+    if pending_kind == "none":
+        payload["decisions"]["queue"]["pending_requests"] = []
+    with pytest.raises(GameLifecycleError, match=r"Charge.*target.*commitment"):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize("field", ["target_selection", "charge_roll"])
+def test_restore_reconciles_pending_charge_movement_authority(field: str) -> None:
+    from tests.charge_distance_helpers import NEW, charge_session, select_source, select_targets
+
+    from warhammer40k_core.engine.charge_target_authority import validate_restored_charge_targets
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session = charge_session()
+    select_targets(session, select_source(session), (NEW,))
+    payload = session.lifecycle.to_payload()
+    request = payload["decisions"]["queue"]["pending_requests"][0]
+    request_payload = request["payload"]
+    assert isinstance(request_payload, dict)
+    proposal = request_payload["proposal_request"]
+    assert isinstance(proposal, dict)
+    context = proposal["context"]
+    assert isinstance(context, dict)
+    context[field] = None
+    state = session.lifecycle.state
+    assert state is not None
+    with pytest.raises(
+        GameLifecycleError, match="Charge movement target commitment authority drift"
+    ):
+        validate_restored_charge_targets(
+            state=state,
+            decisions=DecisionController.from_payload(payload["decisions"]),
+            handler=session.lifecycle._charge_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        )
     with pytest.raises(GameLifecycleError):
         GameLifecycle.from_payload(payload)
 
