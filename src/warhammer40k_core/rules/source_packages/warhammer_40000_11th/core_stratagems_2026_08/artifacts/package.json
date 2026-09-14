@@ -84,7 +84,7 @@
         "warhammer40k_core.engine.stratagems_geometry:_crushing_impact_context_error",
         "warhammer40k_core.engine.stratagems_effect_handlers:_apply_crushing_impact_handler"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": null,
       "transcription_sha256": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
       "verification_status": "unverified"
@@ -102,7 +102,7 @@
         "warhammer40k_core.engine.stratagems_geometry:_crushing_impact_context_error",
         "warhammer40k_core.engine.stratagems_effect_handlers:_apply_crushing_impact_handler"
       ],
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_url": "https://www.40k.app/rules/15-stratagems",
       "transcription_sha256": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
       "verification_status": "authoritative_app_mirror"
@@ -329,7 +329,7 @@
       "transcription_sha256": "b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff"
     }
   ],
-  "package_hash": "fa049c003103adc70fe32fb22cecc23524a2e301e7c94e8e7879237609ad83e0",
+  "package_hash": "986d317b5e6ea805bc40008e1f590a6bcfeeaeaa4f2b9b4d8aa5cafd06b4bbf2",
   "rules": [
     {
       "command_point_cost": 1,
@@ -350,7 +350,7 @@
       ],
       "runtime_rule_id": "core:crushing-impact",
       "section_id": "15.05",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "source_id": "gw-11e-core-stratagems:core:crushing-impact",
       "source_observation_sha256": "329f378b3cb1f78f28f7f32047e01e2b78295d155c30df9fde775bf0cab3afa4",
       "source_text": "15.05 Crushing Impact\nCrushing Impact\nCharge Phase\nTARGET\nThat MONSTER/VEHICLE unit\nWHEN\nYour Charge phase, just after a friendly MONSTER/VEHICLE unit ends a charge move.\nEFFECT\nResolve the following sequence:\n1. Select one enemy unit engaged with your unit.\n2. Select one model in your unit engaged with that enemy unit.\n3. Roll a number of D6 equal to the T characteristic of that model: for each 1, your unit suffers 1 mortal wound; for each 5+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds per unit)\n1 CP",

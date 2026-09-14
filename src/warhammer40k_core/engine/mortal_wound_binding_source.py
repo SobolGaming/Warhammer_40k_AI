@@ -34,6 +34,16 @@ def validate_initial_binding_source(
     if not isinstance(source_context, dict):
         raise GameLifecycleError("Retained mortal-wound source context must be an object.")
     source_kind = source_context.get("source_kind")
+    from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+        EVIDENCE_KEY,
+        validate_rule_mortal_wound_progress,
+    )
+
+    if EVIDENCE_KEY in source_context:
+        validate_rule_mortal_wound_progress(progress)
+        if binding != progress.logical_death_cause_binding:
+            raise GameLifecycleError("Rule mortal wound application start binding drift.")
+        return
     if source_kind == "hazardous":
         from warhammer40k_core.engine.hazardous_retention import (
             validate_retained_hazardous_progress,

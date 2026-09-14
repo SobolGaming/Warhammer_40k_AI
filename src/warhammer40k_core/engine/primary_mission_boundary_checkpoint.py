@@ -662,7 +662,7 @@ def validate_primary_mission_vanguard_checkpoint(
         runtime_content_activation=runtime_content_activation,
     )
     if any(
-        primary_mission_boundary_physical_event_model_ids(event)
+        primary_mission_boundary_physical_event_model_ids(event, event_records=event_records)
         for event in event_records[checkpoint_index + 1 : terminal_index]
     ):
         raise GameLifecycleError("Vanguard boundary has an intervening physical mutation.")

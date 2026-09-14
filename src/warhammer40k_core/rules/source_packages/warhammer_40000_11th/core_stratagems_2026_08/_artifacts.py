@@ -48,8 +48,8 @@ EXPECTED_CATEGORY_12_AUDIT_FINGERPRINT: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "81e56999e279cc4e110353e66a8c66207dc626c81fdaf77625747aa2d961f334"
-EXPECTED_PACKAGE_HASH: Final = "fa049c003103adc70fe32fb22cecc23524a2e301e7c94e8e7879237609ad83e0"
+EXPECTED_ARTIFACT_SHA256: Final = "41aab84b3ab128e71b17b288125407ba285308b690097680d7819b098cf3227c"
+EXPECTED_PACKAGE_HASH: Final = "986d317b5e6ea805bc40008e1f590a6bcfeeaeaa4f2b9b4d8aa5cafd06b4bbf2"
 EXPECTED_ANOMALY_OBSERVATION_SHA256: Final = (
     "561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46"
 )
@@ -136,7 +136,7 @@ EXPECTED_SOURCE_OBSERVATION_SHA256_BY_RULE_ID: Final = {
     "insane-bravery": "11af8114a1e14df4c9e2d6f52425c29a46c17385791480dc364129b84fe77252",
 }
 EXPECTED_SEMANTIC_STATUS_BY_RULE_ID: Final = {
-    "crushing-impact": "partial_engine_runtime",
+    "crushing-impact": "executable_engine_runtime",
     "explosives": "executable_engine_runtime",
     "rapid-ingress": "partial_engine_runtime",
     "fire-overwatch": "executable_engine_runtime",

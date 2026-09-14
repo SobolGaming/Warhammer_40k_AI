@@ -1,12 +1,25 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.crushing_impact_selection import crushing_impact_mortal_wounds
+from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+    continue_rule_mortal_wound_application,
+    resolve_rule_mortal_wound_decision,
+    queue_rule_mortal_wound_request,
+)
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundApplicationCompletionContext,
+)
 
 from warhammer40k_core.engine.explosives_selection import ExplosivesSelection
 
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    UnitCharacteristicModifierContext,
+)
 
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
@@ -133,7 +146,7 @@ def _apply_explosives_handler(
     if mortal_wounds > 0:
         progress = MortalWoundApplicationProgress.start(
             application_id=f"{use_record.use_id}:explosives:mortal-wounds",
-            source_rule_id=CORE_EXPLOSIVES_HANDLER_ID,
+            source_rule_id=use_record.source_id,
             source_context=validate_json_value(
                 {
                     "source_kind": "explosives",
@@ -161,7 +174,7 @@ def _apply_explosives_handler(
                 source_step="explosives_mortal_wounds",
             ),
         )
-        routed = continue_mortal_wound_application(
+        routed = continue_rule_mortal_wound_application(
             state=state,
             decisions=decisions,
             request_id=state.next_decision_request_id(),
@@ -169,7 +182,7 @@ def _apply_explosives_handler(
             dice_manager=manager,
         )
         if routed.request is not None:
-            decisions.request_decision(routed.request)
+            queue_rule_mortal_wound_request(decisions, routed.request)
             return
         if routed.application is None:
             raise GameLifecycleError("Explosives mortal wounds did not produce application.")
@@ -200,7 +213,7 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
     if not isinstance(source_context, dict) or source_context.get("source_kind") != "explosives":
         raise GameLifecycleError("Explosives Feel No Pain source context is invalid.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_decision(
+    routed = resolve_rule_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,
@@ -209,7 +222,7 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
         dice_manager=manager,
     )
     if routed.request is not None:
-        decisions.request_decision(routed.request)
+        queue_rule_mortal_wound_request(decisions, routed.request)
         return LifecycleStatus.waiting_for_decision(
             stage=state.stage,
             decision_request=routed.request,
@@ -223,6 +236,23 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
         )
     if routed.application is None:
         raise GameLifecycleError("Explosives Feel No Pain did not finish routing.")
+    return complete_explosives_mortal_wounds(
+        MortalWoundApplicationCompletionContext(
+            state=state,
+            decisions=decisions,
+            progress=routed.progress,
+            application=routed.application,
+        )
+    )
+
+
+def complete_explosives_mortal_wounds(
+    completion: MortalWoundApplicationCompletionContext,
+) -> LifecycleStatus | None:
+    state, decisions = completion.state, completion.decisions
+    source_context = completion.progress.source_context
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Explosives completion requires source context.")
     use_record = StratagemUseRecord.from_payload(
         cast(StratagemUseRecordPayload, source_context["stratagem_use"])
     )
@@ -237,10 +267,10 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
             "explosives_unit_instance_id",
             source_context["explosives_unit_instance_id"],
         ),
-        target_unit_instance_id=routed.progress.target_unit_instance_id,
+        target_unit_instance_id=completion.progress.target_unit_instance_id,
         roll_state=validate_json_value(roll_state_payload),
-        mortal_wounds=routed.progress.mortal_wounds,
-        mortal_application=routed.application,
+        mortal_wounds=completion.progress.mortal_wounds,
+        mortal_application=completion.application,
     )
     return None
 
@@ -364,6 +394,7 @@ def _apply_crushing_impact_handler(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     context_error = _crushing_impact_context_error(
         state=state,
@@ -387,6 +418,15 @@ def _apply_crushing_impact_handler(
     toughness = _model_toughness(state=state, model_instance_id=model_id)
     if toughness is None:
         raise GameLifecycleError("Crushing Impact model Toughness was not prevalidated.")
+    toughness = runtime_modifier_registry.modified_unit_characteristic(
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=source_unit_id,
+            characteristic=Characteristic.TOUGHNESS,
+            base_value=toughness,
+            current_value=toughness,
+        )
+    )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
@@ -396,10 +436,8 @@ def _apply_crushing_impact_handler(
             actor_id=use_record.player_id,
         )
     )
-    source_mortal_wounds = sum(1 for value in roll_state.current_values if value == 1)
-    enemy_mortal_wounds = min(
-        CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT,
-        sum(1 for value in roll_state.current_values if value >= 5),
+    source_mortal_wounds, enemy_mortal_wounds = crushing_impact_mortal_wounds(
+        roll_state.current_values
     )
     source_application = _apply_stratagem_mortal_wounds(
         state=state,
@@ -407,6 +445,8 @@ def _apply_crushing_impact_handler(
         manager=manager,
         use_record=use_record,
         application_id=f"{use_record.use_id}:crushing-impact:self",
+        source_unit_instance_id=source_unit_id,
+        source_model_instance_id=model_id,
         target_unit_instance_id=source_unit_id,
         mortal_wounds=source_mortal_wounds,
         source_context=validate_json_value(
@@ -425,6 +465,8 @@ def _apply_crushing_impact_handler(
         manager=manager,
         use_record=use_record,
         application_id=f"{use_record.use_id}:crushing-impact:enemy",
+        source_unit_instance_id=source_unit_id,
+        source_model_instance_id=model_id,
         target_unit_instance_id=enemy_unit_id,
         mortal_wounds=enemy_mortal_wounds,
         source_context=validate_json_value(
@@ -475,6 +517,40 @@ def apply_crushing_impact_mortal_wound_decision(
         "crushing_impact_enemy",
     }:
         raise GameLifecycleError("Crushing Impact mortal wound source context is invalid.")
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    routed = resolve_rule_mortal_wound_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+        next_request_id=state.next_decision_request_id(),
+        dice_manager=manager,
+    )
+    if routed.request is not None:
+        queue_rule_mortal_wound_request(decisions, routed.request)
+        return _crushing_impact_pending_status(
+            state=state,
+            request=routed.request,
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Crushing Impact mortal wounds did not finish routing.")
+    return complete_crushing_impact_mortal_wounds(
+        MortalWoundApplicationCompletionContext(
+            state=state,
+            decisions=decisions,
+            progress=routed.progress,
+            application=routed.application,
+        )
+    )
+
+
+def complete_crushing_impact_mortal_wounds(
+    completion: MortalWoundApplicationCompletionContext,
+) -> LifecycleStatus | None:
+    state, decisions = completion.state, completion.decisions
+    source_context = completion.progress.source_context
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Crushing Impact completion requires source context.")
     (
         use_record,
         roll_state,
@@ -484,39 +560,19 @@ def apply_crushing_impact_mortal_wound_decision(
         source_mortal_wounds,
         enemy_mortal_wounds,
     ) = _crushing_impact_details(source_context)
-    source_unit_id = rules_unit_view_by_id(
-        state=state, unit_instance_id=source_unit_id
-    ).unit_instance_id
-    enemy_unit_id = rules_unit_view_by_id(
-        state=state, unit_instance_id=enemy_unit_id
-    ).unit_instance_id
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_decision(
-        state=state,
-        decisions=decisions,
-        request=request,
-        result=result,
-        next_request_id=state.next_decision_request_id(),
-        dice_manager=manager,
-    )
-    if routed.request is not None:
-        decisions.request_decision(routed.request)
-        return _crushing_impact_pending_status(
-            state=state,
-            request=routed.request,
-        )
-    if routed.application is None:
-        raise GameLifecycleError("Crushing Impact mortal wounds did not finish routing.")
     source_application_payload: JsonValue
     enemy_application_payload: JsonValue
     if source_context["source_kind"] == "crushing_impact_self":
-        source_application_payload = validate_json_value(routed.application.to_payload())
+        source_application_payload = validate_json_value(completion.application.to_payload())
         enemy_application = _apply_stratagem_mortal_wounds(
             state=state,
             decisions=decisions,
             manager=manager,
             use_record=use_record,
             application_id=f"{use_record.use_id}:crushing-impact:enemy",
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=model_id,
             target_unit_instance_id=enemy_unit_id,
             mortal_wounds=enemy_mortal_wounds,
             source_context=validate_json_value(
@@ -547,7 +603,7 @@ def apply_crushing_impact_mortal_wound_decision(
             raise GameLifecycleError(
                 "Crushing Impact enemy continuation requires the self application."
             )
-        enemy_application_payload = validate_json_value(routed.application.to_payload())
+        enemy_application_payload = validate_json_value(completion.application.to_payload())
     _emit_crushing_impact_resolved(
         state=state,
         decisions=decisions,
@@ -580,10 +636,8 @@ def _crushing_impact_details(
     model_id = _crushing_impact_model_id_or_none(use_record.effect_selection)
     if enemy_unit_id is None or model_id is None:
         raise GameLifecycleError("Crushing Impact continuation selection drifted.")
-    source_mortal_wounds = sum(1 for value in roll_state.current_values if value == 1)
-    enemy_mortal_wounds = min(
-        CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT,
-        sum(1 for value in roll_state.current_values if value >= 5),
+    source_mortal_wounds, enemy_mortal_wounds = crushing_impact_mortal_wounds(
+        roll_state.current_values
     )
     return (
         use_record,
@@ -796,12 +850,14 @@ def _apply_stratagem_mortal_wounds(
     target_unit_instance_id: str,
     mortal_wounds: int,
     source_context: JsonValue,
+    source_unit_instance_id: str,
+    source_model_instance_id: str,
 ) -> MortalWoundApplication | None:
     if mortal_wounds <= 0:
         return None
     progress = MortalWoundApplicationProgress.start(
         application_id=application_id,
-        source_rule_id=use_record.handler_id,
+        source_rule_id=use_record.source_id,
         source_context=validate_json_value(source_context),
         target_unit_instance_id=target_unit_instance_id,
         defender_player_id=unit_owner_player_id(
@@ -813,14 +869,14 @@ def _apply_stratagem_mortal_wounds(
         destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=use_record.player_id,
-            source_rules_unit_instance_id=None,
-            source_model_instance_id=None,
+            source_rules_unit_instance_id=source_unit_instance_id,
+            source_model_instance_id=source_model_instance_id,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=use_record.phase,
             source_step="stratagem_mortal_wounds",
         ),
     )
-    routed = continue_mortal_wound_application(
+    routed = continue_rule_mortal_wound_application(
         state=state,
         decisions=decisions,
         request_id=state.next_decision_request_id(),
@@ -828,7 +884,7 @@ def _apply_stratagem_mortal_wounds(
         dice_manager=manager,
     )
     if routed.request is not None:
-        decisions.request_decision(routed.request)
+        queue_rule_mortal_wound_request(decisions, routed.request)
         return None
     if routed.application is None:
         raise GameLifecycleError("Stratagem mortal wounds did not produce application.")

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
@@ -9,6 +12,9 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.battlefield_transition_history import (
     prior_fall_back_applied_transition_or_none,
+)
+from warhammer40k_core.engine.charge_move_event_authority import (
+    validate_charge_move_completed_event_authority,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
@@ -341,3 +347,34 @@ __all__ = (
     "validate_primary_mission_mutation_decision_closure",
     "validate_primary_mission_shooting_event_decision_authority",
 )
+
+
+def validate_physical_transition_decision_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
+    for event_index, event in enumerate(event_records):
+        if event.event_type not in {
+            "movement_activation_completed",
+            "charge_move_completed",
+        }:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Physical movement event payload is invalid.")
+        if event.event_type == "movement_activation_completed":
+            validate_primary_mission_movement_event_decision_authority(
+                event_records=event_records,
+                decision_records=decision_records,
+                mutation_index=event_index,
+                payload=event.payload,
+            )
+            continue
+        validate_charge_move_completed_event_authority(
+            event_records=event_records,
+            decision_records=decision_records,
+            event_index=event_index,
+            payload=event.payload,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        )

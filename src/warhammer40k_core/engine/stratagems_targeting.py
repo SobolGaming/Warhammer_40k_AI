@@ -439,11 +439,7 @@ def _target_unit_owner(
     target_unit_id = target_binding.target_unit_instance_id
     if target_unit_id is None:
         return None
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == target_unit_id:
-                return army.player_id
-    return None
+    return _rules_unit_owner(state=state, unit_instance_id=target_unit_id)
 
 
 def _target_unit_has_keyword(

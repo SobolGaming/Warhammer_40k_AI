@@ -153,7 +153,9 @@ def _crushing_impact_context_error(
     enemy_unit_id = _crushing_impact_enemy_target_id_or_none(effect_selection)
     if enemy_unit_id is None:
         return "missing_crushing_impact_enemy_target"
-    enemy_owner = _unit_owner(state=state, unit_instance_id=enemy_unit_id)
+    from warhammer40k_core.engine.stratagems_eligibility import _rules_unit_owner
+
+    enemy_owner = _rules_unit_owner(state=state, unit_instance_id=enemy_unit_id)
     if enemy_owner is None:
         return "unknown_crushing_impact_enemy_target"
     if enemy_owner == context.player_id:
@@ -161,7 +163,8 @@ def _crushing_impact_context_error(
     model_id = _crushing_impact_model_id_or_none(effect_selection)
     if model_id is None:
         return "missing_crushing_impact_model"
-    if model_id not in _unit_by_id(state=state, unit_instance_id=source_unit_id).own_model_ids():
+    source = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id)
+    if model_id not in {model.model_instance_id for model in source.own_models}:
         return "crushing_impact_model_not_in_unit"
     if not _model_is_alive_and_placed(state=state, model_instance_id=model_id):
         return "crushing_impact_model_not_alive_and_placed"
@@ -179,6 +182,13 @@ def _crushing_impact_context_error(
         return "crushing_impact_model_not_engaged_with_target"
     if _model_toughness(state=state, model_instance_id=model_id) is None:
         return "crushing_impact_model_missing_toughness"
+    trigger = context.trigger_payload
+    if (
+        source_unit_id != source.unit_instance_id
+        or not isinstance(trigger, dict)
+        or trigger.get("triggering_unit_instance_id") != source.unit_instance_id
+    ):
+        return "crushing_impact_requires_triggering_unit"
     return None
 
 
@@ -661,25 +671,11 @@ def _geometry_models_for_unit(
     state: GameState,
     unit_instance_id: str,
 ) -> tuple[Model, ...]:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Stratagem geometry requires battlefield_state.")
-    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
-    try:
-        models = tuple(
-            geometry_model_for_placement(
-                model=model,
-                placement=battlefield_state.model_placement_by_id(model.model_instance_id),
-            )
-            for model in unit.own_models
-            if model_is_present_on_battlefield(
-                state=state,
-                model_instance_id=model.model_instance_id,
-            )
-        )
-    except PlacementError as exc:
-        raise GameLifecycleError("Stratagem geometry placement is invalid.") from exc
-    return models
+    from warhammer40k_core.engine.physical_engagement import physical_geometry_models_for_rules_unit
+
+    return physical_geometry_models_for_rules_unit(
+        scenario=_battlefield_scenario_for_stratagem(state), unit_instance_id=unit_instance_id
+    )
 
 
 def _battlefield_scenario_for_stratagem(state: GameState) -> BattlefieldScenario:

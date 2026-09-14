@@ -1265,7 +1265,8 @@ def test_attack_and_stratagem_target_geometry_share_retained_presence() -> None:
         for node in ast.walk(stratagem_geometry)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
-    assert "model_is_present_on_battlefield" in stratagem_calls
+    assert "physical_geometry_models_for_rules_unit" in stratagem_calls
+    assert "model_is_present_on_battlefield" not in stratagem_calls
     assert "placed_alive_geometry_models_for_rules_unit" not in stratagem_calls
 
 

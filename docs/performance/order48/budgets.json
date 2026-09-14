@@ -1,0 +1,20 @@
+{
+  "workload_id": "order47-charge-slice-v1",
+  "base_revision": "10a3b19d09a9fdb0aa1bd393e8bc141487368d05",
+  "samples": 7,
+  "maximum_mean_ratio": 2,
+  "mean_allowance_seconds": 0.05,
+  "maximum_slice_seconds": 0.5,
+  "maximum_decisions": 3,
+  "maximum_events": 75,
+  "full_game_certified": false,
+  "new_capability": {
+    "workload_id": "order48-crushing-impact-v1",
+    "samples": 7,
+    "maximum_slice_seconds": 10,
+    "maximum_decisions": 28,
+    "maximum_events": 450,
+    "maximum_mortal_wounds_per_side": 6,
+    "rationale": "Stress includes Toughness 96, both capped packets, allocation and Feel No Pain. At most four Charge submissions plus twelve allocations and twelve FNP choices. A 10-second provisional slice guard reserves most of the 60-second game objective for other phases; it is not a full-game extrapolation or certification."
+  }
+}

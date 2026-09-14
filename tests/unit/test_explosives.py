@@ -16,6 +16,73 @@ from warhammer40k_core.engine.stratagem_catalog import (
 from warhammer40k_core.geometry.pose import Pose
 
 
+def test_explosives_uses_shared_destruction_continuation_and_replays_collateral_damage() -> None:
+    from tests.crushing_impact_helpers import record_deadly_demise_for_fixture
+
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        mortal_wound_resolution_source_context,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    lifecycle, units = explosives_scene()
+    session = LocalGameSession(lifecycle)
+    record_deadly_demise_for_fixture(
+        session, model_instance_id=units["target"].own_models[0].model_instance_id
+    )
+    source_id = units["source"].unit_instance_id
+    before = sum(model.wounds_remaining for model in units["source"].own_models)
+    request = session.advance_until_decision_or_terminal().decision_request
+    assert request is not None
+    option = next(o for o in request.options if o.option_id.startswith("use-stratagem:explosives:"))
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id="order48:explosives-use",
+    )
+    restored = False
+    while (
+        request := status.decision_request
+    ) is not None and request.decision_type == "select_mortal_wound_model":
+        context = mortal_wound_resolution_source_context(request)
+        assert isinstance(context, dict)
+        if context["source_kind"] == "rule_model_destruction_deadly_demise" and not restored:
+            saved = session.to_persistence_payload()
+            session = LocalGameSession.from_persistence_payload(saved)
+            assert session.to_persistence_payload() == saved
+            restored = True
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id=f"order48:{request.request_id}",
+        )
+    assert restored
+    assert request is not None
+    # Both enemy models are gone; the facade advances through the empty phases.
+    assert request.decision_type == "select_movement_unit"
+    state = session.lifecycle.state
+    assert state is not None
+    assert (
+        sum(
+            model.wounds_remaining
+            for model in rules_unit_view_by_id(state=state, unit_instance_id=source_id).own_models
+        )
+        == before - 1
+    )
+    assert (
+        sum(
+            event.event_type == "explosives_resolved"
+            for event in session.lifecycle.decision_controller.event_log.records
+        )
+        == 1
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order48:explosives-demise"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
 def test_explosives_source_uses_during_phase_finite_selection() -> None:
     row = next(
         r

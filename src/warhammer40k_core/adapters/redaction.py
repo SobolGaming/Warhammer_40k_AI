@@ -78,6 +78,7 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
     {
         "allocation_occurrence",
         "logical_death_cause_binding",
+        "rule_mortal_wound_destruction_evidence",
         "logical_death_event",
         "logical_death_events",
         "model_destruction_cause_authorities",
@@ -505,6 +506,9 @@ def _event_record_hidden_from_context(
         "fight_on_death_destruction_progressed",
         "retained_shooting_started",
         "hazardous_destruction_routing_started",
+        "rule_mortal_wound_destructions_started",
+        "rule_mortal_wound_model_destruction_completed",
+        "rule_mortal_wound_destructions_completed",
         "timing_batch_transition",
         "rule_trigger_observed",
         "attack_sequence_completion_state_recorded",

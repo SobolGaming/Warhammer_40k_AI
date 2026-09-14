@@ -403,11 +403,21 @@ def validate_model_logical_death_inventory(
     from warhammer40k_core.engine.hazardous_retention_history import (
         pending_hazardous_logical_deaths,
     )
+    from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+        pending_rule_mortal_wound_logical_deaths,
+    )
 
-    for event in pending_hazardous_logical_deaths(state=state, event_records=event_records):
+    for event in (
+        *pending_hazardous_logical_deaths(state=state, event_records=event_records),
+        *pending_rule_mortal_wound_logical_deaths(
+            state=state,
+            event_records=event_records,
+            pending_decision_requests=pending_decision_requests,
+        ),
+    ):
         _claim_logical_death_event(
             event=event,
-            claimant="pending-hazardous-router",
+            claimant="pending-rule-mortal-wound-router",
             canonical_by_id=canonical_by_id,
             claims_by_event_id=claims_by_event_id,
         )

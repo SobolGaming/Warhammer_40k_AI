@@ -353,7 +353,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             trigger_kind="after_unit_ends_charge_move",
             phase="charge",
             target_kind="friendly_unit",
-            enumerable=False,
+            enumerable=True,
             target_policy_id="crushing_impact_unit",
             handler_id="core:crushing-impact",
         ),

@@ -15,9 +15,6 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.battlefield_transition_history import (
     authoritative_battlefield_transition_batch_or_none,
 )
-from warhammer40k_core.engine.charge_move_event_authority import (
-    validate_charge_move_completed_event_authority,
-)
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
     DamageApplicationPayload,
@@ -50,7 +47,7 @@ from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence impor
     PrimaryMissionBoundaryModelState,
 )
 from warhammer40k_core.engine.primary_mission_event_decision_authority import (
-    validate_primary_mission_movement_event_decision_authority,
+    validate_physical_transition_decision_authority,
 )
 from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
     PhysicalAuthorityState as _PhysicalAuthority,
@@ -159,7 +156,7 @@ def physical_model_authority_before_event(
         event_records=event_records,
         decision_records=decision_records,
     )
-    _validate_physical_transition_decision_authority(
+    validate_physical_transition_decision_authority(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
@@ -235,6 +232,7 @@ def physical_model_authority_before_event(
         for event in event_records[replay_start_index:]
         for model_id in _physical_authority_by_model(
             (event,),
+            event_history=event_records,
             model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
             starting_wounds_by_model_id=starting_wounds_by_model_id,
             destruction_by_id=destruction_by_id,
@@ -258,6 +256,7 @@ def physical_model_authority_before_event(
         before[model_instance_id] = current_authority
     later = _physical_authority_by_model(
         event_records[replay_start_index:],
+        event_history=event_records,
         initial=before,
         model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
         starting_wounds_by_model_id=starting_wounds_by_model_id,
@@ -328,6 +327,7 @@ def _forward_scoring_commit_anchor_or_none(
     ):
         if _physical_authority_by_model(
             (event,),
+            event_history=event_records,
             model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
             starting_wounds_by_model_id=starting_wounds_by_model_id,
             destruction_by_id=destruction_by_id,
@@ -528,7 +528,7 @@ def validate_primary_mission_boundary_physical_authority(
         event_records=event_records,
         decision_records=decision_records,
     )
-    _validate_physical_transition_decision_authority(
+    validate_physical_transition_decision_authority(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
@@ -565,6 +565,7 @@ def validate_primary_mission_boundary_physical_authority(
     later_records = event_records[checkpoint_index + 1 :]
     later = _physical_authority_by_model(
         later_records,
+        event_history=event_records,
         initial=checkpoint_authority,
         model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
         starting_wounds_by_model_id=starting_wounds_by_model_id,
@@ -587,10 +588,12 @@ def validate_primary_mission_boundary_physical_authority(
         )
 
 
-def primary_mission_boundary_physical_event_model_ids(event: EventRecord) -> tuple[str, ...]:
+def primary_mission_boundary_physical_event_model_ids(
+    event: EventRecord, *, event_records: tuple[EventRecord, ...]
+) -> tuple[str, ...]:
     """Return model IDs mutated by an authenticated physical event family."""
 
-    return tuple(sorted(_physical_authority_by_model((event,))))
+    return tuple(sorted(_physical_authority_by_model((event,), event_history=event_records)))
 
 
 def _validate_model_restoration_event_decision_authority(
@@ -620,6 +623,7 @@ def _validate_model_restoration_event_decision_authority(
 def _physical_authority_by_model(
     event_records: tuple[EventRecord, ...],
     *,
+    event_history: tuple[EventRecord, ...],
     initial: dict[str, _PhysicalAuthority] | None = None,
     model_ids_by_rules_unit_id: dict[str, tuple[str, ...]] | None = None,
     starting_wounds_by_model_id: dict[str, int] | None = None,
@@ -632,7 +636,7 @@ def _physical_authority_by_model(
     applied_direct_mortal_wound_damage: dict[str, set[DamageApplication]] = {}
     for event in event_records:
         damage_snapshot = physical_mortal_wound_damage_snapshot_from_event(
-            event, event_records=event_records
+            event, event_records=event_history
         )
         if damage_snapshot is not None:
             application_id, applications, expected_presence = damage_snapshot
@@ -791,6 +795,7 @@ def _physical_authority_before_event(
             continue
         authority = _physical_authority_by_model(
             event_records[segment_start:prior_index],
+            event_history=event_records,
             initial=authority,
             model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
             starting_wounds_by_model_id=starting_wounds_by_model_id,
@@ -818,6 +823,7 @@ def _physical_authority_before_event(
         segment_start = prior_index + 1
     return _physical_authority_by_model(
         event_records[segment_start:event_index],
+        event_history=event_records,
         initial=authority,
         model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
         starting_wounds_by_model_id=starting_wounds_by_model_id,
@@ -1448,37 +1454,6 @@ def _presence_for_removal(removal_kind: BattlefieldRemovalKind) -> str:
         BattlefieldRemovalKind.INTO_RESERVES: "reserves",
         BattlefieldRemovalKind.TEMPORARILY_REMOVED: "off_battlefield",
     }[removal_kind]
-
-
-def _validate_physical_transition_decision_authority(
-    *,
-    state: GameState,
-    event_records: tuple[EventRecord, ...],
-    decision_records: tuple[DecisionRecord, ...],
-) -> None:
-    for event_index, event in enumerate(event_records):
-        if event.event_type not in {
-            "movement_activation_completed",
-            "charge_move_completed",
-        }:
-            continue
-        if not isinstance(event.payload, dict):
-            raise GameLifecycleError("Physical movement event payload is invalid.")
-        if event.event_type == "movement_activation_completed":
-            validate_primary_mission_movement_event_decision_authority(
-                event_records=event_records,
-                decision_records=decision_records,
-                mutation_index=event_index,
-                payload=event.payload,
-            )
-            continue
-        validate_charge_move_completed_event_authority(
-            event_records=event_records,
-            decision_records=decision_records,
-            event_index=event_index,
-            payload=event.payload,
-            ruleset_descriptor=state.runtime_ruleset_descriptor(),
-        )
 
 
 __all__ = (

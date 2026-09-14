@@ -910,6 +910,32 @@ def _enumerated_target_bindings(
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[StratagemTargetBinding, ...]:
     target_spec = definition.target_spec
+    if target_spec.target_policy_id == CRUSHING_IMPACT_TARGET_POLICY_ID:
+        if context is None or not isinstance(context.trigger_payload, dict):
+            return ()
+        source_id = context.trigger_payload.get("triggering_unit_instance_id")
+        if type(source_id) is not str:
+            return ()
+        binding = StratagemTargetBinding(
+            target_kind=target_spec.target_kind,
+            target_player_id=context.player_id,
+            target_unit_instance_id=source_id,
+        )
+        return (
+            (binding,)
+            if _target_binding_error(
+                state=state,
+                player_id=player_id,
+                target_spec=target_spec,
+                policy=definition.restriction_policy,
+                target_binding=binding,
+                context=context,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+            )
+            is None
+            else ()
+        )
     if target_spec.target_kind is StratagemTargetKind.NONE:
         return (StratagemTargetBinding.none(),)
     if target_spec.target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:

@@ -8,6 +8,9 @@ from warhammer40k_core.core.dice import DiceRollState
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.move_completed_stratagem_candidates import (
+    charge_move_stratagem_candidates,
+)
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
     MovementEndSurgeDistanceKind,
@@ -47,7 +50,9 @@ def move_reaction_candidates(
     if decisions is None:
         raise GameLifecycleError("Move reaction candidates require decisions.")
     if context.completed_phase is not BattlePhase.MOVEMENT:
-        return ()
+        return charge_move_stratagem_candidates(
+            context, stratagem_index=stratagem_index, cost_modifiers=cost_modifiers
+        )
     state = context.state
     candidates: list[TimingRuleCandidate] = []
     if context.movement_action == "fall_back":

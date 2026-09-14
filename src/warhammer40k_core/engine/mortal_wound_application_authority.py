@@ -676,6 +676,13 @@ def completion_events_for_authority(
     source_context = authority.source_context
     if not isinstance(source_context, dict):
         raise GameLifecycleError("Retained mortal-wound authority source must be an object.")
+    from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+        EVIDENCE_KEY,
+        rule_mortal_wound_completion_events,
+    )
+
+    if EVIDENCE_KEY in source_context:
+        return rule_mortal_wound_completion_events(authority, event_records)
     from warhammer40k_core.engine.attack_sequence_model import DEADLY_DEMISE_SOURCE_KIND
     from warhammer40k_core.engine.fight_unit_selected_grant_resolution import (
         SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
@@ -761,6 +768,7 @@ def _supported_completion_events(
             SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
             "deadly_demise_mortal_wounds_applied",
             "hazardous_destruction_routing_started",
+            "rule_mortal_wound_destructions_started",
         }:
             supported.append(event)
             continue
