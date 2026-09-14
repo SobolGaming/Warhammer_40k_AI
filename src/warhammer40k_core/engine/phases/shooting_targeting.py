@@ -88,7 +88,7 @@ def _snap_shooting_type_allowed_for_unit_target(
     *,
     scenario: BattlefieldScenario,
     candidate: dict[str, JsonValue],
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     target_unit_id: str,
 ) -> bool:
     target_visible_model_ids = candidate.get("target_visible_model_ids")
@@ -96,7 +96,7 @@ def _snap_shooting_type_allowed_for_unit_target(
         return False
     return _unit_target_within_max_range(
         scenario=scenario,
-        unit=unit,
+        rules_unit=rules_unit,
         target_unit_id=target_unit_id,
         range_inches=24,
     )
@@ -105,17 +105,24 @@ def _snap_shooting_type_allowed_for_unit_target(
 def _unit_target_within_max_range(
     *,
     scenario: BattlefieldScenario,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     target_unit_id: str,
     range_inches: int,
 ) -> bool:
-    return target_within_shooting_selection_range(
-        scenario=scenario,
-        attacking_unit_instance_id=unit.unit_instance_id,
-        target_unit_instance_id=target_unit_id,
-        max_range_inches=range_inches,
-        placed_alive_attacker_models_only=False,
-        placed_alive_target_models_only=False,
+    return any(
+        target_within_shooting_selection_range(
+            scenario=scenario,
+            attacking_unit_instance_id=component.unit.unit_instance_id,
+            target_unit_instance_id=target_unit_id,
+            max_range_inches=range_inches,
+            placed_alive_attacker_models_only=False,
+            placed_alive_target_models_only=False,
+        )
+        for component in rules_unit.components
+        if any(
+            scenario.model_is_present_on_battlefield(model.model_instance_id)
+            for model in component.unit.own_models
+        )
     )
 
 

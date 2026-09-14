@@ -423,7 +423,6 @@ def _attack_pools_or_validation(
             scenario=scenario,
             candidate=candidate,
             declaration=declaration,
-            unit=source_unit,
             rules_unit=rules_unit,
             weapon_profile=weapon_profile,
             player_id=player_id,
@@ -799,7 +798,6 @@ def _shooting_types_for_declaration_candidate(
     scenario: BattlefieldScenario,
     candidate: ShootingTargetCandidate,
     declaration: WeaponDeclaration,
-    unit: UnitInstance,
     rules_unit: RulesUnitView,
     weapon_profile: WeaponProfile,
     player_id: str,
@@ -814,7 +812,7 @@ def _shooting_types_for_declaration_candidate(
         if _snap_shooting_type_allowed_for_unit_target(
             scenario=scenario,
             candidate=cast(dict[str, JsonValue], candidate.to_payload()),
-            unit=unit,
+            rules_unit=rules_unit,
             target_unit_id=declaration.target_unit_instance_id,
         ):
             return (ShootingType.SNAP,)

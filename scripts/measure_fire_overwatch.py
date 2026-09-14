@@ -22,6 +22,7 @@ from tests.fire_overwatch_helpers import (
 )
 
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,13 +31,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=7)
+    parser.add_argument("--attached", action="store_true")
     args = parser.parse_args()
     if args.samples < 1:
         parser.error("samples must be positive")
     rows = []
     for _ in range(args.samples):
         start = time.perf_counter()
-        session = overwatch_session(moved=True)
+        session = overwatch_session(moved=not args.attached, attached=args.attached)
+        state = session.lifecycle.state
+        assert state is not None
+        enemy_id = rules_unit_view_by_id(state=state, unit_instance_id=ENEMIES[0]).unit_instance_id
         ready = time.perf_counter()
         request = pending_overwatch(session)
         scheduled = time.perf_counter()
@@ -44,7 +49,7 @@ def main() -> None:
         request = status.decision_request
         assert request is not None
         declared = time.perf_counter()
-        status = choose_enemy(session, request, ENEMIES[0])
+        status = choose_enemy(session, request, enemy_id)
         for index in range(50):
             assert status.status_kind is not LifecycleStatusKind.INVALID, status
             state = session.lifecycle.state
@@ -79,7 +84,9 @@ def main() -> None:
         )
     times = sorted(row["slice_seconds"] for row in rows)
     report = {
-        "workload_id": "order45-fire-overwatch-slice-v1",
+        "workload_id": "r45-001-attached-overwatch-v1"
+        if args.attached
+        else "order45-fire-overwatch-slice-v1",
         "revision": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "runtime_diff_sha256": hashlib.sha256(
             subprocess.check_output(["git", "diff", "HEAD", "--", "src"])
@@ -91,18 +98,19 @@ def main() -> None:
             ["sysctl", "-n", "machdep.cpu.brand_string"], text=True
         ).strip(),
         "memory_bytes": int(subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True)),
-        "model_count": 3,
+        "model_count": 5 if args.attached else 3,
         "terrain_count": 0,
         "timing_boundary": "phase-end scheduling through next Shooting decision; setup separate",
         "scenario": {
             "game_id": "order45-overwatch",
-            "moved_enemy": ENEMIES[0],
-            "chosen_enemy": ENEMIES[0],
+            "moved_enemy": None if args.attached else ENEMIES[0],
+            "chosen_enemy": enemy_id,
             "shooters": 1,
             "enemies": 2,
             "command_points": 1,
             "weapon_range_inches": 24,
             "weapon_attacks": 2,
+            "attached": args.attached,
         },
         "mode": "uninstrumented_timing",
         "concurrency": 1,

@@ -1,6 +1,11 @@
 # CORE V2 external contract
 
-Contract version: `16.1.0`
+Contract version: `17.0.0`
+
+Contract 17 provides one Fire Overwatch opportunity at opponent Movement-phase
+end and a canonical Snap declaration against one eligible enemy. Snap's 24-inch
+limit uses all present components of the attacking rules unit; weapon range and
+visibility still apply to the firing model. See [16-to-17.md](migrations/16-to-17.md).
 
 Contract 16.1 adds the finite `select_lethal_hit_wound` decision family, with
 `auto-wound` and `roll-to-wound` options bound to the recorded critical hit.

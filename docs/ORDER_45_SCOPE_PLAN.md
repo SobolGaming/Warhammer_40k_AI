@@ -112,7 +112,7 @@ rules-unit views instead of resolving every reserve unit again; the shared
 submitted-shooter path still resolves its ID from current state. Existing Order 35
 work budgets remain unchanged.
 
-## Final validation
+## Initial Order 45 validation
 
 Final runtime build:
 `warhammer40k-core-v2:runtime-tree-sha256-v1:f6a3f25877be161bc188e1e3c52a6bbf4187f529645b8084f56c04607671eef1`.
@@ -138,3 +138,60 @@ Final runtime build:
 
 The final behavioral suite ran with coverage, followed by the code-quality suite
 without coverage. Earlier failed or interrupted runs are diagnostics only.
+
+## R45-001: attached attacking range
+
+The violated invariant is that Snap's 24-inch selection limit measures the full
+rules unit, independently of the physical component owning the firing weapon.
+The bug-class search found the same physical-unit argument in shooter eligibility,
+candidate generation and declaration validation. All three now pass the current
+`RulesUnitView` to the shared Snap helper, which considers every component with
+present models. Existing per-weapon range, model visibility and present-target
+measurement retain their existing owners. No wider geometry API or solver change
+is needed. Obsolete component arguments were removed from the affected helpers.
+
+Real facade regressions reproduce an unarmed Leader at 23.51 inches with the
+firing Bodyguard at 25.66 inches. The Leader can supply unit range while the
+Bodyguard supplies the only legal shot. Additional cases cover 23.999, 24.000 and
+24.001 inches, a 24-inch firing weapon, blocked firing-model visibility, a removed
+Leader, rejected-submission state equality, restore and exact boundary replay.
+The static audit requires rules-unit scope at all three callers and current
+presence filtering inside the shared range helper.
+
+The existing contract already requires full rules-unit range; its wording now
+makes attached-component scope explicit. No new decision shape, source text,
+source-package identity or contract major is required. Runtime identity and its
+contract examples were regenerated. The attached performance sample reuses the
+existing versioned Overwatch limits without changing thresholds; see the paired
+`r45-001` evidence in `docs/performance/order45/`.
+
+The first aggregate run found one older retained-target regression calling the
+private range helper dynamically with its previous physical-unit argument. Its
+fixture now resolves a real `RulesUnitView`; the retained-target geometry and
+living-only allocation assertions are unchanged. The corrected test and related
+static audit pass. That failed run is diagnostic evidence only; the final
+validation below covers the corrected fixture.
+
+## R45-001 final validation
+
+Runtime build:
+`warhammer40k-core-v2:runtime-tree-sha256-v1:7850f542e6f905ae63908c3929b9b6239fd2df4b9974e18eef3e8c3b79203101`.
+
+- Complete behavioral suite with coverage: **7,833 passed**, **85.09%** coverage,
+  551.70 seconds; 18 xdist work-stealing workers. SQLite ResourceWarnings were
+  non-failing; no tests failed or skipped.
+- Complete code-quality suite without coverage: **464 passed**, 113.22 seconds;
+  18 xdist work-stealing workers, after the passing behavioral suite.
+- Ruff check/format, mypy (2,988 source files), Pyright, all 11 import contracts
+  and `uv run pre-commit run --all-files` passed.
+- The exact eight-shard fail-closed inventory check passed. The new regression
+  cases extend an existing test file; test-file membership is unchanged.
+- Engine identity, reviewed Stratagem source artifacts and generated external
+  contracts passed their checks. Contract compatibility passed against unchanged
+  base `a178a9e1ff5cac93c0c79e61499b2ce45f402012`.
+- Installed-wheel smoke validated 2,778 runtime resources, 27 schemas and all six
+  request families. TypeScript generated-client/type checks, five unit tests and
+  all 342 live conformance assertions passed after `npm ci`.
+- The paired attached-unit benchmark passed the unchanged Overwatch limits:
+  0.0440-second base mean and 0.0427-second head mean, with four decisions and
+  49 events in every sample. Full-game performance remains uncertified.

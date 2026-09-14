@@ -469,6 +469,180 @@ def test_snap_range_is_measured_from_rules_unit_instead_of_firing_model() -> Non
     assert status.status_kind is not LifecycleStatusKind.INVALID
 
 
+@pytest.mark.parametrize("distance", [23.51, 23.999, 24.0, 24.001])
+def test_r45_001_snap_boundary_uses_other_attached_component(distance: float) -> None:
+    _assert_attached_snap_boundary(distance=distance)
+
+
+@pytest.mark.parametrize("restriction", ["weapon-range", "model-visibility", "removed-component"])
+def test_r45_001_group_range_preserves_weapon_visibility_and_present_model_limits(
+    restriction: str,
+) -> None:
+    _assert_attached_snap_boundary(distance=23.51, restriction=restriction)
+
+
+def _assert_attached_snap_boundary(*, distance: float, restriction: str | None = None) -> None:
+    from dataclasses import replace
+
+    from tests.core_stratagem_helpers import _replace_unit_poses
+    from tests.fire_overwatch_helpers import SHOOTER
+    from tests.phase13b_shooting_declaration_helpers import (
+        _display_geometry,
+        _proposal_from_declarations,
+    )
+
+    from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+    from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
+    from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.shooting_types import ShootingType
+    from warhammer40k_core.engine.weapon_declaration import WeaponDeclaration
+    from warhammer40k_core.geometry.pose import Pose
+    from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
+
+    session = overwatch_session(
+        attached=True, weapon_range=24 if restriction == "weapon-range" else 48
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    army = state.army_definition_for_player("player-a")
+    enemy_army = state.army_definition_for_player("player-b")
+    assert army is not None
+    assert enemy_army is not None
+    near_id = "army-alpha:leader"
+    far_id = SHOOTER
+    near_model = army.unit_by_id(near_id).own_models[0]
+    far_model = army.unit_by_id(far_id).own_models[0]
+    target_model = enemy_army.unit_by_id(ENEMIES[0]).own_models[0]
+    target_x = (
+        12.15
+        + distance
+        + near_model.geometry.parts[0].radius_x_inches
+        + target_model.geometry.parts[0].radius_x_inches
+    )
+    far_x = (
+        10
+        + near_model.geometry.parts[0].radius_x_inches
+        - far_model.geometry.parts[0].radius_x_inches
+    )
+    for unit_id, pose in (
+        (far_id, Pose.at(far_x, 10)),
+        (near_id, Pose.at(12.15, 10)),
+        (ENEMIES[0], Pose.at(target_x, 10)),
+        ("army-beta:enemy-leader", Pose.at(target_x + 2, 10)),
+    ):
+        _replace_unit_poses(state, unit_instance_id=unit_id, poses=(pose,))
+    assert state.battlefield_state is not None
+    battlefield = state.battlefield_state
+    target_geometry = geometry_model_for_placement(
+        model=target_model,
+        placement=battlefield.model_placement_by_id(target_model.model_instance_id),
+    )
+    near_distance = geometry_model_for_placement(
+        model=near_model, placement=battlefield.model_placement_by_id(near_model.model_instance_id)
+    ).range_to(target_geometry)
+    assert abs(near_distance - distance) <= 1e-9
+    far_distance = geometry_model_for_placement(
+        model=far_model, placement=battlefield.model_placement_by_id(far_model.model_instance_id)
+    ).range_to(target_geometry)
+    assert abs(far_distance - (distance + 2.15)) <= 1e-9
+    assert far_distance > 24
+    if restriction == "model-visibility":
+        display = _display_geometry(
+            center_x_inches=11, center_y_inches=10, width_inches=0.1, depth_inches=1.8
+        )
+        wall = TerrainFeatureDefinition(
+            feature_id="r45-001:wall",
+            feature_kind=TerrainFeatureKind.HILLS,
+            footprint_center_x_inches=11,
+            footprint_center_y_inches=10,
+            footprint_width_inches=0.1,
+            footprint_depth_inches=1.8,
+            rules_footprint_polygon=display.footprint_polygon,
+            display_geometry=display,
+            walls=(TerrainWallDefinition("wall", 11, 10, 0, 0.1, 1.8, 5),),
+            source_id="test:r45-001:wall",
+        )
+        state.replace_battlefield_state(replace(battlefield, terrain_features=(wall,)))
+    if restriction == "removed-component":
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=near_id,
+            model_instance_id=near_model.model_instance_id,
+            damage=99,
+            damage_kind=DamageKind.NORMAL,
+        )
+    if distance == 23.51 and restriction is None:
+        # The unarmed Leader supplies range; only the distant Bodyguard can shoot.
+        _replace_unit_poses(state, unit_instance_id=ENEMIES[1], poses=(Pose.at(55, 16),))
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload()))
+    state = session.lifecycle.state
+    assert state is not None
+    window = pending_overwatch(session)
+    initial = session.lifecycle.to_payload()
+    request = _require_request(choose_shooter(session, window))
+    assert isinstance(request.payload, dict)
+    raw = cast(dict[str, object], request.payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], raw["available_weapons"])
+    weapon = next(w for w in weapons if w["model_instance_id"] == far_model.model_instance_id)
+    target_id = rules_unit_view_by_id(state=state, unit_instance_id=ENEMIES[0]).unit_instance_id
+    candidates = cast(list[dict[str, object]], raw["target_candidates"])
+    candidate = next(
+        c
+        for c in candidates
+        if c["target_unit_instance_id"] == target_id
+        and c["weapon_instance_id"] == weapon["weapon_instance_id"]
+    )
+    legal = distance <= 24 and restriction is None
+    assert candidate["is_legal"] is legal, candidate
+    assert candidate["shooting_types"] == (["snap"] if legal else [])
+    proposal = _proposal_from_declarations(
+        request=request,
+        declarations=(
+            WeaponDeclaration(
+                attacker_model_instance_id=far_model.model_instance_id,
+                weapon_instance_id=cast(str, weapon["weapon_instance_id"]),
+                wargear_id=cast(str, weapon["wargear_id"]),
+                weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
+                target_unit_instance_id=target_id,
+                shooting_type=ShootingType.SNAP,
+            ),
+        ),
+    )
+    before = session.lifecycle.to_payload()
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="r45-001:far-component-shot",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert (status.status_kind is not LifecycleStatusKind.INVALID) is legal, status
+    if not legal:
+        assert session.lifecycle.to_payload() == before
+
+    elif distance == 24.0:
+        from tests.fire_overwatch_helpers import finish_overwatch
+
+        from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+        finish_overwatch(session, status)
+        artifact = ReplayArtifact.capture(
+            artifact_id="r45-001:boundary-replay",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+        assert (
+            ReplayRunner.from_payload(artifact.to_payload()).run().status
+            is ReplayRunStatus.REPRODUCED
+        )
+        session.advance_until_decision_or_terminal()
+        restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+        assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+
+
 @pytest.mark.parametrize(
     "fault",
     [

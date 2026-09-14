@@ -6574,7 +6574,9 @@ def test_phase14h_attached_target_uses_retained_component_geometry_but_living_al
 
     assert unit_target_within_max_range(
         scenario=scenario,
-        unit=units["intercessor-1"],
+        rules_unit=rules_unit_view_by_id(
+            state=state, unit_instance_id=units["intercessor-1"].unit_instance_id
+        ),
         target_unit_id=formation.attached_unit_instance_id,
         range_inches=240,
     )

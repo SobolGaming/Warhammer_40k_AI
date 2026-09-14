@@ -1,9 +1,45 @@
 """Order 45 target authority and measured phase-end cost gates."""
 
+import ast
 import json
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_snap_range_requires_rules_unit_scope_at_every_consumer() -> None:
+    phases = ROOT / "src/warhammer40k_core/engine/phases"
+    for filename in (
+        "shooting_eligibility.py",
+        "shooting_requests.py",
+        "shooting_declaration_validation.py",
+    ):
+        calls = [
+            node
+            for node in ast.walk(ast.parse((phases / filename).read_text()))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_snap_shooting_type_allowed_for_unit_target"
+        ]
+        assert len(calls) == 1
+        arguments = {keyword.arg: ast.unparse(keyword.value) for keyword in calls[0].keywords}
+        assert arguments["rules_unit"] == "rules_unit"
+        assert "unit" not in arguments
+    targeting = ast.parse((phases / "shooting_targeting.py").read_text())
+    functions = {node.name: node for node in targeting.body if isinstance(node, ast.FunctionDef)}
+    for name in ("_snap_shooting_type_allowed_for_unit_target", "_unit_target_within_max_range"):
+        parameters = {
+            argument.arg: argument.annotation for argument in functions[name].args.kwonlyargs
+        }
+        assert "unit" not in parameters
+        annotation = parameters["rules_unit"]
+        assert annotation is not None
+        assert ast.unparse(annotation) == "RulesUnitView"
+    query = ast.unparse(functions["_unit_target_within_max_range"])
+    assert "rules_unit.components" in query
+    assert "scenario.model_is_present_on_battlefield" in query
 
 
 def test_overwatch_uses_phase_end_scope_and_shared_snap_target_authority() -> None:
@@ -46,12 +82,14 @@ def test_overwatch_uses_phase_end_scope_and_shared_snap_target_authority() -> No
     )
 
 
-def test_overwatch_phase_end_cost_is_comparable_complete_and_bounded() -> None:
+@pytest.mark.parametrize("prefix", ["", "r45-001-"])
+def test_overwatch_phase_end_cost_is_comparable_complete_and_bounded(prefix: str) -> None:
     directory = ROOT / "docs/performance/order45"
-    base = json.loads((directory / "base.json").read_text())
-    head = json.loads((directory / "head.json").read_text())
+    base = json.loads((directory / f"{prefix}base.json").read_text())
+    head = json.loads((directory / f"{prefix}head.json").read_text())
     budget = json.loads((directory / "budgets.json").read_text())
-    assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+    expected_workload = "r45-001-attached-overwatch-v1" if prefix else budget["workload_id"]
+    assert base["workload_id"] == head["workload_id"] == expected_workload
     for field in (
         "platform",
         "python",

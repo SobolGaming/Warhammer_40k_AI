@@ -73,3 +73,22 @@ pass. In particular, the complete placement mean is 0.16059 / 0.17903 seconds
 (base/head); the additional optional choice is included. Discovery reuses the
 current enumerated rules-unit view and does not resolve off-board reserve IDs
 again. Historical Order 35 results remain untouched.
+
+## R45-001 attached-unit check
+
+The paired `r45-001-base.json` / `r45-001-head.json` compare reviewed commit
+`6a2799b287076a55c9922e9d60f53d2a8032934c` with the range fix. Both runs use the
+same script, fixtures, interpreter and hardware, serially without instrumentation
+or concurrent workers. The stationary scenario has five models, attached
+shooter and target groups, one CP, no terrain, two attacks, and one complete
+Overwatch declaration/attack/continuation. Seven samples completed on each.
+
+Mean: 0.04400 / 0.04268 seconds; observed maximum: 0.05819 / 0.04914 seconds
+(base/head). Every sample has four decisions and 49 events. The existing
+`budgets.json` timing and work-count limits apply unchanged and pass. The
+correctness regressions separately cover the attached 24-inch boundary that
+failed on the base; this timing case is legal on both revisions.
+
+Reproduce with `PYTHONPATH=. uv run python scripts/measure_fire_overwatch.py
+--attached --output /tmp/r45-001-head.json` (one shell line). Full-game performance
+remains uncertified. Earlier evidence above is retained for its recorded builds.

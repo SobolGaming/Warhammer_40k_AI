@@ -185,7 +185,7 @@ def _rules_unit_has_legal_shooting_declaration(
                 if _snap_shooting_type_allowed_for_unit_target(
                     scenario=scenario,
                     candidate=cast(dict[str, JsonValue], candidate.to_payload()),
-                    unit=attacker_unit,
+                    rules_unit=rules_unit,
                     target_unit_id=target_unit_id,
                 ):
                     return True
