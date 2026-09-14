@@ -5884,8 +5884,12 @@ requires any pending packet to have an authenticated continuation owner. Direct
 destruction requests carry the packet reference. Retained-reaction requests instead
 identify their separate retention record; restore authenticates that record's
 cause, source context, event history and offered request or accepted decision,
-then matches its source rule, packet ID and logical death to the suspended packet.
-This covers both offered and accepted retained reactions without changing their
-public request payloads (R48-001).
+then matches a cause's source rule, packet ID and logical death to the suspended
+packet. The retained casualty can own that cause directly (R48-001), or descend
+from it through authenticated parent causes after collateral destruction
+(R48-002). Restore uses the existing cause-ancestry owner, including multiple
+levels; missing or forged ancestry cannot establish packet ownership. This covers
+both offered and accepted retained reactions without changing their public
+request payloads.
 These changes reuse existing finite allocation/FNP and destruction decisions;
 contract version 19's generic schemas already cover their public payloads.

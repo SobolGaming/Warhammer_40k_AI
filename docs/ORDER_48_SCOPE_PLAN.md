@@ -218,3 +218,85 @@ shards and their duration inventory, including the new regression file. No
 production code changed after this coverage run. The [restore measurements](performance/order48/r48-001/README.md)
 separate valid matched costs from the base's rejected checkpoints; full-game
 certification remains outstanding. PR #468 remains open and unmerged.
+
+## R48-002 — authenticated collateral cause ancestry
+
+Review of `9dd78ed3` found that an untouched checkpoint at Crushing Impact →
+Deadly Demise → collateral casualty → For the Chapter! still failed restoration.
+The packet validator recognized direct casualties but not their descendants.
+The invariant remains that every pending packet must have its actual,
+authenticated continuation owner, including nested destruction interruptions.
+
+The existing restore pipeline authenticates the cause ledger, parent-before-child
+ordering, producer evidence and retained offered/accepted history before packet
+validation. Packet validation now identifies its original causes by cause kind,
+source rule, application ID and logical death, then uses the existing
+`destruction_cause_ancestor_ids` service to connect a live retained descendant.
+It neither infers ancestry from request text nor reauthenticates retained history.
+Forged or missing parents and altered root ownership continue to fail closed.
+
+The bug-class search covered direct and collateral retained ownership, multiple
+parent levels, cause-ledger restoration, packet source matching and the existing
+attack/retained ancestry consumer. Both Core damage Stratagems use this shared
+owner. The production diff is confined to the existing mortal-wound destruction
+routing and attack-decision dispatch modules; no decision family, public schema,
+named handler, architecture edge or source semantics changed. The adapter contract documents ancestry under
+its existing version 19 envelopes. This scope audit precedes final aggregate gates.
+
+Real-domain regressions cover both Stratagems with one and two collateral levels,
+offered and accepted/declined checkpoints, uninterrupted/restored equivalence,
+completed checkpoints and exact replay. Negative tests alter parent links and
+root packet/source/death identity. The static audit requires use of the existing
+ancestry service and the single retained-history authentication path.
+
+Matched restore measurements use the reviewed commit and final fixture on the
+same local host, with predeclared budgets retained under
+`performance/order48/r48-002`. Rejected base checkpoints remain correctness
+failures, not comparative timing passes. Full-game certification remains deferred.
+
+Accepted Explosives collateral cleanup also exposed a missing completion receipt:
+a retained casualty could be removed, resume the remaining blast allocations,
+then finish via a later declined rule reaction. That dispatch path omitted the
+existing removed-retention completion service, leaving an unclosed history record
+that phase expiration eventually discarded. Crushing Impact retained its removed
+record longer, so that checkpoint restored but left the continuation unclosed.
+Both now emit the completion receipt and parent shooting-resumption event.
+The dispatch path calls the same completion
+service already used by mortal-wound and attack-collateral dispatch, after the
+rule continuation returns without another decision. The accepted/completed
+facade regression covers this return and rejects the old missing-receipt history.
+
+The revised runtime is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:597863f4481249dc938c4b80f11d0a1f366ca1455096af85d1dce7a7528d2850`.
+The final behavioral command was the required coverage/xdist command with
+`--junitxml=/private/tmp/r48-002-behavior.xml`: 7,976 tests passed, 85.12% coverage,
+698.28 seconds. Its ten SQLite resource warnings match the existing warning class.
+The complete successful JUnit profile regenerated the eight-shard inventory,
+labelled as local macOS with 18 work-stealing workers and the exact runtime hash.
+No production code changed after that coverage run.
+
+All 56 head restore measurements passed their predeclared bounds; the slowest
+restore was 4.5389 seconds. The reports preserve the base's rejected checkpoints
+and distinguish them from matched valid costs. Both accepted/completed scenarios
+now contain the retained completion and parent shooting-resumption events. See the
+[R48-002 measurements](performance/order48/r48-002/README.md) for exact counts,
+means, maxima, fixture hashes and environment metadata.
+
+R48-002 final validation:
+
+| Gate | Result |
+| --- | --- |
+| Ruff check / format and pre-commit | Passed without production changes |
+| Mypy and Pyright | Passed; 3,018 files; no type errors |
+| Complete behavioral suite with coverage and xdist work stealing | 7,976 passed; 85.12%; 698.28 s |
+| Complete code-quality suite without coverage | 478 passed; 132.79 s |
+| Regenerated eight-shard inventory and exact check | Passed |
+| Import boundaries | Passed; 11 contracts kept |
+| Source artifacts, runtime identity and exact-base contract checks | Passed |
+| Installed-wheel smoke | Passed; 27 schemas and 2,796 runtime resources |
+| TypeScript generated client / unit tests / conformance | Passed; 5 unit tests and 342 conformance assertions |
+| Matched restoration evidence | All 56 head samples restored exactly; all versioned bounds passed |
+
+All required commands used the repository's configured environment; no production
+code changed after aggregate validation. The exact base-ref contract check used
+`10a3b19d09a9fdb0aa1bd393e8bc141487368d05`. PR #468 remains open and unmerged.

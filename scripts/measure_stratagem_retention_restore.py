@@ -1,4 +1,4 @@
-"""R48-001 matched completed-checkpoint cost and retained-checkpoint diagnostics."""
+"""Matched completed-checkpoint cost and direct/collateral retention diagnostics."""
 
 from __future__ import annotations
 
@@ -31,15 +31,21 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=7)
+    parser.add_argument("--collateral-depth", type=int, choices=(0, 1, 2), default=0)
     args = parser.parse_args()
     if args.samples < 1:
         parser.error("samples must be positive")
     scenarios = []
     for stratagem in ("crushing-impact", "explosives"):
-        for boundary in ("offered", "accepted", "completed"):
+        boundaries = ("offered", "accepted", "completed") + ("accepted_completed",) * bool(
+            args.collateral_depth
+        )
+        for boundary in boundaries:
             setup = time.perf_counter()
-            session, request = offered_stratagem_reaction(stratagem)
-            if boundary == "accepted":
+            session, request = offered_stratagem_reaction(
+                stratagem, collateral_depth=args.collateral_depth
+            )
+            if boundary in ("accepted", "accepted_completed"):
                 option = next(
                     option
                     for option in request.options
@@ -50,7 +56,7 @@ def main() -> None:
                     option_id=option.option_id,
                     result_id="r48-001:reaction",
                 )
-            elif boundary == "completed":
+            if boundary in ("completed", "accepted_completed"):
                 finish_stratagem_reactions(session)
             payload = session.to_persistence_payload()
             setup_seconds = time.perf_counter() - setup
@@ -100,7 +106,11 @@ def main() -> None:
                 }
             )
     report = {
-        "workload_id": "r48-001-retained-checkpoint-v1",
+        "workload_id": (
+            f"r48-002-collateral-depth-{args.collateral_depth}-checkpoint-v1"
+            if args.collateral_depth
+            else "r48-001-retained-checkpoint-v1"
+        ),
         "engine_build_id": current_engine_build_id(),
         "revision": subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True

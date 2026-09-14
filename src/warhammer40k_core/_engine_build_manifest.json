@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fed68d40c0b0c5a06e7ee8875c55b28c778438776a0ef5ff00feb13d165542dc",
-  "fingerprint": "fed68d40c0b0c5a06e7ee8875c55b28c778438776a0ef5ff00feb13d165542dc",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:597863f4481249dc938c4b80f11d0a1f366ca1455096af85d1dce7a7528d2850",
+  "fingerprint": "597863f4481249dc938c4b80f11d0a1f366ca1455096af85d1dce7a7528d2850",
   "resource_count": 2796,
   "resources": [
     {
@@ -10065,9 +10065,9 @@
       "sha256": "dbe8feaf518385b43483e3a169eda7a7d21fff056567af8636230006cae4e6cb"
     },
     {
-      "byte_length": 7478,
+      "byte_length": 7722,
       "path": "warhammer40k_core/engine/lifecycle_attack_dispatch.py",
-      "sha256": "09e1be6c15969426f605fff247998a0d90effbd7e1a0f313220652becde83984"
+      "sha256": "01480bbd56ef87da273d5b0260b7d8a744fad59093ce5b403d3705b5d056e390"
     },
     {
       "byte_length": 14375,
@@ -10340,9 +10340,9 @@
       "sha256": "dff5d348b8a93f7c8e9e1683b0b32f29bd136d81e0cfe1e47adfc2d3ebe69848"
     },
     {
-      "byte_length": 20645,
+      "byte_length": 21088,
       "path": "warhammer40k_core/engine/mortal_wound_destruction_routing.py",
-      "sha256": "bb50a6d35815d78c58ca4082b7835fd86c8ca9a37e02b1853db2d2dea2ee31d0"
+      "sha256": "b09535c2d2e13705324a81d380717021cd8e29b2776413ac767176414025f86c"
     },
     {
       "byte_length": 13108,

@@ -4,6 +4,8 @@ import ast
 import json
 from pathlib import Path
 
+import pytest
+
 from warhammer40k_core.engine.core_stratagem_mortal_wound_continuation import (
     core_stratagem_mortal_wound_bindings,
 )
@@ -74,6 +76,8 @@ def test_packet_restore_consumes_authenticated_retention_without_reloading_state
         == 1
     )
     assert "retained_destructions" not in _calls("mortal_wound_destruction_routing.py")
+    assert "destruction_cause_ancestor_ids" in _calls("mortal_wound_destruction_routing.py")
+    assert "complete_removed_retained_destructions" in _calls("lifecycle_attack_dispatch.py")
     for filename, function in (
         ("model_destruction_cause_producers.py", "validate_model_logical_death_inventory"),
         (
@@ -146,8 +150,9 @@ def test_order48_matched_charge_and_new_capability_meet_versioned_budgets() -> N
                 assert sample[f"{side}_mortal_wounds"] <= limits["maximum_mortal_wounds_per_side"]
 
 
-def test_r48_001_restore_cost_and_retained_checkpoint_results() -> None:
-    directory = ROOT / "docs/performance/order48/r48-001"
+@pytest.mark.parametrize("revision", ["r48-001", "r48-002"])
+def test_restore_cost_and_retained_checkpoint_results(revision: str) -> None:
+    directory = ROOT / "docs/performance/order48" / revision
     base = json.loads((directory / "base.json").read_text())
     head = json.loads((directory / "head.json").read_text())
     budget = json.loads((directory / "budgets.json").read_text())
@@ -173,6 +178,7 @@ def test_r48_001_restore_cost_and_retained_checkpoint_results() -> None:
         (stratagem, boundary)
         for stratagem in ("crushing-impact", "explosives")
         for boundary in ("offered", "accepted", "completed")
+        + ("accepted_completed",) * (revision == "r48-002")
     }
     previous = {(row["stratagem"], row["boundary"]): row for row in base["scenarios"]}
     current = {(row["stratagem"], row["boundary"]): row for row in head["scenarios"]}
@@ -182,9 +188,20 @@ def test_r48_001_restore_cost_and_retained_checkpoint_results() -> None:
         assert len(row["samples"]) == len(old["samples"]) == budget["samples"]
         assert row["completion_rate"] == 1
         assert row["maximum_seconds"] <= budget["maximum_restore_seconds"]
-        for field in ("model_count", "terrain_count", "decision_count", "event_count", "game_id"):
+        for field in ("model_count", "terrain_count", "decision_count", "game_id"):
             assert row[field] == old[field]
-        if row["boundary"] == "completed" or key == ("explosives", "accepted"):
+        receipt_fix = revision == "r48-002" and key == ("explosives", "accepted_completed")
+        retained_completion = revision == "r48-002" and row["boundary"] == "accepted_completed"
+        assert row["event_count"] == old["event_count"] + 2 * retained_completion
+        if row["boundary"] == "completed" or key in (
+            {("explosives", "accepted")}
+            if revision == "r48-001"
+            else {
+                ("crushing-impact", "accepted"),
+                ("explosives", "accepted"),
+                ("crushing-impact", "accepted_completed"),
+            }
+        ):
             assert old["completion_rate"] == 1
             assert row["mean_seconds"] <= (
                 old["mean_seconds"] * budget["completed_mean_ratio"]
@@ -193,6 +210,11 @@ def test_r48_001_restore_cost_and_retained_checkpoint_results() -> None:
         else:
             assert old["completion_rate"] == 0
             assert all(
-                "lacks its pending continuation" in sample["diagnostic"]
+                (
+                    "retained continuation inventory drift"
+                    if receipt_fix
+                    else "lacks its pending continuation"
+                )
+                in sample["diagnostic"]
                 for sample in old["samples"]
             )

@@ -38,9 +38,9 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.retained_destruction_state import (
-    DestructionOwnerKind,
     RetainedDestructionStage,
     RetainedModelDestruction,
+    destruction_cause_ancestor_ids,
     retained_destruction_for_model,
 )
 
@@ -395,15 +395,25 @@ def pending_rule_mortal_wound_logical_deaths(
     result: list[EventRecord] = []
     for progress in pending:
         # Retained requests identify a retention record, not their damage packet.
-        # Its owning restore service has authenticated the cause, source context,
-        # event history and exact offered request or accepted reaction decision.
-        retained_owner = any(
-            record.owner_kind is DestructionOwnerKind.RULE
-            and (record.stage is RetainedDestructionStage.OFFERED or record.is_retained)
-            and record.owner_context.get("source_result_id") == progress.application_id
-            and record.owner_context.get("source_rule_id") == progress.source_rule_id
-            and record.logical_death_event_id
-            in {event.event_id for event in progress.logical_death_events}
+        # Restore has authenticated its history and the cause ledger, including
+        # parent links. Collateral retention can descend from a packet casualty.
+        packet_deaths = {event.event_id for event in progress.logical_death_events}
+        packet_causes = {
+            cause.cause_id
+            for cause in state.model_destruction_cause_authorities
+            if cause.cause_kind is ModelDestructionCauseKind.RULE_EFFECT
+            and cause.producer_context.get("source_result_id") == progress.application_id
+            and cause.producer_context.get("source_rule_id") == progress.source_rule_id
+            and cause.logical_death_event.event_id in packet_deaths
+        }
+        retained_owner = bool(packet_causes) and any(
+            (record.stage is RetainedDestructionStage.OFFERED or record.is_retained)
+            and (
+                record.cause_id in packet_causes
+                or packet_causes.intersection(
+                    destruction_cause_ancestor_ids(state=state, cause_id=record.cause_id)
+                )
+            )
             for record in authenticated_retained_destructions
         )
         if not retained_owner and not any(

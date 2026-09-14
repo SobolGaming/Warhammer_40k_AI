@@ -11,7 +11,9 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.decision_request import DecisionRequest
 
 
-def offered_stratagem_reaction(stratagem: str) -> tuple[LocalGameSession, DecisionRequest]:
+def offered_stratagem_reaction(
+    stratagem: str, *, collateral_depth: int = 0
+) -> tuple[LocalGameSession, DecisionRequest]:
     catalog = replace(
         for_the_chapter_catalog(),
         wargear=ArmyCatalog.phase9a_canonical_content_pack().wargear,
@@ -27,6 +29,8 @@ def offered_stratagem_reaction(stratagem: str) -> tuple[LocalGameSession, Decisi
                         characteristics=tuple(
                             replace(value, raw=1, base=1, final=1)
                             if value.characteristic is Characteristic.WOUNDS
+                            else replace(value, raw=96, base=96, final=96)
+                            if collateral_depth and value.characteristic is Characteristic.TOUGHNESS
                             else value
                             for value in profile.characteristics
                         ),
@@ -39,11 +43,33 @@ def offered_stratagem_reaction(stratagem: str) -> tuple[LocalGameSession, Decisi
     )
     if stratagem == "crushing-impact":
         session = crushing_session(catalog=catalog, toughness=96, wounds=1)
-        request = complete_charge(session).decision_request
     else:
-        lifecycle, _ = explosives_scene(catalog=catalog)
+        lifecycle, _ = explosives_scene(catalog=catalog, extra_friendly=collateral_depth == 1)
         session = LocalGameSession(lifecycle)
-        request = session.advance_until_decision_or_terminal().decision_request
+    if collateral_depth:
+        from tests.crushing_impact_helpers import record_deadly_demise_for_fixture
+        from warhammer40k_core.engine.lifecycle import GameLifecycle
+        from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+        assert collateral_depth in (1, 2)
+        state = session.lifecycle.state
+        assert state is not None
+        unit_ids = (
+            ("army-alpha:source", "army-alpha:next")
+            if stratagem == "crushing-impact"
+            else ("army-beta:target", "army-alpha:source")
+        )
+        for unit_id in unit_ids[:collateral_depth]:
+            model = rules_unit_view_by_id(state=state, unit_instance_id=unit_id).alive_models()[0]
+            record_deadly_demise_for_fixture(session, model_instance_id=model.model_instance_id)
+        # Reload catalog-backed sources alongside the fixture's added Deadly
+        # Demise before the facade captures its replay starting checkpoint.
+        session = LocalGameSession(GameLifecycle.from_payload(session.lifecycle.to_payload()))
+    request = (
+        complete_charge(session)
+        if stratagem == "crushing-impact"
+        else session.advance_until_decision_or_terminal()
+    ).decision_request
     assert request is not None
     option = next(
         option
@@ -59,6 +85,28 @@ def offered_stratagem_reaction(stratagem: str) -> tuple[LocalGameSession, Decisi
         request = status.decision_request
         assert request is not None
         if request.decision_type == "select_destruction_reaction":
+            if collateral_depth:
+                from warhammer40k_core.engine.retained_destruction_state import (
+                    destruction_cause_ancestor_ids,
+                    retained_destructions,
+                )
+
+                state = session.lifecycle.state
+                assert state is not None
+                retained = next(
+                    r
+                    for r in retained_destructions(state=state)
+                    if r.request_id == request.request_id
+                )
+                if len(destruction_cause_ancestor_ids(state=state, cause_id=retained.cause_id)) != (
+                    collateral_depth
+                ):
+                    status = session.submit_option(
+                        request_id=request.request_id,
+                        option_id="decline_destruction_reaction",
+                        result_id=f"r48-002:decline-ancestor:{index}",
+                    )
+                    continue
             return session, request
         assert request.decision_type == "select_mortal_wound_model", request
         status = session.submit_option(
@@ -76,6 +124,8 @@ def finish_stratagem_reactions(session: LocalGameSession) -> None:
 
     status = session.advance_until_decision_or_terminal()
     for index in range(100):
+        if status.status_kind is LifecycleStatusKind.TERMINAL:
+            return
         request = status.decision_request
         assert request is not None
         if request.decision_type in {

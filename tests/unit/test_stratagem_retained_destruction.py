@@ -1,4 +1,4 @@
-"""R48-001: authenticated retained reactions own suspended Stratagem packets."""
+"""Authenticated direct and collateral reactions own suspended Stratagem packets."""
 
 import pytest
 from tests.stratagem_retention_helpers import (
@@ -66,6 +66,8 @@ def test_stratagem_retained_reaction_checkpoints_restore_and_replay(
         is ReplayRunStatus.REPRODUCED
     )
     finish_stratagem_reactions(resumed)
+    assert resumed.lifecycle.state is not None
+    assert retained_destructions(state=resumed.lifecycle.state) == ()
     completed = resumed.to_persistence_payload()
     assert (
         LocalGameSession.from_persistence_payload(completed).to_persistence_payload() == completed
@@ -99,6 +101,104 @@ def test_stratagem_retained_reaction_checkpoints_restore_and_replay(
             log.append(MODEL_COMPLETED, altered)
             with pytest.raises(GameLifecycleError, match="completion order drifted"):
                 pending_rule_mortal_wound_destructions(log.records)
+
+
+@pytest.mark.parametrize("stratagem", ["crushing-impact", "explosives"])
+@pytest.mark.parametrize("depth", [1, 2])
+@pytest.mark.parametrize("accept", [False, True])
+def test_nested_stratagem_retention_restores_ancestry_and_replays(
+    stratagem: str,
+    depth: int,
+    accept: bool,
+) -> None:
+    from warhammer40k_core.engine.retained_destruction_state import destruction_cause_ancestor_ids
+
+    session, request = offered_stratagem_reaction(stratagem, collateral_depth=depth)
+    state = session.lifecycle.state
+    assert state is not None
+    retained = next(
+        r for r in retained_destructions(state=state) if r.request_id == request.request_id
+    )
+    ancestors = destruction_cause_ancestor_ids(state=state, cause_id=retained.cause_id)
+    assert len(ancestors) == depth
+    assert retained.eligible_sources[0].source_rule_id == retained_sources.FOR_THE_CHAPTER_SOURCE_ID
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    option_id = (
+        next(
+            option.option_id
+            for option in request.options
+            if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+        )
+        if accept
+        else DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    for current in (session, restored):
+        status = current.submit_option(
+            request_id=request.request_id, option_id=option_id, result_id="r48-002:reaction"
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    selected = restored.to_persistence_payload()
+    resumed = LocalGameSession.from_persistence_payload(selected)
+    assert resumed.to_persistence_payload() == selected
+    assert (
+        ReplayRunner.from_payload(resumed.replay_artifact(artifact_id="r48-002:pending-replay"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+    finish_stratagem_reactions(resumed)
+    assert resumed.lifecycle.state is not None
+    assert retained_destructions(state=resumed.lifecycle.state) == ()
+    completed = resumed.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(completed).to_persistence_payload() == completed
+    )
+    assert (
+        ReplayRunner.from_payload(resumed.replay_artifact(artifact_id="r48-002:completed-replay"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+@pytest.mark.parametrize("stratagem", ["crushing-impact", "explosives"])
+@pytest.mark.parametrize("drift", ["missing_parent", "wrong_parent", "packet", "source", "death"])
+def test_nested_retention_rejects_unauthenticated_packet_ancestry(
+    stratagem: str, drift: str
+) -> None:
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session, request = offered_stratagem_reaction(stratagem, collateral_depth=2)
+    state = session.lifecycle.state
+    assert state is not None
+    retained = next(
+        r for r in retained_destructions(state=state) if r.request_id == request.request_id
+    )
+    checkpoint = session.lifecycle.to_payload()
+    saved_state = checkpoint["state"]
+    assert saved_state is not None
+    causes = saved_state["model_destruction_cause_authorities"]
+    child = next(cause for cause in causes if cause["cause_id"] == retained.cause_id)
+    parent = next(cause for cause in causes if cause["cause_id"] in child["parent_cause_ids"])
+    root = next(cause for cause in causes if cause["cause_id"] in parent["parent_cause_ids"])
+    if drift == "missing_parent":
+        child["parent_cause_ids"] = []
+    elif drift == "wrong_parent":
+        # An existing earlier cause is still invalid when it is not the
+        # collateral producer authenticated by the child cause's history.
+        child["parent_cause_ids"] = [root["cause_id"]]
+    elif drift in {"packet", "source"}:
+        root["producer_context"]["source_result_id" if drift == "packet" else "source_rule_id"] = (
+            "unrelated"
+        )
+    else:
+        root["logical_death_event"]["event_id"] = "unrelated"
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(checkpoint)
 
 
 @pytest.mark.parametrize("stratagem", ["crushing-impact", "explosives"])

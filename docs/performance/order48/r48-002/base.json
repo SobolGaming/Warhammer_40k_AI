@@ -1,0 +1,398 @@
+{
+  "workload_id": "r48-002-collateral-depth-1-checkpoint-v1",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fed68d40c0b0c5a06e7ee8875c55b28c778438776a0ef5ff00feb13d165542dc",
+  "revision": "9dd78ed35fbe757d79232ffe99388007ef184b12",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "mode": "uninstrumented_timing",
+  "timing_boundary": "LocalGameSession.from_persistence_payload; preparation and roundtrip comparison excluded",
+  "policy": "Shared deterministic facade fixture; accept first source or decline all reactions to completion",
+  "scenarios": [
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "offered",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 3.9176577089820057,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 10,
+      "event_count": 129,
+      "samples": [
+        {
+          "seconds": 0.05372295796405524,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.08375916595105082,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.052650124998763204,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.052847957937046885,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.0529469579923898,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.05297770898323506,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.08280362491495907,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        }
+      ],
+      "mean_seconds": 0.061672642677357156,
+      "median_seconds": 0.05297770898323506,
+      "maximum_seconds": 0.08375916595105082,
+      "completion_rate": 0.0
+    },
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "accepted",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 2.0858961670892313,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 11,
+      "event_count": 135,
+      "samples": [
+        {
+          "seconds": 2.272776374942623,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.2786020409548655,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.2753978329710662,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.2839804999530315,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.277279416914098,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.27243912499398,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.274336125003174,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 2.276401630818977,
+      "median_seconds": 2.2753978329710662,
+      "maximum_seconds": 2.2839804999530315,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "completed",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 3.180289499927312,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 21,
+      "event_count": 291,
+      "samples": [
+        {
+          "seconds": 3.411449083010666,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.464009959017858,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.422467082971707,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.419018749962561,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.4740055829752237,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.501280957949348,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.5213697080034763,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 3.4590858748415485,
+      "median_seconds": 3.464009959017858,
+      "maximum_seconds": 3.5213697080034763,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "accepted_completed",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 4.135647167102434,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 35,
+      "event_count": 373,
+      "samples": [
+        {
+          "seconds": 4.544031166937202,
+          "status": "restored"
+        },
+        {
+          "seconds": 4.501472542062402,
+          "status": "restored"
+        },
+        {
+          "seconds": 4.502395666087978,
+          "status": "restored"
+        },
+        {
+          "seconds": 4.552415707963519,
+          "status": "restored"
+        },
+        {
+          "seconds": 4.495644707931206,
+          "status": "restored"
+        },
+        {
+          "seconds": 4.489255791995674,
+          "status": "restored"
+        },
+        {
+          "seconds": 4.527813291992061,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 4.516146982138578,
+      "median_seconds": 4.502395666087978,
+      "maximum_seconds": 4.552415707963519,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "offered",
+      "game_id": "order41-explosives",
+      "setup_seconds": 1.105666207964532,
+      "model_count": 5,
+      "terrain_count": 0,
+      "decision_count": 2,
+      "event_count": 26,
+      "samples": [
+        {
+          "seconds": 0.019357209093868732,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.0187931249383837,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.01916441705543548,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.059441458084620535,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.018760291975922883,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.01857091602869332,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        },
+        {
+          "seconds": 0.018580707954242826,
+          "status": "rejected",
+          "diagnostic": "Rule mortal wound destruction lacks its pending continuation."
+        }
+      ],
+      "mean_seconds": 0.02466687501873821,
+      "median_seconds": 0.0187931249383837,
+      "maximum_seconds": 0.059441458084620535,
+      "completion_rate": 0.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "accepted",
+      "game_id": "order41-explosives",
+      "setup_seconds": 1.138132374966517,
+      "model_count": 5,
+      "terrain_count": 0,
+      "decision_count": 3,
+      "event_count": 53,
+      "samples": [
+        {
+          "seconds": 1.435770208016038,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.4026419159490615,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.399001167039387,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3979295419994742,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3974561248905957,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.4343341250205413,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3967474160017446,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 1.409125785559549,
+      "median_seconds": 1.399001167039387,
+      "maximum_seconds": 1.435770208016038,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "completed",
+      "game_id": "order41-explosives",
+      "setup_seconds": 1.4305635839700699,
+      "model_count": 5,
+      "terrain_count": 0,
+      "decision_count": 5,
+      "event_count": 204,
+      "samples": [
+        {
+          "seconds": 1.7583123750519007,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.7610001669963822,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.767068041022867,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.75678358389996,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.7534023750340566,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.753200582927093,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.7615790840936825,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 1.7587637441465631,
+      "median_seconds": 1.7583123750519007,
+      "maximum_seconds": 1.767068041022867,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "accepted_completed",
+      "game_id": "order41-explosives",
+      "setup_seconds": 1.4404816250316799,
+      "model_count": 5,
+      "terrain_count": 0,
+      "decision_count": 6,
+      "event_count": 211,
+      "samples": [
+        {
+          "seconds": 0.04399841604754329,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        },
+        {
+          "seconds": 0.04335462499875575,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        },
+        {
+          "seconds": 0.043383584008552134,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        },
+        {
+          "seconds": 0.04334104200825095,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        },
+        {
+          "seconds": 0.043261458980850875,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        },
+        {
+          "seconds": 0.07600408408325166,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        },
+        {
+          "seconds": 0.04333262506406754,
+          "status": "rejected",
+          "diagnostic": "Fight On Death retained continuation inventory drift."
+        }
+      ],
+      "mean_seconds": 0.048096547884467454,
+      "median_seconds": 0.04335462499875575,
+      "maximum_seconds": 0.07600408408325166,
+      "completion_rate": 0.0
+    }
+  ],
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_stratagem_retention_restore.py": "62304857d4f9abf436a4aa66c07a39c4efa3cfa56f23fff1740bc775afaf4b95",
+    "tests/stratagem_retention_helpers.py": "448b3d1db4c94000587765381596df956668b2c0bb9e033ef65bcce70d25aaab",
+    "tests/crushing_impact_helpers.py": "6381d3c030f674210485ee669bc3a44c23716f8b4dec9b18b985a288357d3dcf",
+    "tests/explosives_helpers.py": "a779c89a42c2c217117617856427c930eb8df0494eb7ba638ef57dc616e2cae7",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722"
+  },
+  "full_game_certified": false
+}
