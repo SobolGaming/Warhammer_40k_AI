@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ee586f767269099ac2083d6d287411ccb7f9a326578cd084de10e63221a91525",
-  "fingerprint": "ee586f767269099ac2083d6d287411ccb7f9a326578cd084de10e63221a91525",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:acfbaffb34da0cb3ed0bf5364dfd98469c28c4da23938877af32ec6c0f846e0a",
+  "fingerprint": "acfbaffb34da0cb3ed0bf5364dfd98469c28c4da23938877af32ec6c0f846e0a",
   "resource_count": 2793,
   "resources": [
     {
@@ -1510,9 +1510,9 @@
       "sha256": "9b678110bd97b9a738e7c54a12c491da68e98512a61199ef4a97f306e9713f06"
     },
     {
-      "byte_length": 10824,
+      "byte_length": 12005,
       "path": "warhammer40k_core/engine/charge_endpoint_history.py",
-      "sha256": "d4be05c4cf2bc710a68f84d3c63dcc85007eca555f7d86e7462b834414f4c582"
+      "sha256": "c8675b65984d2a322ec791ab0a4de73fd5780db56a420c50ef40912a9398baae"
     },
     {
       "byte_length": 11085,

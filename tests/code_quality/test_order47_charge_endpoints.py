@@ -76,6 +76,31 @@ def test_order47_endpoint_execution_has_reviewed_source_and_distinct_load_status
     assert mirror.provider_non_affiliation_recorded
 
 
+def test_historical_charge_movement_capabilities_use_the_event_bound_component() -> None:
+    tree = ast.parse((ENGINE / "charge_endpoint_history.py").read_text())
+    constructors = {
+        ("AircraftMovementPolicy", "from_unit"),
+        ("MovementCapabilitySet", "from_keywords"),
+    }
+    found: set[tuple[str, str]] = set()
+    for node in ast.walk(tree):
+        if not (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+        ):
+            continue
+        constructor = (node.func.value.id, node.func.attr)
+        if constructor not in constructors:
+            continue
+        found.add(constructor)
+        unit = next(keyword.value for keyword in node.keywords if keyword.arg == "unit")
+        assert isinstance(unit, ast.Name)
+        assert unit.id == "unit_at_charge"
+    assert found == constructors
+    assert "charge_component_at_physical_boundary" in _calls("charge_endpoint_history.py")
+
+
 def test_order47_matched_charge_slice_meets_its_versioned_budget() -> None:
     directory = ROOT / "docs/performance/order47"
     base = json.loads((directory / "base.json").read_text())

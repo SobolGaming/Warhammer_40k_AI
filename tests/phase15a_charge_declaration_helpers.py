@@ -61,12 +61,14 @@ def charge_lifecycle(
     enemy_origins: dict[str, Pose] | None = None,
     battle_round: int = 1,
     alpha_attached_unit_ids: tuple[str, str] | None = None,
+    catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = charge_config(
         game_id=game_id,
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
         alpha_attached_unit_ids=alpha_attached_unit_ids,
+        catalog=catalog,
     )
     config = replace(
         config,
@@ -156,8 +158,9 @@ def charge_config(
     alpha_unit_ids: tuple[str, ...],
     enemy_unit_ids: tuple[str, ...],
     alpha_attached_unit_ids: tuple[str, str] | None = None,
+    catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,

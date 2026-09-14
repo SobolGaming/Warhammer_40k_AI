@@ -25,6 +25,7 @@ from warhammer40k_core.engine.fight_model_authority_history import historical_ru
 from warhammer40k_core.engine.movement_legality import MovementCapabilitySet
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
+    PhysicalModelAuthority,
     physical_model_authority_before_event,
 )
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
@@ -34,6 +35,7 @@ from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.unit_factory import UnitInstance
 
 _CHARGE_COMPLETIONS = frozenset(
     {
@@ -179,8 +181,9 @@ def validate_charge_endpoint_history(
             ):
                 continue
             army, unit, _ = identities[row.model_instance_id]
+            unit_at_charge = charge_component_at_physical_boundary(unit=unit, physical=physical)
             aircraft = AircraftMovementPolicy.from_unit(
-                unit=unit,
+                unit=unit_at_charge,
                 ruleset_descriptor=ruleset,
                 hover_mode_state=_hover_mode_state_for_unit(
                     hover_mode_states=tuple(state.hover_mode_states),
@@ -192,7 +195,7 @@ def validate_charge_endpoint_history(
                 ruleset_descriptor=ruleset,
                 ability_index=ability_index_for_player(army.player_id),
                 movement_mode=MovementMode.CHARGE,
-                unit=unit,
+                unit=unit_at_charge,
                 model_instance_id=row.model_instance_id,
                 current_model_instance_ids=tuple(
                     model_id
@@ -207,6 +210,27 @@ def validate_charge_endpoint_history(
                 ruleset=ruleset,
                 capabilities=capabilities,
             )
+
+
+def charge_component_at_physical_boundary(
+    *, unit: UnitInstance, physical: tuple[PhysicalModelAuthority, ...]
+) -> UnitInstance:
+    """Recover the component's event-bound living keyword and catalog-source inventory.
+
+    Keyword assignments are immutable source data, but UnitInstance unions only
+    living models. Use authenticated historical wounds; neither current casualties
+    nor models materialized after the event may change the earlier capabilities.
+    This snapshot is never installed in authoritative game state.
+    """
+    by_model_id = {row.model_instance_id: row for row in physical}
+    models = tuple(
+        replace(model, wounds_remaining=by_model_id[model.model_instance_id].wounds_remaining)
+        for model in unit.own_models
+        if model.model_instance_id in by_model_id
+    )
+    if not models:
+        raise GameLifecycleError("Charge historical component has no model authority.")
+    return replace(unit, own_models=models)
 
 
 def validate_charge_model_reachability_bounds(

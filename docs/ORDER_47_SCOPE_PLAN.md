@@ -117,3 +117,35 @@ tests, 342 TypeScript conformance assertions, and installed-wheel smoke all
 passed. The wheel validated 2,793 engine resources, 27 schemas and six request
 families. The final matched Charge slice averaged 0.019838 seconds on head and
 0.019900 seconds on base; all seven samples satisfied the versioned limits.
+
+## R47-001 historical movement capability correction
+
+Invariant: an accepted Charge proof must use the source assignments, model existence
+and living component inventory at the Charge event. A later casualty or revival
+cannot change its earlier movement metric. The regression reproduces the reviewed
+failure after a source-backed FLY leader is destroyed and retained; the equivalent
+bodyguard casualty is a passing control.
+
+The shared Charge history validator now reconstructs an immutable component using
+exact wounds and model existence from `physical_model_authority_before_event` before
+both Aircraft policy and catalog movement-capability evaluation. It never installs
+that snapshot in game state. The bug-class search found this was the only movement
+capability constructor in historical/restore authority modules; live movement calls
+correctly use current components. All three Charge completion families already use
+this history validator. Tests also exclude later keywords/model existence and a
+static audit binds both constructors to the event-bound component.
+
+Scope audit: one runtime module changes, using the existing physical history owner;
+no boundary, decision type, adapter payload or source semantics change is introduced.
+Contract 19 already specifies the historical proof authority, so its envelopes and
+migration schema remain unchanged. Runtime identity and dependent contract examples
+are regenerated. Restore performance diagnostics are retained in
+[the R47-001 report](performance/r47-001/README.md); existing budgets are preserved.
+
+R47-001 final validation passed 7,910 behavioral tests with 85.10% coverage and
+472 code-quality tests (18 workers, work stealing). Ruff, formatting, mypy,
+pyright, all 11 import boundaries, shard inventory and pre-commit passed.
+The regenerated contract passed the base-ref check, five TypeScript unit tests,
+342 conformance assertions and the installed-wheel smoke. The source-backed
+retained-leader regression failed with the reviewed error on `cd46c143`, while
+its bodyguard control passed; both pass with the historical component snapshot.

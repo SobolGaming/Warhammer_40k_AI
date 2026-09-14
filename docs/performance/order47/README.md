@@ -1,5 +1,9 @@
 # Order 47 Charge performance evidence
 
+This archived record covers the initial Order 47 implementation at `cd46c143`.
+The subsequent restore-only R47-001 correction has separate matched diagnostics
+in [the R47-001 report](../r47-001/README.md).
+
 This matched component/gameplay-slice measurement compares main
 `46e2a9b5` with the working-tree engine build recorded in `head.json`.
 Both use the same final benchmark script, fixture, dependency lock, fixed game

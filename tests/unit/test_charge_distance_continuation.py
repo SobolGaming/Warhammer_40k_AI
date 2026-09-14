@@ -1067,6 +1067,115 @@ def test_order47_restore_rejects_tampered_per_model_evidence(tamper: str) -> Non
         GameLifecycle.from_payload(checkpoint)
 
 
+@pytest.mark.parametrize("casualty", ["leader", "source"])
+def test_r47_001_historical_fly_charge_survives_a_later_retained_casualty(casualty: str) -> None:
+    from tests.charge_distance_helpers import select_targets
+    from tests.charge_endpoint_helpers import (
+        ATTACHED_TARGET,
+        attached_move_payload,
+        flying_attached_charge_exemption_session,
+        select_attached_source,
+    )
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+
+    from warhammer40k_core.engine.damage_allocation import (
+        DamageKind,
+        apply_damage_to_model,
+        model_by_id,
+    )
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session, bundle = flying_attached_charge_exemption_session()
+    lifecycle = session.lifecycle
+    request = select_targets(session, select_attached_source(session), (ATTACHED_TARGET,))
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="r47-001-charge",
+        payload=attached_move_payload(session, request),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    before = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(before, runtime_content_bundle=bundle).to_payload() == before
+    event = next(
+        e
+        for e in lifecycle.decision_controller.event_log.records
+        if e.event_type == "charge_move_completed"
+    )
+    payload = cast(dict[str, JsonValue], event.payload)
+    endpoint = cast(dict[str, JsonValue], payload["endpoint_witness"])
+    rows = cast(list[dict[str, JsonValue]], endpoint["model_endpoints"])
+    leader = next(row for row in rows if row["component_unit_instance_id"] == "army-alpha:leader")
+    assert cast(dict[str, JsonValue], leader["preferred_reachability"])["status"] == "unreachable"
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    phase = state.current_battle_phase
+    assert phase is not None
+    unit_id = f"army-alpha:{casualty}"
+    placement = state.battlefield_state.unit_placement_by_id(unit_id).model_placements[0]
+    model = model_by_id(state=state, model_instance_id=placement.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=unit_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+        remove_destroyed_model=False,
+    )
+    retain_destroyed_model_for_fixture(
+        state=state,
+        placement=placement,
+        effect_id="r47-001-retained",
+        source_rule_id="r47-001-retained-source",
+        source_phase=phase,
+        decisions=lifecycle.decision_controller,
+    )
+    after = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(after, runtime_content_bundle=bundle).to_payload() == after
+
+
+def test_r47_001_component_snapshot_excludes_later_keywords_and_model_inventory() -> None:
+    from tests.model_keyword_helpers import mixed_keyword_unit
+
+    from warhammer40k_core.engine.charge_endpoint_history import (
+        charge_component_at_physical_boundary,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
+        PhysicalModelAuthority,
+    )
+
+    unit = mixed_keyword_unit()
+    specialist = next(model for model in unit.own_models if "PSYKER" in model.keywords)
+    ordinary, later_model = tuple(model for model in unit.own_models if model != specialist)
+    current = replace(
+        unit,
+        own_models=tuple(
+            replace(model, wounds_remaining=0) if model == ordinary else model
+            for model in unit.own_models
+        ),
+    )
+    assert "PSYKER" in current.keywords
+    physical = (
+        PhysicalModelAuthority(
+            ordinary.model_instance_id, "battlefield", Pose.at(10, 10), ordinary.starting_wounds
+        ),
+        PhysicalModelAuthority(specialist.model_instance_id, "destroyed", None, 0),
+    )
+    historical = charge_component_at_physical_boundary(unit=current, physical=physical)
+    assert historical.own_model_ids() == tuple(
+        model.model_instance_id for model in unit.own_models if model != later_model
+    )
+    assert "PSYKER" not in historical.keywords
+    assert historical.alive_own_models() == (ordinary,)
+    assert current.alive_own_models() == tuple(
+        model for model in unit.own_models if model != ordinary
+    )
+    with pytest.raises(GameLifecycleError, match="no model authority"):
+        charge_component_at_physical_boundary(unit=current, physical=())
+
+
 @pytest.mark.parametrize(
     "tamper", ["missing_component", "foreign_model", "start_pose", "actor_alias"]
 )
