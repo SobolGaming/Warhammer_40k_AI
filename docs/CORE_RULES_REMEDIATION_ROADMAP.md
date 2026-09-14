@@ -4780,7 +4780,7 @@ Heroic orchestration and Take to the Skies choices retain their later orders.
 
 ### P15I — C15-09 / Order 48
 
-- **Status:** implementation and required local validation complete; PR publication in progress.
+- **Status:** implementation and required local validation complete; PR open for review.
 - **Finding IDs:** `C15-09` / `P15I`.
 - **Dependencies and evidence gate:** P15D, P11A, P06B and P05A are merged. The branch starts at current main `10a3b19d09a9fdb0aa1bd393e8bc141487368d05`; the retained complete maintained-mirror observation satisfies the source gate. No fresh observation is claimed.
 - **Violated invariant:** Crushing Impact must interrupt its owner's completed Charge through the shared decision path, use the chosen model's current Toughness, cap each unit's wounds independently, and finish damage and destruction continuations before Charge resumes.
@@ -4794,4 +4794,4 @@ Heroic orchestration and Take to the Skies choices retain their later orders.
 - **Regression scenarios and same-bug-class search:** MONSTER/VEHICLE, attached source/target identities, distinct selected-model Toughness plus modifiers, both caps, decline, stale CP/phase/keyword/presence/range, retained dead models, both-unit destruction, FNP on both sides, Deadly Demise collateral damage, suspension/restoration, altered and missing receipts, exact replay and public redaction. Searches covered immediate/deferred move discovery, duplicate cap calculations, canonical ownership/geometry, both Core damage consumers, and complete-history requirements in physical authority. The initial Charge and Deadly Demise regressions failed before their fixes.
 - **Generated artifacts/documentation:** source package/loader hashes, runtime identity, external contract examples/manifest, adapter contract, README, [scope/audit record](ORDER_48_SCOPE_PLAN.md), [performance evidence](performance/order48/README.md), and eight-shard inventory from the complete final JUnit profile. Existing named-handler classification remains valid.
 - **Validation results:** all required local gates passed: Ruff check/format, Mypy, Pyright, 7,940 behavioral tests with 85.11% coverage, 475 code-quality tests, regenerated eight-shard inventory check, import boundaries and pre-commit. Generated source/runtime/base-ref contract checks, installed-wheel smoke, TypeScript client and five unit tests passed; conformance passed 342 assertions. All matched Charge and new-capability performance budgets passed; full-game certification remains outstanding. The [scope record](ORDER_48_SCOPE_PLAN.md) includes commands, timing and the corrected shared-owner audit.
-- **PR URL and merge commit:** publication pending. No merge is authorized; stop after opening the completed PR.
+- **PR URL and merge commit:** [PR #468](https://github.com/SobolGaming/Warhammer_40k_AI/pull/468). Not merged; stop for owner review.

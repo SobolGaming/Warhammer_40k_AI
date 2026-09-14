@@ -1,6 +1,6 @@
 # Order 48 — Crushing Impact Charge continuation
 
-Status: implementation and required local validation complete; publication in progress.
+Status: implementation and required local validation complete; PR open for review.
 Finding `C15-09` / `P15I`.
 Base: `10a3b19d09a9fdb0aa1bd393e8bc141487368d05`; dependencies P15D, P11A,
 P06B and P05A are merged.
@@ -70,7 +70,8 @@ Generated artifacts: source semantic support metadata and package/loader hashes,
 runtime build identity, external contract bundle and examples, support artifacts
 where affected, and the eight-shard test inventory from the final JUnit profile.
 
-PR URL and merge commit: pending publication; no merge is authorized by this task.
+PR URL and merge commit: [PR #468](https://github.com/SobolGaming/Warhammer_40k_AI/pull/468).
+Not merged; no merge is authorized by this task.
 
 ## Approved shared destruction repair
 
