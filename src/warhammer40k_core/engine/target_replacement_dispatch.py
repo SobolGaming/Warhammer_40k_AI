@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine import charge_target_dispatch
+from warhammer40k_core.engine.charge_target_continuation import is_charge_target_replacement_request
 from warhammer40k_core.engine.decision_dispatch import DecisionDispatchHandler
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
@@ -27,6 +29,8 @@ if TYPE_CHECKING:
 def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHandler, ...]:
     def pre_validator(request: DecisionRequest, result: DecisionResult) -> LifecycleStatus | None:
         state = host._require_state()  # pyright: ignore[reportPrivateUsage]
+        if is_charge_target_replacement_request(state=state, request=request):
+            return charge_target_dispatch.validate_charge_replacement(host, request, result)
         try:
             current = next_shooting_target_replacement(
                 handler=host._shooting_phase_handler,  # pyright: ignore[reportPrivateUsage]
@@ -51,6 +55,8 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
 
     def applier(record: DecisionRecord, result: DecisionResult) -> LifecycleStatus:
         state = host._require_state()  # pyright: ignore[reportPrivateUsage]
+        if is_charge_target_replacement_request(state=state, request=record.request):
+            return charge_target_dispatch.apply_charge_replacement(host, record, result)
         sequence = active_shooting_sequence(state)
         current = next_shooting_target_replacement(
             handler=host._shooting_phase_handler,  # pyright: ignore[reportPrivateUsage]
@@ -96,6 +102,7 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
         return host.advance_until_decision_or_terminal()
 
     return (
+        *charge_target_dispatch.decision_dispatch_handlers(host),
         DecisionDispatchHandler(
             decision_type=SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
             pre_validator=pre_validator,

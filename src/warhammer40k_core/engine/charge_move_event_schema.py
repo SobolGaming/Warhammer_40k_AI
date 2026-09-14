@@ -15,6 +15,8 @@ CHARGE_MOVE_PROPOSAL_CONTEXT_KEYS: frozenset[str] = frozenset(
         "reachable_target_distances_inches",
         CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
         "charge_roll",
+        "movement_budget",
+        "target_selection",
     }
 )
 CHARGE_MOVE_MODEL_MOVEMENT_PAYLOAD_KEYS: frozenset[str] = frozenset(

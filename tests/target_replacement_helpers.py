@@ -59,14 +59,15 @@ def replacement_scene(
         unit_instance_id=units["new"].unit_instance_id,
         poses=tuple(Pose.at(18 + i, 25) for i in range(5)),
     )
-    if mode == "snap":
+    if mode in {"snap", "charge_interrupt"}:
         from warhammer40k_core.engine.phase import BattlePhase
         from warhammer40k_core.engine.phases.shooting_requests import (
             request_out_of_phase_shooting_declaration,
         )
         from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 
-        state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+        parent_phase = BattlePhase.CHARGE if mode == "charge_interrupt" else BattlePhase.MOVEMENT
+        state.battle_phase_index = state.battle_phase_sequence.index(parent_phase)
         state.active_player_id = "player-b"
         request = _decision_request(
             request_out_of_phase_shooting_declaration(
@@ -76,12 +77,18 @@ def replacement_scene(
                 army_catalog=lifecycle.config.army_catalog,
                 player_id="player-a",
                 unit_instance_id=units["source"].unit_instance_id,
-                parent_phase=BattlePhase.MOVEMENT,
-                source_rule_id=FIRE_OVERWATCH_RULE_ID,
+                parent_phase=parent_phase,
+                source_rule_id=(
+                    "order46:shooting-interruption"
+                    if mode == "charge_interrupt"
+                    else FIRE_OVERWATCH_RULE_ID
+                ),
                 source_decision_request_id="order42:overwatch-request",
                 source_decision_result_id="order42:overwatch-result",
                 source_context={"triggering_enemy_unit_instance_id": units["old"].unit_instance_id},
-                target_unit_ids=(units["old"].unit_instance_id,),
+                target_unit_ids=None
+                if mode == "charge_interrupt"
+                else (units["old"].unit_instance_id,),
             )
         )
     else:

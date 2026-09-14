@@ -4694,7 +4694,7 @@ Committed physical weapons, One Shot uses, random Attacks, original Shooting
 mode and out-of-phase restrictions are preserved. Gathered attacks cannot be
 redirected. Checkpoint/decision/event authority and shared viewer redaction
 cover the new contract 15.3 family. Real Charge queries exercise the reusable
-service; its later-modifier action integration remains Order 46 / C11-03.
+service; Order 46 / C11-03 now integrates its later-modifier Charge continuation.
 See [scope and validation](ORDER_42_SCOPE_PLAN.md) and
 [component/small-slice evidence](performance/order42/README.md).
 
@@ -4748,3 +4748,17 @@ executable semantic support. Contract 17 documents the changed window IDs and
 source scope; old deployments retain their own saved sessions. See the
 [scope and validation](ORDER_45_SCOPE_PLAN.md), [migration](../contracts/migrations/16-to-17.md)
 and [performance evidence](performance/order45/README.md).
+
+
+## Order 46 / P11A — Charge budgets and target continuation
+
+C11-01 and C11-03 preserve raw 2D6, bound the current modified Charge result to
+1–12, then apply source-linked move-distance effects separately. Target selection
+uses both the current movement maximum and the 12-inch target limit. Finite
+Charge target commitments precede path submission; later invalidation uses P04
+replacement or decline without rerolling. Current budget validation also covers
+setup-reactive Charge's existing target-bound path. Contract 18 authenticates
+these commitments through decisions, events, restore and replay. See the
+[scope and source record](ORDER_46_SCOPE_PLAN.md),
+[contract migration](../contracts/migrations/17-to-18.md), and
+[component/slice evidence](performance/order46/README.md).

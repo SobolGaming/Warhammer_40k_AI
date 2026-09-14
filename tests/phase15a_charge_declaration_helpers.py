@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import cast
 
 from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
@@ -26,6 +27,9 @@ from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     PlayerPrimaryMissionAssignment,
 )
+from warhammer40k_core.engine.mission_state_validation import (
+    runtime_ruleset_descriptor_for_mission_setup,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleStage,
@@ -49,11 +53,18 @@ def charge_lifecycle(
     alpha_origins: dict[str, Pose] | None = None,
     enemy_unit_ids: tuple[str, ...] = ("enemy",),
     enemy_origins: dict[str, Pose] | None = None,
+    battle_round: int = 1,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = charge_config(
         game_id=game_id,
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
+    )
+    config = replace(
+        config,
+        ruleset_descriptor=runtime_ruleset_descriptor_for_mission_setup(
+            config.mission_setup, rules_overlay_ids=config.ruleset_descriptor.rules_overlay_ids
+        ),
     )
     armies = mustered_armies(config)
     mission = config.mission_setup
@@ -108,7 +119,7 @@ def charge_lifecycle(
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
-    state.battle_round = 1
+    state.battle_round = battle_round
     state.active_player_id = "player-a"
     decisions = GameLifecycle().decision_controller
     record_completed_command_occurrences_for_fixture(
@@ -140,7 +151,7 @@ def charge_config(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
-            descriptor_version="core-v2-phase15a-test"
+            descriptor_version="core-v2-phase14a-ca2026-27"
         ),
         army_catalog=catalog,
         army_muster_requests=(

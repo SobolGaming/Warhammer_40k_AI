@@ -1,6 +1,11 @@
 # CORE V2 external contract
 
-Contract version: `17.0.0`
+Contract version: `18.0.0`
+
+Contract 18 separates bounded Charge rolls from subsequent movement-distance
+effects and commits finite target choices before path submission. Later target
+invalidation uses the shared replacement decision. See
+[17-to-18.md](migrations/17-to-18.md).
 
 Contract 17 provides one Fire Overwatch opportunity at opponent Movement-phase
 end and a canonical Snap declaration against one eligible enemy. Snap's 24-inch

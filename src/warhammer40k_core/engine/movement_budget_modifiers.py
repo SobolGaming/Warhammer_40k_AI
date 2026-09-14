@@ -140,8 +140,6 @@ def _resolve_movement(
 ) -> tuple[float, tuple[MovementBudgetModifierApplication, ...]]:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_rule_characteristic_operations,
-        generic_rule_matching_unit_effects,
-        generic_rule_modifier_source_id,
     )
     from warhammer40k_core.engine.runtime_characteristic_modifiers import bind_characteristic_terms
 
@@ -208,39 +206,74 @@ def _resolve_movement(
             )
     if not resolved.is_numeric or resolved.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO:
         return float(resolved.final), tuple(applications)
-    distance_effects = tuple(
-        effect
-        for effect in generic_rule_matching_unit_effects(
-            state=context.state,
-            unit_instance_id=context.unit_instance_id,
-            effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
-        )
-        if effect.persisting_effect.effect_id not in ignored_ids
+    final, distance_applications = move_distance_modifier_trace(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        starting_inches=float(resolved.final),
+        ignored_ids=ignored_ids,
     )
-    sources = {
-        effect.persisting_effect.effect_id: generic_rule_modifier_source_id(effect)
-        for effect in distance_effects
-    }
-    final, distance_steps = resolve_distance_deltas(
-        float(resolved.final),
-        tuple(
-            (
-                effect.persisting_effect.effect_id,
-                _required_numeric_parameter(effect.parameters, key="delta"),
-            )
-            for effect in distance_effects
-        ),
+    return final, (*applications, *distance_applications)
+
+
+def move_distance_modifier_trace(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    starting_inches: float,
+    ignored_ids: frozenset[str] = frozenset(),
+) -> tuple[float, tuple[MovementBudgetModifierApplication, ...]]:
+    """Apply subsequent move-distance effects without changing a characteristic or roll."""
+    rows = move_distance_modifiers(
+        state=state, unit_instance_id=unit_instance_id, ignored_ids=ignored_ids
     )
-    applications.extend(
+    sources = {row.modifier_id: row.source_id for row in rows}
+    final, steps = resolve_distance_deltas(
+        starting_inches, tuple((row.modifier_id, row.delta_inches) for row in rows)
+    )
+    return final, tuple(
         MovementBudgetModifierApplication(
             modifier_id=modifier_id,
             source_id=sources[modifier_id],
             before_inches=before,
             after_inches=after,
         )
-        for modifier_id, before, after in distance_steps
+        for modifier_id, before, after in steps
     )
-    return final, tuple(applications)
+
+
+@dataclass(frozen=True, slots=True)
+class MoveDistanceModifier:
+    modifier_id: str
+    source_id: str
+    delta_inches: float
+
+    def __post_init__(self) -> None:
+        _validate_identifier("move-distance modifier_id", self.modifier_id)
+        _validate_identifier("move-distance source_id", self.source_id)
+        _validate_finite_float("move-distance delta_inches", self.delta_inches)
+
+
+def move_distance_modifiers(
+    *, state: GameState, unit_instance_id: str, ignored_ids: frozenset[str] = frozenset()
+) -> tuple[MoveDistanceModifier, ...]:
+    from warhammer40k_core.engine.generic_rule_attack_hooks import (
+        generic_rule_matching_unit_effects,
+        generic_rule_modifier_source_id,
+    )
+
+    return tuple(
+        MoveDistanceModifier(
+            effect.persisting_effect.effect_id,
+            generic_rule_modifier_source_id(effect),
+            _required_numeric_parameter(effect.parameters, key="delta"),
+        )
+        for effect in generic_rule_matching_unit_effects(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
+        )
+        if effect.persisting_effect.effect_id not in ignored_ids
+    )
 
 
 def _validate_finite_float(field_name: str, value: object) -> float:

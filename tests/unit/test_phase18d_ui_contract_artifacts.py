@@ -438,7 +438,7 @@ def test_session_metadata_contract_version_accepts_current_major_releases() -> N
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "17.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "18.0.0"}
     incompatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
 
     validator.validate(compatible)
@@ -453,7 +453,7 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     properties = _json_object(schema["properties"])
     definitions = _json_object(schema["$defs"])
     assert schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v17/session-persistence.schema.json"
+        "https://warhammer40k-core.local/contracts/v18/session-persistence.schema.json"
     )
     assert schema["additionalProperties"] is False
     assert _json_object(properties["schema_version"])["const"] == (
@@ -505,28 +505,28 @@ def test_current_contract_preserves_model_projections_and_advances_visibility_wr
     )
 
     assert metadata["$id"] == (
-        "https://warhammer40k-core.local/contracts/v17/session-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v18/session-metadata.schema.json"
     )
     assert result["$id"] == (
-        "https://warhammer40k-core.local/contracts/v17/session-command-result.schema.json"
+        "https://warhammer40k-core.local/contracts/v18/session-command-result.schema.json"
     )
     assert outcome["$id"] == (
-        "https://warhammer40k-core.local/contracts/v17/session-command-outcome.schema.json"
+        "https://warhammer40k-core.local/contracts/v18/session-command-outcome.schema.json"
     )
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v17-contract"
+        == "session-metadata-v18-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v17-contract"
+        == "session-command-result-v18-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v17-contract"
+        == "session-command-outcome-v18-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]

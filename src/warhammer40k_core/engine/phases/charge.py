@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from math import isfinite
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
@@ -38,9 +39,6 @@ from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     selected_target_charge_constraint_for_unit,
 )
 from warhammer40k_core.engine.charge_declaration import (
-    CHARGE_MOVE_PENDING_STATUS,
-    ChargeDistanceState,
-    ChargeDistanceStatePayload,
     ChargeRollRequest,
     ChargeRollRequestPayload,
     ChargeRollResult,
@@ -61,14 +59,27 @@ from warhammer40k_core.engine.charge_move_event_schema import (
     CHARGE_MOVE_COMPLETED_STATUS,
     CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
 )
+from warhammer40k_core.engine.charge_movement_budget import current_charge_movement_budget
+from warhammer40k_core.engine.charge_phase_state import (
+    ChargePhaseState as ChargePhaseState,
+)
+from warhammer40k_core.engine.charge_phase_state import (
+    ChargePhaseStatePayload as ChargePhaseStatePayload,
+)
+from warhammer40k_core.engine.charge_phase_state import (
+    ChargingUnitSelection as ChargingUnitSelection,
+)
+from warhammer40k_core.engine.charge_phase_state import (
+    ChargingUnitSelectionPayload as ChargingUnitSelectionPayload,
+)
+from warhammer40k_core.engine.charge_phase_state import (
+    _validate_identifier_tuple,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
 from warhammer40k_core.engine.charge_required_targets import (
     charge_target_constraints_satisfied as _charge_target_constraints_satisfied,
-)
-from warhammer40k_core.engine.charge_required_targets import (
-    required_charge_target_unit_instance_ids as _required_charge_target_unit_instance_ids,
 )
 from warhammer40k_core.engine.charge_roll_permissions import (
     charge_reroll_permission_for_unit as _charge_reroll_permission_for_unit,
@@ -80,6 +91,10 @@ from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
     enemy_vehicle_monster_model_ids_for_player,
     unit_has_vehicle_or_monster_keyword,
+)
+from warhammer40k_core.engine.charge_target_continuation import (
+    continue_charge_move,
+    request_charge_targets,
 )
 from warhammer40k_core.engine.charge_targets import (
     charge_target_candidates as _charge_target_candidates,
@@ -121,6 +136,13 @@ from warhammer40k_core.engine.phases import charge_modifier_ignore as _modifier_
 from warhammer40k_core.engine.phases.charge_move_completed_hooks import (
     resolve_charge_move_completed_hooks,
     validate_charge_move_completed_hook_provider,
+)
+from warhammer40k_core.engine.phases.charge_proposal_flow import (
+    _apply_charge_move_proposal_decision,
+    _request_charge_move_proposal_retry,
+)
+from warhammer40k_core.engine.phases.charge_proposal_flow import (
+    invalid_charge_move_proposal_status as invalid_charge_move_proposal_status,
 )
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
@@ -185,28 +207,6 @@ def _empty_stratagem_cost_modifier_registry() -> StratagemCostModifierRegistry:
     return StratagemCostModifierRegistry.empty()
 
 
-def _empty_declared_charge_targets() -> dict[str, tuple[str, ...]]:
-    return {}
-
-
-class ChargingUnitSelectionPayload(TypedDict):
-    player_id: str
-    battle_round: int
-    unit_instance_id: str
-    request_id: str
-    result_id: str
-
-
-class ChargePhaseStatePayload(TypedDict):
-    battle_round: int
-    active_player_id: str
-    phase_complete: bool
-    selected_unit_ids: list[str]
-    active_selection: ChargingUnitSelectionPayload | None
-    distance_states: list[ChargeDistanceStatePayload]
-    declared_target_unit_instance_ids_by_unit: dict[str, list[str]]
-
-
 class ChargeMoveProposalPayload(TypedDict):
     proposal_request_id: str
     proposal_kind: str
@@ -224,64 +224,6 @@ class ChargeEndpointWitnessPayload(TypedDict):
     engaged_target_unit_instance_ids: list[str]
     preferred_distance_target_unit_instance_ids: list[str]
     non_target_engaged_unit_instance_ids: list[str]
-
-
-@dataclass(frozen=True, slots=True)
-class ChargingUnitSelection:
-    player_id: str
-    battle_round: int
-    unit_instance_id: str
-    request_id: str
-    result_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("ChargingUnitSelection player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("ChargingUnitSelection battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier(
-                "ChargingUnitSelection unit_instance_id",
-                self.unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "request_id",
-            _validate_identifier("ChargingUnitSelection request_id", self.request_id),
-        )
-        object.__setattr__(
-            self,
-            "result_id",
-            _validate_identifier("ChargingUnitSelection result_id", self.result_id),
-        )
-
-    def to_payload(self) -> ChargingUnitSelectionPayload:
-        return {
-            "player_id": self.player_id,
-            "battle_round": self.battle_round,
-            "unit_instance_id": self.unit_instance_id,
-            "request_id": self.request_id,
-            "result_id": self.result_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ChargingUnitSelectionPayload) -> Self:
-        return cls(
-            player_id=payload["player_id"],
-            battle_round=payload["battle_round"],
-            unit_instance_id=payload["unit_instance_id"],
-            request_id=payload["request_id"],
-            result_id=payload["result_id"],
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -643,225 +585,6 @@ class ChargeMoveResolution:
 
 
 @dataclass(frozen=True, slots=True)
-class ChargePhaseState:
-    battle_round: int
-    active_player_id: str
-    phase_complete: bool = False
-    selected_unit_ids: tuple[str, ...] = ()
-    active_selection: ChargingUnitSelection | None = None
-    distance_states: tuple[ChargeDistanceState, ...] = ()
-    declared_target_unit_instance_ids_by_unit: dict[str, tuple[str, ...]] = field(
-        default_factory=_empty_declared_charge_targets
-    )
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("ChargePhaseState battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "active_player_id",
-            _validate_identifier("ChargePhaseState active_player_id", self.active_player_id),
-        )
-        if type(self.phase_complete) is not bool:
-            raise GameLifecycleError("ChargePhaseState phase_complete must be a bool.")
-        object.__setattr__(
-            self,
-            "selected_unit_ids",
-            _validate_identifier_tuple(
-                "ChargePhaseState selected_unit_ids", self.selected_unit_ids
-            ),
-        )
-        if self.active_selection is not None:
-            if type(self.active_selection) is not ChargingUnitSelection:
-                raise GameLifecycleError(
-                    "ChargePhaseState active_selection must be ChargingUnitSelection."
-                )
-            if self.active_selection.player_id != self.active_player_id:
-                raise GameLifecycleError("Charge active_selection active player drift.")
-            if self.active_selection.battle_round != self.battle_round:
-                raise GameLifecycleError("Charge active_selection battle round drift.")
-            if self.active_selection.unit_instance_id not in self.selected_unit_ids:
-                raise GameLifecycleError("Charge active_selection must be selected.")
-        object.__setattr__(
-            self,
-            "distance_states",
-            _validate_charge_distance_states(self.distance_states),
-        )
-        object.__setattr__(
-            self,
-            "declared_target_unit_instance_ids_by_unit",
-            _validate_charge_declared_target_map(self.declared_target_unit_instance_ids_by_unit),
-        )
-        if self.phase_complete and self.active_selection is not None:
-            raise GameLifecycleError("Completed Charge phase cannot have active_selection.")
-        if self.phase_complete and self.move_pending_distance_state() is not None:
-            raise GameLifecycleError("Completed Charge phase cannot have pending charge movement.")
-
-    def with_unit_selection(self, selection: ChargingUnitSelection) -> Self:
-        if type(selection) is not ChargingUnitSelection:
-            raise GameLifecycleError("Charge selection must be ChargingUnitSelection.")
-        if self.phase_complete:
-            raise GameLifecycleError("Cannot select a charging unit after phase completion.")
-        if self.active_selection is not None:
-            raise GameLifecycleError("Charge unit selection requires no active selection.")
-        if selection.player_id != self.active_player_id:
-            raise GameLifecycleError("Charge selection player drift.")
-        if selection.battle_round != self.battle_round:
-            raise GameLifecycleError("Charge selection battle round drift.")
-        if selection.unit_instance_id in self.selected_unit_ids:
-            raise GameLifecycleError("Charge unit was already selected.")
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            phase_complete=False,
-            selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
-            active_selection=selection,
-            distance_states=self.distance_states,
-            declared_target_unit_instance_ids_by_unit=(
-                self.declared_target_unit_instance_ids_by_unit
-            ),
-        )
-
-    def with_charge_roll_result(self, roll_result: ChargeRollResult) -> Self:
-        if type(roll_result) is not ChargeRollResult:
-            raise GameLifecycleError("Charge roll result must be ChargeRollResult.")
-        if self.phase_complete:
-            raise GameLifecycleError("Cannot record a charge roll after phase completion.")
-        if self.active_selection is None:
-            raise GameLifecycleError("Charge roll requires active_selection.")
-        if roll_result.request.player_id != self.active_player_id:
-            raise GameLifecycleError("Charge roll player drift.")
-        if roll_result.request.battle_round != self.battle_round:
-            raise GameLifecycleError("Charge roll battle round drift.")
-        if roll_result.request.unit_instance_id != self.active_selection.unit_instance_id:
-            raise GameLifecycleError("Charge roll unit drift.")
-        distance_state = ChargeDistanceState(
-            roll_result=roll_result,
-            source_decision_request_id=roll_result.request.source_decision_request_id,
-            source_decision_result_id=roll_result.request.source_decision_result_id,
-        )
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            phase_complete=False,
-            selected_unit_ids=self.selected_unit_ids,
-            active_selection=self.active_selection if roll_result.move_available else None,
-            distance_states=(*self.distance_states, distance_state),
-            declared_target_unit_instance_ids_by_unit=(
-                self.declared_target_unit_instance_ids_by_unit
-            ),
-        )
-
-    def with_charge_move_resolved(
-        self,
-        unit_instance_id: str,
-        *,
-        selected_target_unit_instance_ids: tuple[str, ...] = (),
-    ) -> Self:
-        resolved_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        target_ids = _validate_identifier_tuple(
-            "selected_target_unit_instance_ids",
-            selected_target_unit_instance_ids,
-        )
-        if self.phase_complete:
-            raise GameLifecycleError("Cannot resolve a charge move after phase completion.")
-        if self.active_selection is None:
-            raise GameLifecycleError("Charge move resolution requires active_selection.")
-        if self.active_selection.unit_instance_id != resolved_unit_id:
-            raise GameLifecycleError("Charge move resolution unit drift.")
-        if self.move_pending_distance_state() is None:
-            raise GameLifecycleError("Charge move resolution requires pending distance state.")
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            phase_complete=False,
-            selected_unit_ids=self.selected_unit_ids,
-            active_selection=None,
-            distance_states=self.distance_states,
-            declared_target_unit_instance_ids_by_unit={
-                **self.declared_target_unit_instance_ids_by_unit,
-                resolved_unit_id: target_ids,
-            },
-        )
-
-    def with_phase_complete(self, *, skipped_unit_ids: tuple[str, ...] = ()) -> Self:
-        if self.active_selection is not None:
-            raise GameLifecycleError("Charge completion requires no active selection.")
-        if self.move_pending_distance_state() is not None:
-            raise GameLifecycleError("Charge completion requires no pending charge movement.")
-        skipped_ids = _validate_identifier_tuple("skipped_unit_ids", skipped_unit_ids)
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            phase_complete=True,
-            selected_unit_ids=tuple(sorted({*self.selected_unit_ids, *skipped_ids})),
-            active_selection=None,
-            distance_states=self.distance_states,
-            declared_target_unit_instance_ids_by_unit=(
-                self.declared_target_unit_instance_ids_by_unit
-            ),
-        )
-
-    def move_pending_distance_state(self) -> ChargeDistanceState | None:
-        if self.active_selection is None:
-            return None
-        for distance_state in reversed(self.distance_states):
-            if (
-                distance_state.roll_result.request.unit_instance_id
-                == self.active_selection.unit_instance_id
-                and distance_state.roll_result.status == CHARGE_MOVE_PENDING_STATUS
-            ):
-                return distance_state
-        return None
-
-    def to_payload(self) -> ChargePhaseStatePayload:
-        return {
-            "battle_round": self.battle_round,
-            "active_player_id": self.active_player_id,
-            "phase_complete": self.phase_complete,
-            "selected_unit_ids": list(self.selected_unit_ids),
-            "active_selection": (
-                None if self.active_selection is None else self.active_selection.to_payload()
-            ),
-            "distance_states": [distance.to_payload() for distance in self.distance_states],
-            "declared_target_unit_instance_ids_by_unit": {
-                unit_id: list(target_ids)
-                for unit_id, target_ids in sorted(
-                    self.declared_target_unit_instance_ids_by_unit.items()
-                )
-            },
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ChargePhaseStatePayload) -> Self:
-        selection_payload = payload["active_selection"]
-        return cls(
-            battle_round=payload["battle_round"],
-            active_player_id=payload["active_player_id"],
-            phase_complete=payload["phase_complete"],
-            selected_unit_ids=tuple(payload["selected_unit_ids"]),
-            active_selection=(
-                None
-                if selection_payload is None
-                else ChargingUnitSelection.from_payload(selection_payload)
-            ),
-            distance_states=tuple(
-                ChargeDistanceState.from_payload(distance)
-                for distance in payload["distance_states"]
-            ),
-            declared_target_unit_instance_ids_by_unit={
-                unit_id: tuple(target_ids)
-                for unit_id, target_ids in payload[
-                    "declared_target_unit_instance_ids_by_unit"
-                ].items()
-            },
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class ChargePhaseHandler:
     move_completion_rule_registry: MoveCompletionRuleRegistry = field(
         default_factory=lambda: MoveCompletionRuleRegistry(())
@@ -950,12 +673,8 @@ class ChargePhaseHandler:
         charge_state = _ensure_charge_phase_state(state=state)
         pending_distance_state = charge_state.move_pending_distance_state()
         if pending_distance_state is not None:
-            return _request_charge_move_proposal(
-                state=state,
-                decisions=decisions,
-                charge_state=charge_state,
-                roll_result=pending_distance_state.roll_result,
-            )
+            return continue_charge_move(state=state, decisions=decisions, handler=self)
+
         if charge_state.active_selection is not None:
             raise GameLifecycleError("Charge active_selection requires pending charge movement.")
         move_completed_status = resolve_charge_move_completed_hooks(
@@ -1091,6 +810,8 @@ class ChargePhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                ability_index=self.ability_index_for_player(_active_player_id(state)),
+                runtime_modifier_registry=self.runtime_modifier_registry,
                 charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
@@ -1212,146 +933,6 @@ def invalid_charging_unit_selection_status(
         result=result,
         current_options=current_options,
     )
-
-
-def invalid_charge_move_proposal_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    decisions: DecisionController,
-    ruleset_descriptor: RulesetDescriptor,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
-) -> LifecycleStatus | None:
-    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    parsed = _parse_charge_move_proposal_submission_or_invalid(
-        state=state,
-        request=request,
-        result=result,
-        decisions=decisions,
-    )
-    if isinstance(parsed, LifecycleStatus):
-        return parsed
-    submitted_proposal_request, proposal = parsed
-    proposal_validation = proposal.validation_result_for_request(submitted_proposal_request)
-    if not proposal_validation.is_valid:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=proposal_validation,
-            message="Charge Move proposal does not match the pending request.",
-        )
-    charge_state = state.charge_phase_state
-    if charge_state is None:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="charge_phase_state_missing",
-                message="Charge Move proposal has no active charge phase state.",
-                field="charge_phase_state",
-            ),
-            message="Charge Move proposal has no active phase state.",
-        )
-    pending_distance = charge_state.move_pending_distance_state()
-    if pending_distance is None:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="charge_distance_state_missing",
-                message="Charge Move proposal has no pending charge distance state.",
-                field="charge_phase_state",
-            ),
-            message="Charge Move proposal has no pending distance state.",
-        )
-    if pending_distance.roll_result.request.unit_instance_id != proposal.unit_instance_id:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="proposal_unit_drift",
-                message="Charge Move proposal unit does not match the pending charge roll.",
-                field="unit_instance_id",
-            ),
-            message="Charge Move proposal unit drifted.",
-        )
-    current_reachable = _reachable_charge_target_distances(
-        state=state,
-        unit_instance_id=proposal.unit_instance_id,
-        maximum_distance_inches=pending_distance.roll_result.value,
-        ruleset_descriptor=ruleset_descriptor,
-        charge_target_restriction_hooks=charge_target_restriction_hooks
-        or ChargeTargetRestrictionHookRegistry.empty(),
-    )
-    requested_reachable = _payload_distance_map(
-        _proposal_context(proposal_request),
-        key="reachable_target_distances_inches",
-    )
-    if current_reachable != requested_reachable:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="charge_reachable_targets_drift",
-                message="Charge Move reachable target snapshot no longer matches state.",
-                field="reachable_target_unit_instance_ids",
-                status="stale",
-            ),
-            message="Charge Move reachable target snapshot is stale.",
-        )
-    current_required = _required_charge_target_unit_instance_ids(
-        state=state,
-        unit_instance_id=proposal.unit_instance_id,
-        reachable_target_unit_instance_ids=tuple(current_reachable),
-    )
-    requested_required = _payload_optional_identifier_list(
-        _proposal_context(proposal_request),
-        key=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
-    )
-    if current_required != requested_required:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="charge_required_targets_drift",
-                message="Charge Move required target snapshot no longer matches state.",
-                field=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
-                status="stale",
-            ),
-            message="Charge Move required target snapshot is stale.",
-        )
-    if proposal.witness is not None:
-        witness_validation = _charge_witness_matches_current_unit_status(
-            state=state,
-            proposal_request=proposal_request,
-            proposal=proposal,
-        )
-        if witness_validation is not None:
-            return _reject_invalid_charge_proposal(
-                state=state,
-                decisions=decisions,
-                result=result,
-                proposal_validation=witness_validation,
-                message="Charge Move witness does not match the current unit.",
-            )
-    return None
 
 
 def invalid_charge_declaration_grant_status(
@@ -1954,6 +1535,8 @@ def _resolve_charge_roll(
         roll_request=roll_request,
         roll_state=roll_state,
         ruleset_descriptor=ruleset_descriptor,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
 
@@ -1967,11 +1550,21 @@ def _resolve_charge_roll_state(
     roll_state: DiceRollState,
     ruleset_descriptor: RulesetDescriptor,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
+    budget = current_charge_movement_budget(
+        state=state,
+        request=roll_request,
+        roll_state=roll_state,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    roll_request = replace(roll_request, roll_modifiers=budget.modified_roll.modifiers)
     reachable_distances = _reachable_charge_target_distances(
         state=state,
         unit_instance_id=selection.unit_instance_id,
-        maximum_distance_inches=roll_request.resolve_roll(roll_state).final_value,
+        maximum_distance_inches=budget.maximum_distance_inches,
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
@@ -1985,6 +1578,7 @@ def _resolve_charge_roll_state(
         request=roll_request,
         roll_state=roll_state,
         reachable_target_distances_inches=reachable_distances,
+        movement_budget=budget,
     )
     charge_state = state.charge_phase_state
     if charge_state is None:
@@ -2004,11 +1598,8 @@ def _resolve_charge_roll_state(
         "charge_move_required",
         phase15a_charge_roll_payload(roll_result=roll_result),
     )
-    return _request_charge_move_proposal(
-        state=state,
-        decisions=decisions,
-        charge_state=charge_state,
-        roll_result=roll_result,
+    return request_charge_targets(
+        state=state, decisions=decisions, budget=budget, reachable=reachable_distances
     )
 
 
@@ -2019,6 +1610,8 @@ def _apply_charge_roll_reroll_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     charge_state = state.charge_phase_state
     if charge_state is None or charge_state.active_selection is None:
@@ -2059,270 +1652,9 @@ def _apply_charge_roll_reroll_decision(
         roll_state=rerolled_state,
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
-    )
-
-
-def _request_charge_move_proposal(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    charge_state: ChargePhaseState,
-    roll_result: ChargeRollResult,
-) -> LifecycleStatus:
-    if charge_state.active_selection is None:
-        raise GameLifecycleError("Charge Move proposal requires active_selection.")
-    required_target_ids = _required_charge_target_unit_instance_ids(
-        state=state,
-        unit_instance_id=roll_result.request.unit_instance_id,
-        reachable_target_unit_instance_ids=tuple(roll_result.reachable_target_distances_inches),
-    )
-    proposal_request = MovementProposalRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
-        actor_id=charge_state.active_player_id,
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        phase=BattlePhase.CHARGE.value,
-        unit_instance_id=roll_result.request.unit_instance_id,
-        proposal_kind=ProposalKind.CHARGE_MOVE,
-        source_decision_request_id=charge_state.active_selection.request_id,
-        source_decision_result_id=charge_state.active_selection.result_id,
-        spatial_context_hash=state.physical_proposal_context_hash(),
-        movement_phase_action=CHARGE_MOVE_ACTION,
-        context={
-            "source_selected_option_id": charge_state.active_selection.unit_instance_id,
-            "movement_mode": MovementMode.CHARGE.value,
-            "maximum_distance_inches": roll_result.value,
-            "reachable_target_unit_instance_ids": list(
-                roll_result.reachable_target_distances_inches
-            ),
-            "reachable_target_distances_inches": dict(
-                sorted(roll_result.reachable_target_distances_inches.items())
-            ),
-            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: list(required_target_ids),
-            "charge_roll": validate_json_value(roll_result.to_payload()),
-        },
-    )
-    request = proposal_request.to_decision_request()
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "charge_move_proposal_requested",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": charge_state.active_player_id,
-                "phase": BattlePhase.CHARGE.value,
-                "unit_instance_id": roll_result.request.unit_instance_id,
-                "movement_phase_action": CHARGE_MOVE_ACTION,
-                "movement_mode": MovementMode.CHARGE.value,
-                "proposal_kind": ProposalKind.CHARGE_MOVE.value,
-                "request_id": request.request_id,
-                "source_decision_request_id": charge_state.active_selection.request_id,
-                "source_decision_result_id": charge_state.active_selection.result_id,
-                "maximum_distance_inches": roll_result.value,
-                "reachable_target_unit_instance_ids": list(
-                    roll_result.reachable_target_distances_inches
-                ),
-                CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: list(required_target_ids),
-                "phase_body_status": _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
-            }
-        ),
-    )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload={
-            "phase": BattlePhase.CHARGE.value,
-            "phase_body_status": _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
-            "battle_round": state.battle_round,
-            "active_player_id": charge_state.active_player_id,
-            "unit_instance_id": roll_result.request.unit_instance_id,
-            "movement_phase_action": CHARGE_MOVE_ACTION,
-            "proposal_kind": ProposalKind.CHARGE_MOVE.value,
-            "maximum_distance_inches": roll_result.value,
-            "reachable_target_unit_instance_ids": list(
-                roll_result.reachable_target_distances_inches
-            ),
-            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: list(required_target_ids),
-        },
-    )
-
-
-def _request_charge_move_proposal_retry(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    proposal_request: MovementProposalRequest,
-    rejected_result: DecisionResult,
-) -> DecisionRequest:
-    retry_proposal = MovementProposalRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
-        actor_id=proposal_request.actor_id,
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        phase=BattlePhase.CHARGE.value,
-        unit_instance_id=proposal_request.unit_instance_id,
-        proposal_kind=ProposalKind.CHARGE_MOVE,
-        source_decision_request_id=proposal_request.source_decision_request_id,
-        source_decision_result_id=proposal_request.source_decision_result_id,
-        spatial_context_hash=state.physical_proposal_context_hash(),
-        movement_phase_action=CHARGE_MOVE_ACTION,
-        context=dict(proposal_request.context or {}),
-    )
-    request = retry_proposal.to_decision_request()
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "charge_move_proposal_requested",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": _active_player_id(state),
-                "phase": BattlePhase.CHARGE.value,
-                "unit_instance_id": proposal_request.unit_instance_id,
-                "movement_phase_action": CHARGE_MOVE_ACTION,
-                "movement_mode": MovementMode.CHARGE.value,
-                "proposal_kind": ProposalKind.CHARGE_MOVE.value,
-                "request_id": request.request_id,
-                "source_decision_request_id": proposal_request.source_decision_request_id,
-                "source_decision_result_id": proposal_request.source_decision_result_id,
-                "previous_proposal_request_id": proposal_request.request_id,
-                "rejected_result_id": rejected_result.result_id,
-                "phase_body_status": _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
-            }
-        ),
-    )
-    return request
-
-
-def _apply_charge_move_proposal_decision(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-    ruleset_descriptor: RulesetDescriptor,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
-    ability_index: AbilityCatalogIndex,
-) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
-
-    _validate_charge_phase_state(state)
-    active_player_id = _active_player_id(state)
-    if result.actor_id != active_player_id:
-        raise GameLifecycleError("Charge Move proposal actor must be the active player.")
-    charge_state = state.charge_phase_state
-    if charge_state is None or charge_state.active_selection is None:
-        raise GameLifecycleError("Charge Move proposal requires active_selection.")
-    record = decisions.record_for_result(result)
-    parsed = _parse_charge_move_proposal_submission_or_invalid(
-        state=state,
-        request=record.request,
-        result=result,
-        decisions=decisions,
-    )
-    if isinstance(parsed, LifecycleStatus):
-        return parsed
-    proposal_request, proposal = parsed
-    proposal_validation = proposal.validation_result_for_request(proposal_request)
-    if not proposal_validation.is_valid:
-        return _reject_invalid_charge_proposal(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_validation=proposal_validation,
-            message="Charge Move proposal does not match the pending request.",
-        )
-    pending_distance = charge_state.move_pending_distance_state()
-    if pending_distance is None:
-        raise GameLifecycleError("Charge Move proposal requires pending distance state.")
-    if proposal.is_no_move_choice:
-        state.replace_charge_phase_state(
-            charge_state.with_charge_move_resolved(proposal.unit_instance_id)
-        )
-        decisions.event_log.append(
-            "charge_move_declined",
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": active_player_id,
-                    "phase": BattlePhase.CHARGE.value,
-                    "unit_instance_id": proposal.unit_instance_id,
-                    "request_id": result.request_id,
-                    "result_id": result.result_id,
-                    "proposal_request_id": proposal_request.request_id,
-                    "phase_body_status": _CHARGE_MOVE_DECLINED_STATUS,
-                    "proposal_validation": proposal_validation.to_payload(),
-                }
-            ),
-        )
-        return None
-    if proposal.witness is None:
-        raise GameLifecycleError("Validated Charge Move proposal must include a witness.")
-    scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    resolution = resolve_charge_move(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
-        selected_target_unit_instance_ids=proposal.charge_target_unit_instance_ids,
-        maximum_distance_inches=pending_distance.roll_result.value,
-        path_witness=proposal.witness,
-        hover_mode_states=tuple(state.hover_mode_states),
-        unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
         ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
-    violation_code = _charge_move_violation_code(
-        resolution=resolution,
-        ruleset_descriptor=ruleset_descriptor,
-        maximum_distance_inches=pending_distance.roll_result.value,
-    )
-    if violation_code is not None:
-        return _reject_invalid_charge_move_resolution(
-            state=state,
-            decisions=decisions,
-            result=result,
-            proposal_request=proposal_request,
-            proposal_validation=proposal_validation,
-            resolution=resolution,
-            violation_code=violation_code,
-            message=_charge_move_invalid_message(violation_code),
-        )
-    transition_batch = resolution.transition_batch(before=unit_placement)
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Charge Move proposal requires battlefield_state.")
-    state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(resolution.attempted_placement)
-    )
-    state.replace_charge_phase_state(
-        charge_state.with_charge_move_resolved(
-            proposal.unit_instance_id,
-            selected_target_unit_instance_ids=resolution.selected_target_unit_instance_ids,
-        )
-    )
-    effect = _record_fights_first_effect_if_needed(
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        proposal_request=proposal_request,
-        result=result,
-        unit_instance_id=proposal.unit_instance_id,
-    )
-    payload = _charge_move_completed_payload(
-        state=state,
-        result=result,
-        proposal_request=proposal_request,
-        proposal_validation=proposal_validation,
-        resolution=resolution,
-        transition_batch=transition_batch,
-        persisting_effect=effect,
-    )
-    record_move_completion_event(
-        state=state, decisions=decisions, event_type="charge_move_completed", payload=payload
-    )
-    return None
 
 
 def resolve_charge_move(
@@ -2331,7 +1663,7 @@ def resolve_charge_move(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     selected_target_unit_instance_ids: tuple[str, ...],
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
     path_witness: PathWitness,
     hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
@@ -2346,10 +1678,12 @@ def resolve_charge_move(
         raise GameLifecycleError("Charge Move unit_placement must be a UnitPlacement.")
     if type(path_witness) is not PathWitness:
         raise GameLifecycleError("Charge Move requires a PathWitness.")
-    if type(maximum_distance_inches) is not int:
-        raise GameLifecycleError("Charge Move maximum distance must be an int.")
-    if maximum_distance_inches < 1 or maximum_distance_inches > 12:
-        raise GameLifecycleError("Charge Move maximum distance must be within 1-12.")
+    if (
+        type(maximum_distance_inches) not in {int, float}
+        or not isfinite(maximum_distance_inches)
+        or maximum_distance_inches < 0
+    ):
+        raise GameLifecycleError("Charge Move maximum distance must be finite and nonnegative.")
     target_ids = _validate_identifier_tuple(
         "selected_target_unit_instance_ids",
         selected_target_unit_instance_ids,
@@ -2688,7 +2022,7 @@ def _reachable_charge_target_distances(
     *,
     state: GameState,
     unit_instance_id: str,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
     ruleset_descriptor: RulesetDescriptor,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> dict[str, float]:
@@ -3337,7 +2671,7 @@ def _charge_move_violation_code(
     *,
     resolution: ChargeMoveResolution,
     ruleset_descriptor: RulesetDescriptor,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
 ) -> str | None:
     return charge_move_violation_code(
         resolution=resolution,
@@ -3350,7 +2684,7 @@ def charge_move_violation_code(
     *,
     resolution: ChargeMoveResolution,
     ruleset_descriptor: RulesetDescriptor,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
 ) -> str | None:
     for path_result in resolution.path_validation_results:
         if not path_result.is_valid:
@@ -3382,7 +2716,7 @@ def _charge_endpoint_violation_code(
     *,
     endpoint_witness: ChargeEndpointWitness,
     ruleset_descriptor: RulesetDescriptor,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
 ) -> str | None:
     selected = endpoint_witness.selected_target_unit_instance_ids
     if not selected:
@@ -3433,7 +2767,7 @@ def _charge_preferred_distance_possible(
     *,
     endpoint_witness: ChargeEndpointWitness,
     preferred_distance_inches: float,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
 ) -> bool:
     return any(
         max(0.0, before_distance - preferred_distance_inches) <= maximum_distance_inches
@@ -3729,60 +3063,91 @@ def _ruleset_descriptor_for_handler(handler: ChargePhaseHandler) -> RulesetDescr
     return handler.ruleset_descriptor
 
 
-def _validate_charge_distance_states(values: object) -> tuple[ChargeDistanceState, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("ChargePhaseState distance_states must be a tuple.")
-    raw_values = cast(tuple[object, ...], values)
-    states: list[ChargeDistanceState] = []
-    seen: set[str] = set()
-    for value in raw_values:
-        if type(value) is not ChargeDistanceState:
-            raise GameLifecycleError(
-                "ChargePhaseState distance_states must contain ChargeDistanceState."
-            )
-        result_id = value.source_decision_result_id
-        if result_id in seen:
-            raise GameLifecycleError("ChargePhaseState distance_states duplicate result_id.")
-        seen.add(result_id)
-        states.append(value)
-    return tuple(states)
-
-
-def _validate_charge_declared_target_map(values: object) -> dict[str, tuple[str, ...]]:
-    if type(values) is not dict:
-        raise GameLifecycleError(
-            "ChargePhaseState declared_target_unit_instance_ids_by_unit must be a dict."
-        )
-    validated: dict[str, tuple[str, ...]] = {}
-    for raw_unit_id, raw_target_ids in cast(dict[object, object], values).items():
-        unit_id = _validate_identifier("declared target unit id", raw_unit_id)
-        if unit_id in validated:
-            raise GameLifecycleError("ChargePhaseState declared target map duplicates unit IDs.")
-        if type(raw_target_ids) is not tuple:
-            raise GameLifecycleError("ChargePhaseState declared target map values must be tuples.")
-        validated[unit_id] = _validate_identifier_tuple(
-            "declared target unit ids",
-            cast(tuple[object, ...], raw_target_ids),
-        )
-    return dict(sorted(validated.items()))
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    raw_values = cast(tuple[object, ...], values)
-    validated = tuple(_validate_identifier(field_name, value) for value in raw_values)
-    if len(set(validated)) != len(validated):
-        raise GameLifecycleError(f"{field_name} must not contain duplicates.")
-    return tuple(sorted(validated))
-
-
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
-
-def _validate_positive_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an int.")
-    if value <= 0:
-        raise GameLifecycleError(f"{field_name} must be greater than zero.")
-    return value
+__all__ = (
+    "_ability_index_for_player",
+    "_active_player_id",
+    "_active_player_placed_unit_ids",
+    "_aircraft_policy_for_charge_unit",
+    "_apply_charge_declaration_grant_decision",
+    "_apply_charge_roll_reroll_decision",
+    "_apply_charging_unit_selection_decision",
+    "_battlefield_scenario",
+    "_charge_after_fall_back_allowed_by_effects",
+    "_charge_declaration_grant_options",
+    "_charge_declaration_grant_unit_effect_expiration",
+    "_charge_declaration_grant_unit_effect_target_ids",
+    "_charge_ended_closer_to_any_selected_target",
+    "_charge_endpoint_violation_code",
+    "_charge_endpoint_witness",
+    "_charge_forbidden_by_effects",
+    "_charge_move_completed_payload",
+    "_charge_move_invalid_message",
+    "_charge_move_transition_batch",
+    "_charge_move_violation_code",
+    "_charge_move_violation_field",
+    "_charge_movement_mode",
+    "_charge_phase_status_payload",
+    "_charge_preferred_distance_possible",
+    "_charge_proposal_kind",
+    "_charge_proposal_payload_parse_failure",
+    "_charge_unit_ineligibility_reason",
+    "_charge_witness_matches_current_unit_status",
+    "_closest_distance_between_model_groups",
+    "_complete_charge_phase_or_request_heroic_intervention",
+    "_decision_payload_object",
+    "_default_stratagem_index",
+    "_empty_ability_indexes",
+    "_empty_stratagem_cost_modifier_registry",
+    "_enemy_geometry_models_for_player",
+    "_ensure_charge_phase_state",
+    "_friendly_geometry_models_for_charge_path",
+    "_friendly_vehicle_monster_model_ids",
+    "_geometry_models_for_unit",
+    "_geometry_models_for_unit_placement",
+    "_hover_mode_state_for_unit",
+    "_invalid_charging_unit_finite_decision_status",
+    "_key_error_field",
+    "_legal_charging_unit_ids",
+    "_model_groups_are_engaged",
+    "_movement_mode_from_token",
+    "_parse_charge_move_proposal_submission_or_invalid",
+    "_payload_distance_map",
+    "_payload_identifier_list",
+    "_payload_object",
+    "_payload_optional_identifier_list",
+    "_payload_string",
+    "_proposal_context",
+    "_proposal_kind_from_token",
+    "_reachable_charge_target_distances",
+    "_record_charge_declaration_grant_effects",
+    "_record_fights_first_effect_if_needed",
+    "_reject_invalid_charge_move_resolution",
+    "_reject_invalid_charge_proposal",
+    "_request_charge_declaration_grant_if_available",
+    "_resolve_charge_roll",
+    "_resolve_charge_roll_state",
+    "_ruleset_descriptor_for_handler",
+    "_selected_charge_declaration_grants_from_payload",
+    "_terrain_volumes_for_features",
+    "_unit_by_id",
+    "_unit_for_selection",
+    "_unit_is_engaged",
+    "_validate_ability_index_mapping",
+    "_validate_charge_move_action",
+    "_validate_charge_phase_state",
+    "_validate_charge_witness_matches_unit",
+    "_validate_distance_map",
+    "_validate_json_object",
+    "_validate_path_validation_results",
+    "_validate_selected_charge_declaration_grants",
+    "_validate_terrain_path_legality_results",
+    "charge_move_invalid_message",
+    "charge_move_violation_code",
+    "charge_move_violation_field",
+    "invalid_charge_declaration_grant_status",
+    "invalid_charging_unit_selection_status",
+    "legal_charge_target_unit_instance_ids",
+    "resolve_charge_move",
+)

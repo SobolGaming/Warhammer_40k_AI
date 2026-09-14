@@ -1,0 +1,25 @@
+{
+  "audit_id": "core-charge-maintained-app-mirrors-2026-09-14",
+  "observed_at": "2026-09-14T09:54:47+00:00",
+  "rows": [
+    {
+      "row_id": "modified-charge-targets-faq",
+      "provider_name": "Game Datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-charge:modified-charge-targets-faq",
+      "transcription_sha256": "c6b5f4d46423ed4c74fbb43b00721b190b7576e4a220a747c84d447bac52d0fc",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "05e5e478d337f737e5a6f4950e7315f915a8ccbcec481e5a4f8eaa9d46707d8b"
+    }
+  ],
+  "observation_time_precision": "second",
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "Read the complete Charge-distance FAQ entry directly in the browser with App-data 931 selected. No co-versioned observation from a second provider is asserted.",
+  "observed_browser_url": "https://game-datamissions.com/11th/rules/changelog?v=931"
+}
