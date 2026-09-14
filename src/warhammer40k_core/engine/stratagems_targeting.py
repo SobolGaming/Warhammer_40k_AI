@@ -2,11 +2,22 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
+
 from warhammer40k_core.engine.rapid_ingress_eligibility import (
     rapid_ingress_window_error,
     rapid_ingress_reserve_error,
     rapid_ingress_target_error,
 )
+
+from warhammer40k_core.engine.fire_overwatch import (
+    fire_overwatch_target_unit_ids,
+    fire_overwatch_shooter_ineligibility_reason,
+)
+from warhammer40k_core.engine.phases.shooting_eligibility import (
+    shooting_rules_unit_has_legal_declaration_against_targets,
+)
+from warhammer40k_core.engine.shooting_types import ShootingType
 
 from typing import TYPE_CHECKING
 
@@ -35,7 +46,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.stratagems_apply import invalid_stratagem_use_status, apply_stratagem_decision, _apply_stratagem_use, invalid_stratagem_target_proposal_status, apply_stratagem_target_proposal, is_stratagem_placement_proposal_request, invalid_stratagem_placement_proposal_status, apply_stratagem_placement_proposal, is_heroic_intervention_charge_move_request, invalid_heroic_intervention_charge_move_status, apply_heroic_intervention_charge_move, _request_heroic_intervention_charge_move_retry
     from warhammer40k_core.engine.stratagems_selection import stratagem_availability_kind_from_token, stratagem_category_from_token, stratagem_target_kind_from_token, _stratagem_decision_option, _effect_selection_token, _stratagem_selection_from_result_payload, _require_stratagem_selection, stratagem_selection_from_decision_result, stratagem_selection_from_target_proposal_result, _record_is_available_for_context, _stratagem_unavailable_reason, _context_state_drift, _detachment_gate_allows, _effect_selection_error, _selected_command_point_cost, _selected_command_point_cost_result, _heroic_intervention_mode_error, _heroic_intervention_mode, _heroic_intervention_mode_additional_cost, _heroic_intervention_mode_costs, _required_effect_selection_fields_error, _effect_selection_string_or_none
     from warhammer40k_core.engine.stratagems_eligibility import _handler_unavailable_reason, _restriction_violation, _same_stratagem_phase, _stratagem_targeted_unit_ids, _stratagem_affected_unit_ids, _canonical_stratagem_affected_unit_id, _attached_unit_id_for_component, _unit_has_runtime_attached_role, _rules_unit_owner, _enumerated_target_bindings
-    from warhammer40k_core.engine.stratagems_geometry import _fire_overwatch_triggering_enemy_unit_id, _fire_overwatch_triggering_enemy_unit_id_or_none, _heroic_intervention_target_binding_error, _crushing_impact_context_error, _counteroffensive_target_context_error, _epic_challenge_context_error, _units_are_within_range_inches, _friendly_unit_within_enemy_range, _units_are_engaged, _model_engaged_with_unit, _geometry_model_for_model_id, _model_is_alive_and_placed, _model_toughness, _crushing_impact_enemy_target_id_or_none, _crushing_impact_model_id_or_none, _epic_challenge_character_model_id_or_none, _explosives_context_error, _explosives_target_unit_id, _explosives_target_unit_id_or_none, _explosives_target_is_visible_and_in_range, _unit_is_within_enemy_engagement_range, _enemy_unit_is_within_friendly_engagement_range, _any_models_within_engagement_range, _geometry_models_for_unit, _battlefield_scenario_for_stratagem, _stratagem_terrain_features, _stratagem_ruleset_descriptor, _explosives_visibility_profile, _unit_owner, _unit_by_id, _unit_by_id_or_none, _reserve_state_for_target, _unit_for_reserve_state, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _unit_has_deep_strike_keyword, _battlefield_scenario, _proposal_from_request_payload, _proposal_from_result_payload, _proposal_context_error, _movement_proposal_request_from_payload, _heroic_intervention_charge_move_from_result_payload, _heroic_intervention_charge_move_request_error, _heroic_intervention_maximum_distance, _heroic_intervention_mode_from_request, _heroic_intervention_requested_reachable_distances, _heroic_intervention_request_context, _placement_proposal_from_result_payload, _proposal_request_is_rapid_ingress
+    from warhammer40k_core.engine.stratagems_geometry import _heroic_intervention_target_binding_error, _crushing_impact_context_error, _counteroffensive_target_context_error, _epic_challenge_context_error, _units_are_within_range_inches, _friendly_unit_within_enemy_range, _units_are_engaged, _model_engaged_with_unit, _geometry_model_for_model_id, _model_is_alive_and_placed, _model_toughness, _crushing_impact_enemy_target_id_or_none, _crushing_impact_model_id_or_none, _epic_challenge_character_model_id_or_none, _explosives_context_error, _explosives_target_unit_id, _explosives_target_unit_id_or_none, _explosives_target_is_visible_and_in_range, _unit_is_within_enemy_engagement_range, _enemy_unit_is_within_friendly_engagement_range, _any_models_within_engagement_range, _geometry_models_for_unit, _battlefield_scenario_for_stratagem, _stratagem_terrain_features, _stratagem_ruleset_descriptor, _explosives_visibility_profile, _unit_owner, _unit_by_id, _unit_by_id_or_none, _reserve_state_for_target, _unit_for_reserve_state, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _unit_has_deep_strike_keyword, _battlefield_scenario, _proposal_from_request_payload, _proposal_from_result_payload, _proposal_context_error, _movement_proposal_request_from_payload, _heroic_intervention_charge_move_from_result_payload, _heroic_intervention_charge_move_request_error, _heroic_intervention_maximum_distance, _heroic_intervention_mode_from_request, _heroic_intervention_requested_reachable_distances, _heroic_intervention_request_context, _placement_proposal_from_result_payload, _proposal_request_is_rapid_ingress
     from warhammer40k_core.engine.stratagems_ingress import _apply_rapid_ingress_placement, _strategic_reserve_rule_for_ingress_request, _proposal_request_marks_movement_phase_arrival, _request_rapid_ingress_placement_retry
     from warhammer40k_core.engine.stratagems_core_handlers import _stratagem_use_from_proposal_context, _apply_supported_stratagem_handler, _validate_supported_stratagem_handler_available, _validate_supported_stratagem_handler_preflight, _generic_rule_ir_from_stratagem_payload, _apply_generic_rule_ir_stratagem_handler, _apply_command_reroll_handler, is_command_reroll_decision_request, invalid_command_reroll_decision_status, apply_command_reroll_decision, _command_reroll_request_context, _apply_insane_bravery_handler, _apply_rapid_ingress_handler, _apply_ingress_move_handler, _ingress_move_effect_payload, _apply_force_desperate_escape_handler
     from warhammer40k_core.engine.stratagems_tactical_secondaries import _apply_new_orders_handler
@@ -106,6 +117,7 @@ def _target_binding_error(
     context: StratagemEligibilityContext | None,
     ruleset_descriptor: RulesetDescriptor | None,
     army_catalog: ArmyCatalog | None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> str | None:
     if target_spec.target_kind is StratagemTargetKind.NONE:
         if target_binding.target_kind is not StratagemTargetKind.NONE:
@@ -346,6 +358,7 @@ def _target_binding_error(
             target_binding=target_binding,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
         )
     if target_spec.target_policy_id == HEROIC_INTERVENTION_TARGET_POLICY_ID:
         if context is None:
@@ -1327,55 +1340,30 @@ def _fire_overwatch_target_binding_error(
     target_binding: StratagemTargetBinding,
     ruleset_descriptor: RulesetDescriptor | None,
     army_catalog: ArmyCatalog | None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> str | None:
-    triggering_unit_id = _fire_overwatch_triggering_enemy_unit_id_or_none(context)
-    if triggering_unit_id is None:
-        return "missing_fire_overwatch_trigger_unit"
-    triggering_owner = _unit_owner(state=state, unit_instance_id=triggering_unit_id)
-    if triggering_owner is None:
-        return "unknown_fire_overwatch_trigger_unit"
-    if triggering_owner == player_id:
-        return "fire_overwatch_trigger_unit_not_enemy"
-    if fire_overwatch_forbidden_by_effects(
-        state.persisting_effects_for_unit(triggering_unit_id),
-        owner_player_id=triggering_owner,
-    ):
-        return "fire_overwatch_target_forbidden"
     if state.battlefield_state is None:
         return "fire_overwatch_requires_battlefield"
     shooting_unit_id = _require_target_unit_id(target_binding)
-    if not _units_are_within_range_inches(
-        state=state,
-        first_unit_instance_id=shooting_unit_id,
-        second_unit_instance_id=triggering_unit_id,
-        distance_inches=FIRE_OVERWATCH_MAX_RANGE_INCHES,
-    ):
-        return "fire_overwatch_unit_not_within_24"
     if ruleset_descriptor is None or army_catalog is None:
         return "fire_overwatch_requires_shooting_rules_context"
-    shooting_unit = _unit_by_id(state=state, unit_instance_id=shooting_unit_id)
-    if _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="TITANIC"):
-        return "fire_overwatch_unit_titanic"
-    if _unit_is_within_enemy_engagement_range(
+    shooter_error = fire_overwatch_shooter_ineligibility_reason(
         state=state,
         player_id=player_id,
         unit_instance_id=shooting_unit_id,
-    ):
-        return "fire_overwatch_unit_engaged"
-    if not shooting_unit_can_select_to_shoot(
-        state=state,
-        unit=shooting_unit,
         army_catalog=army_catalog,
-        player_id=player_id,
-    ):
-        return "fire_overwatch_unit_ineligible_to_shoot"
-    if not shooting_unit_has_legal_declaration_against_targets(
+    )
+    if shooter_error is not None:
+        return shooter_error
+    if not shooting_rules_unit_has_legal_declaration_against_targets(
         state=state,
-        unit=shooting_unit,
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=shooting_unit_id),
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         player_id=player_id,
-        target_unit_ids=(triggering_unit_id,),
+        target_unit_ids=fire_overwatch_target_unit_ids(state=state, player_id=player_id),
+        forced_shooting_type=ShootingType.SNAP,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     ):
         return "fire_overwatch_no_legal_shooting_declaration"
     return None

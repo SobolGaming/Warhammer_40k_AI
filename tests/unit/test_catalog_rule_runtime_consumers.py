@@ -7165,10 +7165,10 @@ def test_catalog_command_point_runtime_helpers_fail_fast_on_contract_drift() -> 
             None,
             TimingTriggerKind.END_PHASE,
             BattlePhaseKind.MOVEMENT,
-            "player-b",
+            "player-a",
             "none",
             False,
-            "missing_fire_overwatch_trigger_unit",
+            "fire_overwatch_requires_opponent_turn",
         ),
         (
             "heroic-intervention",

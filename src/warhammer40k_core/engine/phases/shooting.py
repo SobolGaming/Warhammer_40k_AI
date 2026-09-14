@@ -95,7 +95,6 @@ __all__ = (
     "_declaration_available_weapon_key",
     "_declaration_source_model_id",
     "_declaration_source_unit",
-    "_declaration_target_within_max_range",
     "_default_stratagem_index",
     "_destroyed_enemy_unit_ids_for_sequence",
     "_destroyed_target_unit_ids_for_sequence",

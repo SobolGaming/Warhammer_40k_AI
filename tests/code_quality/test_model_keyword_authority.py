@@ -60,7 +60,11 @@ def test_current_keyword_gates_use_state_backed_rules_unit_authority() -> None:
             "_target_unit_satisfies_required_faction_keywords": "_target_unit_keyword_set",
             "_target_unit_has_excluded_keywords": "_target_unit_keyword_set",
             "_target_unit_has_excluded_faction_keywords": "_target_unit_keyword_set",
-            "_fire_overwatch_target_binding_error": "_target_unit_has_keyword",
+            "_fire_overwatch_target_binding_error": "fire_overwatch_shooter_ineligibility_reason",
+        },
+        "fire_overwatch.py": {
+            "fire_overwatch_shooter_ineligibility_reason": "rules_unit_view_by_id",
+            "fire_overwatch_has_potential_shooter": "rules_unit_views_from_armies",
         },
         "stratagems_geometry.py": {
             "_heroic_intervention_target_binding_error": "_target_unit_has_keyword",

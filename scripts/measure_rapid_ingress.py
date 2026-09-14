@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 from types import CodeType
 
+from tests.fire_overwatch_helpers import decline_overwatch
 from tests.rapid_ingress_helpers import (
     ingress_context,
     ingress_placement,
@@ -109,6 +110,12 @@ def sample(*, case: str, profile: bool = False) -> dict[str, object]:
                 ),
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status
+            if (
+                status.decision_request is not None
+                and status.decision_request.decision_type == "submit_stratagem_target_proposal"
+            ):
+                status = decline_overwatch(session, status.decision_request)
+                assert status.status_kind is not LifecycleStatusKind.INVALID, status
             assert session.lifecycle.reaction_queue.frames == ()
     if profile:
         profiler.disable()
@@ -157,6 +164,7 @@ def main() -> None:
     inputs = (
         "uv.lock",
         "scripts/measure_rapid_ingress.py",
+        "tests/fire_overwatch_helpers.py",
         "tests/rapid_ingress_helpers.py",
         "tests/core_stratagem_helpers.py",
         "tests/setup_completion_helpers.py",
@@ -186,7 +194,9 @@ def main() -> None:
         "rng_source": "engine game_id=phase12c-game; no random choices in measured slice",
         "cpu_allocation": "one benchmark process; host CPU allocation not pinned",
         "models_per_unit": 5,
-        "decision_policy": "remain stationary; select legal reserve target",
+        "decision_policy": (
+            "remain stationary; select legal reserve target; decline phase-end Overwatch"
+        ),
         "hashes": {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in inputs},
         "summaries": summaries,
         "samples": rows,

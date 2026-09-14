@@ -1,0 +1,101 @@
+{
+  "workload_id": "order45-fire-overwatch-slice-v1",
+  "revision": "a178a9e1ff5cac93c0c79e61499b2ce45f402012",
+  "runtime_diff_sha256": "d5b791a33f5b9e38ddc35e01525f05393b1d3c177bc3cc3c517cf28e425d92d2",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "model_count": 3,
+  "terrain_count": 0,
+  "timing_boundary": "phase-end scheduling through next Shooting decision; setup separate",
+  "scenario": {
+    "game_id": "order45-overwatch",
+    "moved_enemy": "army-beta:enemy",
+    "chosen_enemy": "army-beta:enemy",
+    "shooters": 1,
+    "enemies": 2,
+    "command_points": 1,
+    "weapon_range_inches": 24,
+    "weapon_attacks": 2
+  },
+  "mode": "uninstrumented_timing",
+  "concurrency": 1,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/fire_overwatch_helpers.py": "748eb35b4eb052e951b5c915a01f287368e5a37bc3f681722a9673be4f161410",
+    "scripts/measure_fire_overwatch.py": "59f81bfe2826a7106887986b2d832b99b12f500fae0782595918918c0a1a171b"
+  },
+  "samples": [
+    {
+      "setup_seconds": 2.1525695000309497,
+      "scheduling_seconds": 0.006255499902181327,
+      "declaration_seconds": 0.006137042073532939,
+      "continuation_seconds": 0.03538041596766561,
+      "slice_seconds": 0.04777295794337988,
+      "decision_count": 4,
+      "event_count": 52
+    },
+    {
+      "setup_seconds": 0.2589684590930119,
+      "scheduling_seconds": 0.005004457896575332,
+      "declaration_seconds": 0.00513550010509789,
+      "continuation_seconds": 0.028864749940112233,
+      "slice_seconds": 0.039004707941785455,
+      "decision_count": 4,
+      "event_count": 52
+    },
+    {
+      "setup_seconds": 0.3003082920331508,
+      "scheduling_seconds": 0.0054460420506075025,
+      "declaration_seconds": 0.005130250006914139,
+      "continuation_seconds": 0.029571124934591353,
+      "slice_seconds": 0.040147416992112994,
+      "decision_count": 4,
+      "event_count": 52
+    },
+    {
+      "setup_seconds": 0.25607970799319446,
+      "scheduling_seconds": 0.005325167090632021,
+      "declaration_seconds": 0.005154999904334545,
+      "continuation_seconds": 0.029358166037127376,
+      "slice_seconds": 0.03983833303209394,
+      "decision_count": 4,
+      "event_count": 52
+    },
+    {
+      "setup_seconds": 0.2599598750239238,
+      "scheduling_seconds": 0.005274374969303608,
+      "declaration_seconds": 0.0051984579768031836,
+      "continuation_seconds": 0.02927491709124297,
+      "slice_seconds": 0.03974775003734976,
+      "decision_count": 4,
+      "event_count": 52
+    },
+    {
+      "setup_seconds": 0.25921341706998646,
+      "scheduling_seconds": 0.005338915972970426,
+      "declaration_seconds": 0.004999625030905008,
+      "continuation_seconds": 0.028978916932828724,
+      "slice_seconds": 0.03931745793670416,
+      "decision_count": 4,
+      "event_count": 52
+    },
+    {
+      "setup_seconds": 0.2587603749707341,
+      "scheduling_seconds": 0.005270458059385419,
+      "declaration_seconds": 0.005171832977794111,
+      "continuation_seconds": 0.029765291954390705,
+      "slice_seconds": 0.040207582991570234,
+      "decision_count": 4,
+      "event_count": 52
+    }
+  ],
+  "mean_seconds": 0.04086231526785663,
+  "median_seconds": 0.03983833303209394,
+  "p95_seconds": 0.04777295794337988,
+  "maximum_seconds": 0.04777295794337988,
+  "completion_rate": 1,
+  "full_game_certified": false
+}

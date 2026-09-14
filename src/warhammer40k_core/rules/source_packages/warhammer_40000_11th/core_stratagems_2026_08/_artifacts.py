@@ -48,8 +48,8 @@ EXPECTED_CATEGORY_12_AUDIT_FINGERPRINT: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "3f93f3c26def1e33abfc66801822463bc292ed578ab443c3bc314104a7b1be8c"
-EXPECTED_PACKAGE_HASH: Final = "64bee037ad180ad610a90b3813200f79a961386fa19108048c123e70ff1a8286"
+EXPECTED_ARTIFACT_SHA256: Final = "81e56999e279cc4e110353e66a8c66207dc626c81fdaf77625747aa2d961f334"
+EXPECTED_PACKAGE_HASH: Final = "fa049c003103adc70fe32fb22cecc23524a2e301e7c94e8e7879237609ad83e0"
 EXPECTED_ANOMALY_OBSERVATION_SHA256: Final = (
     "561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46"
 )
@@ -139,8 +139,8 @@ EXPECTED_SEMANTIC_STATUS_BY_RULE_ID: Final = {
     "crushing-impact": "partial_engine_runtime",
     "explosives": "executable_engine_runtime",
     "rapid-ingress": "partial_engine_runtime",
-    "fire-overwatch": "partial_engine_runtime",
-    "snap-shooting": "partial_engine_runtime",
+    "fire-overwatch": "executable_engine_runtime",
+    "snap-shooting": "executable_engine_runtime",
     "insane-bravery": "executable_engine_runtime",
 }
 EXPECTED_RUNTIME_CONSUMERS_BY_RULE_ID: Final = {

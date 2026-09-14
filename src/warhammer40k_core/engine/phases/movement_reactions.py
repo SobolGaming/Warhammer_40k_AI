@@ -36,9 +36,7 @@ if TYPE_CHECKING:
 # fmt: on
 
 __all__ = (
-    "_active_player_end_movement_overwatch_trigger_unit_ids",
     "_eligible_triggered_movement_units_from_grants",
-    "_fire_overwatch_end_movement_trigger_payload",
     "_friendly_unit_fell_back_context_from_event",
     "_friendly_unit_fell_back_timing_window_id",
     "_movement_end_surge_distance_roll_spec",
@@ -403,58 +401,3 @@ def movement_end_surge_reaction_group_key(
     if len(keys) != 1:
         raise GameLifecycleError("Movement-end surge reaction grants have configuration drift.")
     return keys.pop()
-
-
-def _active_player_end_movement_overwatch_trigger_unit_ids(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    movement_state: MovementPhaseState,
-) -> tuple[str, ...]:
-    active_player_id = _active_player_id(state)
-    moved_ids = set(movement_state.moved_unit_ids)
-    eligible_action_ids: set[str] = set()
-    eligible_setup_ids: set[str] = set()
-    for record in decisions.event_log.records:
-        payload = record.payload
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("game_id") != state.game_id:
-            continue
-        if payload.get("battle_round") != state.battle_round:
-            continue
-        if payload.get("phase") != BattlePhase.MOVEMENT.value:
-            continue
-        if payload.get("active_player_id") != active_player_id:
-            continue
-        unit_id = payload.get("unit_instance_id")
-        if type(unit_id) is not str or unit_id not in moved_ids:
-            continue
-        if record.event_type == "reinforcement_unit_arrived":
-            eligible_setup_ids.add(unit_id)
-            continue
-        if record.event_type != "movement_activation_completed":
-            continue
-        if payload.get("movement_phase_action") in {
-            MovementPhaseActionKind.NORMAL_MOVE.value,
-            MovementPhaseActionKind.ADVANCE.value,
-            MovementPhaseActionKind.FALL_BACK.value,
-        }:
-            eligible_action_ids.add(unit_id)
-    return tuple(sorted(eligible_action_ids | eligible_setup_ids))
-
-
-def _fire_overwatch_end_movement_trigger_payload(
-    *,
-    moved_unit_instance_id: str,
-    timing_window_id: str,
-) -> JsonValue:
-    moved_unit_id = _validate_identifier("moved_unit_instance_id", moved_unit_instance_id)
-    return validate_json_value(
-        {
-            "moved_unit_instance_id": moved_unit_id,
-            "timing_window_id": _validate_identifier("timing_window_id", timing_window_id),
-            "trigger_window": "end_opponent_movement_phase",
-            "eligible_trigger_kinds": ["set_up", "started_or_ended_move"],
-        }
-    )

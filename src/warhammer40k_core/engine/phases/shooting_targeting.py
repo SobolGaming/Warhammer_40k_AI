@@ -38,7 +38,6 @@ if TYPE_CHECKING:
 
 __all__ = (
     "_declaration_source_unit",
-    "_declaration_target_within_max_range",
     "_heavy_hit_roll_modifier_applies",
     "_rules_unit_remained_stationary",
     "_rules_unit_set_up_this_turn",
@@ -89,7 +88,7 @@ def _snap_shooting_type_allowed_for_unit_target(
     *,
     scenario: BattlefieldScenario,
     candidate: dict[str, JsonValue],
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     target_unit_id: str,
 ) -> bool:
     target_visible_model_ids = candidate.get("target_visible_model_ids")
@@ -97,55 +96,33 @@ def _snap_shooting_type_allowed_for_unit_target(
         return False
     return _unit_target_within_max_range(
         scenario=scenario,
-        unit=unit,
+        rules_unit=rules_unit,
         target_unit_id=target_unit_id,
         range_inches=24,
     )
 
 
-def _declaration_target_within_max_range(
-    *,
-    scenario: BattlefieldScenario,
-    declaration: WeaponDeclaration,
-    target_in_range_model_ids: tuple[str, ...],
-    range_inches: int,
-) -> bool:
-    if not target_in_range_model_ids:
-        return False
-    battlefield = scenario.battlefield_state
-    attacker_placement = battlefield.model_placement_by_id(declaration.attacker_model_instance_id)
-    attacker_model = geometry_model_for_placement(
-        model=scenario.model_instance_for_placement(attacker_placement),
-        placement=attacker_placement,
-    )
-    for target_model_id in target_in_range_model_ids:
-        target_placement = battlefield.model_placement_by_id(target_model_id)
-        target_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(target_placement),
-            placement=target_placement,
-        )
-        if DistanceMeasurementContext.from_models(
-            attacker_model,
-            target_model,
-        ).closest_distance_inches() <= float(range_inches):
-            return True
-    return False
-
-
 def _unit_target_within_max_range(
     *,
     scenario: BattlefieldScenario,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     target_unit_id: str,
     range_inches: int,
 ) -> bool:
-    return target_within_shooting_selection_range(
-        scenario=scenario,
-        attacking_unit_instance_id=unit.unit_instance_id,
-        target_unit_instance_id=target_unit_id,
-        max_range_inches=range_inches,
-        placed_alive_attacker_models_only=False,
-        placed_alive_target_models_only=False,
+    return any(
+        target_within_shooting_selection_range(
+            scenario=scenario,
+            attacking_unit_instance_id=component.unit.unit_instance_id,
+            target_unit_instance_id=target_unit_id,
+            max_range_inches=range_inches,
+            placed_alive_attacker_models_only=False,
+            placed_alive_target_models_only=False,
+        )
+        for component in rules_unit.components
+        if any(
+            scenario.model_is_present_on_battlefield(model.model_instance_id)
+            for model in component.unit.own_models
+        )
     )
 
 

@@ -2,6 +2,13 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 45 implements one Fire Overwatch opportunity at the end of the opponent's
+Movement phase, with an independent choice of one eligible visible enemy within
+24 inches through canonical Snap Shooting. CP, source restrictions, attached units,
+Action locks, restore and replay share the engine path. See [scope and validation](docs/ORDER_45_SCOPE_PLAN.md),
+[performance evidence](docs/performance/order45/README.md), and the
+[Contract 17 migration](contracts/migrations/16-to-17.md).
+
 Order 44 adds the controlling player's per-critical-hit Lethal Hits choice in
 Shooting, Fight and reaction attacks. Automatic wounds and ordinary wound rolls
 share validation, restore and replay. See [scope and validation](docs/ORDER_44_SCOPE_PLAN.md)

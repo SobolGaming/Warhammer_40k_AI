@@ -6,10 +6,9 @@ from functools import partial
 
 from warhammer40k_core.engine.decision_request import parameterized_decision_option
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.fire_overwatch import fire_overwatch_has_potential_shooter
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.movement_reactions import (
-    _active_player_end_movement_overwatch_trigger_unit_ids,
-    _fire_overwatch_end_movement_trigger_payload,
     _stratagem_target_proposal_payload_factory,
 )
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
@@ -26,6 +25,7 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_target_proposal_from_index,
     stratagem_window_declined_for_context,
 )
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import (
     ReactionWindow,
@@ -41,6 +41,7 @@ def core_movement_end_candidates(
     *,
     indexes: Mapping[str, StratagemCatalogIndex],
     cost_modifiers: StratagemCostModifierRegistry,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[TimingRuleCandidate, ...]:
     state, decisions = context.state, context.decisions
     if context.completed_phase is not BattlePhase.MOVEMENT:
@@ -73,41 +74,37 @@ def core_movement_end_candidates(
             requested_event_type="end_movement_stratagem_requested",
         )
     )
-    moved_ids = _active_player_end_movement_overwatch_trigger_unit_ids(
-        state=state,
-        decisions=decisions,
-        movement_state=movement,
-    )
     for player in state.player_ids:
         if player == active:
             continue
-        for unit_id in moved_ids:
-            window_id = (
-                f"fire-overwatch-end-movement-round-{state.battle_round:02d}-"
-                f"unit-{unit_id}-player-{player}"
-            )
-            trigger_payload = _fire_overwatch_end_movement_trigger_payload(
-                moved_unit_instance_id=unit_id,
-                timing_window_id=window_id,
-            )
-            eligibility = StratagemEligibilityContext.from_state(
-                state=state,
-                player_id=player,
-                trigger_kind=TimingTriggerKind.END_PHASE,
-                timing_window_id=window_id,
-                trigger_payload=trigger_payload,
-            )
-            candidate = _parameterized_candidate(
-                context,
-                eligibility=eligibility,
-                index=indexes[player],
-                cost_modifiers=cost_modifiers,
-                handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
-                descriptor_id="core-fire-overwatch-end-opponent-movement",
-                source_step="end_movement_phase_reactions",
-                status_name="fire_overwatch_reaction_pending",
-            )
-            if candidate is not None:
+        window_id = f"fire-overwatch-end-movement-round-{state.battle_round:02d}-player-{player}"
+        eligibility = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            timing_window_id=window_id,
+            trigger_payload={
+                "timing_window_id": window_id,
+                "trigger_window": "end_opponent_movement_phase",
+            },
+        )
+        candidate = _parameterized_candidate(
+            context,
+            eligibility=eligibility,
+            index=indexes[player],
+            cost_modifiers=cost_modifiers,
+            handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+            descriptor_id="core-fire-overwatch-end-opponent-movement",
+            source_step="end_movement_phase_reactions",
+            status_name="fire_overwatch_reaction_pending",
+        )
+        if candidate is not None:
+            if context.army_catalog is None:
+                raise GameLifecycleError("Fire Overwatch discovery requires the army catalog.")
+            if fire_overwatch_has_potential_shooter(
+                state=state, player_id=player, army_catalog=context.army_catalog
+            ):
                 candidates.append(candidate)
         window_id = f"rapid-ingress-end-movement-round-{state.battle_round:02d}-player-{player}"
         eligibility = StratagemEligibilityContext.from_state(
@@ -141,6 +138,7 @@ def _parameterized_candidate(
     descriptor_id: str,
     source_step: str,
     status_name: str,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> TimingRuleCandidate | None:
     if stratagem_window_declined_for_context(decisions=context.decisions, context=eligibility):
         return None
@@ -150,6 +148,9 @@ def _parameterized_candidate(
         context=eligibility,
         handler_id=handler_id,
         stratagem_cost_modifier_registry=cost_modifiers,
+        ruleset_descriptor=context.ruleset_descriptor,
+        army_catalog=context.army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if proposal is None:
         return None

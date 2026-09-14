@@ -4728,3 +4728,23 @@ mutation and on restore. Contract 16.1 exposes the two finite options through th
 existing adapter submission path. See the [source, scope and validation
 record](ORDER_44_SCOPE_PLAN.md) and [performance evidence](performance/order44/README.md).
 This closure does not change the separately owned Overwatch timing finding.
+
+
+## Order 45 / P15H — phase-end Fire Overwatch
+
+C15-08 now schedules one optional Overwatch opportunity at the end of the opponent's
+Movement phase without requiring enemy movement or setup history. The canonical
+Stratagem proposal selects an eligible friendly unengaged non-TITANIC rules unit;
+its shared Snap Shooting declaration chooses one eligible visible enemy within
+24 inches of that rules unit. Every weapon targets the same chosen enemy, subject
+to ordinary weapon range, visibility and loaded source restrictions.
+
+Preflight and submission share target authority, reject stale or malformed choices
+before mutation, and spend CP once. Shared Snap hit/reroll rules and the P16 Action
+lock remain in force. Attached groups, retained-presence cleanup, interrupted
+attacks, phase-end sequencing, restore, exact replay and viewer-scoped adapters
+are covered. The reviewed 15.08/15.09 texts retain their provenance and now record
+executable semantic support. Contract 17 documents the changed window IDs and
+source scope; old deployments retain their own saved sessions. See the
+[scope and validation](ORDER_45_SCOPE_PLAN.md), [migration](../contracts/migrations/16-to-17.md)
+and [performance evidence](performance/order45/README.md).

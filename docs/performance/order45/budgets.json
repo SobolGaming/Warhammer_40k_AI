@@ -1,0 +1,12 @@
+{
+  "workload_id": "order45-fire-overwatch-slice-v1",
+  "samples": 7,
+  "mean_base_multiplier": 2,
+  "mean_additive_seconds": 0.025,
+  "maximum_seconds": 0.15,
+  "maximum_decisions": 4,
+  "maximum_events": 55,
+  "ruin_case_mean_base_multiplier": 2,
+  "ruin_case_additive_seconds": 0.5,
+  "ruin_case_maximum_seconds": 15
+}

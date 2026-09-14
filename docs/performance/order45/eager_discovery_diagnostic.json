@@ -1,0 +1,14 @@
+{
+  "stage": "superseded eager-discovery implementation",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:706a2fea08a3ec30f1f68f7604e6d3c15e8b17f13972e1d6e6af9be54ac3ef84",
+  "observations": [
+    {
+      "test": "tests.unit.test_phase17g_chaos_daemons_cavalcade_of_chaos::test_cavalcade_warp_riders_moves_bloodcrushers_through_exact_event_ruin",
+      "elapsed_seconds": 793.527,
+      "status": "interrupted_exact_calculation",
+      "diagnostic": "warhammer40k_core.geometry.visibility_algebra.VisibilityComputationError: Exact visibility calculation unresolved: interrupted from keyboard"
+    }
+  ],
+  "rules_answer_returned": false,
+  "resolution": "Restore optional proposal discovery; validate selected shots before mutation. Exact solver unchanged."
+}

@@ -14,6 +14,7 @@ from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -29,6 +30,7 @@ def with_movement_end_rules(
     abilities: Mapping[str, AbilityCatalogIndex],
     stratagems: Mapping[str, StratagemCatalogIndex],
     costs: StratagemCostModifierRegistry,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> TurnEndHookRegistry:
     from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
         combine_stratagem_indexes_with_runtime_overrides,
@@ -53,6 +55,7 @@ def with_movement_end_rules(
                     abilities=abilities,
                     stratagems=combined_indexes,
                     costs=costs,
+                    shooting_target_restriction_hooks=shooting_target_restriction_hooks,
                 ),
             ),
         )
@@ -65,6 +68,7 @@ def movement_end_candidates(
     abilities: Mapping[str, AbilityCatalogIndex],
     stratagems: Mapping[str, StratagemCatalogIndex],
     costs: StratagemCostModifierRegistry,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[TimingRuleCandidate, ...]:
     if context.completed_phase is not BattlePhase.MOVEMENT:
         return ()
@@ -76,5 +80,10 @@ def movement_end_candidates(
         *movement_phase_end_candidates(state=context.state, decisions=context.decisions),
         *selected.candidates(state=context.state, decisions=context.decisions),
         *setup_reactive_end_candidates(context, ability_indexes=abilities),
-        *core_movement_end_candidates(context, indexes=stratagems, cost_modifiers=costs),
+        *core_movement_end_candidates(
+            context,
+            indexes=stratagems,
+            cost_modifiers=costs,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        ),
     )

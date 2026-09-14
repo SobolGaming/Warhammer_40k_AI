@@ -23,7 +23,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v10-critical-hits"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v11-phase-end-overwatch"
 
 
 class ReplayArtifactError(ValueError):

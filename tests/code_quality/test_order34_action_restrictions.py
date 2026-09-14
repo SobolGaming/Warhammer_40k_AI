@@ -35,7 +35,11 @@ def test_action_source_generation_and_reused_shooting_bindings_are_exact() -> No
     for source_id in core_actions_2026_09.RESTRICTION_POLICY.after_shooting_source_rule_ids[-2:]:
         row = next(row for row in rows if row["source_id"] == source_id)
         assert consumer in row["runtime_consumer_ids"]
-        assert row["semantic_execution_status"] == "partial_engine_runtime"
+        expected_status = {
+            "gw-11e-core-indirect-shooting:indirect-shooting": "partial_engine_runtime",
+            "gw-11e-core-stratagems:rule:snap-shooting": "executable_engine_runtime",
+        }
+        assert row["semantic_execution_status"] == expected_status[source_id]
 
 
 def test_action_queries_do_not_reconstruct_activity_from_phase_or_whole_history() -> None:
