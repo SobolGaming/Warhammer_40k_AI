@@ -4459,6 +4459,18 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
         battlefield_width_inches=100.0,
         battlefield_depth_inches=100.0,
     )
+    # Parallel rows give every charging model a legal endpoint after the shared
+    # 2.5-inch path; the hook must observe a complete legal Charge.
+    for unit, x in ((source_unit, 10.0), (target_unit, 14.0)):
+        placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+        battlefield = battlefield.with_unit_placement(
+            placement.with_model_placements(
+                tuple(
+                    model.with_pose(Pose.at(x, 10.0 + index * 2.0))
+                    for index, model in enumerate(placement.model_placements)
+                )
+            )
+        )
     state = _state_with_battlefield(
         armies=(source_army, target_army),
         battlefield=battlefield,

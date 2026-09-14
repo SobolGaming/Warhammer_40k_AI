@@ -13,7 +13,7 @@ def choose_charge_targets(
     target_ids: tuple[str, ...],
     result_id: str,
 ) -> LifecycleStatus:
-    assert request.decision_type == "select_charge_targets"
+    assert request.decision_type == "select_charge_targets", request
     option = next(
         option
         for option in request.options

@@ -31,18 +31,10 @@ def current_charge_movement_budget(
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ChargeMovementBudget:
     view = rules_unit_view_by_id(state=state, unit_instance_id=request.unit_instance_id)
-    from warhammer40k_core.engine.phase import GameLifecycleError
-
-    units = tuple(
-        row.unit for row in view.components if row.unit.unit_instance_id == request.unit_instance_id
-    )
-    if len(units) != 1:
-        raise GameLifecycleError("Charge movement requires its canonical charging unit.")
-    unit = units[0]
     modifiers = charge_roll_modifiers_for_unit(
         state=state,
         ability_index=ability_index,
-        unit=unit,
+        unit=view,
         runtime_modifier_registry=runtime_modifier_registry,
     )
     modified = replace(request, roll_modifiers=modifiers).resolve_roll(roll_state)

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
-from math import isfinite
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
@@ -19,18 +18,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import unit_move_completed_hooks as _umc
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
-from warhammer40k_core.engine.aircraft import AircraftMovementPolicy, HoverModeState
+from warhammer40k_core.engine.aircraft import AircraftMovementPolicy
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
-    ModelDisplacementKind,
-    ModelDisplacementRecord,
-    ModelPlacement,
     PlacementError,
-    UnitPlacement,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     conditional_charge_after_movement_action_allowed,
@@ -53,13 +47,77 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookRegistry,
 )
 from warhammer40k_core.engine.charge_effects import charge_after_advance_allowed_by_effects
+from warhammer40k_core.engine.charge_endpoints import (
+    ChargeEndpointWitness as ChargeEndpointWitness,
+)
+from warhammer40k_core.engine.charge_endpoints import (
+    ChargeEndpointWitnessPayload as ChargeEndpointWitnessPayload,
+)
+from warhammer40k_core.engine.charge_endpoints import (
+    _charge_endpoint_violation_code as _charge_endpoint_violation_code,
+)
+from warhammer40k_core.engine.charge_endpoints import (
+    _charge_endpoint_witness as _charge_endpoint_witness,
+)
 from warhammer40k_core.engine.charge_move_event_schema import (
     CHARGE_MOVE_COMPLETED_OPTIONAL_PAYLOAD_KEYS,
     CHARGE_MOVE_COMPLETED_PAYLOAD_KEYS,
     CHARGE_MOVE_COMPLETED_STATUS,
     CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
 )
+from warhammer40k_core.engine.charge_move_geometry import (
+    _charge_move_transition_batch as _charge_move_transition_batch,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _closest_distance_between_model_groups as _closest_distance_between_model_groups,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _enemy_geometry_models_for_player as _enemy_geometry_models_for_player,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _friendly_geometry_models_for_charge_path as _friendly_geometry_models_for_charge_path,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _friendly_vehicle_monster_model_ids as _friendly_vehicle_monster_model_ids,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _geometry_models_for_unit as _geometry_models_for_unit,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _geometry_models_for_unit_placement as _geometry_models_for_unit_placement,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _hover_mode_state_for_unit as _hover_mode_state_for_unit,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _model_groups_are_engaged as _model_groups_are_engaged,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _terrain_volumes_for_features as _terrain_volumes_for_features,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _validate_charge_witness_matches_unit as _validate_charge_witness_matches_unit,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _validate_distance_map as _validate_distance_map,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _validate_json_object as _validate_json_object,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _validate_path_validation_results as _validate_path_validation_results,
+)
+from warhammer40k_core.engine.charge_move_geometry import (
+    _validate_terrain_path_legality_results as _validate_terrain_path_legality_results,
+)
+from warhammer40k_core.engine.charge_move_resolution import (
+    ChargeMoveResolution as ChargeMoveResolution,
+)
+from warhammer40k_core.engine.charge_move_resolution import (
+    resolve_charge_move as resolve_charge_move,
+)
 from warhammer40k_core.engine.charge_movement_budget import current_charge_movement_budget
+from warhammer40k_core.engine.charge_movement_source import validate_charge_witness_for_proposal
 from warhammer40k_core.engine.charge_phase_state import (
     ChargePhaseState as ChargePhaseState,
 )
@@ -87,11 +145,6 @@ from warhammer40k_core.engine.charge_roll_permissions import (
 from warhammer40k_core.engine.charge_roll_reroll_requests import (
     build_charge_roll_reroll_request,
 )
-from warhammer40k_core.engine.charge_rule_effects import (
-    charge_path_context_with_rule_effect_permissions,
-    enemy_vehicle_monster_model_ids_for_player,
-    unit_has_vehicle_or_monster_keyword,
-)
 from warhammer40k_core.engine.charge_target_continuation import (
     continue_charge_move,
     request_charge_targets,
@@ -118,7 +171,6 @@ from warhammer40k_core.engine.mission_action_eligibility import (
     rules_unit_started_mission_action_this_turn,
 )
 from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
-from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -145,32 +197,23 @@ from warhammer40k_core.engine.phases.charge_proposal_flow import (
     invalid_charge_move_proposal_status as invalid_charge_move_proposal_status,
 )
 from warhammer40k_core.engine.physical_engagement import (
-    physical_geometry_models_for_rules_unit,
-    scenario_physical_enemy_rules_unit_ids,
     scenario_physically_engaged_enemy_rules_unit_ids,
 )
 from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    placed_alive_rules_unit_views,
+    rules_unit_view_by_id,
     rules_unit_view_from_armies,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionHookRegistry,
 )
-from warhammer40k_core.engine.unit_coherency import (
-    MovementRollbackRecord,
-    UnitCoherencyResult,
-    resolve_unit_movement_endpoint_coherency,
-)
-from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import (
-    PathValidationResult,
     PathWitness,
     PathWitnessPayload,
-    TerrainPathLegalityResult,
 )
 from warhammer40k_core.geometry.pose import GeometryError
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 COMPLETE_CHARGE_PHASE_OPTION_ID = _modifier_ignore.COMPLETE_CHARGE_PHASE_OPTION_ID
 SELECT_CHARGING_UNIT_DECISION_TYPE = _modifier_ignore.SELECT_CHARGING_UNIT_DECISION_TYPE
@@ -215,15 +258,6 @@ class ChargeMoveProposalPayload(TypedDict):
     movement_mode: str
     charge_target_unit_instance_ids: list[str]
     witness: NotRequired[object]
-
-
-class ChargeEndpointWitnessPayload(TypedDict):
-    selected_target_unit_instance_ids: list[str]
-    target_distances_before_inches: dict[str, float]
-    target_distances_after_inches: dict[str, float]
-    engaged_target_unit_instance_ids: list[str]
-    preferred_distance_target_unit_instance_ids: list[str]
-    non_target_engaged_unit_instance_ids: list[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -421,166 +455,6 @@ class ChargeMoveProposal:
             witness=None
             if witness_payload is None
             else PathWitness.from_payload(cast(PathWitnessPayload, witness_payload)),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class ChargeEndpointWitness:
-    selected_target_unit_instance_ids: tuple[str, ...]
-    target_distances_before_inches: dict[str, float]
-    target_distances_after_inches: dict[str, float]
-    engaged_target_unit_instance_ids: tuple[str, ...]
-    preferred_distance_target_unit_instance_ids: tuple[str, ...]
-    non_target_engaged_unit_instance_ids: tuple[str, ...] = ()
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "selected_target_unit_instance_ids",
-            _validate_identifier_tuple(
-                "ChargeEndpointWitness selected_target_unit_instance_ids",
-                self.selected_target_unit_instance_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "target_distances_before_inches",
-            _validate_distance_map(
-                "ChargeEndpointWitness target_distances_before_inches",
-                self.target_distances_before_inches,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "target_distances_after_inches",
-            _validate_distance_map(
-                "ChargeEndpointWitness target_distances_after_inches",
-                self.target_distances_after_inches,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "engaged_target_unit_instance_ids",
-            _validate_identifier_tuple(
-                "ChargeEndpointWitness engaged_target_unit_instance_ids",
-                self.engaged_target_unit_instance_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "preferred_distance_target_unit_instance_ids",
-            _validate_identifier_tuple(
-                "ChargeEndpointWitness preferred_distance_target_unit_instance_ids",
-                self.preferred_distance_target_unit_instance_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "non_target_engaged_unit_instance_ids",
-            _validate_identifier_tuple(
-                "ChargeEndpointWitness non_target_engaged_unit_instance_ids",
-                self.non_target_engaged_unit_instance_ids,
-            ),
-        )
-
-    def to_payload(self) -> ChargeEndpointWitnessPayload:
-        return {
-            "selected_target_unit_instance_ids": list(self.selected_target_unit_instance_ids),
-            "target_distances_before_inches": dict(
-                sorted(self.target_distances_before_inches.items())
-            ),
-            "target_distances_after_inches": dict(
-                sorted(self.target_distances_after_inches.items())
-            ),
-            "engaged_target_unit_instance_ids": list(self.engaged_target_unit_instance_ids),
-            "preferred_distance_target_unit_instance_ids": list(
-                self.preferred_distance_target_unit_instance_ids
-            ),
-            "non_target_engaged_unit_instance_ids": list(self.non_target_engaged_unit_instance_ids),
-        }
-
-
-@dataclass(frozen=True, slots=True)
-class ChargeMoveResolution:
-    unit_instance_id: str
-    selected_target_unit_instance_ids: tuple[str, ...]
-    attempted_placement: UnitPlacement
-    witness: PathWitness
-    endpoint_witness: ChargeEndpointWitness
-    path_validation_results: tuple[PathValidationResult, ...]
-    terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...]
-    coherency_result: UnitCoherencyResult
-    rollback_record: MovementRollbackRecord | None
-    movement_payload: dict[str, JsonValue]
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier("ChargeMoveResolution unit_instance_id", self.unit_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "selected_target_unit_instance_ids",
-            _validate_identifier_tuple(
-                "ChargeMoveResolution selected_target_unit_instance_ids",
-                self.selected_target_unit_instance_ids,
-            ),
-        )
-        if type(self.attempted_placement) is not UnitPlacement:
-            raise GameLifecycleError(
-                "ChargeMoveResolution attempted_placement must be UnitPlacement."
-            )
-        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
-            raise GameLifecycleError("ChargeMoveResolution attempted_placement unit drift.")
-        if type(self.witness) is not PathWitness:
-            raise GameLifecycleError("ChargeMoveResolution witness must be a PathWitness.")
-        if type(self.endpoint_witness) is not ChargeEndpointWitness:
-            raise GameLifecycleError(
-                "ChargeMoveResolution endpoint_witness must be ChargeEndpointWitness."
-            )
-        object.__setattr__(
-            self,
-            "path_validation_results",
-            _validate_path_validation_results(self.path_validation_results),
-        )
-        object.__setattr__(
-            self,
-            "terrain_path_legality_results",
-            _validate_terrain_path_legality_results(self.terrain_path_legality_results),
-        )
-        if type(self.coherency_result) is not UnitCoherencyResult:
-            raise GameLifecycleError(
-                "ChargeMoveResolution coherency_result must be UnitCoherencyResult."
-            )
-        if (
-            self.rollback_record is not None
-            and type(self.rollback_record) is not MovementRollbackRecord
-        ):
-            raise GameLifecycleError(
-                "ChargeMoveResolution rollback_record must be MovementRollbackRecord."
-            )
-        object.__setattr__(
-            self,
-            "movement_payload",
-            _validate_json_object("ChargeMoveResolution movement_payload", self.movement_payload),
-        )
-
-    @property
-    def is_valid(self) -> bool:
-        return (
-            all(result.is_valid for result in self.path_validation_results)
-            and all(result.is_valid for result in self.terrain_path_legality_results)
-            and self.rollback_record is None
-        )
-
-    def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
-        if not self.is_valid:
-            raise GameLifecycleError("Invalid Charge Move cannot emit displacement records.")
-        return _charge_move_transition_batch(
-            before=before,
-            after=self.attempted_placement,
-            witness=self.witness,
         )
 
 
@@ -1657,200 +1531,6 @@ def _apply_charge_roll_reroll_decision(
     )
 
 
-def resolve_charge_move(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    unit_placement: UnitPlacement,
-    selected_target_unit_instance_ids: tuple[str, ...],
-    maximum_distance_inches: float,
-    path_witness: PathWitness,
-    hover_mode_states: tuple[HoverModeState, ...] = (),
-    terrain: tuple[TerrainVolume, ...] = (),
-    unit_persisting_effects: tuple[PersistingEffect, ...] = (),
-    ability_index: AbilityCatalogIndex | None = None,
-) -> ChargeMoveResolution:
-    if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("Charge Move requires a BattlefieldScenario.")
-    if type(ruleset_descriptor) is not RulesetDescriptor:
-        raise GameLifecycleError("Charge Move requires a RulesetDescriptor.")
-    if type(unit_placement) is not UnitPlacement:
-        raise GameLifecycleError("Charge Move unit_placement must be a UnitPlacement.")
-    if type(path_witness) is not PathWitness:
-        raise GameLifecycleError("Charge Move requires a PathWitness.")
-    if (
-        type(maximum_distance_inches) not in {int, float}
-        or not isfinite(maximum_distance_inches)
-        or maximum_distance_inches < 0
-    ):
-        raise GameLifecycleError("Charge Move maximum distance must be finite and nonnegative.")
-    target_ids = _validate_identifier_tuple(
-        "selected_target_unit_instance_ids",
-        selected_target_unit_instance_ids,
-    )
-    _validate_charge_witness_matches_unit(
-        witness=path_witness,
-        unit_placement=unit_placement,
-    )
-    unit = scenario.unit_instance_for_placement(unit_placement)
-    aircraft_policy = AircraftMovementPolicy.from_unit(
-        unit=unit,
-        ruleset_descriptor=ruleset_descriptor,
-        hover_mode_state=_hover_mode_state_for_unit(
-            hover_mode_states=hover_mode_states,
-            unit_instance_id=unit_placement.unit_instance_id,
-        ),
-    )
-    moved_placements: list[ModelPlacement] = []
-    for placement in unit_placement.model_placements:
-        moved_placements.append(
-            placement.with_pose(path_witness.final_pose_for_model(placement.model_instance_id))
-        )
-    attempted_placement = unit_placement.with_model_placements(tuple(moved_placements))
-    terrain_features = scenario.battlefield_state.terrain_features
-    terrain_volumes = (*terrain, *_terrain_volumes_for_features(terrain_features))
-    path_validation_results: list[PathValidationResult] = []
-    terrain_path_legality_results: list[TerrainPathLegalityResult] = []
-    model_movements: list[JsonValue] = []
-    enemy_vehicle_monster_model_ids = enemy_vehicle_monster_model_ids_for_player(
-        scenario=scenario,
-        player_id=unit_placement.player_id,
-    )
-    for placement in unit_placement.model_placements:
-        model = scenario.model_instance_for_placement(placement)
-        moving_model = geometry_model_for_placement(model=model, placement=placement)
-        model_witness = PathWitness.for_paths(
-            (
-                (
-                    placement.model_instance_id,
-                    path_witness.poses_for_model(placement.model_instance_id),
-                ),
-            )
-        )
-        legality_context = MovementLegalityContext.from_keywords(
-            keywords=aircraft_policy.effective_keywords,
-            ruleset_descriptor=ruleset_descriptor,
-            movement_mode=MovementMode.CHARGE,
-            movement_phase_action=None,
-            displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
-            ability_index=ability_index,
-            unit=unit,
-            model_instance_id=placement.model_instance_id,
-            current_model_instance_ids=tuple(
-                model_placement.model_instance_id
-                for model_placement in unit_placement.model_placements
-            ),
-            unit_persisting_effects=unit_persisting_effects,
-            owner_player_id=unit_placement.player_id,
-        )
-        path_context = legality_context.to_path_validation_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
-            friendly_models=_friendly_geometry_models_for_charge_path(
-                scenario=scenario,
-                unit_placement=unit_placement,
-                attempted_placement=attempted_placement,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_models=_enemy_geometry_models_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-            ),
-            terrain=(),
-            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
-            movement_distance_budget_inches=float(maximum_distance_inches),
-        )
-        path_result = charge_path_context_with_rule_effect_permissions(
-            path_context,
-            unit_persisting_effects=unit_persisting_effects,
-            owner_player_id=unit_placement.player_id,
-            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
-        ).validate()
-        terrain_result = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            terrain=terrain_volumes,
-            terrain_features=terrain_features,
-        ).validate()
-        path_validation_results.append(path_result)
-        terrain_path_legality_results.append(terrain_result)
-        model_movements.append(
-            validate_json_value(
-                {
-                    "model_instance_id": placement.model_instance_id,
-                    "movement_mode": MovementMode.CHARGE.value,
-                    "maximum_distance_inches": maximum_distance_inches,
-                    "start_pose": placement.pose.to_payload(),
-                    "end_pose": path_witness.final_pose_for_model(
-                        placement.model_instance_id
-                    ).to_payload(),
-                    "movement_distance_witness": (
-                        None
-                        if path_result.movement_distance_witness is None
-                        else path_result.movement_distance_witness.to_payload()
-                    ),
-                    "path_validation_result": path_result.to_payload(),
-                    "terrain_path_legality_result": terrain_result.to_payload(),
-                }
-            )
-        )
-    _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        before=unit_placement,
-        attempted=attempted_placement,
-        displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
-    )
-    endpoint_witness = _charge_endpoint_witness(
-        scenario=scenario,
-        before=unit_placement,
-        after=attempted_placement,
-        selected_target_unit_instance_ids=target_ids,
-        ruleset_descriptor=ruleset_descriptor,
-    )
-    movement_payload = _validate_json_object(
-        "ChargeMoveResolution movement_payload",
-        {
-            "movement_mode": MovementMode.CHARGE.value,
-            "maximum_distance_inches": maximum_distance_inches,
-            "selected_target_unit_instance_ids": list(target_ids),
-            "model_movements": model_movements,
-            "path_validation_results": [result.to_payload() for result in path_validation_results],
-            "terrain_path_legality_results": [
-                result.to_payload() for result in terrain_path_legality_results
-            ],
-            "coherency_result": coherency_result.to_payload(),
-            "endpoint_witness": endpoint_witness.to_payload(),
-            "fly_charge_policy": {
-                "has_fly": "FLY" in aircraft_policy.effective_keywords,
-                "uses_aircraft_rules": aircraft_policy.uses_aircraft_rules,
-                "can_declare_charge": aircraft_policy.can_declare_charge,
-            },
-        },
-    )
-    if rollback_record is not None:
-        movement_payload["rollback_record"] = validate_json_value(rollback_record.to_payload())
-    return ChargeMoveResolution(
-        unit_instance_id=unit_placement.unit_instance_id,
-        selected_target_unit_instance_ids=target_ids,
-        attempted_placement=attempted_placement,
-        witness=path_witness,
-        endpoint_witness=endpoint_witness,
-        path_validation_results=tuple(path_validation_results),
-        terrain_path_legality_results=tuple(terrain_path_legality_results),
-        coherency_result=coherency_result,
-        rollback_record=rollback_record,
-        movement_payload=movement_payload,
-    )
-
-
 def _legal_charging_unit_ids(
     *,
     state: GameState,
@@ -1898,48 +1578,49 @@ def _charge_unit_ineligibility_reason(
         unit_instance_id=requested_unit_id,
     ):
         return "charge_unit_started_action"
-    advanced_state = state.advanced_unit_state_for_unit(
-        player_id=charge_state.active_player_id,
-        battle_round=state.battle_round,
-        unit_instance_id=requested_unit_id,
-    )
-    if (
-        advanced_state is not None
-        and ruleset_descriptor.charge_policy.forbids_advance
-        and not advanced_state.can_declare_charge
-        and not charge_after_advance_allowed_by_effects(
-            state=state,
-            unit_instance_id=requested_unit_id,
+    view = rules_unit_view_by_id(state=state, unit_instance_id=requested_unit_id)
+    identity_ids = tuple(sorted({requested_unit_id, *view.component_unit_instance_ids}))
+    for identity_id in identity_ids:
+        advanced_state = state.advanced_unit_state_for_unit(
+            player_id=charge_state.active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=identity_id,
         )
-    ):
-        return "charge_unit_advanced"
-    fell_back_state = state.fell_back_unit_state_for_unit(
-        player_id=charge_state.active_player_id,
-        battle_round=state.battle_round,
-        unit_instance_id=requested_unit_id,
-    )
-    if (
-        fell_back_state is not None
-        and ruleset_descriptor.charge_policy.forbids_fall_back
-        and not fell_back_state.can_declare_charge
-        and not _charge_after_fall_back_allowed_by_effects(
-            state=state,
-            unit_instance_id=requested_unit_id,
+        if (
+            advanced_state is not None
+            and ruleset_descriptor.charge_policy.forbids_advance
+            and not advanced_state.can_declare_charge
+            and not charge_after_advance_allowed_by_effects(
+                state=state, unit_instance_id=requested_unit_id
+            )
+        ):
+            return "charge_unit_advanced"
+        fell_back_state = state.fell_back_unit_state_for_unit(
+            player_id=charge_state.active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=identity_id,
         )
-    ):
-        return "charge_unit_fell_back"
-    disembarked_state = state.disembarked_unit_state_for_unit(
-        player_id=charge_state.active_player_id,
-        battle_round=state.battle_round,
-        unit_instance_id=requested_unit_id,
-    )
-    if disembarked_state is not None and not disembarked_state.can_declare_charge:
-        return "charge_unit_disembarked"
-    if not _aircraft_policy_for_charge_unit(
+        if (
+            fell_back_state is not None
+            and ruleset_descriptor.charge_policy.forbids_fall_back
+            and not fell_back_state.can_declare_charge
+            and not _charge_after_fall_back_allowed_by_effects(
+                state=state, unit_instance_id=requested_unit_id
+            )
+        ):
+            return "charge_unit_fell_back"
+        disembarked_state = state.disembarked_unit_state_for_unit(
+            player_id=charge_state.active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=identity_id,
+        )
+        if disembarked_state is not None and not disembarked_state.can_declare_charge:
+            return "charge_unit_disembarked"
+    if not _charge_actor_can_declare_charge(
         state=state,
         unit_instance_id=requested_unit_id,
         ruleset_descriptor=ruleset_descriptor,
-    ).can_declare_charge:
+    ):
         return "charge_unit_aircraft"
     if _charge_forbidden_by_effects(state=state, unit_instance_id=requested_unit_id):
         return "charge_unit_forbidden_by_effect"
@@ -2038,19 +1719,6 @@ def _reachable_charge_target_distances(
     return dict(sorted(distances.items()))
 
 
-def _closest_distance_between_model_groups(
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-) -> float:
-    if not first_models or not second_models:
-        raise GameLifecycleError("Charge distance requires non-empty model groups.")
-    return min(
-        first_model.range_to(second_model)
-        for first_model in first_models
-        for second_model in second_models
-    )
-
-
 def _unit_is_engaged(
     *,
     state: GameState,
@@ -2076,257 +1744,24 @@ def _unit_is_engaged(
     )
 
 
-def _aircraft_policy_for_charge_unit(
+def _charge_actor_can_declare_charge(
     *,
     state: GameState,
     unit_instance_id: str,
     ruleset_descriptor: RulesetDescriptor,
-) -> AircraftMovementPolicy:
-    scenario = _battlefield_scenario(state)
-    placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    return AircraftMovementPolicy.from_unit(
-        unit=scenario.unit_instance_for_placement(placement),
-        ruleset_descriptor=ruleset_descriptor,
-        hover_mode_state=_hover_mode_state_for_unit(
-            hover_mode_states=tuple(state.hover_mode_states),
-            unit_instance_id=unit_instance_id,
-        ),
-    )
-
-
-def _hover_mode_state_for_unit(
-    *,
-    hover_mode_states: tuple[HoverModeState, ...],
-    unit_instance_id: str,
-) -> HoverModeState | None:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    found: HoverModeState | None = None
-    for hover_mode_state in hover_mode_states:
-        if type(hover_mode_state) is not HoverModeState:
-            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
-        if hover_mode_state.unit_instance_id != requested_unit_id:
-            continue
-        if found is not None:
-            raise GameLifecycleError("hover_mode_states must be unique by unit.")
-        found = hover_mode_state
-    return found if found is not None and found.active else None
-
-
-def _geometry_models_for_unit(
-    *,
-    scenario: BattlefieldScenario,
-    unit_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    return physical_geometry_models_for_rules_unit(
-        scenario=scenario,
-        unit_instance_id=unit_instance_id,
-    )
-
-
-def _geometry_models_for_unit_placement(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-) -> tuple[GeometryModel, ...]:
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(placement),
-            placement=placement,
-        )
-        for placement in unit_placement.model_placements
-    )
-
-
-def _enemy_geometry_models_for_player(
-    *,
-    scenario: BattlefieldScenario,
-    player_id: str,
-) -> tuple[GeometryModel, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    enemy_models: list[GeometryModel] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            enemy_models.extend(
-                geometry_model_for_placement(
-                    model=scenario.model_instance_for_placement(placement),
-                    placement=placement,
-                )
-                for placement in unit_placement.model_placements
-            )
-    return tuple(enemy_models)
-
-
-def _friendly_geometry_models_for_charge_path(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    attempted_placement: UnitPlacement,
-    moving_model_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[GeometryModel] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            placements = (
-                attempted_placement.model_placements
-                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
-                else current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
-
-
-def _friendly_vehicle_monster_model_ids(
-    *,
-    scenario: BattlefieldScenario,
-    player_id: str,
-    moving_model_instance_id: str,
-) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id
-                for placement in unit_placement.model_placements
-                if placement.model_instance_id != moving_model_id
-            )
-    return tuple(sorted(model_ids))
-
-
-def _charge_endpoint_witness(
-    *,
-    scenario: BattlefieldScenario,
-    before: UnitPlacement,
-    after: UnitPlacement,
-    selected_target_unit_instance_ids: tuple[str, ...],
-    ruleset_descriptor: RulesetDescriptor,
-) -> ChargeEndpointWitness:
-    target_ids = _validate_identifier_tuple(
-        "selected_target_unit_instance_ids",
-        selected_target_unit_instance_ids,
-    )
-    before_models = _geometry_models_for_unit_placement(scenario=scenario, unit_placement=before)
-    after_models = _geometry_models_for_unit_placement(scenario=scenario, unit_placement=after)
-    target_distances_before: dict[str, float] = {}
-    target_distances_after: dict[str, float] = {}
-    engaged_target_ids: list[str] = []
-    preferred_target_ids: list[str] = []
-    policy = ruleset_descriptor.engagement_policy
-    for target_id in target_ids:
-        target_models = _geometry_models_for_unit(
-            scenario=scenario,
-            unit_instance_id=target_id,
-        )
-        target_distances_before[target_id] = _closest_distance_between_model_groups(
-            before_models,
-            target_models,
-        )
-        after_distance = _closest_distance_between_model_groups(after_models, target_models)
-        target_distances_after[target_id] = after_distance
-        if _model_groups_are_engaged(
-            first_models=after_models,
-            second_models=target_models,
-            horizontal_inches=policy.horizontal_inches,
-            vertical_inches=policy.vertical_inches,
-        ):
-            engaged_target_ids.append(target_id)
-        if after_distance <= ruleset_descriptor.charge_policy.preferred_target_distance_inches:
-            preferred_target_ids.append(target_id)
-    non_target_engaged_ids: list[str] = []
-    selected_target_set = set(target_ids)
-    for enemy_unit_id in scenario_physical_enemy_rules_unit_ids(
-        scenario=scenario,
-        unit_instance_id=after.unit_instance_id,
-    ):
-        if enemy_unit_id in selected_target_set:
-            continue
-        if _model_groups_are_engaged(
-            first_models=after_models,
-            second_models=_geometry_models_for_unit(
-                scenario=scenario,
-                unit_instance_id=enemy_unit_id,
-            ),
-            horizontal_inches=policy.horizontal_inches,
-            vertical_inches=policy.vertical_inches,
-        ):
-            non_target_engaged_ids.append(enemy_unit_id)
-    return ChargeEndpointWitness(
-        selected_target_unit_instance_ids=target_ids,
-        target_distances_before_inches=target_distances_before,
-        target_distances_after_inches=target_distances_after,
-        engaged_target_unit_instance_ids=tuple(engaged_target_ids),
-        preferred_distance_target_unit_instance_ids=tuple(preferred_target_ids),
-        non_target_engaged_unit_instance_ids=tuple(non_target_engaged_ids),
-    )
-
-
-def _model_groups_are_engaged(
-    *,
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-    horizontal_inches: float,
-    vertical_inches: float,
 ) -> bool:
-    return any(
-        first_model.is_within_engagement_range(
-            second_model,
-            horizontal_inches=horizontal_inches,
-            vertical_inches=vertical_inches,
-        )
-        for first_model in first_models
-        for second_model in second_models
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    return all(
+        AircraftMovementPolicy.from_unit(
+            unit=component.unit,
+            ruleset_descriptor=ruleset_descriptor,
+            hover_mode_state=_hover_mode_state_for_unit(
+                hover_mode_states=tuple(state.hover_mode_states),
+                unit_instance_id=component.unit.unit_instance_id,
+            ),
+        ).can_declare_charge
+        for component in view.living_components
     )
-
-
-def _charge_move_transition_batch(
-    *,
-    before: UnitPlacement,
-    after: UnitPlacement,
-    witness: PathWitness,
-) -> BattlefieldTransitionBatch:
-    before_poses = {
-        placement.model_instance_id: placement.pose for placement in before.model_placements
-    }
-    displacement_records: list[ModelDisplacementRecord] = []
-    for placement in after.model_placements:
-        if placement.model_instance_id not in before_poses:
-            raise GameLifecycleError("Charge Move transition references an unknown model.")
-        if placement.pose == before_poses[placement.model_instance_id]:
-            continue
-        model_path = witness.poses_for_model(placement.model_instance_id)
-        displacement_records.append(
-            ModelDisplacementRecord(
-                model_instance_id=placement.model_instance_id,
-                displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
-                start_pose=before_poses[placement.model_instance_id],
-                end_pose=placement.pose,
-                path_witness=PathWitness.for_paths(((placement.model_instance_id, model_path),)),
-                source_phase=BattlePhase.CHARGE.value,
-                source_step=CHARGE_MOVE_ACTION,
-                source_rule_id=None,
-                source_event_id=None,
-            )
-        )
-    return BattlefieldTransitionBatch(displacements=tuple(displacement_records))
 
 
 def _ensure_charge_phase_state(*, state: GameState) -> ChargePhaseState:
@@ -2378,25 +1813,20 @@ def _active_player_id(state: GameState) -> str:
 
 
 def _active_player_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Charge phase requires battlefield_state.")
-    placed_army = battlefield_state.placed_army_for_player_or_none(player_id)
-    if placed_army is None:
-        return ()
-    return tuple(sorted(placement.unit_instance_id for placement in placed_army.unit_placements))
+    return tuple(
+        sorted(
+            view.unit_instance_id
+            for view in placed_alive_rules_unit_views(state=state)
+            if view.owner_player_id == player_id
+        )
+    )
 
 
-def _unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
-    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_id:
-                return unit
-    raise GameLifecycleError("Charge unit_instance_id is unknown.")
+def _unit_by_id(*, state: GameState, unit_instance_id: str) -> RulesUnitView:
+    return rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
 
 
-def _unit_for_selection(*, state: GameState, selection: ChargingUnitSelection) -> UnitInstance:
+def _unit_for_selection(*, state: GameState, selection: ChargingUnitSelection) -> RulesUnitView:
     if type(selection) is not ChargingUnitSelection:
         raise GameLifecycleError("Charge unit lookup requires a ChargingUnitSelection.")
     return _unit_by_id(state=state, unit_instance_id=selection.unit_instance_id)
@@ -2692,7 +2122,7 @@ def charge_move_violation_code(
     for terrain_result in resolution.terrain_path_legality_results:
         if not terrain_result.is_valid:
             return terrain_result.violations[0].violation_code
-    if resolution.rollback_record is not None:
+    if resolution.rollback_record is not None or not resolution.coherency_result.is_coherent:
         return "unit_coherency_broken"
     endpoint_violation = _charge_endpoint_violation_code(
         endpoint_witness=resolution.endpoint_witness,
@@ -2710,69 +2140,6 @@ def charge_move_invalid_message(violation_code: str) -> str:
 
 def charge_move_violation_field(violation_code: str) -> str:
     return _charge_move_violation_field(violation_code)
-
-
-def _charge_endpoint_violation_code(
-    *,
-    endpoint_witness: ChargeEndpointWitness,
-    ruleset_descriptor: RulesetDescriptor,
-    maximum_distance_inches: float,
-) -> str | None:
-    selected = endpoint_witness.selected_target_unit_instance_ids
-    if not selected:
-        return "charge_target_required"
-    if (
-        ruleset_descriptor.charge_policy.must_end_closer_to_selected_targets
-        and not _charge_ended_closer_to_any_selected_target(endpoint_witness)
-    ):
-        return "charge_not_closer_to_target"
-    if ruleset_descriptor.charge_policy.must_end_engaged_with_every_selected_target:
-        missing = set(selected) - set(endpoint_witness.engaged_target_unit_instance_ids)
-        if missing:
-            return "charge_target_not_engaged"
-    if (
-        ruleset_descriptor.charge_policy.must_reach_preferred_target_distance_if_possible
-        and _charge_preferred_distance_possible(
-            endpoint_witness=endpoint_witness,
-            preferred_distance_inches=(
-                ruleset_descriptor.charge_policy.preferred_target_distance_inches
-            ),
-            maximum_distance_inches=maximum_distance_inches,
-        )
-        and not endpoint_witness.preferred_distance_target_unit_instance_ids
-    ):
-        return "charge_preferred_distance_not_reached"
-    if (
-        ruleset_descriptor.charge_policy.forbids_non_target_engagement
-        and endpoint_witness.non_target_engaged_unit_instance_ids
-    ):
-        return "charge_non_target_engaged"
-    if (
-        ruleset_descriptor.charge_policy.must_end_engaged_if_possible
-        and not endpoint_witness.engaged_target_unit_instance_ids
-    ):
-        return "charge_no_model_engaged_target"
-    return None
-
-
-def _charge_ended_closer_to_any_selected_target(endpoint_witness: ChargeEndpointWitness) -> bool:
-    return any(
-        endpoint_witness.target_distances_after_inches[target_id]
-        < endpoint_witness.target_distances_before_inches[target_id]
-        for target_id in endpoint_witness.selected_target_unit_instance_ids
-    )
-
-
-def _charge_preferred_distance_possible(
-    *,
-    endpoint_witness: ChargeEndpointWitness,
-    preferred_distance_inches: float,
-    maximum_distance_inches: float,
-) -> bool:
-    return any(
-        max(0.0, before_distance - preferred_distance_inches) <= maximum_distance_inches
-        for before_distance in endpoint_witness.target_distances_before_inches.values()
-    )
 
 
 def _charge_move_invalid_message(violation_code: str) -> str:
@@ -2807,58 +2174,9 @@ def _charge_witness_matches_current_unit_status(
     proposal_request: MovementProposalRequest,
     proposal: ChargeMoveProposal,
 ) -> ProposalValidationResult | None:
-    if proposal.witness is None:
-        return None
-    scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    expected_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
+    return validate_charge_witness_for_proposal(
+        state=state, request=proposal_request, witness=proposal.witness
     )
-    if tuple(sorted(proposal.witness.model_ids())) != expected_model_ids:
-        return ProposalValidationResult.invalid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-            violation_code="charge_witness_unit_drift",
-            message="Charge Move witness model IDs do not match the selected unit.",
-            field="witness",
-        )
-    for placement in unit_placement.model_placements:
-        poses = proposal.witness.poses_for_model(placement.model_instance_id)
-        if poses[0] != placement.pose:
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="charge_witness_start_drift",
-                message="Charge Move witness does not start at the current model pose.",
-                field="witness",
-                status="stale",
-            )
-    return None
-
-
-def _validate_charge_witness_matches_unit(
-    *,
-    witness: PathWitness,
-    unit_placement: UnitPlacement,
-) -> None:
-    if type(witness) is not PathWitness:
-        raise GameLifecycleError("Charge Move requires a PathWitness.")
-    expected_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
-    )
-    if tuple(sorted(witness.model_ids())) != expected_model_ids:
-        raise GameLifecycleError("Charge Move witness must match the selected unit models.")
-
-
-def _terrain_volumes_for_features(
-    terrain_features: tuple[TerrainFeatureDefinition, ...],
-) -> tuple[TerrainVolume, ...]:
-    volumes: list[TerrainVolume] = []
-    for feature in terrain_features:
-        if type(feature) is not TerrainFeatureDefinition:
-            raise GameLifecycleError("terrain_features must contain TerrainFeatureDefinition.")
-        volumes.extend(feature.terrain_volumes())
-    return tuple(volumes)
 
 
 def _proposal_context(request: MovementProposalRequest) -> dict[str, object]:
@@ -2902,58 +2220,6 @@ def _payload_distance_map(payload: dict[str, object], *, key: str) -> dict[str, 
     if not isinstance(value, dict):
         raise GameLifecycleError(f"Payload field {key} must be an object.")
     return _validate_distance_map(key, cast(dict[str, object], value))
-
-
-def _validate_distance_map(field_name: str, value: object) -> dict[str, float]:
-    if not isinstance(value, dict):
-        raise GameLifecycleError(f"{field_name} must be an object.")
-    distances: dict[str, float] = {}
-    for raw_key, raw_distance in cast(dict[object, object], value).items():
-        unit_id = _validate_identifier(field_name, raw_key)
-        if type(raw_distance) not in {int, float}:
-            raise GameLifecycleError(f"{field_name} values must be numbers.")
-        distance = float(cast(int | float, raw_distance))
-        if distance < 0.0:
-            raise GameLifecycleError(f"{field_name} distances must be non-negative.")
-        distances[unit_id] = distance
-    return dict(sorted(distances.items()))
-
-
-def _validate_path_validation_results(
-    values: object,
-) -> tuple[PathValidationResult, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("path_validation_results must be a tuple.")
-    results: list[PathValidationResult] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not PathValidationResult:
-            raise GameLifecycleError(
-                "path_validation_results must contain PathValidationResult values."
-            )
-        results.append(value)
-    return tuple(results)
-
-
-def _validate_terrain_path_legality_results(
-    values: object,
-) -> tuple[TerrainPathLegalityResult, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("terrain_path_legality_results must be a tuple.")
-    results: list[TerrainPathLegalityResult] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not TerrainPathLegalityResult:
-            raise GameLifecycleError(
-                "terrain_path_legality_results must contain TerrainPathLegalityResult values."
-            )
-        results.append(value)
-    return tuple(results)
-
-
-def _validate_json_object(field_name: str, value: object) -> dict[str, JsonValue]:
-    json_value = validate_json_value(value)
-    if not isinstance(json_value, dict):
-        raise GameLifecycleError(f"{field_name} must be a JSON object.")
-    return json_value
 
 
 def _key_error_field(error: KeyError) -> str:
@@ -3069,7 +2335,6 @@ __all__ = (
     "_ability_index_for_player",
     "_active_player_id",
     "_active_player_placed_unit_ids",
-    "_aircraft_policy_for_charge_unit",
     "_apply_charge_declaration_grant_decision",
     "_apply_charge_roll_reroll_decision",
     "_apply_charging_unit_selection_decision",
@@ -3078,7 +2343,6 @@ __all__ = (
     "_charge_declaration_grant_options",
     "_charge_declaration_grant_unit_effect_expiration",
     "_charge_declaration_grant_unit_effect_target_ids",
-    "_charge_ended_closer_to_any_selected_target",
     "_charge_endpoint_violation_code",
     "_charge_endpoint_witness",
     "_charge_forbidden_by_effects",
@@ -3089,7 +2353,6 @@ __all__ = (
     "_charge_move_violation_field",
     "_charge_movement_mode",
     "_charge_phase_status_payload",
-    "_charge_preferred_distance_possible",
     "_charge_proposal_kind",
     "_charge_proposal_payload_parse_failure",
     "_charge_unit_ineligibility_reason",

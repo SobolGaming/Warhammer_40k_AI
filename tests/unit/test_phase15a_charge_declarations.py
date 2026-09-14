@@ -231,7 +231,7 @@ def test_source_backed_conditional_charge_rule_ir_classifies_and_overlays_heroic
 
 def test_source_backed_conditional_charge_selects_pair_and_round_trips_required_target() -> None:
     lifecycle, units = _conditional_charge_lifecycle(
-        game_id="phase15a-source-backed-conditional-charge"
+        game_id="phase15a-source-backed-conditional-charge-order47-2"
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     grant_request = _decision_request(
@@ -993,7 +993,7 @@ def test_charge_move_submission_reports_precise_schema_field_without_queue_pop(
             origin=Pose.at(20.0, 20.0),
             model_count=5,
         ),
-        game_id="phase15a-success-charge",
+        game_id="phase15a-success-charge-order47",
     )
     request = _charge_move_request_after_selection(
         lifecycle,
@@ -1073,7 +1073,7 @@ def test_charge_move_submission_rejects_stale_context_without_authoritative_muta
             origin=Pose.at(20.0, 20.0),
             model_count=5,
         ),
-        game_id="phase15a-success-charge",
+        game_id="phase15a-success-charge-order47",
     )
     charger_id = units["intercessor-1"].unit_instance_id
     target_id = units["enemy"].unit_instance_id
@@ -1556,7 +1556,7 @@ def test_phase15b_charge_move_proposal_applies_witness_records_displacements_and
 ):
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),
-        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(10.0, 25.0), model_count=5),
         game_id="phase15a-success-charge",
     )
     proposal_request = _charge_move_request_after_selection(
@@ -1572,7 +1572,8 @@ def test_phase15b_charge_move_proposal_applies_witness_records_displacements_and
     witness = _charge_path_witness_for_unit(
         lifecycle,
         unit_instance_id=units["intercessor-1"].unit_instance_id,
-        dx=3.0,
+        dx=0.0,
+        dy=3.0,
     )
 
     status = _submit_charge_move_proposal(
@@ -2063,6 +2064,7 @@ def test_phase15b_charge_move_proposal_value_object_rejects_malformed_fields() -
 
 def test_phase15b_charge_endpoint_witness_payload_sorts_and_rejects_malformed_fields() -> None:
     witness = ChargeEndpointWitness(
+        model_endpoints=(),
         selected_target_unit_instance_ids=("target-b", "target-a"),
         target_distances_before_inches={"target-b": 5.0, "target-a": 3.0},
         target_distances_after_inches={"target-b": 2.0, "target-a": 1.0},
@@ -2642,16 +2644,16 @@ def test_charge_targets_use_canonical_attached_rules_unit_identity_after_round_t
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("marked-bodyguard", "marked-leader"),
         enemy_model_poses=_compact_test_unit_poses(
-            origin=Pose.at(20.0, 20.0),
+            origin=Pose.at(10.0, 25.0),
             model_count=5,
         ),
         enemy_origins={
-            "marked-bodyguard": Pose.at(20.0, 20.0),
-            "marked-leader": Pose.at(20.0, 24.0),
+            "marked-bodyguard": Pose.at(10.0, 25.0),
+            "marked-leader": Pose.at(17.0, 25.0),
         },
         enemy_attached_unit_ids=("marked-bodyguard", "marked-leader"),
         selected_attached_target_effect_id="phase15a-canonical-attached-charge-target",
-        game_id="phase15a-canonical-attached-charge-target",
+        game_id="phase15a-canonical-attached-charge-target-order47",
     )
     source_id = units["intercessor-1"].unit_instance_id
     component_ids = {
@@ -2722,7 +2724,8 @@ def test_charge_targets_use_canonical_attached_rules_unit_identity_after_round_t
             witness=_charge_path_witness_for_unit(
                 lifecycle,
                 unit_instance_id=source_id,
-                dx=3.0,
+                dx=0.0,
+                dy=3.0,
             ),
         ),
     )
@@ -2825,12 +2828,12 @@ def test_repeated_selected_target_charge_effects_coalesce_one_reroll_and_require
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy-1", "enemy-2"),
         enemy_model_poses=_compact_test_unit_poses(
-            origin=Pose.at(20.0, 20.0),
+            origin=Pose.at(10.0, 25.0),
             model_count=5,
         ),
         enemy_origins={
-            "enemy-1": Pose.at(20.0, 20.0, facing_degrees=180.0),
-            "enemy-2": Pose.at(18.6, 22.1, facing_degrees=180.0),
+            "enemy-1": Pose.at(10.0, 25.0, facing_degrees=180.0),
+            "enemy-2": Pose.at(17.0, 24.4, facing_degrees=180.0),
         },
         game_id="phase15a-success-charge",
     )
@@ -2919,7 +2922,8 @@ def test_repeated_selected_target_charge_effects_coalesce_one_reroll_and_require
             witness=_charge_path_witness_for_unit(
                 lifecycle,
                 unit_instance_id=source.unit_instance_id,
-                dx=3.0,
+                dx=0.0,
+                dy=3.0,
             ),
         ),
     )

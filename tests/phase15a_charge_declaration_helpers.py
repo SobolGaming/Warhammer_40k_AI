@@ -3,7 +3,12 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import cast
 
-from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
+from tests.phase15a_charge_config_helpers import _army_muster_request
+from tests.setup_completion_helpers import (
+    ensure_army_mustered_events_for_fixture,
+    record_completed_command_occurrences_for_fixture,
+    record_current_battlefield_placements_for_fixture,
+)
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -20,6 +25,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -54,11 +60,13 @@ def charge_lifecycle(
     enemy_unit_ids: tuple[str, ...] = ("enemy",),
     enemy_origins: dict[str, Pose] | None = None,
     battle_round: int = 1,
+    alpha_attached_unit_ids: tuple[str, str] | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = charge_config(
         game_id=game_id,
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
+        alpha_attached_unit_ids=alpha_attached_unit_ids,
     )
     config = replace(
         config,
@@ -122,6 +130,8 @@ def charge_lifecycle(
     state.battle_round = battle_round
     state.active_player_id = "player-a"
     decisions = GameLifecycle().decision_controller
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_completed_command_occurrences_for_fixture(
         state,
         decisions=decisions,
@@ -145,6 +155,7 @@ def charge_config(
     game_id: str,
     alpha_unit_ids: tuple[str, ...],
     enemy_unit_ids: tuple[str, ...],
+    alpha_attached_unit_ids: tuple[str, str] | None = None,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
@@ -155,11 +166,22 @@ def charge_config(
         ),
         army_catalog=catalog,
         army_muster_requests=(
-            army_muster_request(
+            _army_muster_request(
                 catalog=catalog,
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=alpha_unit_ids,
+                character_unit_selection_ids=()
+                if alpha_attached_unit_ids is None
+                else (alpha_attached_unit_ids[1],),
+                attachment_declarations=()
+                if alpha_attached_unit_ids is None
+                else (
+                    AttachmentDeclaration(
+                        source_unit_selection_id=alpha_attached_unit_ids[1],
+                        bodyguard_unit_selection_id=alpha_attached_unit_ids[0],
+                    ),
+                ),
             ),
             army_muster_request(
                 catalog=catalog,

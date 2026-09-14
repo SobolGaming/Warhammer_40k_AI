@@ -3,6 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.charge_budget_value import ChargeMovementBudget
+from warhammer40k_core.engine.charge_movement_source import (
+    battlefield_with_charge_placement,
+    charge_movement_placement,
+)
 from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
 from warhammer40k_core.engine.charge_target_continuation import current_charge_targets
 
@@ -385,7 +389,9 @@ def _apply_charge_move_proposal_decision(
     if proposal.witness is None:
         raise GameLifecycleError("Validated Charge Move proposal must include a witness.")
     scenario = _charge._battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    unit_placement = charge_movement_placement(
+        scenario=scenario, unit_instance_id=proposal.unit_instance_id
+    )
     resolution = _charge.resolve_charge_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -418,7 +424,7 @@ def _apply_charge_move_proposal_decision(
     if battlefield_state is None:
         raise GameLifecycleError("Charge Move proposal requires battlefield_state.")
     state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(resolution.attempted_placement)
+        battlefield_with_charge_placement(battlefield_state, resolution.attempted_placement)
     )
     state.replace_charge_phase_state(
         charge_state.with_charge_move_resolved(

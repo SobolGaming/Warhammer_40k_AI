@@ -210,7 +210,7 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v12-charge-targets"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v13-charge-model-endpoints"
 
 
 def test_replay_v8_round_trips_objective_control_record_boundary_authority() -> None:
@@ -1918,7 +1918,7 @@ def _setup_to_battle_artifact() -> ReplayArtifact:
 
 def _movement_shooting_charge_fight_artifact() -> ReplayArtifact:
     game_id = "probe-fight"
-    lifecycle, units = _movement_phase_lifecycle(game_id=game_id)
+    lifecycle, units = _movement_phase_lifecycle(game_id=game_id, parallel_charge_rows=True)
     status = lifecycle.advance_until_decision_or_terminal()
     initial_payload = _lifecycle_payload_copy(lifecycle)
     initial_checkpoint = _projection_checkpoint(
@@ -2057,7 +2057,8 @@ def _drive_movement_shooting_charge_fight(
                 witness=_straight_line_witness_for_unit(
                     lifecycle,
                     unit_instance_id=attacker_unit_id,
-                    dx=2.0,
+                    dx=0.0,
+                    dy=2.0,
                 ),
             ).to_payload()
         ),
@@ -2083,7 +2084,8 @@ def _drive_movement_shooting_charge_fight(
                 witness=_straight_line_witness_for_unit(
                     lifecycle,
                     unit_instance_id=attacker_unit_id,
-                    dx=0.1,
+                    dx=0.0,
+                    dy=0.1,
                 ),
             ).to_payload()
         ),
@@ -2150,6 +2152,7 @@ def _movement_phase_lifecycle(
     game_id: str,
     attached_target: bool = False,
     large_target: bool = False,
+    parallel_charge_rows: bool = False,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _combat_config(
         game_id=game_id,
@@ -2186,7 +2189,9 @@ def _movement_phase_lifecycle(
             army_id="army-beta",
             player_id="player-b",
             poses=_compact_test_unit_poses(
-                origin=Pose.at(19.0, 20.0, facing_degrees=180.0),
+                origin=Pose.at(10.0, 24.0, facing_degrees=180.0)
+                if parallel_charge_rows
+                else Pose.at(19.0, 20.0, facing_degrees=180.0),
                 model_count=len(units["target"].own_models),
             ),
         )
@@ -2225,6 +2230,12 @@ def _movement_phase_lifecycle(
                 state=state,
                 army_definition=army,
             ),
+        )
+    from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+
+    if parallel_charge_rows:
+        record_current_battlefield_placements_for_fixture(
+            state, decisions=seed_lifecycle.decision_controller
         )
     payload = cast(
         GameLifecyclePayload,

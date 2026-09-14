@@ -21,8 +21,8 @@
     },
     "ruleset_descriptor_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "ruleset_id": {"minProperties": 1, "type": "object"},
-    "schema_version": {"const": "session-metadata-v18-contract", "type": "string"},
-    "server_contract_version": {"pattern": "^18\\.[0-9]+\\.[0-9]+$", "type": "string"},
+    "schema_version": {"const": "session-metadata-v19-contract", "type": "string"},
+    "server_contract_version": {"pattern": "^19\\.[0-9]+\\.[0-9]+$", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "session_state": {

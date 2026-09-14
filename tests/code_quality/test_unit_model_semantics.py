@@ -226,7 +226,7 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "_validate_revived_model_engagement",
         ): 1,
         (
-            "src/warhammer40k_core/engine/phases/charge.py",
+            "src/warhammer40k_core/engine/charge_move_geometry.py",
             "_model_groups_are_engaged",
         ): 1,
         (

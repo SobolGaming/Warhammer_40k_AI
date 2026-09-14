@@ -33,6 +33,7 @@ CHARGE_MOVE_MODEL_MOVEMENT_PAYLOAD_KEYS: frozenset[str] = frozenset(
 )
 CHARGE_MOVE_ENDPOINT_WITNESS_PAYLOAD_KEYS: frozenset[str] = frozenset(
     {
+        "model_endpoints",
         "selected_target_unit_instance_ids",
         "target_distances_before_inches",
         "target_distances_after_inches",

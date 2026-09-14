@@ -2,6 +2,13 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 47 enforces every charging model's closer, within-one-inch and engagement
+obligations through the shared validated-path search. Attached units charge once
+under their canonical identity, with atomic component movement and authenticated
+per-model replay evidence. See [scope and validation](docs/ORDER_47_SCOPE_PLAN.md),
+[performance evidence](docs/performance/order47/README.md), and the
+[contract 19 migration](contracts/migrations/18-to-19.md).
+
 Order 46 implements Charge roll/movement-budget separation and finite target
 commitments with shared P04 replacement after later modifier changes. See
 [scope and validation](docs/ORDER_46_SCOPE_PLAN.md) and the

@@ -14,6 +14,18 @@
         "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget",
         "warhammer40k_core.engine.charge_target_continuation:continue_charge_move"
       ]
+    },
+    {
+      "source_id": "gw-11e-core-charge:model-endpoints",
+      "section_id": "11.04",
+      "source_text": "Each model must end its move closer to one or more charge targets.",
+      "transcription_sha256": "f89a63e4c03d60eb727523f3d3894a3bb550507939eaddf3cf145f6257d86191",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.charge_move_resolution:resolve_charge_move",
+        "warhammer40k_core.engine.charge_model_endpoints:charge_model_endpoint_witness"
+      ]
     }
   ],
   "evidence": [
@@ -76,7 +88,67 @@
         "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget",
         "warhammer40k_core.engine.charge_target_continuation:continue_charge_move"
       ]
+    },
+    {
+      "evidence_id": "core-charge-review:model-endpoints",
+      "rule_source_id": "gw-11e-core-charge:model-endpoints",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 11.04 model-endpoints",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f89a63e4c03d60eb727523f3d3894a3bb550507939eaddf3cf145f6257d86191",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "f8e7909d6ec47889f4cb9987ae3adac7ac0f1c98e9fb22a8f7ace3cfe1fb3d7e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.charge_move_resolution:resolve_charge_move",
+        "warhammer40k_core.engine.charge_model_endpoints:charge_model_endpoint_witness"
+      ]
+    },
+    {
+      "evidence_id": "core-charge-mirror:model-endpoints",
+      "rule_source_id": "gw-11e-core-charge:model-endpoints",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-charge-maintained-app-mirrors-2026-09-14",
+      "review_audit_row_id": "model-endpoints",
+      "review_audit_source_observation_sha256": "3c40e1d82103df43d9a12af5de9cb266954ec8e183bea83efd5bc2524fa47e8d",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 11.04 model-endpoints",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/11-charge-phase",
+      "observed_at": "2026-09-14T14:09:27.140Z",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f89a63e4c03d60eb727523f3d3894a3bb550507939eaddf3cf145f6257d86191",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "31351e5beb60cb48a7689831bbdbd028f3253abfeefd8709e9d4336c2f1dcfc8",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.charge_move_resolution:resolve_charge_move",
+        "warhammer40k_core.engine.charge_model_endpoints:charge_model_endpoint_witness"
+      ]
     }
   ],
-  "package_hash": "51fafa48c81818154851d2c1121210c5e4715cf461c0d84af736fff051a14cb0"
+  "package_hash": "ec30c78c0b16a660dc100980796382544539cd2f11d1b75f58d38aa6c0d6559e"
 }

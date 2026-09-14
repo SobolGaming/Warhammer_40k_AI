@@ -1,0 +1,8 @@
+{
+  "workload_id": "order47-charge-slice-v1",
+  "mean_regression_factor": 2.0,
+  "mean_regression_allowance_seconds": 0.05,
+  "maximum_seconds": 0.5,
+  "maximum_decisions": 3,
+  "maximum_events": 75
+}

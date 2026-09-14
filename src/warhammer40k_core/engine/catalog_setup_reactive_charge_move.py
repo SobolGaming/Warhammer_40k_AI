@@ -18,6 +18,11 @@ from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
 from warhammer40k_core.engine.charge_movement_budget import current_charge_movement_budget
+from warhammer40k_core.engine.charge_movement_source import (
+    battlefield_with_charge_placement,
+    charge_movement_placement,
+    validate_charge_witness_for_proposal,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -94,6 +99,17 @@ def invalid_catalog_setup_reactive_charge_move_status(
             result=result,
             proposal_validation=proposal_validation,
             message="Setup-reactive Charge Move proposal does not match the pending request.",
+        )
+    path_validation = validate_charge_witness_for_proposal(
+        state=state, request=proposal_request, witness=proposal.witness
+    )
+    if path_validation is not None:
+        return _reject_invalid_setup_reactive_charge_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=path_validation,
+            message="Setup-reactive Charge path is stale.",
         )
     context = setup_reactive_proposal_context(proposal_request)
     roll = ChargeRollResult.from_payload(
@@ -197,7 +213,9 @@ def apply_catalog_setup_reactive_charge_move(
     if proposal.witness is None:
         raise GameLifecycleError("Validated setup-reactive Charge Move requires a witness.")
     scenario = setup_reactive_battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    unit_placement = charge_movement_placement(
+        scenario=scenario, unit_instance_id=proposal.unit_instance_id
+    )
     context = setup_reactive_proposal_context(proposal_request)
     roll = ChargeRollResult.from_payload(
         cast(ChargeRollResultPayload, setup_reactive_payload_object(context["charge_roll"]))
@@ -237,7 +255,7 @@ def apply_catalog_setup_reactive_charge_move(
         raise GameLifecycleError("Setup-reactive Charge Move requires battlefield_state.")
     transition_batch = resolution.transition_batch(before=unit_placement)
     state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(resolution.attempted_placement)
+        battlefield_with_charge_placement(battlefield_state, resolution.attempted_placement)
     )
     from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
 

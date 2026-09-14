@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `18.0.0`
+Contract version: `19.0.0`
+
+Order 47 / contract 19 adds canonical attached Charge actors and required
+per-model endpoint evidence. See [the migration](migrations/18-to-19.md).
 
 Contract 18 separates bounded Charge rolls from subsequent movement-distance
 effects and commits finite target choices before path submission. Later target
