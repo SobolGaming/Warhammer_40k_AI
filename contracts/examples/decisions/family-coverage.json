@@ -220,6 +220,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "select_charge_targets",
+      "example_path": null,
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "select_charging_unit",
       "example_path": null,
       "interaction_kinds": [
@@ -821,9 +831,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 82,
+  "known_external_token_count": 83,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 80,
+  "registered_decision_type_count": 81,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",

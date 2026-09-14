@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 46 implements Charge roll/movement-budget separation and finite target
+commitments with shared P04 replacement after later modifier changes. See
+[scope and validation](docs/ORDER_46_SCOPE_PLAN.md) and the
+[contract 18 migration](contracts/migrations/17-to-18.md).
+
 Order 45 implements one Fire Overwatch opportunity at the end of the opponent's
 Movement phase, with an independent choice of one eligible visible enemy within
 24 inches through canonical Snap Shooting. CP, source restrictions, attached units,
@@ -22,7 +27,7 @@ See [scope and validation](docs/ORDER_43_SCOPE_PLAN.md) and the
 Order 42 adds shared target invalidation/replacement choices and the Shooting
 consumer, preserving committed weapons, dice, source restrictions, restore,
 replay and adapter visibility. See the [scope and validation](docs/ORDER_42_SCOPE_PLAN.md).
-Charge's later-modifier continuation remains Order 46.
+Charge's later-modifier continuation is implemented by Order 46.
 
 Order 41 implements during-phase Explosives through finite rules-unit/model/enemy
 choices, model-specific range and visibility, shared shooting restrictions and

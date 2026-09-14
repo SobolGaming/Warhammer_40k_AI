@@ -2481,12 +2481,13 @@ Required Phase 13 adapter-contract tests:
 
 ## Phase 15 Charge Decisions
 
-Phase 15A implements Charge phase eligibility, declaration, optional source-backed declaration grants, and deterministic charge-distance rolls. Phase 15B implements the post-roll Charge Move as a parameterized physical proposal. Adapters must not synthesize target selection, placement mutation, displacement records, source-backed declaration effects, or Fights First state from the Phase 15A roll payload; they must answer the pending Phase 15B proposal request.
+Phase 15A implements Charge phase eligibility, declaration, optional source-backed declaration grants, and deterministic charge-distance rolls. Phase 15B implements the post-roll Charge Move as a parameterized physical proposal. Adapters must not synthesize target selection, placement mutation, displacement records, source-backed declaration effects, or Fights First state from the Phase 15A roll payload; they must first answer the pending finite target-set choice and then the Phase 15B proposal request.
 
-Phase 15A exposes this active-player decision:
+Phase 15A exposes these active-player decisions:
 
 - `select_charging_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id`, a deterministic `<unit_instance_id>:ignore:<hash>` variant when the unit may ignore one or more currently applicable Charge-roll modifiers, or `complete_charge_phase`. Unit option payloads include `submission_kind: "select_charging_unit"`, game, round, phase, active player, selected unit ID, target candidates, and the current eligibility context. Modifier-ignore variants add the same source-bound `modifier_ignore_context` used by Movement actions, with `kind: "charge_roll"` snapshots and one option for every legal subset; the unsuffixed unit option keeps all modifiers. The completion option uses `submission_kind: "complete_charge_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player charging units.
 - `select_charge_declaration_grant`: finite active-player choice emitted after `select_charging_unit` and before the Charge roll when runtime content exposes legal declaration grants. Option IDs are deterministic source hook IDs, plus `decline_charge_declaration_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate defensive restrictions locally. Drukhari `Power from Pain: Lithe Agility` uses this surface to spend one Pain token and record Charge-phase empowerment before the Charge roll. Black Templars `Abhor the Witch, Destroy the Witch` uses this surface to accept a source-backed Charge-roll reroll and a mandatory PSYKER target snapshot whose obligation remains active independently of post-roll reachability.
+- `select_charge_targets`: finite active-player choice after the Charge roll. `charge-targets:{index:04d}` options enumerate each legal nonempty canonical target set within both the current movement maximum and 12 inches. `decline_charge_targets` is offered only when source-required targets permit declining. The payload binds the source rule, game/round/phase, original roll action, charging unit, original `charge_roll`, current `movement_budget`, and reachable distances. Each option carries this context and `target_ids`; adapters submit one issued option ID.
 
 Charge eligibility target candidates are engine-enumerated from battlefield state and the active ruleset's `charge_policy`. Each candidate is a current canonical rules unit with at least one present living or retained model; an Attached Unit appears once under its synthetic rules-unit ID, and its component IDs are not separate targets. Fight On Death-only units remain Charge targets. Retained bases contribute declaration distance, Charge Move endpoint Engagement and collision validation. Charging actors still require living movable models. Phase 15A rejects chargers that Advanced, Fell Back, are within Engagement Range, are off the battlefield, already declared a Charge this phase, or have no enemy unit within the descriptor-sourced declaration range, currently 12", unless a future source-backed rule explicitly marks that unit as allowed to declare a charge. An active selected-target Charge constraint is evaluated independently of that candidate list: every current surviving successor of every historical marked rules-unit identity must itself be placed and must be a legal target. If a mark is destroyed, off the battlefield, otherwise unavailable, or has any current surviving successor that is unplaced or not legal, the charging unit cannot declare a Charge while that effect remains active; another legal enemy does not satisfy the obligation.
 
@@ -2507,9 +2508,45 @@ The `charge_roll_resolved` payload includes:
 - `unit_instance_id`;
 - `maximum_distance_inches`;
 - `roll_result`, including source unit-selection request/result IDs;
-- `reachable_target_distances_inches` and `reachable_target_unit_instance_ids`, containing canonical enemy rules units with present living or retained target authority that are currently within both 12" and the rolled maximum distance.
+- `reachable_target_distances_inches` and `reachable_target_unit_instance_ids`, containing canonical enemy rules units with present living or retained target authority that are currently within both 12" and the movement maximum after roll and move-distance modifiers.
 
-If the roll leaves no enemy unit within both 12" and the rolled maximum distance, Phase 15A emits `charge_no_move_possible`, mutates no model placement, emits no displacement payload, and continues to the next charging-unit choice. If one or more reachable targets exist, Phase 15A records a `ChargeDistanceState`, emits `charge_move_required`, and emits a `submit_movement_proposal` request with proposal kind `charge_move`.
+If the initial movement budget leaves no enemy unit within both 12" and that maximum distance, Phase 15A emits `charge_no_move_possible`, mutates no model placement, emits no displacement payload, and continues to the next charging-unit choice. If one or more reachable targets exist, Phase 15A records a `ChargeDistanceState`, emits `charge_move_required`, and emits `select_charge_targets`. An accepted target set emits `charge_targets_selected` and then a `submit_movement_proposal` request with proposal kind `charge_move`.
+
+Order 46 / contract 18 keeps the raw 2D6 immutable. `roll_result.value` is the
+modified Charge roll bounded to 1–12; `movement_budget` records that modified
+roll and source-linked `distance_modifiers`, then a nonnegative
+`maximum_distance_inches`. Subsequent move effects can produce a fractional
+maximum or a maximum above 12. They do not alter the raw dice or the bounded
+Charge result, and do not relax the separate 12-inch target gate. Ordinary
+Movement-characteristic modifiers are not Charge-distance modifiers.
+
+Before movement, Charge recomputes both modifier classes from current source
+authority and checks committed targets. Invalid targets route through P04
+`select_target_replacement` with the original Charge roll request as `action_id`
+and the last target commitment result as `selection_id`. The shared dispatcher
+and restore validators bind ownership to that action ID; Shooting interruptions
+during Charge retain their own replacement action. A fresh finite target
+set or explicit decline completes that decision before movement continues.
+`target_replacement_resolved` and `charge_targets_selected` preserve the causal
+chain. If targets remain valid, only movement authority is refreshed. A stale
+submission is rejected without consuming the queue; an explicit session advance
+withdraws stale pending authority and emits a fresh target, replacement or path
+request. `charge_movement_request_withdrawn` contains request ID, source unit ID,
+nullable prior target-selection result ID, and the context-change reason.
+
+`ChargePhaseState.target_selection` is required and nullable; `ChargeRollResult`
+requires its initial `movement_budget`. Restore checks target commitments against
+accepted decision/event history and rejects missing or superseded replacement
+mutations. The original roll remains replay evidence even if later modifiers
+change the current budget. Internal `charge_target_authority_sha256` and P04
+source hashes are removed by the one shared viewer-redaction module from pending
+requests, options, recorded decisions, projections and event deltas.
+
+Setup-reactive Charge retains its existing source-bound target and proposal
+family while consuming the same roll-then-distance budget arithmetic and current
+budget validation. Contract 18 does not change Heroic Intervention (Order 50),
+Command Re-roll availability (Order 49), per-model endpoint semantics (Order 47)
+or Take to the Skies selection (Order 51).
 
 The Phase 15B Charge Move request uses the shared parameterized proposal wrapper:
 
@@ -2518,7 +2555,7 @@ The Phase 15B Charge Move request uses the shared parameterized proposal wrapper
 - `phase: "charge"`;
 - `movement_phase_action: "charge_move"`;
 - `unit_instance_id`: the charging unit;
-- request context includes `movement_mode: "charge"`, `maximum_distance_inches`, `reachable_target_unit_instance_ids`, `reachable_target_distances_inches`, optional `charge_move_required_target_unit_instance_ids`, and the source `charge_roll` payload. Selected-target requirements retain their full current identity set independently of reachability; if the roll cannot reach every required current target, Phase 15A emits `charge_no_move_possible` and does not emit this proposal.
+- request context includes `movement_mode: "charge"`, `maximum_distance_inches`, `reachable_target_unit_instance_ids`, `reachable_target_distances_inches`, optional `charge_move_required_target_unit_instance_ids`, the original source `charge_roll` payload, current `movement_budget`, and `target_selection` commitment (request ID, result ID, unit ID and sorted target IDs). Selected-target requirements retain their full current identity set independently of reachability; if the roll cannot reach every required current target, Phase 15A emits `charge_no_move_possible` and does not emit this proposal.
 
 Adapters answer with `ParameterizedSubmission` and the fixed `submit_parameterized_payload` option. The payload is a `ChargeMoveProposal` object with:
 
@@ -2527,7 +2564,7 @@ Adapters answer with `ParameterizedSubmission` and the fixed `submit_parameteriz
 - `unit_instance_id`;
 - `movement_phase_action: "charge_move"`;
 - `movement_mode: "charge"`;
-- `charge_target_unit_instance_ids`: zero or more target IDs from the request's reachable target list;
+- `charge_target_unit_instance_ids`: exactly the committed target IDs for a move, or an empty list for a permitted no-move choice;
 - `witness`: a `PathWitness` for every model in the charging unit when one or more targets are selected.
 
 An empty `charge_target_unit_instance_ids` tuple with no witness is the active player's no-move choice unless `charge_move_required_target_unit_instance_ids` is non-empty. When the list is empty, no-move records `charge_move_declined`, mutates no model placement, emits no displacement payload, and grants no Fights First effect. When the list is non-empty, submissions must select every required target ID, and the endpoint witness must show the charging unit engaged with every selected target. Historical Attached Unit marks reconcile through committed starting-formation lineage: source effects transfer to every current surviving source successor, and a marked target expands to every current placed surviving target successor. Nested source/target IDs remain replay evidence for the historical identity; adapters must not rewrite or collapse that lineage.
@@ -5658,7 +5695,7 @@ commits internal state and is never client input. Public geometry/rules witnesse
 and weapon plans retain their existing viewer semantics. Existing finite
 submission and projection schemas cover the new family; no parameterized payload
 or persistence schema is introduced. Charge can supply its own target sets to the
-same service; Order 46 remains responsible for its later-modifier continuation.
+same service; Order 46 adds its later-modifier continuation as documented above.
 
 
 ## Order 43: critical-hit thresholds (contract 16)

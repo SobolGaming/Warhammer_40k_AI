@@ -210,7 +210,7 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v11-phase-end-overwatch"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v12-charge-targets"
 
 
 def test_replay_v8_round_trips_objective_control_record_boundary_authority() -> None:
@@ -2028,6 +2028,14 @@ def _drive_movement_shooting_charge_fight(
         request=charge_request,
         option_id=attacker_unit_id,
         result_id=f"{game_id}-select-charging-unit",
+    )
+    from tests.charge_target_selection_helpers import choose_charge_targets
+
+    status = choose_charge_targets(
+        lifecycle,
+        request=_assert_decision_request(status, "select_charge_targets"),
+        target_ids=(target_unit_id,),
+        result_id=f"{game_id}-select-charge-targets",
     )
     proposal_request = _assert_decision_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
     charge_proposal = MovementProposalRequest.from_decision_request_payload(

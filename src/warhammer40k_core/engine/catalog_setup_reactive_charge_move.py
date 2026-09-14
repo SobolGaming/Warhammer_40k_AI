@@ -10,13 +10,14 @@ from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     setup_reactive_active_player_id,
     setup_reactive_battlefield_scenario,
     setup_reactive_payload_distance_map,
-    setup_reactive_payload_int,
     setup_reactive_payload_object,
     setup_reactive_payload_string,
     setup_reactive_proposal_context,
     setup_reactive_proposal_context_string_or_none,
     setup_reactive_target_limited_reachable_charge_distances,
 )
+from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
+from warhammer40k_core.engine.charge_movement_budget import current_charge_movement_budget
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -41,6 +42,7 @@ from warhammer40k_core.engine.phases.charge import (
     charge_move_violation_code,
     resolve_charge_move,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import ChargeTargetRestrictionHookRegistry
 from warhammer40k_core.geometry.pose import GeometryError
 
@@ -71,6 +73,8 @@ def invalid_catalog_setup_reactive_charge_move_status(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     parsed = _parse_setup_reactive_charge_move_proposal_submission_or_invalid(
@@ -92,7 +96,25 @@ def invalid_catalog_setup_reactive_charge_move_status(
             message="Setup-reactive Charge Move proposal does not match the pending request.",
         )
     context = setup_reactive_proposal_context(proposal_request)
-    maximum_distance = setup_reactive_payload_int(context, key="maximum_distance_inches")
+    roll = ChargeRollResult.from_payload(
+        cast(ChargeRollResultPayload, setup_reactive_payload_object(context["charge_roll"]))
+    )
+    maximum_distance = roll.movement_budget.maximum_distance_inches
+    if context.get("maximum_distance_inches") != maximum_distance:
+        raise GameLifecycleError("Setup-reactive Charge budget context drift.")
+    current = current_charge_movement_budget(
+        state=state,
+        request=roll.request,
+        roll_state=roll.roll_state,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    if current != roll.movement_budget:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Setup-reactive Charge movement budget changed.",
+            payload={"invalid_reason": "setup_reactive_charge_budget_drift"},
+        )
     current_reachable = setup_reactive_target_limited_reachable_charge_distances(
         state=state,
         unit_instance_id=proposal.unit_instance_id,
@@ -177,7 +199,12 @@ def apply_catalog_setup_reactive_charge_move(
     scenario = setup_reactive_battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
     context = setup_reactive_proposal_context(proposal_request)
-    maximum_distance = setup_reactive_payload_int(context, key="maximum_distance_inches")
+    roll = ChargeRollResult.from_payload(
+        cast(ChargeRollResultPayload, setup_reactive_payload_object(context["charge_roll"]))
+    )
+    maximum_distance = roll.movement_budget.maximum_distance_inches
+    if context.get("maximum_distance_inches") != maximum_distance:
+        raise GameLifecycleError("Setup-reactive Charge budget context drift.")
     resolution = resolve_charge_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,

@@ -320,7 +320,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases.charge import ChargeMoveProposal, ChargePhaseHandler
+from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.engine.phases.movement_reactions import (
     _movement_end_surge_event_already_processed,
     movement_end_surge_grant_groups,
@@ -4516,7 +4516,7 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
         decisions=decisions,
         source_unit=source_unit,
         target_unit=target_unit,
-        ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
+        runtime_content_bundle=bundle,
     )
     context = UnitMoveCompletedContext(
         state=state,
@@ -4680,8 +4680,12 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
         ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
     )
 
-    assert status is not None
-    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    # The facade already consumed the source-backed hook before Charge continuation.
+    assert status is None
+    assert any(
+        event.event_type == "unit_move_completed_battle_shock_resolved"
+        for event in decisions.event_log.records
+    )
     from tests.phase11c_command_phase_helpers import resolve_deferred_battle_shock_outcomes
 
     assert (
@@ -10525,14 +10529,30 @@ def _complete_real_catalog_charge_move(
     decisions: DecisionController,
     source_unit: UnitInstance,
     target_unit: UnitInstance,
-    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    runtime_content_bundle: RuntimeContentBundle,
 ) -> EventRecord:
-    handler = ChargePhaseHandler(
+    from tests.charge_target_selection_helpers import choose_charge_targets
+    from tests.phase15a_charge_declaration_helpers import charge_config
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+
+    config = replace(
+        charge_config(
+            game_id=state.game_id,
+            alpha_unit_ids=(source_unit.unit_instance_id.split(":", maxsplit=1)[1],),
+            enemy_unit_ids=(target_unit.unit_instance_id.split(":", maxsplit=1)[1],),
+        ),
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
     )
-    selection_status = handler.begin_phase(state=state, decisions=decisions)
-    assert selection_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    lifecycle = GameLifecycle(
+        decision_controller=decisions, _runtime_content_bundle=runtime_content_bundle
+    )
+    lifecycle.start(config)
+    lifecycle.state = state
+    lifecycle._refresh_runtime_content_bundle_if_armies_mustered(  # pyright: ignore[reportPrivateUsage]
+        preserve_existing_bundle=True
+    )
+    selection_status = lifecycle.advance_until_decision_or_terminal()
     selection_request = selection_status.decision_request
     assert selection_request is not None
     selection_result = DecisionResult.for_request(
@@ -10540,14 +10560,15 @@ def _complete_real_catalog_charge_move(
         request=selection_request,
         selected_option_id=source_unit.unit_instance_id,
     )
-    decisions.submit_result(selection_result)
-    proposal_status = handler.apply_decision(
-        state=state,
-        result=selection_result,
-        decisions=decisions,
+    target_status = lifecycle.submit_decision(selection_result)
+    target_request = target_status.decision_request
+    assert target_request is not None
+    proposal_status = choose_charge_targets(
+        lifecycle,
+        request=target_request,
+        target_ids=(target_unit.unit_instance_id,),
+        result_id="result:catalog-charge-end:select-target",
     )
-    assert proposal_status is not None
-    assert proposal_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     proposal_decision_request = proposal_status.decision_request
     assert proposal_decision_request is not None
     proposal_request = MovementProposalRequest.from_decision_request_payload(
@@ -10589,15 +10610,8 @@ def _complete_real_catalog_charge_move(
         selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
         payload=cast(JsonValue, proposal.to_payload()),
     )
-    decisions.submit_result(proposal_result)
-    assert (
-        handler.apply_decision(
-            state=state,
-            result=proposal_result,
-            decisions=decisions,
-        )
-        is None
-    )
+    status = lifecycle.submit_decision(proposal_result)
+    assert status.status_kind is not LifecycleStatusKind.INVALID
     completed = tuple(
         event
         for event in decisions.event_log.records

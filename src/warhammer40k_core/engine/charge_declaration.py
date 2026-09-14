@@ -21,7 +21,8 @@ from warhammer40k_core.core.modifiers import (
     RollModifierPayload,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.charge_budget_value import ChargeMovementBudget
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 CHARGE_ROLL_TYPE = "charge_roll"
@@ -62,6 +63,7 @@ class ChargeRollResultPayload(TypedDict):
     roll_state: DiceRollStatePayload
     value: int
     modified_roll: ModifiedRollResultPayload
+    movement_budget: dict[str, JsonValue]
     reachable_target_distances_inches: dict[str, float]
     move_available: bool
     status: str
@@ -304,6 +306,7 @@ class ChargeRollResult:
     reachable_target_distances_inches: dict[str, float]
     move_available: bool
     status: str
+    movement_budget: ChargeMovementBudget
 
     def __post_init__(self) -> None:
         if type(self.request) is not ChargeRollRequest:
@@ -317,12 +320,17 @@ class ChargeRollResult:
             or self.value != self.request.resolve_roll(self.roll_state).final_value
         ):
             raise GameLifecycleError("ChargeRollResult value must match bounded modified result.")
+        if (
+            type(self.movement_budget) is not ChargeMovementBudget
+            or self.movement_budget.modified_roll != self.request.resolve_roll(self.roll_state)
+        ):
+            raise GameLifecycleError("ChargeRollResult movement budget roll trace drift.")
         object.__setattr__(
             self,
             "reachable_target_distances_inches",
             _validate_reachable_target_distances(
                 self.reachable_target_distances_inches,
-                maximum_distance_inches=self.value,
+                maximum_distance_inches=self.movement_budget.maximum_distance_inches,
             ),
         )
         if type(self.move_available) is not bool:
@@ -348,7 +356,11 @@ class ChargeRollResult:
         request: ChargeRollRequest,
         roll_state: DiceRollState,
         reachable_target_distances_inches: dict[str, float],
+        movement_budget: ChargeMovementBudget | None = None,
     ) -> Self:
+        if movement_budget is None:
+            modified = request.resolve_roll(roll_state)
+            movement_budget = ChargeMovementBudget(modified, (), float(modified.final_value))
         move_available = bool(reachable_target_distances_inches)
         return cls(
             request=request,
@@ -357,6 +369,7 @@ class ChargeRollResult:
             reachable_target_distances_inches=reachable_target_distances_inches,
             move_available=move_available,
             status=CHARGE_MOVE_PENDING_STATUS if move_available else CHARGE_NO_MOVE_POSSIBLE_STATUS,
+            movement_budget=movement_budget,
         )
 
     def to_payload(self) -> ChargeRollResultPayload:
@@ -365,6 +378,7 @@ class ChargeRollResult:
             "roll_state": self.roll_state.to_payload(),
             "value": self.value,
             "modified_roll": self.request.resolve_roll(self.roll_state).to_payload(),
+            "movement_budget": self.movement_budget.to_payload(),
             "reachable_target_distances_inches": dict(
                 sorted(self.reachable_target_distances_inches.items())
             ),
@@ -381,6 +395,7 @@ class ChargeRollResult:
             reachable_target_distances_inches=dict(payload["reachable_target_distances_inches"]),
             move_available=payload["move_available"],
             status=payload["status"],
+            movement_budget=ChargeMovementBudget.from_payload(payload["movement_budget"]),
         )
         if ModifiedRollResult.from_payload(payload["modified_roll"]) != result.request.resolve_roll(
             result.roll_state
@@ -446,7 +461,7 @@ def phase15a_charge_roll_payload(
             {
                 "phase": phase.value,
                 "unit_instance_id": roll_result.request.unit_instance_id,
-                "maximum_distance_inches": roll_result.value,
+                "maximum_distance_inches": roll_result.movement_budget.maximum_distance_inches,
                 "charge_roll_modifiers": [
                     modifier.to_payload() for modifier in roll_result.request.roll_modifiers
                 ],
@@ -516,7 +531,7 @@ def _validate_target_candidates(values: object) -> tuple[ChargeTargetCandidate, 
 def _validate_reachable_target_distances(
     values: object,
     *,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
 ) -> dict[str, float]:
     if type(values) is not dict:
         raise GameLifecycleError("ChargeRollResult reachable target distances must be a dict.")

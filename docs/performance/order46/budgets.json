@@ -1,0 +1,1 @@
+{"workload_id":"order46-charge-slice-v1","mean_regression_factor":2,"mean_regression_allowance_seconds":0.05,"maximum_seconds":0.5,"maximum_decisions":3,"maximum_events":75,"full_game_certified":false}

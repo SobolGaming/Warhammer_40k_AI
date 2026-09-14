@@ -204,6 +204,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_charge_targets",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_charging_unit",
         "interaction_kinds": [
           "entity_selection"
@@ -1085,13 +1092,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "17.0.0",
+        "contract_version": "18.0.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "f4780817b1d8fcf114984f9e868d43068e3af8def0aa74950ccad9ef037abea3",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7850f542e6f905ae63908c3929b9b6239fd2df4b9974e18eef3e8c3b79203101"
+        "identity_hash": "b165781352c555f1a6e1a32aa1f3eb8c210c941478d731ef7a5628c699f1ca5c",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:15395d775a811b53f356ff53d6786f9e6077dfa82fe12de6d7c6c3f3c235ce86"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -3587,6 +3594,13 @@
       "decision_type": "select_charge_declaration_grant",
       "interaction_kinds": [
         "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_charge_targets",
+      "interaction_kinds": [
+        "finite_option_list"
       ],
       "submission_kind": "finite"
     },

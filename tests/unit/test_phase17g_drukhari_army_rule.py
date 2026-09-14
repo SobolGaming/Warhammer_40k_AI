@@ -133,7 +133,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import (
     ChargingUnitSelection,
-    _record_charge_declaration_grant_effects,  # pyright: ignore[reportPrivateUsage]
+    _record_charge_declaration_grant_effects,
 )
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.phases.movement import (

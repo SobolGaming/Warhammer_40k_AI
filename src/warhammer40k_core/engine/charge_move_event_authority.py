@@ -14,6 +14,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatchPayload,
     ModelDisplacementKind,
 )
+from warhammer40k_core.engine.charge_budget_value import ChargeMovementBudget
 from warhammer40k_core.engine.charge_declaration import (
     ChargeRollResult,
     ChargeRollResultPayload,
@@ -29,6 +30,7 @@ from warhammer40k_core.engine.charge_move_event_schema import (
     CHARGE_MOVE_PROPOSAL_CONTEXT_KEYS,
     CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
 )
+from warhammer40k_core.engine.charge_phase_state import ChargeTargetSelection
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
@@ -326,7 +328,22 @@ def _charge_roll_result(
     roll_result = ChargeRollResult.from_payload(cast(ChargeRollResultPayload, raw_roll))
     if raw_roll != roll_result.to_payload():
         raise GameLifecycleError("Charge move-completed charge-roll shape drifted.")
-    reachable_ids = tuple(roll_result.reachable_target_distances_inches)
+    budget = ChargeMovementBudget.from_payload(context.get("movement_budget"))
+    if budget.modified_roll.unmodified != roll_result.movement_budget.modified_roll.unmodified:
+        raise GameLifecycleError("Charge move-completed budget lost its rolled dice.")
+    reachable = _distance_map(context.get("reachable_target_distances_inches"), "reachable targets")
+    reachable_ids = tuple(reachable)
+    selected = ChargeTargetSelection.from_payload(context.get("target_selection"))
+    if (
+        selected.unit_instance_id != proposal_request.unit_instance_id
+        or not set(selected.target_ids) <= set(reachable)
+        or any(
+            distance > min(12.0, budget.maximum_distance_inches) for distance in reachable.values()
+        )
+    ):
+        raise GameLifecycleError(
+            "Charge move-completed selected targets exceed its current budget."
+        )
     required_ids = _identifier_list(
         context.get(CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY),
         CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
@@ -334,10 +351,8 @@ def _charge_roll_result(
     if (
         context.get("source_selected_option_id") != proposal_request.unit_instance_id
         or context.get("movement_mode") != MovementMode.CHARGE.value
-        or context.get("maximum_distance_inches") != roll_result.value
+        or context.get("maximum_distance_inches") != budget.maximum_distance_inches
         or context.get("reachable_target_unit_instance_ids") != list(reachable_ids)
-        or context.get("reachable_target_distances_inches")
-        != roll_result.reachable_target_distances_inches
         or not set(required_ids) <= set(reachable_ids)
         or roll_result.request.game_id != proposal_request.game_id
         or roll_result.request.battle_round != proposal_request.battle_round
@@ -419,6 +434,17 @@ def _validate_causal_event_order(
         charge_roll_result=charge_roll_result,
         decision_records=decision_records,
     )
+    from warhammer40k_core.engine.charge_target_authority import validate_charge_selection_reference
+
+    validate_charge_selection_reference(
+        selection=ChargeTargetSelection.from_payload(
+            (proposal_request.context or {}).get("target_selection")
+        ),
+        roll=charge_roll_result,
+        before_index=proposal_request_index,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     proposal_record_index = _exact_event_index(
         event_records=event_records,
         event_type="decision_recorded",
@@ -475,10 +501,8 @@ def _proposal_domain_request_event_index(
     if frozenset(payload) == _INITIAL_PROPOSAL_EVENT_PAYLOAD_KEYS:
         expected = {
             **common,
-            "maximum_distance_inches": charge_roll_result.value,
-            "reachable_target_unit_instance_ids": list(
-                charge_roll_result.reachable_target_distances_inches
-            ),
+            "maximum_distance_inches": context["maximum_distance_inches"],
+            "reachable_target_unit_instance_ids": context["reachable_target_unit_instance_ids"],
             CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: context[
                 CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY
             ],
@@ -545,7 +569,16 @@ def _validate_transition_and_result_payload(
         and len(model_movements) == len(witness.model_paths)
     ):
         raise GameLifecycleError("Charge move-completed model result inventory drifted.")
-    maximum_distance = _integer(payload, "maximum_distance_inches")
+    raw_maximum = payload.get("maximum_distance_inches")
+    if (
+        type(raw_maximum) not in {int, float}
+        or not math.isfinite(cast(float, raw_maximum))
+        or cast(float, raw_maximum) < 0
+    ):
+        raise GameLifecycleError(
+            "Charge move-completed maximum distance must be finite and nonnegative."
+        )
+    maximum_distance = float(cast(float, raw_maximum))
     movement_ids: list[str] = []
     displaced_ids: list[str] = []
     for movement, raw_path, raw_terrain in zip(
@@ -621,9 +654,14 @@ def _validate_result_summary(
     proposal: ChargeMoveProposal,
     proposal_request: MovementProposalRequest,
     witness: PathWitness,
-    maximum_distance: int,
+    maximum_distance: float,
     ruleset_descriptor: RulesetDescriptor,
 ) -> None:
+    selected = ChargeTargetSelection.from_payload(
+        (proposal_request.context or {}).get("target_selection")
+    )
+    if selected.target_ids != proposal.charge_target_unit_instance_ids:
+        raise GameLifecycleError("Charge move-completed target selection drifted.")
     if (
         payload.get("movement_mode") != MovementMode.CHARGE.value
         or maximum_distance != (proposal_request.context or {}).get("maximum_distance_inches")
@@ -758,13 +796,6 @@ def _identifier(payload: dict[str, JsonValue], key: str) -> str:
     value = payload.get(key)
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Charge move-completed {key} must be an identifier.")
-    return value
-
-
-def _integer(payload: dict[str, JsonValue], key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Charge move-completed {key} must be an integer.")
     return value
 
 

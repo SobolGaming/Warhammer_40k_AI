@@ -93,7 +93,9 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
 _INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset(
     {"effect_snapshot_sha256", "psychic_modifier_history_origin"}
 )
-_INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS = frozenset({"target_replacement_authority_sha256"})
+_INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS = frozenset(
+    {"target_replacement_authority_sha256", "charge_target_authority_sha256"}
+)
 
 
 class RedactedLifecycleStatusPayload(TypedDict):

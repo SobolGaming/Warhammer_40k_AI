@@ -1317,13 +1317,38 @@ def test_phase17d_catalog_setup_reactive_shoot_charge_requests_finite_actions_an
     }
 
 
-def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus() -> None:
+@pytest.mark.parametrize(("roll_delta", "distance_delta"), [(0, 0.0), (10, -2.0), (-1, 2.5)])
+def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus(
+    roll_delta: int,
+    distance_delta: float,
+) -> None:
     state, catalog, player_b_index = _setup_reactive_single_model_state(
         target_pose=Pose.at(6.5, 10.0),
         source_pose=Pose.at(16.0, 10.0),
     )
     target_unit_id = "army-alpha:intercessor-unit-1"
     source_unit_id = "army-beta:intercessor-unit-2"
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.charge_declaration import (
+        ChargeRollResult,
+        ChargeRollResultPayload,
+    )
+
+    for effect_id, kind, parameters in (
+        ("reactive-roll", "modify_dice_roll", {"delta": roll_delta, "roll_type": "charge"}),
+        ("reactive-distance", "modify_move_distance", {"delta": distance_delta}),
+    ):
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id=effect_id,
+                owner_player_id="player-b",
+                target_unit_instance_ids=(source_unit_id,),
+                target_kind="this_unit",
+                effect_kind=kind,
+                parameters=cast(dict[str, JsonValue], parameters),
+            )
+        )
     decisions = DecisionController()
     reaction_queue = ReactionQueue()
     decisions.event_log.append(
@@ -1397,6 +1422,14 @@ def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus() -> Non
         FIGHTS_FIRST_CHARGE_EFFECT_KIND
     )
 
+    roll = ChargeRollResult.from_payload(
+        cast(ChargeRollResultPayload, proposal_context["charge_roll"])
+    )
+    expected_roll = min(12, max(1, roll.roll_state.current_total + roll_delta))
+    assert roll.value == expected_roll
+    assert proposal_context["maximum_distance_inches"] == expected_roll + distance_delta
+    assert roll.movement_budget.maximum_distance_inches == expected_roll + distance_delta
+
     move_proposal = ChargeMoveProposal(
         proposal_request_id=proposal_request.request_id,
         proposal_kind=proposal_request.proposal_kind,
@@ -1430,7 +1463,11 @@ def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus() -> Non
     assert len(completed_payloads) == 1
     assert completed_payloads[0]["charge_bonus_suppressed"] is True
     assert "persisting_effect" not in completed_payloads[0]
-    assert state.persisting_effects_for_unit(source_unit_id) == ()
+    assert all(
+        isinstance(effect.effect_payload, dict)
+        and effect.effect_payload["effect_kind"] != FIGHTS_FIRST_CHARGE_EFFECT_KIND
+        for effect in state.persisting_effects_for_unit(source_unit_id)
+    )
 
 
 def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> None:
@@ -1824,6 +1861,8 @@ def test_phase17d_catalog_setup_reactive_charge_move_malformed_fields_are_typed(
     malformed_payload[payload_field] = payload_value
 
     status = invalid_catalog_setup_reactive_charge_move_status(
+        ability_index=AbilityCatalogIndex.from_records(()),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         state=state,
         request=charge_request,
         result=_parameterized_result_for_request(

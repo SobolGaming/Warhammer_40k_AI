@@ -27,6 +27,7 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeRollResult,
     phase15a_charge_roll_payload,
 )
+from warhammer40k_core.engine.charge_movement_budget import current_charge_movement_budget
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
@@ -499,12 +500,19 @@ def _apply_setup_reactive_charge(
     roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
         roll_request.spec
     )
+    budget = current_charge_movement_budget(
+        state=state,
+        request=roll_request,
+        roll_state=roll_state,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     reachable_distances = _target_limited_reachable_charge_distances(
         state=state,
         unit_instance_id=source_unit_id,
         player_id=result.actor_id or "",
         target_unit_instance_id=target_unit_id,
-        maximum_distance_inches=roll_state.current_total,
+        maximum_distance_inches=budget.maximum_distance_inches,
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
@@ -512,6 +520,7 @@ def _apply_setup_reactive_charge(
         request=roll_request,
         roll_state=roll_state,
         reachable_target_distances_inches=reachable_distances,
+        movement_budget=budget,
     )
     decisions.event_log.append(
         "catalog_setup_reactive_charge_roll_resolved",
@@ -565,7 +574,7 @@ def _apply_setup_reactive_charge(
         context={
             "source_kind": CATALOG_SETUP_REACTIVE_SOURCE_KIND,
             "movement_mode": MovementMode.CHARGE.value,
-            "maximum_distance_inches": roll_result.value,
+            "maximum_distance_inches": roll_result.movement_budget.maximum_distance_inches,
             "reachable_target_unit_instance_ids": list(
                 roll_result.reachable_target_distances_inches
             ),
@@ -598,7 +607,7 @@ def _apply_setup_reactive_charge(
                 "request_id": request.request_id,
                 "source_decision_request_id": result.request_id,
                 "source_decision_result_id": result.result_id,
-                "maximum_distance_inches": roll_result.value,
+                "maximum_distance_inches": roll_result.movement_budget.maximum_distance_inches,
                 "reachable_target_unit_instance_ids": list(
                     roll_result.reachable_target_distances_inches
                 ),
@@ -619,7 +628,7 @@ def _apply_setup_reactive_charge(
             "target_unit_instance_id": target_unit_id,
             "movement_phase_action": CHARGE_MOVE_ACTION,
             "proposal_kind": ProposalKind.CHARGE_MOVE.value,
-            "maximum_distance_inches": roll_result.value,
+            "maximum_distance_inches": roll_result.movement_budget.maximum_distance_inches,
             "reachable_target_unit_instance_ids": list(
                 roll_result.reachable_target_distances_inches
             ),
@@ -1016,7 +1025,7 @@ def _target_limited_reachable_charge_distances(
     unit_instance_id: str,
     player_id: str,
     target_unit_instance_id: str,
-    maximum_distance_inches: int,
+    maximum_distance_inches: float,
     ruleset_descriptor: RulesetDescriptor,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> dict[str, float]:

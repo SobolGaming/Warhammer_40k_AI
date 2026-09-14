@@ -698,6 +698,15 @@ class GameLifecycle:
         )
         if trigger_status is not None:
             return trigger_status
+        from warhammer40k_core.engine.charge_target_continuation import refresh_pending_charge_move
+
+        charge_continuation = refresh_pending_charge_move(
+            state=state,
+            decisions=self.decision_controller,
+            handler=self._charge_phase_handler,
+        )
+        if charge_continuation is not None:
+            return charge_continuation
         pending_request = self._pending_decision_request()
         continuation_status = (
             _selected_target_bs.advance_catalog_selected_target_battle_shock_lifecycle(
@@ -952,6 +961,15 @@ class GameLifecycle:
             state=lifecycle._require_state(),
             decisions=lifecycle.decision_controller,
             handler=lifecycle._shooting_phase_handler,
+        )
+        from warhammer40k_core.engine.charge_target_authority import (
+            validate_restored_charge_targets,
+        )
+
+        validate_restored_charge_targets(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            handler=lifecycle._charge_phase_handler,
         )
         refreshed_bundle = lifecycle._runtime_content_bundle
         validate_pending_battlefield_request_consistency(
@@ -1499,6 +1517,7 @@ class GameLifecycle:
             elif _is_charge_move_proposal_request(request):
                 malformed_status = invalid_charge_move_proposal_status(
                     state=state,
+                    handler=self._charge_phase_handler,
                     request=request,
                     result=result,
                     decisions=self.decision_controller,

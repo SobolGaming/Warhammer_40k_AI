@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 
 import msgspec
 
+from warhammer40k_core.engine.charge_target_continuation import is_charge_target_replacement_request
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -251,7 +252,10 @@ def validate_restored_replacements(
     ):
         raise GameLifecycleError("Replacement decision/resolution history is incomplete.")
     for pending in decisions.queue.pending_requests:
-        if pending.decision_type != SELECT_TARGET_REPLACEMENT_DECISION_TYPE:
+        if (
+            pending.decision_type != SELECT_TARGET_REPLACEMENT_DECISION_TYPE
+            or is_charge_target_replacement_request(state=state, request=pending)
+        ):
             continue
         current = next_shooting_target_replacement(
             handler=handler,

@@ -96,7 +96,11 @@ def invalid_setup_reactive_charge_move_lifecycle_status(
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
+    if request.actor_id is None:
+        raise GameLifecycleError("Setup-reactive Charge requires its controlling player.")
     return invalid_catalog_setup_reactive_charge_move_status(
+        ability_index=runtime_content_bundle.ability_indexes_by_player_id[request.actor_id],
+        runtime_modifier_registry=runtime_content_bundle.runtime_modifier_registry,
         state=state,
         request=request,
         result=result,
