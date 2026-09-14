@@ -454,6 +454,14 @@ def _effect_selections_for_binding(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
 ) -> tuple[JsonValue, ...]:
+    if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:
+        from warhammer40k_core.engine.crushing_impact_selection import (
+            crushing_impact_effect_selections,
+        )
+
+        return crushing_impact_effect_selections(
+            state=state, context=context, target_binding=target_binding
+        )
     if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID:
         from warhammer40k_core.engine.explosives_selection import explosives_effect_selections
 

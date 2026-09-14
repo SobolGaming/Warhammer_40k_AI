@@ -1,0 +1,9 @@
+{
+  "workload_id": "r48-002-collateral-depth-1-checkpoint-v1",
+  "base_revision": "9dd78ed35fbe757d79232ffe99388007ef184b12",
+  "samples": 7,
+  "completed_mean_ratio": 2.0,
+  "completed_mean_allowance_seconds": 0.05,
+  "maximum_restore_seconds": 10.0,
+  "full_game_certified": false
+}

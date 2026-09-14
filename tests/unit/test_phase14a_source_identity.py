@@ -2191,7 +2191,7 @@ def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
 
     assert hashlib.sha256(raw).hexdigest() == (core_stratagems_2026_08.EXPECTED_ARTIFACT_SHA256)
     assert core_stratagems_2026_08.PACKAGE_HASH == (
-        "fa049c003103adc70fe32fb22cecc23524a2e301e7c94e8e7879237609ad83e0"
+        "986d317b5e6ea805bc40008e1f590a6bcfeeaeaa4f2b9b4d8aa5cafd06b4bbf2"
     )
     assert [(rule.section_id, rule.title) for rule in rules] == [
         ("15.05", "Crushing Impact"),
@@ -2240,7 +2240,7 @@ def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         for rule in rules
     )
     assert {rule.rule_id: rule.semantic_execution_status for rule in rules} == {
-        "crushing-impact": "partial_engine_runtime",
+        "crushing-impact": "executable_engine_runtime",
         "explosives": "executable_engine_runtime",
         "rapid-ingress": "partial_engine_runtime",
         "fire-overwatch": "executable_engine_runtime",
@@ -2354,7 +2354,7 @@ def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         ("faq_document", "app_version", "930"),
         ("insane_rule", "restrictions_text", "stale FAQ answer"),
         ("faq_mirror", "source_url", "https://example.invalid/changelog"),
-        ("rule", "semantic_execution_status", "executable_engine_runtime"),
+        ("rule", "semantic_execution_status", "partial_engine_runtime"),
         ("anomaly", "resolved_section_id", "15.06"),
     ],
 )

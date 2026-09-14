@@ -6699,7 +6699,7 @@
       "battle_shock_hook_ids": [
         "catalog-ir:selected-target-test-roll-modifier"
       ],
-      "bundle_summary_hash": "a1d9ba89bdd8db5e86d0bfb2103d2915ee5843c2c7b6f3d323aae3362c76aff3",
+      "bundle_summary_hash": "d454324d288cb14f112fd4647daff82fcaf47425eeb01f46f0ef4c156a7ca448",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -6719,6 +6719,9 @@
       "hit_roll_modifier_ids": [],
       "model_ability_grant_ids": [],
       "mortal_wound_feel_no_pain_hook_ids": [
+        "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
+        "core-stratagem:crushing_impact_self:mortal-wound-continuation",
+        "core-stratagem:explosives:mortal-wound-continuation",
         "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
       ],
       "move_completion_rule_hook_ids": [

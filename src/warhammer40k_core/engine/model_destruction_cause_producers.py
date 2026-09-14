@@ -56,6 +56,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
         MortalWoundDestructionEvidence,
     )
+    from warhammer40k_core.engine.retained_destruction_state import RetainedModelDestruction
 
 
 PARENT_MODEL_DESTRUCTION_CAUSE_ID_FIELD = "parent_model_destruction_cause_id"
@@ -664,7 +665,7 @@ def validate_model_destruction_cause_restore(
         event_records=event_records,
         decision_records=decision_records,
     )
-    validate_model_destruction_cause_producer_restore(
+    retained = validate_model_destruction_cause_producer_restore(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
@@ -679,6 +680,7 @@ def validate_model_destruction_cause_restore(
         event_records=event_records,
         decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
+        authenticated_retained_destructions=retained,
     )
 
 
@@ -688,7 +690,7 @@ def validate_model_destruction_cause_producer_restore(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
-) -> None:
+) -> tuple[RetainedModelDestruction, ...]:
     """Validate each persisted cause against its owning producer's exact schema."""
 
     for authority in state.model_destruction_cause_authorities:
@@ -713,7 +715,7 @@ def validate_model_destruction_cause_producer_restore(
                 decision_records=decision_records,
                 pending_decision_requests=pending_decision_requests,
             )
-    _mdccr.validate_pending_model_destruction_cause_inventory(
+    return _mdccr.validate_pending_model_destruction_cause_inventory(
         state=state,
         event_records=event_records,
         decision_records=decision_records,

@@ -32,6 +32,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+    from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
     from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
 from warhammer40k_core.engine.battle_shock_outcome_triggers import (
     battle_shock_context_for_trigger,
@@ -57,6 +58,17 @@ def advance_rule_triggers(
     from warhammer40k_core.engine.model_destruction_triggers import (
         resolve_model_destruction_trigger,
     )
+    from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+        advance_rule_mortal_wound_destructions,
+    )
+
+    destruction_status = advance_rule_mortal_wound_destructions(
+        state=state,
+        decisions=decisions,
+        registry_provider=lambda: runtime_bundle_provider().mortal_wound_feel_no_pain_hook_registry,
+    )
+    if destruction_status is not None:
+        return destruction_status
 
     record_loaded_model_destruction_occurrences(
         state=state,
@@ -93,7 +105,11 @@ def advance_rule_triggers(
                 ability_indexes=runtime_bundle.ability_indexes_by_player_id,
             )
             status = resolve_move_trigger(
-                additional_candidates=partial(_loaded_move_reactions, runtime_bundle),
+                additional_candidates=partial(
+                    _loaded_move_reactions,
+                    runtime_bundle,
+                    shooting_handler_provider().stratagem_index,
+                ),
                 context=move_context,
                 trigger=trigger,
                 mortal_wound_hooks=runtime_bundle.unit_move_completed_mortal_wound_hook_registry,
@@ -282,7 +298,9 @@ def validate_trigger_order_candidates(
         )
         authority = move_completion_timing_context(move_context)
         candidates = move_completion_candidates(
-            additional_candidates=partial(_loaded_move_reactions, runtime_bundle),
+            additional_candidates=partial(
+                _loaded_move_reactions, runtime_bundle, shooting_handler.stratagem_index
+            ),
             context=move_context,
             mortal_wound_hooks=runtime_bundle.unit_move_completed_mortal_wound_hook_registry,
             battle_shock_move_hooks=runtime_bundle.unit_move_completed_battle_shock_hook_registry,
@@ -304,6 +322,7 @@ def validate_trigger_order_candidates(
 
 def _loaded_move_reactions(
     bundle: RuntimeContentBundle,
+    stratagem_index: StratagemCatalogIndex,
     context: UnitMoveCompletedContext,
 ) -> tuple[TimingRuleCandidate, ...]:
     from warhammer40k_core.engine.phases.movement_completion_candidates import (
@@ -313,7 +332,7 @@ def _loaded_move_reactions(
     reactions = move_reaction_candidates(
         context,
         surge_hooks=bundle.movement_end_surge_hook_registry,
-        stratagem_index=bundle.stratagem_indexes_by_player_id[context.triggering_player_id],
+        stratagem_index=stratagem_index,
         cost_modifiers=bundle.stratagem_cost_modifier_registry,
     )
     return (*bundle.move_completion_rule_registry.candidates_for(context), *reactions)

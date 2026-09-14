@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.damage_allocation import (
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -28,6 +32,32 @@ if TYPE_CHECKING:
 type MortalWoundFeelNoPainContinuationHandler = Callable[
     ["MortalWoundFeelNoPainContinuationContext"],
     LifecycleStatus | None,
+]
+
+
+@dataclass(frozen=True, slots=True)
+class MortalWoundApplicationCompletionContext:
+    state: GameState
+    decisions: DecisionController
+    progress: MortalWoundApplicationProgress
+    application: MortalWoundApplication
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if (
+            type(self.state) is not GameState
+            or type(self.decisions) is not DecisionController
+            or type(self.progress) is not MortalWoundApplicationProgress
+            or type(self.application) is not MortalWoundApplication
+            or self.progress.remaining_mortal_wounds
+            or self.application != self.progress.to_application()
+        ):
+            raise GameLifecycleError("Mortal wound completion context is invalid.")
+
+
+type MortalWoundApplicationCompletionHandler = Callable[
+    [MortalWoundApplicationCompletionContext], LifecycleStatus | None
 ]
 
 
@@ -85,6 +115,7 @@ class MortalWoundFeelNoPainContinuationHookBinding:
     source_id: str
     source_kind: str
     handler: MortalWoundFeelNoPainContinuationHandler
+    completion_handler: MortalWoundApplicationCompletionHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -96,6 +127,8 @@ class MortalWoundFeelNoPainContinuationHookBinding:
         )
         if not callable(self.handler):
             raise GameLifecycleError("Mortal wound FNP continuation handler is not callable.")
+        if self.completion_handler is not None and not callable(self.completion_handler):
+            raise GameLifecycleError("Mortal wound completion handler is not callable.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -193,6 +226,23 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
             raise GameLifecycleError(
                 "Mortal wound FNP continuation handlers must return status or None."
             )
+        return status
+
+    def complete_application(
+        self, context: MortalWoundApplicationCompletionContext
+    ) -> LifecycleStatus | None:
+        if type(context) is not MortalWoundApplicationCompletionContext:
+            raise GameLifecycleError("Mortal wound completion requires typed context.")
+        binding = self.binding_for_source_context(context.progress.source_context)
+        if (
+            binding is None
+            or binding.source_id != context.progress.source_rule_id
+            or binding.completion_handler is None
+        ):
+            raise GameLifecycleError("Mortal wound completion provider identity drifted.")
+        status = binding.completion_handler(context)
+        if status is not None and type(status) is not LifecycleStatus:
+            raise GameLifecycleError("Mortal wound completion must return status or None.")
         return status
 
 

@@ -1,0 +1,231 @@
+{
+  "workload_id": "order48-crushing-impact-v1",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:155186145754959fc00dbdb3bec0aa0fe4e144a2a39ae32caaa833ba04ccb6c0",
+  "environment_report": "head.json",
+  "mode": "uninstrumented_timing",
+  "concurrency": 1,
+  "terrain_count": 0,
+  "game_id": "order48-crushing-impact",
+  "policy": "Charge source to enemy; select leader if attached; first damage/FNP option",
+  "timing_boundary": "Charge selection through Crushing Impact and next charger; setup separate",
+  "base_capability": "absent: base skips the Charge-end Crushing Impact opportunity",
+  "scenarios": [
+    {
+      "scenario_id": "ordinary",
+      "model_count": 20,
+      "toughness": 4,
+      "wounds": 2,
+      "feel_no_pain": false,
+      "samples": [
+        {
+          "setup_seconds": 2.4026581249199808,
+          "slice_seconds": 0.2008827500976622,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        },
+        {
+          "setup_seconds": 0.5195034169591963,
+          "slice_seconds": 0.15179749997332692,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        },
+        {
+          "setup_seconds": 0.49570654099807143,
+          "slice_seconds": 0.14691200002562255,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        },
+        {
+          "setup_seconds": 0.4958654170623049,
+          "slice_seconds": 0.14659245789516717,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        },
+        {
+          "setup_seconds": 0.49562562501523644,
+          "slice_seconds": 0.19026029098313302,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        },
+        {
+          "setup_seconds": 0.4999704579822719,
+          "slice_seconds": 0.14864862500689924,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        },
+        {
+          "setup_seconds": 0.4996073329821229,
+          "slice_seconds": 0.1493306669872254,
+          "decision_count": 5,
+          "event_count": 98,
+          "source_mortal_wounds": 1,
+          "enemy_mortal_wounds": 0
+        }
+      ],
+      "mean_seconds": 0.16206061299557664,
+      "median_seconds": 0.1493306669872254,
+      "p95_seconds": 0.2008827500976622,
+      "maximum_seconds": 0.2008827500976622,
+      "completion_rate": 1
+    },
+    {
+      "scenario_id": "both_caps_and_feel_no_pain",
+      "model_count": 20,
+      "toughness": 96,
+      "wounds": 20,
+      "feel_no_pain": true,
+      "samples": [
+        {
+          "setup_seconds": 0.49845404201187193,
+          "slice_seconds": 1.2370147909969091,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5017157080583274,
+          "slice_seconds": 1.2849828329635784,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.500615790951997,
+          "slice_seconds": 1.2441274169832468,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5004389579407871,
+          "slice_seconds": 1.2433960830094293,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5452329580439255,
+          "slice_seconds": 1.2459985839668661,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5021742079406977,
+          "slice_seconds": 1.2485903330380097,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5012069169897586,
+          "slice_seconds": 1.2871248329756781,
+          "decision_count": 18,
+          "event_count": 139,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        }
+      ],
+      "mean_seconds": 1.2558906962762453,
+      "median_seconds": 1.2459985839668661,
+      "p95_seconds": 1.2871248329756781,
+      "maximum_seconds": 1.2871248329756781,
+      "completion_rate": 1
+    },
+    {
+      "scenario_id": "both_attached_units_destroyed",
+      "model_count": 22,
+      "toughness": 96,
+      "wounds": 1,
+      "feel_no_pain": false,
+      "samples": [
+        {
+          "setup_seconds": 0.5105672919889912,
+          "slice_seconds": 1.341535457991995,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5094888749299571,
+          "slice_seconds": 1.335165375028737,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5108470420818776,
+          "slice_seconds": 1.3583438330097124,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5113573330454528,
+          "slice_seconds": 1.3229762089904398,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5119620840996504,
+          "slice_seconds": 1.3636934158857912,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5276716670487076,
+          "slice_seconds": 1.3861663750139996,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        },
+        {
+          "setup_seconds": 0.5209574170876294,
+          "slice_seconds": 1.3617474999045953,
+          "decision_count": 12,
+          "event_count": 227,
+          "source_mortal_wounds": 6,
+          "enemy_mortal_wounds": 6
+        }
+      ],
+      "mean_seconds": 1.3528040236893244,
+      "median_seconds": 1.3583438330097124,
+      "p95_seconds": 1.3861663750139996,
+      "maximum_seconds": 1.3861663750139996,
+      "completion_rate": 1
+    }
+  ],
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_crushing_impact.py": "35056d91d4ae29d8b472186bffb5632910665c1de11e0074aff1594f83a3630e",
+    "tests/crushing_impact_helpers.py": "bd522e738cc14985c8baf99c08e6c357b1f89d5696db71cbfa185789b98a1e65",
+    "tests/phase15a_charge_declaration_helpers.py": "28da42324021a8e294eb99e333c3364d3f6b57a248221c95a53d0d2a7d3b4670"
+  },
+  "full_game_certified": false
+}

@@ -127,6 +127,11 @@ def _stratagem_decision_option(
 
 
 def _effect_selection_token(effect_selection: JsonValue) -> str:
+    if isinstance(effect_selection, dict) and CRUSHING_IMPACT_MODEL_CONTEXT_KEY in effect_selection:
+        from warhammer40k_core.engine.crushing_impact_selection import CrushingImpactSelection
+
+        crushing_selection = CrushingImpactSelection.from_payload(effect_selection)
+        return f"enemy:{crushing_selection.enemy_target_unit_instance_id}:model:{crushing_selection.model_instance_id}"
     if (
         isinstance(effect_selection, dict)
         and effect_selection.get("effect_selection_kind") == SELECTION_KIND
@@ -403,13 +408,22 @@ def _effect_selection_error(
     if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:
         if effect_selection is None:
             return None
-        return _required_effect_selection_fields_error(
+        required_error = _required_effect_selection_fields_error(
             effect_selection=effect_selection,
             field_names=(
                 CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
                 CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
             ),
         )
+        if required_error is not None:
+            return required_error
+        from warhammer40k_core.engine.crushing_impact_selection import CrushingImpactSelection
+
+        try:
+            CrushingImpactSelection.from_payload(effect_selection)
+        except GameLifecycleError as exc:
+            return f"malformed_crushing_impact_selection: {exc}"
+        return None
     if definition.handler_id == CORE_EPIC_CHALLENGE_HANDLER_ID:
         if effect_selection is None:
             return None

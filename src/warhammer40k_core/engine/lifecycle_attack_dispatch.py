@@ -84,6 +84,11 @@ def apply_attack_sequence_decision(
             )
             if status is not None:
                 return status
+            from warhammer40k_core.engine.retained_destruction_cleanup import (
+                complete_removed_retained_destructions,
+            )
+
+            complete_removed_retained_destructions(state=state, decisions=context.decisions)
         elif (
             retained.owner_kind is DestructionOwnerKind.ATTACK_COLLATERAL
             and retained.stage is RetainedDestructionStage.DECLINED

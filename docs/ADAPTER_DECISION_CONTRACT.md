@@ -1807,7 +1807,7 @@ Some Stratagems need target or placement details that are not safe to pre-enumer
 - geometric, line-of-sight, model-target, or path-dependent target proposals once the owning phase has the required validators;
 - any future Stratagem whose legal target binding cannot be represented as a finite option set.
 
-Phase 12B introduces the initial parameterized Stratagem target-binding decision type `submit_stratagem_target_proposal` with proposal kind `stratagem_target_binding`. The pending `payload.proposal_request` carries the same request identity envelope as other parameterized proposals: `request_id`, `decision_type`, and `actor_id`, followed by the Stratagem target-binding fields. Adapters answer only with the fixed `submit_parameterized_payload` option and a payload containing the typed `proposal` object. `proposal.effect_selection` is JSON-safe handler-owned selection context for optional sections or nested target choices, such as Heroic Intervention mode, Crushing Impact enemy/model choice, or Epic Challenge character model choice. Stale phase/round, malformed shape, schema-invalid missing target binding, wrong player/game/Stratagem/catalog context, CP drift including optional additional CP, and illegal target binding are rejected before queue pop and before any CP transaction or Stratagem-use record is created.
+Phase 12B introduces the initial parameterized Stratagem target-binding decision type `submit_stratagem_target_proposal` with proposal kind `stratagem_target_binding`. The pending `payload.proposal_request` carries the same request identity envelope as other parameterized proposals: `request_id`, `decision_type`, and `actor_id`, followed by the Stratagem target-binding fields. Adapters answer only with the fixed `submit_parameterized_payload` option and a payload containing the typed `proposal` object. `proposal.effect_selection` is JSON-safe handler-owned selection context for optional sections or nested target choices, such as Heroic Intervention mode or Epic Challenge character model choice. Stale phase/round, malformed shape, schema-invalid missing target binding, wrong player/game/Stratagem/catalog context, CP drift including optional additional CP, and illegal target binding are rejected before queue pop and before any CP transaction or Stratagem-use record is created.
 
 Phase-integrated optional Stratagem windows may also be declined through the same lifecycle path. Finite `use_stratagem` windows include the engine-emitted option ID `decline_stratagem_window` with payload `{"submission_kind": "decline_stratagem_window"}`. Parameterized `submit_stratagem_target_proposal` windows are declinable only when the engine marks the request payload with `declinable: true`; adapters decline by submitting the fixed `submit_parameterized_payload` option with the same decline payload instead of a typed `proposal`. A decline records a `DecisionRecord`, emits `stratagem_window_declined`, spends no CP, creates no `StratagemUseRecord`, applies no effect, and suppresses re-opening the same game/player/round/phase/trigger/timing-window. Phase hooks that expose multiple optional Stratagem opportunities under the same phase and trigger must assign distinct `timing_window_id` values so declining one window cannot suppress a separate later window. Reaction-window declines resolve the reaction frame and then emit `reaction_parent_resumed`.
 
@@ -1842,7 +1842,7 @@ Phase 12C source-backed Core Stratagems are adapter-visible through these handle
 - `core:new-orders`: finite `use_stratagem` options for active Tactical secondary cards. The target binding uses `target_kind: "tactical_secondary_card"` and `target_secondary_mission_id`; accepted use costs 1 CP, is once per game, discards that card, and draws one replacement through engine-owned Tactical secondary state.
 - `core:heroic-intervention`: parameterized target proposal at the end of the opponent Charge phase for one friendly unengaged unit within 12" of enemy units. `proposal.effect_selection.mode` is optional and defaults to `leap_to_defend`; `into_the_fray` adds the source-backed +1 CP cost and caps the Charge roll result at 6 before emitting a Heroic Intervention `submit_movement_proposal` with proposal kind `charge_move`. That movement proposal carries the Stratagem use, mode, charge-roll state, maximum distance, and reachable target snapshot in its context and requires the normal Charge Move `PathWitness` validation path.
 - `core:counteroffensive`: parameterized target proposal in the opponent Fight phase just after an enemy unit has fought. Accepted use costs 2 CP, validates that the target is eligible to fight through `FightOrderState`, records a Fights First effect until end of phase, and records the selected activation with a `counteroffensive:<stratagem_use_id>` interrupt ID before lifecycle progression resumes.
-- `core:crushing-impact`: parameterized target proposal in the active player's Charge phase just after the selected friendly MONSTER/VEHICLE ends a Charge Move. `proposal.effect_selection.enemy_target_unit_instance_id` selects one engaged enemy unit and `proposal.effect_selection.model_instance_id` selects one placed living engaged source model. A destroyed model whose base is temporarily retained for Fight On Death remains physical geometry but cannot be selected as that source. Accepted use rolls D6 equal to that model's Toughness, applies self mortal wounds for each 1, enemy mortal wounds for each 5+ capped at 6, and emits `crushing_impact_resolved`.
+- `core:crushing-impact`: finite `use_stratagem` choice in the active player's Charge phase just after the selected friendly MONSTER/VEHICLE rules unit ends a Charge move. Its engine-enumerated `effect_selection.enemy_target_unit_instance_id` and `effect_selection.model_instance_id` identify an engaged enemy rules unit and a living, placed source model engaged with it. Retained destroyed models cannot be selected. Accepted use rolls the selected model's modified Toughness in D6, applies self wounds for 1s and enemy wounds for 5+, with an independent six-wound cap on each packet, and emits `crushing_impact_resolved`. See Order 48 below.
 - `core:epic-challenge`: parameterized target proposal just after a friendly CHARACTER unit is selected to fight. `proposal.effect_selection.character_model_instance_id` selects one CHARACTER model in the target unit. Accepted use records a per-phase Precision effect for that model's melee weapons and emits `epic_challenge_precision_registered`.
 
 Phase 14G freezes the Charge/Fight ruleset contract but does not emit new player-facing decisions. `RulesetDescriptor.charge_policy` defines after-roll charge-target selection, 12" declaration/target-selection gates, rolled-distance target eligibility, charge-move endpoint constraints, and the Fights First grant. `RulesetDescriptor.fight_policy` defines the Start/Pile In/Fight/Consolidate/End step order, Fight-step-start engagement eligibility, current-engagement eligibility, charged-this-turn eligibility, Fights First and Remaining Combats ordering bands, both-player pile-in/consolidation sequencing, the more-than-5" eligible-pass rule, explicit Normal/Overrun fight types, and Ongoing/Engaging/Objective consolidation modes. Phase 15 Charge/Fight implementations must consume these source-contract payloads and then add or update this document for every finite option family, proposal kind, pending request payload, decision record, or event shape they expose.
@@ -1894,7 +1894,7 @@ Phase 15E adds these Stratagem-coupled Charge/Fight decisions:
 
 - Heroic Intervention target selection uses `submit_stratagem_target_proposal`; accepted use may emit a nested `submit_movement_proposal` Charge Move request. The nested request context includes `stratagem_handler_id: "core:heroic-intervention"` so lifecycle routes it back through the Heroic Intervention charge validator. Reaction frames may carry this movement proposal and only resume after the proposal resolves.
 - Counteroffensive and Epic Challenge are `submit_stratagem_target_proposal` requests emitted from Fight-step timing hooks. Counteroffensive target proposals are reaction-window requests for the opponent after an enemy unit has resolved attacks. Epic Challenge target proposals are declinable requests for the player whose CHARACTER unit has just been selected to fight.
-- Crushing Impact is a Charge-phase `submit_stratagem_target_proposal` after a friendly MONSTER/VEHICLE ends a Charge Move. Its nested enemy/model selections are carried in `effect_selection`, not in adapter-owned state.
+- Crushing Impact uses the finite Charge-completion choice documented under Order 48. The engine owns its nested enemy/model options and both damage continuations.
 
 Core Heroic Intervention timing is hosted at the end of every opponent Charge
 phase whenever the reacting player has at least one concrete legal and affordable
@@ -5830,3 +5830,66 @@ answer and Wound evidence must retain their causal order. Historical target and
 weapon metadata are authenticated from the issued request; restoration does not
 re-evaluate a target that may subsequently have changed. This tightens validation
 within the existing finite contract and adds no adapter-visible payload fields.
+
+## Order 48 — Crushing Impact after Charge completion
+
+The completed-move trigger opens an optional source-backed timing participant for
+`core:crushing-impact` during the charging player's own Charge phase. The finite
+`use_stratagem` request contains deterministic options for the triggering canonical
+rules unit, every legal engaged enemy rules unit and every living, placed source
+model engaged with that enemy. The closed effect-selection object has exactly
+`enemy_target_unit_instance_id` and `model_instance_id`. Attached components are
+represented once under their canonical rules-unit identity; a model retains its
+physical model ID. Selecting an option commits the enemy/model pair. There is no
+intervening roll or state mutation between those two choices.
+
+The Stratagem context carries `triggering_unit_instance_id` and `trigger_event_id`
+under `trigger_payload`, and the occurrence ID is
+`charge-move-completed:<trigger_event_id>`. The existing timing authority validates
+the completed move and selected participant. Stale phase, player, CP, keyword,
+model-presence and engagement state is rejected before queue consumption or spend.
+Adapters submit a pending option ID through `FiniteOptionSubmission`; the earlier
+parameterized Crushing Impact target proposal is no longer issued or accepted.
+
+After spending CP once, the engine rolls D6 equal to the selected model's current
+Toughness through the shared characteristic modifier service. Each 1 causes a
+self mortal wound and each 5+ an enemy mortal wound; each packet is capped at six.
+Self allocation/Feel No Pain completes before enemy allocation/Feel No Pain.
+Source destruction does not cancel the already established enemy packet. The
+existing shared mortal-wound requests belong to the suffering unit's controller,
+and preserve their source use, rolled values and completed self application.
+`crushing_impact_resolved` records both totals and applications exactly once.
+
+Charge remains suspended until this timing occurrence and its deferred destruction
+triggers finish. Decline resumes the same occurrence without spending CP; a completed
+use cannot be offered again for that move. Checkpoint restoration and exact replay
+use the same lifecycle path, including attachment dissolution and either unit's
+destruction. Public combat selections and outcomes use the existing shared adapter
+redaction; internal mortal-wound roots, destruction bindings and timing-batch
+records remain private. No new projection or submission schema is required:
+Contract 19's finite and generic event envelopes already cover these fields, and
+the regenerated engine identity versions the changed executable semantics.
+
+The shared mortal-wound route for Crushing Impact and Explosives retains lethal
+casualties until the existing rule-destruction owner handles Deadly Demise,
+collateral wounds and removal. Completed-packet callbacks are source-linked
+bindings in the existing mortal-wound continuation registry. Private
+`rule_mortal_wound_destructions_started`,
+`rule_mortal_wound_model_destruction_completed` and
+`rule_mortal_wound_destructions_completed` events store and close the suspended
+packet; the `rule_mortal_wound_destruction_evidence` context field is internal.
+The single adapters redaction owner excludes these from public projections and
+event deltas. Restore rejects missing, changed or premature packet receipts and
+requires any pending packet to have an authenticated continuation owner. Direct
+destruction requests carry the packet reference. Retained-reaction requests instead
+identify their separate retention record; restore authenticates that record's
+cause, source context, event history and offered request or accepted decision,
+then matches a cause's source rule, packet ID and logical death to the suspended
+packet. The retained casualty can own that cause directly (R48-001), or descend
+from it through authenticated parent causes after collateral destruction
+(R48-002). Restore uses the existing cause-ancestry owner, including multiple
+levels; missing or forged ancestry cannot establish packet ownership. This covers
+both offered and accepted retained reactions without changing their public
+request payloads.
+These changes reuse existing finite allocation/FNP and destruction decisions;
+contract version 19's generic schemas already cover their public payloads.

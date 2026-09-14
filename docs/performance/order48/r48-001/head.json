@@ -1,0 +1,289 @@
+{
+  "workload_id": "r48-001-retained-checkpoint-v1",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fed68d40c0b0c5a06e7ee8875c55b28c778438776a0ef5ff00feb13d165542dc",
+  "revision": "a6ab86f764527c59bcd1039b27b4221f931ce8e6",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "mode": "uninstrumented_timing",
+  "timing_boundary": "LocalGameSession.from_persistence_payload; preparation and roundtrip comparison excluded",
+  "policy": "Shared deterministic facade fixture; accept first source or decline all reactions to completion",
+  "scenarios": [
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "offered",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 3.399702583090402,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 8,
+      "event_count": 125,
+      "samples": [
+        {
+          "seconds": 2.0030043749138713,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0166889580432326,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.012565499986522,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.015543624991551,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0148549580480903,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.009561083978042,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0225947920698673,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 2.0135447560044537,
+      "median_seconds": 2.0148549580480903,
+      "maximum_seconds": 2.0225947920698673,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "accepted",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 1.586616708082147,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 9,
+      "event_count": 131,
+      "samples": [
+        {
+          "seconds": 2.0442516249604523,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0444649999262765,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0394851659657434,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0556108340388164,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0553438749630004,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.045930749969557,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.0516631670761853,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 2.04810720241429,
+      "median_seconds": 2.045930749969557,
+      "maximum_seconds": 2.0556108340388164,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "crushing-impact",
+      "boundary": "completed",
+      "game_id": "order48-crushing-impact",
+      "setup_seconds": 2.4252948749344796,
+      "model_count": 20,
+      "terrain_count": 0,
+      "decision_count": 16,
+      "event_count": 249,
+      "samples": [
+        {
+          "seconds": 2.944807791034691,
+          "status": "restored"
+        },
+        {
+          "seconds": 3.060745666967705,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.937582749989815,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.963439999963157,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.9453439170029014,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.9950830419547856,
+          "status": "restored"
+        },
+        {
+          "seconds": 2.9320335839875042,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 2.968433821557223,
+      "median_seconds": 2.9453439170029014,
+      "maximum_seconds": 3.060745666967705,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "offered",
+      "game_id": "order41-explosives",
+      "setup_seconds": 0.8809880829649046,
+      "model_count": 4,
+      "terrain_count": 0,
+      "decision_count": 2,
+      "event_count": 19,
+      "samples": [
+        {
+          "seconds": 1.3394168330123648,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3384182919980958,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3420715840766206,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3426863750210032,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3784926659427583,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3411705000326037,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3387670000083745,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 1.3458604642988317,
+      "median_seconds": 1.3411705000326037,
+      "maximum_seconds": 1.3784926659427583,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "accepted",
+      "game_id": "order41-explosives",
+      "setup_seconds": 0.8937123749637976,
+      "model_count": 4,
+      "terrain_count": 0,
+      "decision_count": 3,
+      "event_count": 37,
+      "samples": [
+        {
+          "seconds": 1.3606354999355972,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3965902499621734,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3649274579947814,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.3618095410056412,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.4027702079620212,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.370854959008284,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.4187393749598414,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 1.3823324701183342,
+      "median_seconds": 1.370854959008284,
+      "maximum_seconds": 1.4187393749598414,
+      "completion_rate": 1.0
+    },
+    {
+      "stratagem": "explosives",
+      "boundary": "completed",
+      "game_id": "order41-explosives",
+      "setup_seconds": 0.9921635839855298,
+      "model_count": 4,
+      "terrain_count": 0,
+      "decision_count": 3,
+      "event_count": 160,
+      "samples": [
+        {
+          "seconds": 1.5681850420078263,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.535768250003457,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.56606391700916,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.5628969999961555,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.5306789580499753,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.5658648329554126,
+          "status": "restored"
+        },
+        {
+          "seconds": 1.5290544590679929,
+          "status": "restored"
+        }
+      ],
+      "mean_seconds": 1.5512160655842828,
+      "median_seconds": 1.5628969999961555,
+      "maximum_seconds": 1.5681850420078263,
+      "completion_rate": 1.0
+    }
+  ],
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_stratagem_retention_restore.py": "42b0d9f5541175b3a44f24ae2f93289e4b17abd1bf794b6e434fe21c2a602e24",
+    "tests/stratagem_retention_helpers.py": "e4300da274929979dfe9297b153875f0c41722a6fee7f36128dde2638a0c71b8",
+    "tests/crushing_impact_helpers.py": "6381d3c030f674210485ee669bc3a44c23716f8b4dec9b18b985a288357d3dcf",
+    "tests/explosives_helpers.py": "a779c89a42c2c217117617856427c930eb8df0494eb7ba638ef57dc616e2cae7",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722"
+  },
+  "full_game_certified": false
+}

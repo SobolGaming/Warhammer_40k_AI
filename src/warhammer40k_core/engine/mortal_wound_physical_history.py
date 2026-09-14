@@ -107,6 +107,16 @@ def physical_mortal_wound_damage_snapshot_from_event(
             )
             return application_id, applications, "embarked" if embedded else "battlefield"
         return None
+    if event.event_type == "rule_mortal_wound_destructions_started":
+        from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+            progress_from_destruction_start,
+        )
+
+        progress = progress_from_destruction_start(event)
+        application_id, applications = _nonlethal_snapshot(
+            (progress.application_id, progress.applications)
+        )
+        return application_id, applications, "battlefield"
     if event.event_type != "deadly_demise_mortal_wounds_applied":
         return None
     matches = tuple(
@@ -117,14 +127,15 @@ def physical_mortal_wound_damage_snapshot_from_event(
         if event in completion_events_for_authority(authority=authority, event_records=(event,))
     )
     if len(matches) != 1:
-        raise GameLifecycleError("Deadly Demise physical history lacks one application authority.")
+        raise GameLifecycleError(
+            "Retained damage physical history lacks one application authority."
+        )
     payload = event.payload
-    if not isinstance(payload, dict) or not isinstance(
-        payload.get("mortal_wound_application"), dict
-    ):
-        raise GameLifecycleError("Deadly Demise physical history application is invalid.")
+    application_key = "mortal_wound_application"
+    if not isinstance(payload, dict) or not isinstance(payload.get(application_key), dict):
+        raise GameLifecycleError("Retained damage physical history application is invalid.")
     application = MortalWoundApplication.from_payload(
-        cast(MortalWoundApplicationPayload, payload["mortal_wound_application"])
+        cast(MortalWoundApplicationPayload, payload[application_key])
     )
     destroyed_ids = {
         damage.model_instance_id for damage in application.applications if damage.destroyed

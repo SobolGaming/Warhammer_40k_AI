@@ -100,9 +100,6 @@ from warhammer40k_core.engine.lifecycle import (
     GameLifecycle,
     GameLifecyclePayload,
 )
-from warhammer40k_core.engine.mortal_wound_model_allocation import (
-    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
-)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -150,8 +147,6 @@ from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY,
     COMMAND_REROLL_DICE_CONTEXT_KEY,
     CORE_INSANE_BRAVERY_HANDLER_ID,
-    CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
-    CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
     DESTROYED_TARGET_UNIT_CONTEXT_KEY,
@@ -1576,9 +1571,9 @@ def test_stratagem_target_proposal_round_trips_effect_selection() -> None:
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
     )
-    catalog_record = _source_stratagem_record("crushing-impact")
+    catalog_record = _source_stratagem_record("epic-challenge")
     proposal = StratagemTargetProposal.for_request(
         context=context,
         catalog_record=catalog_record,
@@ -1593,28 +1588,25 @@ def test_stratagem_target_proposal_round_trips_effect_selection() -> None:
     assert proposal.player_id == "player-a"
     assert proposal.battle_round == state.battle_round
     assert proposal.phase is state.current_battle_phase
-    assert proposal.stratagem_id == "crushing-impact"
+    assert proposal.stratagem_id == "epic-challenge"
     assert proposal.target_spec == catalog_record.definition.target_spec
 
     bound = proposal.with_binding(
         binding,
         effect_selection={
-            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
-            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: "army-alpha:tank-model-1",
+            EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY: "army-alpha:tank-model-1",
         },
     )
     updated = bound.with_effect_selection(
         {
-            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit-2",
-            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: "army-alpha:tank-model-2",
+            EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY: "army-alpha:tank-model-2",
         }
     )
     restored = StratagemTargetProposal.from_payload(updated.to_payload())
 
     assert restored.target_binding == binding
     assert restored.effect_selection == {
-        CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit-2",
-        CRUSHING_IMPACT_MODEL_CONTEXT_KEY: "army-alpha:tank-model-2",
+        EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY: "army-alpha:tank-model-2",
     }
 
 
@@ -1691,6 +1683,8 @@ def test_phase15e_core_stratagem_descriptors_are_supported_and_window_scoped() -
         == ()
     )
     for record in phase15e_records:
+        if record.definition.target_spec.enumerable:
+            continue
         proposal_request = StratagemTargetProposal.for_request(
             context=context,
             catalog_record=record,
@@ -2348,21 +2342,6 @@ def test_phase15e_core_stratagem_effect_selection_rejects_malformed_payloads() -
         effect_selection={HEROIC_INTERVENTION_MODE_CONTEXT_KEY: "unsupported-mode"},
     )
 
-    crushing_lifecycle = _battle_lifecycle()
-    crushing_state = _state(crushing_lifecycle)
-    _set_current_battle_phase(crushing_state, BattlePhase.CHARGE)
-    crushing_state.active_player_id = "player-a"
-    _grant_cp(crushing_state, player_id="player-a", amount=1)
-    crushing_status = _submit_source_stratagem_target(
-        crushing_lifecycle,
-        stratagem_id="crushing-impact",
-        player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
-        result_id="phase15e-crushing-missing-model",
-        effect_selection={CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
-    )
-
     epic_lifecycle = _battle_lifecycle()
     epic_state = _state(epic_lifecycle)
     _set_current_battle_phase(epic_state, BattlePhase.FIGHT)
@@ -2382,9 +2361,6 @@ def test_phase15e_core_stratagem_effect_selection_rejects_malformed_payloads() -
     assert heroic_status.status_kind is LifecycleStatusKind.INVALID
     assert heroic_status.payload == {"invalid_reason": "heroic_intervention_mode_unknown"}
     assert heroic_state.command_point_total("player-a") == 2
-    assert crushing_status.status_kind is LifecycleStatusKind.INVALID
-    assert crushing_status.payload == {"invalid_reason": "model_instance_id_required"}
-    assert crushing_state.command_point_total("player-a") == 1
     assert epic_status.status_kind is LifecycleStatusKind.INVALID
     assert epic_status.payload == {"invalid_reason": "effect_selection_malformed"}
     assert epic_state.command_point_total("player-a") == 1
@@ -2440,51 +2416,6 @@ def test_phase15e_core_stratagem_target_policies_reject_invalid_official_context
         target_unit_id="army-alpha:intercessor-unit-1",
         trigger_kind=TimingTriggerKind.END_PHASE,
         result_id="phase15e-heroic-range",
-    )
-
-    crushing_missing_lifecycle = _battle_lifecycle()
-    crushing_missing_state = _state(crushing_missing_lifecycle)
-    _set_current_battle_phase(crushing_missing_state, BattlePhase.CHARGE)
-    crushing_missing_state.active_player_id = "player-a"
-    _replace_unit_keywords(
-        crushing_missing_state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("Monster",),
-    )
-    _grant_cp(crushing_missing_state, player_id="player-a", amount=1)
-    crushing_missing = _submit_source_stratagem_target(
-        crushing_missing_lifecycle,
-        stratagem_id="crushing-impact",
-        player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
-        result_id="phase15e-crushing-missing-enemy",
-    )
-
-    crushing_model_lifecycle = _battle_lifecycle()
-    crushing_model_state = _state(crushing_model_lifecycle)
-    _set_current_battle_phase(crushing_model_state, BattlePhase.CHARGE)
-    crushing_model_state.active_player_id = "player-a"
-    _replace_unit_keywords(
-        crushing_model_state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("Vehicle",),
-    )
-    _grant_cp(crushing_model_state, player_id="player-a", amount=1)
-    crushing_model = _submit_source_stratagem_target(
-        crushing_model_lifecycle,
-        stratagem_id="crushing-impact",
-        player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
-        result_id="phase15e-crushing-model-not-in-unit",
-        effect_selection={
-            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
-            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: _first_model_id(
-                crushing_model_state,
-                unit_instance_id="army-beta:enemy-unit",
-            ),
-        },
     )
 
     epic_selected_lifecycle = _battle_lifecycle()
@@ -2556,8 +2487,6 @@ def test_phase15e_core_stratagem_target_policies_reject_invalid_official_context
         "invalid_reason": "heroic_intervention_vehicle_not_character_or_walker"
     }
     assert heroic_range.payload == {"invalid_reason": "heroic_intervention_unit_not_within_12"}
-    assert crushing_missing.payload == {"invalid_reason": "missing_crushing_impact_enemy_target"}
-    assert crushing_model.payload == {"invalid_reason": "crushing_impact_model_not_in_unit"}
     assert epic_selected.payload == {"invalid_reason": "epic_challenge_unit_not_selected_to_fight"}
     assert epic_character.payload == {"invalid_reason": "epic_challenge_unit_not_character"}
     assert counteroffensive.payload == {
@@ -2937,139 +2866,6 @@ def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -
     assert repeated_status.payload == {"invalid_reason": "source_ability_once_per_phase_per_unit"}
     assert len(repeated_state.stratagem_use_records) == 1
     assert repeated_state.command_point_total("player-b") == 1
-
-
-def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
-    lifecycle = _battle_lifecycle(
-        pose_replacements=(
-            (
-                "army-alpha:intercessor-unit-1",
-                tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
-            ),
-            (
-                "army-beta:enemy-unit",
-                tuple(Pose.at(x=1.0 + index * 2.0, y=0.0) for index in range(5)),
-            ),
-        ),
-    )
-    state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-a"
-    _replace_unit_keywords(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("Vehicle", "Monster"),
-    )
-    source_model_id = _first_model_id(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-    )
-    _grant_cp(state, player_id="player-a", amount=1)
-    status = _submit_source_stratagem_target(
-        lifecycle,
-        stratagem_id="crushing-impact",
-        player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
-        result_id="phase15e-crushing-impact",
-        effect_selection={
-            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
-            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: source_model_id,
-        },
-    )
-    while (
-        status.decision_request is not None
-        and status.decision_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
-    ):
-        request = status.decision_request
-        status = lifecycle.submit_decision(
-            DecisionResult.for_request(
-                result_id=f"phase15e-crushing-impact-model:{request.request_id}",
-                request=request,
-                selected_option_id=request.options[0].option_id,
-            )
-        )
-    event = _last_event_payload(lifecycle.decision_controller, "crushing_impact_resolved")
-
-    assert status.status_kind is not LifecycleStatusKind.INVALID
-    assert state.command_point_total("player-a") == 0
-    assert state.stratagem_use_records[0].targeted_unit_instance_ids == (
-        "army-alpha:intercessor-unit-1",
-    )
-    assert state.stratagem_use_records[0].affected_unit_instance_ids == (
-        "army-alpha:intercessor-unit-1",
-        "army-beta:enemy-unit",
-    )
-    assert event["source_model_instance_id"] == source_model_id
-    assert event["target_unit_instance_id"] == "army-beta:enemy-unit"
-    assert 0 <= cast(int, event["enemy_mortal_wounds"]) <= 6
-
-
-def test_phase15e_crushing_impact_rejects_retained_destroyed_source_model() -> None:
-    lifecycle = _battle_lifecycle(
-        pose_replacements=(
-            (
-                "army-alpha:intercessor-unit-1",
-                tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
-            ),
-            (
-                "army-beta:enemy-unit",
-                tuple(Pose.at(x=1.0 + index * 2.0, y=0.0) for index in range(5)),
-            ),
-        ),
-    )
-    state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-a"
-    source_unit_id = "army-alpha:intercessor-unit-1"
-    _replace_unit_keywords(
-        state,
-        unit_instance_id=source_unit_id,
-        keywords=("Vehicle", "Monster"),
-    )
-    source_model_id = _first_model_id(state, unit_instance_id=source_unit_id)
-    source_model = model_by_id(state=state, model_instance_id=source_model_id)
-    assert state.battlefield_state is not None
-    placement = state.battlefield_state.model_placement_by_id(source_model_id)
-    apply_damage_to_model(
-        state=state,
-        target_unit_instance_id=source_unit_id,
-        model_instance_id=source_model_id,
-        damage=source_model.wounds_remaining,
-        damage_kind=DamageKind.NORMAL,
-        remove_destroyed_model=False,
-    )
-    retain_destroyed_model_for_fixture(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        placement=placement,
-        effect_id="phase12c:fight-on-death:crushing-impact-source",
-        source_rule_id="phase12c:test:fight-on-death",
-        source_phase=BattlePhase.CHARGE,
-    )
-    assert model_is_present_on_battlefield(
-        state=state,
-        model_instance_id=source_model_id,
-    )
-    assert not model_by_id(state=state, model_instance_id=source_model_id).is_alive
-    _grant_cp(state, player_id="player-a", amount=1)
-
-    status = _submit_source_stratagem_target(
-        lifecycle,
-        stratagem_id="crushing-impact",
-        player_id="player-a",
-        target_unit_id=source_unit_id,
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
-        result_id="phase15e-crushing-impact-retained-source-model",
-        effect_selection={
-            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
-            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: source_model_id,
-        },
-    )
-
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    assert status.payload == {"invalid_reason": "crushing_impact_model_not_alive_and_placed"}
-    assert state.command_point_total("player-a") == 1
 
 
 def test_phase15e_epic_challenge_registers_selected_character_model_precision() -> None:

@@ -61,6 +61,7 @@ def charge_lifecycle(
     enemy_origins: dict[str, Pose] | None = None,
     battle_round: int = 1,
     alpha_attached_unit_ids: tuple[str, str] | None = None,
+    enemy_attached_unit_ids: tuple[str, str] | None = None,
     catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = charge_config(
@@ -68,6 +69,7 @@ def charge_lifecycle(
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
         alpha_attached_unit_ids=alpha_attached_unit_ids,
+        enemy_attached_unit_ids=enemy_attached_unit_ids,
         catalog=catalog,
     )
     config = replace(
@@ -158,6 +160,7 @@ def charge_config(
     alpha_unit_ids: tuple[str, ...],
     enemy_unit_ids: tuple[str, ...],
     alpha_attached_unit_ids: tuple[str, str] | None = None,
+    enemy_attached_unit_ids: tuple[str, str] | None = None,
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
@@ -191,6 +194,20 @@ def charge_config(
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=enemy_unit_ids,
+            )
+            if enemy_attached_unit_ids is None
+            else _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_ids=enemy_unit_ids,
+                character_unit_selection_ids=(enemy_attached_unit_ids[1],),
+                attachment_declarations=(
+                    AttachmentDeclaration(
+                        source_unit_selection_id=enemy_attached_unit_ids[1],
+                        bodyguard_unit_selection_id=enemy_attached_unit_ids[0],
+                    ),
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),

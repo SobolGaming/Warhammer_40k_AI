@@ -380,7 +380,7 @@ def test_phase14k_core_stratagem_source_package_uses_current_names() -> None:
         "after_unit_ends_charge_move",
         "charge",
         "friendly_unit",
-        False,
+        True,
         "crushing_impact_unit",
         "core:crushing-impact",
     )

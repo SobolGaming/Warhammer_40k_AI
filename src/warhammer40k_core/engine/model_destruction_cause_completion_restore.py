@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
     from warhammer40k_core.engine.event_log import EventRecord
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.retained_destruction_state import RetainedModelDestruction
 
 
 def validate_pending_model_destruction_cause_inventory(
@@ -39,7 +40,7 @@ def validate_pending_model_destruction_cause_inventory(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
-) -> None:
+) -> tuple[RetainedModelDestruction, ...]:
     from warhammer40k_core.engine.attack_sequence_model import DEADLY_DEMISE_SOURCE_KIND
     from warhammer40k_core.engine.damage_allocation import (
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -284,6 +285,7 @@ def validate_pending_model_destruction_cause_inventory(
             != source_sequence.attacker_player_id
         ):
             raise GameLifecycleError("Pending attack destruction source binding drift.")
+    return retained
 
 
 def validate_model_logical_death_inventory(
@@ -292,6 +294,7 @@ def validate_model_logical_death_inventory(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
+    authenticated_retained_destructions: tuple[RetainedModelDestruction, ...],
 ) -> None:
     """Bind every private logical-death boundary to one authority or pending router."""
 
@@ -403,11 +406,22 @@ def validate_model_logical_death_inventory(
     from warhammer40k_core.engine.hazardous_retention_history import (
         pending_hazardous_logical_deaths,
     )
+    from warhammer40k_core.engine.mortal_wound_destruction_routing import (
+        pending_rule_mortal_wound_logical_deaths,
+    )
 
-    for event in pending_hazardous_logical_deaths(state=state, event_records=event_records):
+    for event in (
+        *pending_hazardous_logical_deaths(state=state, event_records=event_records),
+        *pending_rule_mortal_wound_logical_deaths(
+            state=state,
+            event_records=event_records,
+            pending_decision_requests=pending_decision_requests,
+            authenticated_retained_destructions=authenticated_retained_destructions,
+        ),
+    ):
         _claim_logical_death_event(
             event=event,
-            claimant="pending-hazardous-router",
+            claimant="pending-rule-mortal-wound-router",
             canonical_by_id=canonical_by_id,
             claims_by_event_id=claims_by_event_id,
         )

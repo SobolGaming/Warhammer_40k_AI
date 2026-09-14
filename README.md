@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 48 offers Crushing Impact after Charge completion through finite enemy/model
+choices, applies the selected model's modified Toughness and both six-wound caps,
+and resumes Charge after allocation, Feel No Pain and destruction. See
+[scope and validation](docs/ORDER_48_SCOPE_PLAN.md).
+
 Order 47 enforces every charging model's closer, within-one-inch and engagement
 obligations through the shared validated-path search. Attached units charge once
 under their canonical identity, with atomic component movement and authenticated

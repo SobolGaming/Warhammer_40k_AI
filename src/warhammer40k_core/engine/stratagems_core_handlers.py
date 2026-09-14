@@ -216,12 +216,15 @@ def _apply_supported_stratagem_handler(
         )
         return
     if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:
+        if battle_shock_runtime is None:
+            raise GameLifecycleError("Crushing Impact requires loaded characteristic modifiers.")
         _apply_crushing_impact_handler(
             state=state,
             decisions=decisions,
             context=context,
             target_binding=target_binding,
             use_record=use_record,
+            runtime_modifier_registry=battle_shock_runtime.runtime_modifier_registry,
         )
         return
     if definition.handler_id == CORE_EPIC_CHALLENGE_HANDLER_ID:
@@ -311,6 +314,8 @@ def _validate_supported_stratagem_handler_preflight(
     stratagem_handler_registry: StratagemHandlerRegistry | None,
     battle_shock_runtime: BattleShockTestRuntime | None,
 ) -> None:
+    if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID and battle_shock_runtime is None:
+        raise GameLifecycleError("Crushing Impact requires loaded characteristic modifiers.")
     _validate_supported_stratagem_handler_available(
         definition=definition,
         stratagem_handler_registry=stratagem_handler_registry,
