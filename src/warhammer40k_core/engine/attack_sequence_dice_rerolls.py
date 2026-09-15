@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.command_reroll_windows import (
@@ -82,6 +84,7 @@ def _roll_hit_and_wound(
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
     pool = attack_sequence.current_pool()
@@ -149,6 +152,7 @@ def _roll_hit_and_wound(
             affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
             source_phase=attack_sequence.source_phase,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             phase_body_status="attack_hit_command_reroll_pending",
         )
         if status is not None:
@@ -312,6 +316,7 @@ def _roll_hit_and_wound(
             affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
             source_phase=attack_sequence.source_phase,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             phase_body_status="attack_wound_command_reroll_pending",
         )
         if status is not None:

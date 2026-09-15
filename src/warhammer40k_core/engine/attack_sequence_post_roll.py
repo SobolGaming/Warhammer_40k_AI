@@ -39,6 +39,7 @@ from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.weapon_abilities import (
     DEVASTATING_WOUNDS_RULE_ID,
     DevastatingWoundsResolution,
@@ -330,6 +331,7 @@ def defer_grouped_devastating_wounds(
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
     precision_priority_model_ids: tuple[str, ...],
 ) -> tuple[
@@ -367,6 +369,7 @@ def defer_grouped_devastating_wounds(
             weapon_profile=pool.weapon_profile,
             source_phase=attack_sequence.source_phase,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
         )
         if status is not None:

@@ -190,6 +190,7 @@ class ShootingPhaseHandler:
                 ),
                 already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
                 stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
             shooting_state = shooting_state.with_attack_sequence_update(
@@ -389,6 +390,7 @@ class ShootingPhaseHandler:
             ),
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
             stratagem_index=self.stratagem_index,
+            stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
             runtime_modifier_registry=self.runtime_modifier_registry,
         )
         completed_state = out_of_phase_state.with_attack_sequence_update(
@@ -945,6 +947,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
@@ -989,6 +992,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")

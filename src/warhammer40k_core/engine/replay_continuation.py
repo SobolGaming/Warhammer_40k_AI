@@ -20,14 +20,25 @@ def advance_recorded_automatic_progress(
     lifecycle: GameLifecycle,
     expected_events: tuple[EventRecord, ...],
     initial_event_count: int,
+    stop_at_event_count: int | None = None,
+    stop_at_record_count: int | None = None,
 ) -> None:
     """Follow recorded automatic progress only while history is an exact prefix.
 
     A completed reaction can return ADVANCED without a pending choice. Each
     advance must add events, and the recorded tail bounds how far replay goes.
+    Replay also stops at the next record or checkpoint boundary before checking it.
     Choices remain exclusively owned by the recorded DecisionResults.
     """
     while not lifecycle.decision_controller.queue.pending_requests:
+        if (
+            stop_at_record_count is not None
+            and len(lifecycle.decision_controller.records) >= stop_at_record_count
+        ) or (
+            stop_at_event_count is not None
+            and len(lifecycle.decision_controller.event_log.records) >= stop_at_event_count
+        ):
+            return
         actual = lifecycle.decision_controller.event_log.records[initial_event_count:]
         if len(actual) >= len(expected_events) or actual != expected_events[: len(actual)]:
             return

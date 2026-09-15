@@ -89,3 +89,81 @@ def test_order49_matched_charge_workload_meets_declared_budget() -> None:
     assert head["maximum_seconds"] <= budget["maximum_slice_seconds"]
     assert all(row["decision_count"] <= budget["maximum_decisions"] for row in head["samples"])
     assert all(row["event_count"] <= budget["maximum_events"] for row in head["samples"])
+
+
+def test_attack_reroll_callers_propagate_the_loaded_cost_registry() -> None:
+    trees = {path: ast.parse(path.read_text()) for path in ENGINE.rglob("*.py")}
+    cost_aware = {
+        node.name
+        for path, tree in trees.items()
+        if path.name.startswith("attack_sequence_")
+        or path.name
+        in {
+            "fight_attack_completion.py",
+            "shooting_decisions.py",
+        }
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef)
+        and any(a.arg == "stratagem_cost_modifier_registry" for a in node.args.kwonlyargs)
+    } | {
+        "_grouped_wounded_contexts_for_pool",
+        "_defer_grouped_devastating_wounds",
+        "_request_command_reroll_for_attack_roll_if_available",
+        "request_command_reroll_if_available",
+    }
+    for path, tree in trees.items():
+        for call in ast.walk(tree):
+            if not isinstance(call, ast.Call) or not isinstance(call.func, ast.Name):
+                continue
+            if call.func.id not in cost_aware:
+                continue
+            keywords = {kw.arg: kw.value for kw in call.keywords}
+            if "stratagem_index" in keywords:
+                assert "stratagem_cost_modifier_registry" in keywords, (path, call.lineno)
+                assert not isinstance(keywords["stratagem_cost_modifier_registry"], ast.Constant)
+    shared = next(
+        node
+        for node in trees[ENGINE / "command_reroll_windows.py"].body
+        if isinstance(node, ast.FunctionDef) and node.name == "request_command_reroll_if_available"
+    )
+    defaults = dict(
+        zip((a.arg for a in shared.args.kwonlyargs), shared.args.kw_defaults, strict=True)
+    )
+    assert defaults["stratagem_cost_modifier_registry"] is None
+
+
+def test_order49_review_workloads_meet_declared_budgets() -> None:
+    directory = ROOT / "docs/performance/order49/review"
+    base, head, budget = (
+        json.loads((directory / name).read_text())
+        for name in ("base.json", "head.json", "budgets.json")
+    )
+    assert base["revision"] == budget["base_revision"]
+    assert base["workload_id"] == head["workload_id"] == budget["workload_id"]
+    for field in (
+        "platform",
+        "python",
+        "cpu",
+        "cpu_allocation",
+        "memory_bytes",
+        "mode",
+        "concurrency",
+        "timing_boundary",
+        "scenario",
+        "hashes",
+    ):
+        assert base[field] == head[field], field
+    for report in (base, head):
+        assert len(report["samples"]) == budget["samples"]
+        assert report["completion_rate"] == 1
+        assert report["full_game_certified"] is False
+    for metric in ("attack_seconds", "replay_seconds"):
+        assert head["summary"][metric]["mean"] <= (
+            base["summary"][metric]["mean"] * budget["maximum_mean_ratio"]
+            + budget["mean_allowance_seconds"]
+        )
+        assert head["summary"][metric]["maximum"] <= budget[f"maximum_{metric}"]
+    for row in head["samples"]:
+        assert row["replay_status"] == "reproduced"
+        for metric in ("attack_events", "attack_decisions", "replay_events", "replay_decisions"):
+            assert row[metric] <= budget[f"maximum_{metric}"]

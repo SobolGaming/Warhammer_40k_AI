@@ -1,0 +1,115 @@
+{
+  "workload_id": "order49-review-cost-and-replay-v1",
+  "revision": "61543817c26e8713deee56c2b928c8c1b5d4ea92",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "concurrency": 1,
+  "timing_boundary": {
+    "attack": "fixture/catalog setup through first Hit reroll window, 1 CP, automatic discount",
+    "replay": "ReplayRunner.run only; Overwatch checkpoint at 84 events and phase tail to 92"
+  },
+  "scenario": {
+    "attack_models": 6,
+    "attack_dice": 24,
+    "overwatch_models": 3,
+    "overwatch_dice": 18,
+    "terrain_count": 0,
+    "seeds": [
+      "order49-discounted-attacks",
+      "order45-overwatch"
+    ]
+  },
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/command_reroll_cost_helpers.py": "6ac96d5e95be10fecf353a920e7a2d0acbf6576b7c94214a4ae8518417f79cd9",
+    "tests/fire_overwatch_helpers.py": "748eb35b4eb052e951b5c915a01f287368e5a37bc3f681722a9673be4f161410",
+    "scripts/measure_order49_review.py": "a88643979578e25191461bd0cc43c1faf4b7b12eafd11246b4bca988ad17bc72"
+  },
+  "samples": [
+    {
+      "attack_seconds": 2.2042681250022724,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.3624396660597995,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    },
+    {
+      "attack_seconds": 0.2872963339323178,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.3603256249334663,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    },
+    {
+      "attack_seconds": 0.28614662506151944,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.36089616594836116,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    },
+    {
+      "attack_seconds": 0.2877217079512775,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.3616196250077337,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    },
+    {
+      "attack_seconds": 0.2882167920470238,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.3617456250358373,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    },
+    {
+      "attack_seconds": 0.28766137501224875,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.36238875007256866,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    },
+    {
+      "attack_seconds": 0.28947945893742144,
+      "attack_events": 22,
+      "attack_decisions": 5,
+      "replay_seconds": 0.3615251659648493,
+      "replay_events": 92,
+      "replay_decisions": 4,
+      "replay_status": "drifted"
+    }
+  ],
+  "summary": {
+    "attack_seconds": {
+      "mean": 0.5615414882777259,
+      "median": 0.2877217079512775,
+      "p95": 2.2042681250022724,
+      "maximum": 2.2042681250022724
+    },
+    "replay_seconds": {
+      "mean": 0.36156294614608797,
+      "median": 0.3616196250077337,
+      "p95": 0.3624396660597995,
+      "maximum": 0.3624396660597995
+    }
+  },
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "correctness_note": "The reviewed base is a timing comparison, not a correctness oracle."
+}

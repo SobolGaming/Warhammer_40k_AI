@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -56,6 +58,7 @@ def _continue_grouped_allocation_for_wound_contexts(
     hooks: AttackSequenceHooks,
     priority_group_ids: tuple[str, ...] = (),
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not wounded_contexts:
@@ -188,6 +191,7 @@ def _continue_grouped_allocation_for_wound_contexts(
         wounded_contexts=wounded_contexts,
         allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifiers,
     )
     if status is not None:
@@ -206,6 +210,7 @@ def _continue_grouped_allocation_for_wound_contexts(
         attack_sequence=attack_sequence.with_pending_grouped_damage(pending),
         hooks=hooks,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifiers,
     )
 
@@ -352,6 +357,7 @@ def _continue_after_grouped_allocation_order(
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not attack_contexts:
@@ -387,6 +393,7 @@ def _continue_after_grouped_allocation_order(
         wounded_contexts=wounded_contexts,
         allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifiers,
     )
     if status is not None:
@@ -405,6 +412,7 @@ def _continue_after_grouped_allocation_order(
         attack_sequence=attack_sequence.with_pending_grouped_damage(pending),
         hooks=hooks,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifiers,
     )
 
@@ -419,6 +427,7 @@ def _resolve_grouped_damage_from(
     hooks: AttackSequenceHooks,
     selected_model_id: str | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.pending_grouped_damage is None:
@@ -624,6 +633,7 @@ def _resolve_grouped_damage_from(
             weapon_profile=pool.weapon_profile,
             source_phase=attack_sequence.source_phase,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifiers,
         )
         if status is not None:
@@ -947,6 +957,7 @@ def _roll_grouped_saves(
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     allocation_group: AllocationGroup,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[tuple[SaveDieEntryPayload, ...], LifecycleStatus | None]:
     results: list[SaveDieEntryPayload] = []
@@ -1004,6 +1015,7 @@ def _roll_grouped_saves(
                 affected_unit_instance_id=attack_context["target_unit_instance_id"],
                 source_phase=battle_phase_kind_from_token(attack_context["source_phase"]),
                 stratagem_index=stratagem_index,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
                 phase_body_status="attack_save_command_reroll_pending",
             )
             if status is not None:
@@ -1088,6 +1100,7 @@ def grouped_wounded_contexts_for_pool(
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[
     tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
@@ -1119,6 +1132,7 @@ def grouped_wounded_contexts_for_pool(
                 attack_sequence=current,
                 hooks=hooks,
                 stratagem_index=stratagem_index,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
                 runtime_modifier_registry=runtime_modifier_registry,
             )
             if status is not None:

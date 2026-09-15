@@ -95,7 +95,7 @@ performance is not certified. Final validation uses the required coverage suite,
 code-quality suite, lint/type/import/pre-commit gates, eight-shard inventory,
 base-ref external contract checks, TypeScript conformance and installed-wheel smoke.
 
-Final local validation passed on 2026-09-14:
+Initial publication validation passed on 2026-09-14:
 
 - 7,999 behavioral tests with 85.11% coverage; 482 code-quality tests.
 - Ruff check/format, mypy, Pyright, import-linter and all-files pre-commit.
@@ -105,5 +105,52 @@ Final local validation passed on 2026-09-14:
   installed-wheel smoke, generated TypeScript check, five TypeScript unit tests
   and 342 conformance assertions.
 
-Final runtime fingerprint:
+Initial publication runtime fingerprint:
 `cecf2e8b079f5dbee5f4de26cb179914965e035925f09580c79e980693baadab`.
+
+## PR 469 review corrections
+
+The review of `61543817` identified two violated invariants, reproduced locally:
+
+- Reroll availability and displayed CP cost must use the loaded cost registry
+  used by authoritative submission. All four attack call sites omitted it.
+  The registry now follows the existing Stratagem index through shooting,
+  out-of-phase shooting, fight, allocation and random-damage continuations.
+  The shared Command Re-roll owner requires an explicit registry argument.
+  A static call-chain audit rejects missing propagation. Real facade tests
+  cover Hit, Wound, Save and Damage with a compiled automatic discount at 0 and
+  1 CP, including pending-session restore and the accepted use's CP ledger.
+- Replay must validate a reached checkpoint before later automatic progress.
+  The original Overwatch regression expected 84 events but observed 92 after
+  eight valid phase-transition events were appended. Replay now validates
+  already-reproduced records first and bounds continuation by the next record
+  or checkpoint. Checkpoints sharing a decision index are visited in event-count
+  order. Tests cover checkpoints at both 84 and 92 events, subsequent decisions,
+  both viewer projections, payload round-trip, and a corrupted projection that
+  must fail at 84 events before continuation.
+
+Scope audit: the production changes pass one existing registry through existing
+attack interfaces and correct shared replay scheduling. No new decision family,
+handler, source parser, state owner, fallback, or architecture dependency was
+introduced. Existing Contract 20 payload shapes cover these corrections; the
+adapter contract documents the cost and checkpoint behavior. Generated runtime
+identity and contract examples are refreshed. The new behavioral file requires
+regenerating the eight-shard inventory from the final complete JUnit profile.
+
+Matched performance evidence is in `docs/performance/order49/review/`; the
+reviewed base is retained as a timing comparison despite its known incorrect
+rules/replay outcomes. Full-game performance certification remains deferred.
+
+Review validation: the complete behavioral suite passed all 8,023 tests with
+85.12% coverage in 656.09 seconds on 18 work-stealing workers. The
+review regression subset passed 24 cases, and the broader focused reroll/Overwatch/
+replay set passed 158 cases before the final aggregate. All eight non-restored
+cost cases fail on reviewed commit `61543817`, verifying the regression coverage.
+The final runtime fingerprint is
+`77ddefcce9b59ca82f7850b426b264f87d36104a66d64a1f92ce2ffbf2797578`.
+
+Final review gates also passed: 484 code-quality tests (107.23 seconds), Ruff
+check/format, mypy, Pyright, import-linter, all-files pre-commit, exact eight-shard
+inventory, exact-base external contract verification, installed-wheel smoke
+(2,802 resources and 27 schemas), five TypeScript unit tests and 342 HTTP
+conformance assertions. No production changes followed the final coverage run.

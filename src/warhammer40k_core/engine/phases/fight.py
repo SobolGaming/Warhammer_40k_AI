@@ -739,6 +739,7 @@ def _advance_fight_attack_sequence(
         decisions=decisions,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         stratagem_index=handler.stratagem_index,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
         hooks=handler.attack_sequence_completed_hooks,
         runtime_modifier_registry=handler.runtime_modifier_registry,
     )
@@ -1505,6 +1506,7 @@ def _apply_fight_attack_sequence_decision(
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
             stratagem_index=handler.stratagem_index,
+            stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
             runtime_modifier_registry=handler.runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
@@ -1516,6 +1518,7 @@ def _apply_fight_attack_sequence_decision(
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
             stratagem_index=handler.stratagem_index,
+            stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
             runtime_modifier_registry=handler.runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
@@ -1527,6 +1530,7 @@ def _apply_fight_attack_sequence_decision(
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
             stratagem_index=handler.stratagem_index,
+            stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
             runtime_modifier_registry=handler.runtime_modifier_registry,
         )
     elif result.decision_type in (

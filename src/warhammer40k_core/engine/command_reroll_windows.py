@@ -46,7 +46,7 @@ def request_command_reroll_if_available(
     source_phase: BattlePhase,
     stratagem_index: StratagemCatalogIndex | None,
     phase_body_status: str,
-    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
     trigger_context_extra: dict[str, JsonValue] | None = None,
 ) -> LifecycleStatus | None:
     if roll_state is not None and roll_state.rerolls:

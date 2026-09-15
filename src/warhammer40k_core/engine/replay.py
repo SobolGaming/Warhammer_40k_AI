@@ -693,6 +693,7 @@ class ReplayRunner:
         checkpoint_diagnostic = self._checkpoint_diagnostic(
             lifecycle=lifecycle,
             decision_record_index=0,
+            initial_event_count=initial_event_count,
         )
         if checkpoint_diagnostic is not None:
             return self._drifted_result(
@@ -705,12 +706,25 @@ class ReplayRunner:
             self.artifact.decision_records,
             start=1,
         ):
-            advance_recorded_automatic_progress(
-                lifecycle=lifecycle,
-                expected_events=self.artifact.event_records,
-                initial_event_count=initial_event_count,
-            )
             expected_record_count = initial_record_count + decision_record_index
+            # Submitting one choice can reproduce subsequent automatic records.
+            # Validate those records and their checkpoints before any continuation.
+            if len(lifecycle.decision_controller.records) < expected_record_count:
+                next_checkpoint_event_count = min(
+                    (
+                        checkpoint.event_count
+                        for checkpoint in self.artifact.projection_checkpoints
+                        if checkpoint.decision_record_index >= decision_record_index
+                    ),
+                    default=initial_event_count + len(self.artifact.event_records),
+                )
+                advance_recorded_automatic_progress(
+                    lifecycle=lifecycle,
+                    expected_events=self.artifact.event_records,
+                    initial_event_count=initial_event_count,
+                    stop_at_event_count=next_checkpoint_event_count,
+                    stop_at_record_count=expected_record_count,
+                )
             reproduced_record_diagnostic = _already_reproduced_record_diagnostic(
                 lifecycle=lifecycle,
                 expected_record=expected_record,
@@ -727,6 +741,7 @@ class ReplayRunner:
                 checkpoint_diagnostic = self._checkpoint_diagnostic(
                     lifecycle=lifecycle,
                     decision_record_index=decision_record_index,
+                    initial_event_count=initial_event_count,
                 )
                 if checkpoint_diagnostic is not None:
                     return self._drifted_result(
@@ -761,6 +776,7 @@ class ReplayRunner:
             checkpoint_diagnostic = self._checkpoint_diagnostic(
                 lifecycle=lifecycle,
                 decision_record_index=decision_record_index,
+                initial_event_count=initial_event_count,
             )
             if checkpoint_diagnostic is not None:
                 return self._drifted_result(
@@ -888,10 +904,21 @@ class ReplayRunner:
         *,
         lifecycle: GameLifecycle,
         decision_record_index: int,
+        initial_event_count: int,
     ) -> ReplayDriftDiagnostic | None:
+        from warhammer40k_core.engine.replay_continuation import (
+            advance_recorded_automatic_progress,
+        )
+
         for checkpoint in self.artifact.projection_checkpoints:
             if checkpoint.decision_record_index != decision_record_index:
                 continue
+            advance_recorded_automatic_progress(
+                lifecycle=lifecycle,
+                expected_events=self.artifact.event_records,
+                initial_event_count=initial_event_count,
+                stop_at_event_count=checkpoint.event_count,
+            )
             actual_event_count = len(lifecycle.decision_controller.event_log.records)
             if actual_event_count != checkpoint.event_count:
                 return ReplayDriftDiagnostic(
@@ -1185,7 +1212,7 @@ def _validate_projection_checkpoint_tuple(
     return tuple(
         sorted(
             validated,
-            key=lambda item: (item.decision_record_index, item.checkpoint_id),
+            key=lambda item: (item.decision_record_index, item.event_count, item.checkpoint_id),
         )
     )
 

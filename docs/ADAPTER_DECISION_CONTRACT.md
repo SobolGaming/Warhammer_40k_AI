@@ -5915,7 +5915,10 @@ The one-reroll-per-die restriction applies to both routes.
 
 Command Re-roll's target is the canonical unit that made the roll, including
 when a model in an Attached Unit made it. Opportunity `target_ids` reflect that
-unit and `cost` reflects the shared cost service. Dice identity remains in
+unit and `cost` reflects the shared cost service. Hit, Wound, Save, Damage and
+Charge windows all receive the loaded Stratagem cost registry. A legal automatic
+discount therefore affects both option availability at zero CP and its displayed
+cost, using the same authority as submission and restore. Dice identity remains in
 `target_spec` and the trigger payload. The existing finite submission envelope
 and shared viewer-redaction owner cover the public choices and dice events;
 no adapter calculates or applies a reroll itself.
@@ -5924,7 +5927,12 @@ Replay and persistence verification resume automatic engine progress between
 choices and at the recorded tail only while produced events exactly match a
 prefix of that history. A reaction that finishes without another legal Stratagem
 can therefore be saved before or after phase continuation. Verification does
-not advance beyond the recorded checkpoint or invent a player choice.
+not advance beyond the recorded checkpoint or invent a player choice. It first
+validates already-reproduced automatic decision records and their checkpoints.
+Continuation is bounded by the next record or checkpoint; checkpoints sharing a
+decision index are checked in ascending event-count order, then checkpoint ID.
+This supports distinct checkpoints before and after automatic phase progression
+without changing their event or viewer projection hashes.
 
 These changed targeting/mutation and checkpoint semantics advance metadata and
 command result/outcome families to v20, replay to v14 and persistence to v12.
