@@ -15797,6 +15797,7 @@
         "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
       },
       "model_destruction_cause_authorities": [],
+      "model_movement_history": [],
       "movement_phase_state": null,
       "normal_move_states": [],
       "objective_control_record_authorities": [],
@@ -15927,7 +15928,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v15-interrupted-charges",
+  "schema_version": "replay-artifact-v16-flight-history",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",

@@ -31,7 +31,7 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeRollResult,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
@@ -443,6 +443,27 @@ def _phase_state_consistency_payload(
             unit_instance_id=alpha_unit_id,
             request_id="phase9b-charge-selection-request",
             result_id="phase9b-charge-selection-result",
+        )
+        finite_request = DecisionRequest(
+            request_id=selection.request_id,
+            decision_type="select_charging_unit",
+            actor_id=selection.player_id,
+            payload={},
+            options=(
+                DecisionOption(
+                    option_id=alpha_unit_id,
+                    label="Charge",
+                    payload={"unit_instance_id": alpha_unit_id, "take_to_the_skies": False},
+                ),
+            ),
+        )
+        lifecycle.decision_controller.request_decision(finite_request)
+        lifecycle.decision_controller.submit_result(
+            DecisionResult.for_request(
+                request=finite_request,
+                result_id=selection.result_id,
+                selected_option_id=alpha_unit_id,
+            )
         )
         roll_request = ChargeRollRequest(
             request_id="phase9b-charge-roll-request",

@@ -73,6 +73,11 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     RuntimeModifierRegistry,
 )
+from warhammer40k_core.engine.take_to_the_skies import (
+    flight_choices,
+    flight_selection,
+    validate_flight_context,
+)
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionContext,
     ChargeTargetRestrictionHookRegistry,
@@ -266,6 +271,25 @@ def invalid_catalog_setup_reactive_shoot_charge_status(
         army_catalog=army_catalog,
     )
     if drift_reason is None:
+        if payload.get("action") == CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID:
+            try:
+                validate_flight_context(
+                    payload=payload,
+                    unit=rules_unit_view_by_id(
+                        state=state,
+                        unit_instance_id=_payload_string(payload, key="source_unit_instance_id"),
+                    ),
+                    ruleset=ruleset_descriptor,
+                )
+            except GameLifecycleError as exc:
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Setup-reactive flight choice has drifted.",
+                    payload={
+                        "invalid_reason": "setup_reactive_flight_authority_drift",
+                        "detail": str(exc),
+                    },
+                )
         return None
     return LifecycleStatus.invalid(
         stage=state.stage,
@@ -368,7 +392,7 @@ def emit_setup_reactive_request(
         resume_token=f"{window_id}-resume",
         actor_id=candidate.player_id,
         decision_type=SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
-        options=_setup_reactive_options(candidate),
+        options=_setup_reactive_options(candidate, state.runtime_ruleset_descriptor()),
         payload_factory=_setup_reactive_payload_factory(candidate),
     )
     return LifecycleStatus.waiting_for_decision(
@@ -400,7 +424,9 @@ def _setup_reactive_payload_factory(
     return _factory
 
 
-def _setup_reactive_options(candidate: _SetupReactiveCandidate) -> tuple[DecisionOption, ...]:
+def _setup_reactive_options(
+    candidate: _SetupReactiveCandidate, ruleset: RulesetDescriptor
+) -> tuple[DecisionOption, ...]:
     options = [
         DecisionOption(
             option_id=CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECLINE_OPTION_ID,
@@ -417,11 +443,15 @@ def _setup_reactive_options(candidate: _SetupReactiveCandidate) -> tuple[Decisio
             )
         )
     if candidate.can_charge:
-        options.append(
-            DecisionOption(
-                option_id=CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID,
-                label="charge",
-                payload=candidate.option_payload(CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID),
+        options.extend(
+            flight_choices(
+                option=DecisionOption(
+                    option_id=CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID,
+                    label="charge",
+                    payload=candidate.option_payload(CATALOG_SETUP_REACTIVE_CHARGE_OPTION_ID),
+                ),
+                unit=candidate.source_rules_unit,
+                ruleset=ruleset,
             )
         )
     return tuple(options)
@@ -496,6 +526,7 @@ def _apply_setup_reactive_charge(
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
         roll_modifiers=roll_modifiers,
+        take_to_the_skies=flight_selection(payload),
     )
     roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
         roll_request.spec

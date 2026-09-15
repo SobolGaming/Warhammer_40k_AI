@@ -690,6 +690,16 @@
           "audit_id": "core-charge-maintained-app-mirrors-2026-09-14",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-14T14:09:27.140Z"
+        },
+        {
+          "row_id": "take-to-the-skies",
+          "source_observation_sha256": "016ad68ee8868f6a8cd139544a39b31fad0e5775f947619858eceffa123e2f62",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-flying-maintained-app-mirrors-2026-09-15",
+          "identity_kind": "app_version",
+          "identity_value": "931"
         }
       ],
       "legacy_observations": [
@@ -1175,6 +1185,15 @@
             "gw-11e-core-charge:modified-charge-targets-faq"
           ],
           "catalog_sha256": "ba9135b7aed94bc68621bd5f3db9647ab623ed7c5dd6638f5124abf1253309d9"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-flying",
+          "version": "maintained-app-mirrors-observed-2026-09-15",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-flying:take-to-the-skies"
+          ],
+          "catalog_sha256": "1b1cd0ddd59e7379bb2f0d90e7b3b1e96499f40fa680ad0ca62565222c68f2c4"
         }
       ]
     },

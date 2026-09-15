@@ -16,6 +16,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     ModelDisplacementKind,
     ModelDisplacementRecord,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -89,7 +90,8 @@ from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import PrimaryObjectiveTurnStartState
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
-from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness
+from warhammer40k_core.geometry.pathing import PathValidationResult, PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
@@ -432,6 +434,20 @@ def append_authenticated_normal_move(
         for row in placement.model_placements
     )
     witness = PathWitness.for_paths(model_paths)
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+
+    scenario = battlefield_scenario_for_state(state=state)
+    path_results = tuple(
+        PathValidationResult(
+            movement_distance_witness=MovementDistanceWitness.for_model_path(
+                model=geometry_model_for_placement(
+                    model=scenario.model_instance_for_placement(row), placement=row
+                ),
+                poses=poses,
+            )
+        )
+        for row, (_model_id, poses) in zip(placement.model_placements, model_paths, strict=True)
+    )
     action_request = DecisionRequest(
         request_id=f"phase17n-authority-move-action-{suffix}",
         decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -538,6 +554,9 @@ def append_authenticated_normal_move(
             "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
             "movement_mode": "normal",
             "witness": validate_json_value(witness.to_payload()),
+            "path_validation_results": [
+                validate_json_value(result.to_payload()) for result in path_results
+            ],
             "transition_batch": validate_json_value(transition.to_payload()),
             "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
         },

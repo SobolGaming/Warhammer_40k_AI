@@ -162,6 +162,16 @@ def test_ordinary_native_reroll_precedes_command_and_prevents_rerolling_twice(ac
     from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 
     session, unit_id = ordinary_session(natural=True)
+    from tests.charge_distance_helpers import add_modifier
+
+    assert session.lifecycle.state is not None
+    add_modifier(
+        session.lifecycle.state,
+        effect_id="native-reachable",
+        kind="modify_dice_roll",
+        delta=20,
+        unit_instance_id=unit_id,
+    )
     select = request_from(session.advance_until_decision_or_terminal())
     native = request_from(
         session.submit_option(
@@ -273,6 +283,9 @@ def test_heroic_intervention_spends_target_slot_even_without_natural_reroll() ->
     from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
     session, unit_id = heroic_session(natural=False)
+    from tests.heroic_intervention_helpers import add_heroic_modifier
+
+    add_heroic_modifier(session, unit_id, delta=20)
     request = request_from(session.advance_until_decision_or_terminal())
     movement = request_from(
         _submit_end_charge_heroic_target(

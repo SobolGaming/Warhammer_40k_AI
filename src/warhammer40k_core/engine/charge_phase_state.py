@@ -24,6 +24,7 @@ def _empty_declared_charge_targets() -> dict[str, tuple[str, ...]]:
 
 
 class ChargingUnitSelectionPayload(TypedDict):
+    take_to_the_skies: bool
     player_id: str
     battle_round: int
     unit_instance_id: str
@@ -79,8 +80,11 @@ class ChargingUnitSelection:
     unit_instance_id: str
     request_id: str
     result_id: str
+    take_to_the_skies: bool = False
 
     def __post_init__(self) -> None:
+        if type(self.take_to_the_skies) is not bool:
+            raise GameLifecycleError("Charge flight selection must be a bool.")
         object.__setattr__(
             self,
             "player_id",
@@ -112,6 +116,7 @@ class ChargingUnitSelection:
 
     def to_payload(self) -> ChargingUnitSelectionPayload:
         return {
+            "take_to_the_skies": self.take_to_the_skies,
             "player_id": self.player_id,
             "battle_round": self.battle_round,
             "unit_instance_id": self.unit_instance_id,
@@ -122,6 +127,7 @@ class ChargingUnitSelection:
     @classmethod
     def from_payload(cls, payload: ChargingUnitSelectionPayload) -> Self:
         return cls(
+            take_to_the_skies=payload["take_to_the_skies"],
             player_id=payload["player_id"],
             battle_round=payload["battle_round"],
             unit_instance_id=payload["unit_instance_id"],

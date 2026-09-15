@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "f003d740c80d40055555867ff243953be68fee1e98ce6f618c1df3940cc2501d",
+  "content_hash": "623d2e0055af71efd2794e7e0fb97ee3962d1ee9befacd3f205b674faab0e3dd",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,21 +92,21 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4e17fd79b10a6e66afe783ef552c9e01e0c5c71f8f09af8ed8dfd3c89fa66665",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fe480ca6ef8f2429dc1733860b6d5000101b5fde52476b143a152157ef5a8fdf",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
-  "external_contract_version": "21.0.0",
+  "external_contract_version": "22.0.0",
   "game_session_index": [
     {
       "game_id": "phase18l-contract-persistence",
       "session_id": "session-phase18l-contract-persistence"
     }
   ],
-  "schema_version": "session-persistence-v13-interrupted-charges",
+  "schema_version": "session-persistence-v14-flight-history",
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "7016e67d82ab91b0a8cee08ab6d1c3025a3d046962d345d8477ab60aea38af3e",
+        "content_hash": "dc2f5ecc50f6769d8388bf988dd89c761bdff2ca119dec5aba7aead1a9920c66",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
         "initial_replay_lifecycle": {
@@ -4935,6 +4935,7 @@
               "terrain_layout_id": "phase18l-contract-custom-terrain"
             },
             "model_destruction_cause_authorities": [],
+            "model_movement_history": [],
             "movement_phase_state": null,
             "normal_move_states": [],
             "objective_control_record_authorities": [],
@@ -9874,6 +9875,7 @@
               "terrain_layout_id": "phase18l-contract-custom-terrain"
             },
             "model_destruction_cause_authorities": [],
+            "model_movement_history": [],
             "movement_phase_state": null,
             "normal_move_states": [],
             "objective_control_record_authorities": [],
@@ -9987,7 +9989,7 @@
             ]
           }
         },
-        "lifecycle_hash": "87e63840e329be6f0cdfd2c32341469bab481beeab71363b118a9bcb2745bdcd",
+        "lifecycle_hash": "77d79817282af97eeba8f61bd1822fdcc9088a103042e7d02d5ddb1d62e3c31c",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -14818,6 +14820,7 @@
                 "terrain_layout_id": "phase18l-contract-custom-terrain"
               },
               "model_destruction_cause_authorities": [],
+              "model_movement_history": [],
               "movement_phase_state": null,
               "normal_move_states": [],
               "objective_control_record_authorities": [],
@@ -14948,7 +14951,7 @@
             "seed": "phase18l-contract-persistence"
           },
           "projection_checkpoints": [],
-          "schema_version": "replay-artifact-v15-interrupted-charges",
+          "schema_version": "replay-artifact-v16-flight-history",
           "source_identity": {
             "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
             "catalog_id": "phase9a-canonical",
@@ -15048,11 +15051,11 @@
             },
             "operation": "start_session",
             "outcome_code": "command_committed",
-            "schema_version": "session-command-outcome-v21-contract",
+            "schema_version": "session-command-outcome-v22-contract",
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4e17fd79b10a6e66afe783ef552c9e01e0c5c71f8f09af8ed8dfd3c89fa66665",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fe480ca6ef8f2429dc1733860b6d5000101b5fde52476b143a152157ef5a8fdf",
               "engine_version": "0.1.0",
               "event_cursor": "JSW_VsNoBuCqx6sc2mCBKUJc6OUSEtOxLSdKVvGRuaOj9NWFnzu8kgII5NXbQXPf",
               "game_id": "phase18l-contract-persistence",
@@ -15074,8 +15077,8 @@
                 "game": "warhammer_40000",
                 "version": "core-v2-setup-prebattle-ui-smoke"
               },
-              "schema_version": "session-metadata-v21-contract",
-              "server_contract_version": "21.0.0",
+              "schema_version": "session-metadata-v22-contract",
+              "server_contract_version": "22.0.0",
               "session_id": "session-phase18l-contract-persistence",
               "session_revision": 1,
               "session_state": "active",
@@ -15099,7 +15102,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "4e9f4243293753cdf58ea8074f870dc8dc651f18b59449c50c0bf665c3e24ad0",
+      "history_head": "0f3e822e17e6b95c8c04ba7e3aa6cf16b5f77307b7086f85db07c50459d5c4ba",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -15171,8 +15174,8 @@
       "revision_history": [
         {
           "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
-          "authoritative_state_hash": "28fffae348f596d5294aeeb106119b3f4f895d36c13770986b7534a15b2029fd",
-          "checkpoint_hash": "6fe3c755d438a03c0d0fa02d63b72b24c6a0a948e68ef7f00b0ee7e9c00ec358",
+          "authoritative_state_hash": "1bef81ee2c66ba12637ac16a415a2a191106eada9ff62f21ffc7273c1b298156",
+          "checkpoint_hash": "676cb112942f85d55ef80f367cc8cc111efe44ffc855f513b4910df97aabee91",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -15188,7 +15191,7 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "cb47e1c93ebb8ce9507d43ab47aa2806782996c8beccc491d2796264d0084df0",
+          "revision_commitment": "6e71a0a1e3a6f13d95f53ee0b3121fa319eeb66503fd1abd3600f504fde9454c",
           "rng_draw_count": 0,
           "rng_history_count": 1,
           "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
@@ -15201,8 +15204,8 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "87e63840e329be6f0cdfd2c32341469bab481beeab71363b118a9bcb2745bdcd",
-          "checkpoint_hash": "86aa56765a64f2e0f24d5ae12ab58447c8528a3c514642288053ec80fb7225f0",
+          "authoritative_state_hash": "77d79817282af97eeba8f61bd1822fdcc9088a103042e7d02d5ddb1d62e3c31c",
+          "checkpoint_hash": "a4abde3155c0cc6e679e0670fdb3ec8cc2453a8281b2e32ef0b8ead573494028",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -15221,7 +15224,7 @@
             },
             "token": "LXsts4JlHnwz5vFHMoIKeTZsReUT-7Gf8N3GJwBwc4jxxYU06nNkfgrsJ2s1AEb4"
           },
-          "journal_entry_hash": "b36358fe1b8882be3af15b9ec34e5c17945b887b935abfe363750def5a89691b",
+          "journal_entry_hash": "0d13ebda88c6c03c5d02b4af9f83394deef3bf31c00b545d153a3465379ffafb",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -15238,9 +15241,9 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "cb47e1c93ebb8ce9507d43ab47aa2806782996c8beccc491d2796264d0084df0",
-          "response_hash": "1c91523ae1e7da56024eff3e9cf90378578f5d21b12ecde543b5752278cd5019",
-          "revision_commitment": "4e9f4243293753cdf58ea8074f870dc8dc651f18b59449c50c0bf665c3e24ad0",
+          "previous_revision_commitment": "6e71a0a1e3a6f13d95f53ee0b3121fa319eeb66503fd1abd3600f504fde9454c",
+          "response_hash": "7af0b1b1ceef117cc3864695ae9f2f6920deccc7990d7e1eabb063f427653c1d",
+          "revision_commitment": "0f3e822e17e6b95c8c04ba7e3aa6cf16b5f77307b7086f85db07c50459d5c4ba",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",
@@ -15268,7 +15271,7 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "188085dbfd882fbe41eee2911b3870a620c0c383488445e9c893c41ce8765a0f",
+            "content_hash": "dfa32ae893b1e8e598b0de5d1b768e95075ba4d3e4ad89c4448b84f77dd1efcb",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5cdef2eabf7518e2abf3976239e13cbd51731553a1c5c4fd64dee7a18b529d54",
             "initial_replay_lifecycle": null,
@@ -17574,6 +17577,7 @@
                   "terrain_layout_id": "phase18l-contract-custom-terrain"
                 },
                 "model_destruction_cause_authorities": [],
+                "model_movement_history": [],
                 "movement_phase_state": null,
                 "normal_move_states": [],
                 "objective_control_record_authorities": [],
@@ -17658,7 +17662,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "28fffae348f596d5294aeeb106119b3f4f895d36c13770986b7534a15b2029fd",
+            "lifecycle_hash": "1bef81ee2c66ba12637ac16a415a2a191106eada9ff62f21ffc7273c1b298156",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -19965,6 +19969,7 @@
                     "terrain_layout_id": "phase18l-contract-custom-terrain"
                   },
                   "model_destruction_cause_authorities": [],
+                  "model_movement_history": [],
                   "movement_phase_state": null,
                   "normal_move_states": [],
                   "objective_control_record_authorities": [],
@@ -20057,7 +20062,7 @@
                 "seed": "phase18l-contract-persistence"
               },
               "projection_checkpoints": [],
-              "schema_version": "replay-artifact-v15-interrupted-charges",
+              "schema_version": "replay-artifact-v16-flight-history",
               "source_identity": {
                 "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
                 "catalog_id": "phase9a-canonical",
@@ -20116,7 +20121,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "7016e67d82ab91b0a8cee08ab6d1c3025a3d046962d345d8477ab60aea38af3e",
+            "content_hash": "dc2f5ecc50f6769d8388bf988dd89c761bdff2ca119dec5aba7aead1a9920c66",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
             "initial_replay_lifecycle": {
@@ -24945,6 +24950,7 @@
                   "terrain_layout_id": "phase18l-contract-custom-terrain"
                 },
                 "model_destruction_cause_authorities": [],
+                "model_movement_history": [],
                 "movement_phase_state": null,
                 "normal_move_states": [],
                 "objective_control_record_authorities": [],
@@ -29884,6 +29890,7 @@
                   "terrain_layout_id": "phase18l-contract-custom-terrain"
                 },
                 "model_destruction_cause_authorities": [],
+                "model_movement_history": [],
                 "movement_phase_state": null,
                 "normal_move_states": [],
                 "objective_control_record_authorities": [],
@@ -29997,7 +30004,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "87e63840e329be6f0cdfd2c32341469bab481beeab71363b118a9bcb2745bdcd",
+            "lifecycle_hash": "77d79817282af97eeba8f61bd1822fdcc9088a103042e7d02d5ddb1d62e3c31c",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -34828,6 +34835,7 @@
                     "terrain_layout_id": "phase18l-contract-custom-terrain"
                   },
                   "model_destruction_cause_authorities": [],
+                  "model_movement_history": [],
                   "movement_phase_state": null,
                   "normal_move_states": [],
                   "objective_control_record_authorities": [],
@@ -34958,7 +34966,7 @@
                 "seed": "phase18l-contract-persistence"
               },
               "projection_checkpoints": [],
-              "schema_version": "replay-artifact-v15-interrupted-charges",
+              "schema_version": "replay-artifact-v16-flight-history",
               "source_identity": {
                 "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
                 "catalog_id": "phase9a-canonical",

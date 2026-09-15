@@ -979,7 +979,15 @@ class GameLifecycle:
         from warhammer40k_core.engine.charge_target_authority import (
             validate_restored_charge_targets,
         )
+        from warhammer40k_core.engine.flight_decision_authority import validate_restored_flight
+        from warhammer40k_core.engine.model_movement_history import validate_model_movement_history
 
+        validate_restored_flight(
+            state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
+        validate_model_movement_history(
+            lifecycle._require_state(), lifecycle.decision_controller.event_log.records
+        )
         validate_restored_charge_targets(
             state=lifecycle._require_state(),
             decisions=lifecycle.decision_controller,
@@ -1397,7 +1405,13 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
-        invalid_status = None
+        from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+
+        invalid_status = invalid_flight_authority(
+            state=state, decisions=self.decision_controller, request=request, result=result
+        )
+        if invalid_status is not None:
+            return invalid_status
         if _bsa.requires_command_prevalidation(state=state, request=request):
             invalid_status = self._pre_validate_command_phase_decision(request, result)
         if invalid_status is None and request.decision_type == DICE_REROLL_DECISION_TYPE:
@@ -1747,10 +1761,17 @@ class GameLifecycle:
 
     def _pre_validate_triggered_movement_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
-        return None
+        from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+
+        return invalid_flight_authority(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            request=request,
+            result=result,
+        )
 
     def _apply_triggered_movement_decision(
         self,
@@ -2021,6 +2042,13 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
+        from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+
+        invalid_status = invalid_flight_authority(
+            state=state, decisions=self.decision_controller, request=request, result=result
+        )
+        if invalid_status is not None:
+            return invalid_status
         if request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE:
             invalid_status = invalid_charging_unit_selection_status(
                 state=state,

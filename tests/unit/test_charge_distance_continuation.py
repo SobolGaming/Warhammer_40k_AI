@@ -938,7 +938,10 @@ def test_order47_restored_distance_proof_uses_the_source_movement_metric(flies: 
 
     ruleset = RulesetDescriptor.warhammer_40000_eleventh()
     capabilities = MovementCapabilitySet.from_keywords(
-        keywords=("FLY",) if flies else (), ruleset_descriptor=ruleset
+        keywords=("FLY",) if flies else (),
+        ruleset_descriptor=ruleset,
+        movement_mode="charge",
+        take_to_the_skies=flies,
     )
     assert capabilities.ignores_vertical_distance is flies
     start = Model("source-model", Pose.at(10, 10), CircularBase(0.5), ModelVolume(2))
@@ -978,7 +981,7 @@ def test_order47_restored_distance_proof_uses_the_source_movement_metric(flies: 
 
 
 def test_order47_checkpoint_authenticates_an_attached_models_distance_exemption() -> None:
-    from tests.charge_distance_helpers import select_targets
+    from tests.charge_distance_helpers import add_modifier, select_targets
     from tests.charge_endpoint_helpers import (
         ATTACHED_TARGET,
         attached_move_payload,
@@ -995,6 +998,11 @@ def test_order47_checkpoint_authenticates_an_attached_models_distance_exemption(
         alpha_origins={"leader": Pose.at(17, 17.6)},
         game_id="order47-exemption-9",
         enemy_model_poses=compact_test_unit_poses(origin=Pose.at(10, 26), model_count=5),
+    )
+    assert lifecycle.state is not None
+    add_modifier(lifecycle.state, effect_id="exemption-roll", kind="modify_dice_roll", delta=20)
+    add_modifier(
+        lifecycle.state, effect_id="exemption-distance", kind="modify_move_distance", delta=-7
     )
     session = LocalGameSession(lifecycle)
     request = select_targets(session, select_attached_source(session), (ATTACHED_TARGET,))
@@ -1088,7 +1096,9 @@ def test_r47_001_historical_fly_charge_survives_a_later_retained_casualty(casual
 
     session, bundle = flying_attached_charge_exemption_session()
     lifecycle = session.lifecycle
-    request = select_targets(session, select_attached_source(session), (ATTACHED_TARGET,))
+    request = select_targets(
+        session, select_attached_source(session, take_to_the_skies=True), (ATTACHED_TARGET,)
+    )
     status = session.submit_parameterized_payload(
         request_id=request.request_id,
         result_id="r47-001-charge",

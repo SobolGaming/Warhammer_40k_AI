@@ -84,16 +84,21 @@ def flying_attached_charge_exemption_session() -> tuple[LocalGameSession, Runtim
     )
     lifecycle = GameLifecycle.from_payload(lifecycle.to_payload(), runtime_content_bundle=bundle)
     assert lifecycle.state is not None
-    add_modifier(lifecycle.state, effect_id="r47-001-distance", kind="modify_dice_roll", delta=-6)
+    add_modifier(lifecycle.state, effect_id="r47-001-roll", kind="modify_dice_roll", delta=20)
+    add_modifier(
+        lifecycle.state, effect_id="r47-001-distance", kind="modify_move_distance", delta=-5
+    )
     return LocalGameSession(lifecycle), bundle
 
 
-def select_attached_source(session: LocalGameSession) -> DecisionRequest:
+def select_attached_source(
+    session: LocalGameSession, *, take_to_the_skies: bool = False
+) -> DecisionRequest:
     request = request_from(session.advance_until_decision_or_terminal())
     return request_from(
         session.submit_option(
             request_id=request.request_id,
-            option_id=ATTACHED_SOURCE,
+            option_id=ATTACHED_SOURCE + (":take_to_the_skies" if take_to_the_skies else ""),
             result_id="order47-attached-select",
         )
     )

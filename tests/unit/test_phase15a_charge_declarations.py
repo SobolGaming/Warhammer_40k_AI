@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.charge_distance_helpers import add_modifier
 from tests.charge_target_selection_helpers import choose_charge_targets
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase15a_charge_test_support import (
@@ -510,6 +511,14 @@ def test_generated_snarling_protector_heroic_uses_charge_adapter_and_replay_path
     state = _state(lifecycle)
     maulerfiend = units["maulerfiend"]
     ordinary = units["ordinary"]
+    for unit in (maulerfiend, ordinary):
+        add_modifier(
+            state,
+            effect_id=f"test:heroic-fixture:{unit.unit_instance_id}",
+            kind="modify_dice_roll",
+            delta=20,
+            unit_instance_id=unit.unit_instance_id,
+        )
     assert maulerfiend.datasheet_id == "000001029"
     assert state.command_point_total("player-a") == 1
     bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
@@ -1519,6 +1528,13 @@ def test_charge_roll_with_no_reachable_targets_resolves_without_model_movement()
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(27.0, 20.0), model_count=5),
         game_id="phase15a-no-move-charge",
     )
+    add_modifier(
+        _state(lifecycle),
+        effect_id="test:charge-fixture:test_charge_roll_with_no_reachable_targets_resolves_without_model_movement",
+        kind="modify_dice_roll",
+        delta=-20,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+    )
     state = _state(lifecycle)
     assert state.battlefield_state is not None
     before_battlefield = state.battlefield_state.to_payload()
@@ -1770,6 +1786,13 @@ def test_phase15b_endpoint_only_charge_witness_records_rejected_attempt_and_retr
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
         game_id="phase15a-success-charge",
     )
+    add_modifier(
+        _state(lifecycle),
+        effect_id="test:charge-fixture:test_phase15b_endpoint_only_charge_witness_records_rejected_attempt_and_retries",
+        kind="modify_dice_roll",
+        delta=20,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+    )
     proposal_request = _charge_move_request_after_selection(
         lifecycle,
         unit_instance_id=units["intercessor-1"].unit_instance_id,
@@ -1888,6 +1911,7 @@ def test_phase15b_charge_movement_legality_applies_fly_transit_policy() -> None:
         movement_mode=MovementMode.CHARGE,
         movement_phase_action=None,
         displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+        take_to_the_skies=True,
     )
 
     moving_model = Model(
@@ -2308,6 +2332,13 @@ def test_phase15b_malformed_charge_move_payload_rejects_before_queue_pop() -> No
         alpha_unit_ids=("intercessor-1",),
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
         game_id="phase15a-success-charge",
+    )
+    add_modifier(
+        _state(lifecycle),
+        effect_id="test:charge-fixture:test_phase15b_malformed_charge_move_payload_rejects_before_queue_pop",
+        kind="modify_dice_roll",
+        delta=20,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
     )
     proposal_request = _charge_move_request_after_selection(
         lifecycle,

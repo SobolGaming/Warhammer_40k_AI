@@ -1470,10 +1470,17 @@ def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus(
     )
 
 
-def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> None:
+@pytest.mark.parametrize("flight", [False, True])
+def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle(flight: bool) -> None:
+    from warhammer40k_core.engine.charge_declaration import (
+        ChargeRollResult,
+        ChargeRollResultPayload,
+    )
+
     state, catalog, player_b_index = _setup_reactive_single_model_state(
         target_pose=Pose.at(6.5, 10.0),
         source_pose=Pose.at(16.0, 10.0),
+        fly=True,
     )
     lifecycle = _setup_reactive_lifecycle(state=state, catalog=catalog)
     target_unit_id = "army-alpha:intercessor-unit-1"
@@ -1512,7 +1519,7 @@ def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> N
         DecisionResult.for_request(
             result_id="phase17d-setup-reactive-charge-action",
             request=action_request,
-            selected_option_id="charge",
+            selected_option_id="charge:take_to_the_skies" if flight else "charge",
         )
     )
 
@@ -1592,6 +1599,14 @@ def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> N
     assert len(completed_payloads) == 1
     assert completed_payloads[0]["charge_bonus_suppressed"] is True
     assert "persisting_effect" not in completed_payloads[0]
+    rolls = _event_payloads(
+        lifecycle.decision_controller, "catalog_setup_reactive_charge_roll_resolved"
+    )
+    roll = ChargeRollResult.from_payload(cast(ChargeRollResultPayload, rolls[0]["roll_result"]))
+    assert roll.request.take_to_the_skies is flight
+    assert roll.movement_budget.maximum_distance_inches == max(0, roll.value - (2 if flight else 0))
+    assert lifecycle.state is not None
+    assert len(lifecycle.state.model_movement_history) == 1
     assert state.persisting_effects_for_unit(source_unit_id) == ()
 
 
@@ -4854,12 +4869,24 @@ def _setup_reactive_single_model_state(
     target_pose: Pose,
     source_pose: Pose,
     keep_all_source_models: bool = False,
+    fly: bool = False,
 ) -> tuple[GameState, ArmyCatalog, AbilityCatalogIndex]:
     descriptor = _generic_catalog_descriptor(
         SETUP_REACTIVE_SHOOT_CHARGE_TEXT,
         ability_id="setup-reactive-shoot-charge",
     )
     catalog = _catalog_with_descriptor(descriptor)
+    if fly:
+        catalog = replace(
+            catalog,
+            datasheets=tuple(
+                replace(
+                    sheet,
+                    keywords=replace(sheet.keywords, keywords=(*sheet.keywords.keywords, "FLY")),
+                )
+                for sheet in catalog.datasheets
+            ),
+        )
     armies = (
         muster_army(
             catalog=catalog,

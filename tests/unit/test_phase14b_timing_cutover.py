@@ -4,6 +4,7 @@ import json
 from typing import TypedDict, cast
 
 import pytest
+from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -27,10 +28,8 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, PlaceholderPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
-    MovementPhaseActionKind,
     MovementPhaseState,
     MovementUnitSelection,
 )
@@ -255,19 +254,17 @@ def test_phase14b_opponent_orders_end_movement_reactions(first_rule: str) -> Non
         selected_unit_ids=("army-alpha:intercessor-unit-1",),
         moved_unit_ids=("army-alpha:intercessor-unit-1",),
     )
-    record_move_completion_event(
+    append_authenticated_normal_move(
         state=state,
         decisions=lifecycle.decision_controller,
-        event_type="movement_activation_completed",
-        payload={
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": "player-a",
-            "phase": BattlePhase.MOVEMENT.value,
-            "unit_instance_id": "army-alpha:intercessor-unit-1",
-            "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
-            "phase_body_status": "activation_complete",
-        },
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        suffix="phase14b-ordering",
+        pose_transform=lambda pose: Pose.at(
+            pose.position.x + 0.1,
+            pose.position.y,
+            pose.position.z,
+            facing_degrees=pose.facing.degrees,
+        ),
     )
 
     session = LocalGameSession(lifecycle=lifecycle)
