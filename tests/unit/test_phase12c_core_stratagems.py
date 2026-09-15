@@ -192,9 +192,7 @@ from warhammer40k_core.engine.stratagems import (
     _heroic_intervention_reachable_target_distances,
     create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
-    invalid_heroic_intervention_charge_move_status,
     invalid_stratagem_target_proposal_status,
-    is_heroic_intervention_charge_move_request,
     is_stratagem_window_decline_result,
     request_stratagem_target_proposal,
     request_stratagem_use,
@@ -1777,9 +1775,9 @@ def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> No
     assert state.stratagem_use_records[0].effect_selection == {
         HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
     }
-    assert context_payload["mode"] == HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+    assert cast(dict[str, JsonValue], context_payload["movement_budget"])["roll_limit"] is not None
     maximum_distance = context_payload["maximum_distance_inches"]
-    assert type(maximum_distance) is int
+    assert isinstance(maximum_distance, (int, float))
     assert maximum_distance <= 6
 
 
@@ -1839,7 +1837,7 @@ def test_phase15e_heroic_intervention_reachable_targets_skip_absent_enemy_geomet
     state.replace_battlefield_state(state.battlefield_state.without_unit_placement(heroic_unit_id))
     with pytest.raises(
         GameLifecycleError,
-        match="Heroic Intervention source unit requires placed models",
+        match="Charge battlefield scenario is invalid",
     ):
         _heroic_intervention_reachable_target_distances(
             state=state,
@@ -1907,7 +1905,7 @@ def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_fir
     )
     completed = _last_event_payload(
         lifecycle.decision_controller,
-        "heroic_intervention_charge_move_completed",
+        "charge_move_completed",
     )
     transition_batch = cast(dict[str, JsonValue], completed["transition_batch"])
     displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
@@ -1921,7 +1919,7 @@ def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_fir
     assert {cast(str, record["displacement_kind"]) for record in displacements} == {"charge_move"}
     assert completed["unit_instance_id"] == heroic_unit_id
     assert effect_payload["effect_kind"] == "charge_grants_fights_first"
-    assert effect_payload["stratagem_use_id"] == state.stratagem_use_records[0].use_id
+    assert effect_payload["decision_result_id"] == "phase15e-heroic-charge-move"
     assert state.persisting_effects_for_unit(heroic_unit_id)
 
 
@@ -1985,7 +1983,7 @@ def test_phase15e_heroic_intervention_charge_move_rejects_missing_witness() -> N
     assert violations[0]["violation_code"] == "charge_move_witness_required"
     assert not _has_event(
         lifecycle.decision_controller,
-        "heroic_intervention_charge_move_completed",
+        "charge_move_completed",
     )
 
 
@@ -2039,14 +2037,18 @@ def test_phase15e_heroic_intervention_charge_no_move_records_decline() -> None:
     )
     declined = _last_event_payload(
         lifecycle.decision_controller,
-        "heroic_intervention_charge_move_declined",
+        "charge_move_declined",
     )
 
     assert status.status_kind is not LifecycleStatusKind.INVALID
     assert declined["proposal_request_id"] == proposal_request.request_id
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before_battlefield
-    assert state.persisting_effects_for_unit(heroic_unit_id) == ()
+    assert not any(
+        isinstance(e.effect_payload, dict)
+        and e.effect_payload.get("effect_kind") == "charge_grants_fights_first"
+        for e in state.persisting_effects_for_unit(heroic_unit_id)
+    )
 
 
 def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> None:
@@ -2105,7 +2107,7 @@ def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> 
     )
     invalid = _last_event_payload(
         lifecycle.decision_controller,
-        "heroic_intervention_charge_move_invalid",
+        "charge_move_invalid",
     )
 
     assert isinstance(status.payload, dict)
@@ -2120,12 +2122,16 @@ def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> 
     )
     assert retry_request.request_id == retry_request_id
     assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-    assert is_heroic_intervention_charge_move_request(retry_request)
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert retry_proposal_request.context == proposal_request.context
     assert invalid["violation_code"] == "endpoint_only_path"
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before_battlefield
-    assert state.persisting_effects_for_unit(heroic_unit_id) == ()
+    assert not any(
+        isinstance(e.effect_payload, dict)
+        and e.effect_payload.get("effect_kind") == "charge_grants_fights_first"
+        for e in state.persisting_effects_for_unit(heroic_unit_id)
+    )
 
 
 def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry() -> None:
@@ -2148,6 +2154,16 @@ def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry
     assert state.battlefield_state is not None
     before_battlefield = state.battlefield_state.to_payload()
     _grant_cp(state, player_id="player-a", amount=2)
+    from tests.heroic_intervention_helpers import drive_heroic_charge_choices
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
+
+    state.replace_charge_phase_state(
+        ChargePhaseState(
+            battle_round=state.battle_round, active_player_id="player-b", phase_complete=True
+        )
+    )
     target_proposal_request = StratagemTargetProposal.for_request(
         context=_context(
             state=state,
@@ -2194,6 +2210,12 @@ def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry
             ),
         )
     )
+    target_status = drive_heroic_charge_choices(
+        LocalGameSession(lifecycle),
+        target_status,
+        unit_id=heroic_unit_id,
+        result_prefix="heroic-retry",
+    )
     movement_request = _decision_request(target_status)
     proposal_request = MovementProposalRequest.from_decision_request_payload(
         movement_request.payload
@@ -2223,14 +2245,18 @@ def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry
 
     assert status.status_kind is LifecycleStatusKind.INVALID
     assert isinstance(status.payload, dict)
-    assert status.payload["next_request_id"] == retry_request.request_id
-    assert is_heroic_intervention_charge_move_request(retry_request)
+    assert retry_request.request_id != movement_request.request_id
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert len(lifecycle.reaction_queue.frames) == 1
     assert lifecycle.reaction_queue.frames[0].request_id == retry_request.request_id
     assert not _has_event(lifecycle.decision_controller, "reaction_parent_resumed")
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before_battlefield
-    assert state.persisting_effects_for_unit(heroic_unit_id) == ()
+    assert not any(
+        isinstance(e.effect_payload, dict)
+        and e.effect_payload.get("effect_kind") == "charge_grants_fights_first"
+        for e in state.persisting_effects_for_unit(heroic_unit_id)
+    )
 
 
 def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and_drift() -> None:
@@ -2265,22 +2291,21 @@ def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and
     request = _decision_request(waiting)
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
 
-    bad_option = invalid_heroic_intervention_charge_move_status(
-        state=state,
-        request=request,
-        result=DecisionResult(
-            result_id="phase15e-heroic-bad-option",
-            request_id=request.request_id,
-            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
-            actor_id=request.actor_id,
-            selected_option_id="bad-option",
-            payload=None,
-        ),
-    )
-    bad_payload = invalid_heroic_intervention_charge_move_status(
-        state=state,
-        request=request,
-        result=DecisionResult(
+    from warhammer40k_core.engine.decision_request import DecisionError
+
+    with pytest.raises(DecisionError, match="parameterized"):
+        lifecycle.submit_decision(
+            DecisionResult(
+                result_id="phase15e-heroic-bad-option",
+                request_id=request.request_id,
+                decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+                actor_id=request.actor_id,
+                selected_option_id="bad-option",
+                payload=None,
+            ),
+        )
+    bad_payload = lifecycle.submit_decision(
+        DecisionResult(
             result_id="phase15e-heroic-bad-payload",
             request_id=request.request_id,
             decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2294,10 +2319,8 @@ def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and
         unit_instance_id=enemy_unit_id,
         poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=50.0) for index in range(5)),
     )
-    stale_reachable = invalid_heroic_intervention_charge_move_status(
-        state=state,
-        request=request,
-        result=DecisionResult(
+    stale_reachable = lifecycle.submit_decision(
+        DecisionResult(
             result_id="phase15e-heroic-stale-reachable",
             request_id=request.request_id,
             decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2317,14 +2340,9 @@ def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and
         ),
     )
 
-    assert bad_option is not None
-    assert bad_option.payload == {"invalid_reason": "malformed"}
-    assert bad_payload is not None
-    assert bad_payload.payload == {"invalid_reason": "malformed"}
-    assert stale_reachable is not None
-    assert stale_reachable.payload == {
-        "invalid_reason": "heroic_intervention_reachable_targets_drift"
-    }
+    assert bad_payload.status_kind is LifecycleStatusKind.INVALID
+    assert stale_reachable.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.peek_next() == request
 
 
 def test_phase15e_core_stratagem_effect_selection_rejects_malformed_payloads() -> None:
@@ -2731,6 +2749,9 @@ def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -
             use_index=1,
         )
     )
+    special_lifecycle.decision_controller.event_log.append(
+        "stratagem_used", special_state.stratagem_use_records[0].to_payload()
+    )
     special_bundle = object.__getattribute__(special_lifecycle, "_runtime_content_bundle")
     assert isinstance(special_bundle, RuntimeContentBundle)
     special_context = _context(
@@ -2758,7 +2779,8 @@ def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
             target_player_id="player-b",
             target_unit_instance_id=normal_id,
-        )
+        ),
+        effect_selection={"mode": "leap_to_defend"},
     )
     ordinary_rejected = special_lifecycle.submit_decision(
         _target_proposal_result(
@@ -2778,7 +2800,8 @@ def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
             target_player_id="player-b",
             target_unit_instance_id=special_id,
-        )
+        ),
+        effect_selection={"mode": "leap_to_defend"},
     )
     special_status = special_lifecycle.submit_decision(
         _target_proposal_result(
@@ -2788,7 +2811,7 @@ def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -
         )
     )
 
-    assert _decision_request(special_status).decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert _decision_request(special_status).decision_type == "select_charging_unit"
     special_use = _stratagem_use_by_result_id(
         special_state,
         "snarling-protector-heroic-after-normal-use",
@@ -5620,6 +5643,19 @@ def _submit_source_stratagem_target(
     catalog_record: StratagemCatalogRecord | None = None,
 ) -> LifecycleStatus:
     state = _state(lifecycle)
+    if stratagem_id == "heroic-intervention" and state.charge_phase_state is None:
+        from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
+
+        assert state.active_player_id is not None
+        state.replace_charge_phase_state(
+            ChargePhaseState(
+                battle_round=state.battle_round,
+                active_player_id=state.active_player_id,
+                phase_complete=True,
+            )
+        )
+    if stratagem_id == "heroic-intervention" and effect_selection is None:
+        effect_selection = {"mode": "leap_to_defend"}
     record = _source_stratagem_record(stratagem_id) if catalog_record is None else catalog_record
     context = _context(
         state=state,
@@ -5645,13 +5681,23 @@ def _submit_source_stratagem_target(
         ),
         effect_selection=effect_selection,
     )
-    return lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         _target_proposal_result(
             request=request,
             result_id=result_id,
             proposal=proposal,
         )
     )
+
+    if stratagem_id == "heroic-intervention":
+        from tests.heroic_intervention_helpers import drive_heroic_charge_choices
+
+        from warhammer40k_core.adapters.local_session import LocalGameSession
+
+        return drive_heroic_charge_choices(
+            LocalGameSession(lifecycle), status, unit_id=target_unit_id, result_prefix=result_id
+        )
+    return status
 
 
 def _handcrafted_stratagem_option(
@@ -6265,6 +6311,20 @@ def _snarling_protector_heroic_lifecycle(
     _grant_cp(state, player_id="player-b", amount=0)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
     state.active_player_id = "player-a"
+    from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
+
+    enemy_id = "army-alpha:intercessor-unit-1"
+    state.replace_charge_phase_state(
+        ChargePhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            phase_complete=True,
+            selected_unit_ids=(enemy_id,) if enemy_made_charge_move else (),
+            declared_target_unit_instance_ids_by_unit={enemy_id: ("army-beta:normal-unit",)}
+            if enemy_made_charge_move
+            else {},
+        )
+    )
     if enemy_made_charge_move:
         state.record_persisting_effect(
             PersistingEffect(

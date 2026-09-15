@@ -229,7 +229,12 @@ def validate_charge_move_completed_event_authority(
         witness=witness,
         ruleset_descriptor=ruleset_descriptor,
     )
+    from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
+
     _validate_fights_first_effect(
+        turn_player_id=charge_turn_owner_at_event(
+            event_records=event_records, event_index=event_index, actor_id=proposal_request.actor_id
+        ),
         payload=payload,
         proposal_record=proposal_record,
         proposal_request=proposal_request,
@@ -761,6 +766,7 @@ def _validate_result_summary(
 
 def _validate_fights_first_effect(
     *,
+    turn_player_id: str,
     payload: dict[str, JsonValue],
     proposal_record: DecisionRecord,
     proposal_request: MovementProposalRequest,
@@ -782,7 +788,7 @@ def _validate_fights_first_effect(
         started_phase=BattlePhaseKind.CHARGE,
         expiration=EffectExpiration.end_turn(
             battle_round=proposal_request.battle_round,
-            player_id=proposal_request.actor_id,
+            player_id=turn_player_id,
         ),
         effect_payload={
             "effect_kind": FIGHTS_FIRST_CHARGE_EFFECT_KIND,

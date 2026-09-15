@@ -6,6 +6,7 @@ from warhammer40k_core.engine.active_player_scopes import (
     ActivePlayerScope,
     ActivePlayerScopeKind,
     ActivePlayerScopePayload,
+    charge_scope,
     shooting_scope,
     validate_scopes,
 )
@@ -81,6 +82,9 @@ def validate_active_player_history(*, state: GameState, decisions: DecisionContr
     if tuple(active) != persisted:
         raise GameLifecycleError("Active-player movement scope differs from recorded history.")
     expected_attack_scopes: list[ActivePlayerScope] = []
+    charge = charge_scope(state)
+    if charge is not None:
+        expected_attack_scopes.append(charge)
     fight = state.fight_phase_state
     fight_scope = fight_scope_for_state(fight)
     if (

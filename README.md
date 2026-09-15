@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 50 resolves Heroic Intervention through the ordinary Charge declaration,
+reroll, modifier, target-selection and witnessed-movement sequence. Into the Fray
+caps the modified roll before separate movement-distance effects; Leap to Defend
+uses completed Charge moves from the current phase. See
+[Order 50 scope and evidence](docs/ORDER_50_SCOPE_PLAN.md).
+
 Order 49 offers whole-roll Command Re-roll for ordinary Charges and preserves
 natural Charge rerolls during Heroic Intervention. Command Re-roll targets the
 rolling unit, so the shared one-Stratagem-per-unit-per-phase restriction applies.

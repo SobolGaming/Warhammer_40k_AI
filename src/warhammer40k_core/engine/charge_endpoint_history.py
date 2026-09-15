@@ -40,7 +40,6 @@ if TYPE_CHECKING:
 _CHARGE_COMPLETIONS = frozenset(
     {
         "charge_move_completed",
-        "heroic_intervention_charge_move_completed",
         "catalog_setup_reactive_charge_move_completed",
     }
 )

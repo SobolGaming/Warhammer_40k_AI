@@ -40,7 +40,6 @@ MOVE_COMPLETION_EVENT_TYPES = frozenset(
         "unit_disembarked",
         "triggered_movement_resolved",
         "fight_movement_completed",
-        "heroic_intervention_charge_move_completed",
         "catalog_setup_reactive_charge_move_completed",
     }
 )
@@ -121,7 +120,6 @@ def move_trigger_source_context(
     action: str
     if event.event_type in {
         "fight_movement_completed",
-        "heroic_intervention_charge_move_completed",
         "catalog_setup_reactive_charge_move_completed",
     }:
         from warhammer40k_core.engine.movement_proposals import (

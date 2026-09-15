@@ -21,7 +21,6 @@ AUTHORITATIVE_BATTLEFIELD_TRANSITION_EVENT_TYPES = frozenset(
         "catalog_setup_reactive_charge_move_completed",
         "charge_move_completed",
         "fight_movement_completed",
-        "heroic_intervention_charge_move_completed",
         "movement_activation_completed",
         "reinforcement_unit_arrived",
         "triggered_movement_resolved",

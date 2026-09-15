@@ -54,7 +54,7 @@ def pending_charge_roll(
         phase is None
         or phase.active_selection is None
         or state.current_battle_phase is not BattlePhase.CHARGE
-        or phase.active_selection.player_id != state.active_player_id
+        or phase.active_selection.player_id != phase.active_player_id
     ):
         raise GameLifecycleError("Pending Charge roll requires an active selection.")
     selection = phase.active_selection

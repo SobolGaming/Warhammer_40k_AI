@@ -22,9 +22,6 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     PlacementError,
 )
-from warhammer40k_core.engine.catalog_conditional_leader_queries import (
-    conditional_charge_after_movement_action_allowed,
-)
 from warhammer40k_core.engine.charge_declaration_hooks import (
     DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID,
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
@@ -33,7 +30,18 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationGrantPayload,
     ChargeDeclarationHookRegistry,
 )
-from warhammer40k_core.engine.charge_effects import charge_after_advance_allowed_by_effects
+from warhammer40k_core.engine.charge_eligibility import (
+    charge_after_fall_back_allowed_by_effects as _charge_after_fall_back_allowed_by_effects,
+)
+from warhammer40k_core.engine.charge_eligibility import (
+    charge_forbidden_by_effects as _charge_forbidden_by_effects,
+)
+from warhammer40k_core.engine.charge_eligibility import (
+    charge_unit_ineligibility_reason as _charge_unit_ineligibility_reason,
+)
+from warhammer40k_core.engine.charge_eligibility import (
+    legal_charging_unit_ids as _legal_charging_unit_ids,
+)
 from warhammer40k_core.engine.charge_endpoints import (
     ChargeEndpointWitness as ChargeEndpointWitness,
 )
@@ -122,17 +130,10 @@ from warhammer40k_core.engine.charge_phase_state import (
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
-from warhammer40k_core.engine.charge_required_targets import (
-    charge_target_constraints_satisfied as _charge_target_constraints_satisfied,
-)
 from warhammer40k_core.engine.charge_roll_flow import (
     _apply_charge_roll_reroll_decision,
     _resolve_charge_roll,
     _resolve_charge_roll_state,
-    continue_charge_roll,
-)
-from warhammer40k_core.engine.charge_target_continuation import (
-    continue_charge_move,
 )
 from warhammer40k_core.engine.charge_targets import (
     charge_target_candidates as _charge_target_candidates,
@@ -152,9 +153,6 @@ from warhammer40k_core.engine.faction_resources import (
     faction_resource_result_enriched_payload,
     resolve_faction_resource_refund_roll,
 )
-from warhammer40k_core.engine.mission_action_eligibility import (
-    rules_unit_started_mission_action_this_turn,
-)
 from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -171,7 +169,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases import charge_modifier_ignore as _modifier_ignore
 from warhammer40k_core.engine.phases.charge_move_completed_hooks import (
-    resolve_charge_move_completed_hooks,
     validate_charge_move_completed_hook_provider,
 )
 from warhammer40k_core.engine.phases.charge_proposal_flow import (
@@ -528,100 +525,9 @@ class ChargePhaseHandler:
         decisions: DecisionController,
         reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
-        _validate_charge_phase_state(state)
-        charge_state = _ensure_charge_phase_state(state=state)
-        pending_distance_state = charge_state.move_pending_distance_state()
-        if pending_distance_state is not None:
-            return continue_charge_move(state=state, decisions=decisions, handler=self)
+        from warhammer40k_core.engine.charge_phase_flow import begin_phase
 
-        if charge_state.active_selection is not None:
-            status = continue_charge_roll(state=state, decisions=decisions, handler=self)
-            if status is not None:
-                return status
-            charge_state = _ensure_charge_phase_state(state=state)
-        move_completed_status = resolve_charge_move_completed_hooks(
-            state=state,
-            decisions=decisions,
-            handler=self,
-            movement_action=CHARGE_MOVE_ACTION,
-        )
-        if move_completed_status is not None:
-            return move_completed_status
-        if charge_state.phase_complete:
-            return _complete_charge_phase_or_request_heroic_intervention(
-                handler=self,
-                state=state,
-                decisions=decisions,
-                reaction_queue=reaction_queue,
-            )
-
-        legal_unit_ids = _legal_charging_unit_ids(
-            state=state,
-            charge_state=charge_state,
-            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-            charge_target_restriction_hooks=self.charge_target_restriction_hooks,
-        )
-        if not legal_unit_ids:
-            state.replace_charge_phase_state(charge_state.with_phase_complete())
-            return _complete_charge_phase_or_request_heroic_intervention(
-                handler=self,
-                state=state,
-                decisions=decisions,
-                reaction_queue=reaction_queue,
-            )
-
-        request = DecisionRequest(
-            request_id=state.next_decision_request_id(),
-            decision_type=SELECT_CHARGING_UNIT_DECISION_TYPE,
-            actor_id=_active_player_id(state),
-            payload=validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": BattlePhase.CHARGE.value,
-                    "active_player_id": _active_player_id(state),
-                }
-            ),
-            options=_modifier_ignore.charging_unit_options_with_modifier_ignore_choices(
-                state=state,
-                unit_ids=legal_unit_ids,
-                include_complete=True,
-                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-                ability_index=_ability_index_for_player(
-                    self.ability_indexes_by_player_id,
-                    player_id=_active_player_id(state),
-                ),
-                runtime_modifier_registry=self.runtime_modifier_registry,
-                active_player_id=_active_player_id(state),
-                unit_lookup=_unit_by_id,
-                target_candidate_provider=_charge_target_candidates,
-                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
-            ),
-        )
-        decisions.request_decision(request)
-        decisions.event_log.append(
-            "charging_unit_selection_requested",
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": _active_player_id(state),
-                    "phase": BattlePhase.CHARGE.value,
-                    "request_id": request.request_id,
-                    "legal_unit_count": len(legal_unit_ids),
-                }
-            ),
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=request,
-            payload={
-                "phase": BattlePhase.CHARGE.value,
-                "battle_round": state.battle_round,
-                "active_player_id": _active_player_id(state),
-                "legal_unit_count": len(legal_unit_ids),
-            },
-        )
+        return begin_phase(self, state=state, decisions=decisions, reaction_queue=reaction_queue)
 
     def apply_decision(
         self,
@@ -1258,7 +1164,6 @@ def _record_charge_declaration_grant_effects(
         started_phase=BattlePhaseKind.CHARGE,
         expiration=_charge_declaration_grant_unit_effect_expiration(
             state=state,
-            selection=selection,
             grant=grant,
         ),
         effect_payload=grant.unit_effect_payload,
@@ -1297,170 +1202,23 @@ def _charge_declaration_grant_unit_effect_target_ids(
 def _charge_declaration_grant_unit_effect_expiration(
     *,
     state: GameState,
-    selection: ChargingUnitSelection,
     grant: ChargeDeclarationGrant,
 ) -> EffectExpiration:
+    turn_player_id = state.active_player_id
+    if turn_player_id is None:
+        raise GameLifecycleError("Charge grant expiration requires a turn owner.")
     if grant.unit_effect_expiration == "end_phase":
         return EffectExpiration.end_phase(
             battle_round=state.battle_round,
             phase=BattlePhaseKind.CHARGE,
-            player_id=selection.player_id,
+            player_id=turn_player_id,
         )
     if grant.unit_effect_expiration == "end_turn":
         return EffectExpiration.end_turn(
             battle_round=state.battle_round,
-            player_id=selection.player_id,
+            player_id=turn_player_id,
         )
     raise GameLifecycleError("Charge declaration grant effect expiration is unsupported.")
-
-
-def _legal_charging_unit_ids(
-    *,
-    state: GameState,
-    charge_state: ChargePhaseState,
-    ruleset_descriptor: RulesetDescriptor,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
-) -> tuple[str, ...]:
-    active_player_id = _active_player_id(state)
-    placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
-    legal_ids: list[str] = []
-    for unit_id in placed_unit_ids:
-        ineligible_reason = _charge_unit_ineligibility_reason(
-            state=state,
-            unit_instance_id=unit_id,
-            ruleset_descriptor=ruleset_descriptor,
-            charge_state=charge_state,
-            ignore_already_selected=False,
-            charge_target_restriction_hooks=charge_target_restriction_hooks,
-        )
-        if ineligible_reason is None:
-            legal_ids.append(unit_id)
-    return tuple(sorted(legal_ids))
-
-
-def _charge_unit_ineligibility_reason(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-    ruleset_descriptor: RulesetDescriptor,
-    charge_state: ChargePhaseState,
-    ignore_already_selected: bool,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
-) -> str | None:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    if not ignore_already_selected and requested_unit_id in charge_state.selected_unit_ids:
-        return "charge_unit_already_selected"
-    if requested_unit_id not in _active_player_placed_unit_ids(
-        state=state,
-        player_id=charge_state.active_player_id,
-    ):
-        return "charge_unit_off_battlefield"
-    if rules_unit_started_mission_action_this_turn(
-        state=state,
-        player_id=charge_state.active_player_id,
-        unit_instance_id=requested_unit_id,
-    ):
-        return "charge_unit_started_action"
-    view = rules_unit_view_by_id(state=state, unit_instance_id=requested_unit_id)
-    identity_ids = tuple(sorted({requested_unit_id, *view.component_unit_instance_ids}))
-    for identity_id in identity_ids:
-        advanced_state = state.advanced_unit_state_for_unit(
-            player_id=charge_state.active_player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=identity_id,
-        )
-        if (
-            advanced_state is not None
-            and ruleset_descriptor.charge_policy.forbids_advance
-            and not advanced_state.can_declare_charge
-            and not charge_after_advance_allowed_by_effects(
-                state=state, unit_instance_id=requested_unit_id
-            )
-        ):
-            return "charge_unit_advanced"
-        fell_back_state = state.fell_back_unit_state_for_unit(
-            player_id=charge_state.active_player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=identity_id,
-        )
-        if (
-            fell_back_state is not None
-            and ruleset_descriptor.charge_policy.forbids_fall_back
-            and not fell_back_state.can_declare_charge
-            and not _charge_after_fall_back_allowed_by_effects(
-                state=state, unit_instance_id=requested_unit_id
-            )
-        ):
-            return "charge_unit_fell_back"
-        disembarked_state = state.disembarked_unit_state_for_unit(
-            player_id=charge_state.active_player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=identity_id,
-        )
-        if disembarked_state is not None and not disembarked_state.can_declare_charge:
-            return "charge_unit_disembarked"
-    if not _charge_actor_can_declare_charge(
-        state=state,
-        unit_instance_id=requested_unit_id,
-        ruleset_descriptor=ruleset_descriptor,
-    ):
-        return "charge_unit_aircraft"
-    if _charge_forbidden_by_effects(state=state, unit_instance_id=requested_unit_id):
-        return "charge_unit_forbidden_by_effect"
-    if ruleset_descriptor.charge_policy.requires_unengaged_unit and _unit_is_engaged(
-        state=state,
-        unit_instance_id=requested_unit_id,
-        player_id=charge_state.active_player_id,
-        ruleset_descriptor=ruleset_descriptor,
-    ):
-        return "charge_unit_engaged"
-    legal_target_ids = legal_charge_target_unit_instance_ids(
-        state=state,
-        unit_instance_id=requested_unit_id,
-        ruleset_descriptor=ruleset_descriptor,
-        charge_target_restriction_hooks=charge_target_restriction_hooks,
-    )
-    if not _charge_target_constraints_satisfied(
-        state=state,
-        unit_instance_id=requested_unit_id,
-        candidate_target_unit_instance_ids=legal_target_ids,
-    ):
-        return "charge_unit_required_target_unavailable"
-    if not legal_target_ids:
-        return "charge_unit_no_legal_targets"
-    return None
-
-
-def _charge_forbidden_by_effects(*, state: GameState, unit_instance_id: str) -> bool:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for effect in state.persisting_effects_for_unit(requested_unit_id):
-        payload = effect.effect_payload
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("charge_forbidden") is True and not (
-            type(payload.get("effect_kind")) is str
-            and conditional_charge_after_movement_action_allowed(
-                state=state,
-                rules_unit_instance_id=requested_unit_id,
-                movement_action_effect_kind=str(payload["effect_kind"]),
-            )
-        ):
-            return True
-    return False
-
-
-def _charge_after_fall_back_allowed_by_effects(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> bool:
-    for effect in state.persisting_effects_for_unit(unit_instance_id):
-        payload = effect.effect_payload
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("effect_kind") == CHARGE_AFTER_FALL_BACK_EFFECT_KIND:
-            return True
-    return False
 
 
 def legal_charge_target_unit_instance_ids(
@@ -1573,7 +1331,12 @@ def _validate_charge_phase_state(state: GameState) -> None:
     charge_state = state.charge_phase_state
     if charge_state.battle_round != state.battle_round:
         raise GameLifecycleError("charge_phase_state battle round drift.")
-    if charge_state.active_player_id != state.active_player_id:
+    parent = (
+        charge_state
+        if charge_state.interruption is None
+        else charge_state.interruption.suspended_phase
+    )
+    if parent.active_player_id != state.active_player_id:
         raise GameLifecycleError("charge_phase_state active player drift.")
 
 
@@ -1592,7 +1355,8 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
 def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Charge phase requires active_player_id.")
-    return state.active_player_id
+    phase = state.charge_phase_state
+    return state.active_player_id if phase is None else phase.active_player_id
 
 
 def _active_player_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
@@ -1859,6 +1623,9 @@ def _record_fights_first_effect_if_needed(
     if not ruleset_descriptor.charge_policy.grants_fights_first_until_end_turn:
         return None
     active_player_id = _active_player_id(state)
+    turn_player_id = state.active_player_id
+    if turn_player_id is None:
+        raise GameLifecycleError("Charge bonus requires the current turn owner.")
     effect = PersistingEffect(
         effect_id=f"{result.result_id}:charge:fights-first",
         source_rule_id="core-rules:charge:fights-first",
@@ -1868,7 +1635,7 @@ def _record_fights_first_effect_if_needed(
         started_phase=BattlePhaseKind.CHARGE,
         expiration=EffectExpiration.end_turn(
             battle_round=state.battle_round,
-            player_id=active_player_id,
+            player_id=turn_player_id,
         ),
         effect_payload={
             "effect_kind": FIGHTS_FIRST_CHARGE_EFFECT_KIND,
@@ -2122,6 +1889,7 @@ __all__ = (
     "_apply_charge_roll_reroll_decision",
     "_apply_charging_unit_selection_decision",
     "_battlefield_scenario",
+    "_charge_actor_can_declare_charge",
     "_charge_after_fall_back_allowed_by_effects",
     "_charge_declaration_grant_options",
     "_charge_declaration_grant_unit_effect_expiration",

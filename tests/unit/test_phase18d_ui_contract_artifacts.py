@@ -438,7 +438,7 @@ def test_session_metadata_contract_version_accepts_current_major_releases() -> N
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "20.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "21.0.0"}
     incompatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
 
     validator.validate(compatible)
@@ -516,17 +516,17 @@ def test_current_contract_preserves_model_projections_and_advances_visibility_wr
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v20-contract"
+        == "session-metadata-v21-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v20-contract"
+        == "session-command-result-v21-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v20-contract"
+        == "session-command-outcome-v21-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]

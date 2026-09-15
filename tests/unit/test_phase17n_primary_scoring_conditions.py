@@ -3547,7 +3547,7 @@ def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_mov
     state, moving_unit_id, _objective_id = _phase17n_surveil_move_marker_state()
     decisions = DecisionController()
     trigger = decisions.event_log.append(
-        "heroic_intervention_charge_move_completed",
+        "charge_move_completed",
         {
             "game_id": state.game_id,
             "player_id": "player-b",

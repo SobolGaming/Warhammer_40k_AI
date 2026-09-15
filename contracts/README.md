@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `20.0.0`
+Contract version: `21.0.0`
+
+Order 50 / contract 21 resolves Heroic Intervention through the shared Charge
+sequence. See [the migration](migrations/20-to-21.md).
 
 Order 49 / contract 20 adds whole Charge rerolls with canonical unit targeting.
 See [the migration](migrations/19-to-20.md).

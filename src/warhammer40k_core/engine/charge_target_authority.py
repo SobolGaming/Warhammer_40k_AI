@@ -230,8 +230,11 @@ def validate_restored_charge_targets(
         is_catalog_setup_reactive_charge_move_request,
     )
     from warhammer40k_core.engine.charge_roll_dispatch import validate_restored_charge_rerolls
-    from warhammer40k_core.engine.stratagems import is_heroic_intervention_charge_move_request
+    from warhammer40k_core.engine.heroic_intervention_history import (
+        validate_interrupted_charge_source,
+    )
 
+    validate_interrupted_charge_source(state=state, decisions=decisions)
     validate_restored_charge_rerolls(state=state, decisions=decisions, handler=handler)
     history = charge_selection_history(
         event_records=decisions.event_log.records, decision_records=decisions.records
@@ -263,7 +266,6 @@ def validate_restored_charge_targets(
             if (
                 proposal.proposal_kind is ProposalKind.CHARGE_MOVE
                 and not is_catalog_setup_reactive_charge_move_request(request)
-                and not is_heroic_intervention_charge_move_request(request)
                 and (
                     phase is None
                     or phase.target_selection is None

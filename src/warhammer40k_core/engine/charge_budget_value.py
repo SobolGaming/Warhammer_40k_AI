@@ -26,10 +26,21 @@ class ChargeMoveDistanceModifier(msgspec.Struct, frozen=True, forbid_unknown_fie
             raise GameLifecycleError("Charge distance modifier must be finite.")
 
 
+class ChargeRollLimit(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    source_id: str
+    maximum: int
+
+    def __post_init__(self) -> None:
+        IdentifierValidator(GameLifecycleError)("Charge roll limit source", self.source_id)
+        if type(self.maximum) is not int or not 1 <= self.maximum <= 12:
+            raise GameLifecycleError("Charge roll limit must be between one and twelve.")
+
+
 class _BudgetPayload(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     modified_roll: ModifiedRollResultPayload
     distance_modifiers: tuple[ChargeMoveDistanceModifier, ...]
     maximum_distance_inches: float
+    roll_limit: ChargeRollLimit | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,6 +48,7 @@ class ChargeMovementBudget:
     modified_roll: ModifiedRollResult
     distance_modifiers: tuple[ChargeMoveDistanceModifier, ...]
     maximum_distance_inches: float
+    roll_limit: ChargeRollLimit | None = None
 
     def __post_init__(self) -> None:
         if type(self.modified_roll) is not ModifiedRollResult:
@@ -48,8 +60,10 @@ class ChargeMovementBudget:
             for row in self.distance_modifiers
         ):
             raise GameLifecycleError("Charge distance modifiers require source-linked records.")
+        if self.roll_limit is not None and type(self.roll_limit) is not ChargeRollLimit:
+            raise GameLifecycleError("Charge budget limit requires a typed source.")
         expected, _ = resolve_distance_deltas(
-            float(self.modified_roll.final_value),
+            float(self.roll_value),
             tuple((row.modifier_id, row.delta_inches) for row in self.distance_modifiers),
         )
         if (
@@ -57,6 +71,11 @@ class ChargeMovementBudget:
             or self.maximum_distance_inches != expected
         ):
             raise GameLifecycleError("Charge movement budget distance trace drift.")
+
+    @property
+    def roll_value(self) -> int:
+        value = self.modified_roll.final_value
+        return value if self.roll_limit is None else min(value, self.roll_limit.maximum)
 
     def to_payload(self) -> dict[str, JsonValue]:
         return cast(
@@ -68,6 +87,7 @@ class ChargeMovementBudget:
                         msgspec.to_builtins(row) for row in self.distance_modifiers
                     ],
                     "maximum_distance_inches": self.maximum_distance_inches,
+                    "roll_limit": msgspec.to_builtins(self.roll_limit),
                 }
             ),
         )
@@ -82,6 +102,7 @@ class ChargeMovementBudget:
             ModifiedRollResult.from_payload(parsed.modified_roll),
             parsed.distance_modifiers,
             parsed.maximum_distance_inches,
+            parsed.roll_limit,
         )
         if result.to_payload() != payload:
             raise GameLifecycleError("Charge budget payload shape drift.")

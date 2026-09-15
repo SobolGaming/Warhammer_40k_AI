@@ -26,7 +26,6 @@ def test_charge_move_consumers_share_canonical_physical_mutation_and_stale_path_
     for filename in (
         "phases/charge_proposal_flow.py",
         "catalog_setup_reactive_charge_move.py",
-        "stratagems_apply.py",
     ):
         assert {
             "resolve_charge_move",
@@ -36,7 +35,6 @@ def test_charge_move_consumers_share_canonical_physical_mutation_and_stale_path_
     for filename in (
         "phases/charge.py",
         "catalog_setup_reactive_charge_move.py",
-        "stratagems_apply.py",
     ):
         assert "validate_charge_witness_for_proposal" in _calls(filename), filename
     for path in (*ENGINE.glob("charge*.py"), *ENGINE.joinpath("phases").glob("charge*.py")):

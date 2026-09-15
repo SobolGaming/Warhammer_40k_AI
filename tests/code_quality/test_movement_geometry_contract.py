@@ -33,7 +33,6 @@ LIVE_MOVEMENT_CALLS = (
     (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_fall_back_move"),
     (CHARGE_PHASE, "_apply_charge_move_proposal_decision", "resolve_charge_move"),
     (FIGHT_PHASE, "apply_fight_movement_proposal", "resolve_rules_unit_fight_movement"),
-    (STRATAGEMS, "apply_heroic_intervention_charge_move", "resolve_charge_move"),
     (TRIGGERED_MOVEMENT, "request_from_state", "resolve_triggered_movement"),
     (TRIGGERED_MOVEMENT, "apply_decision", "resolve_triggered_movement"),
     (TRIGGERED_MOVEMENT, "apply_proposal_decision", "resolve_triggered_movement"),

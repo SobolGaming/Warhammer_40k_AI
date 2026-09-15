@@ -17,7 +17,6 @@ from warhammer40k_core.engine.movement_proposals import (
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.reaction_queue import REACTION_DECISION_TYPE, ReactionQueue
 from warhammer40k_core.engine.stratagems import (
-    is_heroic_intervention_charge_move_request,
     is_stratagem_placement_proposal_request,
 )
 
@@ -40,7 +39,17 @@ def validate_reaction_queue_consistency(
         raise GameLifecycleError("Lifecycle reaction queue requires a current battle phase.")
     if pending_request is None:
         raise GameLifecycleError("Lifecycle reaction queue requires a pending decision.")
-    if pending_request.decision_type not in reaction_frame_decision_types:
+    charge = state.charge_phase_state
+    charge_active = charge is not None and charge.interruption is not None
+    charge_types = {
+        "select_charging_unit",
+        "select_charge_declaration_grant",
+        "select_charge_targets",
+        "select_target_replacement",
+    }
+    if pending_request.decision_type not in reaction_frame_decision_types and not (
+        charge_active and pending_request.decision_type in charge_types
+    ):
         raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
     if (
         pending_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
@@ -50,8 +59,8 @@ def validate_reaction_queue_consistency(
         raise GameLifecycleError("Lifecycle reaction queue pending placement decision drift.")
     if (
         pending_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-        and not is_heroic_intervention_charge_move_request(pending_request)
         and not is_catalog_setup_reactive_charge_move_request(pending_request)
+        and not charge_active
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending movement decision drift.")
     seen_request_ids: set[str] = set()

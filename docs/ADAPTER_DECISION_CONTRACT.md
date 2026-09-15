@@ -1840,7 +1840,7 @@ Phase 12C source-backed Core Stratagems are adapter-visible through these handle
   0 CP; an unaffordable request still fails restoration. R35-001 changes no
   decision, proposal, event, persistence, or viewer-visible payload shape.
 - `core:new-orders`: finite `use_stratagem` options for active Tactical secondary cards. The target binding uses `target_kind: "tactical_secondary_card"` and `target_secondary_mission_id`; accepted use costs 1 CP, is once per game, discards that card, and draws one replacement through engine-owned Tactical secondary state.
-- `core:heroic-intervention`: parameterized target proposal at the end of the opponent Charge phase for one friendly unengaged unit within 12" of enemy units. `proposal.effect_selection.mode` is optional and defaults to `leap_to_defend`; `into_the_fray` adds the source-backed +1 CP cost and caps the Charge roll result at 6 before emitting a Heroic Intervention `submit_movement_proposal` with proposal kind `charge_move`. That movement proposal carries the Stratagem use, mode, charge-roll state, maximum distance, and reachable target snapshot in its context and requires the normal Charge Move `PathWitness` validation path.
+- `core:heroic-intervention`: at the end of the opponent Charge phase, submit a friendly unengaged unit within 12 inches and an explicit `proposal.effect_selection.mode`. A VEHICLE must be a CHARACTER or WALKER. Contract 21 uses ordinary Charge declaration, modifier-ignore, grant, reroll, target/replacement and witnessed movement decisions. Into the Fray costs one additional CP and limits the modified roll to six before separate distance modifiers; Leap to Defend permits enemies that made a Charge move this phase. See the Order 50 section below.
 - `core:counteroffensive`: parameterized target proposal in the opponent Fight phase just after an enemy unit has fought. Accepted use costs 2 CP, validates that the target is eligible to fight through `FightOrderState`, records a Fights First effect until end of phase, and records the selected activation with a `counteroffensive:<stratagem_use_id>` interrupt ID before lifecycle progression resumes.
 - `core:crushing-impact`: finite `use_stratagem` choice in the active player's Charge phase just after the selected friendly MONSTER/VEHICLE rules unit ends a Charge move. Its engine-enumerated `effect_selection.enemy_target_unit_instance_id` and `effect_selection.model_instance_id` identify an engaged enemy rules unit and a living, placed source model engaged with it. Retained destroyed models cannot be selected. Accepted use rolls the selected model's modified Toughness in D6, applies self wounds for 1s and enemy wounds for 5+, with an independent six-wound cap on each packet, and emits `crushing_impact_resolved`. See Order 48 below.
 - `core:epic-challenge`: parameterized target proposal just after a friendly CHARACTER unit is selected to fight. `proposal.effect_selection.character_model_instance_id` selects one CHARACTER model in the target unit. Accepted use records a per-phase Precision effect for that model's melee weapons and emits `epic_challenge_precision_registered`.
@@ -1892,7 +1892,7 @@ Accepted melee declarations lower to shared `RangedAttackPool` records with `sou
 
 Phase 15E adds these Stratagem-coupled Charge/Fight decisions:
 
-- Heroic Intervention target selection uses `submit_stratagem_target_proposal`; accepted use may emit a nested `submit_movement_proposal` Charge Move request. The nested request context includes `stratagem_handler_id: "core:heroic-intervention"` so lifecycle routes it back through the Heroic Intervention charge validator. Reaction frames may carry this movement proposal and only resume after the proposal resolves.
+- Heroic Intervention uses `submit_stratagem_target_proposal` followed by the shared Charge decisions. The engine records the source in `ChargePhaseState.interruption` and restores the suspended opponent phase after its movement triggers finish. Reaction frames follow those decisions; adapters do not route a separate Heroic movement context.
 - Counteroffensive and Epic Challenge are `submit_stratagem_target_proposal` requests emitted from Fight-step timing hooks. Counteroffensive target proposals are reaction-window requests for the opponent after an enemy unit has resolved attacks. Epic Challenge target proposals are declinable requests for the player whose CHARACTER unit has just been selected to fight.
 - Crushing Impact uses the finite Charge-completion choice documented under Order 48. The engine owns its nested enemy/model options and both damage continuations.
 
@@ -5936,5 +5936,39 @@ without changing their event or viewer projection hashes.
 
 These changed targeting/mutation and checkpoint semantics advance metadata and
 command result/outcome families to v20, replay to v14 and persistence to v12.
-See [19-to-20](../contracts/migrations/19-to-20.md). Order 50 retains responsibility
-for the broader Heroic Intervention modifier/eligibility pipeline.
+See [19-to-20](../contracts/migrations/19-to-20.md). Order 50 below supersedes the Heroic-specific continuation payload and completes
+the shared modifier/eligibility pipeline.
+
+
+## Order 50 — Heroic Intervention uses ordinary Charge decisions
+
+Contract 21 replaces the separate Heroic Intervention dice and movement flow.
+The existing Stratagem target proposal must specify `effect_selection.mode`
+(`leap_to_defend` or `into_the_fray`) before any roll and before CP spend.
+The resulting finite `select_charging_unit` request contains only the authorized
+rules unit and its existing modifier-ignore options. It leads through ordinary
+Charge declaration grants, natural rerolls, finite target selection/replacement,
+and the canonical `charge_move` proposal with its complete `PathWitness`.
+Command Re-roll remains subject to the already-consumed unit Stratagem slot.
+
+`ChargePhaseState.interruption` binds the source, single unit, target restrictions,
+optional source-linked roll limit and suspended completed ordinary Charge phase.
+Turn ownership stays unchanged; the interrupted Charge has its own active-player
+scope. Completion restores the suspended phase after downstream movement triggers.
+Fights First, declaration grants and modifier-ignore effects use the actual
+current turn owner for expiration, preserving the acting unit as effect owner.
+Into the Fray adds `roll_limit` to the shared movement-budget record (null for
+ordinary Charges). The cap applies to the modified roll before movement-distance
+modifiers; `ChargeRollResult.value` is the source-limited roll. Both the ordinary
+modifier trace and source limit remain serialized.
+
+Leap target IDs come from completed Charge history in this phase, using canonical
+attached identities. Into the Fray separately restricts targets to six inches.
+Current eligibility and loaded target hooks are rechecked by the Charge owner.
+Stale, malformed, wrong-target and budget-drifted submissions retain the pending
+request and do not move models. Target changes use the existing P04 replacement
+choice. All adapters and replay submit the same engine-owned decisions.
+
+Saved v20 sessions and replays require their matching deployment; see
+[20-to-21](../contracts/migrations/20-to-21.md). Historical Order 49 flow names above
+are superseded by this section.

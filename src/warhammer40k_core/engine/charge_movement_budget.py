@@ -43,7 +43,15 @@ def current_charge_movement_budget(
         ChargeMoveDistanceModifier(row.modifier_id, row.source_id, row.delta_inches)
         for row in applications
     )
-    maximum, _ = resolve_distance_deltas(
-        float(modified.final_value), tuple((row.modifier_id, row.delta_inches) for row in rows)
+    phase = state.charge_phase_state
+    source = None if phase is None else phase.interruption
+    limit = (
+        source.roll_limit
+        if source is not None and source.unit_instance_id == request.unit_instance_id
+        else None
     )
-    return ChargeMovementBudget(modified, rows, maximum)
+    value = modified.final_value if limit is None else min(modified.final_value, limit.maximum)
+    maximum, _ = resolve_distance_deltas(
+        float(value), tuple((row.modifier_id, row.delta_inches) for row in rows)
+    )
+    return ChargeMovementBudget(modified, rows, maximum, limit)

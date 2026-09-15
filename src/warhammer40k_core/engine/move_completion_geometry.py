@@ -59,7 +59,6 @@ def completed_move_model_placements(
     elif event.event_type in {
         "charge_move_completed",
         "triggered_movement_resolved",
-        "heroic_intervention_charge_move_completed",
         "catalog_setup_reactive_charge_move_completed",
     }:
         poses = _model_movement_endpoints(payload)

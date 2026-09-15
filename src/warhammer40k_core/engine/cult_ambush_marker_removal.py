@@ -41,7 +41,6 @@ _PROCESSED_MARKER_REMOVAL_MOVE_EVENTS = frozenset(
         "unit_disembarked",
         "reinforcement_unit_arrived",
         "triggered_movement_resolved",
-        "heroic_intervention_charge_move_completed",
         "catalog_setup_reactive_charge_move_completed",
     }
 )

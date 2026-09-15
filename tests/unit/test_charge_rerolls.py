@@ -8,6 +8,7 @@ from typing import cast
 import pytest
 from tests.charge_distance_helpers import request_from
 from tests.charge_reroll_helpers import heroic_session
+from tests.heroic_intervention_helpers import drive_heroic_charge_choices
 from tests.phase15a_charge_declaration_helpers import charge_lifecycle, compact_test_unit_poses
 from tests.phase15a_charge_test_support import (
     _submit_end_charge_heroic_target,
@@ -115,8 +116,13 @@ def test_heroic_native_reroll_restores_replays_and_never_spends_second_cp(accept
     option_id = request.options[-1 if accept else 0].option_id
     for branch in (session, restored):
         movement = request_from(
-            branch.submit_option(
-                request_id=request.request_id, option_id=option_id, result_id="hi-native"
+            drive_heroic_charge_choices(
+                branch,
+                branch.submit_option(
+                    request_id=request.request_id, option_id=option_id, result_id="hi-native"
+                ),
+                unit_id=unit_id,
+                result_prefix="hi-native",
             )
         )
         assert movement.decision_type == "submit_movement_proposal"
@@ -124,7 +130,9 @@ def test_heroic_native_reroll_restores_replays_and_never_spends_second_cp(accept
 
         context = MovementProposalRequest.from_decision_request_payload(movement.payload).context
         assert isinstance(context, dict)
-        roll = cast(dict[str, JsonValue], context["charge_roll_state"])
+        roll = cast(
+            dict[str, JsonValue], cast(dict[str, JsonValue], context["charge_roll"])["roll_state"]
+        )
         assert len(cast(list[JsonValue], roll["rerolls"])) == int(accept)
         if accept:
             assert cast(list[dict[str, JsonValue]], roll["rerolls"])[0]["selected_indices"] == [
@@ -273,7 +281,9 @@ def test_heroic_intervention_spends_target_slot_even_without_natural_reroll() ->
     )
     context = MovementProposalRequest.from_decision_request_payload(movement.payload).context
     assert isinstance(context, dict)
-    roll = DiceRollState.from_payload(cast(DiceRollStatePayload, context["charge_roll_state"]))
+    roll = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, cast(dict[str, JsonValue], context["charge_roll"])["roll_state"])
+    )
     assert not roll.original_result.spec.reroll_forbidden_rule_ids
     state = session.lifecycle.state
     assert state is not None

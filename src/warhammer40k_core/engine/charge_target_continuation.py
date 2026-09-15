@@ -59,7 +59,6 @@ def pending_charge(state: GameState) -> ChargePhaseState:
         or phase.active_selection is None
         or phase.move_pending_distance_state() is None
         or state.current_battle_phase is not BattlePhase.CHARGE
-        or phase.active_player_id != state.active_player_id
         or phase.battle_round != state.battle_round
     ):
         raise GameLifecycleError("Charge continuation requires its current rolled action.")
