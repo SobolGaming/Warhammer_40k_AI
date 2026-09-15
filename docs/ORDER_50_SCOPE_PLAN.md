@@ -65,18 +65,37 @@ Charge eligibility. The already-used Stratagem retains its recorded cost.
 
 ## Validation
 
+The PR review found a restore invariant violation: every supported decision emitted
+by the shared Charge completion owner must remain valid while the interrupted
+Charge holds its reaction frame. The restore allowlist omitted catalog mortal-wound
+target selection and rules sequencing. Both now require the existing active
+interruption context; all frame identity, phase and request checks remain intact.
+The consumer audit traced completion sequencing, catalog target selection,
+mortal-wound allocation, Feel No Pain, destruction, Battle-shock rerolls and
+Stratagem continuations. The latter families were already allowed.
+
+Regressions load one or two catalog mortal-wound abilities, complete a witnessed
+Heroic Charge, restore each pending completion/damage checkpoint, and compare
+continuation payloads and exact replay. They also reject completion types outside
+an interrupted Charge. The canonical fixture now records turn-start evidence so
+completion damage can destroy a unit through the ordinary scoring authority.
+This repair changes only restore decision admissibility, with two fixed set
+entries; gameplay algorithms, orchestration and existing performance budgets
+are unchanged. The existing decision contract covers these finite choices.
+
 Focused regressions cover source-loaded conditional grants and modifier-ignore
 permissions, both natural-reroll choices, positive/negative roll modifiers,
 post-cap movement effects, the six-inch target boundary, VEHICLE exceptions,
 AIRCRAFT restrictions, attached actors, invalid/retried paths, stale submissions,
 source-history drift, viewer projections, restoration and exact replay.
 
-Final behavioral validation: **8,047 passed**, **85.11% coverage**, 18 xdist
-workers with work stealing. The successful JUnit profile regenerated all eight
-committed CI shards. Coverage output used an isolated temporary directory after
-an initial worker could not atomically rename a repository-local coverage file;
-that initial run also identified nine obsolete contract/event fixture expectations,
-all corrected and verified before the successful complete rerun.
+Final behavioral validation after the completion-checkpoint repair: **8,051 passed**,
+**85.12% coverage**, 18 xdist workers with work stealing. The original successful
+implementation profile regenerated all eight committed CI shards; this repair
+adds cases to an existing inventoried file, and the exact shard check passes.
+Coverage output used an isolated temporary directory. The original implementation
+run identified nine obsolete contract/event fixture expectations, all corrected
+before its successful complete rerun.
 
 The complete code-quality gate passed **487 tests** without coverage. Two stale
 static references to extracted/deleted functions were updated before its final

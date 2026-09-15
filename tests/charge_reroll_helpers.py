@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 from tests.phase15a_charge_declaration_helpers import charge_lifecycle, compact_test_unit_poses
+from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -103,6 +104,7 @@ def heroic_session(
     )
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
+    record_primary_turn_start_evidence_for_fixture(state, decisions=lifecycle.decision_controller)
     return LocalGameSession(lifecycle), rules_unit_view_by_id(
         state=state, unit_instance_id=units["charger"].unit_instance_id
     ).unit_instance_id

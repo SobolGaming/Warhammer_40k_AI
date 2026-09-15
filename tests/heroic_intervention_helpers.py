@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tests.charge_distance_helpers import request_from
 from tests.charge_reroll_helpers import heroic_session
@@ -14,6 +14,9 @@ from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus
 from warhammer40k_core.engine.stratagems import StratagemTargetBinding, StratagemTargetKind
+
+if TYPE_CHECKING:
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
 
 
 def add_heroic_modifier(
@@ -102,3 +105,54 @@ def drive_heroic_charge_choices(
             result_id=f"{result_prefix}:targets",
         )
     return status
+
+
+def heroic_completion_catalog(*, ability_count: int) -> ArmyCatalog:
+    """Load completion effects through the same catalog boundary as ordinary Charges."""
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.core.datasheet import (
+        CatalogAbilitySourceKind,
+        CatalogAbilitySupport,
+        CatalogJsonObject,
+        DatasheetAbilityDescriptor,
+    )
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+    from warhammer40k_core.rules.source_data import RuleSourceText
+
+    base = ArmyCatalog.phase9a_canonical_content_pack()
+    abilities: list[DatasheetAbilityDescriptor] = []
+    for index in range(ability_count):
+        source = RuleSourceText.from_raw(
+            source_id=f"test:order50:completion:{index}",
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+            raw_text=(
+                "Each time this unit ends a Charge move, select one enemy unit within "
+                "Engagement Range of this unit and roll one D6 for each model in this unit: "
+                "for each 4+, that enemy unit suffers D3 mortal wounds."
+            ),
+        )
+        rule_ir = compile_rule_source_text(
+            source, source_keyword_sequence_parts=("INFANTRY",)
+        ).rule_ir
+        assert rule_ir.is_supported
+        abilities.append(
+            DatasheetAbilityDescriptor(
+                ability_id=f"order50-completion-{index}",
+                name=f"Charge completion fixture {index}",
+                source_id=source.source_id,
+                support=CatalogAbilitySupport.GENERIC_RULE_IR,
+                source_kind=CatalogAbilitySourceKind.DATASHEET,
+                effect_description=source.raw_text,
+                rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+            )
+        )
+    return replace(
+        base,
+        datasheets=tuple(
+            replace(sheet, abilities=(*sheet.abilities, *abilities))
+            if sheet.datasheet_id == "core-intercessor-like-infantry"
+            else sheet
+            for sheet in base.datasheets
+        ),
+    )

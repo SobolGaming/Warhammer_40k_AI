@@ -537,3 +537,153 @@ def test_heroic_loads_conditional_declaration_grant_and_reroll_from_source_bundl
         assert grant_effect.owner_player_id == "player-a"
         assert grant_effect.expiration.player_id == "player-b"
     assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()
+
+
+@pytest.mark.parametrize("ability_count", [1, 2])
+def test_heroic_completion_decisions_restore_continue_and_replay(ability_count: int) -> None:
+    """Every pending shared completion choice must remain a restorable reaction checkpoint."""
+    from tests.heroic_intervention_helpers import (
+        add_heroic_modifier,
+        heroic_completion_catalog,
+        use_heroic,
+    )
+
+    from warhammer40k_core.core.ruleset_descriptor import MovementMode
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.charge_movement_source import charge_movement_placement
+    from warhammer40k_core.engine.movement_proposals import ProposalKind
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
+    from warhammer40k_core.geometry.pathing import PathWitness
+    from warhammer40k_core.geometry.pose import Pose
+
+    session, unit_id = heroic_session(
+        natural=False, catalog=heroic_completion_catalog(ability_count=ability_count)
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    if ability_count == 2:
+        from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
+
+        for army in state.army_definitions:
+            if army.player_id == "player-b":
+                for unit in army.units:
+                    for model in unit.own_models:
+                        state.record_model_feel_no_pain_sources(
+                            model_instance_id=model.model_instance_id,
+                            sources=(FeelNoPainSource(source_id="order50:fnp", threshold=5),),
+                            decline_allowed=True,
+                        )
+    add_heroic_modifier(session, unit_id, delta=20)
+    declaration = use_heroic(session, unit_id)
+    targets = request_from(
+        session.submit_option(
+            request_id=declaration.request_id, option_id=unit_id, result_id="completion-declare"
+        )
+    )
+    target = next(o for o in targets.options if o.option_id != "decline_charge_targets")
+    movement = request_from(
+        session.submit_option(
+            request_id=targets.request_id, option_id=target.option_id, result_id="completion-target"
+        )
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    placement = charge_movement_placement(
+        scenario=battlefield_scenario_for_state(state=state), unit_instance_id=unit_id
+    )
+    assert isinstance(target.payload, dict)
+    target_ids = target.payload["target_ids"]
+    assert isinstance(target_ids, list)
+    proposal = ChargeMoveProposal(
+        proposal_request_id=movement.request_id,
+        unit_instance_id=unit_id,
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=tuple(str(value) for value in target_ids),
+        witness=PathWitness.for_paths(
+            tuple(
+                (
+                    model.model_instance_id,
+                    (model.pose, Pose.at(model.pose.position.x, model.pose.position.y + 4)),
+                )
+                for model in placement.model_placements
+            )
+        ),
+    )
+    status = session.submit_parameterized_payload(
+        request_id=movement.request_id,
+        payload=validate_json_value(proposal.to_payload()),
+        result_id="completion-move",
+    )
+    request = request_from(status)
+    assert request.decision_type == (
+        "select_catalog_unit_move_completed_mortal_wounds_target"
+        if ability_count == 1
+        else "resolve_sequencing_order"
+    )
+    seen: set[str] = set()
+    saved = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    for index in range(40):
+        phase = state.charge_phase_state
+        if phase is None or phase.interruption is None:
+            break
+        request = request_from(status)
+        seen.add(request.decision_type)
+        restored = LocalGameSession(
+            GameLifecycle.from_payload(
+                cast(GameLifecyclePayload, json.loads(json.dumps(restored.lifecycle.to_payload())))
+            )
+        )
+        for branch in (session, restored):
+            status = branch.submit_option(
+                request_id=request.request_id,
+                option_id=request.options[0].option_id,
+                result_id=f"completion-effect-{index}",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    else:
+        pytest.fail("Charge completion did not resume the suspended phase.")
+    assert "select_catalog_unit_move_completed_mortal_wounds_target" in seen
+    assert "select_mortal_wound_model" in seen
+    assert ("select_feel_no_pain" in seen) is (ability_count > 1)
+    assert ("resolve_sequencing_order" in seen) is (ability_count > 1)
+    assert not session.lifecycle.reaction_queue.frames
+    assert all(scope.kind.value != "charge" for scope in state.active_player_scopes)
+    assert any(
+        event.event_type == "unit_move_completed_mortal_wounds_resolved"
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="completion-replay"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+@pytest.mark.parametrize(
+    "decision_type",
+    ["resolve_sequencing_order", "select_catalog_unit_move_completed_mortal_wounds_target"],
+)
+def test_charge_completion_reaction_types_require_an_interrupted_charge(decision_type: str) -> None:
+    from warhammer40k_core.engine.lifecycle_reaction_queue import (
+        validate_reaction_queue_consistency,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session, _ = heroic_session(natural=False)
+    pending = request_from(session.advance_until_decision_or_terminal())
+    state = session.lifecycle.state
+    assert state is not None
+    with pytest.raises(GameLifecycleError, match="pending decision_type drift"):
+        validate_reaction_queue_consistency(
+            state=state,
+            reaction_queue=session.lifecycle.reaction_queue,
+            pending_request=replace(pending, decision_type=decision_type),
+            reaction_frame_decision_types={pending.decision_type},
+        )

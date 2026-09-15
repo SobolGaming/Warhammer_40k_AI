@@ -5,6 +5,9 @@ from collections.abc import Collection
 from warhammer40k_core.engine.attack_sequence import (
     is_destroyed_transport_disembark_proposal_request,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+)
 from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
     is_catalog_setup_reactive_charge_move_request,
 )
@@ -16,6 +19,7 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.reaction_queue import REACTION_DECISION_TYPE, ReactionQueue
+from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     is_stratagem_placement_proposal_request,
 )
@@ -46,6 +50,9 @@ def validate_reaction_queue_consistency(
         "select_charge_declaration_grant",
         "select_charge_targets",
         "select_target_replacement",
+        # Shared completion hooks finish before the interrupted Charge releases its frame.
+        SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+        SEQUENCING_DECISION_TYPE,
     }
     if pending_request.decision_type not in reaction_frame_decision_types and not (
         charge_active and pending_request.decision_type in charge_types

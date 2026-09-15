@@ -5955,6 +5955,11 @@ Command Re-roll remains subject to the already-consumed unit Stratagem slot.
 optional source-linked roll limit and suspended completed ordinary Charge phase.
 Turn ownership stays unchanged; the interrupted Charge has its own active-player
 scope. Completion restores the suspended phase after downstream movement triggers.
+The reaction frame remains active through shared completion sequencing
+(`resolve_sequencing_order`), catalog mortal-wound target selection, allocation,
+Feel No Pain and destruction. Saves at these existing finite-decision checkpoints
+restore and continue through the same lifecycle dispatcher before releasing the
+Charge scope and reaction frame.
 Fights First, declaration grants and modifier-ignore effects use the actual
 current turn owner for expiration, preserving the acting unit as effect owner.
 Into the Fray adds `roll_limit` to the shared movement-budget record (null for
