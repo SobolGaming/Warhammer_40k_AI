@@ -663,17 +663,12 @@ def _unit_can_take_to_the_skies(
 ) -> bool:
     if not ruleset_descriptor.fly_policy.take_to_the_skies_supported:
         return False
-    unit = scenario.unit_instance_for_placement(unit_placement)
-    hover_mode_state = _hover_mode_state_for_unit(
-        hover_mode_states=hover_mode_states,
-        unit_instance_id=unit_placement.unit_instance_id,
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    view = rules_unit_view_from_armies(
+        armies=scenario.armies, unit_instance_id=unit_placement.unit_instance_id
     )
-    aircraft_policy = AircraftMovementPolicy.from_unit(
-        unit=unit,
-        ruleset_descriptor=ruleset_descriptor,
-        hover_mode_state=hover_mode_state,
-    )
-    return "FLY" in aircraft_policy.effective_keywords and not aircraft_policy.hover_mode_active
+    return "FLY" in view.keywords
 
 
 def _fall_back_modes_for_parameterized_option(
@@ -786,11 +781,11 @@ def _model_movement_budget_inches(
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=movement_mode,
+            state=state,
+            unit_instance_id=unit_instance_id,
         )
     )
-    if movement_budget < 0.0:
-        raise GameLifecycleError("Movement distance modifier cannot reduce budget below 0.")
-    return movement_budget
+    return max(0.0, movement_budget)
 
 
 def _movement_distance_modifier_inches(
@@ -798,6 +793,8 @@ def _movement_distance_modifier_inches(
     aircraft_policy: AircraftMovementPolicy,
     ruleset_descriptor: RulesetDescriptor,
     movement_mode: MovementMode,
+    state: GameState | None = None,
+    unit_instance_id: str | None = None,
 ) -> float:
     if type(aircraft_policy) is not AircraftMovementPolicy:
         raise GameLifecycleError("Movement distance modifier requires AircraftMovementPolicy.")
@@ -813,11 +810,21 @@ def _movement_distance_modifier_inches(
         return movement_mode_policy.movement_distance_modifier
     if not ruleset_descriptor.fly_policy.take_to_the_skies_supported:
         raise GameLifecycleError("RulesetDescriptor does not support Take to the Skies.")
+    if state is not None:
+        from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+        from warhammer40k_core.engine.take_to_the_skies import flight_penalty
+
+        if unit_instance_id is None:
+            raise GameLifecycleError("Flight penalty requires a canonical rules unit.")
+        return -flight_penalty(
+            unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id),
+            ruleset=ruleset_descriptor,
+        )
     if "FLY" not in aircraft_policy.effective_keywords:
         raise GameLifecycleError("Take to the Skies requires the FLY keyword.")
     if "HOVER" in aircraft_policy.effective_keywords:
         return 0.0
-    return movement_mode_policy.movement_distance_modifier
+    return -ruleset_descriptor.fly_policy.movement_penalty_inches
 
 
 def _movement_mode_for_action(

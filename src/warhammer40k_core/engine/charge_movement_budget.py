@@ -43,6 +43,20 @@ def current_charge_movement_budget(
         ChargeMoveDistanceModifier(row.modifier_id, row.source_id, row.delta_inches)
         for row in applications
     )
+    if request.take_to_the_skies:
+        from warhammer40k_core.engine.take_to_the_skies import (
+            TAKE_TO_THE_SKIES_SOURCE_ID,
+            flight_penalty,
+        )
+
+        rows = (
+            *rows,
+            ChargeMoveDistanceModifier(
+                f"{request.request_id}:take-to-the-skies",
+                TAKE_TO_THE_SKIES_SOURCE_ID,
+                -flight_penalty(unit=view, ruleset=state.runtime_ruleset_descriptor()),
+            ),
+        )
     phase = state.charge_phase_state
     source = None if phase is None else phase.interruption
     limit = (

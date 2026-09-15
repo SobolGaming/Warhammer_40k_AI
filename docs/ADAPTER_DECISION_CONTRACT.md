@@ -5977,3 +5977,34 @@ choice. All adapters and replay submit the same engine-owned decisions.
 Saved v20 sessions and replays require their matching deployment; see
 [20-to-21](../contracts/migrations/20-to-21.md). Historical Order 49 flow names above
 are superseded by this section.
+
+## Order 51: per-move flight and turn distances (contract 22)
+
+Normal Move, Advance and Fall Back retain the `movement_mode` finite choices
+specified above. The choice precedes any Advance roll and remains bound to the
+movement proposal through grant, reroll and retry decisions. Hover keeps both
+walking and flight options. Eligible attached units share one choice and distance
+penalty; only their FLY models gain model/terrain transit and ignored vertical
+distance. Flight subtracts two inches from the maximum after other distance
+effects, clamped at zero; Hover waives that subtraction.
+
+Charge unit options (including Heroic Intervention) compose a
+`:take_to_the_skies` suffix with any modifier-ignore variant before rolling.
+Charge and reactive finite options carry `take_to_the_skies`,
+`flying_model_instance_ids` and `flight_penalty_inches`. ChargingUnitSelection and
+ChargeRollRequest require the boolean; completed Charge `fly_charge_policy`
+records it. Reactive Normal moves and setup-reactive Charges use the same choice
+and per-model capability owner. Reactive proposals and distance rerolls bind the
+choice to their original selection IDs; stale eligibility or a changed commitment
+is invalid before acceptance. Flight is not a proposal parameter that a client may
+change after seeing the roll.
+
+Accepted movement completion records persist per-model same-point path distances
+under the turn owner across phases, including reactive and Fight moves. Heavy
+sums those distances for the current turn. Setup and stationary completions do not
+invent traveled paths. Restore checks the ledger against completion evidence and
+checks Charge/reactive choices against their finite records. The ledger stays
+internal; existing viewer-scoped projection and event redaction cover public
+movement choices and their existing unit/model references.
+
+See [contract migration 21 to 22](../contracts/migrations/21-to-22.md).

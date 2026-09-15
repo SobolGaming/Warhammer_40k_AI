@@ -46,6 +46,7 @@ class ChargeEligibilityContextPayload(TypedDict):
 
 
 class ChargeRollRequestPayload(TypedDict):
+    take_to_the_skies: bool
     request_id: str
     game_id: str
     battle_round: int
@@ -195,8 +196,11 @@ class ChargeRollRequest:
     source_decision_request_id: str
     source_decision_result_id: str
     roll_modifiers: tuple[RollModifier, ...] = ()
+    take_to_the_skies: bool = False
 
     def __post_init__(self) -> None:
+        if type(self.take_to_the_skies) is not bool:
+            raise GameLifecycleError("Charge flight selection must be a bool.")
         object.__setattr__(
             self,
             "request_id",
@@ -266,6 +270,7 @@ class ChargeRollRequest:
 
     def to_payload(self) -> ChargeRollRequestPayload:
         return {
+            "take_to_the_skies": self.take_to_the_skies,
             "request_id": self.request_id,
             "game_id": self.game_id,
             "battle_round": self.battle_round,
@@ -287,6 +292,7 @@ class ChargeRollRequest:
             unit_instance_id=payload["unit_instance_id"],
             source_decision_request_id=payload["source_decision_request_id"],
             source_decision_result_id=payload["source_decision_result_id"],
+            take_to_the_skies=payload["take_to_the_skies"],
             roll_modifiers=tuple(
                 RollModifier.from_payload(modifier) for modifier in payload["roll_modifiers"]
             ),

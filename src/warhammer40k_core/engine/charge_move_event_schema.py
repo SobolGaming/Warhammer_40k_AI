@@ -43,7 +43,7 @@ CHARGE_MOVE_ENDPOINT_WITNESS_PAYLOAD_KEYS: frozenset[str] = frozenset(
     }
 )
 CHARGE_MOVE_FLY_POLICY_PAYLOAD_KEYS: frozenset[str] = frozenset(
-    {"has_fly", "uses_aircraft_rules", "can_declare_charge"}
+    {"has_fly", "uses_aircraft_rules", "can_declare_charge", "take_to_the_skies"}
 )
 CHARGE_MOVE_COMPLETED_PAYLOAD_KEYS: frozenset[str] = frozenset(
     {

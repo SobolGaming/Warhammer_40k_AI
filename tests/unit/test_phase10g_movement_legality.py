@@ -43,7 +43,7 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
     )
 
     assert capabilities.has_fly
-    assert capabilities.can_move_through_models
+    assert not capabilities.can_move_through_models
     assert capabilities.can_traverse_ruins_walls
     assert (
         movement_mode_for_phase_action(MovementPhaseActionKind.NORMAL_MOVE) is MovementMode.NORMAL
@@ -73,6 +73,21 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
 
 class _EnumLikeAction:
     value = MovementPhaseActionKind.NORMAL_MOVE.value
+
+
+@pytest.mark.parametrize(
+    "mode", [MovementMode.NORMAL, MovementMode.ADVANCE, MovementMode.FALL_BACK, MovementMode.CHARGE]
+)
+def test_order51_fly_without_committed_choice_grants_no_transit(mode: MovementMode) -> None:
+    capabilities = MovementCapabilitySet.from_keywords(
+        ("FLY",),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        movement_mode=mode,
+    )
+    assert capabilities.has_fly
+    assert not capabilities.can_move_through_models
+    assert not capabilities.can_move_through_terrain
+    assert not capabilities.ignores_vertical_distance
 
 
 def test_movement_capability_payload_rejects_semantic_permission_drift() -> None:
@@ -446,3 +461,12 @@ def _descriptor_with_custom_movement_policy(
         movement_policy=MovementPolicyDescriptor(movement_modes=tuple(movement_modes)),
         descriptor_hash="",
     )
+
+
+def test_selected_flight_requires_an_explicit_move_kind() -> None:
+    with pytest.raises(MovementLegalityError, match="unavailable for this move"):
+        MovementCapabilitySet.from_keywords(
+            keywords=("FLY",),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            take_to_the_skies=True,
+        )

@@ -129,20 +129,22 @@ def charging_unit_options_with_modifier_ignore_choices(
             unit=unit,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        options.extend(
-            options_with_modifier_ignore_choices(
-                option=option,
-                unit_instance_id=unit_id,
-                permissions=permissions,
-                available_modifiers=tuple(
-                    ModifierIgnoreSnapshot.for_roll_modifier(
-                        kind=ModifierIgnoreKind.CHARGE_ROLL,
-                        modifier=modifier,
-                    )
-                    for modifier in roll_modifiers
-                ),
-            )
+        from warhammer40k_core.engine.take_to_the_skies import flight_choices
+
+        variants = options_with_modifier_ignore_choices(
+            option=option,
+            unit_instance_id=unit_id,
+            permissions=permissions,
+            available_modifiers=tuple(
+                ModifierIgnoreSnapshot.for_roll_modifier(
+                    kind=ModifierIgnoreKind.CHARGE_ROLL,
+                    modifier=modifier,
+                )
+                for modifier in roll_modifiers
+            ),
         )
+        for variant in variants:
+            options.extend(flight_choices(option=variant, unit=unit, ruleset=ruleset_descriptor))
     if include_complete:
         options.append(
             DecisionOption(

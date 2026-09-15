@@ -28,6 +28,7 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     PhysicalModelAuthority,
     physical_model_authority_before_event,
 )
+from warhammer40k_core.engine.take_to_the_skies import flight_selection
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -194,6 +195,7 @@ def validate_charge_endpoint_history(
                 ruleset_descriptor=ruleset,
                 ability_index=ability_index_for_player(army.player_id),
                 movement_mode=MovementMode.CHARGE,
+                take_to_the_skies=flight_selection(payload["fly_charge_policy"]),
                 unit=unit_at_charge,
                 model_instance_id=row.model_instance_id,
                 current_model_instance_ids=tuple(

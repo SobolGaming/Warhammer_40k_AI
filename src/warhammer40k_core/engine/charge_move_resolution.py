@@ -174,6 +174,7 @@ def resolve_charge_move(
     terrain: tuple[TerrainVolume, ...] = (),
     unit_persisting_effects: tuple[PersistingEffect, ...] = (),
     ability_index: AbilityCatalogIndex | None = None,
+    take_to_the_skies: bool = False,
 ) -> ChargeMoveResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Charge Move requires a BattlefieldScenario.")
@@ -261,6 +262,7 @@ def resolve_charge_move(
             keywords=aircraft_policy.effective_keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=MovementMode.CHARGE,
+            take_to_the_skies=take_to_the_skies,
             movement_phase_action=None,
             displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
             ability_index=ability_index,
@@ -393,7 +395,8 @@ def resolve_charge_move(
             "coherency_result": coherency_result.to_payload(),
             "endpoint_witness": endpoint_witness.to_payload(),
             "fly_charge_policy": {
-                "has_fly": all("FLY" in p.effective_keywords for p in aircraft_policies),
+                "take_to_the_skies": take_to_the_skies,
+                "has_fly": any("FLY" in p.effective_keywords for p in aircraft_policies),
                 "uses_aircraft_rules": any(p.uses_aircraft_rules for p in aircraft_policies),
                 "can_declare_charge": all(p.can_declare_charge for p in aircraft_policies),
             },

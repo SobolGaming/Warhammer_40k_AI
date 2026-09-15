@@ -144,6 +144,10 @@ from warhammer40k_core.engine.missions import (
     mission_scoring_policies_from_setup,
     reserve_destruction_policy_from_scoring_policy,
 )
+from warhammer40k_core.engine.model_movement_history import (
+    ModelMovementDistance,
+    validate_history_state,
+)
 from warhammer40k_core.engine.normal_move_history import NormalMoveState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -1189,6 +1193,9 @@ class GameState:
         default_factory=_new_fell_back_unit_states
     )
     normal_move_states: list[NormalMoveState] = field(default_factory=_new_normal_move_states)
+    model_movement_history: list[ModelMovementDistance] = field(
+        default_factory=lambda: list[ModelMovementDistance]()
+    )
     battle_shocked_unit_ids: list[str] = field(default_factory=_new_battle_shocked_unit_ids)
     battle_shocked_unit_states: list[BattleShockedUnitState] = field(
         default_factory=_new_battle_shocked_unit_states
@@ -1317,6 +1324,7 @@ class GameState:
             "GameState battle_round",
             self.battle_round,
         )
+        validate_history_state(self)
         self.active_player_id = _validate_optional_player_id(
             "GameState active_player_id",
             self.active_player_id,
@@ -4778,6 +4786,7 @@ class GameState:
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
             "normal_move_states": [state.to_payload() for state in self.normal_move_states],
+            "model_movement_history": [row.to_payload() for row in self.model_movement_history],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
             "battle_shocked_unit_states": [
                 state.to_payload() for state in self.battle_shocked_unit_states
@@ -5153,6 +5162,9 @@ class GameState:
             ],
             fell_back_unit_states=[
                 FellBackUnitState.from_payload(state) for state in payload["fell_back_unit_states"]
+            ],
+            model_movement_history=[
+                ModelMovementDistance.from_payload(row) for row in payload["model_movement_history"]
             ],
             normal_move_states=[
                 NormalMoveState.from_payload(state) for state in payload["normal_move_states"]

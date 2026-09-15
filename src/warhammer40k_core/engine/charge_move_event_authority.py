@@ -209,6 +209,13 @@ def validate_charge_move_completed_event_authority(
         proposal_request=proposal_request,
         selection_record=selection_record,
     )
+    from warhammer40k_core.engine.take_to_the_skies import flight_selection
+
+    if (
+        flight_selection(payload["fly_charge_policy"])
+        != charge_roll_result.request.take_to_the_skies
+    ):
+        raise GameLifecycleError("Charge movement flight differs from its committed roll.")
     _validate_causal_event_order(
         event_records=event_records,
         decision_records=decision_records,
@@ -365,6 +372,8 @@ def _charge_roll_result(
         or roll_result.request.unit_instance_id != proposal_request.unit_instance_id
         or roll_result.request.source_decision_request_id != selection_record.request.request_id
         or roll_result.request.source_decision_result_id != selection_record.result.result_id
+        or roll_result.request.take_to_the_skies
+        != _object(selection_record.result.payload, "selection").get("take_to_the_skies")
         or not roll_result.move_available
     ):
         raise GameLifecycleError("Charge move-completed charge-roll authority drifted.")

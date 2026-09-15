@@ -22,6 +22,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.take_to_the_skies import flight_selection
 from warhammer40k_core.engine.triggered_movement import (
     DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
@@ -77,6 +78,16 @@ def request_from_state(
         raise GameLifecycleError("Triggered movement requires at least one movement choice.")
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    selections = (
+        (False, True)
+        if "FLY" in view.keywords
+        and descriptor.movement_mode is MovementMode.NORMAL
+        and ruleset_descriptor.fly_policy.take_to_the_skies_supported
+        else (False,)
+    )
     resolutions = tuple(
         resolve_triggered_movement(
             scenario=scenario,
@@ -84,19 +95,23 @@ def request_from_state(
             unit_placement=unit_placement,
             descriptor=descriptor,
             path_witness=witness,
+            take_to_the_skies=selected,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             normal_move_states=tuple(state.normal_move_states),
             hover_mode_states=tuple(state.hover_mode_states),
         )
         for witness in candidate_witness_tuple
+        for selected in selections
     )
-    invalid_resolutions = tuple(resolution for resolution in resolutions if not resolution.is_valid)
-    if invalid_resolutions:
-        raise GameLifecycleError(
-            "Triggered movement request candidates must all be valid: "
-            f"{_triggered_movement_violation_code(invalid_resolutions[0])}."
-        )
+    for witness in candidate_witness_tuple:
+        matches = tuple(resolution for resolution in resolutions if resolution.witness == witness)
+        if not any(resolution.is_valid for resolution in matches):
+            raise GameLifecycleError(
+                "Triggered movement request candidates must all be valid: "
+                f"{_triggered_movement_violation_code(matches[0])}."
+            )
+    resolutions = tuple(resolution for resolution in resolutions if resolution.is_valid)
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Triggered movement requires current battle phase.")
@@ -177,6 +192,7 @@ def apply_decision(
         unit_placement=unit_placement,
         descriptor=descriptor,
         path_witness=witness,
+        take_to_the_skies=flight_selection(payload),
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
@@ -311,6 +327,7 @@ def apply_proposal_decision(
         unit_placement=unit_placement,
         descriptor=descriptor,
         path_witness=submission.witness,
+        take_to_the_skies=flight_selection(proposal_request.context),
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),

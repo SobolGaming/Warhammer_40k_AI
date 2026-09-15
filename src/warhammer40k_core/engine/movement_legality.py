@@ -251,6 +251,7 @@ class MovementCapabilitySet:
         unit_persisting_effects: tuple[PersistingEffect, ...] = (),
         owner_player_id: str | None = None,
         ignores_vertical_distance_override: bool = False,
+        take_to_the_skies: bool = False,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         normalized_keywords = _validate_keyword_tuple(
@@ -292,7 +293,20 @@ class MovementCapabilitySet:
             movement_mode=movement_mode,
             model_allegiance="enemy",
         )
-        has_fly = "has_fly" in flags
+        has_fly = (
+            "FLY" in unit.own_model_by_id(model_instance_id).keywords
+            if unit is not None and model_instance_id is not None
+            else "has_fly" in flags
+        )
+        if type(take_to_the_skies) is not bool:
+            raise MovementLegalityError("Take to the Skies selection must be a bool.")
+        flight_selected = take_to_the_skies or movement_mode is MovementMode.FLY_TAKE_TO_SKIES
+        if flight_selected and (
+            not descriptor.fly_policy.take_to_the_skies_supported
+            or not _fly_transit_applies_for_mode(movement_mode)
+        ):
+            raise MovementLegalityError("Take to the Skies is unavailable for this move.")
+        flying = has_fly and flight_selected
         is_titanic = "is_titanic" in flags
         is_infantry = "is_infantry" in flags
         is_beast = "is_beast" in flags
@@ -306,7 +320,7 @@ class MovementCapabilitySet:
             )
         )
         fly_moves_through_models = (
-            has_fly
+            flying
             and descriptor.fly_policy.may_move_through_models
             and _fly_transit_applies_for_mode(movement_mode)
         )
@@ -331,7 +345,7 @@ class MovementCapabilitySet:
         can_move_through_models = can_move_through_friendly_models or can_move_through_enemy_models
         can_move_through_terrain = (
             can_traverse_ruins_walls
-            or (has_fly and descriptor.fly_policy.may_move_through_terrain)
+            or (flying and descriptor.fly_policy.may_move_through_terrain)
             or terrain_transit_permission
             or _catalog_terrain_transit_allowed(catalog_permissions)
         )
@@ -347,7 +361,7 @@ class MovementCapabilitySet:
             )
         ignores_vertical_distance = bool(
             ignores_vertical_distance_override
-            or (has_fly and descriptor.fly_policy.ignores_vertical_distance)
+            or (flying and descriptor.fly_policy.ignores_vertical_distance)
             or _catalog_ignores_vertical_distance(catalog_permissions)
         )
         return cls(
@@ -660,6 +674,7 @@ class MovementLegalityContext:
         unit_persisting_effects: tuple[PersistingEffect, ...] = (),
         owner_player_id: str | None = None,
         ignores_vertical_distance_override: bool = False,
+        take_to_the_skies: bool = False,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         mode = movement_mode_from_token(movement_mode)
@@ -680,6 +695,7 @@ class MovementLegalityContext:
                 unit_persisting_effects=unit_persisting_effects,
                 owner_player_id=owner_player_id,
                 ignores_vertical_distance_override=ignores_vertical_distance_override,
+                take_to_the_skies=take_to_the_skies,
             ),
             engagement_policy=EngagementMovementPolicy.from_ruleset_descriptor(
                 descriptor,
@@ -1173,7 +1189,7 @@ def _validated_catalog_permissions(
 
 def _fly_transit_applies_for_mode(movement_mode: object | None) -> bool:
     if movement_mode is None:
-        return True
+        return False
     return movement_mode_from_token(movement_mode) in _FLY_TRANSIT_MOVEMENT_MODES
 
 

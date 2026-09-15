@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import cast
 
 from tests.charge_reroll_helpers import heroic_session
+from tests.heroic_intervention_helpers import add_heroic_modifier
 
 from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
@@ -44,6 +45,7 @@ def main() -> None:
     for _ in range(args.samples):
         start = time.perf_counter()
         session, unit_id = heroic_session(natural=False)
+        add_heroic_modifier(session, unit_id, delta=20)
         lifecycle = session.lifecycle
         state = lifecycle.state
         assert state is not None
@@ -136,7 +138,7 @@ def main() -> None:
         )
     times = sorted(row["slice_seconds"] for row in rows)
     report = {
-        "workload_id": "order50-heroic-intervention-slice-v1",
+        "workload_id": "order51-heroic-intervention-slice-v2",
         "revision": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "engine_build_id": current_engine_build_id(),
         "runtime_diff_sha256": hashlib.sha256(
@@ -159,6 +161,7 @@ def main() -> None:
             "enemy_units": 1,
             "path_segments": 2,
             "concurrency": 1,
+            "charge_roll_modifier": 20,
         },
         "mode": "uninstrumented_timing",
         "concurrency": 1,
@@ -169,6 +172,7 @@ def main() -> None:
                 "tests/phase15a_charge_declaration_helpers.py",
                 "scripts/measure_heroic_intervention.py",
                 "tests/charge_reroll_helpers.py",
+                "tests/heroic_intervention_helpers.py",
             )
         },
         "samples": rows,

@@ -15,6 +15,7 @@ from warhammer40k_core.engine.decision_dispatch import DecisionDispatchHandler
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.flight_decision_authority import validate_charge_selection_flight
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.target_replacement import replacement_selection
 
@@ -26,6 +27,7 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
     def pre_validator(request: DecisionRequest, result: DecisionResult) -> LifecycleStatus | None:
         state = host._require_state()  # pyright: ignore[reportPrivateUsage]
         try:
+            validate_charge_selection_flight(state=state, decisions=host.decision_controller)
             _validate_charge_target_choice(host, request, result)
         except (GameLifecycleError, DecisionError) as exc:
             return LifecycleStatus.invalid(
@@ -71,6 +73,7 @@ def validate_charge_replacement(
 ) -> LifecycleStatus | None:
     state = host._require_state()  # pyright: ignore[reportPrivateUsage]
     try:
+        validate_charge_selection_flight(state=state, decisions=host.decision_controller)
         current = next_charge_target_replacement(
             state=state,
             handler=host._charge_phase_handler,  # pyright: ignore[reportPrivateUsage]

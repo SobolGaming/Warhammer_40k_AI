@@ -89,6 +89,8 @@ def pending_charge_roll(
             or not isinstance(record.result.payload, dict)
             or record.result.payload.get("unit_instance_id") != selection.unit_instance_id
             or record.result.actor_id != selection.player_id
+            or request.take_to_the_skies != selection.take_to_the_skies
+            or record.result.payload.get("take_to_the_skies") != selection.take_to_the_skies
         ):
             raise GameLifecycleError("Pending Charge roll selection authority drift.")
         roll = DiceRollState.from_payload(
@@ -174,6 +176,7 @@ def _resolve_charge_roll(
         source_decision_request_id=selection.request_id,
         source_decision_result_id=selection.result_id,
         roll_modifiers=roll_modifiers,
+        take_to_the_skies=selection.take_to_the_skies,
     )
     legal_target_ids = _charge.legal_charge_target_unit_instance_ids(
         state=state,

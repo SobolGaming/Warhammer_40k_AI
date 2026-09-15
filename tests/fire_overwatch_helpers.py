@@ -12,6 +12,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _proposal_from_request,
     _shooting_lifecycle,
 )
+from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfile, WeaponKeyword
@@ -20,7 +21,6 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
-from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement import MovementPhaseState
 from warhammer40k_core.engine.stratagems import (
@@ -144,19 +144,17 @@ def overwatch_session(
         moved_unit_ids=(ENEMIES[0],) if moved else (),
     )
     if moved:
-        record_move_completion_event(
+        append_authenticated_normal_move(
             state=state,
             decisions=lifecycle.decision_controller,
-            event_type="movement_activation_completed",
-            payload={
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": "player-b",
-                "phase": "movement",
-                "unit_instance_id": ENEMIES[0],
-                "movement_phase_action": "normal_move",
-                "phase_body_status": "activation_complete",
-            },
+            unit_instance_id=ENEMIES[0],
+            suffix="order45-overwatch",
+            pose_transform=lambda pose: Pose.at(
+                pose.position.x + 0.1,
+                pose.position.y,
+                pose.position.z,
+                facing_degrees=pose.facing.degrees,
+            ),
         )
     return LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
 

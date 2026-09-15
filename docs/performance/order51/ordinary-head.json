@@ -1,0 +1,93 @@
+{
+  "workload_id": "order49-charge-reroll-slice-v1",
+  "revision": "dc043bf27baf51c02d8db1a177190ecd77ad3254",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fe480ca6ef8f2429dc1733860b6d5000101b5fde52476b143a152157ef5a8fdf",
+  "runtime_diff_sha256": "5443f72451f477cf612af1c4102f081b2e963442b4adc85f3c2075c498d42969",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "model_count": 15,
+  "terrain_count": 0,
+  "timing_boundary": "Charge declaration through accepted path and next decision; setup separate",
+  "scenario": {
+    "game_id": "order47-charge-benchmark-1",
+    "models_per_unit": 5,
+    "charging_units": 2,
+    "enemy_units": 1,
+    "path_segments": 2,
+    "concurrency": 1
+  },
+  "mode": "uninstrumented_timing",
+  "concurrency": 1,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/phase15a_charge_declaration_helpers.py": "28da42324021a8e294eb99e333c3364d3f6b57a248221c95a53d0d2a7d3b4670",
+    "scripts/measure_charge_endpoints.py": "40e1cf944efadada965c3b1fcd4cf6c0bd59cd93fd952f8b79674222cf8f482b"
+  },
+  "samples": [
+    {
+      "setup_seconds": 2.3783936660038307,
+      "selection_seconds": 0.014903125003911555,
+      "movement_seconds": 0.014042209018953145,
+      "slice_seconds": 0.0289453340228647,
+      "decision_count": 4,
+      "event_count": 47
+    },
+    {
+      "setup_seconds": 0.4970096660545096,
+      "selection_seconds": 0.013729084050282836,
+      "movement_seconds": 0.012025915901176631,
+      "slice_seconds": 0.025754999951459467,
+      "decision_count": 4,
+      "event_count": 47
+    },
+    {
+      "setup_seconds": 0.4588127079186961,
+      "selection_seconds": 0.013536375015974045,
+      "movement_seconds": 0.012450583977624774,
+      "slice_seconds": 0.02598695899359882,
+      "decision_count": 4,
+      "event_count": 47
+    },
+    {
+      "setup_seconds": 0.45816037501208484,
+      "selection_seconds": 0.013246665941551328,
+      "movement_seconds": 0.01183950004633516,
+      "slice_seconds": 0.02508616598788649,
+      "decision_count": 4,
+      "event_count": 47
+    },
+    {
+      "setup_seconds": 0.45887108403258026,
+      "selection_seconds": 0.013659165939316154,
+      "movement_seconds": 0.011891792062669992,
+      "slice_seconds": 0.025550958001986146,
+      "decision_count": 4,
+      "event_count": 47
+    },
+    {
+      "setup_seconds": 0.45944587502162904,
+      "selection_seconds": 0.013611458009108901,
+      "movement_seconds": 0.011708750040270388,
+      "slice_seconds": 0.02532020804937929,
+      "decision_count": 4,
+      "event_count": 47
+    },
+    {
+      "setup_seconds": 0.4607412089826539,
+      "selection_seconds": 0.013852416072040796,
+      "movement_seconds": 0.012086708913557231,
+      "slice_seconds": 0.025939124985598028,
+      "decision_count": 4,
+      "event_count": 47
+    }
+  ],
+  "mean_seconds": 0.02608339285611042,
+  "median_seconds": 0.025754999951459467,
+  "p95_seconds": 0.0289453340228647,
+  "maximum_seconds": 0.0289453340228647,
+  "completion_rate": 1,
+  "full_game_certified": false
+}

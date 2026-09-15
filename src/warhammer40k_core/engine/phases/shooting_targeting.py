@@ -212,29 +212,12 @@ def _rules_unit_within_heavy_movement_allowance(
         state=state, rules_unit=rules_unit, player_id=player_id
     ):
         return False
-    unit_ids = _rules_unit_state_unit_ids(rules_unit)
-    movement_state = state.movement_phase_state
-    if movement_state is None:
-        return True
-    movement_unit_ids = set(movement_state.moved_unit_ids)
-    if not movement_unit_ids.intersection(unit_ids):
-        return True
-    matching_records = tuple(
-        record
-        for record in movement_state.movement_distance_records
-        if record.unit_instance_id in unit_ids
-    )
-    if not matching_records:
-        return False
-    unit_can_fly = any(_canonical_keyword(keyword) == "FLY" for keyword in rules_unit.keywords)
-    return all(
-        (
-            record.maximum_model_horizontal_distance_inches
-            if unit_can_fly
-            else record.maximum_model_distance_inches
-        )
-        <= 3.0
-        for record in matching_records
+    from warhammer40k_core.engine.model_movement_history import models_within_turn_distance
+
+    return models_within_turn_distance(
+        state=state,
+        model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
+        maximum_inches=3.0,
     )
 
 
