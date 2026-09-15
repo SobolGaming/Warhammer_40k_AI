@@ -18,6 +18,7 @@ from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 
 
@@ -27,6 +28,7 @@ def advance_fight_attack_sequence_until_completion(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     hooks: AttackSequenceCompletedHookRegistry,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | FightActivationSelection:
@@ -41,6 +43,7 @@ def advance_fight_attack_sequence_until_completion(
         attack_sequence=completed_candidate,
         already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
     )
     updated_state = fight_state.with_attack_sequence_update(

@@ -418,8 +418,6 @@ def _stratagem_affected_unit_ids(
     raw_unit_ids: list[str] = []
     if target_binding is not None and target_binding.target_unit_instance_id is not None:
         raw_unit_ids.append(target_binding.target_unit_instance_id)
-    if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
-        raw_unit_ids.append(_command_reroll_affected_unit_id(context))
     if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID and target_binding is not None:
         explosives_target_id = _explosives_target_unit_id_or_none(effect_selection)
         if explosives_target_id is not None:
@@ -910,6 +908,36 @@ def _enumerated_target_bindings(
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[StratagemTargetBinding, ...]:
     target_spec = definition.target_spec
+    if target_spec.target_policy_id == "command_reroll_unit":
+        if (
+            context is None
+            or _command_reroll_context_error(state=state, definition=definition, context=context)
+            is not None
+        ):
+            return ()
+        unit_id = _canonical_stratagem_affected_unit_id(
+            state=state, unit_instance_id=_command_reroll_affected_unit_id(context)
+        )
+        binding = StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id=player_id,
+            target_unit_instance_id=unit_id,
+        )
+        return (
+            (binding,)
+            if _target_binding_error(
+                state=state,
+                player_id=player_id,
+                target_spec=target_spec,
+                policy=definition.restriction_policy,
+                target_binding=binding,
+                context=context,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+            )
+            is None
+            else ()
+        )
     if target_spec.target_policy_id == CRUSHING_IMPACT_TARGET_POLICY_ID:
         if context is None or not isinstance(context.trigger_payload, dict):
             return ()

@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine import attack_sequence_destruction_authority as _asda
@@ -192,6 +194,7 @@ def apply_allocation_order_decision(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     request = decisions.record_for_result(result).request
@@ -221,6 +224,7 @@ def apply_allocation_order_decision(
         allocated_model_ids=already_allocated_model_ids,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
     )
 
@@ -236,6 +240,7 @@ def apply_damage_allocation_model_decision(
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
@@ -267,6 +272,7 @@ def apply_damage_allocation_model_decision(
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         selected_model_id=decision.selected_model_id,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
     )
 
@@ -300,6 +306,7 @@ def apply_precision_allocation_decision(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
@@ -334,6 +341,7 @@ def apply_precision_allocation_decision(
         wounded_contexts=wounded_contexts,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
         precision_priority_model_ids=_precision_pool_selection(
             decisions=decisions,
@@ -387,6 +395,7 @@ def apply_precision_allocation_decision(
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         priority_group_ids=priority_group_ids,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
     )
 
@@ -1263,6 +1272,7 @@ def _resolve_grouped_current_pool(
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.attack_index != 0:
@@ -1329,6 +1339,7 @@ def _resolve_grouped_current_pool(
             attack_sequence=attack_sequence,
             hooks=hooks,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
         )
         if status is not None:
@@ -1404,6 +1415,7 @@ def _resolve_grouped_current_pool(
         wounded_contexts=wounded_contexts,
         hooks=hooks,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
         precision_priority_model_ids=_precision_pool_selection(
             decisions=decisions,
@@ -1430,5 +1442,6 @@ def _resolve_grouped_current_pool(
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
     )

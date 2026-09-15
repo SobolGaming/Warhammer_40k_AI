@@ -158,8 +158,8 @@ def fidelity_retained_replacement_scene() -> tuple[
     catalog, rifle, second = fidelity_replacement_catalog()
     lifecycle, units = fight_lifecycle(
         catalog=catalog,
-        # Preserve both nested casualties with Order 43 hit-record RNG history.
-        game_id="order43-retarget-7",
+        # Preserve both nested casualties with Order 49 Stratagem-window history.
+        game_id="order49-retarget-17",
         alpha_unit_ids=("old", "new", "unchanged"),
         enemy_unit_ids=("source",),
         model_count=1,

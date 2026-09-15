@@ -93,7 +93,6 @@ from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
     CHARGE_NO_MOVE_POSSIBLE_STATUS,
-    CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,
     ChargeDistanceState,
     ChargeRollRequest,
     ChargeRollResult,
@@ -3202,7 +3201,7 @@ def test_unit_that_started_action_this_turn_cannot_declare_charge(action_status:
     }
 
 
-def test_charge_roll_forbids_command_reroll_request() -> None:
+def test_charge_roll_without_cp_has_no_command_reroll_request() -> None:
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
@@ -3223,9 +3222,7 @@ def test_charge_roll_forbids_command_reroll_request() -> None:
         if event.event_type == "decision_requested"
     }
 
-    assert CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID in (
-        roll_result.request.spec.reroll_forbidden_rule_ids
-    )
+    assert roll_result.request.spec.reroll_forbidden_rule_ids == ()
     assert DICE_REROLL_DECISION_TYPE not in requested_decision_types
     assert {
         request.decision_type for request in lifecycle.decision_controller.queue.pending_requests

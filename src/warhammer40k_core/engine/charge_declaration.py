@@ -26,7 +26,6 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 CHARGE_ROLL_TYPE = "charge_roll"
-CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID = "phase15a:charge-roll-command-reroll-forbidden"
 CHARGE_MOVE_PENDING_STATUS = "move_pending"
 CHARGE_NO_MOVE_POSSIBLE_STATUS = "no_move_possible"
 
@@ -255,7 +254,6 @@ class ChargeRollRequest:
             reason=f"Charge distance for {self.unit_instance_id}",
             roll_type=CHARGE_ROLL_TYPE,
             actor_id=self.player_id,
-            reroll_forbidden_rule_ids=(CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,),
         )
 
     def resolve_roll(self, roll_state: DiceRollState) -> ModifiedRollResult:

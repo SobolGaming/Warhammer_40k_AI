@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.shooting_imports import *
@@ -432,6 +434,7 @@ def _apply_attack_sequence_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     out_of_phase_state = state.out_of_phase_shooting_state
@@ -444,6 +447,7 @@ def _apply_attack_sequence_decision(
             attack_sequence=out_of_phase_state.attack_sequence,
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
         )
         state.replace_out_of_phase_shooting_state(
@@ -464,6 +468,7 @@ def _apply_attack_sequence_decision(
         attack_sequence=shooting_state.attack_sequence,
         already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         runtime_modifier_registry=runtime_modifier_registry,
     )
     state.replace_shooting_phase_state(
@@ -545,6 +550,7 @@ def _apply_attack_sequence_decision_to_sequence(
     attack_sequence: AttackSequence,
     already_allocated_model_ids: tuple[str, ...],
     stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     updated_sequence: AttackSequence | None
@@ -568,6 +574,7 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
@@ -579,6 +586,7 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
@@ -590,6 +598,7 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type in (

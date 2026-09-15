@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `19.0.0`
+Contract version: `20.0.0`
+
+Order 49 / contract 20 adds whole Charge rerolls with canonical unit targeting.
+See [the migration](migrations/19-to-20.md).
 
 Order 47 / contract 19 adds canonical attached Charge actors and required
 per-model endpoint evidence. See [the migration](migrations/18-to-19.md).

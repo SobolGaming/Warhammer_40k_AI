@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
@@ -182,6 +184,7 @@ def _damage_value(
     weapon_profile: WeaponProfile,
     source_phase: BattlePhase,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[int | None, LifecycleStatus | None]:
     if type(profile) is not DamageProfile:
@@ -224,6 +227,7 @@ def _damage_value(
         affected_unit_instance_id=affected_unit_instance_id,
         source_phase=source_phase,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         phase_body_status="attack_damage_command_reroll_pending",
     )
     if status is not None:

@@ -19,6 +19,7 @@ from warhammer40k_core.engine import (
     catalog_unit_move_completed_mortal_wounds_runtime as _catalog_move_mw,
 )
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
+from warhammer40k_core.engine import charge_roll_dispatch as _charge_rerolls
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
 from warhammer40k_core.engine import fight_activation_abilities as _fa
@@ -1407,6 +1408,9 @@ class GameLifecycle:
             )
             if selected_target_reroll_status is not None:
                 return selected_target_reroll_status
+        charge_status = _charge_rerolls.invalid_charge_reroll(self, request, result)
+        if charge_status is not None:
+            return charge_status
         if request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return self._movement_phase_handler.invalid_movement_action_selection_status(
                 state=state, request=request, result=result
@@ -1564,6 +1568,9 @@ class GameLifecycle:
         if is_stratagem_placement_proposal_request(record.request):
             return self._apply_stratagem_placement_decision(record=record, result=result)
         runtime_bundle = self._require_runtime_content_bundle()
+        charge_status = _charge_rerolls.apply_charge_reroll(self, record.request, result)
+        if charge_status is not None:
+            return charge_status
         reroll_status = _bsa.apply_global_reroll_if_applicable(
             state=state,
             decisions=self.decision_controller,

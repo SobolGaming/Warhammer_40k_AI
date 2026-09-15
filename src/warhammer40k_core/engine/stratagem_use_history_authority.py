@@ -12,6 +12,7 @@ from warhammer40k_core.engine.command_points import (
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
@@ -358,31 +359,7 @@ def _finite_selection(
             "handler_payload",
         }
     ):
-        handler_payload = _object(
-            request_payload.get("handler_payload"), context="reaction handler payload"
-        )
-        reaction_window = _object(request_payload.get("reaction_window"), context="reaction window")
-        parent = _object(request_payload.get("parent"), context="reaction parent")
-        if frozenset(reaction_window) != frozenset(
-            {"timing_window", "eligible_player_ids", "blocks_parent"}
-        ):
-            raise GameLifecycleError("Finite Stratagem-use reaction window shape drifted.")
-        try:
-            parsed_reaction_window = ReactionWindow.from_payload(
-                cast(ReactionWindowPayload, reaction_window)
-            )
-        except (KeyError, TimingWindowError) as exc:
-            raise GameLifecycleError("Finite Stratagem-use reaction window is invalid.") from exc
-        if (
-            handler_payload != direct_payload
-            or request_payload.get("interrupts_parent") is not True
-            or frozenset(parent) != frozenset({"phase", "step", "resume_token"})
-            or parsed_reaction_window.timing_window.phase is None
-            or parsed_reaction_window.timing_window.phase.value != parent.get("phase")
-            or request.actor_id not in parsed_reaction_window.eligible_player_ids
-            or not parsed_reaction_window.blocks_parent
-        ):
-            raise GameLifecycleError("Finite Stratagem-use reaction context drifted.")
+        _validate_reaction_request_payload(request=request, direct_payload=direct_payload)
     else:
         raise GameLifecycleError("Finite Stratagem-use request shape drifted.")
     if request_payload.get("finite") is not True:
@@ -408,6 +385,46 @@ def _finite_selection(
     ):
         raise GameLifecycleError("Finite Stratagem-use request context drifted.")
     return context, catalog_record, target_binding, effect_selection
+
+
+def _validate_reaction_request_payload(
+    *, request: DecisionRequest, direct_payload: dict[str, JsonValue]
+) -> None:
+    request_payload = _object(request.payload, context="reaction request")
+    if set(request_payload) != {
+        *direct_payload,
+        "reaction_window",
+        "interrupts_parent",
+        "parent",
+        "handler_payload",
+    }:
+        raise GameLifecycleError("Stratagem-use reaction request shape drifted.")
+    handler_payload = _object(
+        request_payload.get("handler_payload"), context="reaction handler payload"
+    )
+    reaction_window = _object(request_payload.get("reaction_window"), context="reaction window")
+    parent = _object(request_payload.get("parent"), context="reaction parent")
+    if frozenset(reaction_window) != frozenset(
+        {"timing_window", "eligible_player_ids", "blocks_parent"}
+    ):
+        raise GameLifecycleError("Finite Stratagem-use reaction window shape drifted.")
+    try:
+        parsed_reaction_window = ReactionWindow.from_payload(
+            cast(ReactionWindowPayload, reaction_window)
+        )
+    except (KeyError, TimingWindowError) as exc:
+        raise GameLifecycleError("Finite Stratagem-use reaction window is invalid.") from exc
+    if (
+        handler_payload != direct_payload
+        or any(request_payload[key] != value for key, value in direct_payload.items())
+        or request_payload.get("interrupts_parent") is not True
+        or frozenset(parent) != frozenset({"phase", "step", "resume_token"})
+        or parsed_reaction_window.timing_window.phase is None
+        or parsed_reaction_window.timing_window.phase.value != parent.get("phase")
+        or request.actor_id not in parsed_reaction_window.eligible_player_ids
+        or not parsed_reaction_window.blocks_parent
+    ):
+        raise GameLifecycleError("Finite Stratagem-use reaction context drifted.")
 
 
 def _validate_finite_use_binding(
@@ -481,6 +498,10 @@ def _proposal_from_exact_request(record: DecisionRecord) -> StratagemTargetPropo
     ):
         raise GameLifecycleError("Stratagem-use proposal request authority drifted.")
     payload = _object(request.payload, context="proposal request")
+    if "reaction_window" in payload:
+        direct = _object(payload.get("handler_payload"), context="reaction handler payload")
+        _validate_reaction_request_payload(request=request, direct_payload=direct)
+        payload = direct
     if frozenset(payload) not in {
         frozenset({"proposal_request"}),
         frozenset({"proposal_request", "declinable"}),

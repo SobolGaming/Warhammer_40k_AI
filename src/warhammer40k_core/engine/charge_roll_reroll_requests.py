@@ -7,7 +7,6 @@ from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     SelectedTargetChargeConstraint,
 )
 from warhammer40k_core.engine.charge_declaration import (
-    CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,
     ChargeRollRequest,
 )
 from warhammer40k_core.engine.charge_required_targets import (
@@ -33,6 +32,7 @@ def build_charge_roll_reroll_request(
     permission: RerollPermission,
     selected_target_constraint: SelectedTargetChargeConstraint | None,
     legal_target_unit_instance_ids: tuple[str, ...],
+    request_id: str | None = None,
 ) -> DecisionRequest:
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     required_target_ids = required_charge_target_unit_instance_ids(
@@ -42,10 +42,9 @@ def build_charge_roll_reroll_request(
     )
     return manager.build_reroll_request(
         roll_state,
-        request_id=state.next_decision_request_id(),
+        request_id=state.next_decision_request_id() if request_id is None else request_id,
         actor_id=roll_request.player_id,
         permission=permission,
-        ignored_reroll_forbidden_rule_ids=(CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,),
         extra_payload={
             "charge_context": {
                 "game_id": state.game_id,

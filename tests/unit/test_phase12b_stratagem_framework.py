@@ -164,7 +164,7 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "battle_tactic",
             "gw-11e-core-stratagems:core:command-reroll",
-            "none",
+            "command_reroll_unit",
             "core:command-reroll",
             "core",
             None,

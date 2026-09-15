@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
 from collections.abc import Callable
 
 from typing import TYPE_CHECKING
@@ -68,6 +70,7 @@ def resolve_attack_sequence_until_blocked(
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     before_gathering: Callable[[AttackSequence], LifecycleStatus | None] | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
@@ -108,6 +111,7 @@ def resolve_attack_sequence_until_blocked(
                 attack_sequence=current,
                 hooks=active_hooks,
                 stratagem_index=stratagem_index,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
                 runtime_modifier_registry=runtime_modifiers,
             )
             if status is not None:
@@ -139,6 +143,7 @@ def resolve_attack_sequence_until_blocked(
             allocated_model_ids=allocated_model_ids,
             hooks=active_hooks,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifiers,
         )
         if status is not None:

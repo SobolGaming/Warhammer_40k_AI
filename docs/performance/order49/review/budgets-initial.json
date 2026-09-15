@@ -1,0 +1,13 @@
+{
+  "workload_id": "order49-review-cost-and-replay-v1",
+  "base_revision": "61543817c26e8713deee56c2b928c8c1b5d4ea92",
+  "samples": 7,
+  "maximum_mean_ratio": 2,
+  "mean_allowance_seconds": 0.05,
+  "maximum_attack_seconds": 2,
+  "maximum_replay_seconds": 2,
+  "maximum_attack_events": 25,
+  "maximum_attack_decisions": 6,
+  "maximum_replay_events": 92,
+  "maximum_replay_decisions": 4
+}

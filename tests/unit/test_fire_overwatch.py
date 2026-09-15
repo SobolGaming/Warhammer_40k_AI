@@ -72,7 +72,10 @@ def test_phase_end_overwatch_offers_every_eligible_enemy(moved: bool, enemy: str
 
 @pytest.mark.parametrize("checkpoint", ["stratagem", "declaration", "attacks"])
 @pytest.mark.parametrize("enemy", ENEMIES)
-def test_overwatch_restore_replay_and_phase_end_continuation(checkpoint: str, enemy: str) -> None:
+@pytest.mark.parametrize("follow_next_choice", [False, True])
+def test_overwatch_restore_replay_and_phase_end_continuation(
+    checkpoint: str, enemy: str, follow_next_choice: bool
+) -> None:
     from tests.fire_overwatch_helpers import finish_overwatch
 
     from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -93,8 +96,9 @@ def test_overwatch_restore_replay_and_phase_end_continuation(checkpoint: str, en
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
     for candidate in (session, restored):
         pending = candidate.lifecycle.decision_controller.queue.pending_requests
-        assert pending
-        request = pending[0]
+        if checkpoint != "attacks":
+            assert pending
+            request = pending[0]
         if checkpoint == "stratagem":
             status = choose_shooter(candidate, request)
             request = _require_request(status)
@@ -122,6 +126,16 @@ def test_overwatch_restore_replay_and_phase_end_continuation(checkpoint: str, en
             )
             == 1
         )
+        # Cover automatic progress both between choices and at the replay tail.
+        if follow_next_choice:
+            next_request = _require_request(candidate.advance_until_decision_or_terminal())
+            assert next_request.decision_type == "select_shooting_unit"
+            status = candidate.submit_option(
+                request_id=next_request.request_id,
+                option_id="complete_shooting_phase",
+                result_id="order45:complete-next-shooting",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
     assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
     for viewer in ("player-a", "player-b"):
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
@@ -847,7 +861,7 @@ def test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock(attacks:
             )
             == MISSION_ACTION_UNIT_ALREADY_SHOT
         )
-        session.advance_until_decision_or_terminal()
+    session.advance_until_decision_or_terminal()
     assert state.current_battle_phase is BattlePhase.SHOOTING
     assert (
         mission_action_unit_ineligibility_reason(
@@ -910,3 +924,107 @@ def test_overwatch_target_scope_uses_current_living_or_retained_group_presence(
         state=state, model_instance_id=model.model_instance_id
     )
     assert ENEMIES[0] not in legal
+
+
+@pytest.mark.parametrize("append_phase_events", [False, True])
+@pytest.mark.parametrize("checkpoint_after_phase", [False, True])
+@pytest.mark.parametrize("corrupt_projection", [False, True])
+def test_overwatch_projection_checkpoint_precedes_automatic_phase_progress(
+    append_phase_events: bool,
+    checkpoint_after_phase: bool,
+    corrupt_projection: bool,
+) -> None:
+    from dataclasses import replace
+
+    from tests.fire_overwatch_helpers import finish_overwatch
+
+    from warhammer40k_core.adapters.projection import project_game_view
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.replay import (
+        ReplayArtifact,
+        ReplayDiagnosticCode,
+        ReplayProjectionCheckpoint,
+        ReplayProjectionSnapshot,
+        ReplayRunner,
+    )
+
+    session = overwatch_session(cp=2, attacks=18)
+    request = pending_overwatch(session)
+    initial = session.lifecycle.to_payload()
+    initial_records = len(session.lifecycle.decision_controller.records)
+    status = choose_shooter(session, request)
+    status = choose_enemy(session, _require_request(status), ENEMIES[0])
+    finish_overwatch(session, status)
+    assert not session.lifecycle.decision_controller.queue.pending_requests
+    view = session.view(viewer_player_id="player-a")
+    checkpoint = ReplayProjectionCheckpoint.from_lifecycle(
+        lifecycle=session.lifecycle,
+        checkpoint_id="overwatch-completed",
+        decision_record_index=len(session.lifecycle.decision_controller.records) - initial_records,
+        viewer_player_id="player-a",
+        projection_schema=view["projection_schema"],
+        projection_state_hash=view["projection_state_hash"],
+    )
+    if corrupt_projection:
+        checkpoint = replace(checkpoint, projection_state_hash="0" * 64)
+    checkpoints = [checkpoint]
+    if append_phase_events or checkpoint_after_phase:
+        session.advance_until_decision_or_terminal()
+        assert (
+            len(session.lifecycle.decision_controller.event_log.records)
+            == checkpoint.event_count + 8
+        )
+    if checkpoint_after_phase:
+        after_view = session.view(viewer_player_id="player-b")
+        checkpoints.append(
+            ReplayProjectionCheckpoint.from_lifecycle(
+                lifecycle=session.lifecycle,
+                checkpoint_id="after-phase",
+                decision_record_index=checkpoint.decision_record_index,
+                viewer_player_id="player-b",
+                projection_schema=after_view["projection_schema"],
+                projection_state_hash=after_view["projection_state_hash"],
+            )
+        )
+    if append_phase_events and checkpoint_after_phase:
+        request = _require_request(session.advance_until_decision_or_terminal())
+        session.submit_option(
+            request_id=request.request_id,
+            option_id="complete_shooting_phase",
+            result_id="after-checkpoints",
+        )
+
+    observed: list[str] = []
+
+    def projection_provider(
+        lifecycle: GameLifecycle,
+        reached: ReplayProjectionCheckpoint,
+    ) -> ReplayProjectionSnapshot:
+        assert len(lifecycle.decision_controller.event_log.records) == reached.event_count
+        observed.append(reached.checkpoint_id)
+        projection = project_game_view(
+            lifecycle=lifecycle, viewer_player_id=reached.viewer_player_id
+        )
+        return ReplayProjectionSnapshot(
+            viewer_player_id=reached.viewer_player_id,
+            projection_schema=projection["projection_schema"],
+            projection_state_hash=projection["projection_state_hash"],
+        )
+
+    artifact = ReplayArtifact.capture(
+        artifact_id="overwatch-checkpoint-before-tail",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=session.lifecycle,
+        projection_checkpoints=tuple(reversed(checkpoints)),
+    )
+    artifact = ReplayArtifact.from_payload(artifact.to_payload())
+    result = ReplayRunner(artifact=artifact, projection_provider=projection_provider).run()
+    if corrupt_projection:
+        assert not result.reproduced_exactly
+        assert result.diagnostics[0].diagnostic_code is ReplayDiagnosticCode.PROJECTION_HASH_DRIFT
+        assert result.diagnostics[0].checkpoint_id == "overwatch-completed"
+        assert result.reproduced_event_count == checkpoint.event_count
+        assert observed == ["overwatch-completed"]
+    else:
+        assert result.reproduced_exactly, result.to_payload()
+        assert observed == [checkpoint.checkpoint_id for checkpoint in checkpoints]

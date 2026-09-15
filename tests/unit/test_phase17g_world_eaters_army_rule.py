@@ -580,6 +580,7 @@ def test_unbridled_bloodlust_charge_modifier_reaches_charge_phase_consumer() -> 
     decisions.submit_result(result)
 
     handler.apply_decision(state=charge_state, result=result, decisions=decisions)
+    handler.begin_phase(state=charge_state, decisions=decisions)
     roll_result = _charge_roll_result_from_event(decisions, "charge_roll_resolved")
 
     assert [modifier.operand for modifier in roll_result.request.roll_modifiers] == [1]
