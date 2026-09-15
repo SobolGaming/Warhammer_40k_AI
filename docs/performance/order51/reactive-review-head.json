@@ -1,0 +1,118 @@
+{
+  "workload_id": "order51-review-reactive-flight-v1",
+  "revision": "09aaa696e19a86f9b610f12b3ae34426af738175",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:93b487aaac21bce4373c755445c3a477ea9b780407ad18394ca0a67f4eb56bd3",
+  "runtime_diff_sha256": "4caa0797a6cbbafdf71b1b450f804916509482d2d895d7f9e403dc24b7424d1e",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "concurrency": 1,
+  "timing_boundary": "Two resolver calls; catalog, fixture and witness construction excluded",
+  "scenario": {
+    "game_id": "order51-review-reactive",
+    "models": 10,
+    "moving_models": 5,
+    "terrain_count": 0,
+    "paths_inches": [
+      2,
+      3
+    ],
+    "descriptor_limit_inches": 4,
+    "flight_limit_inches": 2,
+    "take_to_the_skies": true,
+    "hover": false
+  },
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/phase15a_charge_declaration_helpers.py": "28da42324021a8e294eb99e333c3364d3f6b57a248221c95a53d0d2a7d3b4670",
+    "scripts/measure_reactive_flight.py": "8a87aea7175e1a371babb9d3efd15761787c1e94a1526ce365b0de428b9eaeae"
+  },
+  "samples": [
+    {
+      "seconds": 0.005834415904246271,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.0050525839906185865,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.004654458956792951,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.004833832965232432,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.004584416979923844,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.004790375009179115,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.004720250028185546,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    }
+  ],
+  "mean_seconds": 0.004924333404882678,
+  "median_seconds": 0.004790375009179115,
+  "maximum_seconds": 0.005834415904246271,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "correctness_note": "Base wrongly accepts three inches; compare cost only."
+}

@@ -6,9 +6,9 @@
     "coverage_percent": 85.11,
     "distribution": "worksteal",
     "failed": 0,
-    "junit_sha256": "f6312cf00cab97d8c60fd386d6a65d14915916617eb9f6513db76818d2d19a5c",
-    "passed": 8086,
-    "seconds": 629.32,
+    "junit_sha256": "6343c0706a2ee113f74218b6d8e2b8da283137845738a0b0e4c7020393b3a514",
+    "passed": 8088,
+    "seconds": 555.736,
     "warnings": 10,
     "workers": 18
   },
@@ -29,16 +29,25 @@
     "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
     "coverage": false,
     "failed": 0,
-    "junit_sha256": "84e5780387aefe896467f334149f29738a577b9b3e90533543c838a727384737",
-    "passed": 491,
-    "seconds": 127.41
+    "junit_sha256": "0b75184bf7b0e42be09cd88aa499320f10fef96f64001bc971772372c8ec910f",
+    "passed": 493,
+    "seconds": 101.21
   },
   "date": "2026-09-15",
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fe480ca6ef8f2429dc1733860b6d5000101b5fde52476b143a152157ef5a8fdf",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:93b487aaac21bce4373c755445c3a477ea9b780407ad18394ca0a67f4eb56bd3",
   "performance": {
     "full_game_certified": false,
     "matched_samples_per_revision": 7,
+    "reactive_review_workload": "order51-review-reactive-flight-v1",
     "unchanged_order50_budgets": "passed"
+  },
+  "review_correction": {
+    "finding_id": "R51-001",
+    "focused_behavioral_cases": 31,
+    "focused_quality_cases": 6,
+    "regression_after_fix": "3-inch path rejected without movement; 2-inch retry accepted; Hover and declined flight preserve 3-inch acceptance",
+    "regression_before_fix": "3-inch path accepted against 2-inch flight allowance",
+    "reviewed_revision": "09aaa696e19a86f9b610f12b3ae34426af738175"
   },
   "schema": "order51-final-validation-v1",
   "typescript": {

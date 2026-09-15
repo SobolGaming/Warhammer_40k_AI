@@ -71,15 +71,15 @@ production fields through defaults.
 
 ## Final local validation — 2026-09-15
 
-Validated runtime `fe480ca6ef8f2429dc1733860b6d5000101b5fde52476b143a152157ef5a8fdf`
+Validated runtime `93b487aaac21bce4373c755445c3a477ea9b780407ad18394ca0a67f4eb56bd3`
 against base `dc043bf27baf51c02d8db1a177190ecd77ad3254`:
 
-- Complete behavioral suite with coverage: **8,086 passed**, **85.11%** coverage
-  (85% required), 629.32 seconds, 18 workers with work stealing.
-- Complete code-quality suite without coverage: **491 passed**, 127.41 seconds.
+- Complete behavioral suite with coverage: **8,088 passed**, **85.11%** coverage
+  (85% required), 555.74 seconds, 18 workers with work stealing.
+- Complete code-quality suite without coverage: **493 passed**, 101.21 seconds.
 - Ruff check/format, mypy, Pyright, all 11 import contracts and pre-commit passed.
-- Regenerated all eight shards from the complete successful local JUnit profile;
-  the exact eight-shard inventory check passed.
+- The exact eight-shard inventory check passed. R51-001 adds cases to an
+  existing behavioral file; the committed file inventory is unchanged.
 - Source generator and engine identity checks, exact-base contract compatibility,
   generated TypeScript client/type checks, five TypeScript unit tests,
   **342 live conformance assertions**, and installed-wheel smoke passed.
@@ -90,3 +90,30 @@ The bundled Node runtime executed the TypeScript package script equivalents;
 `npm` is unavailable on this host. See the [machine-readable validation record](performance/order51/validation.json)
 and [matched performance evidence](performance/order51/README.md). Both Charge
 slices pass the unchanged budgets; complete-game performance remains uncertified.
+
+## Review correction R51-001 — reactive flight distance penalty
+
+Violated invariant: the distance reported for a committed flight choice must be
+the same distance enforced on its witnessed path before engine mutation. At
+`09aaa696`, the shared reactive resolver computed the adjusted allowance but
+passed the unadjusted descriptor maximum into physical validation. A three-inch
+path was therefore accepted against a reported two-inch limit.
+
+The repair passes the existing adjusted `maximum_distance` to validation. The
+bug-class search covered every `movement_distance_budget_inches` binding in the
+engine: ordinary movement uses its computed per-model budget, Charge (including
+Heroic and setup-reactive Charge) receives its resolved maximum, and fight/Scout
+consumers use their resolved move allowances. No second instance was found.
+Both finite reactive candidates and parameterized submissions share the repaired
+resolver, so they retain one validation and mutation path.
+
+The facade regression failed before the fix, then passed with rejection at three
+inches, unchanged positions/history after rejection, restoration and a legal
+two-inch retry. Declining flight and Hover retain three-inch acceptance. Accepted
+path-budget evidence must equal the reported allowance. A static audit rejects
+passing the raw descriptor maximum directly to path validation.
+
+No adapter-visible shape, choice, visibility policy or schema changes; the existing
+contract 22 flight/retry semantics cover this correction. Runtime identity and
+its generated examples are refreshed. Matched reactive-path measurements and
+the unchanged-budget audit are retained in the linked performance evidence.

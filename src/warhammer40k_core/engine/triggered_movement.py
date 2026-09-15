@@ -950,7 +950,7 @@ def resolve_triggered_movement(
                 for model_id in aircraft_model_ids
                 if model_id != placement.model_instance_id and model_id not in retained_model_ids
             ),
-            movement_distance_budget_inches=descriptor.max_distance_inches,
+            movement_distance_budget_inches=maximum_distance,
         ).validate()
         terrain_result = legality_context.to_terrain_path_legality_context(
             moving_model=moving_model,

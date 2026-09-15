@@ -534,7 +534,8 @@ def test_live_charge_flight_drift_rejects_before_recording_targets() -> None:
 
 
 @pytest.mark.parametrize("selected", [False, True])
-def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool) -> None:
+@pytest.mark.parametrize("hover", [False, True])
+def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool, hover: bool) -> None:
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.engine.event_log import validate_json_value
     from warhammer40k_core.engine.movement_proposals import (
@@ -553,7 +554,7 @@ def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool) -> N
 
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("mover",),
-        catalog=_flight_catalog(),
+        catalog=_flight_catalog(hover=hover),
         game_id="order51-reactive",
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(30, 20), model_count=5),
     )
@@ -596,7 +597,12 @@ def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool) -> N
     assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
     assert state.battlefield_state is not None
     placement = state.battlefield_state.unit_placement_by_id(unit_id)
-    for distance, result_id in ((5.0, "too-far"), (1.0, "valid-retry")):
+    maximum_distance = 2.0 if selected and not hover else 4.0
+    accepted_distance = min(maximum_distance, 3.0)
+    for distance, result_id in (
+        (maximum_distance + 1.0, "too-far"),
+        (accepted_distance, "valid-retry"),
+    ):
         proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
         assert proposal.context is not None
         assert proposal.context["take_to_the_skies"] is selected
@@ -617,21 +623,43 @@ def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool) -> N
             movement_phase_action=cast(str, proposal.movement_phase_action),
             witness=witness,
         )
+        before_battlefield = state.battlefield_state
         status = session.submit_parameterized_payload(
             request_id=proposal_request.request_id,
             payload=validate_json_value(payload.to_payload()),
             result_id=result_id,
         )
-        if distance == 5:
+        if result_id == "too-far":
             assert status.status_kind is LifecycleStatusKind.INVALID
+            assert state.battlefield_state == before_battlefield
             assert state.model_movement_history == []
+            assert not any(
+                event.event_type == "triggered_movement_resolved"
+                for event in lifecycle.decision_controller.event_log.records
+            )
             proposal_request = lifecycle.decision_controller.queue.pending_requests[0]
             checkpoint = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
             assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+        else:
+            assert status.status_kind is not LifecycleStatusKind.INVALID
     assert len(state.model_movement_history) == 5
     assert all(
-        isclose(row.distance_inches, 1, abs_tol=1e-9) for row in state.model_movement_history
+        isclose(row.distance_inches, accepted_distance, abs_tol=1e-9)
+        for row in state.model_movement_history
     )
+    completion = next(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "triggered_movement_resolved"
+    )
+    assert isinstance(completion.payload, dict)
+    assert completion.payload["movement_inches"] == maximum_distance
+    results = cast(list[dict[str, object]], completion.payload["path_validation_results"])
+    assert len(results) == 5
+    for result in results:
+        witness_payload = cast(dict[str, object], result["movement_distance_witness"])
+        budget = cast(dict[str, object], witness_payload["budget"])
+        assert budget["max_distance_inches"] == maximum_distance
 
 
 @pytest.mark.parametrize("selected", [False, True])
