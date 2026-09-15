@@ -16,11 +16,6 @@ from warhammer40k_core.engine.decision_request import DecisionError, DecisionReq
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.heroic_intervention_rolls import (
-    apply_heroic_charge_reroll,
-    is_heroic_charge_reroll,
-    validate_heroic_charge_reroll,
-)
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 
 if TYPE_CHECKING:
@@ -61,32 +56,6 @@ def invalid_charge_reroll(
     return None
 
 
-def apply_charge_reroll(
-    lifecycle: GameLifecycle, request: DecisionRequest, result: DecisionResult
-) -> LifecycleStatus | None:
-    if not is_heroic_charge_reroll(request):
-        return None
-    if request.actor_id is None:
-        raise GameLifecycleError("Charge reroll actor is missing.")
-    apply_heroic_charge_reroll(
-        state=lifecycle._require_state(),
-        decisions=lifecycle.decision_controller,
-        request=request,
-        result=result,
-        ability_index=lifecycle._charge_phase_handler.ability_index_for_player(request.actor_id),
-    )
-    if lifecycle._result_resolves_active_reaction_frame(result):
-        follow_up = lifecycle._pending_decision_request()
-        if follow_up is None:
-            raise GameLifecycleError("Heroic reroll did not produce its Charge continuation.")
-        lifecycle.reaction_queue.continue_reaction(
-            result=result,
-            next_request_id=follow_up.request_id,
-            decisions=lifecycle.decision_controller,
-        )
-    return lifecycle.advance_until_decision_or_terminal()
-
-
 def validate_restored_charge_rerolls(
     *, state: GameState, decisions: DecisionController, handler: ChargePhaseHandler
 ) -> None:
@@ -111,8 +80,6 @@ def validate_restored_charge_rerolls(
 
 
 def is_charge_reroll(request: DecisionRequest) -> bool:
-    if is_heroic_charge_reroll(request):
-        return True
     payload = request.payload
     if not isinstance(payload, dict):
         return False
@@ -159,11 +126,6 @@ def validate_charge_reroll(
     if request.actor_id is None:
         raise GameLifecycleError("Charge reroll actor is missing.")
     ability_index = handler.ability_index_for_player(request.actor_id)
-    if is_heroic_charge_reroll(request):
-        validate_heroic_charge_reroll(
-            state=state, decisions=decisions, request=request, ability_index=ability_index
-        )
-        return
     roll_request, initial = pending_charge_roll(state=state, decisions=decisions)
     if request.actor_id != roll_request.player_id:
         raise GameLifecycleError("Charge reroll actor differs from selected charger.")

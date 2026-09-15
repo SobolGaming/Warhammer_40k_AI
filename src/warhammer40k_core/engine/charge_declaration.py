@@ -314,15 +314,12 @@ class ChargeRollResult:
         if self.roll_state.original_result.spec != self.request.spec:
             raise GameLifecycleError("ChargeRollResult roll_state spec must match request.")
         if (
-            type(self.value) is not int
-            or self.value != self.request.resolve_roll(self.roll_state).final_value
-        ):
-            raise GameLifecycleError("ChargeRollResult value must match bounded modified result.")
-        if (
             type(self.movement_budget) is not ChargeMovementBudget
             or self.movement_budget.modified_roll != self.request.resolve_roll(self.roll_state)
         ):
             raise GameLifecycleError("ChargeRollResult movement budget roll trace drift.")
+        if type(self.value) is not int or self.value != self.movement_budget.roll_value:
+            raise GameLifecycleError("ChargeRollResult value must match bounded modified result.")
         object.__setattr__(
             self,
             "reachable_target_distances_inches",
@@ -363,7 +360,7 @@ class ChargeRollResult:
         return cls(
             request=request,
             roll_state=roll_state,
-            value=request.resolve_roll(roll_state).final_value,
+            value=movement_budget.roll_value,
             reachable_target_distances_inches=reachable_target_distances_inches,
             move_available=move_available,
             status=CHARGE_MOVE_PENDING_STATUS if move_available else CHARGE_NO_MOVE_POSSIBLE_STATUS,

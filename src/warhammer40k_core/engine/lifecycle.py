@@ -149,9 +149,6 @@ from warhammer40k_core.engine.healing_decision_dispatch import (
 from warhammer40k_core.engine.lifecycle_attack_prevalidation import (
     fight_attack_sequence_is_active_for_request,
 )
-from warhammer40k_core.engine.lifecycle_heroic_intervention import (
-    apply_heroic_intervention_charge_move_lifecycle_decision,
-)
 from warhammer40k_core.engine.lifecycle_payload_consistency import (
     validate_pending_battlefield_request_consistency,
 )
@@ -300,12 +297,10 @@ from warhammer40k_core.engine.stratagems import (
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
     invalid_command_reroll_decision_status,
-    invalid_heroic_intervention_charge_move_status,
     invalid_stratagem_placement_proposal_status,
     invalid_stratagem_target_proposal_status,
     invalid_stratagem_use_status,
     is_command_reroll_decision_request,
-    is_heroic_intervention_charge_move_request,
     is_stratagem_placement_proposal_request,
     is_stratagem_window_decline_result,
     stratagem_selection_from_decision_result,
@@ -699,6 +694,16 @@ class GameLifecycle:
         )
         if trigger_status is not None:
             return trigger_status
+        from warhammer40k_core.engine.interrupted_charge import advance_interrupted_charge
+
+        interrupted = advance_interrupted_charge(
+            state=state,
+            decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
+            handler=self._charge_phase_handler,
+        )
+        if interrupted is not None:
+            return interrupted
         from warhammer40k_core.engine.charge_target_continuation import refresh_pending_charge_move
 
         charge_continuation = refresh_pending_charge_move(
@@ -861,6 +866,14 @@ class GameLifecycle:
         self._reconcile_catalog_model_state_changes()
         if self._runtime_content_bundle is not None:
             self._refresh_runtime_content_bundle_if_armies_mustered()
+        from warhammer40k_core.engine.interrupted_charge import continue_interrupted_charge_reaction
+
+        continue_interrupted_charge_reaction(
+            state=state,
+            decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
+            result=result,
+        )
         _selected_target_bs.validate_catalog_selected_target_battle_shock_submitted_status(
             state=state,
             decisions=self.decision_controller,
@@ -1497,13 +1510,7 @@ class GameLifecycle:
                 resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
             )
         elif request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES:
-            if is_heroic_intervention_charge_move_request(request):
-                malformed_status = invalid_heroic_intervention_charge_move_status(
-                    state=state,
-                    request=request,
-                    result=result,
-                )
-            elif is_triggered_movement_proposal_request(request):
+            if is_triggered_movement_proposal_request(request):
                 malformed_status = invalid_triggered_movement_proposal_status(
                     state=state,
                     request=request,
@@ -1568,9 +1575,6 @@ class GameLifecycle:
         if is_stratagem_placement_proposal_request(record.request):
             return self._apply_stratagem_placement_decision(record=record, result=result)
         runtime_bundle = self._require_runtime_content_bundle()
-        charge_status = _charge_rerolls.apply_charge_reroll(self, record.request, result)
-        if charge_status is not None:
-            return charge_status
         reroll_status = _bsa.apply_global_reroll_if_applicable(
             state=state,
             decisions=self.decision_controller,
@@ -1597,14 +1601,6 @@ class GameLifecycle:
         )
         if setup_reactive_status is not None:
             return setup_reactive_status
-        if (
-            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-            and is_heroic_intervention_charge_move_request(record.request)
-        ):
-            return self._apply_heroic_intervention_charge_move_decision(
-                record=record,
-                result=result,
-            )
         if (
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
             and is_triggered_movement_proposal_request(record.request)
@@ -1695,24 +1691,6 @@ class GameLifecycle:
                 decisions=self.decision_controller,
             )
         return self.advance_until_decision_or_terminal()
-
-    def _apply_heroic_intervention_charge_move_decision(
-        self,
-        record: DecisionRecord,
-        result: DecisionResult,
-    ) -> LifecycleStatus:
-        return apply_heroic_intervention_charge_move_lifecycle_decision(
-            state=self._require_state(),
-            config=self._require_config(),
-            runtime_content_bundle=self._require_runtime_content_bundle(),
-            decisions=self.decision_controller,
-            reaction_queue=self.reaction_queue,
-            record=record,
-            result=result,
-            resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
-            pending_decision_request=self._pending_decision_request,
-            advance_until_decision_or_terminal=self.advance_until_decision_or_terminal,
-        )
 
     def _apply_destroyed_transport_disembark_decision(
         self,
@@ -2077,19 +2055,12 @@ class GameLifecycle:
         return None
 
     def _apply_charge_phase_decision(
-        self,
-        _record: DecisionRecord,
-        result: DecisionResult,
+        self, _record: DecisionRecord, result: DecisionResult
     ) -> LifecycleStatus:
-        state = self._require_state()
-        charge_status = self._charge_phase_handler.apply_decision(
-            state=state,
-            result=result,
-            decisions=self.decision_controller,
+        status = self._charge_phase_handler.apply_decision(
+            state=self._require_state(), result=result, decisions=self.decision_controller
         )
-        if charge_status is not None:
-            return charge_status
-        return self.advance_until_decision_or_terminal()
+        return status if status is not None else self.advance_until_decision_or_terminal()
 
     def _pre_validate_catalog_move_completed_mortal_wounds_decision(
         self,
@@ -2601,7 +2572,7 @@ class GameLifecycle:
             ),
         )
         advanced_status = self.advance_until_decision_or_terminal()
-        if resolves_reaction_frame:
+        if resolves_reaction_frame and self._result_resolves_active_reaction_frame(result):
             if self._fight_interrupt_activation_is_active():
                 self._continue_or_resolve_fight_reaction(
                     result=result,

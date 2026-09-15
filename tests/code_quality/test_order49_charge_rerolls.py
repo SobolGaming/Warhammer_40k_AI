@@ -24,8 +24,8 @@ def test_charge_rerolls_use_shared_dice_and_stratagem_owners() -> None:
     assert "request_command_reroll_if_available" in _calls("charge_roll_flow.py")
     assert "stratagem_use_options_for_handler_from_index" in _calls("command_reroll_windows.py")
     assert "_selected_command_point_cost" in _calls("command_reroll_windows.py")
-    assert "charge_reroll_permission_for_unit" in _calls("heroic_intervention_rolls.py")
-    assert "validate_stratagem_use_history" in _calls("heroic_intervention_rolls.py")
+    assert "_charge_reroll_permission_for_unit" in _calls("charge_roll_flow.py")
+    assert "validate_stratagem_use_history" in _calls("heroic_intervention_history.py")
     assert "validate_mutation_decision_closure" in _calls("charge_roll_flow.py")
     for name in ("charge_declaration.py", "heroic_intervention_rolls.py"):
         tree = ast.parse((ENGINE / name).read_text())

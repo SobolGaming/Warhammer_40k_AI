@@ -11,6 +11,7 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, Plac
 from warhammer40k_core.engine.charge_declaration import ChargeTargetCandidate
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.physical_engagement import physical_geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionContext,
     ChargeTargetRestrictionHookRegistry,
@@ -35,7 +36,9 @@ def charge_target_restriction(
     restrictions = registry.restrictions_for(
         ChargeTargetRestrictionContext(
             state=state,
-            player_id=_active_player_id(state),
+            player_id=rules_unit_view_by_id(
+                state=state, unit_instance_id=charging_unit_instance_id
+            ).owner_player_id,
             battle_round=state.battle_round,
             charging_unit_instance_id=charging_unit_instance_id,
             target_unit_instance_id=target_unit_instance_id,
@@ -54,8 +57,13 @@ def charge_target_candidates(
     scenario = _battlefield_scenario(state)
     max_range = ruleset_descriptor.charge_policy.max_declaration_range_inches
     candidates: list[ChargeTargetCandidate] = []
+    owner = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id).owner_player_id
+    phase = state.charge_phase_state
+    source = None if phase is None else phase.interruption
+    if source is not None and source.unit_instance_id != unit_instance_id:
+        source = None
     for target in fight_present_rules_unit_views(state=state):
-        if target.owner_player_id == _active_player_id(state):
+        if target.owner_player_id == owner:
             continue
         target_id = target.unit_instance_id
         distance = closest_unit_distance_inches(
@@ -76,6 +84,13 @@ def charge_target_candidates(
             violation_code = restriction.violation_code
         else:
             violation_code = None if is_legal else "target_out_of_declaration_range"
+        if is_legal and source is not None:
+            if distance > source.target_range_inches:
+                is_legal, violation_code = False, "charge_source_target_out_of_range"
+            elif (
+                source.allowed_target_ids is not None and target_id not in source.allowed_target_ids
+            ):
+                is_legal, violation_code = False, "charge_source_target_not_authorized"
         candidates.append(
             ChargeTargetCandidate(
                 target_unit_instance_id=target_id,
@@ -120,9 +135,3 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     except PlacementError as exc:
         raise GameLifecycleError("Charge battlefield scenario is invalid.") from exc
     return scenario
-
-
-def _active_player_id(state: GameState) -> str:
-    if state.active_player_id is None:
-        raise GameLifecycleError("Charge phase requires active_player_id.")
-    return state.active_player_id

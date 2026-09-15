@@ -6,12 +6,14 @@ from typing import Self, TypedDict, cast
 import msgspec
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.charge_budget_value import ChargeRollLimit
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
     ChargeDistanceState,
     ChargeDistanceStatePayload,
     ChargeRollResult,
 )
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -59,6 +61,7 @@ class ChargeTargetSelection(msgspec.Struct, frozen=True, forbid_unknown_fields=T
 
 
 class ChargePhaseStatePayload(TypedDict):
+    interruption: dict[str, JsonValue] | None
     battle_round: int
     active_player_id: str
     phase_complete: bool
@@ -135,6 +138,7 @@ class ChargePhaseState:
     selected_unit_ids: tuple[str, ...] = ()
     active_selection: ChargingUnitSelection | None = None
     distance_states: tuple[ChargeDistanceState, ...] = ()
+    interruption: ChargeInterruption | None = None
     target_selection: ChargeTargetSelection | None = None
     declared_target_unit_instance_ids_by_unit: dict[str, tuple[str, ...]] = field(
         default_factory=_empty_declared_charge_targets
@@ -160,6 +164,15 @@ class ChargePhaseState:
                 "ChargePhaseState selected_unit_ids", self.selected_unit_ids
             ),
         )
+        if self.interruption is not None:
+            if type(self.interruption) is not ChargeInterruption:
+                raise GameLifecycleError("Charge interruption must be typed.")
+            if self.interruption.suspended_phase.battle_round != self.battle_round:
+                raise GameLifecycleError("Charge interruption round drift.")
+            if self.interruption.suspended_phase.active_player_id == self.active_player_id:
+                raise GameLifecycleError("Charge interruption must belong to the other player.")
+            if any(unit != self.interruption.unit_instance_id for unit in self.selected_unit_ids):
+                raise GameLifecycleError("Charge interruption selected an unauthorized unit.")
         if self.active_selection is not None:
             if type(self.active_selection) is not ChargingUnitSelection:
                 raise GameLifecycleError(
@@ -207,6 +220,7 @@ class ChargePhaseState:
         if selection.unit_instance_id in self.selected_unit_ids:
             raise GameLifecycleError("Charge unit was already selected.")
         return type(self)(
+            interruption=self.interruption,
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
@@ -237,6 +251,7 @@ class ChargePhaseState:
             source_decision_result_id=roll_result.request.source_decision_result_id,
         )
         return type(self)(
+            interruption=self.interruption,
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
@@ -271,6 +286,7 @@ class ChargePhaseState:
         if self.move_pending_distance_state() is None:
             raise GameLifecycleError("Charge move resolution requires pending distance state.")
         return type(self)(
+            interruption=self.interruption,
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
@@ -290,6 +306,7 @@ class ChargePhaseState:
             raise GameLifecycleError("Charge completion requires no pending charge movement.")
         skipped_ids = _validate_identifier_tuple("skipped_unit_ids", skipped_unit_ids)
         return type(self)(
+            interruption=self.interruption,
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=True,
@@ -318,6 +335,7 @@ class ChargePhaseState:
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
             "phase_complete": self.phase_complete,
+            "interruption": None if self.interruption is None else self.interruption.to_payload(),
             "selected_unit_ids": list(self.selected_unit_ids),
             "active_selection": (
                 None if self.active_selection is None else self.active_selection.to_payload()
@@ -341,6 +359,9 @@ class ChargePhaseState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             phase_complete=payload["phase_complete"],
+            interruption=None
+            if payload["interruption"] is None
+            else ChargeInterruption.from_payload(payload["interruption"]),
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             active_selection=(
                 None
@@ -361,6 +382,97 @@ class ChargePhaseState:
                 ].items()
             },
         )
+
+
+@dataclass(frozen=True, slots=True)
+class ChargeInterruption:
+    """A source-authorized single Charge with a suspended ordinary phase."""
+
+    source_id: str
+    source_request_id: str
+    source_result_id: str
+    unit_instance_id: str
+    allowed_target_ids: tuple[str, ...] | None
+    target_range_inches: float
+    roll_limit: ChargeRollLimit | None
+    suspended_phase: ChargePhaseState
+
+    def __post_init__(self) -> None:
+        for name in ("source_id", "source_request_id", "source_result_id", "unit_instance_id"):
+            _validate_identifier(name, getattr(self, name))
+        if (
+            type(self.suspended_phase) is not ChargePhaseState
+            or self.suspended_phase.interruption is not None
+        ):
+            raise GameLifecycleError("Charge interruption requires an ordinary parent phase.")
+        if not self.suspended_phase.phase_complete:
+            raise GameLifecycleError("Charge interruption requires completed ordinary Charges.")
+        if (
+            self.allowed_target_ids is not None
+            and self.allowed_target_ids
+            != _validate_identifier_tuple("allowed_target_ids", self.allowed_target_ids)
+        ):
+            raise GameLifecycleError("Charge interruption targets must be canonical.")
+        if (
+            type(self.target_range_inches) not in {int, float}
+            or not 0 < self.target_range_inches <= 12
+        ):
+            raise GameLifecycleError("Charge interruption target range is invalid.")
+        if self.roll_limit is not None and (
+            type(self.roll_limit) is not ChargeRollLimit
+            or self.roll_limit.source_id != self.source_id
+        ):
+            raise GameLifecycleError("Charge interruption roll limit source drift.")
+
+    def to_payload(self) -> dict[str, JsonValue]:
+        return cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    "source_id": self.source_id,
+                    "source_request_id": self.source_request_id,
+                    "source_result_id": self.source_result_id,
+                    "unit_instance_id": self.unit_instance_id,
+                    "allowed_target_ids": None
+                    if self.allowed_target_ids is None
+                    else list(self.allowed_target_ids),
+                    "target_range_inches": self.target_range_inches,
+                    "roll_limit": msgspec.to_builtins(self.roll_limit),
+                    "suspended_phase": self.suspended_phase.to_payload(),
+                }
+            ),
+        )
+
+    @classmethod
+    def from_payload(cls, payload: object) -> ChargeInterruption:
+        try:
+            parsed = msgspec.convert(payload, type=_ChargeInterruptionPayload, strict=True)
+        except msgspec.ValidationError as exc:
+            raise GameLifecycleError("Charge interruption payload is malformed.") from exc
+        result = cls(
+            parsed.source_id,
+            parsed.source_request_id,
+            parsed.source_result_id,
+            parsed.unit_instance_id,
+            parsed.allowed_target_ids,
+            parsed.target_range_inches,
+            parsed.roll_limit,
+            ChargePhaseState.from_payload(cast(ChargePhaseStatePayload, parsed.suspended_phase)),
+        )
+        if result.to_payload() != payload:
+            raise GameLifecycleError("Charge interruption payload shape drift.")
+        return result
+
+
+class _ChargeInterruptionPayload(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    source_id: str
+    source_request_id: str
+    source_result_id: str
+    unit_instance_id: str
+    allowed_target_ids: tuple[str, ...] | None
+    target_range_inches: float
+    roll_limit: ChargeRollLimit | None
+    suspended_phase: dict[str, object]
 
 
 def _validate_charge_distance_states(values: object) -> tuple[ChargeDistanceState, ...]:

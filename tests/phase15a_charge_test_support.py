@@ -451,6 +451,16 @@ def _end_charge_heroic_session(
         ChargePhaseState(
             battle_round=state.battle_round,
             active_player_id="player-b",
+            selected_unit_ids=(units["enemy"].unit_instance_id,),
+            declared_target_unit_instance_ids_by_unit={
+                units["enemy"].unit_instance_id: (
+                    next(
+                        unit.unit_instance_id
+                        for unit in units.values()
+                        if unit.unit_instance_id.startswith("army-alpha:")
+                    ),
+                )
+            },
         ).with_phase_complete()
     )
     enemy = units["enemy"]
@@ -493,6 +503,21 @@ def _set_snarling_source_state_for_heroic_test(
     if state.battlefield_state is None:
         raise AssertionError("Heroic Intervention source fixture requires battlefield state.")
     if source_state == "unplaced":
+        from warhammer40k_core.engine.reserve_arrival_requirements import (
+            reposition_destruction_policy,
+        )
+        from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+
+        state.record_reserve_state(
+            ReserveState.declared_before_battle(
+                player_id="player-a",
+                unit_instance_id=unit.unit_instance_id,
+                reserve_kind=ReserveKind.RESERVES,
+                destruction_deadline_policy=reposition_destruction_policy(
+                    mission_setup=state.mission_setup, destruction_deadline_policy=None
+                ),
+            )
+        )
         state.replace_battlefield_state(
             state.battlefield_state.without_unit_placement(unit.unit_instance_id)
         )
@@ -544,10 +569,16 @@ def _submit_end_charge_heroic_target(
             HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND
         },
     )
-    return session.submit_parameterized_payload(
+    status = session.submit_parameterized_payload(
         request_id=request.request_id,
         payload=validate_json_value({"proposal": selected.to_payload()}),
         result_id=result_id,
+    )
+
+    from tests.heroic_intervention_helpers import drive_heroic_charge_choices
+
+    return drive_heroic_charge_choices(
+        session, status, unit_id=target_unit_instance_id, result_prefix=result_id
     )
 
 

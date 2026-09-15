@@ -47,7 +47,6 @@ _MOVE_COMPLETION_EVENTS = frozenset(
         "catalog_setup_reactive_charge_move_completed",
         "charge_move_completed",
         "fight_movement_completed",
-        "heroic_intervention_charge_move_completed",
         "movement_activation_completed",
         "triggered_movement_resolved",
     }

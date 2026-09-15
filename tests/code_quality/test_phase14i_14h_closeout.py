@@ -50,7 +50,7 @@ FIGHT_UNIT_SELECTED_HOOKS_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "fight_unit_selected_hooks.py"
 )
 LIFECYCLE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle.py"
-CHARGE_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
+CHARGE_ELIGIBILITY_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "charge_eligibility.py"
 DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_rules_unit_disembark.py"
 )
@@ -423,8 +423,8 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     )
     proposal_validation_source = source_for(MOVEMENT_PROPOSALS_PATH)
     charge_eligibility_source = function_source_for(
-        (CHARGE_PHASE_PATH,),
-        "_charge_unit_ineligibility_reason",
+        (CHARGE_ELIGIBILITY_PATH,),
+        "charge_unit_ineligibility_reason",
     )
     adapter_contract = source_for(ADAPTER_CONTRACT_PATH)
     turn_cleanup_source = source_for(GAME_STATE_PATH)

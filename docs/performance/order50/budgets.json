@@ -1,0 +1,15 @@
+{
+  "base_revision": "a4a31b381f9bec6bce0812b8aa0645b5a3297a54",
+  "samples": 7,
+  "maximum_mean_ratio": 2,
+  "mean_allowance_seconds": 0.05,
+  "maximum_slice_seconds": 0.5,
+  "maximum_decisions": 6,
+  "maximum_events": 100,
+  "full_game_certified": false,
+  "workloads": [
+    "order49-charge-reroll-slice-v1",
+    "order50-heroic-intervention-slice-v1"
+  ],
+  "rationale": "Matched accepted Charge moves. Heroic adds the two ordinary declaration/target choices and source scope events; ordinary Charge has unchanged work counts."
+}

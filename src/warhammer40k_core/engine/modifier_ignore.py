@@ -201,6 +201,9 @@ def record_modifier_ignore_selection(
         return None
     context = _validated_context(raw_context, expected_unit_instance_id=unit_id)
     actor_id = _validate_identifier("modifier-ignore actor_id", result.actor_id)
+    turn_player_id = state.active_player_id
+    if turn_player_id is None:
+        raise GameLifecycleError("Modifier-ignore expiration requires the current turn owner.")
     effect = PersistingEffect(
         effect_id=f"{result.result_id}:modifier-ignore-selection",
         source_rule_id="core:modifier-ignore-selection",
@@ -210,7 +213,7 @@ def record_modifier_ignore_selection(
         expiration=EffectExpiration.end_phase(
             battle_round=state.battle_round,
             phase=phase,
-            player_id=actor_id,
+            player_id=turn_player_id,
         ),
         effect_payload=validate_json_value(
             {

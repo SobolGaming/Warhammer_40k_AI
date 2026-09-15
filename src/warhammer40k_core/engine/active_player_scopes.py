@@ -20,6 +20,7 @@ class ActivePlayerScopeKind(StrEnum):
     OUT_OF_PHASE_SHOOT = "out_of_phase_shoot"
     FIGHT = "fight"
     FIGHT_MOVE = "fight_move"
+    CHARGE = "charge"
 
 
 class ActivePlayerScopePayload(TypedDict):
@@ -247,3 +248,18 @@ def update_fight_scope(state: GameState, updated: FightPhaseState | None) -> Non
         and next_scope in state.active_player_scopes
     ):
         pop_scope(state, next_scope)
+
+
+def charge_scope(state: GameState) -> ActivePlayerScope | None:
+    phase = state.charge_phase_state
+    if phase is None or phase.interruption is None:
+        return None
+    source = phase.interruption
+    return ActivePlayerScope(
+        ActivePlayerScopeKind.CHARGE,
+        phase.active_player_id,
+        source.unit_instance_id,
+        source.source_id,
+        source.source_request_id,
+        source.source_result_id,
+    )

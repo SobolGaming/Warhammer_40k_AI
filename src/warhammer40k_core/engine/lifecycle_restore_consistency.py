@@ -246,7 +246,12 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
         raise GameLifecycleError("charge_phase_state requires CHARGE phase.")
     if state.active_player_id is None:
         raise GameLifecycleError("charge_phase_state requires active player.")
-    if charge_state.active_player_id != state.active_player_id:
+    parent = (
+        charge_state
+        if charge_state.interruption is None
+        else charge_state.interruption.suspended_phase
+    )
+    if parent.active_player_id != state.active_player_id:
         raise GameLifecycleError("charge_phase_state active player drift.")
     if charge_state.battle_round != state.battle_round:
         raise GameLifecycleError("charge_phase_state battle round drift.")
@@ -259,7 +264,7 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         unit_id
         for unit_id, player_id in unit_owner_by_id.items()
-        if player_id == state.active_player_id
+        if player_id == charge_state.active_player_id
     }
     for unit_id in charge_state.selected_unit_ids:
         if unit_id not in active_player_unit_ids:
@@ -285,7 +290,7 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
             target_owner = unit_owner_by_id.get(target_unit_id)
             if target_owner is None:
                 raise GameLifecycleError("charge_phase_state target unit is unknown.")
-            if target_owner == state.active_player_id:
+            if target_owner == charge_state.active_player_id:
                 raise GameLifecycleError("charge_phase_state target unit is not an enemy.")
 
 

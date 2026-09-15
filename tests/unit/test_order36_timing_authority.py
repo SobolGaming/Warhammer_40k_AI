@@ -290,7 +290,6 @@ def _move_endpoint_fixture(
         "reinforcement_unit_arrived",
         "charge_move_completed",
         "triggered_movement_resolved",
-        "heroic_intervention_charge_move_completed",
         "catalog_setup_reactive_charge_move_completed",
     ],
 )

@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 from tests.phase15a_charge_declaration_helpers import charge_lifecycle, compact_test_unit_poses
+from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -51,12 +52,16 @@ def reroll_catalog() -> ArmyCatalog:
     )
 
 
-def heroic_session(*, natural: bool) -> tuple[LocalGameSession, str]:
+def heroic_session(
+    *, natural: bool, attached: bool = False, catalog: ArmyCatalog | None = None
+) -> tuple[LocalGameSession, str]:
     lifecycle, units = charge_lifecycle(
-        alpha_unit_ids=("charger",),
+        alpha_unit_ids=("charger", "leader") if attached else ("charger",),
+        alpha_attached_unit_ids=("charger", "leader") if attached else None,
+        alpha_origins={"charger": Pose.at(10, 20), "leader": Pose.at(10, 18)},
         game_id="order49-heroic",
         enemy_model_poses=compact_test_unit_poses(origin=Pose.at(10, 26), model_count=5),
-        catalog=reroll_catalog() if natural else None,
+        catalog=reroll_catalog() if natural else catalog,
     )
     state = lifecycle.state
     assert state is not None
@@ -65,6 +70,16 @@ def heroic_session(*, natural: bool) -> tuple[LocalGameSession, str]:
         ChargePhaseState(
             battle_round=state.battle_round,
             active_player_id="player-b",
+            selected_unit_ids=(units["enemy"].unit_instance_id,),
+            declared_target_unit_instance_ids_by_unit={
+                units["enemy"].unit_instance_id: (
+                    next(
+                        unit.unit_instance_id
+                        for unit in units.values()
+                        if unit.unit_instance_id.startswith("army-alpha:")
+                    ),
+                )
+            },
         ).with_phase_complete()
     )
     state.record_persisting_effect(
@@ -89,6 +104,7 @@ def heroic_session(*, natural: bool) -> tuple[LocalGameSession, str]:
     )
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
+    record_primary_turn_start_evidence_for_fixture(state, decisions=lifecycle.decision_controller)
     return LocalGameSession(lifecycle), rules_unit_view_by_id(
         state=state, unit_instance_id=units["charger"].unit_instance_id
     ).unit_instance_id
