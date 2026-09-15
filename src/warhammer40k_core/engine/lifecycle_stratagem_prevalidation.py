@@ -28,6 +28,11 @@ def prevalidate_stratagem_decision(
 ) -> LifecycleStatus | None:
     state = lifecycle._require_state()
     result.validate_for_request(request)
+    from warhammer40k_core.engine.charge_roll_dispatch import invalid_charge_reroll
+
+    charge_status = invalid_charge_reroll(lifecycle, request, result)
+    if charge_status is not None:
+        return charge_status
     if lifecycle._result_resolves_active_reaction_frame(result):
         lifecycle.reaction_queue.validate_result(result)
     try:

@@ -22,7 +22,7 @@
       "decision_count": 6,
       "work_limits": {
         "rules_unit_view_by_id": 240,
-        "rules_unit_identity_ids": 8,
+        "rules_unit_identity_ids": 10,
         "persisting_effects_for_lineage": 210,
         "applies_to_unit": 8000,
         "_legal_shooting_unit_ids": 3,
@@ -38,7 +38,9 @@
         "mean": 0.2,
         "maximum": 0.25,
         "head_to_base_mean_ratio": 1.25
-      }
+      },
+      "budget_version": "order49-command-reroll-unit-target-v2",
+      "calibration_note": "Order 49 adds exactly two required Battle-shock identity checks when enumerating and validating Command Re-roll unit targets. Matched base/head evidence is retained in docs/performance/order49/action-restrictions-{base,head}.json; every other work metric is unchanged."
     },
     "attached_selection": {
       "workload_id": "order34-live-attached_selection-v1",
@@ -89,5 +91,5 @@
       }
     }
   },
-  "calibration_policy": "Per-case work ceilings bound the measured source-backed live paths and 32-effect inventory with small explicit headroom; geometry solver calls and phase/selection multiplicities may not grow. Existing budgets are unchanged. Profile wall times are not timing evidence."
+  "calibration_policy": "Per-case work ceilings bound the measured source-backed live paths and 32-effect inventory with small explicit headroom; geometry solver calls and phase/selection multiplicities may not grow. Order 49 explicitly recalibrates only unrestricted rules_unit_identity_ids from 8 to 10 for the corrected Command Re-roll target; all other work and timing ceilings are unchanged. Profile wall times are not timing evidence."
 }

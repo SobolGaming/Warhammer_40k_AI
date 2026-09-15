@@ -72,7 +72,10 @@ def test_phase_end_overwatch_offers_every_eligible_enemy(moved: bool, enemy: str
 
 @pytest.mark.parametrize("checkpoint", ["stratagem", "declaration", "attacks"])
 @pytest.mark.parametrize("enemy", ENEMIES)
-def test_overwatch_restore_replay_and_phase_end_continuation(checkpoint: str, enemy: str) -> None:
+@pytest.mark.parametrize("follow_next_choice", [False, True])
+def test_overwatch_restore_replay_and_phase_end_continuation(
+    checkpoint: str, enemy: str, follow_next_choice: bool
+) -> None:
     from tests.fire_overwatch_helpers import finish_overwatch
 
     from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -93,8 +96,9 @@ def test_overwatch_restore_replay_and_phase_end_continuation(checkpoint: str, en
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
     for candidate in (session, restored):
         pending = candidate.lifecycle.decision_controller.queue.pending_requests
-        assert pending
-        request = pending[0]
+        if checkpoint != "attacks":
+            assert pending
+            request = pending[0]
         if checkpoint == "stratagem":
             status = choose_shooter(candidate, request)
             request = _require_request(status)
@@ -122,6 +126,16 @@ def test_overwatch_restore_replay_and_phase_end_continuation(checkpoint: str, en
             )
             == 1
         )
+        # Cover automatic progress both between choices and at the replay tail.
+        if follow_next_choice:
+            next_request = _require_request(candidate.advance_until_decision_or_terminal())
+            assert next_request.decision_type == "select_shooting_unit"
+            status = candidate.submit_option(
+                request_id=next_request.request_id,
+                option_id="complete_shooting_phase",
+                result_id="order45:complete-next-shooting",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
     assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
     for viewer in ("player-a", "player-b"):
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
@@ -847,7 +861,7 @@ def test_phase_end_snap_preserves_raw_six_no_hit_reroll_and_action_lock(attacks:
             )
             == MISSION_ACTION_UNIT_ALREADY_SHOT
         )
-        session.advance_until_decision_or_terminal()
+    session.advance_until_decision_or_terminal()
     assert state.current_battle_phase is BattlePhase.SHOOTING
     assert (
         mission_action_unit_ineligibility_reason(

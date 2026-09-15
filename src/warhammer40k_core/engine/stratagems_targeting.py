@@ -426,6 +426,15 @@ def _target_binding_error(
             context=context,
             target_binding=target_binding,
         )
+    if target_spec.target_policy_id == "command_reroll_unit":
+        if context is None:
+            return "missing_command_reroll_context"
+        expected_id = _canonical_stratagem_affected_unit_id(
+            state=state, unit_instance_id=_command_reroll_affected_unit_id(context)
+        )
+        if target_unit_instance_id != expected_id:
+            return "command_reroll_target_drift"
+        return None
     if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
         return "unsupported_target_policy"
     return None

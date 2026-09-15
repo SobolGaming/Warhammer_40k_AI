@@ -19,7 +19,7 @@ def test_charge_source_artifact_and_observation_are_reproducible() -> None:
 
 def test_charge_consumers_share_current_budget_and_target_authority() -> None:
     for filename in (
-        "phases/charge.py",
+        "charge_roll_flow.py",
         "catalog_setup_reactive_shoot_charge.py",
         "catalog_setup_reactive_charge_move.py",
         "charge_target_continuation.py",

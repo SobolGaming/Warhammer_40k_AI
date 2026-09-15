@@ -32,6 +32,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=7)
+    parser.add_argument("--include-charge-reroll-window", action="store_true")
     args = parser.parse_args()
     if args.samples < 1:
         parser.error("samples must be positive")
@@ -57,6 +58,14 @@ def main() -> None:
         )
         request = status.decision_request
         assert request is not None
+        if args.include_charge_reroll_window and request.decision_type == "use_stratagem":
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id="decline_stratagem_window",
+                result_id="benchmark-decline-reroll",
+            )
+            request = status.decision_request
+            assert request is not None
         assert request.decision_type == "select_charge_targets"
         option = next(
             o
@@ -114,7 +123,11 @@ def main() -> None:
         )
     times = sorted(row["slice_seconds"] for row in rows)
     report = {
-        "workload_id": "order47-charge-slice-v1",
+        "workload_id": (
+            "order49-charge-reroll-slice-v1"
+            if args.include_charge_reroll_window
+            else "order47-charge-slice-v1"
+        ),
         "revision": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "engine_build_id": current_engine_build_id(),
         "runtime_diff_sha256": hashlib.sha256(

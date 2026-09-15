@@ -23,7 +23,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v13-charge-model-endpoints"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v14-charge-rerolls"
 
 
 class ReplayArtifactError(ValueError):
@@ -682,6 +682,11 @@ class ReplayRunner:
         )
 
     def run(self) -> ReplayRunResult:
+        from warhammer40k_core.engine.replay_continuation import (
+            advance_recorded_automatic_progress,
+            request_drift_diagnostic,
+        )
+
         lifecycle = GameLifecycle.from_payload(self.artifact.initial_lifecycle_payload)
         initial_event_count = len(lifecycle.decision_controller.event_log.records)
         initial_record_count = len(lifecycle.decision_controller.records)
@@ -700,6 +705,11 @@ class ReplayRunner:
             self.artifact.decision_records,
             start=1,
         ):
+            advance_recorded_automatic_progress(
+                lifecycle=lifecycle,
+                expected_events=self.artifact.event_records,
+                initial_event_count=initial_event_count,
+            )
             expected_record_count = initial_record_count + decision_record_index
             reproduced_record_diagnostic = _already_reproduced_record_diagnostic(
                 lifecycle=lifecycle,
@@ -725,7 +735,7 @@ class ReplayRunner:
                         diagnostics=(checkpoint_diagnostic,),
                     )
                 continue
-            request_diagnostic = _request_drift_diagnostic(
+            request_diagnostic = request_drift_diagnostic(
                 lifecycle=lifecycle,
                 expected_record=expected_record,
                 decision_record_index=decision_record_index,
@@ -759,6 +769,11 @@ class ReplayRunner:
                     diagnostics=(checkpoint_diagnostic,),
                 )
 
+        advance_recorded_automatic_progress(
+            lifecycle=lifecycle,
+            expected_events=self.artifact.event_records,
+            initial_event_count=initial_event_count,
+        )
         expected_final_record_count = initial_record_count + len(self.artifact.decision_records)
         actual_final_record_count = len(lifecycle.decision_controller.records)
         if actual_final_record_count != expected_final_record_count:
@@ -1073,76 +1088,6 @@ def _already_reproduced_record_diagnostic(
         expected=_json_payload(expected_record.to_payload()),
         actual=_json_payload(actual_record.to_payload()),
     )
-
-
-def _request_drift_diagnostic(
-    *,
-    lifecycle: GameLifecycle,
-    expected_record: DecisionRecord,
-    decision_record_index: int,
-) -> ReplayDriftDiagnostic | None:
-    pending_requests = lifecycle.decision_controller.queue.pending_requests
-    if not pending_requests:
-        return ReplayDriftDiagnostic(
-            diagnostic_code=ReplayDiagnosticCode.NO_PENDING_REQUEST,
-            message="Replay expected a pending DecisionRequest.",
-            decision_record_index=decision_record_index,
-            record_id=expected_record.record_id,
-            expected=_json_payload(expected_record.request.to_payload()),
-            actual=None,
-        )
-    actual_request = pending_requests[0]
-    expected_request = expected_record.request
-    if actual_request.request_id != expected_request.request_id:
-        return ReplayDriftDiagnostic(
-            diagnostic_code=ReplayDiagnosticCode.REQUEST_ID_DRIFT,
-            message="Replayed DecisionRequest ID drifted.",
-            decision_record_index=decision_record_index,
-            record_id=expected_record.record_id,
-            expected={"request_id": expected_request.request_id},
-            actual={"request_id": actual_request.request_id},
-        )
-    if actual_request.decision_type != expected_request.decision_type:
-        return ReplayDriftDiagnostic(
-            diagnostic_code=ReplayDiagnosticCode.DECISION_TYPE_DRIFT,
-            message="Replayed DecisionRequest type drifted.",
-            decision_record_index=decision_record_index,
-            record_id=expected_record.record_id,
-            expected={"decision_type": expected_request.decision_type},
-            actual={"decision_type": actual_request.decision_type},
-        )
-    if actual_request.actor_id != expected_request.actor_id:
-        return ReplayDriftDiagnostic(
-            diagnostic_code=ReplayDiagnosticCode.ACTOR_DRIFT,
-            message="Replayed DecisionRequest actor drifted.",
-            decision_record_index=decision_record_index,
-            record_id=expected_record.record_id,
-            expected={"actor_id": expected_request.actor_id},
-            actual={"actor_id": actual_request.actor_id},
-        )
-    expected_payload_hash = decision_request_payload_hash(expected_request)
-    actual_payload_hash = decision_request_payload_hash(actual_request)
-    if actual_payload_hash != expected_payload_hash:
-        return ReplayDriftDiagnostic(
-            diagnostic_code=ReplayDiagnosticCode.REQUEST_PAYLOAD_HASH_DRIFT,
-            message="Replayed DecisionRequest payload hash drifted.",
-            decision_record_index=decision_record_index,
-            record_id=expected_record.record_id,
-            expected={"payload_hash": expected_payload_hash},
-            actual={"payload_hash": actual_payload_hash},
-        )
-    expected_option_hash = decision_request_options_fingerprint(expected_request)
-    actual_option_hash = decision_request_options_fingerprint(actual_request)
-    if actual_option_hash != expected_option_hash:
-        return ReplayDriftDiagnostic(
-            diagnostic_code=ReplayDiagnosticCode.LEGAL_OPTION_FINGERPRINT_DRIFT,
-            message="Replayed legal option fingerprint drifted.",
-            decision_record_index=decision_record_index,
-            record_id=expected_record.record_id,
-            expected={"legal_option_fingerprint": expected_option_hash},
-            actual={"legal_option_fingerprint": actual_option_hash},
-        )
-    return None
 
 
 def _validate_schema_version(value: object) -> str:

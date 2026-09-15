@@ -2491,7 +2491,7 @@ Phase 15A exposes these active-player decisions:
 
 Charge eligibility target candidates are engine-enumerated from battlefield state and the active ruleset's `charge_policy`. Each candidate is a current canonical rules unit with at least one present living or retained model; an Attached Unit appears once under its synthetic rules-unit ID, and its component IDs are not separate targets. Fight On Death-only units remain Charge targets. Retained bases contribute declaration distance, Charge Move endpoint Engagement and collision validation. Charging actors still require living movable models. Phase 15A rejects chargers that Advanced, Fell Back, are within Engagement Range, are off the battlefield, already declared a Charge this phase, or have no enemy unit within the descriptor-sourced declaration range, currently 12", unless a future source-backed rule explicitly marks that unit as allowed to declare a charge. An active selected-target Charge constraint is evaluated independently of that candidate list: every current surviving successor of every historical marked rules-unit identity must itself be placed and must be a legal target. If a mark is destroyed, off the battlefield, otherwise unavailable, or has any current surviving successor that is unplaced or not legal, the charging unit cannot declare a Charge while that effect remains active; another legal enemy does not satisfy the obligation.
 
-Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and either emits a `select_charge_declaration_grant` request or rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-authored target declaration payload. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class. Source-backed non-Command rerolls, such as Drukhari Lithe Agility after an accepted Power from Pain declaration grant, Black Templars Abhor the Witch after an accepted PSYKER charge grant, or Chaos Terminators' Lethal Obsession, may still emit `select_dice_reroll`; the request payload carries the source permission and the engine ignores only the Command Re-roll forbidden marker for that source-backed reroll. Every source-backed Charge reroll request also carries `charge_context.legal_target_unit_instance_ids` and `charge_context.charge_move_required_target_unit_instance_ids`; selected-target requests additionally carry `charge_context.selected_target_charge_constraint`. The constraint records `reroll_allowed`, every `required_target_unit_instance_id`, all contributing `source_effect_ids`, historical marked identity IDs, unavailable and destroyed identity IDs, and deterministic current/surviving/placed lineage. Repeated compatible marks coalesce into one whole-roll reroll permission. When either snapshot expresses a mandatory target, lifecycle revalidates the constraint, required-target snapshot, and legal-target snapshot before queue pop, so a reactive move, destruction, split, expiry, or other target drift returns typed invalid status without consuming the pending request.
+Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and either emits a `select_charge_declaration_grant` request or rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-authored target declaration payload. The Charge host emits `charge_roll_started`, offers any source-backed whole-roll natural reroll, then offers eligible Command Re-roll if the original roll remains unrerolled. Command Re-roll uses the standard finite `use_stratagem` opportunity and targets the rolling canonical rules unit. Its `stratagem_context.trigger_payload.charge_action_id` binds the original roll to the selected Charge action. CP, Battle-shock and same-phase target/use restrictions apply. Declining a natural reroll preserves Command Re-roll eligibility; accepting it prevents another reroll. Both dice are replaced before the modified result and movement budget are calculated. Every source-backed Charge reroll request also carries `charge_context.legal_target_unit_instance_ids` and `charge_context.charge_move_required_target_unit_instance_ids`; selected-target requests additionally carry `charge_context.selected_target_charge_constraint`. The constraint records `reroll_allowed`, every `required_target_unit_instance_id`, all contributing `source_effect_ids`, historical marked identity IDs, unavailable and destroyed identity IDs, and deterministic current/surviving/placed lineage. Repeated compatible marks coalesce into one whole-roll reroll permission. When either snapshot expresses a mandatory target, lifecycle revalidates the constraint, required-target snapshot, and legal-target snapshot before queue pop, so a reactive move, destruction, split, expiry, or other target drift returns typed invalid status without consuming the pending request.
 
 An accepted charging-unit modifier-ignore option first records the same
 phase-scoped selection effect and `modifier_ignores_selected` event used by
@@ -5893,3 +5893,40 @@ both offered and accepted retained reactions without changing their public
 request payloads.
 These changes reuse existing finite allocation/FNP and destruction decisions;
 contract version 19's generic schemas already cover their public payloads.
+
+
+## Order 49: whole Charge rerolls
+
+Contract 20 enables the ordinary Charge Command Re-roll window described above.
+The pending Charge action retains its original `charge_roll_started` event until
+all reroll choices finish. The event authenticates the selected unit decision and
+its recorded raw dice. No target or movement distance is committed before the
+reroll result. Restore and live prevalidation authenticate source, actor, phase,
+original dice and pending request before queue consumption.
+
+Heroic Intervention remains a target-bearing Stratagem. It prevents Command
+Re-roll on that unit in the same phase through the shared target restriction.
+A natural Charge reroll emits the existing finite `select_dice_reroll` family,
+with `decline` and `reroll:0,1`; its `heroic_intervention_reroll_context` binds
+`stratagem_use`, `mode` and original `roll_state`. The engine authenticates the
+source use, reaction wrapper, CP ledger and current ability, then resumes the
+existing witnessed Charge movement proposal. Native rerolls spend no extra CP.
+The one-reroll-per-die restriction applies to both routes.
+
+Command Re-roll's target is the canonical unit that made the roll, including
+when a model in an Attached Unit made it. Opportunity `target_ids` reflect that
+unit and `cost` reflects the shared cost service. Dice identity remains in
+`target_spec` and the trigger payload. The existing finite submission envelope
+and shared viewer-redaction owner cover the public choices and dice events;
+no adapter calculates or applies a reroll itself.
+
+Replay and persistence verification resume automatic engine progress between
+choices and at the recorded tail only while produced events exactly match a
+prefix of that history. A reaction that finishes without another legal Stratagem
+can therefore be saved before or after phase continuation. Verification does
+not advance beyond the recorded checkpoint or invent a player choice.
+
+These changed targeting/mutation and checkpoint semantics advance metadata and
+command result/outcome families to v20, replay to v14 and persistence to v12.
+See [19-to-20](../contracts/migrations/19-to-20.md). Order 50 retains responsibility
+for the broader Heroic Intervention modifier/eligibility pipeline.

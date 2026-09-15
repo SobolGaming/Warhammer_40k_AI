@@ -736,9 +736,12 @@ def test_charge_limits_reach_facade_events_restore_and_exact_replay(
     session = LocalGameSession(lifecycle=lifecycle)
     request = session.advance_until_decision_or_terminal().decision_request
     assert request is not None
-    session.submit_option(
+    status = session.submit_option(
         request_id=request.request_id, option_id=unit_id, result_id="select-charger"
     )
+    from tests.charge_distance_helpers import decline_charge_command_reroll, request_from
+
+    decline_charge_command_reroll(session, request_from(status))
     event = next(
         e
         for e in lifecycle.decision_controller.event_log.records

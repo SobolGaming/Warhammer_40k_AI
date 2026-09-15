@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 49 offers whole-roll Command Re-roll for ordinary Charges and preserves
+natural Charge rerolls during Heroic Intervention. Command Re-roll targets the
+rolling unit, so the shared one-Stratagem-per-unit-per-phase restriction applies.
+See [rules and validation](docs/ORDER_49_SCOPE_PLAN.md).
+
 Order 48 offers Crushing Impact after Charge completion through finite enemy/model
 choices, applies the selected model's modified Toughness and both six-wound caps,
 and resumes Charge after allocation, Feel No Pain and destruction. See

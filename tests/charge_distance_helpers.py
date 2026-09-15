@@ -68,9 +68,31 @@ def add_modifier(state: GameState, *, effect_id: str, kind: str, delta: float) -
 
 def select_source(session: LocalGameSession) -> DecisionRequest:
     request = request_from(session.advance_until_decision_or_terminal())
-    return request_from(
+    request = request_from(
         session.submit_option(
             request_id=request.request_id, option_id=SOURCE, result_id="order46-select-source"
+        )
+    )
+    return decline_charge_command_reroll(session, request)
+
+
+def decline_charge_command_reroll(
+    session: LocalGameSession, request: DecisionRequest
+) -> DecisionRequest:
+    """Drive the optional reroll before testing a Charge's targets or movement."""
+    if request.decision_type != "use_stratagem":
+        return request
+    assert isinstance(request.payload, dict)
+    context = request.payload["stratagem_context"]
+    assert isinstance(context, dict)
+    trigger = context["trigger_payload"]
+    assert isinstance(trigger, dict)
+    assert isinstance(trigger["charge_action_id"], str)
+    return request_from(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id="decline_stratagem_window",
+            result_id=f"decline-charge-reroll:{request.request_id}",
         )
     )
 
@@ -82,6 +104,7 @@ def select_targets(
     *,
     result_id: str = "order46-targets",
 ) -> DecisionRequest:
+    request = decline_charge_command_reroll(session, request)
     option = next(
         o
         for o in request.options

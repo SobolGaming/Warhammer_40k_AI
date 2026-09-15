@@ -1,0 +1,12 @@
+{
+  "workload_id": "order49-charge-reroll-slice-v1",
+  "base_revision": "8e569cd024ffbedab035febdc262dfc410041b48",
+  "samples": 7,
+  "maximum_mean_ratio": 2,
+  "mean_allowance_seconds": 0.05,
+  "maximum_slice_seconds": 0.5,
+  "maximum_decisions": 4,
+  "maximum_events": 75,
+  "full_game_certified": false,
+  "rationale": "Same Charge declaration, target and witnessed move; head adds one legal decline decision. Timing limits remain unchanged."
+}

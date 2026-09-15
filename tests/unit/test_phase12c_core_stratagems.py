@@ -786,7 +786,7 @@ def test_command_reroll_rejects_unknown_affected_unit_context() -> None:
     assert state.stratagem_use_records == []
 
 
-def test_command_reroll_is_not_blocked_by_same_phase_unit_targeting() -> None:
+def test_command_reroll_is_blocked_by_same_phase_unit_targeting() -> None:
     unit_id = "army-alpha:intercessor-unit-1"
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -838,7 +838,7 @@ def test_command_reroll_is_not_blocked_by_same_phase_unit_targeting() -> None:
         context=context,
     )
 
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert len(state.stratagem_use_records) == 1
     assert state.command_point_total("player-a") == 1
 

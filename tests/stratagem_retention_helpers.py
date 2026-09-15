@@ -42,7 +42,12 @@ def offered_stratagem_reaction(
         ),
     )
     if stratagem == "crushing-impact":
-        session = crushing_session(catalog=catalog, toughness=96, wounds=1)
+        session = crushing_session(
+            catalog=catalog,
+            toughness=96,
+            wounds=1,
+            game_id="order49-retention-0" if collateral_depth == 1 else "order48-crushing-impact",
+        )
     else:
         lifecycle, _ = explosives_scene(catalog=catalog, extra_friendly=collateral_depth == 1)
         session = LocalGameSession(lifecycle)

@@ -591,6 +591,8 @@ def _verify_persistence_replay(
     artifact: ReplayArtifact,
     expected_lifecycle: GameLifecycle,
 ) -> None:
+    from warhammer40k_core.engine.replay_continuation import advance_recorded_automatic_progress
+
     try:
         initial_lifecycle = GameLifecycle.from_payload(
             copy.deepcopy(artifact.initial_lifecycle_payload)
@@ -619,6 +621,11 @@ def _verify_persistence_replay(
                 "LocalGameSession persistence replay event tail drifted."
             )
         for record_offset, record in enumerate(artifact.decision_records):
+            advance_recorded_automatic_progress(
+                lifecycle=replay_session.lifecycle,
+                expected_events=expected_event_tail,
+                initial_event_count=initial_event_count,
+            )
             absolute_record_index = initial_decision_count + record_offset
             if _persistence_replay_record_already_reproduced(
                 lifecycle=replay_session.lifecycle,
@@ -626,13 +633,7 @@ def _verify_persistence_replay(
                 absolute_record_index=absolute_record_index,
             ):
                 continue
-            status = submit_replay_record(session=replay_session, record=record)
-            if status.status_kind is LifecycleStatusKind.ADVANCED:
-                status = replay_session.advance_until_decision_or_terminal()
-                if status.status_kind is LifecycleStatusKind.ADVANCED:
-                    raise LocalGameSessionPersistenceError(
-                        "LocalGameSession replay did not reach a visible lifecycle boundary."
-                    )
+            submit_replay_record(session=replay_session, record=record)
             if not _persistence_replay_record_already_reproduced(
                 lifecycle=replay_session.lifecycle,
                 expected_record=record,
@@ -641,6 +642,11 @@ def _verify_persistence_replay(
                 raise LocalGameSessionPersistenceError(
                     "LocalGameSession persistence replay did not reproduce its decision record."
                 )
+        advance_recorded_automatic_progress(
+            lifecycle=replay_session.lifecycle,
+            expected_events=expected_event_tail,
+            initial_event_count=initial_event_count,
+        )
     except (DecisionError, GameLifecycleError) as exc:
         raise LocalGameSessionPersistenceError(
             "LocalGameSession persistence replay submission failed."

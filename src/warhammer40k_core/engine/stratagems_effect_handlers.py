@@ -14,6 +14,7 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
 from warhammer40k_core.engine.explosives_selection import ExplosivesSelection
 
 from typing import TYPE_CHECKING
+from warhammer40k_core.engine.heroic_intervention_rolls import _apply_heroic_intervention_handler
 
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -752,90 +753,6 @@ def _apply_epic_challenge_handler(
             "phase": use_record.phase.value,
             "stratagem_use": use_record.to_payload(),
             "persisting_effect": effect.to_payload(),
-        },
-    )
-
-
-def _apply_heroic_intervention_handler(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    result: DecisionResult,
-    context: StratagemEligibilityContext,
-    definition: StratagemDefinition,
-    target_binding: StratagemTargetBinding,
-    use_record: StratagemUseRecord,
-) -> None:
-    target_unit_id = _require_target_unit_id(target_binding)
-    mode = _heroic_intervention_mode(
-        definition=definition,
-        effect_selection=use_record.effect_selection,
-    )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    roll_state = manager.roll(
-        DiceRollSpec(
-            expression=DiceExpression(quantity=2, sides=6),
-            reason=f"Heroic Intervention charge roll for {use_record.use_id}",
-            roll_type="charge_roll",
-            actor_id=use_record.player_id,
-            reroll_forbidden_rule_ids=(CORE_COMMAND_REROLL_HANDLER_ID,),
-        )
-    )
-    maximum_distance = roll_state.current_total
-    if mode == HEROIC_INTERVENTION_MODE_INTO_THE_FRAY and maximum_distance > 6:
-        maximum_distance = 6
-    reachable = _heroic_intervention_reachable_target_distances(
-        state=state,
-        player_id=use_record.player_id,
-        heroic_unit_id=target_unit_id,
-        mode=mode,
-        maximum_distance_inches=maximum_distance,
-    )
-    proposal_request = MovementProposalRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
-        actor_id=context.player_id,
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        phase=BattlePhase.CHARGE.value,
-        unit_instance_id=target_unit_id,
-        proposal_kind=ProposalKind.CHARGE_MOVE,
-        source_decision_request_id=result.request_id,
-        source_decision_result_id=result.result_id,
-        spatial_context_hash=state.physical_proposal_context_hash(),
-        movement_phase_action=CHARGE_MOVE_ACTION,
-        context=cast(
-            dict[str, JsonValue],
-            validate_json_value(
-                {
-                    "stratagem_handler_id": CORE_HEROIC_INTERVENTION_HANDLER_ID,
-                    "stratagem_use": use_record.to_payload(),
-                    "mode": mode,
-                    "movement_mode": MovementMode.CHARGE.value,
-                    "charge_roll_state": roll_state.to_payload(),
-                    "maximum_distance_inches": maximum_distance,
-                    "reachable_target_unit_instance_ids": list(reachable),
-                    "reachable_target_distances_inches": reachable,
-                }
-            ),
-        ),
-    )
-    request = proposal_request.to_decision_request()
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "heroic_intervention_charge_move_requested",
-        {
-            "game_id": state.game_id,
-            "player_id": use_record.player_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.CHARGE.value,
-            "stratagem_use": use_record.to_payload(),
-            "mode": mode,
-            "charge_roll_state": roll_state.to_payload(),
-            "maximum_distance_inches": maximum_distance,
-            "reachable_target_unit_instance_ids": list(reachable),
-            "reachable_target_distances_inches": reachable,
-            "request_id": request.request_id,
         },
     )
 

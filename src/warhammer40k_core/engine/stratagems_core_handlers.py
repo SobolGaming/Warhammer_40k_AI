@@ -237,6 +237,9 @@ def _apply_supported_stratagem_handler(
         )
         return
     if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        if battle_shock_runtime is None:
+            raise GameLifecycleError("Heroic Intervention requires loaded Charge ability sources.")
+        ability_index = battle_shock_runtime.ability_indexes_by_player_id[context.player_id]
         _apply_heroic_intervention_handler(
             state=state,
             decisions=decisions,
@@ -245,6 +248,7 @@ def _apply_supported_stratagem_handler(
             definition=definition,
             target_binding=target_binding,
             use_record=use_record,
+            ability_index=ability_index,
         )
         return
     if definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:

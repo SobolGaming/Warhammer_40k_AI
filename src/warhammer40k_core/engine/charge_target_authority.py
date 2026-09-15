@@ -229,8 +229,10 @@ def validate_restored_charge_targets(
     from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
         is_catalog_setup_reactive_charge_move_request,
     )
+    from warhammer40k_core.engine.charge_roll_dispatch import validate_restored_charge_rerolls
     from warhammer40k_core.engine.stratagems import is_heroic_intervention_charge_move_request
 
+    validate_restored_charge_rerolls(state=state, decisions=decisions, handler=handler)
     history = charge_selection_history(
         event_records=decisions.event_log.records, decision_records=decisions.records
     )
