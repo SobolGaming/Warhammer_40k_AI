@@ -223,6 +223,8 @@ def test_persisted_hover_mode_state_changes_movement_action_availability() -> No
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
         MovementPhaseActionKind.NORMAL_MOVE.value,
         MovementPhaseActionKind.ADVANCE.value,
+        "normal_move:fly_take_to_skies",
+        "advance:fly_take_to_skies",
     }
     normal_payload = next(
         option.payload

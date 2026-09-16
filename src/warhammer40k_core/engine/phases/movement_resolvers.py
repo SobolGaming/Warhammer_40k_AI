@@ -430,6 +430,8 @@ def _resolve_unit_move(
             runtime_modifier_registry=runtime_modifier_registry,
         )
         movement_distance_modifier_inches = _movement_distance_modifier_inches(
+            state=state,
+            unit_instance_id=movement_unit_id,
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=movement_mode,

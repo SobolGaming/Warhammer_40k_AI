@@ -1,0 +1,15 @@
+{
+  "base_revision": "dc043bf27baf51c02d8db1a177190ecd77ad3254",
+  "samples": 7,
+  "maximum_mean_ratio": 2,
+  "mean_allowance_seconds": 0.05,
+  "maximum_slice_seconds": 0.5,
+  "maximum_decisions": 6,
+  "maximum_events": 100,
+  "full_game_certified": false,
+  "workloads": [
+    "order49-charge-reroll-slice-v1",
+    "order51-heroic-intervention-slice-v2"
+  ],
+  "rationale": "Inherit the committed Order 50 regression and work budgets unchanged. Both revisions use the same accepted paths; the Heroic v2 fixture supplies a real Charge-roll modifier before the existing source cap."
+}

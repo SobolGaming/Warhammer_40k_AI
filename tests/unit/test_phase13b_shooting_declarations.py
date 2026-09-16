@@ -313,8 +313,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    MovementDistanceRecord,
-    MovementPhaseState,
 )
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
@@ -1085,7 +1083,7 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
     cases = (
         (3.0, 3.0, False, 1),
         (3.1, 3.1, False, 0),
-        (6.0, 2.0, True, 1),
+        (6.0, 2.0, True, 0),
         (6.0, 2.0, False, 0),
         (6.0, 3.1, True, 0),
     )
@@ -1104,19 +1102,18 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
         if has_fly:
             attacker = with_unit_keywords(attacker, keywords=(*attacker.keywords, "Fly"))
             _replace_unit_instance_in_state(state=state, replacement=attacker)
-        state.movement_phase_state = MovementPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            selected_unit_ids=(attacker.unit_instance_id,),
-            moved_unit_ids=(attacker.unit_instance_id,),
-            movement_distance_records=(
-                MovementDistanceRecord(
-                    unit_instance_id=attacker.unit_instance_id,
-                    maximum_model_distance_inches=moved_inches,
-                    maximum_model_horizontal_distance_inches=horizontal_inches,
-                ),
-            ),
-        )
+        from warhammer40k_core.engine.model_movement_history import ModelMovementDistance
+
+        state.model_movement_history = [
+            ModelMovementDistance(
+                event_id="fixture:accepted-move",
+                battle_round=1,
+                turn_player_id="player-a",
+                model_instance_id=model.model_instance_id,
+                distance_inches=moved_inches,
+            )
+            for model in attacker.own_models
+        ]
         selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
         declaration_request = _select_shooting_unit_and_type(
             lifecycle,

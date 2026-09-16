@@ -43,14 +43,16 @@ def charge_session(*, old_origin: Pose = _OLD_ORIGIN) -> LocalGameSession:
     return LocalGameSession(lifecycle=lifecycle)
 
 
-def add_modifier(state: GameState, *, effect_id: str, kind: str, delta: float) -> None:
+def add_modifier(
+    state: GameState, *, effect_id: str, kind: str, delta: float, unit_instance_id: str = SOURCE
+) -> None:
     parameters: dict[str, JsonValue] = {"delta": delta}
     if kind == "modify_dice_roll":
         parameters = {"delta": int(delta), "roll_type": "charge"}
     effect = generic_effect(
         effect_id=effect_id,
         owner_player_id="player-a",
-        target_unit_instance_ids=(SOURCE,),
+        target_unit_instance_ids=(unit_instance_id,),
         target_kind="this_unit",
         effect_kind=kind,
         parameters=parameters,

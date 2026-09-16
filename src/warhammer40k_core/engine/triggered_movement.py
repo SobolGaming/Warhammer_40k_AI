@@ -58,6 +58,10 @@ from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
 )
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowPayload
+from warhammer40k_core.engine.take_to_the_skies import flight_selection
+from warhammer40k_core.engine.triggered_movement_options import (
+    triggered_movement_unit_selection_options as _triggered_movement_unit_selection_options,
+)
 from warhammer40k_core.engine.triggered_movement_physical_authority import (
     merge_triggered_movement_source_endpoints,
     require_triggered_movement_source_model_placements,
@@ -645,7 +649,14 @@ class TriggeredMovementRequest:
             options.append(
                 DecisionOption(
                     option_id=option_id,
-                    label=f"{self.descriptor.movement_kind.value.title()} Move {index}",
+                    label=(
+                        f"{self.descriptor.movement_kind.value.title()} Move {index}"
+                        + (
+                            " - Take to the Skies"
+                            if flight_selection(resolution.movement_payload)
+                            else ""
+                        )
+                    ),
                     payload=validate_json_value(
                         {
                             "triggered_movement_kind": self.descriptor.movement_kind.value,
@@ -708,6 +719,7 @@ def triggered_movement_unit_selection_request(
             "eligible_units": [validate_json_value(unit.to_payload()) for unit in unit_options],
         },
         options=_triggered_movement_unit_selection_options(
+            state=state,
             descriptor=descriptor,
             eligible_units=unit_options,
         ),
@@ -817,6 +829,7 @@ def resolve_triggered_movement(
     normal_move_states: tuple[NormalMoveState, ...] = (),
     hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
+    take_to_the_skies: bool = False,
 ) -> TriggeredMovementResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Triggered movement requires a BattlefieldScenario.")
@@ -851,6 +864,23 @@ def resolve_triggered_movement(
         source_model_placements=source_model_placements,
         witness=path_witness,
     )
+    maximum_distance = descriptor.max_distance_inches
+    if take_to_the_skies:
+        from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+        from warhammer40k_core.engine.take_to_the_skies import flight_penalty
+
+        if descriptor.movement_mode is not MovementMode.NORMAL:
+            raise GameLifecycleError("Reactive flight requires a Normal move.")
+        maximum_distance = max(
+            0.0,
+            maximum_distance
+            - flight_penalty(
+                unit=rules_unit_view_from_armies(
+                    armies=scenario.armies, unit_instance_id=unit_placement.unit_instance_id
+                ),
+                ruleset=ruleset_descriptor,
+            ),
+        )
     unit = scenario.unit_instance_for_placement(unit_placement)
     hover_mode_state = _hover_mode_state_for_unit(
         hover_mode_states=hover_mode_states,
@@ -882,6 +912,9 @@ def resolve_triggered_movement(
             keywords=aircraft_policy.effective_keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=descriptor.movement_mode,
+            take_to_the_skies=take_to_the_skies,
+            unit=unit,
+            model_instance_id=placement.model_instance_id,
             movement_phase_action=None,
             displacement_kind=descriptor.displacement_kind,
         )
@@ -917,7 +950,7 @@ def resolve_triggered_movement(
                 for model_id in aircraft_model_ids
                 if model_id != placement.model_instance_id and model_id not in retained_model_ids
             ),
-            movement_distance_budget_inches=descriptor.max_distance_inches,
+            movement_distance_budget_inches=maximum_distance,
         ).validate()
         terrain_result = legality_context.to_terrain_path_legality_context(
             moving_model=moving_model,
@@ -931,7 +964,7 @@ def resolve_triggered_movement(
             validate_json_value(
                 {
                     "model_instance_id": placement.model_instance_id,
-                    "movement_inches": descriptor.max_distance_inches,
+                    "movement_inches": maximum_distance,
                     "start_pose": placement.pose.to_payload(),
                     "end_pose": path_witness.final_pose_for_model(
                         placement.model_instance_id
@@ -954,13 +987,23 @@ def resolve_triggered_movement(
         source_model_placements=source_model_placements,
         displacement_kind=descriptor.displacement_kind,
     )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+    from warhammer40k_core.engine.take_to_the_skies import flight_choice_context
+
     movement_payload: dict[str, JsonValue] = {
+        **flight_choice_context(
+            unit=rules_unit_view_from_armies(
+                armies=scenario.armies, unit_instance_id=unit_placement.unit_instance_id
+            ),
+            ruleset=ruleset_descriptor,
+            selected=take_to_the_skies,
+        ),
         "triggered_movement_kind": descriptor.movement_kind.value,
         "displacement_kind": descriptor.displacement_kind.value,
         "source_rule_id": descriptor.source_rule_id,
         "trigger_timing": validate_json_value(descriptor.trigger_timing.to_payload()),
         "movement_phase_action": None,
-        "movement_inches": descriptor.max_distance_inches,
+        "movement_inches": maximum_distance,
         "model_movements": model_movements,
         "path_validation_results": validate_json_value(
             [result.to_payload() for result in path_validation_results]
@@ -1270,54 +1313,6 @@ def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
     return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
 
 
-def _triggered_movement_unit_selection_options(
-    *,
-    descriptor: TriggeredMovementDescriptor,
-    eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
-) -> tuple[DecisionOption, ...]:
-    options: list[DecisionOption] = []
-    if descriptor.optional:
-        options.append(
-            DecisionOption(
-                option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
-                label="Decline Triggered Movement",
-                payload=validate_json_value(
-                    {
-                        "triggered_movement_kind": descriptor.movement_kind.value,
-                        "displacement_kind": descriptor.displacement_kind.value,
-                        "descriptor": descriptor.to_payload(),
-                        "source_rule_id": descriptor.source_rule_id,
-                        "trigger_timing": descriptor.trigger_timing.to_payload(),
-                        "movement_phase_action": None,
-                        "requires_movement_proposal": False,
-                        "declined": True,
-                    }
-                ),
-            )
-        )
-    for unit in eligible_units:
-        options.append(
-            DecisionOption(
-                option_id=f"{descriptor.movement_kind.value}:{unit.unit_instance_id}",
-                label=f"{descriptor.movement_kind.value.title()} {unit.unit_instance_id}",
-                payload=validate_json_value(
-                    {
-                        "triggered_movement_kind": descriptor.movement_kind.value,
-                        "displacement_kind": descriptor.displacement_kind.value,
-                        "unit_instance_id": unit.unit_instance_id,
-                        "descriptor": descriptor.to_payload(),
-                        "source_rule_id": descriptor.source_rule_id,
-                        "trigger_timing": descriptor.trigger_timing.to_payload(),
-                        "movement_phase_action": TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
-                        "requires_movement_proposal": True,
-                        "eligible_unit": unit.to_payload(),
-                    }
-                ),
-            )
-        )
-    return tuple(options)
-
-
 def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[reportUnusedFunction]
     *,
     state: GameState,
@@ -1390,6 +1385,9 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
                 "selection_request_id": result.request_id,
                 "selection_result_id": result.result_id,
                 "selection_option_id": result.selected_option_id,
+                "take_to_the_skies": flight_selection(payload)
+                if descriptor.movement_mode is MovementMode.NORMAL
+                else False,
             },
         )
         decisions.request_decision(reroll_request)
@@ -1443,6 +1441,9 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
             "selection_request_id": result.request_id,
             "selection_result_id": result.result_id,
             "selection_option_id": result.selected_option_id,
+            "take_to_the_skies": flight_selection(payload)
+            if descriptor.movement_mode is MovementMode.NORMAL
+            else False,
         },
     ).to_decision_request()
     decisions.request_decision(request)
@@ -1589,6 +1590,7 @@ def apply_triggered_movement_distance_reroll_decision(
             "selection_request_id": selection_request_id,
             "selection_result_id": selection_result_id,
             "selection_option_id": selection_option_id,
+            "take_to_the_skies": flight_selection(payload),
             "distance_reroll_request_id": request.request_id,
             "distance_reroll_result_id": result.result_id,
             "distance_roll_state": validate_json_value(rerolled_state.to_payload()),

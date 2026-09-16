@@ -839,7 +839,10 @@ def _apply_charging_unit_selection_decision(
         result=result,
         unit_instance_id=unit_instance_id,
     )
+    from warhammer40k_core.engine.take_to_the_skies import flight_selection
+
     selection = ChargingUnitSelection(
+        take_to_the_skies=flight_selection(result.payload),
         player_id=active_player_id,
         battle_round=state.battle_round,
         unit_instance_id=unit_instance_id,

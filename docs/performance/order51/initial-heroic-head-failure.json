@@ -1,0 +1,8 @@
+{
+  "workload_id": "order50-heroic-intervention-slice-v1",
+  "completed": false,
+  "failure": "Charge roll produced no reachable target; existing fixed-path benchmark expected select_charge_targets.",
+  "exception": "AssertionError at scripts/measure_heroic_intervention.py:81",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cfee445bfadeff5e5702fb06d89f817fea42fc26a42065b3a40ba5dcc2954869",
+  "resolution": "Versioned v2 uses a real +20 Charge-roll modifier before the source cap, preserving the measured accepted path independently of seeded dice."
+}

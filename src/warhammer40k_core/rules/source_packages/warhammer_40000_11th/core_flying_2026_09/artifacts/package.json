@@ -1,0 +1,85 @@
+{
+  "artifact_schema": "core-v2-core-flying-source-v1",
+  "source_package_id": "gw-11e-core-flying",
+  "source_version": "maintained-app-mirrors-observed-2026-09-15",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-flying:take-to-the-skies",
+      "section_id": "21.03 FAQ v931",
+      "source_text": "you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "transcription_sha256": "92b3008c4e2a4340d8889da3008bbc923569d0451896a17ffad11bc2408ea19b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.take_to_the_skies:flight_choices",
+        "warhammer40k_core.engine.movement_legality:MovementCapabilitySet",
+        "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-flying-review:take-to-the-skies",
+      "rule_source_id": "gw-11e-core-flying:take-to-the-skies",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "Game Datamissions 21.03 FAQ v931 take-to-the-skies",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "92b3008c4e2a4340d8889da3008bbc923569d0451896a17ffad11bc2408ea19b",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "8cda2058e956183d0c43b2cf1950ba65592d525668f62e4d7106236cec6c0aee",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.take_to_the_skies:flight_choices",
+        "warhammer40k_core.engine.movement_legality:MovementCapabilitySet",
+        "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget"
+      ]
+    },
+    {
+      "evidence_id": "core-flying-mirror:take-to-the-skies",
+      "rule_source_id": "gw-11e-core-flying:take-to-the-skies",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-flying-maintained-app-mirrors-2026-09-15",
+      "review_audit_row_id": "take-to-the-skies",
+      "review_audit_source_observation_sha256": "016ad68ee8868f6a8cd139544a39b31fad0e5775f947619858eceffa123e2f62",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 21.03 FAQ v931 take-to-the-skies",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "92b3008c4e2a4340d8889da3008bbc923569d0451896a17ffad11bc2408ea19b",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "9545afddb9ae954487865660ba33f44706c9383efe8ddcfe6988a67c12054a2a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.take_to_the_skies:flight_choices",
+        "warhammer40k_core.engine.movement_legality:MovementCapabilitySet",
+        "warhammer40k_core.engine.charge_movement_budget:current_charge_movement_budget"
+      ]
+    }
+  ],
+  "package_hash": "27b26c14f4f80bea2ee9e7ce13d91254e9e7d2959f534ad86f05d95d0d599160"
+}

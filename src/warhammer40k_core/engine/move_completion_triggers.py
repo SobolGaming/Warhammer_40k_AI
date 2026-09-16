@@ -65,7 +65,14 @@ def record_move_completion_event(
 ) -> EventRecord:
     if event_type not in MOVE_COMPLETION_EVENT_TYPES:
         raise GameLifecycleError("Move-completion recorder requires a supported source event.")
+    from warhammer40k_core.engine.model_movement_history import distances_from_completion
+
+    if state.active_player_id is None:
+        raise GameLifecycleError("Movement history requires the current turn owner.")
     event = decisions.event_log.append(event_type, payload)
+    state.model_movement_history.extend(
+        distances_from_completion(event, turn_player_id=state.active_player_id)
+    )
     context = move_trigger_source_context(state=state, decisions=decisions, event=event)
     if context["movement_action"] in _MOVE_ACTIONS:
         observe_rule_trigger(

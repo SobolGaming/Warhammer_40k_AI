@@ -27,6 +27,7 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSourcePayload,
 )
 from warhammer40k_core.engine.effects import PersistingEffectPayload
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_resources import FactionResourceLedgerPayload
 from warhammer40k_core.engine.faction_rule_states import FactionRuleStatePayload
 from warhammer40k_core.engine.fight_order import FightPhaseStatePayload
@@ -211,6 +212,7 @@ class GameStatePayload(TypedDict):
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
     normal_move_states: list[NormalMoveStatePayload]
+    model_movement_history: list[dict[str, JsonValue]]
     battle_shocked_unit_ids: list[str]
     battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
     objective_control_records: list[ObjectiveControlRecordPayload]

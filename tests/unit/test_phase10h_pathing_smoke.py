@@ -214,7 +214,7 @@ def test_fly_normal_move_can_transit_enemy_models_and_engagement_range() -> None
     mover = _model("fly-mover", 1.0, 1.0)
     enemy_base_blocker = _model("enemy-base-blocker", 3.0, 1.0)
     enemy_engagement_blocker = _model("enemy-engagement-blocker", 3.0, 2.5)
-    context = _normal_legality_context(keywords=("FLY", "INFANTRY"))
+    context = _normal_legality_context(keywords=("FLY", "INFANTRY"), take_to_the_skies=True)
 
     enemy_base_context = _path_context(
         context,
@@ -273,7 +273,7 @@ def test_fly_normal_move_still_cannot_end_in_enemy_engagement_range_or_on_model(
     mover = _model("fly-mover", 1.0, 1.0)
     engagement_blocker = _model("enemy-engagement-blocker", 3.0, 2.5)
     model_blocker = _model("enemy-model-blocker", 3.0, 1.0)
-    context = _normal_legality_context(keywords=("FLY", "INFANTRY"))
+    context = _normal_legality_context(keywords=("FLY", "INFANTRY"), take_to_the_skies=True)
 
     engagement_result = _path_context(
         context,
@@ -302,7 +302,7 @@ def test_fly_normal_move_still_cannot_end_in_enemy_engagement_range_or_on_model(
 def test_fly_vehicle_can_transit_friendly_vehicle_monster_blocker() -> None:
     mover = _model("fly-vehicle-mover", 1.0, 1.0, radius=0.7)
     friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
-    context = _normal_legality_context(keywords=("FLY", "VEHICLE"))
+    context = _normal_legality_context(keywords=("FLY", "VEHICLE"), take_to_the_skies=True)
 
     result = _path_context(
         context,
@@ -547,9 +547,11 @@ def _model(
 def _normal_legality_context(
     *,
     keywords: tuple[str, ...] = ("INFANTRY",),
+    take_to_the_skies: bool = False,
 ) -> MovementLegalityContext:
     return _legality_context(
         keywords=keywords,
+        take_to_the_skies=take_to_the_skies,
         movement_mode=MovementMode.NORMAL,
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
@@ -562,9 +564,11 @@ def _legality_context(
     movement_phase_action: MovementPhaseActionKind | None,
     displacement_kind: ModelDisplacementKind,
     keywords: tuple[str, ...] = ("INFANTRY",),
+    take_to_the_skies: bool = False,
 ) -> MovementLegalityContext:
     return MovementLegalityContext.from_keywords(
         keywords=keywords,
+        take_to_the_skies=take_to_the_skies,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=movement_mode,
         movement_phase_action=None

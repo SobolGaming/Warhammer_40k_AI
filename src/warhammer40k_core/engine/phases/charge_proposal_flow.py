@@ -9,6 +9,9 @@ from warhammer40k_core.engine.charge_movement_source import (
 )
 from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
 from warhammer40k_core.engine.charge_target_continuation import current_charge_targets
+from warhammer40k_core.engine.take_to_the_skies import (
+    selected_charge_flight as flight_selection_for_charge,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -398,6 +401,7 @@ def _apply_charge_move_proposal_decision(
         unit_placement=unit_placement,
         selected_target_unit_instance_ids=proposal.charge_target_unit_instance_ids,
         maximum_distance_inches=budget.maximum_distance_inches,
+        take_to_the_skies=flight_selection_for_charge(state),
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),

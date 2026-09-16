@@ -115,6 +115,16 @@ def invalid_catalog_setup_reactive_charge_move_status(
     roll = ChargeRollResult.from_payload(
         cast(ChargeRollResultPayload, setup_reactive_payload_object(context["charge_roll"]))
     )
+    from warhammer40k_core.engine.flight_decision_authority import validate_charge_flight
+
+    try:
+        validate_charge_flight(roll=roll.request, decisions=decisions)
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message=str(exc),
+            payload={"invalid_reason": "setup_reactive_charge_flight_drift"},
+        )
     maximum_distance = roll.movement_budget.maximum_distance_inches
     if context.get("maximum_distance_inches") != maximum_distance:
         raise GameLifecycleError("Setup-reactive Charge budget context drift.")
@@ -220,6 +230,16 @@ def apply_catalog_setup_reactive_charge_move(
     roll = ChargeRollResult.from_payload(
         cast(ChargeRollResultPayload, setup_reactive_payload_object(context["charge_roll"]))
     )
+    from warhammer40k_core.engine.flight_decision_authority import validate_charge_flight
+
+    try:
+        validate_charge_flight(roll=roll.request, decisions=decisions)
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message=str(exc),
+            payload={"invalid_reason": "setup_reactive_charge_flight_drift"},
+        )
     maximum_distance = roll.movement_budget.maximum_distance_inches
     if context.get("maximum_distance_inches") != maximum_distance:
         raise GameLifecycleError("Setup-reactive Charge budget context drift.")
@@ -230,6 +250,7 @@ def apply_catalog_setup_reactive_charge_move(
         selected_target_unit_instance_ids=proposal.charge_target_unit_instance_ids,
         maximum_distance_inches=maximum_distance,
         path_witness=proposal.witness,
+        take_to_the_skies=roll.request.take_to_the_skies,
         hover_mode_states=tuple(state.hover_mode_states),
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
         ability_index=ability_index,

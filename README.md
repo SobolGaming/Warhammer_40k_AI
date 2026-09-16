@@ -791,3 +791,15 @@ Order 33 / P10 Indirect Shooting implementation and review evidence are tracked
 in [the scope and acceptance matrix](docs/ORDER_33_SCOPE_PLAN.md). Reproduce its
 offline source artifacts with `uv run python tools/build_core_indirect_shooting_source.py --check`.
 The phase decision schemas remain in [the adapter contract](docs/ADAPTER_DECISION_CONTRACT.md).
+
+### Order 51: Take to the Skies
+
+Flight is a finite choice for each eligible move, before Advance or Charge dice.
+Only FLY models in the selected rules unit receive its transit and vertical-distance
+permissions; Hover retains the choice and waives its two-inch maximum-distance
+penalty. Per-model accepted distances persist across phases for Heavy's turn-long
+movement check. See [scope and evidence](docs/ORDER_51_SCOPE_PLAN.md) and
+[contract 22 migration](contracts/migrations/21-to-22.md).
+
+Check the reviewed timing source with
+`uv run python tools/build_core_flying_source.py --check`.

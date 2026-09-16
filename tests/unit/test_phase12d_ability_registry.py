@@ -434,10 +434,14 @@ def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index()
     capabilities = MovementCapabilitySet.from_keywords(
         ("Fly", "Infantry"),
         ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        take_to_the_skies=True,
     )
     empty_capabilities = MovementCapabilitySet.from_keywords(
         ("Fly", "Infantry"),
         ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        take_to_the_skies=True,
         ability_index=empty_index,
     )
 
@@ -463,6 +467,8 @@ def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index()
     missing_handler_capabilities = MovementCapabilitySet.from_keywords(
         ("Fly", "Infantry"),
         ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        take_to_the_skies=True,
         ability_registry=AbilityHandlerRegistry.empty(),
     )
     assert not missing_handler_capabilities.has_fly
