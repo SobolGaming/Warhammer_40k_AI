@@ -27,6 +27,7 @@ def _session(
     source: str = SOURCE,
     kind: TriggeredMovementKind = TriggeredMovementKind.SURGE,
     reroll: bool = False,
+    reroll_bonus: int = 0,
 ) -> tuple[LocalGameSession, DecisionRequest]:
     from dataclasses import replace
 
@@ -61,9 +62,14 @@ def _session(
                 actor_id="player-a",
             )
         )
-        descriptor = replace(descriptor, max_distance_inches=float(roll.current_total))
+        descriptor = replace(
+            descriptor, max_distance_inches=float(roll.current_total + reroll_bonus)
+        )
         eligible = replace(
-            eligible, distance_roll_state=roll, distance_reroll_permission=permission
+            eligible,
+            distance_roll_state=roll,
+            distance_reroll_permission=permission,
+            distance_roll_bonus_inches=reroll_bonus,
         )
     request = triggered_movement_unit_selection_request(
         state=state,
@@ -199,11 +205,21 @@ def test_prior_non_surge_move_prevents_surge_in_same_actual_player_phase() -> No
     assert [option.option_id for option in request.options] == ["decline_triggered_movement"]
 
 
-def test_surge_target_survives_distance_reroll_and_checkpoint() -> None:
+@pytest.mark.parametrize("option_id", ["reroll:0", "decline"])
+@pytest.mark.parametrize("bonus", [0, 2])
+def test_surge_target_survives_distance_reroll_and_checkpoint(option_id: str, bonus: int) -> None:
+    from typing import cast
+
     from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
     from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.engine.triggered_movement import (
+        TriggeredMovementDescriptor,
+        TriggeredMovementDescriptorPayload,
+    )
 
-    session, selection = _session(reroll=True)
+    session, selection = _session(reroll=True, reroll_bonus=bonus)
     status = session.submit_option(
         request_id=selection.request_id,
         result_id="select-rolled-surge",
@@ -214,8 +230,9 @@ def test_surge_target_survives_distance_reroll_and_checkpoint() -> None:
     assert reroll.decision_type == DICE_REROLL_DECISION_TYPE
     restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
     assert restored.to_payload() == session.lifecycle.to_payload()
+
     status = session.submit_option(
-        request_id=reroll.request_id, result_id="surge-reroll", option_id="reroll:0"
+        request_id=reroll.request_id, result_id="surge-reroll", option_id=option_id
     )
     assert status.decision_request is not None
     proposal = MovementProposalRequest.from_decision_request_payload(
@@ -225,6 +242,155 @@ def test_surge_target_survives_distance_reroll_and_checkpoint() -> None:
     assert proposal.context["surge_target_unit_instance_id"] == TARGET
     restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
     assert restored.to_payload() == session.lifecycle.to_payload()
+    descriptor = TriggeredMovementDescriptor.from_payload(
+        cast(TriggeredMovementDescriptorPayload, proposal.context["descriptor"])
+    )
+    distance = descriptor.max_distance_inches
+    status = _submit_path(session, status.decision_request, (distance,) * 5, "rolled-path")
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    artifact = session.replay_artifact(artifact_id="surge-distance-grant")
+    assert ReplayRunner.from_payload(artifact).run().status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.parametrize("stage", ["proposal", "retry", "reroll_pending", "rerolled", "kept"])
+@pytest.mark.parametrize("field", ["max_distance_inches", "movement_kind", "optional"])
+def test_surge_restore_rejects_descriptor_drift_from_recorded_grant(stage: str, field: str) -> None:
+    import copy
+
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session, selection = _session(reroll=stage in {"reroll_pending", "rerolled", "kept"})
+    status = session.submit_option(
+        request_id=selection.request_id,
+        result_id="grant-select",
+        option_id=f"surge:{SOURCE}:target:{TARGET}",
+    )
+    assert status.decision_request is not None
+    if stage in {"rerolled", "kept"}:
+        session.submit_option(
+            request_id=status.decision_request.request_id,
+            result_id="grant-reroll",
+            option_id="reroll:0" if stage == "rerolled" else "decline",
+        )
+    elif stage == "retry":
+        _submit_path(session, status.decision_request, (1,) * 5, "grant-short")
+    checkpoint = copy.deepcopy(session.lifecycle.to_payload())
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    pending = checkpoint["decisions"]["queue"]["pending_requests"][0]
+    context = pending["payload"]
+    assert isinstance(context, dict)
+    if stage != "reroll_pending":
+        proposal = context["proposal_request"]
+        assert isinstance(proposal, dict)
+        context = proposal["context"]
+        assert isinstance(context, dict)
+    descriptor = context["descriptor"]
+    assert isinstance(descriptor, dict)
+    original = descriptor["max_distance_inches"]
+    assert isinstance(original, (int, float))
+    descriptor[field] = {
+        "max_distance_inches": original + 3,
+        "movement_kind": "triggered",
+        "optional": False,
+    }[field]
+    for event in checkpoint["decisions"]["event_log"]:
+        if (
+            event["event_type"] == "decision_requested"
+            and isinstance(event["payload"], dict)
+            and event["payload"].get("request_id") == pending["request_id"]
+        ):
+            event["payload"] = validate_json_value(pending)
+    assert (
+        checkpoint["decisions"]["records"][0]
+        == session.lifecycle.to_payload()["decisions"]["records"][0]
+    )
+    with pytest.raises(
+        GameLifecycleError, match="Surge descriptor differs from its recorded grant"
+    ):
+        GameLifecycle.from_payload(checkpoint)
+
+
+@pytest.mark.parametrize("tamper", ["roll_copy", "reroll_id", "bonus", "dice_event"])
+def test_surge_restore_authenticates_reroll_evidence(tamper: str) -> None:
+    import copy
+
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session, selection = _session(reroll=True)
+    status = session.submit_option(
+        request_id=selection.request_id,
+        result_id="evidence-select",
+        option_id=f"surge:{SOURCE}:target:{TARGET}",
+    )
+    assert status.decision_request is not None
+    session.submit_option(
+        request_id=status.decision_request.request_id,
+        result_id="evidence-reroll",
+        option_id="reroll:0",
+    )
+    checkpoint = copy.deepcopy(session.lifecycle.to_payload())
+    pending = checkpoint["decisions"]["queue"]["pending_requests"][0]
+    assert isinstance(pending["payload"], dict)
+    proposal = pending["payload"]["proposal_request"]
+    assert isinstance(proposal, dict)
+    context = proposal["context"]
+    assert isinstance(context, dict)
+    if tamper == "roll_copy":
+        context["distance_roll_state"] = None
+    elif tamper == "reroll_id":
+        context["distance_reroll_request_id"] = selection.request_id
+    elif tamper == "bonus":
+        unit = context["selected_unit"]
+        assert isinstance(unit, dict)
+        unit["distance_roll_bonus_inches"] = 3
+    else:
+        rolled = next(
+            event
+            for event in reversed(checkpoint["decisions"]["event_log"])
+            if event["event_type"] == "dice_rolled"
+        )
+        assert isinstance(rolled["payload"], dict)
+        rolled["payload"]["source"] = "fixed"
+    for event in checkpoint["decisions"]["event_log"]:
+        if (
+            event["event_type"] == "decision_requested"
+            and isinstance(event["payload"], dict)
+            and event["payload"].get("request_id") == pending["request_id"]
+        ):
+            event["payload"] = validate_json_value(pending)
+    with pytest.raises(GameLifecycleError, match=r"Surge (distance|lost|selected unit)"):
+        GameLifecycle.from_payload(checkpoint)
+
+
+def test_surge_limit_drift_rejects_live_submission_before_queue_pop() -> None:
+    import copy
+
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session, selection = _session()
+    status = session.submit_option(
+        request_id=selection.request_id,
+        result_id="live-grant-select",
+        option_id=f"surge:{SOURCE}:target:{TARGET}",
+    )
+    request = status.decision_request
+    assert request is not None
+    assert isinstance(request.payload, dict)
+    proposal = request.payload["proposal_request"]
+    assert isinstance(proposal, dict)
+    context = proposal["context"]
+    assert isinstance(context, dict)
+    descriptor = context["descriptor"]
+    assert isinstance(descriptor, dict)
+    assert descriptor["max_distance_inches"] == 3
+    descriptor["max_distance_inches"] = 6
+    before = copy.deepcopy(session.lifecycle.to_payload())
+    status = _submit_path(session, request, (6,) * 5, "live-inflated-limit")
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {"invalid_reason": "surge_authority_drift"}
+    assert session.lifecycle.to_payload() == before
 
 
 def test_surge_reroll_revalidates_eligibility_before_consuming_dice() -> None:

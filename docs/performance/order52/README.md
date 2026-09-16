@@ -31,6 +31,29 @@ before/after profiled reports retain all work counts; the repaired path uses 8
 lookups and preserves every existing budget. A phase containing a Surge still
 resolves canonical unit/model identity before deciding whether that unit is locked.
 
+## Recorded-grant review fix
+
+`grant-base.json` and `grant-head.json` measure the shared authority boundary
+before and after binding the restored descriptor to its original grant. The same
+driver validates a fixed-distance proposal and an accepted-reroll proposal through
+canonical ten-model sessions, with 27 and 33 recorded events respectively. Seven
+serial samples exclude fixture setup, coverage and competing tests. Both runs use
+the same provisional host, dependency lock and fixture helper; the base is an
+isolated archive of `cf740452`, and the head report pins the corrected runtime ID.
+
+The combined mean increased from 1.179 ms to 2.262 ms; the head maximum was
+2.343 ms. The existing 0.5-second maximum and mean ratio 2 plus 0.02 seconds
+remain unchanged and pass. This small checkpoint workload does not certify
+long-history or full-game costs. Both reports retain the complete samples and
+input hashes, and the quality audit checks the matched inputs and budgets.
+
+Run `scripts/measure_surge_authority.py` from each matching runtime root using
+that root's `src` and fixture modules on `PYTHONPATH`:
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python scripts/measure_surge_authority.py --revision REVISION --output grant.json
+```
+
 Run the same committed driver and fixture against each matching runtime:
 
 ```sh

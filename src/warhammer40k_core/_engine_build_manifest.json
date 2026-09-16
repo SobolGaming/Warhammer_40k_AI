@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0fe6cd5e222683254c1840e120917c00305825cc89a6e7d6246d0e9aa66dca06",
-  "fingerprint": "0fe6cd5e222683254c1840e120917c00305825cc89a6e7d6246d0e9aa66dca06",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:08e23951fca0b38b5e6b98086825862c9de1af2d9cce8df1ed1a648849c8941f",
+  "fingerprint": "08e23951fca0b38b5e6b98086825862c9de1af2d9cce8df1ed1a648849c8941f",
   "resource_count": 2821,
   "resources": [
     {
@@ -12015,9 +12015,9 @@
       "sha256": "fd4d6536e1c5f0272151c324547f5b405991528a9d3cabc72e10c493cc57ef13"
     },
     {
-      "byte_length": 8183,
+      "byte_length": 14941,
       "path": "warhammer40k_core/engine/surge_authority.py",
-      "sha256": "7b5cd02969cfbd08503d917b4289d15c6ba7793b0220e33b98e3bcba8b64d88c"
+      "sha256": "77fc29a76fe548eaa5d355942ba8f032180a058899e8de43604324b81f64da6b"
     },
     {
       "byte_length": 3406,
@@ -12030,9 +12030,9 @@
       "sha256": "cc5d94d0b982df1030a9938be4c5c283dd89b42f161179723069e703898633b5"
     },
     {
-      "byte_length": 11745,
+      "byte_length": 11769,
       "path": "warhammer40k_core/engine/surge_history.py",
-      "sha256": "f981bc5b1ede7b79349e132a50b429a09672fa94becb3850fae254e2cdac4072"
+      "sha256": "03dfb4dde5aaa6432bdf1e75991a5854c260f1cae9143f3719e3ad7e197e8a29"
     },
     {
       "byte_length": 7323,

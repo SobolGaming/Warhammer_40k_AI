@@ -65,6 +65,26 @@ completes its source-granted Surge through the shared implementation. Corsair
 Vengeful Sorrow supplies its real decision/event history to the same trigger
 validator and exposes the committed enemy target.
 
+The pre-merge grant review found a violated authority invariant: changing a
+pending proposal's distance from 3 to 6 inches, together with its matching request
+event, survived restore because only the target was bound to the original finite
+selection. The shared selection-chain validator now compares the entire
+descriptor and selected-unit record with that grant. Changed distances require
+the original reroll permission, matching decision IDs, ordered recorded events,
+and an isolated reconstruction through `DiceRollManager.resolve_reroll`; only
+the original source bonus is added. The copied proposal roll state must match.
+Live submission, pending rerolls, retries and completed-movement history consume
+this same validator. A changed movement-kind token cannot bypass it.
+
+The focused bug-class search followed descriptor replacement and distance-roll
+copies in triggered-movement selection, reroll resolution, proposal retries and
+Surge completion history, and checked the existing Charge/Battle-shock historical
+dice validation patterns. The fix stays within Surge grant authentication and
+reuses the dice owner; unrelated reaction families and geometric solvers are
+unchanged. Regression cases reject descriptor, bonus, reroll-reference and dice
+evidence tampering, including the reported checkpoint edit, while accepted and
+declined rerolls with source bonuses complete, restore and replay exactly.
+
 ## Geometric proof boundary
 
 An endpoint already engaging the selected target satisfies that model's required
@@ -80,5 +100,6 @@ Focused tests cover facade selection, ties, every-model approach, Engagement,
 non-target exclusion, prior movement, Battle-shock drift, rerolls, attachment,
 phase/turn scoping, player projections, rejection/retry, exact replay and checkpoint
 tampering. Source and static audits pin the reviewed artifact and shared owners.
-Final aggregate validation is recorded in `performance/order52/validation.json`.
+Initial aggregate validation is recorded in `performance/order52/validation.json`;
+the grant-review fix's final gates are in `performance/order52/grant-validation.json`.
 Performance evidence and its limits are in [the diagnostic report](performance/order52/README.md).

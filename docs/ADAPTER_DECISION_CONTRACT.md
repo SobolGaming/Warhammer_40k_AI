@@ -6030,6 +6030,16 @@ stale geometry and malformed proposals are rejected before queue pop. A
 well-formed but rule-invalid path is recorded with a fresh retry request and
 does not mutate battlefield or movement history.
 
+Restore, live submission and completed-movement history also bind the entire
+Surge descriptor and selected unit to that original finite grant. A distance
+change requires the matching recorded reroll decision and permission. The engine
+reconstructs its dice transition from the preceding event history, authenticates
+the resulting dice events and roll-state copy, and adds only the original source's
+distance bonus. Keeping the roll preserves its distance. Editing a proposal and
+its matching `decision_requested` event cannot enlarge the movement limit. This
+validation uses the existing contract 23 payloads and adds no adapter choice or
+schema field.
+
 Every living model must engage the selected target if a legal path permits it,
 otherwise achieve a proved nearest endpoint. No model may finish engaged with
 another enemy. `surge_model_endpoints` records model/component/target IDs, the

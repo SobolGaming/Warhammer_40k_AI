@@ -2,21 +2,27 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.event_log import EventLog, EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phase_movement_history import surge_locked
-from warhammer40k_core.engine.surge_choices import selected_surge_target
+from warhammer40k_core.engine.surge_choices import selected_surge_target, surge_choice_context
 from warhammer40k_core.engine.surge_movement import surge_ineligibility, validate_surge_target
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+    TRIGGERED_MOVEMENT_DISTANCE_REROLL_CONTEXT_KIND,
     TriggeredMovementDescriptor,
     TriggeredMovementDescriptorPayload,
+    TriggeredMovementEligibleUnit,
+    TriggeredMovementEligibleUnitPayload,
     TriggeredMovementKind,
     is_triggered_movement_distance_reroll_request,
     is_triggered_movement_proposal_request,
@@ -102,12 +108,22 @@ def validate_surge_request(
     descriptor = TriggeredMovementDescriptor.from_payload(
         cast(TriggeredMovementDescriptorPayload, payload["descriptor"])
     )
-    if descriptor.movement_kind is not TriggeredMovementKind.SURGE:
+    if descriptor.movement_kind is not TriggeredMovementKind.SURGE and not any(
+        record.request.request_id == payload.get("selection_request_id")
+        and record.request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
+        and isinstance(record.request.payload, dict)
+        and isinstance(record.request.payload.get("descriptor"), dict)
+        and cast(dict[str, JsonValue], record.request.payload["descriptor"]).get("movement_kind")
+        == TriggeredMovementKind.SURGE.value
+        for record in decisions.records
+    ):
         return
     require_surge_trigger(state=state, decisions=decisions, descriptor=descriptor)
     selections: tuple[dict[str, JsonValue], ...]
     if proposal or request.decision_type != SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE:
-        selections = (validate_surge_selection_chain(decisions, payload, descriptor),)
+        selections = (
+            validate_surge_selection_chain(decisions, payload, descriptor, request=request),
+        )
     elif result is not None:
         result.validate_for_request(request)
         if not isinstance(result.payload, dict):
@@ -139,6 +155,8 @@ def validate_surge_selection_chain(
     decisions: DecisionController,
     context: dict[str, JsonValue],
     descriptor: TriggeredMovementDescriptor,
+    *,
+    request: DecisionRequest,
 ) -> dict[str, JsonValue]:
     matches = tuple(
         record
@@ -153,7 +171,137 @@ def validate_surge_selection_chain(
     selected = matches[0].result.payload
     if selected_surge_target(context, descriptor) != selected_surge_target(selected, descriptor):
         raise GameLifecycleError("Surge target differs from its original finite choice.")
+    _validate_surge_granted_descriptor(
+        decisions=decisions,
+        selection=matches[0],
+        request=request,
+        context=context,
+        descriptor=descriptor,
+    )
     return selected
+
+
+def _validate_surge_granted_descriptor(
+    *,
+    decisions: DecisionController,
+    selection: DecisionRecord,
+    request: DecisionRequest,
+    context: dict[str, JsonValue],
+    descriptor: TriggeredMovementDescriptor,
+) -> None:
+    grant = selection.request.payload
+    chosen = selection.result.payload
+    if (
+        not isinstance(grant, dict)
+        or not isinstance(grant.get("descriptor"), dict)
+        or not isinstance(chosen, dict)
+        or not isinstance(chosen.get("eligible_unit"), dict)
+    ):
+        raise GameLifecycleError("Surge original grant is malformed.")
+    original = TriggeredMovementDescriptor.from_payload(
+        cast(TriggeredMovementDescriptorPayload, grant["descriptor"])
+    )
+    unit = TriggeredMovementEligibleUnit.from_payload(
+        cast(TriggeredMovementEligibleUnitPayload, chosen["eligible_unit"])
+    )
+    if context.get("selected_unit") != unit.to_payload():
+        raise GameLifecycleError("Surge selected unit differs from its recorded grant.")
+    expected = original
+    pending_reroll = is_triggered_movement_distance_reroll_request(request)
+    reroll_fields = {
+        "distance_reroll_request_id",
+        "distance_reroll_result_id",
+        "distance_roll_state",
+    }
+    if unit.distance_reroll_permission is None or pending_reroll:
+        if reroll_fields & context.keys():
+            raise GameLifecycleError("Surge has ungranted distance reroll evidence.")
+    else:
+        matches = tuple(
+            record
+            for record in decisions.records
+            if record.request.request_id == context.get("distance_reroll_request_id")
+            and record.result.result_id == context.get("distance_reroll_result_id")
+            and is_triggered_movement_distance_reroll_request(record.request)
+        )
+        if len(matches) != 1:
+            raise GameLifecycleError("Surge lost its recorded distance reroll decision.")
+        record = matches[0]
+        _validate_surge_reroll_request(record.request, selection, original, unit)
+        events = decisions.event_log.records
+        selection_index = _surge_event_index(events, "decision_recorded", selection.to_payload())
+        reroll_index = _surge_event_index(events, "decision_recorded", record.to_payload())
+        proposal_index = _surge_event_index(events, "decision_requested", request.to_payload())
+        if not selection_index < reroll_index < proposal_index:
+            raise GameLifecycleError("Surge distance reroll decision order drifted.")
+        game_id = grant.get("game_id")
+        initial = unit.distance_roll_state
+        if not isinstance(game_id, str) or initial is None:
+            raise GameLifecycleError("Surge distance reroll source is missing.")
+        # Reconstruct only the recorded dice transition on an isolated event log.
+        # No proposal-supplied total or roll-state copy can enlarge the grant.
+        boundary = reroll_index + 1
+        manager = DiceRollManager(
+            game_id,
+            event_log=EventLog.from_payload([event.to_payload() for event in events[:boundary]]),
+        )
+        rolled = manager.resolve_reroll(
+            initial, request=record.request, result=record.result, record_decision=False
+        )
+        generated = manager.event_log.records[boundary:]
+        if (
+            boundary + len(generated) > proposal_index
+            or generated != events[boundary : boundary + len(generated)]
+            or context.get("distance_roll_state") != rolled.to_payload()
+        ):
+            raise GameLifecycleError("Surge distance reroll evidence differs from recorded dice.")
+        expected = replace(
+            original,
+            max_distance_inches=float(rolled.current_total + unit.distance_roll_bonus_inches),
+        )
+    if descriptor != expected:
+        raise GameLifecycleError("Surge descriptor differs from its recorded grant.")
+    if pending_reroll:
+        _validate_surge_reroll_request(request, selection, original, unit)
+
+
+def _validate_surge_reroll_request(
+    request: DecisionRequest,
+    selection: DecisionRecord,
+    descriptor: TriggeredMovementDescriptor,
+    unit: TriggeredMovementEligibleUnit,
+) -> None:
+    if unit.distance_roll_state is None or unit.distance_reroll_permission is None:
+        raise GameLifecycleError("Surge has no recorded distance reroll permission.")
+    expected = DiceRollManager(0).build_reroll_request(
+        unit.distance_roll_state,
+        request_id=request.request_id,
+        actor_id=selection.result.actor_id,
+        permission=unit.distance_reroll_permission,
+        extra_payload={
+            **surge_choice_context(selection.result.payload, descriptor),
+            "context_kind": TRIGGERED_MOVEMENT_DISTANCE_REROLL_CONTEXT_KIND,
+            "descriptor": validate_json_value(descriptor.to_payload()),
+            "selected_unit": validate_json_value(unit.to_payload()),
+            "selection_request_id": selection.request.request_id,
+            "selection_result_id": selection.result.result_id,
+            "selection_option_id": selection.result.selected_option_id,
+            "take_to_the_skies": False,
+        },
+    )
+    if request != expected:
+        raise GameLifecycleError("Surge distance reroll request differs from its recorded grant.")
+
+
+def _surge_event_index(events: tuple[EventRecord, ...], event_type: str, payload: object) -> int:
+    matches = tuple(
+        index
+        for index, event in enumerate(events)
+        if event.event_type == event_type and event.payload == payload
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("Surge distance reroll lost its recorded event authority.")
+    return matches[0]
 
 
 def invalid_surge_authority(
