@@ -824,6 +824,20 @@ class GameLifecycle:
             )
             if destruction_invalid is not None:
                 return destruction_invalid
+            from warhammer40k_core.engine.surge_authority import invalid_surge_authority
+            from warhammer40k_core.engine.triggered_movement import (
+                is_triggered_movement_distance_reroll_request,
+            )
+
+            if is_triggered_movement_distance_reroll_request(pending_request):
+                surge_invalid = invalid_surge_authority(
+                    state=state,
+                    decisions=self.decision_controller,
+                    request=pending_request,
+                    result=result,
+                )
+                if surge_invalid is not None:
+                    return surge_invalid
             handler = self._decision_dispatch_registry.handler_for(pending_request.decision_type)
             invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:
@@ -984,6 +998,16 @@ class GameLifecycle:
 
         validate_restored_flight(
             state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
+        from warhammer40k_core.engine.surge_authority import validate_restored_surge
+
+        validate_restored_surge(
+            state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
+        from warhammer40k_core.engine.phase_movement_history import validate_phase_movement_history
+
+        validate_phase_movement_history(
+            state=lifecycle._require_state(), events=lifecycle.decision_controller.event_log.records
         )
         validate_model_movement_history(
             lifecycle._require_state(), lifecycle.decision_controller.event_log.records
@@ -1765,6 +1789,16 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+        from warhammer40k_core.engine.surge_authority import invalid_surge_authority
+
+        surge_status = invalid_surge_authority(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            request=request,
+            result=result,
+        )
+        if surge_status is not None:
+            return surge_status
 
         return invalid_flight_authority(
             state=self._require_state(),

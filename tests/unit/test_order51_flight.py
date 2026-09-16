@@ -16,6 +16,7 @@ from tests.phase15a_charge_test_support import (
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.geometry.pose import Pose
 
@@ -414,6 +415,10 @@ def test_heavy_uses_each_models_accepted_vertical_distance(selected: bool, mixed
         event_type="movement_activation_completed",
         payload={
             **resolution.movement_payload,
+            "transition_batch": validate_json_value(
+                resolution.transition_batch(before=placement).to_payload()
+            ),
+            "witness": validate_json_value(witness.to_payload()),
             "game_id": state.game_id,
             "battle_round": 1,
             "active_player_id": "player-a",
@@ -441,6 +446,10 @@ def test_heavy_uses_each_models_accepted_vertical_distance(selected: bool, mixed
             event_type="movement_activation_completed",
             payload={
                 **resolution.movement_payload,
+                "transition_batch": validate_json_value(
+                    resolution.transition_batch(before=placement).to_payload()
+                ),
+                "witness": validate_json_value(witness.to_payload()),
                 "game_id": state.game_id,
                 "battle_round": 1,
                 "active_player_id": "player-a",
@@ -548,6 +557,8 @@ def test_reactive_flight_is_bound_through_retry_and_restore(selected: bool, hove
         TriggeredMovementDescriptor,
         TriggeredMovementEligibleUnit,
         TriggeredMovementKind,
+    )
+    from warhammer40k_core.engine.triggered_movement_selection import (
         triggered_movement_unit_selection_request,
     )
     from warhammer40k_core.geometry.pathing import PathWitness

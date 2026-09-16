@@ -1,0 +1,47 @@
+{
+  "workload_id": "order52-surge-grant-authority-v1",
+  "revision": "f3274b5d42825a00be766cc2a4b9bc18768ba98f",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:08e23951fca0b38b5e6b98086825862c9de1af2d9cce8df1ed1a648849c8941f",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "concurrency": 1,
+  "setup_seconds": 2.8018916660221294,
+  "timing_boundary": "Two Surge authority validations: fixed and rerolled; setup excluded",
+  "scenario": {
+    "models": 10,
+    "moving_models": 5,
+    "terrain_count": 0,
+    "seed": "order52-surge"
+  },
+  "event_counts": [
+    27,
+    33
+  ],
+  "hashes": {
+    "driver": "ac640df69deab0677e17a18085191f488bcbaabeacce98b250c6a1c8942c0c96",
+    "helper": "aa8cda8b5e019dbcd4c588b71e74580bf50910e7093e45aed8860a3f4ea68a63",
+    "lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "samples_seconds": [
+    0.002409084001556039,
+    0.0022378750145435333,
+    0.0022098340559750795,
+    0.002225457923486829,
+    0.002298792009241879,
+    0.0022484580986201763,
+    0.0021929170470684767
+  ],
+  "mean_seconds": 0.0022603454500702874,
+  "median_seconds": 0.0022378750145435333,
+  "maximum_seconds": 0.002409084001556039,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "maximum_seconds": 0.5,
+    "mean_ratio": 2.0,
+    "mean_additive_seconds": 0.02
+  }
+}

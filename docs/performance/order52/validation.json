@@ -1,0 +1,96 @@
+{
+  "base_revision": "4135da5ea81ea998880c334fb743681787c9cfe7",
+  "behavioral": {
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85",
+    "coverage_floor_percent": 85,
+    "coverage_percent": 85.11,
+    "distribution": "worksteal",
+    "errors": 0,
+    "failed": 0,
+    "junit_sha256": "6c62e449079a7840cc6742ba55e33da10ef639835564e6cf85a8d39490f5019d",
+    "passed": 8110,
+    "seconds": 552.474,
+    "skipped": 0,
+    "warnings": 10,
+    "workers": 18
+  },
+  "checks_passed": [
+    "uv run ruff check .",
+    "uv run ruff format --check .",
+    "uv run mypy src tests",
+    "uv run pyright",
+    "uv run lint-imports",
+    "uv run pre-commit run --all-files",
+    "uv run --no-sync python scripts/build_external_contract.py --check --base-ref 4135da5ea81ea998880c334fb743681787c9cfe7",
+    "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+    "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+    "uv run python tools/build_core_surge_source.py --check",
+    "uv run python scripts/build_engine_build_identity.py --check"
+  ],
+  "code_quality": {
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
+    "coverage": false,
+    "distribution": "worksteal",
+    "errors": 0,
+    "failed": 0,
+    "junit_sha256": "116d726ce51c73554524ae8ffc6a344911ebaeeeb3042d8db2f2f9a1d7e95ec5",
+    "passed": 497,
+    "seconds": 99.373,
+    "skipped": 0,
+    "status": "passed",
+    "workers": 18
+  },
+  "date": "2026-09-16",
+  "diagnostic_runs": [
+    {
+      "reason": "Initial aggregate interrupted after pyright found extraction issues.",
+      "result": "not a final gate"
+    },
+    {
+      "coverage_percent": 85.11,
+      "failed": 12,
+      "junit_sha256": "0485654fc3fde17628b16dcf86035ec2c7f61a5addf270e9c9113e4c438c803a",
+      "passed": 8098,
+      "reason": "Contract/source-count fixtures, earlier tamper diagnostics, and missing Corsair source-controller wiring corrected."
+    },
+    {
+      "reason": "Focused local HTTP server test required socket permission; rerun passed with local-server access.",
+      "status": "resolved"
+    },
+    {
+      "failed": 6,
+      "junit_sha256": "b770c465837b06809c264308b149627c2575c06237d761885e439c9af6c7ada7",
+      "kind": "code_quality",
+      "passed": 491,
+      "reason": "Moved static audit pointers, updated the source inventory, reviewed historical per-model geometry and removed unnecessary unit reconstruction when no current Surge exists.",
+      "status": "superseded_by_final_validation"
+    }
+  ],
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0fe6cd5e222683254c1840e120917c00305825cc89a6e7d6246d0e9aa66dca06",
+  "performance": {
+    "component_budgets": "passed",
+    "full_game_certified": false,
+    "matched_samples_per_revision": 7,
+    "rapid_ingress_legal_unit_lookups": {
+      "after": 8,
+      "before": 12,
+      "unchanged_budget": 8
+    },
+    "workload": "order52-surge-v1"
+  },
+  "schema": "order52-final-validation-v1",
+  "typescript": {
+    "contract_version": "23.0.0",
+    "execution": "Bundled Node executed the package script equivalents; npm is unavailable.",
+    "generated_client_check": "passed",
+    "live_assertions_passed": 342,
+    "replay_sha256": "c259af288f019ab051d35458d9fc92bedac58577823649d0431f44315017cf9c",
+    "typecheck": "passed",
+    "unit_tests_passed": 5
+  },
+  "wheel": {
+    "engine_resource_count": 2821,
+    "schema_count": 27,
+    "validated_request_family_count": 6
+  }
+}

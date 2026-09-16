@@ -11,10 +11,18 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.charge_movement_source import (
+    ChargePlacement,
+    charge_attempted_placement,
+    charge_movement_placement,
+    charge_placement_id,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
+    UnitCoherencyContext,
     UnitCoherencyResult,
     resolve_unit_movement_endpoint_coherency,
 )
@@ -40,7 +48,7 @@ def triggered_movement_unit_has_placed_living_source(
 def triggered_movement_source_model_placements(
     *,
     scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
+    unit_placement: ChargePlacement,
 ) -> tuple[ModelPlacement, ...]:
     """Return the placed living models authorized to make a triggered move."""
 
@@ -62,7 +70,7 @@ def triggered_movement_source_model_placements(
 def require_triggered_movement_source_model_placements(
     *,
     scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
+    unit_placement: ChargePlacement,
 ) -> tuple[ModelPlacement, ...]:
     placements = triggered_movement_source_model_placements(
         scenario=scenario,
@@ -92,16 +100,18 @@ def validate_triggered_movement_source_witness(
 
 def merge_triggered_movement_source_endpoints(
     *,
-    unit_placement: UnitPlacement,
+    unit_placement: ChargePlacement,
     source_model_placements: tuple[ModelPlacement, ...],
     witness: PathWitness,
-) -> UnitPlacement:
+) -> ChargePlacement:
     _require_unit_placement(unit_placement)
     validate_triggered_movement_source_witness(
         witness=witness,
         source_model_placements=source_model_placements,
     )
     source_ids = {placement.model_instance_id for placement in source_model_placements}
+    if isinstance(unit_placement, RulesUnitPlacement):
+        return charge_attempted_placement(unit_placement, witness)
     return unit_placement.with_model_placements(
         tuple(
             placement.with_pose(witness.final_pose_for_model(placement.model_instance_id))
@@ -116,8 +126,8 @@ def resolve_triggered_movement_source_coherency(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
-    before: UnitPlacement,
-    attempted: UnitPlacement,
+    before: ChargePlacement,
+    attempted: ChargePlacement,
     source_model_placements: tuple[ModelPlacement, ...],
     displacement_kind: ModelDisplacementKind,
 ) -> tuple[UnitCoherencyResult, MovementRollbackRecord | None]:
@@ -127,6 +137,22 @@ def resolve_triggered_movement_source_coherency(
     _require_unit_placement(before)
     _require_unit_placement(attempted)
     source_placements = _require_non_empty_model_placements(source_model_placements)
+    if isinstance(before, RulesUnitPlacement) or isinstance(attempted, RulesUnitPlacement):
+        from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
+
+        return (
+            UnitCoherencyContext.from_ruleset_descriptor(
+                ruleset_descriptor, unit_instance_id=charge_placement_id(before)
+            ).validate_models(
+                tuple(
+                    geometry_model_for_placement(
+                        model=scenario.model_instance_for_placement(placement), placement=placement
+                    )
+                    for placement in attempted.model_placements
+                )
+            ),
+            None,
+        )
     source_ids = {placement.model_instance_id for placement in source_placements}
     before_source = before.with_model_placements(source_placements)
     attempted_source = attempted.with_model_placements(
@@ -216,11 +242,26 @@ def _require_scenario(scenario: object) -> None:
 
 
 def _require_unit_placement(unit_placement: object) -> None:
-    if type(unit_placement) is not UnitPlacement:
+    if type(unit_placement) not in {UnitPlacement, RulesUnitPlacement}:
         raise GameLifecycleError("Triggered movement source authority requires UnitPlacement.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def triggered_movement_placement(
+    *, scenario: BattlefieldScenario, unit_instance_id: str
+) -> ChargePlacement:
+    """Use the existing canonical group owner shared with Charge movement."""
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    view = rules_unit_view_from_armies(armies=scenario.armies, unit_instance_id=unit_instance_id)
+    if len(view.component_unit_instance_ids) == 1:
+        return scenario.battlefield_state.unit_placement_by_id(view.unit_instance_id)
+    placement = charge_movement_placement(scenario=scenario, unit_instance_id=unit_instance_id)
+    if isinstance(placement, UnitPlacement):
+        return scenario.battlefield_state.unit_placement_by_id(placement.unit_instance_id)
+    return placement
 
 
 __all__ = (

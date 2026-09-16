@@ -6008,3 +6008,57 @@ internal; existing viewer-scoped projection and event redaction cover public
 movement choices and their existing unit/model references.
 
 See [contract migration 21 to 22](../contracts/migrations/21-to-22.md).
+
+## Order 52: Surge targets and phase movement authority (contract 23)
+
+The existing `select_triggered_movement` family enumerates Surge unit/target
+pairs with `surge:<canonical-rules-unit-id>:target:<enemy-rules-unit-id>` IDs.
+The target must be a closest physical enemy; ties expose one option per enemy.
+Payloads include `surge_target_unit_instance_id` and the sorted
+`closest_target_unit_instance_ids`. Decline retains its existing option ID.
+Surge cannot select Take to the Skies.
+
+Triggered movement's `aircraft_movement_policies` payload maps component unit IDs
+to their effective aircraft policy. This replaces the single-unit policy field
+so attached movement never reports whichever component happened to run last.
+
+The selected target remains in the existing `surge_move` proposal context and
+distance-reroll context, bound to the original finite selection IDs through
+retries. Adapters submit only the witnessed model paths. Missing granting
+triggers, changed target commitments, Battle-shock, Engagement, previous movement,
+stale geometry and malformed proposals are rejected before queue pop. A
+well-formed but rule-invalid path is recorded with a fresh retry request and
+does not mutate battlefield or movement history.
+
+Restore, live submission and completed-movement history also bind the entire
+Surge descriptor and selected unit to that original finite grant. A distance
+change requires the matching recorded reroll decision and permission. The engine
+reconstructs its dice transition from the preceding event history, authenticates
+the resulting dice events and roll-state copy, and adds only the original source's
+distance bonus. Keeping the roll preserves its distance. Editing a proposal and
+its matching `decision_requested` event cannot enlarge the movement limit. This
+validation uses the existing contract 23 payloads and adds no adapter choice or
+schema field.
+
+The proposal's `unit_instance_id` must exactly match the canonical rules-unit ID
+in both the recorded finite selection and its eligible-unit record. Another
+friendly unit or an attached component alias is rejected before queue pop, even
+if the proposal's selected-unit context and request event are otherwise valid.
+Restore and completed-movement history enforce the same binding.
+
+Every living model must engage the selected target if a legal path permits it,
+otherwise achieve a proved nearest endpoint. No model may finish engaged with
+another enemy. `surge_model_endpoints` records model/component/target IDs, the
+source rule ID, before/after ranges and engagement/approach proof status.
+Search exhaustion produces `surge_reachability_unresolved`; it never establishes
+impossibility or maximum approach. Successful mathematical bounds are recomputed
+on restore against event-time geometry. Attached components move atomically.
+
+All accepted move types populate internal `phase_movement_history`, scoped by
+round, actual turn owner and phase. Surge requires an empty same-unit occurrence
+and locks every subsequent move in that occurrence. Normal, Charge, Fight,
+reactive movement and parameterized setup consume the same lock. Physical model
+identity preserves the lock through attached-unit casualties. The ledger is not
+added to viewer projections; existing shared decision/event redaction applies.
+
+See [contract migration 22 to 23](../contracts/migrations/22-to-23.md).

@@ -162,6 +162,10 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
     game_lifecycle_stage_from_token,
 )
+from warhammer40k_core.engine.phase_movement_history import (
+    PhaseMovementRecord,
+    validate_phase_movement_state,
+)
 from warhammer40k_core.engine.phases.charge import (
     ChargePhaseState,
 )
@@ -1193,6 +1197,9 @@ class GameState:
         default_factory=_new_fell_back_unit_states
     )
     normal_move_states: list[NormalMoveState] = field(default_factory=_new_normal_move_states)
+    phase_movement_history: list[PhaseMovementRecord] = field(
+        default_factory=lambda: list[PhaseMovementRecord]()
+    )
     model_movement_history: list[ModelMovementDistance] = field(
         default_factory=lambda: list[ModelMovementDistance]()
     )
@@ -1477,6 +1484,7 @@ class GameState:
             self.fell_back_unit_states,
             player_ids=self.player_ids,
         )
+        validate_phase_movement_state(self)
         self.normal_move_states = _validate_normal_move_states(
             self.normal_move_states,
             player_ids=self.player_ids,
@@ -3560,12 +3568,17 @@ class GameState:
         self.battlefield_state = battlefield_state
 
     def replace_battlefield_state(self, battlefield_state: BattlefieldRuntimeState) -> None:
+        from warhammer40k_core.engine.phase_movement_history import (
+            validate_battlefield_movement_locks,
+        )
+
         if type(battlefield_state) is not BattlefieldRuntimeState:
             raise GameLifecycleError(
                 "GameState battlefield_state must be a BattlefieldRuntimeState."
             )
         if self.battlefield_state is None:
             raise GameLifecycleError("GameState battlefield_state does not exist.")
+        validate_battlefield_movement_locks(state=self, updated=battlefield_state)
         validate_battlefield_state_matches_mission_setup(
             battlefield_state=battlefield_state,
             mission_setup=self.mission_setup,
@@ -4786,6 +4799,7 @@ class GameState:
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
             "normal_move_states": [state.to_payload() for state in self.normal_move_states],
+            "phase_movement_history": [row.to_payload() for row in self.phase_movement_history],
             "model_movement_history": [row.to_payload() for row in self.model_movement_history],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
             "battle_shocked_unit_states": [
@@ -5162,6 +5176,9 @@ class GameState:
             ],
             fell_back_unit_states=[
                 FellBackUnitState.from_payload(state) for state in payload["fell_back_unit_states"]
+            ],
+            phase_movement_history=[
+                PhaseMovementRecord.from_payload(row) for row in payload["phase_movement_history"]
             ],
             model_movement_history=[
                 ModelMovementDistance.from_payload(row) for row in payload["model_movement_history"]

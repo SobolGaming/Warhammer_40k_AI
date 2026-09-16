@@ -204,8 +204,10 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementEligibleUnit,
     TriggeredMovementKind,
-    apply_triggered_movement_distance_reroll_decision,
     is_triggered_movement_distance_reroll_request,
+)
+from warhammer40k_core.engine.triggered_movement_selection import (
+    apply_triggered_movement_distance_reroll_decision,
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_abilities import (

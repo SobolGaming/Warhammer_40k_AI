@@ -34,6 +34,8 @@ from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
+)
+from warhammer40k_core.engine.triggered_movement_selection import (
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
@@ -181,6 +183,7 @@ def _activate_surge(
     )
     request = triggered_movement_unit_selection_request(
         state=state,
+        decisions=decisions,
         player_id=reacting_player_id,
         descriptor=descriptor,
         eligible_units=reactions._eligible_triggered_movement_units_from_grants(

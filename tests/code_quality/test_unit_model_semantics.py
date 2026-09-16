@@ -118,6 +118,9 @@ SHADOW_LEGION_ENHANCEMENTS = (
     CHAOS_DAEMONS_DATASHEETS.parent / "detachments" / "shadow_legion" / "enhancements.py"
 )
 TRIGGERED_MOVEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement.py"
+TRIGGERED_MOVEMENT_RESOLUTION = (
+    ROOT / "src/warhammer40k_core/engine/triggered_movement_resolution.py"
+)
 TRIGGERED_MOVEMENT_PHYSICAL_AUTHORITY = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement_physical_authority.py"
 )
@@ -177,6 +180,12 @@ UNIT_MODULES = (
 
 DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
     {
+        # Reconstructed per-model endpoint geometry at the completed event,
+        # not a query against current whole-unit battlefield authority.
+        (
+            "src/warhammer40k_core/engine/surge_history.py",
+            "validate_surge_history",
+        ): 1,
         (
             "src/warhammer40k_core/engine/catalog_selected_target_effects_support.py",
             "any_models_satisfy_distance",
@@ -1029,7 +1038,7 @@ def test_content_and_stratagem_engagement_consumers_keep_living_authority_separa
 
 def test_triggered_movement_separates_living_sources_from_retained_physical_bases() -> None:
     resolver = _function_node(
-        path=TRIGGERED_MOVEMENT,
+        path=TRIGGERED_MOVEMENT_RESOLUTION,
         function_name="resolve_triggered_movement",
     )
     resolver_calls = {
@@ -1072,7 +1081,7 @@ def test_triggered_movement_separates_living_sources_from_retained_physical_base
     assert "battlefield_scenario_for_state" in scenario_calls
 
     restriction_owner = _function_node(
-        path=TRIGGERED_MOVEMENT,
+        path=TRIGGERED_MOVEMENT_RESOLUTION,
         function_name="_triggered_movement_restriction_violations",
     )
     restriction_calls = _direct_call_names(restriction_owner)

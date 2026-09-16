@@ -212,6 +212,7 @@ class GameStatePayload(TypedDict):
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
     normal_move_states: list[NormalMoveStatePayload]
+    phase_movement_history: list[dict[str, JsonValue]]
     model_movement_history: list[dict[str, JsonValue]]
     battle_shocked_unit_ids: list[str]
     battle_shocked_unit_states: list[BattleShockedUnitStatePayload]

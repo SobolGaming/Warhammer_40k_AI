@@ -2249,7 +2249,7 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
     )
     assert isinstance(arrival_event_payload, dict)
     arrival_event_payload["active_player_id"] = GSC_PLAYER_ID
-    with pytest.raises(GameLifecycleError, match="Move completion trigger source authority drift"):
+    with pytest.raises(GameLifecycleError, match="Phase movement history differs"):
         GameLifecycle.from_payload(tampered_payload)
 
 

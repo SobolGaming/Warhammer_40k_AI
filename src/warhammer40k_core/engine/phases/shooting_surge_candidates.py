@@ -26,6 +26,8 @@ from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementKind,
+)
+from warhammer40k_core.engine.triggered_movement_selection import (
     triggered_movement_unit_selection_request,
 )
 
@@ -128,6 +130,7 @@ def _activate(
     )
     request = triggered_movement_unit_selection_request(
         state=state,
+        decisions=decisions,
         player_id=reacting_player_id,
         descriptor=descriptor,
         eligible_units=reactions._eligible_triggered_movement_units_from_shooting_grants(

@@ -1,0 +1,133 @@
+{
+  "workload_id": "order52-surge-v1",
+  "revision": "codex/order-52-surge-movement",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0fe6cd5e222683254c1840e120917c00305825cc89a6e7d6246d0e9aa66dca06",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "setup_seconds": 2.2462187920464203,
+  "timing_boundary": "Two resolver calls; fixture and witness setup excluded",
+  "scenario": {
+    "models": 10,
+    "moving_models": 5,
+    "terrain_count": 0,
+    "maximum_inches": 3,
+    "paths_inches": [
+      [
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      [
+        3,
+        3,
+        3,
+        3,
+        1
+      ]
+    ],
+    "decision_policy": "fixed witnessed endpoints",
+    "game_id": "order52-surge"
+  },
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/surge_helpers.py": "aa8cda8b5e019dbcd4c588b71e74580bf50910e7093e45aed8860a3f4ea68a63",
+    "scripts/measure_surge.py": "5f2101f5dbbfacb989358c1f1534dedc7e25c6d59924a5bc12b477023951bf35"
+  },
+  "samples": [
+    {
+      "seconds": 0.008952374919317663,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.006475416943430901,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.005666707991622388,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.005773416953161359,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.005609625019133091,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.0057870830642059445,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.005703541915863752,
+      "accepted": [
+        true,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5
+      ]
+    }
+  ],
+  "mean_seconds": 0.006281166686676443,
+  "maximum_seconds": 0.008952374919317663,
+  "median_seconds": 0.005773416953161359,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "correctness_note": "The base accepts incomplete approach and is only a cost comparison.",
+  "budgets": {
+    "maximum_seconds": 0.5,
+    "mean_ratio": 2.0,
+    "mean_additive_seconds": 0.02
+  }
+}

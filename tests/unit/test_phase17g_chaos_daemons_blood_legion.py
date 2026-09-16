@@ -2446,7 +2446,7 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
     surge_request = decision_request(surge_status)
     assert surge_request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
     assert surge_request.actor_id == "player-a"
-    surge_option_id = f"surge:{_BLOOD_UNIT_ID}"
+    surge_option_id = f"surge:{_BLOOD_UNIT_ID}:target:{_ENEMY_UNIT_ID}"
     assert surge_option_id in {option.option_id for option in surge_request.options}
 
     proposal_status = lifecycle.submit_decision(
@@ -2461,6 +2461,11 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
     assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert proposal.proposal_kind is ProposalKind.SURGE_MOVE
     assert proposal.unit_instance_id == _BLOOD_UNIT_ID
+    assert proposal.context is not None
+    surge_descriptor_payload = proposal.context["descriptor"]
+    assert isinstance(surge_descriptor_payload, dict)
+    surge_maximum = surge_descriptor_payload["max_distance_inches"]
+    assert isinstance(surge_maximum, (int, float))
 
     resolved_status = _submit_surge_proposal(
         lifecycle=lifecycle,
@@ -2470,7 +2475,7 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
         witness=straight_line_witness_for_unit(
             lifecycle,
             unit_instance_id=_BLOOD_UNIT_ID,
-            dx=-1.0,
+            dx=-min(surge_maximum, 4.0),
         ),
     )
 
@@ -2486,11 +2491,9 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
     resolved_payload = _event_payload(lifecycle.decision_controller, "triggered_movement_resolved")
     assert resolved_payload["source_rule_id"] == rule.SOURCE_RULE_ID
     assert resolved_payload["unit_instance_id"] == _BLOOD_UNIT_ID
-    assert len(state.normal_move_states) == 2
+    assert len(state.normal_move_states) == 1
     surge_states = tuple(
-        move_state
-        for move_state in state.normal_move_states
-        if move_state.source_rule_id == rule.SOURCE_RULE_ID
+        move_state for move_state in state.phase_movement_history if move_state.is_surge
     )
     assert len(surge_states) == 1
 

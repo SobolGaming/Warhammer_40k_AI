@@ -82,8 +82,10 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementEligibleUnit,
     TriggeredMovementHandler,
     TriggeredMovementKind,
-    apply_triggered_movement_distance_reroll_decision,
     is_triggered_movement_distance_reroll_request,
+)
+from warhammer40k_core.engine.triggered_movement_selection import (
+    apply_triggered_movement_distance_reroll_decision,
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
@@ -648,7 +650,10 @@ def test_superlative_agile_distance_uses_standard_reroll_then_proposal_path() ->
         )
     )
     eligible = TriggeredMovementEligibleUnit(
-        unit_instance_id=fixture.autarch_bodyguard.unit_instance_id,
+        unit_instance_id=rules_unit_view_by_id(
+            state=fixture.state,
+            unit_instance_id=fixture.autarch_bodyguard.unit_instance_id,
+        ).unit_instance_id,
         hook_id=army_rule.OPPORTUNITY_SEIZED_HOOK_ID,
         source_id=army_rule.SOURCE_RULE_ID,
         replay_payload={"maneuver": army_rule.OPPORTUNITY_SEIZED_MANEUVER},
@@ -658,7 +663,7 @@ def test_superlative_agile_distance_uses_standard_reroll_then_proposal_path() ->
     )
     assert TriggeredMovementEligibleUnit.from_payload(eligible.to_payload()) == eligible
     descriptor = TriggeredMovementDescriptor(
-        movement_kind=TriggeredMovementKind.SURGE,
+        movement_kind=TriggeredMovementKind.TRIGGERED,
         source_rule_id=army_rule.SOURCE_RULE_ID,
         trigger_timing=ReactionWindow(
             phase=BattlePhaseKind.MOVEMENT,
@@ -677,7 +682,7 @@ def test_superlative_agile_distance_uses_standard_reroll_then_proposal_path() ->
     selection = DecisionResult.for_request(
         result_id="result:autarch-agile-selection",
         request=request,
-        selected_option_id=f"surge:{eligible.unit_instance_id}",
+        selected_option_id=f"triggered:{eligible.unit_instance_id}",
     )
     decisions.submit_result(selection)
 

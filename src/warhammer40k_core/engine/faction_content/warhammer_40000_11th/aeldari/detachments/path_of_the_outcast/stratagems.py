@@ -47,6 +47,8 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementEligibleUnit,
     TriggeredMovementKind,
+)
+from warhammer40k_core.engine.triggered_movement_selection import (
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance

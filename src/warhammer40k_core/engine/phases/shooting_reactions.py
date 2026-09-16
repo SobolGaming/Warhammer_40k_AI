@@ -625,6 +625,7 @@ def _request_shooting_end_surge_if_available(
         )
         request = triggered_movement_unit_selection_request(
             state=state,
+            decisions=decisions,
             player_id=reacting_player_id,
             descriptor=descriptor,
             eligible_units=_eligible_triggered_movement_units_from_shooting_grants(
