@@ -953,6 +953,8 @@ def test_r36_001_scope_history_preserves_movement_attack_interleaving(move_first
         TriggeredMovementDescriptor,
         TriggeredMovementEligibleUnit,
         TriggeredMovementKind,
+    )
+    from warhammer40k_core.engine.triggered_movement_selection import (
         triggered_movement_unit_selection_request,
     )
 

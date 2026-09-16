@@ -1,6 +1,12 @@
 # CORE V2 external contract
 
-Contract version: `21.0.0`
+Contract version: `23.0.0`
+
+Order 52 / contract 23 commits Surge targets and phase movement history.
+See [the migration](migrations/22-to-23.md).
+
+Order 51 / contract 22 commits per-move flight and turn movement distances.
+See [the migration](migrations/21-to-22.md).
 
 Order 50 / contract 21 resolves Heroic Intervention through the shared Charge
 sequence. See [the migration](migrations/20-to-21.md).

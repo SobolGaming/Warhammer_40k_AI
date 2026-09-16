@@ -182,6 +182,10 @@ class ShootingEndSurgeHookRegistry:
                     raise GameLifecycleError("Shooting-end surge handler returned hook_id drift.")
                 if grant.source_id != binding.source_id:
                     raise GameLifecycleError("Shooting-end surge handler returned source_id drift.")
+                from warhammer40k_core.engine.surge_movement import surge_ineligibility
+
+                if surge_ineligibility(context.state, grant.unit_instance_id) is not None:
+                    continue
                 grants.append(grant)
         return tuple(sorted(grants, key=lambda grant: (grant.hook_id, grant.unit_instance_id)))
 

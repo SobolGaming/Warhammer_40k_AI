@@ -27,6 +27,7 @@ def triggered_movement_unit_selection_options(
     from warhammer40k_core.engine.triggered_movement import (
         DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
         TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
+        TriggeredMovementKind,
     )
 
     options: list[DecisionOption] = []
@@ -69,6 +70,10 @@ def triggered_movement_unit_selection_options(
                 ),
             )
         )
+    if descriptor.movement_kind is TriggeredMovementKind.SURGE:
+        from warhammer40k_core.engine.surge_choices import surge_target_options
+
+        return surge_target_options(state=state, options=tuple(options))
     return tuple(
         variant
         for option in options

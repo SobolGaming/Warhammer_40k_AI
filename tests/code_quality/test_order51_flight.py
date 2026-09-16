@@ -27,7 +27,7 @@ def test_heavy_does_not_depend_on_temporary_movement_phase_state() -> None:
 
 
 def test_reactive_path_validation_cannot_use_the_raw_descriptor_budget() -> None:
-    source = ROOT / "src/warhammer40k_core/engine/triggered_movement.py"
+    source = ROOT / "src/warhammer40k_core/engine/triggered_movement_resolution.py"
     tree = ast.parse(source.read_text())
     budgets = [
         keyword.value

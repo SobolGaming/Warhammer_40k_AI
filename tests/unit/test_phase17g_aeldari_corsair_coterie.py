@@ -816,6 +816,29 @@ def test_vengeful_sorrow_uses_destroyed_model_context_and_requests_surge_move() 
         },
     )
 
+    trigger_payload = cast(
+        dict[str, JsonValue], _json_object(context.eligibility_context.trigger_payload)
+    )
+    completed = context.decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            **trigger_payload,
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.SHOOTING.value,
+            "active_player_id": state.active_player_id,
+        },
+    )
+    context = replace(
+        context,
+        eligibility_context=replace(
+            context.eligibility_context,
+            trigger_payload={
+                **trigger_payload,
+                "attack_sequence_completed_event_id": completed.event_id,
+            },
+        ),
+    )
     result = stratagems.apply_vengeful_sorrow(context)
 
     assert result.reason is None
@@ -824,6 +847,11 @@ def test_vengeful_sorrow_uses_destroyed_model_context_and_requests_surge_move() 
     replay_payload = _json_object(result.replay_payload)
     assert replay_payload["triggered_movement_request_id"] == request.request_id
     assert replay_payload["effect_kind"] == "vengeful_sorrow"
+    assert any(
+        isinstance(option.payload, dict)
+        and option.payload.get("surge_target_unit_instance_id") == _ENEMY_UNIT_ID
+        for option in request.options
+    )
 
 
 def test_corsair_stratagem_validators_reject_ineligible_targets_and_phase_state() -> None:

@@ -21,7 +21,10 @@ FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolu
 LIFECYCLE = ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle.py"
 STRATAGEMS = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 STRATAGEM_FILES = (STRATAGEMS, *sorted(STRATAGEMS.parent.glob("stratagems_*.py")))
-TRIGGERED_MOVEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement.py"
+TRIGGERED_MOVEMENT = ROOT / "src/warhammer40k_core/engine/triggered_movement_resolution.py"
+TRIGGERED_MOVEMENT_HANDLER = (
+    ROOT / "src/warhammer40k_core/engine/triggered_movement_handler_impl.py"
+)
 BATTLE_SHOCK_HOOKS = ROOT / "src" / "warhammer40k_core" / "engine" / "battle_shock_hooks.py"
 BATTLE_SHOCK_RESOLUTION = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "battle_shock_resolution.py"
@@ -33,9 +36,9 @@ LIVE_MOVEMENT_CALLS = (
     (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_fall_back_move"),
     (CHARGE_PHASE, "_apply_charge_move_proposal_decision", "resolve_charge_move"),
     (FIGHT_PHASE, "apply_fight_movement_proposal", "resolve_rules_unit_fight_movement"),
-    (TRIGGERED_MOVEMENT, "request_from_state", "resolve_triggered_movement"),
-    (TRIGGERED_MOVEMENT, "apply_decision", "resolve_triggered_movement"),
-    (TRIGGERED_MOVEMENT, "apply_proposal_decision", "resolve_triggered_movement"),
+    (TRIGGERED_MOVEMENT_HANDLER, "request_from_state", "resolve_triggered_movement"),
+    (TRIGGERED_MOVEMENT_HANDLER, "apply_decision", "resolve_triggered_movement"),
+    (TRIGGERED_MOVEMENT_HANDLER, "apply_proposal_decision", "resolve_triggered_movement"),
 )
 GEOMETRY_KEYWORDS = frozenset(
     ("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")

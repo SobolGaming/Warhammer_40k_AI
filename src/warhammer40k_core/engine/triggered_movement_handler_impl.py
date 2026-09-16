@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.active_player_scopes import begin_reactive_move, end_reactive_move
+from warhammer40k_core.engine.charge_movement_source import charge_placement_id
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -22,6 +23,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.surge_choices import selected_surge_target
 from warhammer40k_core.engine.take_to_the_skies import flight_selection
 from warhammer40k_core.engine.triggered_movement import (
     DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
@@ -30,7 +32,6 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptorPayload,
     TriggeredMovementKind,
     TriggeredMovementRequest,
-    _apply_triggered_movement_unit_selection_decision,
     _battlefield_scenario,
     _decision_payload_object,
     _descriptor_from_proposal_request,
@@ -51,8 +52,16 @@ from warhammer40k_core.engine.triggered_movement import (
     _validate_reaction_window_matches_state,
     _validate_triggered_movement_declined_payload,
     _validate_triggered_movement_state_ready,
+)
+from warhammer40k_core.engine.triggered_movement_physical_authority import (
+    triggered_movement_placement,
+)
+from warhammer40k_core.engine.triggered_movement_resolution import (
     apply_triggered_movement_to_battlefield,
     resolve_triggered_movement,
+)
+from warhammer40k_core.engine.triggered_movement_selection import (
+    _apply_triggered_movement_unit_selection_decision,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 
@@ -67,23 +76,42 @@ def request_from_state(
     unit_instance_id: str,
     descriptor: TriggeredMovementDescriptor,
     candidate_witnesses: tuple[PathWitness, ...],
+    decisions: DecisionController | None = None,
 ) -> DecisionRequest:
     _validate_triggered_movement_state_ready(state)
     ruleset_descriptor = _ruleset_descriptor_for_handler(handler)
     if type(descriptor) is not TriggeredMovementDescriptor:
         raise GameLifecycleError("Triggered movement requires a descriptor.")
     _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
+    from warhammer40k_core.engine.surge_authority import require_surge_trigger
+    from warhammer40k_core.engine.surge_movement import (
+        closest_surge_targets,
+        movement_lock_reason,
+        surge_ineligibility,
+    )
+
+    lock = movement_lock_reason(state, unit_instance_id)
+    if lock is not None:
+        raise GameLifecycleError(lock)
+    require_surge_trigger(state=state, decisions=decisions, descriptor=descriptor)
+    if descriptor.movement_kind is TriggeredMovementKind.SURGE:
+        reason = surge_ineligibility(state, unit_instance_id)
+        if reason is not None:
+            raise GameLifecycleError(reason)
     candidate_witness_tuple = _validate_path_witness_tuple(candidate_witnesses)
     if not candidate_witness_tuple:
         raise GameLifecycleError("Triggered movement requires at least one movement choice.")
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    unit_placement = triggered_movement_placement(
+        scenario=scenario, unit_instance_id=unit_instance_id
+    )
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     view = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     selections = (
         (False, True)
         if "FLY" in view.keywords
+        and descriptor.movement_kind is not TriggeredMovementKind.SURGE
         and descriptor.movement_mode is MovementMode.NORMAL
         and ruleset_descriptor.fly_policy.take_to_the_skies_supported
         else (False,)
@@ -96,6 +124,7 @@ def request_from_state(
             descriptor=descriptor,
             path_witness=witness,
             take_to_the_skies=selected,
+            surge_target_unit_instance_id=target_id,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             normal_move_states=tuple(state.normal_move_states),
@@ -103,6 +132,11 @@ def request_from_state(
         )
         for witness in candidate_witness_tuple
         for selected in selections
+        for target_id in (
+            closest_surge_targets(scenario=scenario, unit_instance_id=unit_instance_id)
+            if descriptor.movement_kind is TriggeredMovementKind.SURGE
+            else (None,)
+        )
     )
     for witness in candidate_witness_tuple:
         matches = tuple(resolution for resolution in resolutions if resolution.witness == witness)
@@ -125,7 +159,7 @@ def request_from_state(
         player_id=unit_placement.player_id,
         active_player_id=active_player_id,
         current_phase=current_phase.value,
-        unit_instance_id=unit_placement.unit_instance_id,
+        unit_instance_id=charge_placement_id(unit_placement),
         descriptor=descriptor,
         resolutions=resolutions,
     ).to_decision_request()
@@ -162,7 +196,9 @@ def apply_decision(
     if unit_instance_id != _payload_string(request_payload, "unit_instance_id"):
         raise GameLifecycleError("Triggered movement result unit drift.")
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    unit_placement = triggered_movement_placement(
+        scenario=scenario, unit_instance_id=unit_instance_id
+    )
     if result.actor_id != unit_placement.player_id:
         raise GameLifecycleError("Triggered movement actor must own the moving unit.")
     if _payload_optional_bool(payload, "declined"):
@@ -193,6 +229,7 @@ def apply_decision(
         descriptor=descriptor,
         path_witness=witness,
         take_to_the_skies=flight_selection(payload),
+        surge_target_unit_instance_id=selected_surge_target(payload, descriptor),
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
@@ -242,9 +279,15 @@ def apply_decision(
         source_rule_id=descriptor.source_rule_id,
     )
     state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(resolution.attempted_placement)
+        apply_triggered_movement_to_battlefield(
+            battlefield_state=battlefield_state,
+            resolution=resolution,
+        )
     )
-    if descriptor.movement_mode is MovementMode.NORMAL:
+    if (
+        descriptor.movement_mode is MovementMode.NORMAL
+        and descriptor.movement_kind is not TriggeredMovementKind.SURGE
+    ):
         state.record_normal_move_state(
             NormalMoveState(
                 player_id=unit_placement.player_id,
@@ -252,11 +295,7 @@ def apply_decision(
                 phase=descriptor.trigger_timing.phase,
                 unit_instance_id=unit_instance_id,
                 source_rule_id=descriptor.source_rule_id,
-                source_kind=(
-                    NormalMoveSourceKind.SURGE
-                    if descriptor.movement_kind is TriggeredMovementKind.SURGE
-                    else NormalMoveSourceKind.TRIGGERED
-                ),
+                source_kind=NormalMoveSourceKind.TRIGGERED,
                 request_id=result.request_id,
                 result_id=result.result_id,
             )
@@ -316,8 +355,8 @@ def apply_proposal_decision(
     descriptor = _descriptor_from_proposal_request(proposal_request)
     _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(
-        proposal_request.unit_instance_id
+    unit_placement = triggered_movement_placement(
+        scenario=scenario, unit_instance_id=proposal_request.unit_instance_id
     )
     if result.actor_id != unit_placement.player_id:
         raise GameLifecycleError("Triggered movement proposal actor must own the unit.")
@@ -328,6 +367,7 @@ def apply_proposal_decision(
         descriptor=descriptor,
         path_witness=submission.witness,
         take_to_the_skies=flight_selection(proposal_request.context),
+        surge_target_unit_instance_id=selected_surge_target(proposal_request.context, descriptor),
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
@@ -365,7 +405,10 @@ def apply_proposal_decision(
             resolution=resolution,
         )
     )
-    if descriptor.movement_mode is MovementMode.NORMAL:
+    if (
+        descriptor.movement_mode is MovementMode.NORMAL
+        and descriptor.movement_kind is not TriggeredMovementKind.SURGE
+    ):
         state.record_normal_move_state(
             NormalMoveState(
                 player_id=unit_placement.player_id,
@@ -373,11 +416,7 @@ def apply_proposal_decision(
                 phase=descriptor.trigger_timing.phase,
                 unit_instance_id=proposal_request.unit_instance_id,
                 source_rule_id=descriptor.source_rule_id,
-                source_kind=(
-                    NormalMoveSourceKind.SURGE
-                    if descriptor.movement_kind is TriggeredMovementKind.SURGE
-                    else NormalMoveSourceKind.TRIGGERED
-                ),
+                source_kind=NormalMoveSourceKind.TRIGGERED,
                 request_id=result.request_id,
                 result_id=result.result_id,
             )

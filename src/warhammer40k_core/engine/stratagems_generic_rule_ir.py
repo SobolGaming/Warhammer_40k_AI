@@ -985,6 +985,8 @@ def _request_generic_triggered_normal_move(
         TriggeredMovementDescriptor,
         TriggeredMovementEligibleUnit,
         TriggeredMovementKind,
+    )
+    from warhammer40k_core.engine.triggered_movement_selection import (
         triggered_movement_unit_selection_request,
     )
 
@@ -1045,6 +1047,7 @@ def _request_generic_triggered_normal_move(
         replay_effect_kind = "generic_rule_ir_triggered_normal_move"
     request = triggered_movement_unit_selection_request(
         state=state,
+        decisions=decisions,
         player_id=use_record.player_id,
         descriptor=descriptor,
         eligible_units=(

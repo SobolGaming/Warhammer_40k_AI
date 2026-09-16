@@ -191,6 +191,14 @@ def invalid_physical_proposal_spatial_context_status(
     from warhammer40k_core.engine.phase import LifecycleStatus
 
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    from warhammer40k_core.engine.phase_movement_history import surge_locked
+
+    if surge_locked(state, proposal_request.unit_instance_id):
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="A unit that Surged cannot move again this phase.",
+            payload={"invalid_reason": "surge_movement_locked_this_phase"},
+        )
     spatial_validation = proposal_request.spatial_context_validation(
         current_spatial_context_hash=physical_proposal_context_hash_for_state(state)
     )

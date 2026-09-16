@@ -23,6 +23,8 @@ from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWi
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementKind,
+)
+from warhammer40k_core.engine.triggered_movement_resolution import (
     resolve_triggered_movement,
 )
 from warhammer40k_core.geometry.pathing import PathWitness

@@ -171,13 +171,15 @@ def assert_move_units_step_complete_for_reinforcements(
     )
     if incomplete_selected_unit_ids:
         raise GameLifecycleError(message)
+    from warhammer40k_core.engine.phase_movement_history import surge_locked
+
     remaining_unit_ids = _remaining_move_units_unit_ids(
         scenario=_battlefield_scenario(state),
         active_player_id=movement_state.active_player_id,
         selected_unit_ids=movement_state.selected_unit_ids,
         accounted_unplaced_model_ids=state.unavailable_model_ids(),
     )
-    if remaining_unit_ids:
+    if any(not surge_locked(state, unit_id) for unit_id in remaining_unit_ids):
         raise GameLifecycleError(message)
 
 
@@ -375,6 +377,10 @@ def _movement_unit_candidates(
             continue
         alive_components = rules_unit.living_components
         if not alive_components:
+            continue
+        from warhammer40k_core.engine.phase_movement_history import surge_locked
+
+        if surge_locked(state, rules_unit.unit_instance_id):
             continue
         component_ids = tuple(component.unit.unit_instance_id for component in alive_components)
         alive_model_ids = tuple(

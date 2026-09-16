@@ -1652,7 +1652,7 @@ def test_realm_of_chaos_replay_rejects_arrival_route_contract_tamper(
         ("selection_authority", "reinforcement selection authority drift"),
         ("selection_event", "reinforcement selection event closure drift"),
         ("selection_order", "reinforcement selection ordering drift"),
-        ("arrival_order", "Move completion has no supported source event"),
+        ("arrival_order", "Phase movement history differs"),
     ],
 )
 def test_realm_of_chaos_replay_rejects_arrival_source_and_event_order_tamper(
@@ -1950,7 +1950,7 @@ def test_realm_reentry_rapid_ingress_binds_opponent_active_player() -> None:
         raise AssertionError("test requires one Rapid Ingress arrival/terminal pair")
     for event in matching_events:
         _json_object_for_test(event["payload"])["active_player_id"] = "player-a"
-    with pytest.raises(GameLifecycleError, match="Move completion trigger source authority drift"):
+    with pytest.raises(GameLifecycleError, match="Phase movement history differs"):
         GameLifecycle.from_payload(forged_payload)
 
 

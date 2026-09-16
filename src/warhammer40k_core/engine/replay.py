@@ -23,7 +23,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v16-flight-history"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v17-surge-authority"
 
 
 class ReplayArtifactError(ValueError):
@@ -859,7 +859,13 @@ class ReplayRunner:
                 expected=_json_payload(expected_record.to_payload()),
                 actual={"error": str(exc)},
             )
-        if status.status_kind is LifecycleStatusKind.INVALID:
+        # A well-formed proposal may be recorded as a rejected attempt and
+        # issue a retry. It is part of the replay, provided the exact record
+        # was produced; the event-stream comparison below authenticates the
+        # rejection and continuation. Pre-pop invalid submissions still fail.
+        if status.status_kind is LifecycleStatusKind.INVALID and (
+            len(lifecycle.decision_controller.records) < expected_record_count
+        ):
             return ReplayDriftDiagnostic(
                 diagnostic_code=ReplayDiagnosticCode.SUBMISSION_INVALID,
                 message="Replay decision submission returned an invalid lifecycle status.",

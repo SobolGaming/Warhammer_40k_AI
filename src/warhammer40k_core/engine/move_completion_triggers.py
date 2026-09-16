@@ -73,6 +73,13 @@ def record_move_completion_event(
     state.model_movement_history.extend(
         distances_from_completion(event, turn_player_id=state.active_player_id)
     )
+    from warhammer40k_core.engine.phase_movement_history import completion_phase_record
+
+    phase_record = completion_phase_record(
+        state=state, event=event, turn_player_id=state.active_player_id
+    )
+    if phase_record is not None:
+        state.phase_movement_history.append(phase_record)
     context = move_trigger_source_context(state=state, decisions=decisions, event=event)
     if context["movement_action"] in _MOVE_ACTIONS:
         observe_rule_trigger(

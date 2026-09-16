@@ -803,3 +803,12 @@ movement check. See [scope and evidence](docs/ORDER_51_SCOPE_PLAN.md) and
 
 Check the reviewed timing source with
 `uv run python tools/build_core_flying_source.py --check`.
+
+### Order 52: Surge movement
+
+Surge commits a closest target through finite options, validates each living
+model's witnessed approach, and locks subsequent movement in that phase.
+Source eligibility, attached models, retries, restore and replay share engine
+authority. See [scope and evidence](docs/ORDER_52_SCOPE_PLAN.md) and
+[contract 23 migration](contracts/migrations/22-to-23.md).
+Check the source with `uv run python tools/build_core_surge_source.py --check`.
