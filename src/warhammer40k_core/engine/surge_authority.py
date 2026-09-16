@@ -206,6 +206,15 @@ def _validate_surge_granted_descriptor(
     )
     if context.get("selected_unit") != unit.to_payload():
         raise GameLifecycleError("Surge selected unit differs from its recorded grant.")
+    if is_triggered_movement_proposal_request(request):
+        proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+        if (
+            proposal.unit_instance_id != unit.unit_instance_id
+            or proposal.unit_instance_id != chosen.get("unit_instance_id")
+        ):
+            raise GameLifecycleError(
+                "Surge moving unit differs from its recorded canonical selection."
+            )
     expected = original
     pending_reroll = is_triggered_movement_distance_reroll_request(request)
     reroll_fields = {

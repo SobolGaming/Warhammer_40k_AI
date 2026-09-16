@@ -47,6 +47,13 @@ remain unchanged and pass. This small checkpoint workload does not certify
 long-history or full-game costs. Both reports retain the complete samples and
 input hashes, and the quality audit checks the matched inputs and budgets.
 
+`moving-unit-base.json` and `moving-unit-head.json` repeat the identical driver
+before and after binding the proposal's actual unit ID. The base is `f3274b5d`;
+the head report pins the corrected runtime fingerprint. Combined means are
+2.260 ms and 2.281 ms, with a head maximum of 2.404 ms. Seven serial samples
+use the same host and inputs without competing tests. Both unchanged component
+budgets pass; the same long-history and full-game limitations apply.
+
 Run `scripts/measure_surge_authority.py` from each matching runtime root using
 that root's `src` and fixture modules on `PYTHONPATH`:
 

@@ -393,6 +393,114 @@ def test_surge_limit_drift_rejects_live_submission_before_queue_pop() -> None:
     assert session.lifecycle.to_payload() == before
 
 
+@pytest.mark.parametrize("boundary", ["restore", "submit"])
+@pytest.mark.parametrize("stage", ["proposal", "retry", "rerolled"])
+@pytest.mark.parametrize(
+    ("attached", "moving_unit_id"),
+    [(False, "army-alpha:other"), (True, "army-alpha:other"), (True, SOURCE)],
+)
+def test_surge_moving_unit_is_bound_before_any_mutation(
+    boundary: str, stage: str, attached: bool, moving_unit_id: str
+) -> None:
+    import copy
+
+    from tests.phase15a_charge_declaration_helpers import charge_lifecycle, compact_test_unit_poses
+
+    from warhammer40k_core.engine.movement_proposals import (
+        MovementProposalPayload,
+        MovementProposalRequest,
+    )
+    from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.geometry.pose import Pose
+
+    lifecycle, _ = charge_lifecycle(
+        alpha_unit_ids=("source", "leader", "other") if attached else ("source", "other"),
+        alpha_attached_unit_ids=("source", "leader") if attached else None,
+        alpha_origins={
+            "source": Pose.at(10, 20),
+            "leader": Pose.at(10, 21.8),
+            "other": Pose.at(10, 10),
+        },
+        enemy_model_poses=compact_test_unit_poses(origin=Pose.at(10, 30), model_count=5),
+        game_id="surge-moving-unit-authority",
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    source_id = rules_unit_view_by_id(state=state, unit_instance_id=SOURCE).unit_instance_id
+    session, selection = _session(lifecycle, reroll=stage == "rerolled")
+    status = session.submit_option(
+        request_id=selection.request_id,
+        result_id="moving-unit-select",
+        option_id=f"surge:{source_id}:target:{TARGET}",
+    )
+    first_request = status.decision_request
+    assert first_request is not None
+    if stage == "rerolled":
+        status = session.submit_option(
+            request_id=first_request.request_id,
+            result_id="moving-unit-reroll",
+            option_id="reroll:0",
+        )
+    elif stage == "retry":
+        count = 6 if attached else 5
+        status = _submit_path(session, first_request, (1,) * count, "moving-unit-short")
+        assert status.status_kind is LifecycleStatusKind.INVALID
+    request = lifecycle.decision_controller.queue.pending_requests[0]
+    pristine = copy.deepcopy(lifecycle.to_payload())
+    assert GameLifecycle.from_payload(pristine).to_payload() == pristine
+    assert isinstance(request.payload, dict)
+    proposal = request.payload["proposal_request"]
+    assert isinstance(proposal, dict)
+    assert proposal["unit_instance_id"] == source_id
+    assert moving_unit_id != source_id
+    proposal["unit_instance_id"] = moving_unit_id
+    context = proposal["context"]
+    assert isinstance(context, dict)
+    descriptor = context["descriptor"]
+    assert isinstance(descriptor, dict)
+    distance = descriptor["max_distance_inches"]
+    assert isinstance(distance, (int, float))
+    for event in lifecycle.decision_controller.event_log.records:
+        if (
+            event.event_type == "decision_requested"
+            and isinstance(event.payload, dict)
+            and event.payload.get("request_id") == request.request_id
+        ):
+            event.payload["payload"] = validate_json_value(request.payload)
+    before = copy.deepcopy(lifecycle.to_payload())
+    assert before["decisions"]["records"] == pristine["decisions"]["records"]
+    if boundary == "restore":
+        with pytest.raises(GameLifecycleError, match="Surge moving unit differs"):
+            GameLifecycle.from_payload(before)
+    else:
+        moving_count = 6 if moving_unit_id == SOURCE else 5
+        typed_proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+        witness = surge_path(
+            lifecycle,
+            (float(distance),) * moving_count,
+            unit_id=source_id if moving_unit_id == SOURCE else moving_unit_id,
+        )
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="wrong-unit-path",
+            payload=validate_json_value(
+                MovementProposalPayload(
+                    proposal_request_id=request.request_id,
+                    proposal_kind=typed_proposal.proposal_kind,
+                    unit_instance_id=moving_unit_id,
+                    movement_phase_action="surge_move",
+                    witness=witness,
+                ).to_payload()
+            ),
+        )
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert status.payload == {"invalid_reason": "surge_authority_drift"}
+    # Includes battlefield, pending queue, decisions/events, movement ledgers and scopes.
+    assert lifecycle.to_payload() == before
+
+
 def test_surge_reroll_revalidates_eligibility_before_consuming_dice() -> None:
     from warhammer40k_core.engine.phase import LifecycleStatusKind
 

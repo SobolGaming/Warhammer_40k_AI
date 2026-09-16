@@ -85,6 +85,15 @@ unchanged. Regression cases reject descriptor, bonus, reroll-reference and dice
 evidence tampering, including the reported checkpoint edit, while accepted and
 declined rerolls with source bonuses complete, restore and replay exactly.
 
+The moving-unit review additionally binds `MovementProposalRequest.unit_instance_id`
+to the canonical ID in the original selection and eligible-unit record. Checking
+only the copied context allowed another friendly unit to move before reactive
+scope completion failed. The bug-class trace follows ordinary, retried and
+rerolled proposals into physical placement, completion events and scope closure;
+all share the repaired validator, including completed history. Regressions cover
+standalone and attached selections, component aliases, checkpoint restore and
+pre-pop rejection with unchanged battlefield, queue, decisions, events and ledgers.
+
 ## Geometric proof boundary
 
 An endpoint already engaging the selected target satisfies that model's required
@@ -102,4 +111,5 @@ phase/turn scoping, player projections, rejection/retry, exact replay and checkp
 tampering. Source and static audits pin the reviewed artifact and shared owners.
 Initial aggregate validation is recorded in `performance/order52/validation.json`;
 the grant-review fix's final gates are in `performance/order52/grant-validation.json`.
+The moving-unit fix's final gates are in `performance/order52/moving-unit-validation.json`.
 Performance evidence and its limits are in [the diagnostic report](performance/order52/README.md).

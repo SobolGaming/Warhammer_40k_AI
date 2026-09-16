@@ -68,6 +68,12 @@ def test_surge_live_and_historical_descriptors_share_recorded_grant_validation()
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     assert "_validate_surge_granted_descriptor" in calls
+    grant_comparisons = {
+        ast.unparse(node)
+        for node in ast.walk(functions["_validate_surge_granted_descriptor"])
+        if isinstance(node, ast.Compare)
+    }
+    assert "proposal.unit_instance_id != unit.unit_instance_id" in grant_comparisons
     for module in ("surge_authority.py", "surge_history.py"):
         tree = ast.parse((ENGINE / module).read_text())
         uses = [
@@ -115,11 +121,12 @@ def test_surge_performance_evidence_uses_identical_workload_and_declared_budgets
     assert head["maximum_seconds"] <= base["budgets"]["maximum_seconds"]
 
 
-def test_surge_grant_validation_retains_matched_performance_evidence() -> None:
+@pytest.mark.parametrize("prefix", ["grant", "moving-unit"])
+def test_surge_grant_validation_retains_matched_performance_evidence(prefix: str) -> None:
     directory = ROOT / "docs/performance/order52"
     base, head = (
         json.loads((directory / name).read_text())
-        for name in ("grant-base.json", "grant-head.json")
+        for name in (f"{prefix}-base.json", f"{prefix}-head.json")
     )
     for field in (
         "workload_id",

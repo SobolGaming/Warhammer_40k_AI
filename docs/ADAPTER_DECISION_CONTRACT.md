@@ -6040,6 +6040,12 @@ its matching `decision_requested` event cannot enlarge the movement limit. This
 validation uses the existing contract 23 payloads and adds no adapter choice or
 schema field.
 
+The proposal's `unit_instance_id` must exactly match the canonical rules-unit ID
+in both the recorded finite selection and its eligible-unit record. Another
+friendly unit or an attached component alias is rejected before queue pop, even
+if the proposal's selected-unit context and request event are otherwise valid.
+Restore and completed-movement history enforce the same binding.
+
 Every living model must engage the selected target if a legal path permits it,
 otherwise achieve a proved nearest endpoint. No model may finish engaged with
 another enemy. `surge_model_endpoints` records model/component/target IDs, the
