@@ -3,7 +3,11 @@
 from dataclasses import replace
 
 from tests.phase10p_reserves_helpers import battle_state_with_reserve
-from warhammer40k_core.core.deployment_zones import DeploymentZone
+from warhammer40k_core.core.deployment_zones import (
+    DeploymentZone,
+    DeploymentZoneCircleCutout,
+    DeploymentZoneShape,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind, ModelPlacement
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.deployment import (
@@ -89,5 +93,48 @@ def oversized_deployment_case(
             ),
         ),
         context=request.context,
+    )
+    return state, request, proposal
+
+
+def composite_deployment_case(
+    *, redundant: bool, reverse: bool = False
+) -> tuple[GameState, DeploymentPlacementRequest, DeploymentPlacementProposal]:
+    diameter = 200 / 25.4
+    state, request, proposal = oversized_deployment_case(zone_width=diameter)
+    assert state.mission_setup is not None
+    cover = DeploymentZone.rectangle(
+        "square", "player-a", min_x=0, min_y=0, max_x=diameter, max_y=diameter
+    )
+    split = DeploymentZone(
+        deployment_zone_id="redundant-square",
+        player_id="player-a",
+        shape=DeploymentZoneShape(
+            polygons=tuple(
+                polygon
+                for lo, hi in ((0, diameter / 2), (diameter / 2, diameter))
+                for polygon in DeploymentZoneShape.rectangle(
+                    min_x=lo, min_y=0, max_x=hi, max_y=diameter
+                ).polygons
+            ),
+            cutouts=(DeploymentZoneCircleCutout(diameter / 2, diameter / 2, 1),),
+        ),
+    )
+    zones = (cover, split) if redundant else (cover,)
+    state.mission_setup = replace(
+        state.mission_setup,
+        deployment_zones=(
+            *(reversed(zones) if reverse else zones),
+            *state.mission_setup.deployment_zones[1:],
+        ),
+    )
+    request = replace(
+        request,
+        mission_setup=state.mission_setup,
+        deployment_zones=tuple(
+            zone
+            for zone in state.mission_setup.deployment_zones
+            if zone.player_id == request.player_id
+        ),
     )
     return state, request, proposal

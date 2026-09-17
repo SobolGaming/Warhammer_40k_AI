@@ -1220,6 +1220,26 @@ def test_order54_oversized_deployment_requires_impossibility_and_own_edge(
     assert result.is_valid is accepted
 
 
+@pytest.mark.parametrize("reverse", [False, True])
+def test_order54_composite_zone_cannot_authorize_oversized_deployment(reverse: bool) -> None:
+    from tests.large_model_setup_helpers import composite_deployment_case
+
+    for redundant in (False, True):
+        state, request, proposal = composite_deployment_case(redundant=redundant, reverse=reverse)
+        before = state.to_payload()
+        result = resolve_deployment_placement(
+            state=state,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            request=request,
+            proposal=proposal,
+        )
+        assert not result.is_valid
+        assert {violation.violation_code for violation in result.violations} == {
+            DeploymentPlacementViolationCode.DEPLOYMENT_ZONE_VIOLATION
+        }
+        assert state.to_payload() == before
+
+
 def test_order54_facade_deployment_restore_replay_and_pregame_duration() -> None:
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.core.datasheet import BaseSizeDefinition

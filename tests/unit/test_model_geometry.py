@@ -558,3 +558,26 @@ def test_setup_fit_unions_regions_without_applying_one_regions_cutout_to_another
         CircularBase(2),
         (((left, right), (), ((2.0, 2.0, 1.0),)), ((left, right), (), ())),
     )
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("split_cover", [False, True])
+def test_setup_fit_absorbs_semantically_redundant_composite_regions(
+    reverse: bool, split_cover: bool
+) -> None:
+    from warhammer40k_core.geometry.setup_fit import Region, base_fits_regions
+
+    square = ((0.0, 0.0), (4.0, 0.0), (4.0, 4.0), (0.0, 4.0))
+    left = ((0.0, 0.0), (2.0, 0.0), (2.0, 4.0), (0.0, 4.0))
+    right = ((2.0, 0.0), (4.0, 0.0), (4.0, 4.0), (2.0, 4.0))
+    cover: tuple[Region, ...] = (
+        (((left,), (), ()), ((right,), (), ())) if split_cover else (((square,), (), ()),)
+    )
+    redundant: Region = ((left, right), (), ((2.0, 2.0, 1.0),))
+    regions = (*cover, redundant)
+    if reverse:
+        regions = tuple(reversed(regions))
+    for radius, fits in ((2.0, True), (2.01, False)):
+        assert base_fits_regions(CircularBase(radius), cover) is fits
+        assert base_fits_regions(CircularBase(radius), regions) is fits
+    assert base_fits_regions(CircularBase(2), (redundant,)) is False

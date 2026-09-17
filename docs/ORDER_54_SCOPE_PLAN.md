@@ -25,10 +25,12 @@ evidence, not a claim of a newly retrieved official GW document. Regenerate with
    It handles circular, oval and rectangular bases, polygon unions and polygon
    or circular cutouts. Each region retains its own cutouts. Convex regions use
    exact support constraints; other shapes use quantified real arithmetic.
-   Coordinates are rationalized from their decimal representation. Equivalent
-   polygon regions with subsumed cutouts are absorbed before quantified solving;
-   the pinned solver rejects a redundant tangent-region formula without this
-   exact normalization. A regression preserves both the fit and cutout scope. A failed
+   Coordinates are rationalized from their decimal representation. Redundant
+   regions are removed only after an exact quantifier-free proof that they have
+   no point outside the union of the remaining regions. The shared membership
+   predicate retains each region's cutouts and recognizes equivalent polygon
+   decompositions, including coverage split across multiple regions. This avoids
+   a pinned-solver rejection of redundant nonlinear branches at tangency. A failed
    sample, obstructing model or terrain feature never proves oversized status.
    Unresolved solver results raise an explicit domain error, never permission.
 3. Deployment and prebattle placement retain collision, coherency, terrain,
@@ -56,6 +58,15 @@ and recorded restrictions with no movement/shooting/charge consumers. These are
 instances of the requested invariant. Frozen deployment, prebattle and reserve
 modules were reduced by extracting their existing validation/resolution functions
 before extending them. No new decision family or named handler is introduced.
+
+Review finding P2 in `6ae47595` exposed an incomplete absorption test: syntactically
+different polygon decompositions bypassed it and falsely authorized deployment.
+The repair stays in shared `geometry/setup_fit.py`; the consumer search confirms
+deployment, prebattle and reserve fit queries already route through it. Regression
+tests cover both region orders, coverage by one or several regions, exact-fit and
+too-large bases, retained cutouts, and the canonical 200 mm deployment rejection
+with and without the redundant region. The existing adapter contract covers the
+unchanged proposal and invalid-result shapes; only runtime identity changes.
 
 Order 55's transport/disembark exception and Order 66's wider Aircraft overhaul
 remain separate roadmap work. This change adds no transport exception, flight

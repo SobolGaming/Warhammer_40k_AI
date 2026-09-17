@@ -47,9 +47,24 @@ def test_oversized_setup_consumers_share_geometry_and_activity_authority() -> No
     )
 
 
-def test_oversized_setup_performance_evidence_has_matched_inputs() -> None:
+@pytest.mark.parametrize(
+    ("prefix", "base_expected", "head_expected"),
+    [
+        ("", [False, False, True, False], [True, False, True, False]),
+        (
+            "review-",
+            [True, False, True, False, False, True],
+            [True, False, True, False, False, False],
+        ),
+    ],
+)
+def test_oversized_setup_performance_evidence_has_matched_inputs(
+    prefix: str, base_expected: list[bool], head_expected: list[bool]
+) -> None:
     directory = ROOT / "docs/performance/order54"
-    base, head = (json.loads((directory / name).read_text()) for name in ("base.json", "head.json"))
+    base, head = (
+        json.loads((directory / f"{prefix}{name}.json").read_text()) for name in ("base", "head")
+    )
     for field in (
         "workload_id",
         "platform",
@@ -65,8 +80,8 @@ def test_oversized_setup_performance_evidence_has_matched_inputs() -> None:
     ):
         assert base[field] == head[field], field
     for report, expected in (
-        (base, [False, False, True, False]),
-        (head, [True, False, True, False]),
+        (base, base_expected),
+        (head, head_expected),
     ):
         assert len(report["samples"]) == 7
         assert report["completion_rate"] == 1

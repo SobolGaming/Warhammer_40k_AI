@@ -61,6 +61,40 @@ def _inside(x: RealTerm, y: RealTerm, polygon: RationalPolygon, *, strict: bool 
     return either(*(halfplanes(part) for part in convex_polygon_parts(polygon)))
 
 
+def _region_membership(x: RealTerm, y: RealTerm, region: Region) -> Formula:
+    polygons, holes, circles = region
+    return both(
+        either(*(_inside(x, y, _rational_polygon(p)) for p in polygons)),
+        *(negate(_inside(x, y, _rational_polygon(p), strict=True)) for p in holes),
+        *(
+            ((x - Fraction(str(hx))) ** 2 + (y - Fraction(str(hy))) ** 2).ge(
+                Fraction(str(radius)) ** 2
+            )
+            for hx, hy, radius in circles
+        ),
+    )
+
+
+def _irredundant_regions(regions: tuple[Region, ...]) -> tuple[Region, ...]:
+    retained = list(dict.fromkeys(regions))
+    if len(retained) == 1:
+        return tuple(retained)
+    x, y = variable("x"), variable("y")
+    membership = {region: _region_membership(x, y, region) for region in retained}
+    # Prefer removing cutout/decomposed representations. Containment is proved
+    # over actual sets, including coverage by multiple remaining regions. Tuple
+    # equality cannot recognize equivalent decompositions or scoped cutouts.
+    for region in sorted(
+        retained, key=lambda row: (len(row[1]) + len(row[2]), len(row[0])), reverse=True
+    ):
+        if len(retained) == 1:
+            break
+        others = either(*(membership[other] for other in retained if other != region))
+        if not decide(both(membership[region], negate(others)), ("x", "y")):
+            retained.remove(region)
+    return tuple(retained)
+
+
 @lru_cache(maxsize=512)
 def base_fits_region(
     base: BaseShape,
@@ -75,24 +109,10 @@ def base_fits_region(
 def base_fits_regions(base: BaseShape, setup_regions: tuple[Region, ...]) -> bool:
     if not setup_regions or any(not region[0] for region in setup_regions):
         raise GeometryError("Setup fit requires nonempty polygon regions.")
-    # Remove Boolean absorption before constructing the quantified formula:
-    # (P minus H1) union (P minus H2) is P minus H2 when H2 is a subset of H1.
-    # Keeping redundant nonlinear branches changes nlqsat's result at tangency
-    # in the pinned solver. This is an exact set identity, not a sampled fit.
-    unique_regions = tuple(dict.fromkeys(setup_regions))
-    setup_regions = tuple(
-        region
-        for region in unique_regions
-        if not any(
-            region != other
-            and frozenset(region[0]) == frozenset(other[0])
-            and frozenset(other[1]).issubset(region[1])
-            and frozenset(other[2]).issubset(region[2])
-            and (frozenset(region[1]), frozenset(region[2]))
-            != (frozenset(other[1]), frozenset(other[2]))
-            for other in unique_regions
-        )
-    )
+    # Redundant nonlinear branches change nlqsat's result at tangency in the
+    # pinned solver. Exact quantifier-free containment proofs remove them before
+    # constructing the quantified fit formula; unresolved proofs still raise.
+    setup_regions = _irredundant_regions(setup_regions)
     polygons, polygon_cutouts, circle_cutouts = setup_regions[0]
     if not polygons:
         raise GeometryError("Setup fit requires at least one polygon.")
@@ -143,21 +163,7 @@ def base_fits_regions(base: BaseShape, setup_regions: tuple[Region, ...]) -> boo
         if type(base) is RectangularBase
         else ((u * b) ** 2 + (v * a) ** 2).le((a * b) ** 2)
     )
-    in_region = either(
-        *(
-            both(
-                either(*(_inside(px, py, _rational_polygon(p)) for p in zone_polygons)),
-                *(negate(_inside(px, py, _rational_polygon(p), strict=True)) for p in zone_holes),
-                *(
-                    ((px - Fraction(str(hx))) ** 2 + (py - Fraction(str(hy))) ** 2).ge(
-                        Fraction(str(radius)) ** 2
-                    )
-                    for hx, hy, radius in zone_circles
-                ),
-            )
-            for zone_polygons, zone_holes, zone_circles in setup_regions
-        )
-    )
+    in_region = either(*(_region_membership(px, py, region) for region in setup_regions))
     return decide(
         both(orientation, quantified("forall", ("u", "v"), implies(in_base, in_region))), names
     )

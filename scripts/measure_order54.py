@@ -10,7 +10,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from tests.large_model_setup_helpers import oversized_deployment_case
+from tests.large_model_setup_helpers import composite_deployment_case, oversized_deployment_case
 
 from warhammer40k_core.engine.deployment import resolve_deployment_placement
 
@@ -19,11 +19,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--revision", required=True)
+    parser.add_argument("--composite", action="store_true")
     args = parser.parse_args()
     cases = tuple(
         oversized_deployment_case(zone_width=width, x=x)
         for width, x in ((3, None), (3, 5), (10, None), (10, 9))
     )
+    if args.composite:
+        cases += tuple(composite_deployment_case(redundant=value) for value in (False, True))
     first_state = cases[0][0]
     assert first_state.battlefield_state is not None
     assert first_state.mission_setup is not None
@@ -45,7 +48,11 @@ def main() -> None:
     times = [r["seconds"] for r in samples]
     root = Path(__file__).resolve().parents[1]
     report = {
-        "workload_id": "order54-oversized-deployment-v1",
+        "workload_id": (
+            "order54-composite-deployment-v2"
+            if args.composite
+            else "order54-oversized-deployment-v1"
+        ),
         "revision": args.revision,
         "platform": platform.platform(),
         "python": platform.python_version(),
@@ -56,7 +63,7 @@ def main() -> None:
         "cpu_allocation": os.cpu_count(),
         "concurrency": 1,
         "timing_boundary": (
-            "Four deployment resolutions; fixture creation excluded; first sample cold"
+            f"{len(cases)} deployment resolutions; fixture creation excluded; first sample cold"
         ),
         "scenario": {
             "models": sum(
@@ -66,6 +73,7 @@ def main() -> None:
             "terrain_count": len(first_state.mission_setup.terrain_features),
             "zone_widths": [3, 3, 10, 10],
             "base_diameter_mm": 200,
+            "composite_cases": args.composite,
         },
         "hashes": {
             p: hashlib.sha256((root / p).read_bytes()).hexdigest()
