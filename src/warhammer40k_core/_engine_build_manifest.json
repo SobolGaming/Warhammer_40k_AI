@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b78a1e9eff48d0c55b1bd689011b08f30497ed9e16876bcb07018013981ee26c",
-  "fingerprint": "b78a1e9eff48d0c55b1bd689011b08f30497ed9e16876bcb07018013981ee26c",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:92f285ced6a5f6fdc021f816ee9d0534f7d8a5428941a55960d55f5a2fd26a6f",
+  "fingerprint": "92f285ced6a5f6fdc021f816ee9d0534f7d8a5428941a55960d55f5a2fd26a6f",
   "resource_count": 2844,
   "resources": [
     {
@@ -12190,9 +12190,9 @@
       "sha256": "df1fc326c69933cdf7e88af48b92b3abc4d39f685a0c2b370041439865ff1aab"
     },
     {
-      "byte_length": 11491,
+      "byte_length": 11483,
       "path": "warhammer40k_core/engine/transport_disembark_geometry.py",
-      "sha256": "a65bfffd686c97d3b63928faf2144292373f29c64ce2ee660dd18d74c0ca3b56"
+      "sha256": "ed2213680c8bd4a8b984ebf67566cb3c66af7e3d12c6e2bdea6b489223d952b4"
     },
     {
       "byte_length": 6016,

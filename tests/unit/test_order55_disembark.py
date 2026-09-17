@@ -78,6 +78,139 @@ def test_disembark_size_proof_and_one_inch_limit(diameter: float, gap: float, va
 
 
 @pytest.mark.parametrize(
+    ("horizontal_gap", "vertical_gap", "valid"),
+    [
+        (0.5, None, False),  # The reported, fully supported five-inch ruins floor.
+        (0, 0.999999, True),
+        (0, 1, True),
+        (0, 1.000001, False),
+        (0.6, 0.799999, True),
+        (0.6, 0.8, True),
+        (0.6, 0.800001, False),
+    ],
+)
+def test_elevated_oversized_disembark_uses_three_dimensional_one_inch_boundary(
+    horizontal_gap: float, vertical_gap: float | None, valid: bool
+) -> None:
+    from dataclasses import replace
+    from math import hypot, isclose
+
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID
+    from tests.large_model_disembark_helpers import (
+        large_disembark_placement,
+        large_disembark_session,
+    )
+
+    from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+    from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
+    from warhammer40k_core.engine.damage_allocation import unit_by_id
+    from warhammer40k_core.engine.transports import (
+        DisembarkModeKind,
+        DisembarkSelection,
+        TransportMovementStatus,
+        TransportOperationViolationCode,
+        resolve_disembark,
+    )
+    from warhammer40k_core.geometry.pose import Pose
+    from warhammer40k_core.geometry.terrain import (
+        TerrainFeatureDefinition,
+        TerrainFloorDefinition,
+        TerrainWallDefinition,
+    )
+
+    session = large_disembark_session()
+    state = session.lifecycle.state
+    assert state is not None
+    scenario = battlefield_scenario_for_state(state=state)
+    unit = unit_by_id(state=state, unit_instance_id=PASSENGER_ID)
+    transport_placement = scenario.battlefield_state.unit_placement_by_id(TRANSPORT_ID)
+    transport = unit_by_id(state=state, unit_instance_id=TRANSPORT_ID)
+    hull = geometry_model_for_placement(
+        model=transport.own_models[0], placement=transport_placement.model_placements[0]
+    )
+    floor_z = (
+        5 if vertical_gap is None else hull.pose.position.z + hull.volume.height + vertical_gap
+    )
+    placement = large_disembark_placement(session, gap=horizontal_gap)
+    large, *small = placement.model_placements
+    pose = Pose.at(large.pose.position.x, large.pose.position.y, floor_z)
+    large = replace(large, pose=pose)
+    placement = replace(placement, model_placements=(large, *small))
+    display = TerrainDisplayGeometry.axis_aligned_rectangle(
+        display_template_id="order55-upper-floor",
+        center_x_inches=pose.position.x,
+        center_y_inches=pose.position.y,
+        width_inches=6,
+        depth_inches=6,
+    )
+    floor = TerrainFeatureDefinition(
+        feature_id="order55-supported-upper-floor",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=pose.position.x,
+        footprint_center_y_inches=pose.position.y,
+        footprint_width_inches=6,
+        footprint_depth_inches=6,
+        rules_footprint_polygon=display.footprint_polygon,
+        display_geometry=display,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="north",
+                center_x_inches=pose.position.x,
+                center_y_inches=pose.position.y + 2.94,
+                bottom_z_inches=0,
+                width_inches=6,
+                depth_inches=0.12,
+                height_inches=floor_z,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="upper",
+                center_x_inches=pose.position.x,
+                center_y_inches=pose.position.y,
+                bottom_z_inches=floor_z,
+                width_inches=6,
+                depth_inches=6,
+                thickness_inches=0.12,
+            ),
+        ),
+    )
+    passenger = geometry_model_for_placement(model=unit.own_models[0], placement=large)
+    assert isclose(passenger.base_distance_to(hull), horizontal_gap, abs_tol=1e-9)
+    assert isclose(
+        passenger.range_to(hull),
+        hypot(horizontal_gap, floor_z - hull.pose.position.z - hull.volume.height),
+        abs_tol=1e-9,
+    )
+    result = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        cargo_state=state.transport_cargo_states[0],
+        selection=DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=PASSENGER_ID,
+            transport_unit_instance_id=TRANSPORT_ID,
+            attempted_placement=placement,
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ),
+        unit=unit,
+        transport_placement=transport_placement,
+        terrain_features=(floor,),
+    )
+    assert result.is_valid is valid, result.violations
+    assert tuple(v.violation_code for v in result.violations) == (
+        () if valid else (TransportOperationViolationCode.DISEMBARK_DISTANCE,)
+    )
+    assert type(result).from_payload(result.to_payload()) == result
+    if not valid:
+        assert result.updated_cargo_state is None
+
+
+@pytest.mark.parametrize(
     "mode_name", ["tactical_disembark", "assault_disembark", "shock_disembark"]
 )
 @pytest.mark.parametrize("prevalidation", [False, True])

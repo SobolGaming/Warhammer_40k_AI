@@ -1,6 +1,6 @@
 {
   "workload_id": "order55-oversized-disembark-v1",
-  "revision": "92f285ced6a5f6fdc021f816ee9d0534f7d8a5428941a55960d55f5a2fd26a6f",
+  "revision": "411fb2d317b5b8f6d9fe65a35bc1b492fd469547",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -33,7 +33,7 @@
   },
   "samples": [
     {
-      "seconds": 0.004626333946362138,
+      "seconds": 0.004924792097881436,
       "accepted": [
         true,
         false,
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "seconds": 0.002637833124026656,
+      "seconds": 0.0024593330454081297,
       "accepted": [
         true,
         false,
@@ -51,7 +51,7 @@
       ]
     },
     {
-      "seconds": 0.002542249858379364,
+      "seconds": 0.002648875117301941,
       "accepted": [
         true,
         false,
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "seconds": 0.0026526248548179865,
+      "seconds": 0.0028059170581400394,
       "accepted": [
         true,
         false,
@@ -69,7 +69,7 @@
       ]
     },
     {
-      "seconds": 0.002699833130463958,
+      "seconds": 0.0024900410789996386,
       "accepted": [
         true,
         false,
@@ -78,7 +78,7 @@
       ]
     },
     {
-      "seconds": 0.0025505830999463797,
+      "seconds": 0.0024507080670446157,
       "accepted": [
         true,
         false,
@@ -87,7 +87,7 @@
       ]
     },
     {
-      "seconds": 0.0025008339434862137,
+      "seconds": 0.002615000121295452,
       "accepted": [
         true,
         false,
@@ -96,9 +96,9 @@
       ]
     }
   ],
-  "mean_seconds": 0.0028871845653546707,
-  "median_seconds": 0.002637833124026656,
-  "maximum_seconds": 0.004626333946362138,
+  "mean_seconds": 0.002913523798010179,
+  "median_seconds": 0.002615000121295452,
+  "maximum_seconds": 0.004924792097881436,
   "completion_rate": 1,
   "full_game_certified": false,
   "budgets": {

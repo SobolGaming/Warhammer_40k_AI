@@ -35,6 +35,8 @@ def test_all_disembark_consumers_use_the_shared_endpoint_authority() -> None:
     assert "base_fits_disembark_distance(model.base, transport.base, distance_inches)" in shared
     assert "if not oversized and enemy_unit_id in allowed_engagement_units:" in shared
     assert "DISEMBARK_POLICY.maximum_base_distance_inches" in shared
+    assert "model.range_to(transport) <= DISEMBARK_POLICY.maximum_base_distance_inches" in shared
+    assert "base_distance_to(" not in shared
     assert "append_disembark_endpoint_violations(" in (engine / "transports.py").read_text()
     assert "resolve_disembark_internal(" in (engine / "emergency_disembark.py").read_text()
     assert (

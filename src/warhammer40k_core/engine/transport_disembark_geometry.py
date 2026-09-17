@@ -104,7 +104,7 @@ def append_disembark_endpoint_violations(
         if not ordinary_distance and not (
             oversized
             and any(
-                model.base_distance_to(transport) <= DISEMBARK_POLICY.maximum_base_distance_inches
+                model.range_to(transport) <= DISEMBARK_POLICY.maximum_base_distance_inches
                 for transport in transport_models
             )
         ):

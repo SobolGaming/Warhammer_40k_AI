@@ -49,6 +49,14 @@ size-only question. Every proposed endpoint still recomputes distance, engagemen
 and all other physical checks from current state. No cached endpoint permission,
 new player choice, named handler or alternative mutation path is introduced.
 
+The one-inch endpoint limit uses `Model.range_to`, the shared closest-volume
+measurement combining horizontal base/hull distance and vertical separation.
+The review regression places the canonical five-inch passenger on a supported
+five-inch ruins floor: its 0.5-inch horizontal gap is insufficient because its
+3D distance is about 1.92 inches. Just-below, exact and just-above one-inch
+boundaries cover both vertical-only and diagonal separation. Terrain support and
+coherency pass independently; rejected endpoints carry only the distance error.
+
 ## Audit and scope
 
 The bug-class search found one unconditional whole-footprint distance check shared
@@ -56,6 +64,11 @@ by all physical/component paths. The repair is there, including suppression of
 Combat/Shock's ordinary engagement permissions for the exceptional model. The
 ordinary three/six-inch policy is preserved. The extracted canonical enemy rules-
 unit lookup remains covered by the existing static physical-identity audit.
+
+The vertical-distance bug-class search found one shared consumer of the oversized
+one-inch policy. All its callers receive the same 3D correction, with a static
+audit against reintroducing horizontal-only measurement there. Separate ordinary
+whole-footprint and Embark distance policies are outside this exception's scope.
 
 Order 60's maximum-survivor/closest-placement Emergency policy, Order 62's Shock
 engagement-owner source resolution and Order 63's ingress propagation remain

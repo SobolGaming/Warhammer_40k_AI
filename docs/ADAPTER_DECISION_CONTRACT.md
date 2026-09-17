@@ -6127,7 +6127,8 @@ one shared physical endpoint validator, including attached components and
 Combat/Emergency/destroyed-Transport setup. When a proposed model is outside its
 ordinary three- or six-inch whole-base band, the engine proves whether any pose
 of its base fits beside the Transport. Only a size-impossibility proof permits
-that model's base within one inch of the Transport base/hull, and that model must
+that model's base within one inch of the Transport base/hull in three dimensions,
+including vertical separation, and that model must
 be unengaged even when its mode ordinarily permits engagement. Other setup and
 rules-unit requirements continue to apply. Blocked space or a bad proposed pose
 cannot authorize the exception.
