@@ -6119,3 +6119,22 @@ Source corner edges (`north_west_corner`, `north_east_corner`,
 `south_west_corner`, `south_east_corner`) designate their two adjoining
 cardinal edges. Contact with either designated edge satisfies the source corner
 edge; contact with an opposing edge does not. Source layout identity is retained.
+
+## Order 55: engine-derived oversized disembark placement
+
+All existing `disembark` placement proposals and their finite mode choices use
+one shared physical endpoint validator, including attached components and
+Combat/Emergency/destroyed-Transport setup. When a proposed model is outside its
+ordinary three- or six-inch whole-base band, the engine proves whether any pose
+of its base fits beside the Transport. Only a size-impossibility proof permits
+that model's base within one inch of the Transport base/hull, and that model must
+be unengaged even when its mode ordinarily permits engagement. Other setup and
+rules-unit requirements continue to apply. Blocked space or a bad proposed pose
+cannot authorize the exception.
+
+This uses the existing `PlacementProposalPayload`, mode/grant validation,
+`disembark_distance`/`enemy_engagement_range` diagnostics and retry behavior.
+No new proposal field, decision, exception flag, event shape or viewer-visible
+family is added. The current contract covers these payloads; only the authoritative
+runtime identity and its generated examples change. Restore and replay retain
+exact base/hull geometry and selections and use the same engine submission path.

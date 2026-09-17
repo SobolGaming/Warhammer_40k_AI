@@ -40,6 +40,7 @@ def disembark_session(
     modes: tuple[DisembarkModeKind, ...] = (),
     *,
     eligible: bool = True,
+    oversized_base_diameter_inches: float | None = None,
 ) -> LocalGameSession:
     config = _config()
     alpha, beta = config.army_muster_requests
@@ -63,6 +64,10 @@ def disembark_session(
             beta,
         ),
     )
+    if oversized_base_diameter_inches is not None:
+        from tests.large_model_disembark_helpers import large_disembark_config
+
+        config = large_disembark_config(config, diameter=oversized_base_diameter_inches)
     state = GameState.from_config(config)
     armies = _mustered_armies(config)
     for army in armies:
@@ -88,6 +93,10 @@ def disembark_session(
             started_phase_embarked_unit_instance_ids=(PASSENGER_ID,),
         )
     )
+    if oversized_base_diameter_inches is not None:
+        from tests.large_model_disembark_helpers import prepare_large_disembark_state
+
+        prepare_large_disembark_state(state)
     decisions = DecisionController()
     enter_battle_for_fixture(state, decisions=decisions)
     _record_default_fixed_secondary_choices_for_missing_players(state)

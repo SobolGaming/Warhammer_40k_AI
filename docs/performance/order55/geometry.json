@@ -1,0 +1,186 @@
+{
+  "workload_id": "order55-cold-analytic-fit-v1",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "concurrency": 1,
+  "distance_inches": 3,
+  "maximum_sample_budget_seconds": 1,
+  "cases": [
+    {
+      "id": "ellipse-circle-positive",
+      "base": {
+        "kind": "oval",
+        "radius": null,
+        "length": 5.0,
+        "width": 1.0
+      },
+      "transport": {
+        "kind": "circular",
+        "radius": 2.0,
+        "length": null,
+        "width": null
+      }
+    },
+    {
+      "id": "ellipse-circle-negative",
+      "base": {
+        "kind": "oval",
+        "radius": null,
+        "length": 8.0,
+        "width": 2.0
+      },
+      "transport": {
+        "kind": "circular",
+        "radius": 2.0,
+        "length": null,
+        "width": null
+      }
+    },
+    {
+      "id": "rectangle-circle-negative",
+      "base": {
+        "kind": "rectangular",
+        "radius": null,
+        "length": 8.0,
+        "width": 2.0
+      },
+      "transport": {
+        "kind": "circular",
+        "radius": 2.0,
+        "length": null,
+        "width": null
+      }
+    },
+    {
+      "id": "ellipse-ellipse-positive",
+      "base": {
+        "kind": "oval",
+        "radius": null,
+        "length": 8.0,
+        "width": 2.0
+      },
+      "transport": {
+        "kind": "oval",
+        "radius": null,
+        "length": 6.0,
+        "width": 2.0
+      }
+    },
+    {
+      "id": "rectangle-ellipse-positive",
+      "base": {
+        "kind": "rectangular",
+        "radius": null,
+        "length": 8.0,
+        "width": 2.0
+      },
+      "transport": {
+        "kind": "oval",
+        "radius": null,
+        "length": 6.0,
+        "width": 2.0
+      }
+    },
+    {
+      "id": "ellipse-rectangle-positive",
+      "base": {
+        "kind": "oval",
+        "radius": null,
+        "length": 8.0,
+        "width": 2.0
+      },
+      "transport": {
+        "kind": "rectangular",
+        "radius": null,
+        "length": 6.0,
+        "width": 2.0
+      }
+    }
+  ],
+  "samples": [
+    {
+      "seconds": 0.02948658401146531,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "seconds": 0.015455499989911914,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "seconds": 0.015489582903683186,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "seconds": 0.015165583929046988,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "seconds": 0.015011749928817153,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "seconds": 0.015054415911436081,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "seconds": 0.014789249980822206,
+      "fits": [
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    }
+  ],
+  "earlier_quantified_prototype": {
+    "ellipse-circle-positive": "interrupted without a proved result",
+    "ellipse-ellipse-positive": "interrupted without a proved result",
+    "elapsed_seconds": null,
+    "resolution": "Exact tangent, PSD and rational containment certificates; no guessed result."
+  },
+  "full_game_certified": false
+}
