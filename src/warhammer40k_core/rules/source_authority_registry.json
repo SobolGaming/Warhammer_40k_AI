@@ -710,6 +710,16 @@
           "audit_id": "core-surge-maintained-app-mirrors-2026-09-16",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-16T00:00:00+00:00"
+        },
+        {
+          "audit_id": "core-super-heavy-walker-maintained-app-mirrors-2026-09-16",
+          "row_id": "super-heavy-walker",
+          "source_observation_sha256": "9240dc6508400375ec9f96cbf7528865d72d8ab17e3afc1190463e3dc235df21",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-16T00:00:00+00:00"
         }
       ],
       "legacy_observations": [
@@ -1209,8 +1219,19 @@
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-surge",
           "version": "maintained-app-mirrors-observed-2026-09-16",
-          "allowed_rule_source_ids": ["gw-11e-core-surge:surge-move"],
+          "allowed_rule_source_ids": [
+            "gw-11e-core-surge:surge-move"
+          ],
           "catalog_sha256": "0704c8588bd0f343af951af7fda729b6d182c559ae90d46755c61784f48baaba"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-super-heavy-walker",
+          "version": "maintained-app-mirrors-observed-2026-09-16",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-super-heavy-walker:super-heavy-walker"
+          ],
+          "catalog_sha256": "90e6d87bef527b37d00b9a6fbf0808f2aa6dddb366ac84dc4168cf29af2f6316"
         }
       ]
     },

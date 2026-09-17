@@ -200,11 +200,12 @@ def move_trigger_source_context(
             or owner != rules_unit_view_by_id(state=state, unit_instance_id=unit_id).owner_player_id
         ):
             raise GameLifecycleError("Reactive move completion source identity drift.")
-        action = (
-            "normal_move"
-            if descriptor.movement_mode.value == "normal"
-            else descriptor.displacement_kind.value
-        )
+        if descriptor.movement_mode.value == "normal":
+            action = "normal_move"
+        elif descriptor.movement_mode.value in {"advance", "fall_back"}:
+            action = descriptor.movement_mode.value
+        else:
+            action = descriptor.displacement_kind.value
     else:
         owner = _hooks._triggering_player_id_from_move_completion_payload(
             payload, event_type=event.event_type

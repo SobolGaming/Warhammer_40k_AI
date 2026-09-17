@@ -75,6 +75,7 @@ def resolve_triggered_movement(
     hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
     take_to_the_skies: bool = False,
+    move_keyword_choice: JsonValue = None,
     surge_target_unit_instance_id: str | None = None,
 ) -> TriggeredMovementResolution:
     if type(scenario) is not BattlefieldScenario:
@@ -138,6 +139,27 @@ def resolve_triggered_movement(
                 ruleset=ruleset_descriptor,
             ),
         )
+    from warhammer40k_core.engine.move_ability_choices import (
+        CHOICE_KEY,
+        choice_descriptor,
+        chosen_move_keywords,
+        descriptors_for_move,
+        movement_ability_keywords,
+    )
+    from warhammer40k_core.engine.phases.movement_geometry import (
+        _enemy_model_ids_with_keyword_any_for_player,
+        _friendly_model_ids_with_keyword_any,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    view = rules_unit_view_from_armies(armies=scenario.armies, unit_instance_id=unit_id)
+    ability_keywords = movement_ability_keywords(view)
+    choice_payload = {} if move_keyword_choice is None else {CHOICE_KEY: move_keyword_choice}
+    temporary_keywords = chosen_move_keywords(choice_payload)
+    if temporary_keywords and choice_descriptor(move_keyword_choice) not in descriptors_for_move(
+        ability_keywords, descriptor.movement_mode.value, is_surge=is_surge
+    ):
+        raise GameLifecycleError("Movement keywords require their descriptor's allowed move.")
     aircraft_model_ids = aircraft_model_ids_for_scenario(
         scenario,
         hover_mode_states=hover_mode_states,
@@ -172,7 +194,15 @@ def resolve_triggered_movement(
         model_poses = path_witness.poses_for_model(placement.model_instance_id)
         model_witness = PathWitness.for_paths(((placement.model_instance_id, model_poses),))
         legality_context = MovementLegalityContext.from_keywords(
-            keywords=aircraft_policy.effective_keywords,
+            keywords=tuple(
+                sorted(
+                    {
+                        *aircraft_policy.effective_keywords,
+                        *ability_keywords,
+                        *temporary_keywords,
+                    }
+                )
+            ),
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=descriptor.movement_mode,
             take_to_the_skies=take_to_the_skies,
@@ -215,8 +245,31 @@ def resolve_triggered_movement(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
             ),
-            friendly_model_transit_blocker_ids=friendly_retained_ids,
-            enemy_model_transit_blocker_ids=enemy_retained_ids,
+            friendly_model_transit_blocker_ids=tuple(
+                sorted(
+                    {
+                        *friendly_retained_ids,
+                        *_friendly_model_ids_with_keyword_any(
+                            scenario=scenario,
+                            player_id=unit_placement.player_id,
+                            moving_model_instance_id=placement.model_instance_id,
+                            keyword_any=legality_context.capabilities.friendly_model_transit_blocker_keywords,
+                        ),
+                    }
+                )
+            ),
+            enemy_model_transit_blocker_ids=tuple(
+                sorted(
+                    {
+                        *enemy_retained_ids,
+                        *_enemy_model_ids_with_keyword_any_for_player(
+                            scenario=scenario,
+                            player_id=unit_placement.player_id,
+                            keyword_any=legality_context.capabilities.enemy_model_transit_blocker_keywords,
+                        ),
+                    }
+                )
+            ),
             aircraft_model_ids=tuple(
                 model_id
                 for model_id in aircraft_model_ids
@@ -292,6 +345,7 @@ def resolve_triggered_movement(
     from warhammer40k_core.engine.take_to_the_skies import flight_choice_context
 
     movement_payload: dict[str, JsonValue] = {
+        **choice_payload,
         **flight_choice_context(
             unit=rules_unit_view_from_armies(armies=scenario.armies, unit_instance_id=unit_id),
             ruleset=ruleset_descriptor,

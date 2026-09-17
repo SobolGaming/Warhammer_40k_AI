@@ -14,6 +14,7 @@ from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollMan
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import resolve_faction_resource_refund_roll
+from warhammer40k_core.engine.move_ability_choices import choice_fields
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -247,6 +248,7 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
                 "selection_request_id": result.request_id,
                 "selection_result_id": result.result_id,
                 "selection_option_id": result.selected_option_id,
+                **choice_fields(payload),
                 "take_to_the_skies": flight_selection(payload)
                 if descriptor.movement_mode is MovementMode.NORMAL
                 else False,
@@ -304,6 +306,7 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
             "selection_request_id": result.request_id,
             "selection_result_id": result.result_id,
             "selection_option_id": result.selected_option_id,
+            **choice_fields(payload),
             "take_to_the_skies": flight_selection(payload)
             if descriptor.movement_mode is MovementMode.NORMAL
             else False,
@@ -444,6 +447,7 @@ def apply_triggered_movement_distance_reroll_decision(
             "selection_request_id": selection_request_id,
             "selection_result_id": selection_result_id,
             "selection_option_id": selection_option_id,
+            **choice_fields(payload),
             "take_to_the_skies": flight_selection(payload),
             "distance_reroll_request_id": request.request_id,
             "distance_reroll_result_id": result.result_id,

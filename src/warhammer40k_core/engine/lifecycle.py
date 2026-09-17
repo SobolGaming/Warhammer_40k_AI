@@ -993,10 +993,10 @@ class GameLifecycle:
         from warhammer40k_core.engine.charge_target_authority import (
             validate_restored_charge_targets,
         )
-        from warhammer40k_core.engine.flight_decision_authority import validate_restored_flight
         from warhammer40k_core.engine.model_movement_history import validate_model_movement_history
+        from warhammer40k_core.engine.movement_decision_authority import validate_restored_movement
 
-        validate_restored_flight(
+        validate_restored_movement(
             state=lifecycle._require_state(), decisions=lifecycle.decision_controller
         )
         from warhammer40k_core.engine.surge_authority import validate_restored_surge
@@ -1429,9 +1429,9 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
-        from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+        from warhammer40k_core.engine.movement_decision_authority import invalid_movement_authority
 
-        invalid_status = invalid_flight_authority(
+        invalid_status = invalid_movement_authority(
             state=state, decisions=self.decision_controller, request=request, result=result
         )
         if invalid_status is not None:
@@ -1788,7 +1788,7 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+        from warhammer40k_core.engine.movement_decision_authority import invalid_movement_authority
         from warhammer40k_core.engine.surge_authority import invalid_surge_authority
 
         surge_status = invalid_surge_authority(
@@ -1800,7 +1800,7 @@ class GameLifecycle:
         if surge_status is not None:
             return surge_status
 
-        return invalid_flight_authority(
+        return invalid_movement_authority(
             state=self._require_state(),
             decisions=self.decision_controller,
             request=request,
@@ -2076,9 +2076,9 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
-        from warhammer40k_core.engine.flight_decision_authority import invalid_flight_authority
+        from warhammer40k_core.engine.movement_decision_authority import invalid_movement_authority
 
-        invalid_status = invalid_flight_authority(
+        invalid_status = invalid_movement_authority(
             state=state, decisions=self.decision_controller, request=request, result=result
         )
         if invalid_status is not None:

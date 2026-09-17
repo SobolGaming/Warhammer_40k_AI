@@ -1,0 +1,152 @@
+{
+  "workload_id": "order53-move-abilities-v1",
+  "revision": "53d89a28915700b8d655942c54ca6a9ff8f7f660",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4e780fbbfe03c3bc9d282c9e44562aceefa6545e4d6c613c61a00906ade8d2b9",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu_allocation": 18,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "concurrency": 1,
+  "timing_boundary": "Four resolver calls (two ordinary, two reactive); catalog, fixture and witness construction excluded",
+  "scenario": {
+    "game_id": "order53-move-abilities",
+    "models": 10,
+    "moving_models": 5,
+    "terrain_count": 0,
+    "paths_inches": [
+      2,
+      3
+    ],
+    "descriptor_limit_inches": 4,
+    "keywords": [
+      "VEHICLE",
+      "WALKER",
+      "SUPER_HEAVY_WALKER"
+    ]
+  },
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "tests/phase15a_charge_declaration_helpers.py": "28da42324021a8e294eb99e333c3364d3f6b57a248221c95a53d0d2a7d3b4670",
+    "scripts/measure_order53.py": "993ebcc852a88d59186758a1c0311ebe1d3197b3d440367e75ce90e3095ae201"
+  },
+  "samples": [
+    {
+      "seconds": 0.012369791977107525,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.011536709032952785,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.011011166963726282,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.010900708963163197,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.010902333073318005,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.010682958993129432,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "seconds": 0.010796791058965027,
+      "accepted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "path_result_counts": [
+        5,
+        5,
+        5,
+        5
+      ]
+    }
+  ],
+  "mean_seconds": 0.011171494294623179,
+  "median_seconds": 0.010902333073318005,
+  "maximum_seconds": 0.012369791977107525,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "correctness_note": "Four legal open-terrain paths; semantic boundary coverage is in the behavior tests.",
+  "budgets": {
+    "mean_ratio": 2,
+    "mean_additive_seconds": 0.02,
+    "maximum_seconds": 0.5
+  }
+}

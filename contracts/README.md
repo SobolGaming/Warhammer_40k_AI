@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `23.0.0`
+Contract version: `24.0.0`
+
+Order 53 / contract 24 commits optional all-model movement keywords and direct
+post-move Battle-shock. See [the migration](migrations/23-to-24.md).
 
 Order 52 / contract 23 commits Surge targets and phase movement history.
 See [the migration](migrations/22-to-23.md).

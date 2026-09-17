@@ -6699,7 +6699,7 @@
       "battle_shock_hook_ids": [
         "catalog-ir:selected-target-test-roll-modifier"
       ],
-      "bundle_summary_hash": "d454324d288cb14f112fd4647daff82fcaf47425eeb01f46f0ef4c156a7ca448",
+      "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -6725,6 +6725,7 @@
         "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
       ],
       "move_completion_rule_hook_ids": [
+        "core-move-ability:super-heavy-walker:completion",
         "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
         "primary:surveil:move-marker-removal"
       ],
@@ -15929,7 +15930,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v17-surge-authority",
+  "schema_version": "replay-artifact-v18-move-keywords",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",

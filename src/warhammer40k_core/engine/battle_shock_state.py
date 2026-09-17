@@ -46,6 +46,36 @@ def apply_battle_shock_result_state(*, state: GameState, result: BattleShockResu
         raise GameLifecycleError("BattleShockResult unit owner drift.")
     if result.passed:
         return BATTLE_SHOCK_STATE_NOT_REQUIRED
+    return apply_direct_battle_shock_state(
+        state=state,
+        player_id=result.request.player_id,
+        unit_instance_id=result.request.unit_instance_id,
+        source_result_id=result.result_id,
+        battle_round=result.request.battle_round,
+    )
+
+
+def apply_direct_battle_shock_state(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    source_result_id: str,
+    battle_round: int,
+) -> str:
+    """Apply status without inventing a Battle-shock test or its outcome triggers."""
+    if (
+        battle_round != state.battle_round
+        or player_id not in state.player_ids
+        or not source_result_id
+    ):
+        raise GameLifecycleError("Direct Battle-shock source occurrence drift.")
+    current_rules_units = current_rules_unit_views_for_canonical_identity(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    )
+    if any(unit.owner_player_id != player_id for unit in current_rules_units):
+        raise GameLifecycleError("Direct Battle-shock target owner drift.")
     surviving_rules_units = tuple(
         rules_unit
         for rules_unit in current_rules_units
@@ -64,11 +94,11 @@ def apply_battle_shock_result_state(*, state: GameState, result: BattleShockResu
         return BATTLE_SHOCK_STATE_ALREADY
     shocked_states = tuple(
         BattleShockedUnitState(
-            player_id=result.request.player_id,
+            player_id=player_id,
             unit_instance_id=rules_unit.unit_instance_id,
             model_instance_ids=tuple(model.model_instance_id for model in rules_unit.own_models),
-            source_result_id=result.result_id,
-            battle_round_started=result.request.battle_round,
+            source_result_id=source_result_id,
+            battle_round_started=battle_round,
         )
         for rules_unit in missing_rules_units
     )

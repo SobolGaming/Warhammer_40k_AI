@@ -107,6 +107,14 @@ Regenerate their reviewed source artifacts offline with
 committed data, then regenerate engine identity and the external contract as
 shown in [contracts/README.md](contracts/README.md).
 
+Order 53 adds source-backed Super-Heavy Walker movement, the per-move all-model
+MOBILE choice and its sequenced direct Battle-shock roll. See
+[scope and validation](docs/ORDER_53_SCOPE_PLAN.md) and
+[Contract 24 migration](contracts/migrations/23-to-24.md). Reproduce its reviewed
+source artifact offline with
+`uv run python tools/build_core_super_heavy_walker_source.py --check`, then verify
+engine identity and the external contract using the generator commands below.
+
 For faction coverage, start with the [faction support guides](docs/FACTION_SUPPORT.md).
 They list current army rules, detachments and unit costs, separate historical
 implementation evidence from fieldability/playability, and link the

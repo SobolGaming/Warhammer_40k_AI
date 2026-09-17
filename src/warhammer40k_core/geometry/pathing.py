@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import StrEnum
-from itertools import pairwise
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -24,15 +23,31 @@ from warhammer40k_core.geometry.movement_envelope import (
     MovementEnvelope,
     MovementEnvelopePayload,
 )
+from warhammer40k_core.geometry.path_measurement import (
+    horizontal_section_transit_permitted,
+)
+from warhammer40k_core.geometry.path_measurement import (
+    interpolate_pose as _interpolate_pose,
+)
+from warhammer40k_core.geometry.path_measurement import (
+    path_3d_distance as _path_3d_distance,
+)
+from warhammer40k_core.geometry.path_measurement import (
+    path_horizontal_distance as _path_horizontal_distance,
+)
+from warhammer40k_core.geometry.path_measurement import (
+    path_vertical_distance as _path_vertical_distance,
+)
+from warhammer40k_core.geometry.path_measurement import (
+    path_without_vertical_distance as _path_without_vertical_distance,
+)
 from warhammer40k_core.geometry.pathing_model_references import (
     validate_disjoint_path_validation_model_ids,
     validate_model_tuple_for_path_validation,
     validate_path_validation_model_reference_ids,
 )
 from warhammer40k_core.geometry.pose import (
-    Facing,
     GeometryError,
-    Point3,
     Pose,
     PosePayload,
     validate_pose,
@@ -193,6 +208,7 @@ class TerrainPathLegalityContextPayload(TypedDict):
     can_traverse_ruins_walls: bool
     can_move_through_terrain: bool
     terrain_as_if_absent_height_inches: float | None
+    horizontal_terrain_transit_height_inches: float | None
     has_fly: bool
     sample_interval_inches: float
 
@@ -1067,6 +1083,7 @@ class TerrainPathLegalityContext:
     can_traverse_ruins_walls: bool = False
     can_move_through_terrain: bool = False
     terrain_as_if_absent_height_inches: float | None = None
+    horizontal_terrain_transit_height_inches: float | None = None
     has_fly: bool = False
     sample_interval_inches: float = 0.5
 
@@ -1123,6 +1140,14 @@ class TerrainPathLegalityContext:
             _validate_optional_non_negative_number(
                 "TerrainPathLegalityContext terrain_as_if_absent_height_inches",
                 self.terrain_as_if_absent_height_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "horizontal_terrain_transit_height_inches",
+            _validate_optional_non_negative_number(
+                "TerrainPathLegalityContext horizontal_terrain_transit_height_inches",
+                self.horizontal_terrain_transit_height_inches,
             ),
         )
         _validate_bool("TerrainPathLegalityContext has_fly", self.has_fly)
@@ -1308,6 +1333,12 @@ class TerrainPathLegalityContext:
             and _path_reaches_or_clears_terrain_top(touching_poses, terrain)
         ):
             return self.terrain_movement_policy.fly_traversal_mode
+        if horizontal_section_transit_permitted(
+            top_inches=terrain.top_z_inches(),
+            maximum_height_inches=self.horizontal_terrain_transit_height_inches,
+            poses=touching_poses,
+        ):
+            return TerrainTraversalMode.FREELY_TRAVERSABLE
         free_height = self.terrain_movement_policy.freely_traversable_height_threshold_inches
         if (
             feature_policy is not None
@@ -1467,6 +1498,9 @@ class TerrainPathLegalityContext:
             "can_traverse_ruins_walls": self.can_traverse_ruins_walls,
             "can_move_through_terrain": self.can_move_through_terrain,
             "terrain_as_if_absent_height_inches": self.terrain_as_if_absent_height_inches,
+            "horizontal_terrain_transit_height_inches": (
+                self.horizontal_terrain_transit_height_inches
+            ),
             "has_fly": self.has_fly,
             "sample_interval_inches": self.sample_interval_inches,
         }
@@ -1489,6 +1523,9 @@ class TerrainPathLegalityContext:
             can_traverse_ruins_walls=payload["can_traverse_ruins_walls"],
             can_move_through_terrain=payload["can_move_through_terrain"],
             terrain_as_if_absent_height_inches=payload["terrain_as_if_absent_height_inches"],
+            horizontal_terrain_transit_height_inches=payload[
+                "horizontal_terrain_transit_height_inches"
+            ],
             has_fly=payload["has_fly"],
             sample_interval_inches=payload["sample_interval_inches"],
         )
@@ -2229,37 +2266,6 @@ def _path_reaches_or_clears_terrain_top(
     )
 
 
-def _path_horizontal_distance(poses: tuple[Pose, ...]) -> float:
-    return sum(
-        math.hypot(
-            end.position.x - start.position.x,
-            end.position.y - start.position.y,
-        )
-        for start, end in pairwise(poses)
-    )
-
-
-def _path_without_vertical_distance(poses: tuple[Pose, ...]) -> tuple[Pose, ...]:
-    measurement_z = poses[0].position.z
-    return tuple(
-        Pose.at(
-            x=pose.position.x,
-            y=pose.position.y,
-            z=measurement_z,
-            facing_degrees=pose.facing.degrees,
-        )
-        for pose in poses
-    )
-
-
-def _path_vertical_distance(poses: tuple[Pose, ...]) -> float:
-    return sum(abs(end.position.z - start.position.z) for start, end in pairwise(poses))
-
-
-def _path_3d_distance(poses: tuple[Pose, ...]) -> float:
-    return sum(start.distance_3d_to(end) for start, end in pairwise(poses))
-
-
 def _sampled_pose_path(
     poses: tuple[Pose, ...],
     *,
@@ -2276,21 +2282,6 @@ def _sampled_pose_path(
             sampled.append(_interpolate_pose(previous, pose, step / steps))
         previous = pose
     return tuple(sampled)
-
-
-def _interpolate_pose(start: Pose, end: Pose, t: float) -> Pose:
-    return Pose(
-        position=Point3(
-            x=_interpolate(start.position.x, end.position.x, t),
-            y=_interpolate(start.position.y, end.position.y, t),
-            z=_interpolate(start.position.z, end.position.z, t),
-        ),
-        facing=Facing(_interpolate(start.facing.degrees, end.facing.degrees, t)),
-    )
-
-
-def _interpolate(start: float, end: float, t: float) -> float:
-    return start + ((end - start) * t)
 
 
 def _model_is_within_battlefield(
