@@ -50,7 +50,8 @@ def test_charge_consumers_share_current_budget_and_target_authority() -> None:
     ), "Replacement ownership must survive an erased target commitment."
     lifecycle = (ENGINE / "lifecycle.py").read_text()
     assert "validate_restored_charge_targets(" in lifecycle
-    assert "refresh_pending_charge_move(" in lifecycle
+    assert "advance_once(self)" in lifecycle
+    assert "refresh_pending_charge_move(" in (ENGINE / "lifecycle_advancement.py").read_text()
     authority = (ENGINE / "charge_move_event_authority.py").read_text()
     assert "validate_charge_selection_reference(" in authority
     for filename in (

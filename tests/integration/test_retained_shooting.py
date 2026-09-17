@@ -136,7 +136,7 @@ def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
         # Preserve the own-Hazardous death with Order 43 hit-record RNG history.
-        game_id="order34-own-hazard-True-16" if with_feel_no_pain else "order43-ownhazard-14",
+        game_id="order56-own-hazard-fnp-3" if with_feel_no_pain else "order56-own-hazard-0",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -546,8 +546,8 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
     profile = retained_sources.stratagem_profile()
     lifecycle, units = fight_lifecycle(
         catalog=unending_fidelity_catalog(),
-        # Preserve the first-pool casualty with Order 43 hit-record RNG history.
-        game_id="order43-fidelity-4",
+        # Preserve the first-pool casualty with Order 56 source-inventory RNG history.
+        game_id="order56-fidelity-1",
         alpha_unit_ids=("alpha",),
         enemy_unit_ids=("enemy", "leader") if attached else ("enemy",),
         enemy_unit_specs={"enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1)}
@@ -1395,7 +1395,7 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
         # Preserve the nested casualty with Order 43 hit-record RNG history.
-        game_id="order43-nested-0",
+        game_id="order56-nested-action-10",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

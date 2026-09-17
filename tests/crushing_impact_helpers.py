@@ -141,7 +141,11 @@ def complete_charge(session: LocalGameSession) -> LifecycleStatus:
 
 
 def record_deadly_demise_for_fixture(
-    session: LocalGameSession, *, model_instance_id: str, range_inches: float = 30.0
+    session: LocalGameSession,
+    *,
+    model_instance_id: str,
+    range_inches: float = 30.0,
+    duplicated: bool = False,
 ) -> None:
     from warhammer40k_core.engine.damage_allocation import (
         DestructionReactionKind,
@@ -152,26 +156,31 @@ def record_deadly_demise_for_fixture(
     assert state is not None
     state.record_model_destruction_reaction_sources(
         model_instance_id=model_instance_id,
-        sources=(
+        sources=tuple(
             DestructionReactionSource(
-                source_id="order48:deadly-demise",
+                source_id=f"order48:deadly-demise:{value}"
+                if duplicated
+                else "order48:deadly-demise",
                 source_rule_id="order48:fixture:deadly-demise",
                 reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
                 optional=False,
                 payload={
                     "trigger_roll_threshold": 1,
                     "range_inches": range_inches,
-                    "mortal_wounds": {"kind": "fixed", "value": 1},
+                    "mortal_wounds": {"kind": "fixed", "value": value},
                 },
-            ),
+            )
+            for value in ((1, 2) if duplicated else (1,))
         ),
     )
 
 
-def crushing_deadly_demise_session() -> LocalGameSession:
+def crushing_deadly_demise_session(*, duplicated: bool = False) -> LocalGameSession:
     session = crushing_session(toughness=96, wounds=1)
     state = session.lifecycle.state
     assert state is not None
     model = rules_unit_view_by_id(state=state, unit_instance_id=SOURCE).alive_models()[0]
-    record_deadly_demise_for_fixture(session, model_instance_id=model.model_instance_id)
+    record_deadly_demise_for_fixture(
+        session, model_instance_id=model.model_instance_id, duplicated=duplicated
+    )
     return session

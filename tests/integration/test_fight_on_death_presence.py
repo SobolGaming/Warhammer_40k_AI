@@ -458,7 +458,7 @@ def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> 
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
         origins={"intercessor-1": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
-        game_id="order-30-retained-fight",
+        game_id="order56-retained-fight-0",
         model_count=1,
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",

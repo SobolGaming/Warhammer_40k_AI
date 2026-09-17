@@ -231,7 +231,6 @@ from warhammer40k_core.engine.weapon_abilities import (
     melta_rule_id,
     rapid_fire_attack_bonus,
     rapid_fire_rule_id,
-    weapon_ability_selection_request,
 )
 from warhammer40k_core.engine.weapon_declaration import (
     SHOOTING_DECLARATION_PROPOSAL_KIND,
@@ -450,7 +449,6 @@ __all__ = (
     "unresolved_target_unit_ids",
     "validate_json_value",
     "validate_psychic_attack_modifier_ignore_decision",
-    "weapon_ability_selection_request",
     "weapon_profile_with_character_target_ap_effects",
     "weapon_profile_with_ranged_keyword_effects",
 )

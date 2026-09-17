@@ -130,6 +130,12 @@ def _armies_match_muster_runtime_state(
     if len(state_armies) != len(expected_armies):
         return False
     for state_army, expected_army in zip(state_armies, expected_armies, strict=True):
+        # Active choices are runtime state, authenticated separately against the
+        # shared decision/event history rather than the immutable muster input.
+        state_army = replace(
+            state_army,
+            units=tuple(replace(unit, core_ability_selections=()) for unit in state_army.units),
+        )
         if state.stage not in {
             GameLifecycleStage.BATTLE,
             GameLifecycleStage.COMPLETE,

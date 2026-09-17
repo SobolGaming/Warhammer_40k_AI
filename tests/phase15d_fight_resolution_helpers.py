@@ -321,6 +321,7 @@ def melee_request(
         source_decision_result_id="phase15d-source-result",
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         available_weapons=available_melee_weapons_payloads(
+            source_decision_result_id="phase15d-source-result",
             scenario=scenario,
             ruleset_descriptor=ruleset,
             unit=attacker,

@@ -1,4 +1,4 @@
-"""Build the reviewed Order 22 source artifacts offline."""
+"""Build the retained Order 22 source with Order 56 execution evidence offline."""
 
 from __future__ import annotations
 
@@ -73,6 +73,11 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
                 "warhammer40k_core.core.ability_sources:datasheet_ability_sources",
                 "warhammer40k_core.core.weapon_ability_sources:weapon_ability_sources",
                 "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability",
+                "warhammer40k_core.engine.core_ability_selection:core_ability_selection_dispatch_handler",
+                "warhammer40k_core.engine.weapon_selection_context:WeaponSelectionContext",
+                "warhammer40k_core.engine.core_ability_damage_selection:apply_attack_deadly_demise_instance_choice",
+                "warhammer40k_core.engine.core_ability_damage_selection:apply_rule_deadly_demise_instance_choice",
+                "warhammer40k_core.engine.prebattle_instance_selection:scout_distance_options_for_model_ids",
             ],
         ),
     ):
@@ -85,7 +90,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
                 "source_text": source_text,
                 "transcription_sha256": text_hash,
                 "load_support_status": "loaded",
-                "semantic_execution_status": "partial_engine_runtime",
+                "semantic_execution_status": "executable_engine_runtime",
                 "runtime_consumer_ids": consumers,
             }
         )
@@ -98,7 +103,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "official_corroborating_source_ids": [],
             "observation_sha256": "",
             "load_support_status": "loaded",
-            "semantic_execution_status": "partial_engine_runtime",
+            "semantic_execution_status": "executable_engine_runtime",
             "runtime_consumer_ids": consumers,
         }
         review = {

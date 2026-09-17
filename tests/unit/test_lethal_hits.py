@@ -47,7 +47,7 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
     # Fixed legal result identities exercise an original critical wound in each
     # phase without replacing RNG or the engine's decision controller.
-    first_result_id = f"order44:first-choice-{0 if phase is BattlePhase.SHOOTING else 1}"
+    first_result_id = "order56:first-choice-2"
     for current in (session, restored):
         current.submit_option(
             request_id=request.request_id, result_id=first_result_id, option_id=choice
@@ -276,7 +276,7 @@ def test_out_of_phase_snap_shooting_choice_uses_attacking_owner_and_replays() ->
     # Shooting; the original fixture identity misses with all eighteen attacks.
     session.submit_parameterized_payload(
         request_id=status.decision_request.request_id,
-        result_id="order44:overwatch-declaration",
+        result_id="order56:overwatch-declaration-0",
         payload=validate_json_value(
             _proposal_from_request(
                 request=status.decision_request, target_unit_id="army-beta:enemy"

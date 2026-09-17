@@ -146,9 +146,9 @@ def fidelity_replacement_catalog(
     return catalog, rifle, second
 
 
-def fidelity_retained_replacement_scene() -> tuple[
-    GameLifecycle, dict[str, UnitInstance], DecisionRequest
-]:
+def fidelity_retained_replacement_scene(
+    *, game_id: str = "order56-retarget-05"
+) -> tuple[GameLifecycle, dict[str, UnitInstance], DecisionRequest]:
     """Fight-phase Unending Fidelity shooting, paused before target revalidation."""
     from tests.phase15c_fight_order_helpers import fight_lifecycle
     from warhammer40k_core.engine.retained_destruction_state import retained_destructions
@@ -158,8 +158,8 @@ def fidelity_retained_replacement_scene() -> tuple[
     catalog, rifle, second = fidelity_replacement_catalog()
     lifecycle, units = fight_lifecycle(
         catalog=catalog,
-        # Preserve both nested casualties with Order 49 Stratagem-window history.
-        game_id="order49-retarget-17",
+        # Preserve both nested casualties with the Order 56 source-inventory history.
+        game_id=game_id,
         alpha_unit_ids=("old", "new", "unchanged"),
         enemy_unit_ids=("source",),
         model_count=1,

@@ -169,6 +169,18 @@ def apply_attack_sequence_decision(
         return advanced_status
     if _mw_model.is_mortal_wound_resolution_request(record.request):
         return context.apply_mortal_wounds(record, result)
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        apply_rule_deadly_demise_instance_choice,
+        is_deadly_demise_instance_request,
+    )
+
+    if is_deadly_demise_instance_request(
+        record.request
+    ) and rule_model_destruction.is_rule_model_destruction_reaction_request(record.request):
+        apply_rule_deadly_demise_instance_choice(
+            state=state, decisions=context.decisions, result=result
+        )
+        return context.advance()
     if rule_model_destruction.is_rule_model_destruction_reaction_request(record.request):
         destruction_phase = rule_model_destruction.rule_model_destruction_phase(record.request)
         if destruction_phase is BattlePhase.FIGHT:

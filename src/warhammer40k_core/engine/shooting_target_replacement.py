@@ -8,7 +8,8 @@ from itertools import product
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset import RulesetEdition
-from warhammer40k_core.core.weapon_profiles import AbilityKind, AttackProfile
+from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
+from warhammer40k_core.core.weapon_profiles import AttackProfile
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
@@ -26,6 +27,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingProposalValidationResult,
     shooting_declaration_proposal_from_json,
 )
+from warhammer40k_core.engine.weapon_selection_context import WeaponSelectionContext
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence import AttackSequence
@@ -136,6 +138,7 @@ def _candidate_pool(
     base_attacks: int,
     attack_profile: AttackProfile,
     selected_ability_ids: tuple[str, ...] | None = None,
+    committed_selection_context: WeaponSelectionContext | None = None,
     validate_only: bool = False,
 ) -> RangedAttackPool | ShootingProposalValidationResult:
     from warhammer40k_core.engine.phases import shooting_declaration_validation as validation
@@ -207,6 +210,7 @@ def _candidate_pool(
         committed_weapon=committed,
         committed_base_attacks=base_attacks,
         committed_attack_profile=attack_profile,
+        committed_selection_context=committed_selection_context,
         validate_only=validate_only,
     )
     if isinstance(result, ShootingProposalValidationResult):
@@ -250,6 +254,7 @@ def next_shooting_target_replacement(
             base_attacks=base_attacks,
             attack_profile=pool.weapon_profile.attack_profile,
             selected_ability_ids=pool.selected_weapon_ability_ids,
+            committed_selection_context=pool.weapon_selection_context,
             validate_only=True,
         )
         if isinstance(existing, RangedAttackPool) or existing.is_valid:
@@ -273,14 +278,7 @@ def next_shooting_target_replacement(
             alternatives: list[tuple[tuple[int, RangedAttackPool] | None, ...]] = []
             for candidate_index in indices:
                 source_pool = sequence.attack_pools[candidate_index]
-                choices = (
-                    (),
-                    *(
-                        (ability.ability_id,)
-                        for ability in source_pool.weapon_profile.abilities
-                        if ability.ability_kind is AbilityKind.ANTI_KEYWORD
-                    ),
-                )
+                choices = (source_pool.selected_weapon_ability_ids,)
                 candidates: list[tuple[int, RangedAttackPool] | None] = []
                 for ability_ids in choices:
                     candidate = _candidate_pool(
@@ -290,6 +288,7 @@ def next_shooting_target_replacement(
                         index=candidate_index,
                         target_id=target_id,
                         selected_ability_ids=ability_ids,
+                        committed_selection_context=source_pool.weapon_selection_context,
                         attack_profile=source_pool.weapon_profile.attack_profile,
                         base_attacks=_base_attacks(
                             decisions,
@@ -389,7 +388,11 @@ def _replacement_label(state: GameState, pools: dict[int, RangedAttackPool], tot
     descriptions: list[str] = []
     for index, pool in pools.items():
         for ability in pool.weapon_profile.abilities:
-            if ability.ability_id in pool.selected_weapon_ability_ids:
+            if any(
+                source.ability_id == ability.ability_id
+                and source.instance_id in pool.selected_weapon_ability_ids
+                for source in weapon_ability_sources(pool.weapon_profile)
+            ):
                 descriptions.append(f"weapon {index + 1}: {ability.name}")
     forgone = total - len(pools)
     if forgone:

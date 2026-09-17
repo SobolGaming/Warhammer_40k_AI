@@ -7,6 +7,7 @@ import pytest
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
@@ -17,6 +18,10 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
     WeaponProfileError,
+)
+from warhammer40k_core.engine.ability_instance_selection import (
+    selected_weapon_profile,
+    weapon_instance_selection_requests,
 )
 from warhammer40k_core.engine.core_stratagem_effects import (
     FIRE_OVERWATCH_EFFECT_KIND,
@@ -61,20 +66,120 @@ from warhammer40k_core.engine.weapon_abilities import (
     rapid_fire_rule_id,
     sustained_hits_generated_hits,
     weapon_ability_int_value,
-    weapon_ability_selection_request,
 )
 
 
-def test_order22_equal_anti_sources_are_stored_but_require_instance_selection() -> None:
+def test_order56_attack_inventory_preserves_conditional_sources_across_split_targets() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
+    from warhammer40k_core.engine.weapon_selection_context import WeaponSelectionContext
+
+    native = _profile(
+        keywords=(WeaponKeyword.SUSTAINED_HITS,),
+        abilities=(AbilityDescriptor.sustained_hits(1),),
+    )
+    granted = grant_weapon_ability(
+        native,
+        keyword=WeaponKeyword.SUSTAINED_HITS,
+        ability=AbilityDescriptor.sustained_hits(2),
+        source_id="source:conditional",
+        source_instance_id="effect:conditional",
+    )
+    context = WeaponSelectionContext(
+        weapon_instance_id="model:weapon:1",
+        source_request_id="declaration:1",
+        target_profiles=(("target:a", native), ("target:b", granted)),
+    )
+    requests = context.selection_requests(actor_id="player:a")
+    assert len(requests) == 1
+    assert len(requests[0].options) == 2
+    grant_id = next(
+        source.instance_id
+        for source in granted.ability_sources
+        if source.source_id == "source:conditional"
+    )
+    chosen = (grant_id,)
+    assert context.selected_profile("target:a", chosen).abilities == ()
+    assert context.selected_profile("target:a", chosen).keywords == ()
+    assert context.selected_profile("target:b", chosen).abilities == (
+        AbilityDescriptor.sustained_hits(2),
+    )
+    assert WeaponSelectionContext.from_payload(context.to_payload()) == context
+    # Later target redirection changes applicability, never the Select Weapons inventory.
+    later = grant_weapon_ability(
+        granted,
+        keyword=WeaponKeyword.SUSTAINED_HITS,
+        ability=AbilityDescriptor.sustained_hits(3),
+        source_id="source:later",
+        source_instance_id="effect:later",
+    )
+    redirected = context.with_resolved_profile("target:c", later)
+    assert redirected.instance_groups() == context.instance_groups()
+    assert redirected.selected_profile("target:c", chosen).abilities == (
+        AbilityDescriptor.sustained_hits(2),
+    )
+    assert WeaponSelectionContext.from_payload(redirected.to_payload()) == redirected
+    expired = context.with_resolved_profile("target:b", native)
+    assert expired.selected_profile("target:b", chosen).abilities == ()
+    with pytest.raises(GameLifecycleError, match="exactly one"):
+        context.selected_profile("target:b", ())
+    with pytest.raises(GameLifecycleError, match="unavailable"):
+        context.selected_profile("target:b", ("forged",))
+    with pytest.raises(GameLifecycleError, match="target"):
+        context.selected_profile("target:c", chosen)
+
+
+def test_order56_equal_sources_have_distinct_finite_choices() -> None:
     from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
+    from warhammer40k_core.engine.ability_instance_selection import (
+        selected_weapon_profile,
+        weapon_instance_selection_requests,
+    )
 
     native = _profile(keywords=(), abilities=(AbilityDescriptor.anti_keyword("Infantry", 2),))
     source = weapon_ability_sources(native)[0]
     duplicate = replace(source, source_instance_id="second-native-slot")
     profile = replace(native, ability_sources=(source, duplicate))
     assert WeaponProfile.from_payload(profile.to_payload()) == profile
-    with pytest.raises(GameLifecycleError, match="Duplicated Anti sources require instance"):
-        has_weapon_keyword(profile, WeaponKeyword.LETHAL_HITS)
+    requests = weapon_instance_selection_requests(profile, actor_id="player-1", request_id="use-1")
+    assert len(requests) == 1
+    assert {option.option_id for option in requests[0].options} == {
+        source.instance_id,
+        duplicate.instance_id,
+    }
+    for option in requests[0].options:
+        selected = selected_weapon_profile(profile, (option.option_id,))
+        assert len(weapon_ability_sources(selected)) == 1
+        assert anti_keyword_critical_threshold(profile=selected, target_keywords=("INFANTRY",)) == 2
+    with pytest.raises(GameLifecycleError, match="exactly one"):
+        selected_weapon_profile(profile, ())
+    with pytest.raises(GameLifecycleError, match="unavailable"):
+        selected_weapon_profile(profile, ("forged",))
+
+
+def test_order56_duplicate_selection_precedes_target_conditions_and_never_stacks() -> None:
+    from warhammer40k_core.engine.ability_instance_selection import (
+        selected_weapon_profile,
+        weapon_instance_selection_requests,
+    )
+
+    profile = _profile(
+        keywords=(WeaponKeyword.SUSTAINED_HITS,),
+        abilities=(
+            AbilityDescriptor.sustained_hits(1),
+            AbilityDescriptor.sustained_hits(2),
+            AbilityDescriptor.anti_keyword("Infantry", 2),
+            AbilityDescriptor.anti_keyword("Vehicle", 4),
+        ),
+    )
+    requests = weapon_instance_selection_requests(profile, actor_id="player-1", request_id="use-1")
+    assert len(requests) == 2
+    choices = tuple(request.options[0].option_id for request in requests)
+    selected = selected_weapon_profile(profile, choices)
+    assert len(selected.abilities) == 2
+    assert len(profile.abilities) == 4
+    assert WeaponProfile.from_payload(selected.to_payload()) == selected
+    with pytest.raises(GameLifecycleError, match="exactly one"):
+        selected_weapon_profile(profile, tuple(option.option_id for option in requests[0].options))
 
 
 def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
@@ -161,7 +266,7 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
     )
     no_descriptor_profile = _profile(keywords=(), abilities=())
 
-    with pytest.raises(GameLifecycleError, match="require instance selection"):
+    with pytest.raises(GameLifecycleError, match="requires controlling-player selection"):
         weapon_ability_int_value(
             _profile(
                 keywords=(WeaponKeyword.RAPID_FIRE,),
@@ -227,16 +332,24 @@ def test_phase13d_anti_keyword_threshold_matches_canonical_target_keywords() -> 
             AbilityDescriptor.anti_keyword("monster", 5),
         ),
     )
-
-    assert (
-        anti_keyword_critical_threshold(
-            profile=profile,
-            target_keywords=("infantry", "character"),
+    for source in weapon_ability_sources(profile):
+        selected = selected_weapon_profile(profile, (source.instance_id,))
+        expected_infantry, expected_monster = (
+            (4, None) if source.ability_id == "anti-keyword:infantry:4" else (None, 5)
         )
-        == 4
-    )
-    assert anti_keyword_critical_threshold(profile=profile, target_keywords=("MONSTER",)) == 5
-    assert anti_keyword_critical_threshold(profile=profile, target_keywords=("vehicle",)) is None
+        assert (
+            anti_keyword_critical_threshold(
+                profile=selected, target_keywords=("infantry", "character")
+            )
+            == expected_infantry
+        )
+        assert (
+            anti_keyword_critical_threshold(profile=selected, target_keywords=("MONSTER",))
+            == expected_monster
+        )
+        assert (
+            anti_keyword_critical_threshold(profile=selected, target_keywords=("vehicle",)) is None
+        )
 
 
 def test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets() -> None:
@@ -301,19 +414,16 @@ def test_phase14i_duplicate_anti_keyword_abilities_require_selected_descriptor()
         ),
     )
 
-    request = weapon_ability_selection_request(
+    request = weapon_instance_selection_requests(
         profile,
-        AbilityKind.ANTI_KEYWORD,
-        target_keywords=("vehicle", "infantry"),
         actor_id="player-a",
         request_id="phase14i-duplicate-anti-selection",
-    )
+    )[0]
 
     assert request is not None
-    assert tuple(option.option_id for option in request.options) == (
-        "anti-keyword:infantry:2",
-        "anti-keyword:vehicle:4",
-    )
+    assert {option.option_id for option in request.options} == {
+        source.instance_id for source in weapon_ability_sources(profile)
+    }
     with pytest.raises(GameLifecycleError, match="requires controlling-player selection"):
         anti_keyword_critical_threshold(
             profile=profile,
@@ -321,17 +431,33 @@ def test_phase14i_duplicate_anti_keyword_abilities_require_selected_descriptor()
         )
     assert (
         anti_keyword_critical_threshold(
-            profile=profile,
+            profile=selected_weapon_profile(
+                profile,
+                (
+                    next(
+                        source.instance_id
+                        for source in weapon_ability_sources(profile)
+                        if source.ability_id == "anti-keyword:vehicle:4"
+                    ),
+                ),
+            ),
             target_keywords=("vehicle", "infantry"),
-            selected_ability_id="anti-keyword:vehicle:4",
         )
         == 4
     )
     assert (
         anti_keyword_critical_threshold(
-            profile=profile,
+            profile=selected_weapon_profile(
+                profile,
+                (
+                    next(
+                        source.instance_id
+                        for source in weapon_ability_sources(profile)
+                        if source.ability_id == "anti-keyword:infantry:2"
+                    ),
+                ),
+            ),
             target_keywords=("vehicle", "infantry"),
-            selected_ability_id="anti-keyword:infantry:2",
         )
         == 2
     )
@@ -468,37 +594,41 @@ def test_phase14i_duplicate_anti_weapon_ability_selection_is_adapter_visible() -
         abilities=(anti_vehicle,),
     )
 
-    request = weapon_ability_selection_request(
+    request = weapon_instance_selection_requests(
         profile,
-        AbilityKind.ANTI_KEYWORD,
-        target_keywords=("INFANTRY", "VEHICLE"),
         actor_id="player-a",
         request_id="phase14i-duplicate-anti-selection",
         source_context={"timing": "weapon-profile-import"},
-    )
+    )[0]
 
     assert request is not None
     assert (
-        weapon_ability_selection_request(
+        weapon_instance_selection_requests(
             single_descriptor_profile,
-            AbilityKind.ANTI_KEYWORD,
-            target_keywords=("VEHICLE",),
             actor_id="player-a",
             request_id="phase14i-single-anti-selection",
         )
-        is None
+        == ()
     )
     assert request.decision_type == WEAPON_ABILITY_SELECTION_DECISION_TYPE
     assert request.actor_id == "player-a"
-    expected_option_ids = tuple(sorted((anti_vehicle.ability_id, anti_infantry.ability_id)))
+    expected_option_ids = tuple(source.instance_id for source in weapon_ability_sources(profile))
     assert tuple(option.option_id for option in request.options) == expected_option_ids
     first_option_payload = cast(dict[str, JsonValue], request.options[0].payload)
-    assert first_option_payload["selected_ability_id"] == expected_option_ids[0]
+    assert first_option_payload["selected_ability_instance_id"] == expected_option_ids[0]
     assert (
         anti_keyword_critical_threshold(
-            profile=profile,
+            profile=selected_weapon_profile(
+                profile,
+                (
+                    next(
+                        source.instance_id
+                        for source in weapon_ability_sources(profile)
+                        if source.ability_id == anti_infantry.ability_id
+                    ),
+                ),
+            ),
             target_keywords=("INFANTRY", "VEHICLE"),
-            selected_ability_id=anti_infantry.ability_id,
         )
         == 2
     )
@@ -644,3 +774,37 @@ def _effect(
         ),
         effect_payload={"effect_kind": effect_kind_value, **payload},
     )
+
+
+def test_order56_deadly_demise_instance_choice_is_mandatory() -> None:
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        build_deadly_demise_instance_request,
+    )
+    from warhammer40k_core.engine.damage_allocation import (
+        DestructionReactionKind,
+        DestructionReactionSource,
+    )
+
+    sources = tuple(
+        DestructionReactionSource(
+            source_id=f"demise:{value}",
+            source_rule_id=f"rule:demise:{value}",
+            reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+            optional=False,
+            payload={
+                "trigger_roll_threshold": 6,
+                "range_inches": 6.0,
+                "mortal_wounds": {"kind": "fixed", "value": value},
+            },
+        )
+        for value in (1, 3)
+    )
+    request = build_deadly_demise_instance_request(
+        request_id="choice:1",
+        player_id="player:b",
+        context={"model_instance_id": "model:b"},
+        sources=sources,
+    )
+    assert tuple(option.option_id for option in request.options) == ("demise:1", "demise:3")
+    assert request.actor_id == "player:b"
+    assert not any(option.option_id == "decline" for option in request.options)

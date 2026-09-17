@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+__all__ = (
+    "_continue_rule_deadly_demise_sources",
+    "_remove_rule_destroyed_model_and_continue",
+    "_validate_pre_removal_context_matches_state",
+)
+
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -463,6 +469,18 @@ def _continue_rule_deadly_demise_sources(
     )
     if retention_status is not None:
         return retention_status
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        request_deadly_demise_instance_if_duplicated,
+    )
+
+    choice_status = request_deadly_demise_instance_if_duplicated(
+        state=state,
+        decisions=decisions,
+        context=root_context,
+        sources=sources,
+    )
+    if choice_status is not None:
+        return choice_status
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     model_id = _payload_string(root_context, "model_instance_id")
     controller_player_id = _payload_string(root_context, "destroyed_model_controller_player_id")
@@ -1052,6 +1070,14 @@ def apply_rule_model_destruction_reaction_decision(
     request = record.request
     if not is_rule_model_destruction_reaction_request(request):
         raise GameLifecycleError("Rule destruction reaction result request kind drift.")
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        apply_rule_deadly_demise_instance_choice,
+        is_deadly_demise_instance_request,
+    )
+
+    if is_deadly_demise_instance_request(request):
+        apply_rule_deadly_demise_instance_choice(state=state, decisions=decisions, result=result)
+        return None
     decision = DestructionReactionDecision.from_result(request=request, result=result)
     context = _destruction_context(request)
     _validate_context_matches_state(state=state, decisions=decisions, context=context)

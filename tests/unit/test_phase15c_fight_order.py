@@ -86,7 +86,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
-    record_core_fights_first_source_for_unit,
+    record_core_fights_first_sources_for_unit,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
@@ -775,6 +775,27 @@ def test_attached_target_identity_preserves_model_scoped_melee_evidence() -> Non
         )
     )
 
+    validation = validate_rules_unit_melee_declaration(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=proposal,
+        army_catalog=lifecycle.config.army_catalog,
+        state=state,
+    )
+    assert not validation.is_valid
+    assert validation.violations[0].violation_code == "weapon_ability_inventory_drift"
+    request = replace(
+        request,
+        available_weapons=rules_unit_available_melee_weapons_payloads(
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            rules_unit=attacker,
+            army_catalog=lifecycle.config.army_catalog,
+            state=state,
+            source_decision_result_id=request.source_decision_result_id,
+        ),
+    )
     validation = validate_rules_unit_melee_declaration(
         scenario=scenario,
         ruleset_descriptor=ruleset,
@@ -2266,13 +2287,13 @@ def test_fights_first_descriptor_registers_static_ordering_source() -> None:
     )
     state = _state(lifecycle)
     registry = FightsFirstRegistry.from_state(state)
-    duplicate_effect = record_core_fights_first_source_for_unit(
+    duplicate_effect = record_core_fights_first_sources_for_unit(
         state=state,
         unit=units["alpha-first"],
     )
     original_battle_round = state.battle_round
     state.battle_round = original_battle_round + 1
-    later_duplicate_effect = record_core_fights_first_source_for_unit(
+    later_duplicate_effect = record_core_fights_first_sources_for_unit(
         state=state,
         unit=units["alpha-first"],
     )
@@ -6459,12 +6480,21 @@ def _player_id_for_unit(unit: UnitInstance) -> str:
 
 
 def _advance_to_fight_order_request(lifecycle: GameLifecycle) -> DecisionRequest:
-    return _decision_request(
-        _drain_fight_movement_requests(
-            lifecycle,
-            lifecycle.advance_until_decision_or_terminal(),
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = session.advance_until_decision_or_terminal()
+    for index in range(32):
+        status = _drain_fight_movement_requests(lifecycle, status)
+        request = _decision_request(status)
+        if request.decision_type != "select_core_ability_instance":
+            return request
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id=f"core-before-fight:{index}",
         )
-    )
+    raise AssertionError("Core instance selections did not reach Fight.")
 
 
 def _advance_to_fight_movement_request_for_unit(

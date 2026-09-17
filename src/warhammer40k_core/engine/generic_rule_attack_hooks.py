@@ -667,36 +667,45 @@ def _matching_generic_attack_effects(
             raise GameLifecycleError(
                 "Generic RuleIR attacker model does not belong to the supplied component unit."
             )
-    target_id = (
+    target_rules_unit = (
         None
         if physical_target_id is None
         else rules_unit_view_by_id(
             state=state,
             unit_instance_id=physical_target_id,
-        ).unit_instance_id
+        )
     )
+    target_id = None if target_rules_unit is None else target_rules_unit.unit_instance_id
     target_lookup_ids = (
         (physical_target_id,) if target_unit_lookup_ids is None else target_unit_lookup_ids
     )
-    role_unit_ids: tuple[tuple[AttackRole, str], ...] = (("attacker", attacker_id),)
+    # These immutable views were authenticated above. Reuse them within this query
+    # rather than resolving the same identities for each role and effect inventory.
+    views_by_id = {physical_attacker_id: attacker_rules_unit, attacker_id: attacker_rules_unit}
+    if target_rules_unit is not None and physical_target_id is not None:
+        views_by_id[physical_target_id] = target_rules_unit
+        views_by_id[target_rules_unit.unit_instance_id] = target_rules_unit
+    role_units = [("attacker", attacker_rules_unit)]
     for raw_target_id in target_lookup_ids:
         if raw_target_id is None:
             continue
-        canonical_target_id = rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=_validate_identifier(
-                "target_unit_instance_id",
-                raw_target_id,
-            ),
-        ).unit_instance_id
-        role_unit_ids = (
-            *role_unit_ids,
-            ("target", canonical_target_id),
-        )
+        lookup_id = _validate_identifier("target_unit_instance_id", raw_target_id)
+        if lookup_id not in views_by_id:
+            views_by_id[lookup_id] = rules_unit_view_by_id(state=state, unit_instance_id=lookup_id)
+        role_units.append(("target", views_by_id[lookup_id]))
+    from warhammer40k_core.engine.rules_unit_effects import (
+        rules_unit_effect_applications_from_inventory,
+    )
+
     matches: list[GenericAttackEffect] = []
     seen: set[tuple[str, AttackRole]] = set()
-    for role, unit_id in role_unit_ids:
-        for application in rules_unit_effect_applications(state, unit_id):
+    for role_token, rules_unit in role_units:
+        role = cast(AttackRole, role_token)
+        for application in rules_unit_effect_applications_from_inventory(
+            armies=tuple(state.army_definitions),
+            effects=tuple(state.persisting_effects),
+            rules_unit=rules_unit,
+        ):
             generic_effect = _generic_attack_effect_or_none(
                 persisting_effect=application.effect,
                 effective_target_unit_instance_ids=(application.unit_instance_id,),

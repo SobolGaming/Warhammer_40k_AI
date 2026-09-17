@@ -17,8 +17,6 @@ from warhammer40k_core.core.weapon_profiles import (
     devastating_wounds_effect_from_token,
     target_keyword_match_mode_from_token,
 )
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_indirect_shooting_2026_09 as indirect_shooting_source,
@@ -93,13 +91,11 @@ def weapon_ability_int_value(
     ability_kind: AbilityKind,
     *,
     target_keywords: tuple[str, ...] = (),
-    selected_ability_id: str | None = None,
 ) -> int | None:
     value = weapon_ability_value(
         profile,
         ability_kind,
         target_keywords=target_keywords,
-        selected_ability_id=selected_ability_id,
     )
     if value is None:
         return None
@@ -115,7 +111,6 @@ def weapon_ability_value(
     ability_kind: AbilityKind,
     *,
     target_keywords: tuple[str, ...] = (),
-    selected_ability_id: str | None = None,
 ) -> int | str | None:
     _validate_weapon_profile(profile)
     _validate_ability_kind(ability_kind)
@@ -131,14 +126,7 @@ def weapon_ability_value(
         ability_kind,
         target_keywords=target_keywords,
     )
-    descriptor: AbilityDescriptor | None
-    if len(matching_descriptors) > 1 or selected_ability_id is not None:
-        descriptor = _selected_duplicate_ability_descriptor(
-            matching_descriptors,
-            selected_ability_id=selected_ability_id,
-        )
-    else:
-        descriptor = matching_descriptors[0] if matching_descriptors else None
+    descriptor = matching_descriptors[0] if matching_descriptors else None
     if descriptor is not None:
         value = _ability_parameter_value(descriptor)
         if type(value) is int or type(value) is str:
@@ -162,9 +150,7 @@ def weapon_ability_applies(
     _validate_weapon_profile(profile)
     _validate_ability_kind(ability_kind)
     _target_keyword_set(target_keywords)
-    descriptors = tuple(
-        ability for ability in profile.abilities if ability.ability_kind is ability_kind
-    )
+    descriptors = _ability_descriptors(profile, ability_kind)
     expected_keyword = _ABILITY_KEYWORDS_BY_KIND.get(ability_kind)
     if descriptors and expected_keyword is not None and expected_keyword not in profile.keywords:
         raise GameLifecycleError(
@@ -183,68 +169,6 @@ def weapon_ability_applies(
             f"{expected_keyword.value} requires a structured ability descriptor."
         )
     return False
-
-
-def weapon_ability_selection_request(
-    profile: WeaponProfile,
-    ability_kind: AbilityKind,
-    *,
-    target_keywords: tuple[str, ...],
-    actor_id: str,
-    request_id: str,
-    source_context: JsonValue = None,
-) -> DecisionRequest | None:
-    _validate_weapon_profile(profile)
-    _validate_ability_kind(ability_kind)
-    target_keyword_tuple = _validate_target_keyword_tuple(
-        "Weapon ability target keywords",
-        target_keywords,
-    )
-    actor = _validate_identifier("Weapon ability selection actor_id", actor_id)
-    request = _validate_identifier("Weapon ability selection request_id", request_id)
-    descriptors = _ability_descriptors(profile, ability_kind)
-    expected_keyword = _ABILITY_KEYWORDS_BY_KIND.get(ability_kind)
-    if descriptors and expected_keyword is not None and expected_keyword not in profile.keywords:
-        raise GameLifecycleError(
-            f"{expected_keyword.value} descriptor requires the weapon keyword."
-        )
-    matching_descriptors = _matching_ability_descriptors(
-        profile,
-        ability_kind,
-        target_keywords=target_keyword_tuple,
-    )
-    if len(matching_descriptors) <= 1:
-        return None
-    return DecisionRequest(
-        request_id=request,
-        decision_type=WEAPON_ABILITY_SELECTION_DECISION_TYPE,
-        actor_id=actor,
-        payload=validate_json_value(
-            {
-                "submission_kind": WEAPON_ABILITY_SELECTION_DECISION_TYPE,
-                "weapon_profile_id": profile.profile_id,
-                "ability_kind": ability_kind.value,
-                "target_keywords": list(target_keyword_tuple),
-                "source_context": source_context,
-            }
-        ),
-        options=tuple(
-            DecisionOption(
-                option_id=descriptor.ability_id,
-                label=descriptor.name,
-                payload=validate_json_value(
-                    {
-                        "submission_kind": WEAPON_ABILITY_SELECTION_DECISION_TYPE,
-                        "weapon_profile_id": profile.profile_id,
-                        "ability_kind": ability_kind.value,
-                        "selected_ability_id": descriptor.ability_id,
-                        "ability_descriptor": descriptor.to_payload(),
-                    }
-                ),
-            )
-            for descriptor in matching_descriptors
-        ),
-    )
 
 
 def lethal_hits_applies(profile: WeaponProfile, *, target_keywords: tuple[str, ...]) -> bool:
@@ -292,7 +216,6 @@ def anti_keyword_critical_threshold(
     *,
     profile: WeaponProfile,
     target_keywords: tuple[str, ...],
-    selected_ability_id: str | None = None,
 ) -> int | None:
     _validate_weapon_profile(profile)
     _target_keyword_set(target_keywords)
@@ -305,13 +228,7 @@ def anti_keyword_critical_threshold(
     )
     if not matching_descriptors:
         return None
-    if len(matching_descriptors) > 1 or selected_ability_id is not None:
-        selected_descriptor = _selected_duplicate_ability_descriptor(
-            tuple(matching_descriptors),
-            selected_ability_id=selected_ability_id,
-        )
-    else:
-        selected_descriptor = matching_descriptors[0]
+    selected_descriptor = matching_descriptors[0]
     threshold = _ability_parameter_by_name_from_descriptor(
         descriptor=selected_descriptor,
         parameter_name="threshold",
@@ -484,7 +401,18 @@ def _ability_descriptors(
     profile: WeaponProfile,
     ability_kind: AbilityKind,
 ) -> tuple[AbilityDescriptor, ...]:
-    return tuple(ability for ability in profile.abilities if ability.ability_kind is ability_kind)
+    from warhammer40k_core.engine.ability_instance_selection import weapon_instance_groups
+
+    descriptors = tuple(
+        ability for ability in profile.abilities if ability.ability_kind is ability_kind
+    )
+    ability_ids = {descriptor.ability_id for descriptor in descriptors}
+    if any(
+        len(sources) > 1 and any(source.ability_id in ability_ids for source in sources)
+        for _, sources in weapon_instance_groups(profile)
+    ):
+        raise GameLifecycleError("Weapon ability requires controlling-player selection.")
+    return descriptors
 
 
 def _matching_ability_descriptors(
@@ -515,22 +443,6 @@ def _matching_ability_descriptors(
             target_keywords=target_keywords,
         )
     )
-
-
-def _selected_duplicate_ability_descriptor(
-    descriptors: tuple[AbilityDescriptor, ...],
-    *,
-    selected_ability_id: str | None,
-) -> AbilityDescriptor:
-    if not descriptors:
-        raise GameLifecycleError("Selected weapon ability descriptor does not match this target.")
-    if selected_ability_id is None:
-        raise GameLifecycleError("Weapon ability requires controlling-player selection.")
-    selected_id = _validate_identifier("selected_ability_id", selected_ability_id)
-    for descriptor in descriptors:
-        if descriptor.ability_id == selected_id:
-            return descriptor
-    raise GameLifecycleError("Selected weapon ability descriptor does not match this target.")
 
 
 def _ability_parameter_by_name_from_descriptor(
@@ -665,29 +577,6 @@ def _canonical_keyword(keyword: object) -> str:
 def _validate_weapon_profile(profile: object) -> WeaponProfile:
     if type(profile) is not WeaponProfile:
         raise GameLifecycleError("Weapon ability helpers require a WeaponProfile.")
-    descriptors = profile.abilities
-    if profile.ability_sources:
-        by_id = {ability.ability_id: ability for ability in profile.abilities}
-        descriptors = tuple(
-            by_id[source.ability_id]
-            for source in profile.ability_sources
-            if source.ability_id in by_id
-        )
-    kinds: set[AbilityKind] = set()
-    anti_ids: set[str] = set()
-    for descriptor in descriptors:
-        if descriptor.ability_kind is AbilityKind.ANTI_KEYWORD:
-            if descriptor.ability_id in anti_ids:
-                raise GameLifecycleError(
-                    "Duplicated Anti sources require instance selection (P24C2)."
-                )
-            anti_ids.add(descriptor.ability_id)
-            continue
-        if descriptor.ability_kind in kinds:
-            raise GameLifecycleError(
-                "Duplicated weapon ability sources require instance selection (P24C2)."
-            )
-        kinds.add(descriptor.ability_kind)
     return profile
 
 

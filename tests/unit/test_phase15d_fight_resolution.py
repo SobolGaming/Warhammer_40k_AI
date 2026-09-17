@@ -947,6 +947,156 @@ def _damage_logical_death_restore_fixture(
     return authority, logical_event, source_event
 
 
+def test_order56_melee_requires_one_source_instance_and_projects_its_value() -> None:
+    from warhammer40k_core.engine.ability_instance_selection import (
+        weapon_instance_selection_requests,
+    )
+
+    catalog, ruleset, scenario, attacker, target, _ = _melee_fixture(
+        leader_keywords=(WeaponKeyword.CLEAVE,),
+        leader_abilities=(AbilityDescriptor.cleave(1), AbilityDescriptor.cleave(2)),
+    )
+    request = _melee_request(catalog=catalog, ruleset=ruleset, scenario=scenario, attacker=attacker)
+    profile = next(
+        w for w in catalog.wargear if w.wargear_id == "core-leader-blade"
+    ).weapon_profiles[0]
+    choices = weapon_instance_selection_requests(
+        profile, actor_id=request.actor_id, request_id="use-1"
+    )
+    declaration = MeleeWeaponDeclaration(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id="core-leader-blade",
+        weapon_profile_id=profile.profile_id,
+        target_allocations=(MeleeTargetAllocation(target.unit_instance_id),),
+    )
+    missing = _melee_proposal(request=request, attacker=attacker, declarations=(declaration,))
+    assert not validate_melee_declaration_rules(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=missing,
+        army_catalog=catalog,
+    ).is_valid
+    for option in choices[0].options:
+        selected = replace(declaration, selected_weapon_ability_ids=(option.option_id,))
+        assert MeleeWeaponDeclaration.from_payload(selected.to_payload()) == selected
+        proposal = replace(missing, declarations=(selected,))
+        assert validate_melee_declaration_rules(
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            request=request,
+            proposal=proposal,
+            army_catalog=catalog,
+        ).is_valid
+        sequence = melee_attack_sequence_from_proposal(
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            proposal=proposal,
+            army_catalog=catalog,
+            dice_manager=DiceRollManager("order56-melee"),
+            sequence_id="order56-melee-sequence",
+        )
+        assert len(sequence.attack_pools[0].weapon_profile.abilities) == 1
+        assert sequence.attack_pools[0].selected_weapon_ability_ids == (option.option_id,)
+
+
+def test_order56_melee_keeps_offered_conditional_sources_after_target_selection() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
+    from warhammer40k_core.engine.weapon_selection_context import (
+        WeaponSelectionContext,
+        WeaponSelectionContextPayload,
+    )
+
+    catalog, ruleset, scenario, attacker, target_a, target_b = _melee_fixture(
+        leader_keywords=(WeaponKeyword.CLEAVE,),
+        leader_abilities=(AbilityDescriptor.cleave(1),),
+    )
+    state = _attack_sequence_state(
+        game_id="order56-conditional-melee", ruleset=ruleset, scenario=scenario
+    )
+
+    def conditional_grant(context: WeaponProfileModifierContext) -> WeaponProfile:
+        if context.target_unit_instance_id != target_b.unit_instance_id:
+            return context.weapon_profile
+        return grant_weapon_ability(
+            context.weapon_profile,
+            keyword=WeaponKeyword.CLEAVE,
+            ability=AbilityDescriptor.cleave(2),
+            source_id="test:order56:conditional-cleave",
+            source_instance_id="test:order56:conditional-cleave:activation",
+        )
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        weapon_profile_modifier_bindings=(
+            WeaponProfileModifierBinding(
+                modifier_id="test:order56:conditional-cleave",
+                source_id="test:order56:conditional-cleave",
+                handler=conditional_grant,
+            ),
+        )
+    )
+    request = _melee_request(catalog=catalog, ruleset=ruleset, scenario=scenario, attacker=attacker)
+    request = replace(
+        request,
+        available_weapons=available_melee_weapons_payloads(
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            unit=attacker,
+            army_catalog=catalog,
+            state=state,
+            source_decision_result_id=request.source_decision_result_id,
+            runtime_modifier_registry=registry,
+        ),
+    )
+    row = cast(dict[str, JsonValue], request.available_weapons[0])
+    context = WeaponSelectionContext.from_payload(
+        cast(WeaponSelectionContextPayload, row["weapon_ability_selection_context"])
+    )
+    choice = next(
+        source.instance_id
+        for _, sources in context.instance_groups()
+        for source in sources
+        if source.source_id == "test:order56:conditional-cleave"
+    )
+    proposal = _melee_proposal(
+        request=request,
+        attacker=attacker,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id="core-leader-blade",
+                weapon_profile_id="core-leader-blade:standard",
+                target_allocations=(MeleeTargetAllocation(target_a.unit_instance_id),),
+                selected_weapon_ability_ids=(choice,),
+            ),
+        ),
+    )
+    assert validate_melee_declaration_rules(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=proposal,
+        army_catalog=catalog,
+        state=state,
+        runtime_modifier_registry=registry,
+    ).is_valid
+    sequence = melee_attack_sequence_from_proposal(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        army_catalog=catalog,
+        dice_manager=DiceRollManager(state.game_id),
+        sequence_id="order56-conditional-melee-sequence",
+        state=state,
+        runtime_modifier_registry=registry,
+    )
+    pool = sequence.attack_pools[0]
+    assert pool.weapon_selection_context == context
+    assert pool.selected_weapon_ability_ids == (choice,)
+    assert WeaponKeyword.CLEAVE not in pool.weapon_profile.keywords
+    assert pool.weapon_profile.abilities == ()
+
+
 def test_phase15d_melee_split_lowers_to_shared_attack_sequence_pools() -> None:
     catalog, ruleset, scenario, attacker, target_a, target_b = _melee_fixture()
     request = _melee_request(
@@ -1608,6 +1758,43 @@ def test_phase15d_epic_challenge_and_charge_follow_attached_lineage(
     for effect in effects:
         state.record_persisting_effect(effect)
 
+    stale = validate_rules_unit_melee_declaration(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=proposal,
+        army_catalog=catalog,
+        state=state,
+    )
+    assert stale.violations[0].violation_code == "weapon_ability_inventory_drift"
+    request, proposal = _attached_rules_unit_melee_request_and_proposal(
+        catalog=catalog,
+        ruleset=ruleset,
+        scenario=scenario,
+        state=state,
+        rules_unit=rules_unit,
+        components=(bodyguard, leader),
+        target_unit_instance_id=target.unit_instance_id,
+    )
+    selections: dict[str, tuple[str, ...]] = {}
+    for row in request.available_weapons:
+        assert isinstance(row, dict)
+        choices = cast(list[dict[str, JsonValue]], row["required_weapon_ability_selections"])
+        selections[cast(str, row["model_instance_id"])] = tuple(
+            cast(str, cast(list[dict[str, JsonValue]], choice["options"])[0]["option_id"])
+            for choice in choices
+        )
+    proposal = replace(
+        proposal,
+        declarations=tuple(
+            replace(
+                declaration,
+                selected_weapon_ability_ids=selections[declaration.attacker_model_instance_id],
+            )
+            for declaration in proposal.declarations
+        ),
+    )
+
     assert validate_rules_unit_melee_declaration(
         scenario=scenario,
         ruleset_descriptor=ruleset,
@@ -1919,6 +2106,7 @@ def test_phase15d_rules_unit_melee_delegates_standalone_unit_semantics() -> None
         source_decision_result_id="phase15d-standalone-source-result",
     )
     request = _rules_unit_melee_request(
+        source_result_id="phase15d-standalone-source-result",
         ruleset=ruleset,
         rules_unit=rules_unit,
         available=available,
@@ -2069,6 +2257,7 @@ def test_phase15d_standalone_attacker_can_select_only_standalone_target_from_mix
         source_decision_result_id="phase15d-mixed-target-source-result",
     )
     request = _rules_unit_melee_request(
+        source_result_id="phase15d-mixed-target-source-result",
         ruleset=ruleset,
         rules_unit=attacker_rules_unit,
         available=available,
@@ -7622,6 +7811,7 @@ def _rules_unit_melee_request(
     rules_unit: RulesUnitView,
     available: tuple[JsonValue, ...],
     target_ids: tuple[str, ...],
+    source_result_id: str = "phase15d-attached-source-result",
 ) -> MeleeDeclarationProposalRequest:
     return MeleeDeclarationProposalRequest(
         request_id="phase15d-rules-unit-melee-request",
@@ -7631,7 +7821,7 @@ def _rules_unit_melee_request(
         active_player_id=rules_unit.owner_player_id,
         unit_instance_id=rules_unit.unit_instance_id,
         source_decision_request_id="phase15d-rules-unit-source-request",
-        source_decision_result_id="phase15d-attached-source-result",
+        source_decision_result_id=source_result_id,
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         available_weapons=available,
         target_unit_instance_ids=target_ids,
@@ -8171,6 +8361,7 @@ def _melee_request(
         source_decision_result_id="phase15d-source-result",
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         available_weapons=available_melee_weapons_payloads(
+            source_decision_result_id="phase15d-source-result",
             scenario=scenario,
             ruleset_descriptor=ruleset,
             unit=attacker,

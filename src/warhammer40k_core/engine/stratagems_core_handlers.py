@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
 from typing import TYPE_CHECKING
@@ -72,6 +74,7 @@ def _stratagem_use_from_proposal_context(
 
 def _apply_supported_stratagem_handler(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
@@ -176,6 +179,7 @@ def _apply_supported_stratagem_handler(
         return
     if definition.handler_id == CORE_FIRE_OVERWATCH_HANDLER_ID:
         _apply_fire_overwatch_handler(
+            runtime_modifier_registry=runtime_modifier_registry,
             state=state,
             decisions=decisions,
             context=context,
@@ -253,6 +257,7 @@ def _apply_supported_stratagem_handler(
         return
     if definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
         _apply_generic_rule_ir_stratagem_handler(
+            runtime_modifier_registry=runtime_modifier_registry,
             state=state,
             decisions=decisions,
             context=context,

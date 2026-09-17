@@ -260,6 +260,7 @@ class ShootingPhaseHandler:
         ):
             return _request_shooting_declaration(
                 state=state,
+                runtime_modifier_registry=self.runtime_modifier_registry,
                 decisions=decisions,
                 active_selection=shooting_state.active_selection,
                 selected_shooting_type=shooting_state.selected_shooting_type.shooting_type,
@@ -515,6 +516,7 @@ class ShootingPhaseHandler:
                 message="Shooting declaration proposal does not match the pending request.",
             )
         rule_validation = _validate_declaration_submission(
+            pending_request=request,
             state=state,
             proposal=proposal,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
@@ -882,6 +884,7 @@ class ShootingPhaseHandler:
         if result.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE:
             return _apply_shooting_unit_selected_grant_decision(
                 state=state,
+                runtime_modifier_registry=self.runtime_modifier_registry,
                 result=result,
                 decisions=decisions,
                 registry=self.shooting_unit_selected_grant_hooks,

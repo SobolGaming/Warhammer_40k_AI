@@ -3664,6 +3664,8 @@ def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None
 
 
 def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
+
     anti_vehicle = AbilityDescriptor.anti_keyword("Vehicle", 4)
     anti_infantry = AbilityDescriptor.anti_keyword("Infantry", 2)
     duplicate_anti_profile = replace(
@@ -3678,6 +3680,10 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
         abilities=(anti_vehicle, anti_infantry),
         damage_profile=DamageProfile.fixed(1),
     )
+    instance_ids = {
+        source.ability_id: source.instance_id
+        for source in weapon_ability_sources(duplicate_anti_profile)
+    }
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         game_id="phase14i-duplicate-anti",
@@ -3720,8 +3726,8 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
     nested_requests = cast(list[dict[str, object]], request_payload["nested_interaction_requests"])
 
     assert {option["option_id"] for option in anti_options} == {
-        anti_vehicle.ability_id,
-        anti_infantry.ability_id,
+        instance_ids[anti_vehicle.ability_id],
+        instance_ids[anti_infantry.ability_id],
     }
     assert anti_selection_request in nested_requests
     assert anti_selection_request["schema_version"] == (
@@ -3758,7 +3764,7 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
         cast(list[dict[str, object]], missing_selection_validation["violations"])[0][
             "violation_code"
         ]
-        == "weapon_ability_selection_required"
+        == "weapon_ability_selection_invalid"
     )
     assert lifecycle.decision_controller.queue.peek_next() == declaration_request
 
@@ -3766,7 +3772,7 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
         request=declaration_request,
         target_unit_id=defender.unit_instance_id,
         weapon_profile_id=duplicate_anti_profile.profile_id,
-        selected_weapon_ability_ids=(anti_vehicle.ability_id,),
+        selected_weapon_ability_ids=(instance_ids[anti_vehicle.ability_id],),
     )
     status = _submit_payload(
         lifecycle,
@@ -3779,12 +3785,30 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
     pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
     wound_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.WOUND)
 
-    assert pool_payload["selected_weapon_ability_ids"] == [anti_vehicle.ability_id]
+    assert pool_payload["selected_weapon_ability_ids"] == [instance_ids[anti_vehicle.ability_id]]
     assert wound_payloads
     assert cast(dict[str, object], wound_payloads[0]["payload"])["selected_weapon_ability_ids"] == [
-        anti_vehicle.ability_id
+        instance_ids[anti_vehicle.ability_id]
     ]
     assert cast(dict[str, object], wound_payloads[0]["payload"])["critical_threshold"] == 4
+
+    from warhammer40k_core.engine.ability_instance_history import validate_ability_instance_history
+
+    validate_ability_instance_history(state=state, decisions=lifecycle.decision_controller)
+    from warhammer40k_core.engine.ability_instance_history import validate_weapon_pool_choice
+    from warhammer40k_core.engine.weapon_declaration import RangedAttackPoolPayload
+
+    pool = RangedAttackPool.from_payload(cast(RangedAttackPoolPayload, pool_payload))
+    context = pool.weapon_selection_context
+    assert context is not None
+    forged_ids = (instance_ids[anti_infantry.ability_id],)
+    forged = replace(
+        pool,
+        selected_weapon_ability_ids=forged_ids,
+        weapon_profile=context.selected_profile(pool.target_unit_instance_id, forged_ids),
+    )
+    with pytest.raises(GameLifecycleError, match="disagree with their declaration"):
+        validate_weapon_pool_choice(forged, tuple(lifecycle.decision_controller.records))
 
 
 def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:

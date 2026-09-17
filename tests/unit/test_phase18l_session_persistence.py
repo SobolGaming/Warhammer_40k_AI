@@ -665,6 +665,14 @@ def test_order22_duplicate_sources_survive_facade_submission_checkpoint_and_repl
     session.start(replace(config, army_catalog=catalog))
     request = session.advance_until_decision_or_terminal().decision_request
     assert request is not None
+    while request.decision_type == "select_core_ability_instance":
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id=f"{request.request_id}:core-instance",
+        )
+        request = status.decision_request
+        assert request is not None
     session.submit_option(
         request_id=request.request_id,
         option_id=FIXED_SECONDARY_OPTION_ID,

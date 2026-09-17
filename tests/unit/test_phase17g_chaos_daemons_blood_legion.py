@@ -1276,7 +1276,7 @@ def test_furys_cage_self_mortal_wounds_resume_through_fnp_adapter_decisions() ->
 
 
 def test_furys_cage_lethal_damage_routes_deadly_demise_through_nested_fnp_and_replay() -> None:
-    game_id = "phase17g-furys-cage-dd-fnp-32"
+    game_id = "order56-furys-cage-21"
     lifecycle = _furys_cage_fight_lifecycle(
         game_id=game_id,
         attached=False,

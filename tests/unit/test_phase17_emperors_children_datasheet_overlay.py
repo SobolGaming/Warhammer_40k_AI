@@ -4009,7 +4009,7 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
     ("within_objective_range", "game_id", "expected_wound_value"),
     [
         (True, "phase18j-excessive-inside-0001", 5),
-        (False, "phase18j-excessive-outside-v3-003", 1),
+        (False, "order56-excessive-outside-1", 1),
     ],
 )
 def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
@@ -5096,7 +5096,7 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     armies, state, indexes, fulgrim, enemy = _fulgrim_runtime_fixture(
         phase=BattlePhase.SHOOTING,
         active_player_id="player-a",
-        game_id="fulgrim-p05a-poison-003-order36-2",
+        game_id="order56-fulgrim-poison-5",
     )
     decisions = DecisionController()
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)

@@ -683,97 +683,9 @@ class GameLifecycle:
         )
 
     def _advance_once(self) -> LifecycleStatus:
-        state = self._require_state()
-        from warhammer40k_core.engine.rule_trigger_runtime import advance_rule_triggers
+        from warhammer40k_core.engine.lifecycle_advancement import advance_once
 
-        trigger_status = advance_rule_triggers(
-            state=state,
-            decisions=self.decision_controller,
-            runtime_bundle_provider=self._require_runtime_content_bundle,
-            shooting_handler_provider=lambda: self._shooting_phase_handler,
-        )
-        if trigger_status is not None:
-            return trigger_status
-        from warhammer40k_core.engine.interrupted_charge import advance_interrupted_charge
-
-        interrupted = advance_interrupted_charge(
-            state=state,
-            decisions=self.decision_controller,
-            reaction_queue=self.reaction_queue,
-            handler=self._charge_phase_handler,
-        )
-        if interrupted is not None:
-            return interrupted
-        from warhammer40k_core.engine.charge_target_continuation import refresh_pending_charge_move
-
-        charge_continuation = refresh_pending_charge_move(
-            state=state,
-            decisions=self.decision_controller,
-            handler=self._charge_phase_handler,
-        )
-        if charge_continuation is not None:
-            return charge_continuation
-        pending_request = self._pending_decision_request()
-        continuation_status = (
-            _selected_target_bs.advance_catalog_selected_target_battle_shock_lifecycle(
-                state=state,
-                decisions=self.decision_controller,
-                pending_request=pending_request,
-                runtime_content_bundle=self._runtime_content_bundle,
-            )
-        )
-        if continuation_status is not None:
-            return continuation_status
-        from warhammer40k_core.engine.retained_shooting import advance_retained_shooting
-
-        retained_shooting_status = advance_retained_shooting(
-            state=state,
-            decisions=self.decision_controller,
-            ruleset_descriptor=self._require_config().ruleset_descriptor,
-            army_catalog=self._require_config().army_catalog,
-        )
-        if retained_shooting_status is not None:
-            return retained_shooting_status
-        out_of_phase_status = self._shooting_phase_handler.advance_out_of_phase_shooting_if_needed(
-            state=state,
-            decisions=self.decision_controller,
-        )
-        if out_of_phase_status is not None:
-            if self._reconcile_catalog_model_state_changes():
-                self._refresh_runtime_content_bundle_if_armies_mustered()
-            return out_of_phase_status
-        forced_fight_status = self._fight_phase_handler.advance_forced_fight_activations_if_needed(
-            state=state,
-            decisions=self.decision_controller,
-            reaction_queue=self.reaction_queue,
-        )
-        if forced_fight_status is not None:
-            if self._reconcile_catalog_model_state_changes():
-                self._refresh_runtime_content_bundle_if_armies_mustered()
-            return forced_fight_status
-        if state.stage is GameLifecycleStage.COMPLETE:
-            return LifecycleStatus.terminal(
-                stage=GameLifecycleStage.COMPLETE,
-                message="Game lifecycle is complete.",
-                payload=state.game_result_payload(),
-            )
-        if state.stage is GameLifecycleStage.SETUP:
-            status = self._setup_flow.advance(
-                state=state,
-                decisions=self.decision_controller,
-                config=self._require_config(),
-                reaction_frame_count=len(self.reaction_queue.frames),
-            )
-            self._refresh_runtime_content_bundle_if_armies_mustered()
-            return status
-        status = self._require_battle_round_flow().advance(
-            state=state,
-            decisions=self.decision_controller,
-            reaction_queue=self.reaction_queue,
-        )
-        if self._reconcile_catalog_model_state_changes():
-            self._refresh_runtime_content_bundle_if_armies_mustered()
-        return status
+        return advance_once(self)
 
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         state = self._require_state()
@@ -1032,6 +944,15 @@ class GameLifecycle:
             decisions=lifecycle.decision_controller,
             runtime_content_bundle=refreshed_bundle,
         )
+        from warhammer40k_core.engine.core_ability_selection import (
+            validate_core_ability_selection_history,
+        )
+
+        validate_core_ability_selection_history(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
+        )
         from warhammer40k_core.engine.active_player_scope_history import (
             validate_active_player_history,
         )
@@ -1174,8 +1095,20 @@ class GameLifecycle:
         }
 
     def _build_decision_dispatch_registry(self) -> DecisionDispatchRegistry:
+        from warhammer40k_core.engine.core_ability_selection import (
+            core_ability_selection_dispatch_handler,
+        )
+
         return build_decision_dispatch_registry(
             (
+                core_ability_selection_dispatch_handler(
+                    state_provider=self._require_state,
+                    decisions=self.decision_controller,
+                    advance=self.advance_until_decision_or_terminal,
+                    registry_provider=lambda: (
+                        self._shooting_phase_handler.runtime_modifier_registry
+                    ),
+                ),
                 *(
                     DecisionDispatchHandler(
                         decision_type=decision_type,

@@ -4800,3 +4800,38 @@ Heroic orchestration and Take to the Skies choices retain their later orders.
 
 Order 54 / P03A implementation and evidence: [oversized setup scope audit](ORDER_54_SCOPE_PLAN.md),
 [Contract 25 migration](../contracts/migrations/24-to-25.md).
+
+
+## P24C2 implementation evidence — Order 56
+
+Status: implemented and locally validated on `codex/order-56-duplicate-ability-selection`.
+Final gate evidence is recorded in `docs/performance/order56/README.md`.
+Finding: `C24-03B`. Together with the merged P24C1 source-identity foundation,
+this supplies the remaining C24-03 duplicate-selection behavior. Category 24's
+other findings remain separately owned; this is not a category-wide certificate.
+
+The invariant is one controlling-player-selected source per duplicated Core or
+weapon family, irrespective of numbers or keywords. The approved scope and
+end-to-end ownership audit are in `docs/ORDER_56_SCOPE_PLAN.md`. Shared finite
+Core choices and nested Select Weapons choices preserve native/granted source
+instances, with exact validation before mutation and persisted source evidence.
+Shooting, melee, attached units, conditional grants, Firing Deck, out-of-phase
+attacks and retargeting consume the same selection. Feel No Pain retains its
+source decision; Deadly Demise selects one mandatory source and resumes the
+ordinary attack or rule-destruction continuation. Scouts uses shared values plus
+the lowest unshared value, including Dedicated Transport cargo.
+
+Source authority remains the complete retained 24.02 observation from P24C1:
+`gw-11e-core-duplicated-abilities:duplicated-abilities`, observed
+2026-09-06T14:49:36Z, observation hash
+`4a37e2adbecc617bc913a16d9548f68f895393887bdc9f6e33fcea33fa11da49`.
+Source text and official historical provenance are unchanged. The offline builder
+and pinned typed loader now record `loaded` / `executable_engine_runtime` with
+selection and consumption owners. No new faction/content support is claimed.
+
+Contract 26 replaces descriptor option IDs with source-instance IDs and documents
+Core choices, melee selections, viewer scoping and save/replay migration.
+Behavioral additions use existing files; eight-shard membership remains unchanged.
+No new named handlers or architecture exceptions are introduced. Complete-game
+performance remains unmeasured; retained base/head component evidence does not
+certify the deferred full-game budgets.

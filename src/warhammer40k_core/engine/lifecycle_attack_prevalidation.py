@@ -348,6 +348,13 @@ def _invalid_destruction_reaction_status(
     )
     if invalid_status is not None:
         return invalid_status
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        invalid_deadly_demise_instance_status,
+        is_deadly_demise_instance_request,
+    )
+
+    if is_deadly_demise_instance_request(request):
+        return invalid_deadly_demise_instance_status(state=state, request=request, result=result)
     return invalid_destruction_reaction_context_status(
         state=state,
         request=request,

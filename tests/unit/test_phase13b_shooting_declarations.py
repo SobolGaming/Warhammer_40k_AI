@@ -93,6 +93,7 @@ from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruin
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import DatasheetDefinition
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollResult,
@@ -12092,30 +12093,70 @@ def test_psychic_attack_classification_enables_psychic_only_feel_no_pain() -> No
     assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
 
 
-def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+@pytest.mark.parametrize("native_threshold", [None, 5, 6])
+def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle(
+    native_threshold: int | None,
+) -> None:
+    catalog = _canonical_catalog()
+    if native_threshold is not None:
+        catalog = _catalog_with_core_feel_no_pain_datasheet(token="5+")
+        datasheets: list[DatasheetDefinition] = []
+        for datasheet in catalog.datasheets:
+            fnp = tuple(
+                ability
+                for ability in datasheet.abilities
+                if ability.ability_id == "core-feel-no-pain"
+            )
+            if fnp:
+                datasheet = replace(
+                    datasheet,
+                    abilities=(
+                        *datasheet.abilities,
+                        replace(
+                            fnp[0],
+                            source_id=f"{fnp[0].source_id}:additional",
+                            parameter_tokens=(f"{native_threshold}+",),
+                        ),
+                    ),
+                )
+            datasheets.append(datasheet)
+        catalog = replace(catalog, datasheets=tuple(datasheets))
+    lifecycle, units = (
+        _shooting_lifecycle(alpha_unit_ids=("intercessor-1",), catalog=catalog)
+        if native_threshold is None
+        else _compact_shooting_lifecycle(catalog=catalog)
+    )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
-        lifecycle,
-        target_unit=defender,
-        source_unit=attacker,
-        application_id="phase13c-optional-fnp-preexisting-casualties",
-    )
-    source_a = FeelNoPainSource(source_id="phase13c-fnp-a", threshold=5)
-    source_b = FeelNoPainSource(source_id="phase13c-fnp-b", threshold=6)
-    state.record_model_feel_no_pain_sources(
-        model_instance_id=defender_model.model_instance_id,
-        sources=(source_a, source_b),
-        decline_allowed=True,
-    )
+    if native_threshold is None:
+        defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+            lifecycle,
+            target_unit=defender,
+            source_unit=attacker,
+            application_id="phase13c-optional-fnp-preexisting-casualties",
+        )
+        source_a = FeelNoPainSource(source_id="phase13c-fnp-a", threshold=5)
+        source_b = FeelNoPainSource(source_id="phase13c-fnp-b", threshold=6)
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=defender_model.model_instance_id,
+            sources=(source_a, source_b),
+            decline_allowed=True,
+        )
+    else:
+        defender_model = defender.own_models[0]
+        _retain_only_placed_model(
+            state=state, unit=defender, model_instance_id=defender_model.model_instance_id
+        )
+        source_a, source_b = state.feel_no_pain_sources_for_model(
+            model_instance_id=defender_model.model_instance_id
+        )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         damage_profile=DamageProfile.fixed(2),
     )
     sequence = AttackSequence.start(
-        sequence_id="phase13c-optional-fnp",
+        sequence_id="attack-sequence:phase13c-optional-fnp",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -12127,6 +12168,16 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> Non
             ),
         ),
     )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
@@ -12135,7 +12186,7 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> Non
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )
-    attack_context_id = "phase13c-optional-fnp:pool-001:attack-001"
+    attack_context_id = "attack-sequence:phase13c-optional-fnp:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
@@ -12173,27 +12224,40 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> Non
     assert status is not None
     request = _decision_request(status)
     assert request.decision_type == "select_feel_no_pain"
-    assert {option.option_id for option in request.options} == {
-        "decline",
-        source_a.source_id,
-        source_b.source_id,
-    }
+    assert {option.option_id for option in request.options} == (
+        {"decline", source_a.source_id, source_b.source_id}
+        if native_threshold is None
+        else {source_a.source_id, source_b.source_id}
+    )
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
     )
 
-    final_status = lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase13c-optional-fnp-decline",
-            request=request,
-            selected_option_id="decline",
-        )
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+
+    session = LocalGameSession(lifecycle=lifecycle)
+    final_status = session.submit_option(
+        request_id=request.request_id,
+        option_id="decline" if native_threshold is None else source_a.source_id,
+        result_id="phase13c-optional-fnp-select",
     )
     updated_model = model_by_id(state=state, model_instance_id=defender_model.model_instance_id)
 
-    _assert_waiting_for_movement_unit(final_status)
-    assert updated_model.is_alive is False
+    if native_threshold is None:
+        _assert_waiting_for_movement_unit(final_status)
+        assert updated_model.is_alive is False
+    else:
+        record = next(
+            record
+            for record in lifecycle.decision_controller.records
+            if record.result.result_id == "phase13c-optional-fnp-select"
+        )
+        assert final_status.status_kind is not LifecycleStatusKind.INVALID
+        assert record.result.selected_option_id == source_a.source_id
+        assert source_a.source_id != source_b.source_id
+        assert {source_a.threshold, source_b.threshold} == {5, native_threshold}
+        assert updated_model.wounds_remaining <= defender_model.wounds_remaining
 
 
 @pytest.mark.parametrize(
@@ -16181,11 +16245,24 @@ def test_phase14h_destroyed_transport_apply_rejects_invalid_recorded_contexts() 
 
 
 @pytest.mark.slow
-def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal() -> None:
+@pytest.mark.parametrize("duplicate_instance", [False, True])
+def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
+    duplicate_instance: bool,
+) -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_pose=Pose.at(14.0, 35.0),
-        catalog=_catalog_with_deadly_demise_datasheet(token="D3"),
+        catalog=_compact_intercessor_catalog(_catalog_with_deadly_demise_datasheet(token="D3"))
+        if duplicate_instance
+        else _catalog_with_deadly_demise_datasheet(token="D3"),
+        alpha_datasheets={
+            "intercessor-1": ("core-intercessor-like-infantry", "core-intercessor-like", 1)
+        }
+        if duplicate_instance
+        else None,
+        enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1)
+        if duplicate_instance
+        else None,
     )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
@@ -16214,6 +16291,23 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         "range_inches": 6.0,
         "mortal_wounds": {"kind": "d3"},
     }
+    if duplicate_instance:
+        state.record_model_destruction_reaction_sources(
+            model_instance_id=defender_model.model_instance_id,
+            sources=(
+                deadly_demise_source,
+                replace(
+                    deadly_demise_source,
+                    source_id="order56:alternative-demise",
+                    source_rule_id="order56:demise-source",
+                    payload={
+                        "trigger_roll_threshold": 6,
+                        "range_inches": 6.0,
+                        "mortal_wounds": {"kind": "fixed", "value": 1},
+                    },
+                ),
+            ),
+        )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
@@ -16308,6 +16402,57 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
             ),
         ),
     )
+    if duplicate_instance:
+        from warhammer40k_core.adapters.local_session import LocalGameSession
+
+        assert status is not None
+        request = _decision_request(status)
+        assert request.decision_type == "select_destruction_reaction"
+        assert {option.option_id for option in request.options} == {
+            deadly_demise_source.source_id,
+            "order56:alternative-demise",
+        }
+        assert not any(
+            event.event_type == "dice_roll_resolved"
+            and isinstance(event.payload, dict)
+            and event.payload.get("spec") == deadly_demise_spec.to_payload()
+            for event in lifecycle.decision_controller.event_log.records
+        )
+        assert state.shooting_phase_state is not None
+        state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+        restored = GameLifecycle.from_payload(lifecycle.to_payload())
+        session = LocalGameSession(lifecycle=restored)
+        assert session.view(viewer_player_id="player-b")["pending_decision"]
+        result_status = session.submit_option(
+            request_id=request.request_id,
+            option_id="order56:alternative-demise",
+            result_id="order56:choose-demise",
+        )
+        assert result_status.status_kind.value != "invalid"
+        selections = [
+            event
+            for event in restored.decision_controller.event_log.records
+            if event.event_type == "core_ability_instance_selected"
+        ]
+        assert len(selections) == 1
+        selection = cast(dict[str, JsonValue], selections[0].payload)
+        assert (
+            cast(dict[str, JsonValue], selection["selected_source"])["source_id"]
+            == "order56:alternative-demise"
+        )
+        assert not any(
+            event.event_type == "destruction_reaction_resolved"
+            and isinstance(event.payload, dict)
+            and isinstance(event.payload.get("selected_source"), dict)
+            and cast(dict[str, JsonValue], event.payload["selected_source"])["source_id"]
+            == deadly_demise_source.source_id
+            for event in restored.decision_controller.event_log.records
+        )
+        GameLifecycle.from_payload(restored.to_payload())
+        return
     applied = _last_event_payload(lifecycle, "deadly_demise_mortal_wounds_applied")
     application = cast(dict[str, object], applied["mortal_wound_application"])
     applications = cast(list[dict[str, object]], application["applications"])
@@ -16392,7 +16537,7 @@ def test_phase13e_deadly_demise_descriptor_registers_sources_for_each_model() ->
         source = sources[0]
         assert source.source_id == (
             "datasheet:core-intercessor-like-infantry:ability:deadly-demise:"
-            f"{model.model_instance_id}:deadly-demise"
+            f"{defender.ability_source_instances()[0].instance_id}:{model.model_instance_id}:deadly-demise"
         )
         assert source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
         assert source.source_rule_id == (
@@ -16438,7 +16583,7 @@ def test_phase13c_feel_no_pain_descriptor_registers_sources_for_each_model() -> 
         source = sources[0]
         assert source.source_id == (
             "datasheet:core-intercessor-like-infantry:ability:feel-no-pain:"
-            f"{model.model_instance_id}:feel-no-pain"
+            f"{defender.ability_source_instances()[0].instance_id}:{model.model_instance_id}:feel-no-pain"
         )
         assert source.threshold == 5
         assert source.attack_condition is None

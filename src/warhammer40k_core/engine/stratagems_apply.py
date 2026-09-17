@@ -318,6 +318,9 @@ def _apply_stratagem_use(
         effect_payload=definition.effect_payload,
     )
     _apply_supported_stratagem_handler(
+        runtime_modifier_registry=runtime_content_bundle.runtime_modifier_registry
+        if runtime_content_bundle is not None
+        else None,
         state=state,
         decisions=decisions,
         result=result,

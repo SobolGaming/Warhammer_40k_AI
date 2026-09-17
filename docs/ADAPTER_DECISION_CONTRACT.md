@@ -1956,9 +1956,54 @@ promotion; the default June provider continues to emit its typed unsupported
 diagnostic. No July-specific adapter option, proposal kind, or mutation path is
 introduced.
 
-Phase 14I defines the finite `select_weapon_ability_instance` request shape and helper for duplicate source-backed weapon ability instances when the PDF timing gives the controlling player a choice. Phase 13B Shooting declaration target candidates embed this request under `required_weapon_ability_selections` for duplicate matching `[ANTI]` descriptors, and adapters must copy the selected option ID into the matching `WeaponDeclarationPayload.selected_weapon_ability_ids` entry before submitting the declaration. Structured Anti descriptors use canonical slash-separated keyword groups in the `keyword` parameter, such as `vehicle/monster`, and may use `match_mode: "missing_keyword"` for `[ANTI-NON-X]` semantics. Other attack/targeting hosts that can encounter duplicate instances must call the helper and route the selected descriptor ID before resolving that duplicate ability. The request payload includes `submission_kind: "select_weapon_ability_instance"`, `weapon_profile_id`, `ability_kind`, canonical `target_keywords`, and replay-safe `source_context`. Option IDs are the selected structured ability descriptor IDs; option payloads repeat the submission kind, weapon profile ID, ability kind, selected ability ID, and the full ability descriptor payload. Adapters must select one emitted option ID and must not synthesize ability IDs from text. If no duplicate choice exists for the current target and timing, no request is emitted. Runtime helpers reject duplicate ability use without an explicit selected ability ID.
+Order 56 / contract 26 defines the nested finite `select_weapon_ability_instance`
+request for **every duplicated weapon family** in Shooting and Fight Select
+Weapons. Option IDs are physical `AbilitySourceInstance.instance_id` values,
+including distinct equal-value grants. Different Anti keywords belong to one
+family before target conditions are evaluated. `selection_context` contains the
+physical weapon ID, source request ID, and immutable target-specific profiles
+with complete native/granted source inventories. Adapters copy exactly one
+emitted ID per duplicated family into `selected_weapon_ability_ids` on the
+matching Shooting or melee declaration. No matching-target filter or implicit
+maximum/first-instance choice is permitted. The engine validates the live and
+request-time inventories before queue pop, then projects only the chosen
+instances into attack pools. Split melee allocations share the complete offered
+inventory and evaluate the selected source for each target. Target replacement
+retains the original choices and frozen inventory;
+`resolved_target_profiles` captures later applicability without widening the
+selection. An expired conditional selection contributes no replacement ability.
 
-`WEAPON_ABILITY_SELECTION_DECISION_TYPE` is intentionally not a top-level `GameLifecycle.submit_decision(...)` dispatch entry today; it is the single documented nested-decision allowlist entry for duplicate weapon-ability descriptor disambiguation in Shooting declarations, where adapters resolve `select_weapon_ability_instance` by copying the selected descriptor ID from `required_weapon_ability_selections` into the later declaration proposal. Tesseract Vault C'tan Power weapon selection is expressed inside the existing `submit_shooting_declaration` proposal: the request exposes `shooting_weapon_selection_limits` derived from `DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT`, and the engine revalidates the submitted declarations against those limits before queue pop.
+`WEAPON_ABILITY_SELECTION_DECISION_TYPE` remains the single nested-decision allowlist
+entry: its options are submitted within the ordinary
+`submit_shooting_declaration` or `submit_melee_declaration` proposal and recorded
+by the parent decision. Tesseract Vault weapon-count limits remain independent: the existing
+`shooting_weapon_selection_limits` payload comes from
+`DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT` and is revalidated before queue pop.
+
+`select_core_ability_instance` is a registered finite decision for persistent
+Core families, with unit, controlling player, family, complete source inventory
+and opportunity identity. One selection applies until replaced or its source
+expires; new decision boundaries permit reselection. Native/granted sources use
+the same inventory. Finite option payloads identify the selected source and its
+catalog descriptor or runtime grant. Unit `core_ability_selections` and selected/
+expired events authenticate restore against decision records. Repeated Deep
+Strike grants retain `core_keyword_sources` even when the keyword was already
+present. Setup requests and selected events carry `secret: true`, player
+ownership and `visibility_source: "core_ability_instance"`; the shared adapters redaction module scopes decisions, records,
+status and event deltas. Expiry details are also controlling-player private.
+
+Feel No Pain uses its existing source-choice path. Duplicated mandatory Deadly
+Demise uses `select_destruction_reaction` with
+`selection_kind: "duplicated_deadly_demise_instance"`, complete source and
+destruction context, and one mandatory source per option, without decline.
+It resumes the same attack, grouped damage or rule-destruction continuation.
+Scouts keeps every universally shared distance and the lowest unshared distance
+as finite prebattle choices, including Dedicated Transport cargo. Selection and
+path proposal validation both enforce the chosen distance.
+
+See [contract 25 to 26](../contracts/migrations/25-to-26.md) for persistence,
+replay and client migration.
+
 
 CP totals, CP ledger transactions, and normal Stratagem-use events are public in matched play. Viewer-scoped projections expose public CP ledger data under `public_command_point_ledgers` and public Stratagem-use records under `public_stratagem_use_records`. Adapter event deltas may expose normal CP and Stratagem events to every player unless a future source-backed hidden rule explicitly marks a pending decision, record, or event hidden. Any hidden Stratagem rule must update this document before implementation and must not leak hidden information through option counts, payload fields, event metadata, or derived projection data.
 
@@ -5287,13 +5332,11 @@ policy. No new decision type, option family or proposal kind is introduced. The
 existing proposal schema accepts the new optional inventory; submissions still
 validate against engine-owned profiles and use the same lifecycle path.
 
-P24C1 supplies identity and storage, not the P24C2 instance-selection workflow.
-Unresolved duplicate non-Anti descriptors raise a domain error at the shared
-weapon-ability execution boundary rather than choosing a source, summing values,
-or selecting a maximum. The existing distinct-descriptor Anti decision remains
-unchanged. Keyword membership remains a non-stacking presence query. Source
-support is `loaded` / `partial_engine_runtime`; C24-03B and the parent C24-03
-family remain open, including Select Weapons timing and the Scouts selection rule.
+P24C1 originally supplied identity and storage while leaving selection open.
+Order 56 / P24C2 now supplies the controlling-player workflow documented above.
+The retained source is `loaded` / `executable_engine_runtime`; descriptor-ID
+Anti selection is superseded by source-instance selection for every family.
+Keyword membership remains a non-stacking presence query.
 
 ## Order 25: embarked ability availability (P01C)
 

@@ -12,6 +12,7 @@ from warhammer40k_core.core.ability_sources import AbilitySourceError, AbilitySo
 if TYPE_CHECKING:
     from warhammer40k_core.core.weapon_profiles import (
         AbilityDescriptor,
+        AbilityKind,
         WeaponKeyword,
         WeaponProfile,
     )
@@ -48,10 +49,10 @@ def weapon_ability_sources(profile: WeaponProfile) -> tuple[AbilitySourceInstanc
     )
 
 
-def _native_ability_ids(profile: WeaponProfile) -> tuple[str, ...]:
+def weapon_keyword_for_ability_kind(kind: AbilityKind) -> WeaponKeyword | None:
     from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword
 
-    descriptor_keywords = {
+    return {
         AbilityKind.DEVASTATING_WOUNDS: WeaponKeyword.DEVASTATING_WOUNDS,
         AbilityKind.SUSTAINED_HITS: WeaponKeyword.SUSTAINED_HITS,
         AbilityKind.LETHAL_HITS: WeaponKeyword.LETHAL_HITS,
@@ -60,11 +61,14 @@ def _native_ability_ids(profile: WeaponProfile) -> tuple[str, ...]:
         AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
         AbilityKind.HEAVY: WeaponKeyword.HEAVY,
         AbilityKind.HUNTER: WeaponKeyword.HUNTER,
-    }
+    }.get(kind)
+
+
+def _native_ability_ids(profile: WeaponProfile) -> tuple[str, ...]:
     described = {
-        descriptor_keywords[a.ability_kind]
+        weapon_keyword_for_ability_kind(a.ability_kind)
         for a in profile.abilities
-        if a.ability_kind in descriptor_keywords
+        if weapon_keyword_for_ability_kind(a.ability_kind) is not None
     }
     return (
         *(ability.ability_id for ability in profile.abilities),

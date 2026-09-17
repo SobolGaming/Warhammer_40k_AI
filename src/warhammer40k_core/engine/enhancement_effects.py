@@ -564,20 +564,22 @@ def _apply_unit_keyword_grant(
     updated_units: list[UnitInstance] = []
     target_seen = False
     payload: dict[str, JsonValue] | None = None
-    requested_keyword = _canonical_keyword(effect.keyword)
     for unit in army.units:
         if unit.unit_instance_id != effect.target_unit_instance_id:
             updated_units.append(unit)
             continue
         target_seen = True
-        existing = {_canonical_keyword(keyword) for keyword in unit.keywords}
-        if requested_keyword in existing:
+        updated_unit = grant_unit_keywords(
+            unit,
+            keywords=(effect.keyword,),
+            source_id=effect.source_id,
+            source_instance_id=effect.effect_id,
+        )
+        if updated_unit == unit:
             updated_units.append(unit)
             continue
-        updated_keywords = tuple(sorted((*unit.keywords, effect.keyword)))
-        updated_units.append(
-            grant_unit_keywords(unit, keywords=(effect.keyword,), source_id=effect.source_id)
-        )
+        updated_keywords = tuple(sorted({*unit.keywords, effect.keyword}))
+        updated_units.append(updated_unit)
         payload = {
             **cast(dict[str, JsonValue], effect.to_payload()),
             "player_id": army.player_id,
@@ -775,7 +777,3 @@ def _validate_effect_bindings(value: object) -> tuple[EnhancementEffectBinding, 
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()

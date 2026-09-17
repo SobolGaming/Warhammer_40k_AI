@@ -2813,6 +2813,7 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
     )
     decisions.submit_result(result)
     _apply_shooting_unit_selected_grant_decision(
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
         state=state,
         result=result,
         decisions=decisions,

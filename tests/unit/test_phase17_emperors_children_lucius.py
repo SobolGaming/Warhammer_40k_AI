@@ -239,7 +239,7 @@ def test_lone_operative_profile_defaults_retains_source_and_validates_ranges() -
         ability_id="test:unrelated-ability-id",
         name="Lone Operative",
     )
-    assert lone_operative_profile_for_unit(name_only) is None
+    assert lone_operative_profile_for_unit(name_only) == default_profile
 
     parameterized = _unit_with_lone_operative_range(lucius, range_inches=15.0)
     parameterized_profile = lone_operative_profile_for_unit(parameterized)

@@ -218,6 +218,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_core_ability_instance",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_cult_ambush_resurgence",
         "interaction_kinds": [
           "confirmation"
@@ -1092,13 +1099,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "25.0.0",
+        "contract_version": "26.0.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "fd50ea8600b7050b2fca5f770adda0f665c9c1980e53d77b211d1ee94861b780",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:92f285ced6a5f6fdc021f816ee9d0534f7d8a5428941a55960d55f5a2fd26a6f"
+        "identity_hash": "2a343907659d9e1a9ce6f545574cc08cc2967032bfba990350cb80b35c895a8e",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fff3b14ae50ba8051743011c2fb91deda94b7df13d2006a894cc766280c18084"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -3608,6 +3615,13 @@
       "decision_type": "select_charging_unit",
       "interaction_kinds": [
         "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_core_ability_instance",
+      "interaction_kinds": [
+        "finite_option_list"
       ],
       "submission_kind": "finite"
     },
