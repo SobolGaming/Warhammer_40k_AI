@@ -356,8 +356,17 @@ def _resolve_unit_move(
         ruleset_descriptor=ruleset_descriptor,
         hover_mode_state=hover_mode_state,
     )
+    from warhammer40k_core.engine.move_ability_choices import movement_ability_keywords
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    ability_keywords = movement_ability_keywords(
+        rules_unit_view_from_armies(
+            armies=scenario.armies,
+            unit_instance_id=movement_unit_id,
+        )
+    )
     effective_movement_keywords = _effective_movement_keywords(
-        aircraft_policy.effective_keywords,
+        tuple(sorted({*aircraft_policy.effective_keywords, *ability_keywords})),
         temporary_keywords=validated_temporary_keywords,
     )
     witness = (

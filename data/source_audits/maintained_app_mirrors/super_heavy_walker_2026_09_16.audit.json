@@ -1,0 +1,51 @@
+{
+  "audit_id": "core-super-heavy-walker-maintained-app-mirrors-2026-09-16",
+  "observed_at": "2026-09-16T00:00:00+00:00",
+  "observation_time_precision": "day",
+  "rows": [
+    {
+      "row_id": "super-heavy-walker",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-09-16T00:00:00+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-super-heavy-walker:super-heavy-walker",
+      "transcription_sha256": "9d2329fa28bc526c73ad5d9dc85249079a6d64f3a9ba5484a4acc4482db09487",
+      "provider_non_affiliation_recorded": true,
+      "transcription_scope": "Short excerpt; complete 24.35 operative text reviewed in the search index.",
+      "reviewed_obligations": [
+        "Applies to each Normal, Advance and Fall Back move of a unit with this ability.",
+        "Every model may transit other models, including Monster and Vehicle but excluding Titanic.",
+        "Every model may move horizontally through terrain sections at most four inches high.",
+        "Before moving, the owner may grant all models MOBILE until that move ends.",
+        "Choosing MOBILE requires one D6 at move completion; a one makes the unit Battle-shocked.",
+        "MOBILE permits horizontal movement through dense terrain; normal endpoints still apply."
+      ],
+      "source_observation_sha256": "9240dc6508400375ec9f96cbf7528865d72d8ab17e3afc1190463e3dc235df21"
+    }
+  ],
+  "observation_method": "Complete search-index text; direct retrieval returned HTTP 403.",
+  "co_version_comparison": "No second-provider observation asserted.",
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "official_review": {
+    "artifact_path": "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
+    "pages": [
+      85
+    ],
+    "sections": [
+      "24.35"
+    ],
+    "reviewed_obligations": [
+      "Applies to each Normal, Advance and Fall Back move of a unit with this ability.",
+      "Every model may transit other models, including Monster and Vehicle but excluding Titanic.",
+      "Every model may move horizontally through terrain sections at most four inches high.",
+      "Before moving, the owner may grant all models MOBILE until that move ends.",
+      "Choosing MOBILE requires one D6 at move completion; a one makes the unit Battle-shocked.",
+      "MOBILE permits horizontal movement through dense terrain; normal endpoints still apply."
+    ]
+  }
+}

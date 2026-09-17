@@ -1,0 +1,21 @@
+{
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6723c185d2ca78c8d007fa6848495aa627494ce2f5c5961e189b313685735288",
+  "case": "legal",
+  "result": {
+    "case": "legal",
+    "setup_seconds": 3.6208844169741496,
+    "slice_seconds": 0.07154437503777444,
+    "inventory_size": 1,
+    "eligible_targets": 1,
+    "unavailable_reason": null,
+    "target_unavailable_reason": null,
+    "submitted": true,
+    "work_counts": {
+      "reserve_state_for_unit": 4,
+      "unarrived_reserve_states_for_player": 10,
+      "rules_unit_view_by_id": 9,
+      "rapid_ingress_target_error": 3,
+      "_rapid_ingress_unit_ids": 3
+    }
+  }
+}

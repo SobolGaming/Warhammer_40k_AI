@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.move_ability_choices import movement_keyword_options
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.take_to_the_skies import flight_choices
 
@@ -74,7 +75,7 @@ def triggered_movement_unit_selection_options(
         from warhammer40k_core.engine.surge_choices import surge_target_options
 
         return surge_target_options(state=state, options=tuple(options))
-    return tuple(
+    flight_options = tuple(
         variant
         for option in options
         for variant in (
@@ -88,6 +89,22 @@ def triggered_movement_unit_selection_options(
             if descriptor.movement_mode is MovementMode.NORMAL
             and isinstance(option.payload, dict)
             and not option.payload.get("declined")
+            else (option,)
+        )
+    )
+
+    return tuple(
+        variant
+        for option in flight_options
+        for variant in (
+            movement_keyword_options(
+                options=(option,),
+                unit=rules_unit_view_by_id(
+                    state=state,
+                    unit_instance_id=str(option.payload["unit_instance_id"]),
+                ),
+            )
+            if isinstance(option.payload, dict) and not option.payload.get("declined")
             else (option,)
         )
     )

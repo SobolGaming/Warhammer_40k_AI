@@ -1,0 +1,94 @@
+{
+  "base_revision": "53d89a28915700b8d655942c54ca6a9ff8f7f660",
+  "behavioral": {
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85",
+    "coverage_floor_percent": 85,
+    "coverage_percent": 85.11,
+    "distribution": "worksteal",
+    "errors": 0,
+    "failed": 0,
+    "junit_sha256": "c5fd2f8ea20d6dbf012df97cef23f2ffd27b3f7737940fc10c13aff15db82fe0",
+    "passed": 8211,
+    "seconds": 597.589,
+    "skipped": 0,
+    "status": "passed",
+    "workers": 18
+  },
+  "checks_passed": [
+    "uv run ruff check .",
+    "uv run ruff format --check .",
+    "uv run mypy src tests",
+    "uv run pyright",
+    "uv run lint-imports",
+    "uv run pre-commit run --all-files",
+    "uv run --no-sync python scripts/build_external_contract.py --check --base-ref 53d89a28915700b8d655942c54ca6a9ff8f7f660",
+    "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+    "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+    "uv run --no-sync python tools/build_core_super_heavy_walker_source.py --check",
+    "uv run --no-sync python scripts/build_engine_build_identity.py --check"
+  ],
+  "code_quality": {
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
+    "coverage": false,
+    "distribution": "worksteal",
+    "errors": 0,
+    "failed": 0,
+    "junit_sha256": "87b6bc183afdd551c485f082c8075580ed67bdaaa323e5804c5f649297eb1af0",
+    "passed": 503,
+    "seconds": 107.309,
+    "skipped": 0,
+    "status": "passed",
+    "workers": 18
+  },
+  "date": "2026-09-16",
+  "diagnostic_runs": [
+    {
+      "failed": 1,
+      "junit_sha256": "bef3496ee96aa156166089c80628f3565d46e90a07e3be45604f0d2eaa2931d4",
+      "kind": "code_quality",
+      "passed": 502,
+      "reason": "The complete quality run found the new source package missing from the explicit classification inventory. The package classification was added without changing production code.",
+      "result": "superseded by complete passing final quality validation"
+    },
+    {
+      "reason": "Initial aggregate interrupted after the focused Order 35 work gate found one unnecessary ingress unit lookup. The explicit placement/stationary fast path restored the existing budget.",
+      "result": "discarded; final aggregate rerun after production fix"
+    },
+    {
+      "coverage_percent": 85.1,
+      "failed": 1,
+      "junit_sha256": "8f8075069d49a1202f82781df67ccc620e77e52ff2c5764473ff453f6836eae1",
+      "passed": 8210,
+      "reason": "The first completed coverage run found the old source-package inventory count in a test. Both matching inventory assertions were updated from 31 to 32; all 114 source-identity checks passed before the final rerun.",
+      "result": "superseded by complete passing final validation"
+    }
+  ],
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a510c53db41005214552b502fe609bf47449085a746a1b714c5f6fce62227ff6",
+  "performance": {
+    "component_budgets": "passed",
+    "full_game_certified": false,
+    "long_history_scaling_measured": false,
+    "matched_samples_per_revision": 7,
+    "rapid_ingress_legal_unit_lookups": {
+      "after": 8,
+      "before": 9,
+      "unchanged_budget": 8
+    },
+    "workload": "order53-move-abilities-v1"
+  },
+  "schema": "order53-final-validation-v1",
+  "typescript": {
+    "contract_version": "24.0.0",
+    "execution": "Bundled Node executed the package script equivalents; npm is unavailable.",
+    "generated_client_check": "passed",
+    "live_assertions_passed": 342,
+    "replay_sha256": "c7a5c2672594e3cc772d63c711b6c4e7edc8df2fd493280f9bbf63bf0600faa7",
+    "typecheck": "passed",
+    "unit_tests_passed": 5
+  },
+  "wheel": {
+    "engine_resource_count": 2830,
+    "schema_count": 27,
+    "validated_request_family_count": 6
+  }
+}

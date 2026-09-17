@@ -157,6 +157,7 @@
               "items": {
                 "oneOf": [
                   {"$ref": "#/$defs/moving_action_option"},
+                  {"$ref": "#/$defs/move_keyword_action_option"},
                   {"$ref": "#/$defs/remain_stationary_option"},
                   {"$ref": "#/$defs/disembark_option"},
                   {"$ref": "#/$defs/permitted_disembark_option"},
@@ -189,6 +190,40 @@
         "unit_instance_id"
       ],
       "type": "object"
+    },
+    "move_keyword_choice": {
+      "type": "object", "additionalProperties": false,
+      "required": ["descriptor_id", "source_rule_id", "unit_instance_id", "model_instance_ids", "selected", "keywords"],
+      "properties": {
+        "descriptor_id": {"$ref": "#/$defs/identifier"},
+        "source_rule_id": {"$ref": "#/$defs/identifier"},
+        "unit_instance_id": {"$ref": "#/$defs/identifier"},
+        "model_instance_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "selected": {"type": "boolean"},
+        "keywords": {"type": "array", "items": {"$ref": "#/$defs/identifier"}}
+      },
+      "oneOf": [
+        {"properties": {"selected": {"const": false}, "keywords": {"maxItems": 0}}},
+        {"properties": {"selected": {"const": true}, "keywords": {"const": ["MOBILE"]}}}
+      ]
+    },
+    "move_keyword_action_option": {
+      "type": "object", "additionalProperties": false,
+      "required": ["option_id", "label", "payload"],
+      "properties": {
+        "option_id": {"$ref": "#/$defs/identifier"},
+        "label": {"$ref": "#/$defs/identifier"},
+        "payload": {
+          "type": "object",
+          "required": ["movement_phase_action", "unit_instance_id", "movement_mode", "move_keyword_choice"],
+          "properties": {
+            "movement_phase_action": {"enum": ["normal_move", "advance", "fall_back"]},
+            "movement_mode": {"enum": ["normal", "advance", "fall_back", "fly_take_to_skies"]},
+            "unit_instance_id": {"$ref": "#/$defs/identifier"},
+            "move_keyword_choice": {"$ref": "#/$defs/move_keyword_choice"}
+          }
+        }
+      }
     },
     "moving_action_option": {
       "additionalProperties": false,

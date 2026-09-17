@@ -7,9 +7,11 @@ from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.active_player_scopes import begin_reactive_move, end_reactive_move
 from warhammer40k_core.engine.charge_movement_source import charge_placement_id
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.move_ability_choices import CHOICE_KEY, movement_keyword_options
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalPayloadPayload,
@@ -116,6 +118,16 @@ def request_from_state(
         and ruleset_descriptor.fly_policy.take_to_the_skies_supported
         else (False,)
     )
+    keyword_options = movement_keyword_options(
+        options=(
+            DecisionOption(
+                option_id="move",
+                label="Move",
+                payload=validate_json_value({"descriptor": descriptor.to_payload()}),
+            ),
+        ),
+        unit=view,
+    )
     resolutions = tuple(
         resolve_triggered_movement(
             scenario=scenario,
@@ -124,6 +136,7 @@ def request_from_state(
             descriptor=descriptor,
             path_witness=witness,
             take_to_the_skies=selected,
+            move_keyword_choice=cast(dict[str, JsonValue], keyword_option.payload).get(CHOICE_KEY),
             surge_target_unit_instance_id=target_id,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
@@ -132,6 +145,7 @@ def request_from_state(
         )
         for witness in candidate_witness_tuple
         for selected in selections
+        for keyword_option in keyword_options
         for target_id in (
             closest_surge_targets(scenario=scenario, unit_instance_id=unit_instance_id)
             if descriptor.movement_kind is TriggeredMovementKind.SURGE
@@ -229,6 +243,7 @@ def apply_decision(
         descriptor=descriptor,
         path_witness=witness,
         take_to_the_skies=flight_selection(payload),
+        move_keyword_choice=payload.get(CHOICE_KEY),
         surge_target_unit_instance_id=selected_surge_target(payload, descriptor),
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
@@ -367,6 +382,7 @@ def apply_proposal_decision(
         descriptor=descriptor,
         path_witness=submission.witness,
         take_to_the_skies=flight_selection(proposal_request.context),
+        move_keyword_choice=(proposal_request.context or {}).get(CHOICE_KEY),
         surge_target_unit_instance_id=selected_surge_target(proposal_request.context, descriptor),
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),

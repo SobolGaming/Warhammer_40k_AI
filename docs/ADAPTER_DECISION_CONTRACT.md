@@ -6062,3 +6062,33 @@ identity preserves the lock through attached-unit casualties. The ledger is not
 added to viewer projections; existing shared decision/event redaction applies.
 
 See [contract migration 22 to 23](../contracts/migrations/22-to-23.md).
+
+## Order 53 — per-move all-model keyword commitment
+
+The existing `select_movement_action` and `select_triggered_movement` families
+now enumerate optional source-backed `move_keyword_choice` variants for eligible
+Normal, Advance and Fall Back moves. The JSON object contains `descriptor_id`,
+`source_rule_id`, canonical `unit_instance_id`, sorted living `model_instance_ids`,
+`selected`, and `keywords`. Both the selected and declined grant are explicit;
+selected variants grant MOBILE and append `:move_keywords` to ordinary/reactive
+unit option IDs. Engine-enumerated finite paths instead retain their numbered IDs.
+
+The decision precedes movement and ordinary Advance dice. The move's original
+finite record owns the grant across proposals, retries and source-distance rerolls.
+Malformed, drifted or substituted commitments fail before queue pop or mutation.
+The temporary keywords are local to that witnessed move, including all attached
+models; they do not modify permanent keyword assignments. Surge is a separate
+move kind despite its shared Normal geometry mode and cannot use this grant.
+
+The shared move-completion timing batch sequences exactly one mandatory D6 per
+selected grant, regardless of models moved or terrain crossed. The source-linked
+`move_keyword_roll_resolved` event contains the trigger, participant, result,
+choice, roll state and status update. A one uses direct Battle-shock state mutation,
+without a Leadership test or its outcome callbacks. Restore validates the original
+choice, historical living membership, exact dice and timing completion; replay
+reproduces the event stream. Existing Battle-shock cleanup remains authoritative.
+These decisions, proposals and completed results are public gameplay information;
+all players receive them through the existing viewer-scoped projection/event APIs.
+
+See [Contract 24 migration](../contracts/migrations/23-to-24.md) for the persistence,
+replay and required terrain-path field version boundary.

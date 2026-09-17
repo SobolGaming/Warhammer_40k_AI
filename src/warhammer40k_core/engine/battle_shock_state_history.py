@@ -62,7 +62,10 @@ def validate_battle_shock_state_history(
     if (
         not state.battle_shocked_unit_ids
         and not state.battle_shocked_unit_states
-        and not any(event.event_type == _BATTLE_SHOCK_RESOLVED_EVENT for event in event_records)
+        and not any(
+            event.event_type in {_BATTLE_SHOCK_RESOLVED_EVENT, "move_keyword_roll_resolved"}
+            for event in event_records
+        )
     ):
         return
 
@@ -133,6 +136,21 @@ def _replay_battle_shock_state_until(
             raise GameLifecycleError(
                 "Attached rules-unit split events are invalid under retained identity semantics."
             )
+        if event.event_type == "move_keyword_roll_resolved":
+            from warhammer40k_core.engine.direct_battle_shock_history import (
+                replay_direct_battle_shock,
+            )
+
+            replay_direct_battle_shock(
+                state=state,
+                event_records=event_records,
+                decision_records=decision_records,
+                event_index=event_index,
+                replayed_states=replayed_states,
+                owner_by_unit_id=owner_by_unit_id,
+                model_ids_by_unit_id=model_ids_by_unit_id,
+            )
+            continue
         if event.event_type == _BATTLE_SHOCK_RESOLVED_EVENT:
             _apply_resolved_event(
                 state=state,

@@ -80,6 +80,7 @@ class MovementCapabilitySetPayload(TypedDict):
     blocks_friendly_vehicle_monster_pass_through: bool
     can_move_over_friendly_vehicle_monster_models: bool
     terrain_as_if_absent_height_inches: float | None
+    horizontal_terrain_transit_height_inches: float | None
     friendly_model_transit_blocker_keywords: list[str]
     enemy_model_transit_blocker_keywords: list[str]
     desperate_escape_tests_auto_passed: bool
@@ -162,6 +163,7 @@ class MovementCapabilitySet:
     blocks_friendly_vehicle_monster_pass_through: bool
     can_move_over_friendly_vehicle_monster_models: bool
     terrain_as_if_absent_height_inches: float | None
+    horizontal_terrain_transit_height_inches: float | None = None
     friendly_model_transit_blocker_keywords: tuple[str, ...] = ()
     enemy_model_transit_blocker_keywords: tuple[str, ...] = ()
     desperate_escape_tests_auto_passed: bool = False
@@ -221,6 +223,14 @@ class MovementCapabilitySet:
         )
         object.__setattr__(
             self,
+            "horizontal_terrain_transit_height_inches",
+            _validate_optional_non_negative_number(
+                "MovementCapabilitySet horizontal_terrain_transit_height_inches",
+                self.horizontal_terrain_transit_height_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
             "friendly_model_transit_blocker_keywords",
             _validate_keyword_tuple(
                 "MovementCapabilitySet friendly_model_transit_blocker_keywords",
@@ -245,6 +255,7 @@ class MovementCapabilitySet:
         ability_index: AbilityCatalogIndex | None = None,
         ability_registry: AbilityHandlerRegistry | None = None,
         movement_mode: object | None = None,
+        movement_is_surge: bool = False,
         unit: UnitInstance | None = None,
         model_instance_id: str | None = None,
         current_model_instance_ids: tuple[str, ...] = (),
@@ -257,6 +268,23 @@ class MovementCapabilitySet:
         normalized_keywords = _validate_keyword_tuple(
             "MovementCapabilitySet keywords",
             keywords,
+        )
+        from warhammer40k_core.engine.move_ability_choices import descriptors_for_move
+
+        _validate_bool("movement_is_surge", movement_is_surge)
+        move_abilities = descriptors_for_move(
+            normalized_keywords,
+            "" if movement_mode is None else movement_mode_from_token(movement_mode).value,
+            is_surge=movement_is_surge,
+        )
+        intrinsic_blockers = tuple(
+            sorted(
+                {
+                    keyword
+                    for ability in move_abilities
+                    for keyword in ability.model_transit_excluded_keywords
+                }
+            )
         )
         resolved_ability_index = (
             eleventh_edition_ability_index() if ability_index is None else ability_index
@@ -336,11 +364,13 @@ class MovementCapabilitySet:
             fly_moves_through_models
             or catalog_friendly_model_permissions
             or friendly_model_effect_permissions
+            or move_abilities
         )
         can_move_through_enemy_models = bool(
             fly_moves_through_models
             or catalog_enemy_model_permissions
             or enemy_model_effect_permissions
+            or move_abilities
         )
         can_move_through_models = can_move_through_friendly_models or can_move_through_enemy_models
         can_move_through_terrain = (
@@ -387,16 +417,37 @@ class MovementCapabilitySet:
                 "blocks_friendly_vehicle_monster_pass_through" in flags
             ),
             can_move_over_friendly_vehicle_monster_models=(
-                _catalog_move_over_friendly_vehicle_monster_allowed(catalog_permissions)
+                bool(move_abilities)
+                or _catalog_move_over_friendly_vehicle_monster_allowed(catalog_permissions)
             ),
             terrain_as_if_absent_height_inches=_max_terrain_height(catalog_permissions),
-            friendly_model_transit_blocker_keywords=_combined_model_transit_blocker_keywords(
-                catalog_friendly_model_permissions,
-                friendly_model_effect_permissions,
+            horizontal_terrain_transit_height_inches=max(
+                (ability.horizontal_terrain_transit_height_inches for ability in move_abilities),
+                default=None,
             ),
-            enemy_model_transit_blocker_keywords=_combined_model_transit_blocker_keywords(
-                catalog_enemy_model_permissions,
-                enemy_model_effect_permissions,
+            friendly_model_transit_blocker_keywords=_movement_ability_blocker_keywords(
+                existing=_combined_model_transit_blocker_keywords(
+                    catalog_friendly_model_permissions,
+                    friendly_model_effect_permissions,
+                ),
+                intrinsic=intrinsic_blockers,
+                existing_permission=bool(
+                    catalog_friendly_model_permissions or friendly_model_effect_permissions
+                ),
+                unrestricted_permission=fly_moves_through_models,
+                intrinsic_permission=bool(move_abilities),
+            ),
+            enemy_model_transit_blocker_keywords=_movement_ability_blocker_keywords(
+                existing=_combined_model_transit_blocker_keywords(
+                    catalog_enemy_model_permissions,
+                    enemy_model_effect_permissions,
+                ),
+                intrinsic=intrinsic_blockers,
+                existing_permission=bool(
+                    catalog_enemy_model_permissions or enemy_model_effect_permissions
+                ),
+                unrestricted_permission=fly_moves_through_models,
+                intrinsic_permission=bool(move_abilities),
             ),
             desperate_escape_tests_auto_passed=desperate_escape_tests_auto_passed,
         )
@@ -428,6 +479,9 @@ class MovementCapabilitySet:
                 self.can_move_over_friendly_vehicle_monster_models
             ),
             "terrain_as_if_absent_height_inches": self.terrain_as_if_absent_height_inches,
+            "horizontal_terrain_transit_height_inches": (
+                self.horizontal_terrain_transit_height_inches
+            ),
             "friendly_model_transit_blocker_keywords": list(
                 self.friendly_model_transit_blocker_keywords
             ),
@@ -466,6 +520,9 @@ class MovementCapabilitySet:
                 "can_move_over_friendly_vehicle_monster_models"
             ],
             terrain_as_if_absent_height_inches=raw_payload["terrain_as_if_absent_height_inches"],
+            horizontal_terrain_transit_height_inches=raw_payload[
+                "horizontal_terrain_transit_height_inches"
+            ],
             friendly_model_transit_blocker_keywords=tuple(
                 raw_payload["friendly_model_transit_blocker_keywords"]
             ),
@@ -689,6 +746,10 @@ class MovementLegalityContext:
                 ability_index=ability_index,
                 ability_registry=ability_registry,
                 movement_mode=mode,
+                movement_is_surge=(
+                    model_displacement_kind_from_token(displacement_kind)
+                    is ModelDisplacementKind.SURGE_MOVE
+                ),
                 unit=unit,
                 model_instance_id=model_instance_id,
                 current_model_instance_ids=current_model_instance_ids,
@@ -840,6 +901,7 @@ class MovementLegalityContext:
             terrain_as_if_absent_height_inches=(
                 self.capabilities.terrain_as_if_absent_height_inches
             ),
+            horizontal_terrain_transit_height_inches=self.capabilities.horizontal_terrain_transit_height_inches,
             has_fly=self.capabilities.has_fly,
             sample_interval_inches=sample_interval_inches,
         )
@@ -1255,3 +1317,21 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
     if number < 0.0:
         raise MovementLegalityError(f"{field_name} must not be negative.")
     return number
+
+
+def _movement_ability_blocker_keywords(
+    *,
+    existing: tuple[str, ...],
+    intrinsic: tuple[str, ...],
+    existing_permission: bool,
+    unrestricted_permission: bool,
+    intrinsic_permission: bool,
+) -> tuple[str, ...]:
+    if not intrinsic_permission:
+        return existing
+    if unrestricted_permission:
+        return ()
+    if existing_permission:
+        # Independent permissions are alternatives; a narrower grant cannot revoke another.
+        return tuple(sorted(set(existing).intersection(intrinsic)))
+    return intrinsic

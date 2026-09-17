@@ -137,6 +137,9 @@ def _apply_movement_proposal_decision(
     )
     unit_placement = representative_movement_placement(rules_unit_placement)
     action = movement_phase_action_kind_from_token(submission.movement_phase_action)
+    from warhammer40k_core.engine.move_ability_choices import chosen_move_keywords
+
+    proposal_keywords = chosen_move_keywords(proposal_request.context)
     source_selected_option_id = _payload_string(
         proposal_request.context or {},
         key="source_selected_option_id",
@@ -163,10 +166,13 @@ def _apply_movement_proposal_decision(
             ),
             runtime_modifier_registry=runtime_modifier_registry,
             ability_index=ability_index,
-            temporary_movement_keywords=_temporary_movement_keywords_for_unit(
-                state=state,
-                player_id=active_player_id,
-                unit_instance_id=proposal_request.unit_instance_id,
+            temporary_movement_keywords=(
+                *proposal_keywords,
+                *_temporary_movement_keywords_for_unit(
+                    state=state,
+                    player_id=active_player_id,
+                    unit_instance_id=proposal_request.unit_instance_id,
+                ),
             ),
         )
         transition_reason = _aircraft_reserve_transition_reason_for_normal_move(
@@ -270,10 +276,13 @@ def _apply_movement_proposal_decision(
             ),
             runtime_modifier_registry=runtime_modifier_registry,
             ability_index=ability_index,
-            temporary_movement_keywords=_temporary_movement_keywords_for_unit(
-                state=state,
-                player_id=active_player_id,
-                unit_instance_id=proposal_request.unit_instance_id,
+            temporary_movement_keywords=(
+                *proposal_keywords,
+                *_temporary_movement_keywords_for_unit(
+                    state=state,
+                    player_id=active_player_id,
+                    unit_instance_id=proposal_request.unit_instance_id,
+                ),
             ),
             ignores_vertical_distance=any(
                 grant.ignores_vertical_distance
@@ -437,10 +446,13 @@ def _apply_movement_proposal_decision(
             ),
             runtime_modifier_registry=runtime_modifier_registry,
             ability_index=ability_index,
-            temporary_movement_keywords=_temporary_movement_keywords_for_unit(
-                state=state,
-                player_id=active_player_id,
-                unit_instance_id=proposal_request.unit_instance_id,
+            temporary_movement_keywords=(
+                *proposal_keywords,
+                *_temporary_movement_keywords_for_unit(
+                    state=state,
+                    player_id=active_player_id,
+                    unit_instance_id=proposal_request.unit_instance_id,
+                ),
             ),
         )
         fall_back_resolution = _fall_back_result_with_mode(

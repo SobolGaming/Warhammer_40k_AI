@@ -86,7 +86,7 @@ def _movement_action_options_for_selected_unit(
             unit_instance_id=unit_instance_id,
         )
         unit_placement = representative_movement_placement(rules_unit_placement)
-        return _movement_action_options(
+        options = _movement_action_options(
             state=state,
             ability_index=ability_index,
             runtime_modifier_registry=runtime_modifier_registry,
@@ -109,6 +109,9 @@ def _movement_action_options_for_selected_unit(
                 unit_instance_id=unit_instance_id,
             ),
         )
+        from warhammer40k_core.engine.move_ability_choices import movement_keyword_options
+
+        return movement_keyword_options(options=options, unit=_rules_unit)
     remain_stationary = DecisionOption(
         option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
         label="Remain Stationary",
@@ -1105,6 +1108,15 @@ def _request_movement_proposal(
     }
     if context is not None:
         request_context.update(context)
+    from warhammer40k_core.engine.move_ability_choices import recorded_choice_fields
+
+    request_context.update(
+        recorded_choice_fields(
+            decisions=decisions,
+            request_id=result.request_id,
+            result_id=result.result_id,
+        )
+    )
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
         decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,

@@ -31,6 +31,7 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.move_ability_choices import chosen_move_keywords
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalPayload,
@@ -635,6 +636,11 @@ class TriggeredMovementRequest:
                         + (
                             " - Take to the Skies"
                             if flight_selection(resolution.movement_payload)
+                            else ""
+                        )
+                        + (
+                            " - gain " + ", ".join(keywords)
+                            if (keywords := chosen_move_keywords(resolution.movement_payload))
                             else ""
                         )
                     ),
