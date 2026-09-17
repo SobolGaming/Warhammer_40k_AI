@@ -263,8 +263,8 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "_any_models_within_engagement_range",
         ): 1,
         (
-            "src/warhammer40k_core/engine/transports.py",
-            "_append_disembark_endpoint_violations",
+            "src/warhammer40k_core/engine/transport_disembark_geometry.py",
+            "append_disembark_endpoint_violations",
         ): 1,
         (
             "src/warhammer40k_core/geometry/collision.py",
@@ -1107,8 +1107,8 @@ def test_combat_disembark_uses_canonical_physical_transport_engagement() -> None
     assert "_placed_geometry_models" not in current_engagement_calls
 
     endpoint_validation = _function_node(
-        path=TRANSPORTS,
-        function_name="_append_disembark_endpoint_violations",
+        path=TRANSPORTS.with_name("transport_disembark_geometry.py"),
+        function_name="append_disembark_endpoint_violations",
     )
     endpoint_calls = {
         node.func.id

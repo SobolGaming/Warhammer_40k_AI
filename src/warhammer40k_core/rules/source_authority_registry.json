@@ -730,6 +730,16 @@
           "audit_id": "core-large-model-setup-maintained-app-mirrors-2026-09-17",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-17T00:00:00+00:00"
+        },
+        {
+          "row_id": "large-model-disembark",
+          "source_observation_sha256": "5dbb0c10e629fecede27a6b8594d55a66326ec5d6a50677af0e56326d2ed18b8",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/03-moving",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-large-model-disembark-maintained-app-mirrors-2026-09-17",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-17T00:00:00+00:00"
         }
       ],
       "legacy_observations": [
@@ -1251,6 +1261,15 @@
             "gw-11e-core-large-model-setup:large-model-setup"
           ],
           "catalog_sha256": "8994e78f67d169ba516fa749027d45e4982bb8de1a574edc14136e72cabc701b"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-large-model-disembark",
+          "version": "maintained-app-mirrors-observed-2026-09-17",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-large-model-disembark:large-model-disembark"
+          ],
+          "catalog_sha256": "908613587fd368a1b386aa3e601b18bff4c7cd1a95c17eafcec60fc055c4717a"
         }
       ]
     },

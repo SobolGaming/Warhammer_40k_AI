@@ -5422,8 +5422,9 @@ def test_assault_disembark_permission_and_state_payloads_fail_closed() -> None:
         or status not in (TransportMovementStatus.ADVANCE, TransportMovementStatus.FALL_BACK)
     ],
 )
+@pytest.mark.parametrize("oversized", [False, True])
 def test_assault_disembark_places_attached_rules_unit_atomically(
-    mode: DisembarkModeKind, movement_status: TransportMovementStatus
+    mode: DisembarkModeKind, movement_status: TransportMovementStatus, oversized: bool
 ) -> None:
     scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
     attached_id = "attached-unit:army-alpha:attached-transport-passengers"
@@ -5461,6 +5462,55 @@ def test_assault_disembark_places_attached_rules_unit_atomically(
             ),
         ),
     )
+    if oversized:
+        from warhammer40k_core.core.datasheet import BaseSizeDefinition
+        from warhammer40k_core.geometry.model_geometry import ModelGeometry
+
+        model = bodyguard.own_models[0]
+        base = BaseSizeDefinition.circular(127)
+        model = replace(
+            model,
+            base_size=base,
+            geometry=ModelGeometry.from_base_size(
+                base,
+                keywords=model.keywords,
+                geometry_source_id=model.model_profile_id,
+            ),
+        )
+        bodyguard = replace(bodyguard, own_models=(model, *bodyguard.own_models[1:]))
+        scenario = replace(
+            scenario,
+            armies=tuple(
+                replace(
+                    army,
+                    units=tuple(
+                        bodyguard if unit.unit_instance_id == bodyguard.unit_instance_id else unit
+                        for unit in army.units
+                    ),
+                )
+                for army in scenario.armies
+            ),
+        )
+        grouped_placement = replace(
+            grouped_placement,
+            component_unit_placements=(
+                _unit_placement_at(
+                    bodyguard,
+                    army_id="army-alpha",
+                    player_id="player-a",
+                    poses=(
+                        Pose.at(10, 10 + 50 / 25.4 + 3),
+                        Pose.at(7, 11),
+                        Pose.at(7, 9),
+                        Pose.at(9, 7),
+                        Pose.at(11, 7),
+                    ),
+                ),
+                _unit_placement_at(
+                    leader, army_id="army-alpha", player_id="player-a", poses=(Pose.at(13, 9),)
+                ),
+            ),
+        )
     rules_unit = rules_unit_view_from_armies(
         armies=scenario.armies,
         unit_instance_id=attached_id,

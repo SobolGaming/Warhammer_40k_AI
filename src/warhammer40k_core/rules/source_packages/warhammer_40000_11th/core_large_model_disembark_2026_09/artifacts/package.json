@@ -1,0 +1,86 @@
+{
+  "artifact_schema": "core-v2-core-large-model-disembark-source-v1",
+  "source_package_id": "gw-11e-core-large-model-disembark",
+  "source_version": "maintained-app-mirrors-observed-2026-09-17",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-large-model-disembark:large-model-disembark",
+      "section_id": "03.02.02",
+      "source_text": "base within 1\" of that Transport’s base (or hull), and not engaged with any enemy units.",
+      "transcription_sha256": "84601593cedab8b07f626e0876707038b4ba0b40085cd486fd61e639adf5dd02",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-large-model-disembark-review:large-model-disembark",
+      "rule_source_id": "gw-11e-core-large-model-disembark:large-model-disembark",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 03.02.02 Setting Up Large Models: Disembarking",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "84601593cedab8b07f626e0876707038b4ba0b40085cd486fd61e639adf5dd02",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "371f7215833483aca5ac119b0e5a78a2880f27ce74d899a8f68b4ab109004404",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+      ]
+    },
+    {
+      "evidence_id": "core-large-model-disembark-mirror:large-model-disembark",
+      "rule_source_id": "gw-11e-core-large-model-disembark:large-model-disembark",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-large-model-disembark-maintained-app-mirrors-2026-09-17",
+      "review_audit_row_id": "large-model-disembark",
+      "review_audit_source_observation_sha256": "5dbb0c10e629fecede27a6b8594d55a66326ec5d6a50677af0e56326d2ed18b8",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 03.02.02 Setting Up Large Models: Disembarking",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/03-moving",
+      "observed_at": "2026-09-17T00:00:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "84601593cedab8b07f626e0876707038b4ba0b40085cd486fd61e639adf5dd02",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "eeef3aeddc43c0e6d9cd86fa055876a3876fc2337b48e8da2f80a6aa35bb8ae9",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+      ]
+    }
+  ],
+  "disembark_policy": {
+    "source_rule_id": "gw-11e-core-large-model-disembark:large-model-disembark",
+    "requires_impossible_size_fit": true,
+    "maximum_base_distance_inches": 1.0,
+    "requires_unengaged": true,
+    "uses_mode_setup_distance": true
+  },
+  "package_hash": "730aa5c8550dcfc124deb12b9372ec1fed9f5a17a0cb76080e8fb37a5d7b2da2"
+}

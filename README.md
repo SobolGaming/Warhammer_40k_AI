@@ -826,3 +826,9 @@ Source eligibility, attached models, retries, restore and replay share engine
 authority. See [scope and evidence](docs/ORDER_52_SCOPE_PLAN.md) and
 [contract 23 migration](contracts/migrations/22-to-23.md).
 Check the source with `uv run python tools/build_core_surge_source.py --check`.
+
+Order 55 permits oversized disembark placement within one inch only after proving
+ordinary placement impossible due to base size, with the exceptional model
+unengaged. All modes and attached components share that validation. See
+[scope and proof](docs/ORDER_55_SCOPE_PLAN.md). Verify its reviewed source with
+`uv run python tools/build_core_large_model_disembark_source.py --check`.
