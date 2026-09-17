@@ -557,6 +557,23 @@ def _resolve_unit_move(
                 engagement_check_count=path_result.engagement_check_count,
                 movement_distance_witness=path_result.movement_distance_witness,
             )
+        if state is not None:
+            from warhammer40k_core.engine.large_model_restrictions import (
+                large_model_activity_reason,
+            )
+
+            lock = large_model_activity_reason(state, movement_unit_id, movement_mode.value)
+            if lock is not None:
+                path_result = PathValidationResult.invalid(
+                    PathConstraintViolation(
+                        violation_code=lock, message=lock, model_id=model.model_instance_id
+                    ),
+                    sampled_pose_count=path_result.sampled_pose_count,
+                    model_collision_check_count=path_result.model_collision_check_count,
+                    terrain_collision_check_count=path_result.terrain_collision_check_count,
+                    engagement_check_count=path_result.engagement_check_count,
+                    movement_distance_witness=path_result.movement_distance_witness,
+                )
         path_validation_results.append(path_result)
         terrain_path_legality_results.append(terrain_result)
         model_movement_payload: dict[str, object] = {

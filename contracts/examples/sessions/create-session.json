@@ -1546,6 +1546,7 @@
     "game_id": "phase18d-contract-session",
     "max_lifecycle_transitions": 128,
     "mission_setup": {
+      "attacker_battlefield_edge": "north",
       "attacker_player_id": "player-a",
       "battlefield_depth_inches": 60.0,
       "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
@@ -1723,6 +1724,7 @@
         }
       ],
       "battlefield_width_inches": 44.0,
+      "defender_battlefield_edge": "south",
       "defender_player_id": "player-b",
       "deployment_map_id": "take-and-hold-vs-purge-the-foe-layout-3-deployment",
       "deployment_zones": [

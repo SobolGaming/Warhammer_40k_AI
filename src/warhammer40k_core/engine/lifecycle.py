@@ -824,20 +824,18 @@ class GameLifecycle:
             )
             if destruction_invalid is not None:
                 return destruction_invalid
-            from warhammer40k_core.engine.surge_authority import invalid_surge_authority
-            from warhammer40k_core.engine.triggered_movement import (
-                is_triggered_movement_distance_reroll_request,
+            from warhammer40k_core.engine.setup_turn_prevalidation import (
+                invalid_setup_turn_activity,
             )
 
-            if is_triggered_movement_distance_reroll_request(pending_request):
-                surge_invalid = invalid_surge_authority(
-                    state=state,
-                    decisions=self.decision_controller,
-                    request=pending_request,
-                    result=result,
-                )
-                if surge_invalid is not None:
-                    return surge_invalid
+            activity_invalid = invalid_setup_turn_activity(
+                state=state,
+                decisions=self.decision_controller,
+                request=pending_request,
+                result=result,
+            )
+            if activity_invalid is not None:
+                return activity_invalid
             handler = self._decision_dispatch_registry.handler_for(pending_request.decision_type)
             invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:

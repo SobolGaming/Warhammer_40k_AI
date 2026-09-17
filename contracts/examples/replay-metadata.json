@@ -1550,6 +1550,7 @@
       "game_id": "phase18d-contract-session",
       "max_lifecycle_transitions": 128,
       "mission_setup": {
+        "attacker_battlefield_edge": "north",
         "attacker_player_id": "player-a",
         "battlefield_depth_inches": 60.0,
         "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
@@ -1727,6 +1728,7 @@
           }
         ],
         "battlefield_width_inches": 44.0,
+        "defender_battlefield_edge": "south",
         "defender_player_id": "player-b",
         "deployment_map_id": "take-and-hold-vs-purge-the-foe-layout-3-deployment",
         "deployment_zones": [
@@ -11626,6 +11628,7 @@
       "hover_mode_states": [],
       "mission_action_states": [],
       "mission_setup": {
+        "attacker_battlefield_edge": "north",
         "attacker_player_id": "player-a",
         "battlefield_depth_inches": 60.0,
         "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
@@ -11803,6 +11806,7 @@
           }
         ],
         "battlefield_width_inches": 44.0,
+        "defender_battlefield_edge": "south",
         "defender_player_id": "player-b",
         "deployment_map_id": "take-and-hold-vs-purge-the-foe-layout-3-deployment",
         "deployment_zones": [
@@ -15930,11 +15934,11 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v18-move-keywords",
+  "schema_version": "replay-artifact-v19-large-model-setup",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "0f4bea564150afae66c86c23b8289a04bfe2bde2bae0463752717825e9a62291",
+    "game_config_hash": "8de7b3c13c0e03331032df6d843af44df17212423d3e149d1d5bcaf4b2863b50",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
     "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",

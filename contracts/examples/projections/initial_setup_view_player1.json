@@ -7918,6 +7918,7 @@
   "current_setup_step": "select_secondary_missions",
   "game_id": "ui-contract-initial",
   "mission_setup": {
+    "attacker_battlefield_edge": "north",
     "attacker_player_id": "player-a",
     "battlefield_depth_inches": 60.0,
     "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
@@ -8095,6 +8096,7 @@
       }
     ],
     "battlefield_width_inches": 44.0,
+    "defender_battlefield_edge": "south",
     "defender_player_id": "player-b",
     "deployment_map_id": "take-and-hold-vs-purge-the-foe-layout-3-deployment",
     "deployment_zones": [
@@ -14834,7 +14836,7 @@
   },
   "primary_rules_unit_turn_start_snapshots": [],
   "projection_schema": "game-view-v12-model-keywords",
-  "projection_state_hash": "ced566887731f5e4a9b1dba4d263aa52f375857a389c2bc20c94c20f2ad57746",
+  "projection_state_hash": "6de4c5f612aa551e98d03fc96cc3e509d92274ce237fc86443bb7634c0785cb3",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

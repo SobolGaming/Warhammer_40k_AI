@@ -15,6 +15,11 @@ from warhammer40k_core.engine.mission_action_eligibility import (
 def shooting_state_restriction_reason(
     *, state: GameState, rules_unit: RulesUnitView, player_id: str
 ) -> str | None:
+    from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
+
+    reason = large_model_activity_reason(state, rules_unit.unit_instance_id, "ranged_attacks")
+    if reason is not None:
+        return reason
     if mission_action_prevents_rules_unit_from_shooting_this_phase(
         state=state, player_id=player_id, unit_instance_id=rules_unit.unit_instance_id
     ):

@@ -1,0 +1,118 @@
+{
+  "workload_id": "order54-composite-deployment-v2",
+  "revision": "6ae47595078afd49c9a61bc4b06d20b18ebe14a8",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "timing_boundary": "6 deployment resolutions; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": 11,
+    "placed_models": 10,
+    "terrain_count": 0,
+    "zone_widths": [
+      3,
+      3,
+      10,
+      10
+    ],
+    "base_diameter_mm": 200,
+    "composite_cases": true
+  },
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order54.py": "71346d7d6cea2cfaa8c1a41b76089cbbe4631141e49c75950cf07228711cd860",
+    "tests/large_model_setup_helpers.py": "4a0b74956564aadfe7a80bc10d19144cbae093326c6850ea371bcbd2aa085dbb"
+  },
+  "samples": [
+    {
+      "seconds": 0.09383395803160965,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "seconds": 0.0027351670432835817,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "seconds": 0.002365583088248968,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "seconds": 0.0023905839771032333,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "seconds": 0.002391334157437086,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "seconds": 0.002637250116094947,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "seconds": 0.002412542002275586,
+      "accepted": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    }
+  ],
+  "mean_seconds": 0.015538059773721866,
+  "median_seconds": 0.002412542002275586,
+  "maximum_seconds": 0.09383395803160965,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 0.05,
+    "maximum_seconds": 1
+  }
+}

@@ -220,6 +220,10 @@ export interface components {
             army_muster_requests: Record<string, never>[]; fixed_secondary_mission_ids: string[]; game_id: string;
             max_lifecycle_transitions: number;
             mission_setup: {
+                /** @enum {unknown} */
+                attacker_battlefield_edge: "north" | "south" | "east" | "west" | "north_west_corner" | "north_east_corner" | "south_west_corner" | "south_east_corner" | null;
+                /** @enum {unknown} */
+                defender_battlefield_edge: "north" | "south" | "east" | "west" | "north_west_corner" | "north_east_corner" | "south_west_corner" | "south_east_corner" | null;
                 primary_mission_assignments: {
                     force_disposition_id: string; player_id: string; primary_mission_id: string;
                 }[];
@@ -268,7 +272,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v24-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v25-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -632,7 +636,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v24-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v25-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -813,6 +817,10 @@ export interface components {
             schema_version: "battlefield-view-v4-phase17n-step3";
         };
         mission_setup: {
+            /** @enum {unknown} */
+            attacker_battlefield_edge: "north" | "south" | "east" | "west" | "north_west_corner" | "north_east_corner" | "south_west_corner" | "south_east_corner" | null;
+            /** @enum {unknown} */
+            defender_battlefield_edge: "north" | "south" | "east" | "west" | "north_west_corner" | "north_east_corner" | "south_west_corner" | "south_east_corner" | null;
             primary_mission_assignments: {
                 force_disposition_id: string; player_id: string; primary_mission_id: string;
             }[];
@@ -1280,7 +1288,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v18-move-keywords";
+            schema_version: "replay-artifact-v19-large-model-setup";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

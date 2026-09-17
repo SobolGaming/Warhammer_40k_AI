@@ -25,6 +25,7 @@ from tests.rapid_ingress_helpers import (
 
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import LifecycleStatusKind
+from warhammer40k_core.engine.reserves import resolve_reserve_arrival
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
 from warhammer40k_core.engine.stratagems_eligibility import _enumerated_target_bindings
 from warhammer40k_core.engine.stratagems_model import StratagemTargetBinding, StratagemTargetKind
@@ -124,6 +125,13 @@ def sample(*, case: str, profile: bool = False) -> dict[str, object]:
     if profile:
         for entry in profiler.getstats():
             if isinstance(entry.code, CodeType) and entry.code.co_name in WORK_METRICS:
+                # Count the public resolver once, not both its entry point and
+                # the same-named implementation extracted for the module budget.
+                if (
+                    entry.code.co_name == "resolve_reserve_arrival"
+                    and entry.code is not resolve_reserve_arrival.__code__
+                ):
+                    continue
                 counts[entry.code.co_name] = counts.get(entry.code.co_name, 0) + entry.callcount
     return {
         "case": case,

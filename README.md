@@ -115,6 +115,12 @@ source artifact offline with
 `uv run python tools/build_core_super_heavy_walker_source.py --check`, then verify
 engine identity and the external contract using the generator commands below.
 
+Order 54 implements proven oversized deployment at the player's edge and shared
+setup-turn activity restrictions, preserving the Strategic Reserves AIRCRAFT
+exception. See [scope and validation](docs/ORDER_54_SCOPE_PLAN.md) and
+[Contract 25 migration](contracts/migrations/24-to-25.md). Verify source data with
+`uv run python tools/build_core_large_model_setup_source.py --check`.
+
 For faction coverage, start with the [faction support guides](docs/FACTION_SUPPORT.md).
 They list current army rules, detachments and unit costs, separate historical
 implementation evidence from fieldability/playability, and link the

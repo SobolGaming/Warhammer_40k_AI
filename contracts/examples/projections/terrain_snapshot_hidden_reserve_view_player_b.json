@@ -8052,6 +8052,7 @@
   "current_setup_step": null,
   "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
   "mission_setup": {
+    "attacker_battlefield_edge": "north",
     "attacker_player_id": "player-a",
     "battlefield_depth_inches": 60.0,
     "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
@@ -8229,6 +8230,7 @@
       }
     ],
     "battlefield_width_inches": 44.0,
+    "defender_battlefield_edge": "south",
     "defender_player_id": "player-b",
     "deployment_map_id": "take-and-hold-vs-purge-the-foe-layout-3-deployment",
     "deployment_zones": [
@@ -14983,7 +14985,7 @@
     }
   ],
   "projection_schema": "game-view-v12-model-keywords",
-  "projection_state_hash": "01a42e395742dd2a12078a35a0fbf89ea61a05b0d194ac399a883d794bf187a5",
+  "projection_state_hash": "a0f0aad2a5d4a816b3fcd9c499cad124bdd065cf461756e1723171b80c392f4a",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

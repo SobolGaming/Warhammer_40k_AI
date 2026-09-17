@@ -1,0 +1,34 @@
+{
+  "audit_id": "core-large-model-setup-maintained-app-mirrors-2026-09-17",
+  "observed_at": "2026-09-17T00:00:00+00:00",
+  "observation_time_precision": "day",
+  "rows": [
+    {
+      "row_id": "large-model-setup",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/03-moving",
+      "observed_at": "2026-09-17T00:00:00+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-large-model-setup:large-model-setup",
+      "transcription_sha256": "989b99ddd217c06dae6e6f3a3c3bbc86251e23ae77eca9e36d557f910df05bce",
+      "provider_non_affiliation_recorded": true,
+      "transcription_scope": "Short excerpt; complete 03.02.02 operative text reviewed in the search index.",
+      "reviewed_obligations": [
+        "Deployment exception requires proof the model base cannot fit wholly within its deployment zone.",
+        "The exceptional deployment base must contact that player's battlefield edge.",
+        "The unit cannot make Normal, Advance, Fall Back or Charge moves or ranged attacks during the setup turn.",
+        "Strategic Reserves oversized edge placement has the same restriction, excluding AIRCRAFT models.",
+        "Parts overhanging a deployment zone do not waive the requirement for the base to remain wholly within it.",
+        "Pregame deployment is outside either player's turn; it does not create a first-turn restriction."
+      ],
+      "source_observation_sha256": "9803367ef2aedb8bb32c5a81bb016d0b35e7fc6fecd75da3350a52bfc8b4ced1"
+    }
+  ],
+  "observation_method": "Complete search-index text; direct retrieval returned HTTP 403.",
+  "co_version_comparison": "No second-provider observation asserted.",
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  }
+}

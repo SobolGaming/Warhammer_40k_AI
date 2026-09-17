@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `24.0.0`
+Contract version: `25.0.0`
+
+Order 54 / contract 25 commits mission edge authority and oversized setup
+placement/restriction semantics. See [the migration](migrations/24-to-25.md).
 
 Order 53 / contract 24 commits optional all-model movement keywords and direct
 post-move Battle-shock. See [the migration](migrations/23-to-24.md).

@@ -85,6 +85,7 @@ def request_from_state(
     if type(descriptor) is not TriggeredMovementDescriptor:
         raise GameLifecycleError("Triggered movement requires a descriptor.")
     _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
+    from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
     from warhammer40k_core.engine.surge_authority import require_surge_trigger
     from warhammer40k_core.engine.surge_movement import (
         closest_surge_targets,
@@ -92,6 +93,12 @@ def request_from_state(
         surge_ineligibility,
     )
 
+    if descriptor.movement_kind is not TriggeredMovementKind.SURGE:
+        reason = large_model_activity_reason(
+            state, unit_instance_id, descriptor.movement_mode.value
+        )
+        if reason is not None:
+            raise GameLifecycleError(reason)
     lock = movement_lock_reason(state, unit_instance_id)
     if lock is not None:
         raise GameLifecycleError(lock)
