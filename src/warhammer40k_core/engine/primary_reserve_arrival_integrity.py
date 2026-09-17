@@ -117,12 +117,18 @@ _GENERIC_RULE_IR_INGRESS_PARAMETERS: dict[str, JsonValue] = {
 
 def validate_primary_reserve_arrival_event_authority(
     *,
+    state: GameState,
     payload: dict[str, JsonValue],
     proposal_request: MovementProposalRequest,
     submitted: PlacementProposalPayload,
     ingress_use: StratagemUseRecord | None,
 ) -> None:
     """Close route-specific arrival event schema against the accepted result."""
+    from warhammer40k_core.engine.large_model_restrictions import (
+        validate_arrival_restriction_evidence,
+    )
+
+    validate_arrival_restriction_evidence(state=state, submitted=submitted, payload=payload)
     expected_keys: set[str] = set(_ARRIVAL_EVENT_COMMON_KEYS)
     if ingress_use is None:
         expected_keys.add("movement_phase_action")

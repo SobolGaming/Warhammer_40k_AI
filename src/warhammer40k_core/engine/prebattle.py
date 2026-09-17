@@ -43,7 +43,6 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
-    terrain_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
@@ -138,6 +137,8 @@ class PreBattleViolationCode(StrEnum):
     WRONG_UNIT_MODEL = "wrong_unit_model"
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
     DEPLOYMENT_ZONE_VIOLATION = "deployment_zone_violation"
+    LARGE_MODEL_PLAYER_EDGE_UNSUPPORTED = "large_model_player_edge_unsupported"
+    LARGE_MODEL_EDGE_CONTACT_MISSING = "large_model_edge_contact_missing"
     MODEL_OVERLAP = "model_overlap"
     TERRAIN_ENDPOINT_ILLEGAL = "terrain_endpoint_illegal"
     OBJECTIVE_MARKER_ENDPOINT_OVERLAP = "objective_marker_endpoint_overlap"
@@ -1825,7 +1826,9 @@ def _resolve_prebattle_placement(
         proposal=proposal,
         view=view,
     )
-    _append_setup_geometry_violations(
+    from warhammer40k_core.engine.prebattle_setup_geometry import append_setup_geometry_violations
+
+    append_setup_geometry_violations(
         violations=violations,
         state=state,
         scenario=scenario,
@@ -2254,130 +2257,6 @@ def _validate_placement_models(
                 )
             )
     return coherency_result, tuple(models)
-
-
-def _append_setup_geometry_violations(
-    *,
-    violations: list[PreBattleViolation],
-    state: GameState,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    view: RulesUnitView,
-    models: tuple[Model, ...],
-    deployment_zones: tuple[DeploymentZone, ...],
-) -> None:
-    mission_setup = _require_mission_setup(state)
-    battlefield_state = scenario.battlefield_state
-    placed_models = scenario.placed_geometry_models()
-    enemy_models = tuple(
-        model
-        for model in placed_models
-        if _model_owner_player_id(scenario=scenario, model_instance_id=model.model_id)
-        != view.owner_player_id
-    )
-    own_model_ids = {model.model_id for model in models}
-    own_model_ids.update(model.model_instance_id for model in view.alive_models())
-    blockers = tuple(model for model in placed_models if model.model_id not in own_model_ids)
-    markers = tuple(marker.to_objective_marker() for marker in mission_setup.objective_markers)
-    any_outside_zone = False
-    for model in models:
-        if not _model_is_within_battlefield(
-            model,
-            battlefield_width_inches=battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
-        ):
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.BATTLEFIELD_EDGE_CROSSED,
-                    message="Pre-battle placement crosses the battlefield edge.",
-                    model_instance_id=model.model_id,
-                )
-            )
-        in_deployment_zone = any(
-            shapely_backend.base_footprint_within_deployment_zone(
-                model.base,
-                model.pose,
-                zone,
-            )
-            for zone in deployment_zones
-        )
-        if not in_deployment_zone:
-            any_outside_zone = True
-        for blocker in blockers:
-            if _models_overlap_with_volume(model, blocker):
-                violations.append(
-                    PreBattleViolation(
-                        violation_code=PreBattleViolationCode.MODEL_OVERLAP,
-                        message="Pre-battle placement overlaps another model.",
-                        model_instance_id=model.model_id,
-                        blocker_id=blocker.model_id,
-                    )
-                )
-        for enemy_model in enemy_models:
-            if model.is_within_engagement_range(
-                enemy_model,
-                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-            ):
-                violations.append(
-                    PreBattleViolation(
-                        violation_code=PreBattleViolationCode.ENEMY_ENGAGEMENT_RANGE,
-                        message="Pre-battle placement is within enemy Engagement Range.",
-                        model_instance_id=model.model_id,
-                        blocker_id=enemy_model.model_id,
-                    )
-                )
-        terrain_violation = terrain_endpoint_placement_violation(
-            model=model,
-            unit=_unit_for_model(view=view, model_instance_id=model.model_id),
-            ruleset_descriptor=ruleset_descriptor,
-            terrain_features=battlefield_state.terrain_features,
-            violation_code=PreBattleViolationCode.TERRAIN_ENDPOINT_ILLEGAL.value,
-            placement_label="Pre-battle placement",
-        )
-        if terrain_violation is not None:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message=terrain_violation.message,
-                    model_instance_id=terrain_violation.model_instance_id,
-                    blocker_id=terrain_violation.blocker_id,
-                )
-            )
-        objective_violation = objective_marker_endpoint_placement_violation(
-            model=model,
-            objective_markers=markers,
-            violation_code=PreBattleViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP.value,
-            placement_label="Pre-battle placement",
-        )
-        if objective_violation is not None:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP,
-                    message=objective_violation.message,
-                    model_instance_id=objective_violation.model_instance_id,
-                    blocker_id=objective_violation.blocker_id,
-                )
-            )
-    overlap = _moving_models_overlap(models)
-    if overlap is not None:
-        first_id, second_id = overlap
-        violations.append(
-            PreBattleViolation(
-                violation_code=PreBattleViolationCode.MODEL_OVERLAP,
-                message="Pre-battle placement models overlap each other.",
-                model_instance_id=first_id,
-                blocker_id=second_id,
-            )
-        )
-    if any_outside_zone:
-        violations.append(
-            PreBattleViolation(
-                violation_code=PreBattleViolationCode.DEPLOYMENT_ZONE_VIOLATION,
-                message="Pre-battle placement must be wholly within the player's deployment zone.",
-                field="model_placements",
-            )
-        )
 
 
 def _append_scout_path_violations(
@@ -3062,7 +2941,7 @@ def _enemy_vehicle_monster_model_ids_for_player(
     return tuple(sorted(model_ids))
 
 
-def _unit_for_model(*, view: RulesUnitView, model_instance_id: str) -> UnitInstance:
+def unit_for_model(*, view: RulesUnitView, model_instance_id: str) -> UnitInstance:
     requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
     for component in view.components:
         if any(
@@ -3109,7 +2988,7 @@ def _canonical_keyword(keyword: str) -> str:
     return _validate_identifier("keyword", keyword).upper().replace(" ", "_").replace("-", "_")
 
 
-def _model_is_within_battlefield(
+def model_is_within_battlefield(
     model: Model,
     *,
     battlefield_width_inches: float,
@@ -3130,7 +3009,7 @@ def _models_overlap_with_volume(first: Model, second: Model) -> bool:
     return first.volume.vertical_gap_to(first.pose, second.volume, second.pose) <= _EPSILON
 
 
-def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
+def moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
     for first_index, first in enumerate(models):
         for second in models[first_index + 1 :]:
             if _models_overlap_with_volume(first, second):
@@ -3138,7 +3017,7 @@ def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
     return None
 
 
-def _model_owner_player_id(*, scenario: BattlefieldScenario, model_instance_id: str) -> str:
+def model_owner_player_id(*, scenario: BattlefieldScenario, model_instance_id: str) -> str:
     requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
     for placed_army in scenario.battlefield_state.placed_armies:
         for unit_placement in placed_army.unit_placements:

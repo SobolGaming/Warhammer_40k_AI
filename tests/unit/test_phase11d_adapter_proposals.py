@@ -558,7 +558,7 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
 
 def test_fall_back_proposal_accepts_voluntary_desperate_escape_for_every_model() -> None:
     session, movement_status = _local_session_at_movement_unit_selection(
-        game_id="phase11d-desperate-escape-failure-0000",
+        game_id="phase11d-desperate-escape-failure-0001",
         pose_factory=_fall_back_deployment_pose,
     )
     state = _session_state(session)

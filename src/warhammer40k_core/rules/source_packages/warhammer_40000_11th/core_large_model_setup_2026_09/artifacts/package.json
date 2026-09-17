@@ -1,0 +1,96 @@
+{
+  "artifact_schema": "core-v2-core-large-model-setup-source-v1",
+  "source_package_id": "gw-11e-core-large-model-setup",
+  "source_version": "maintained-app-mirrors-observed-2026-09-17",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-large-model-setup:large-model-setup",
+      "section_id": "03.02.02",
+      "source_text": "it must be set up so that it is touching your battlefield edge. ... (excluding AIRCRAFT models)",
+      "transcription_sha256": "989b99ddd217c06dae6e6f3a3c3bbc86251e23ae77eca9e36d557f910df05bce",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.large_model_setup:oversized_deployment_violation",
+        "warhammer40k_core.engine.large_model_restrictions:large_model_activity_reason"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-large-model-setup-review:large-model-setup",
+      "rule_source_id": "gw-11e-core-large-model-setup:large-model-setup",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 03.02.02 Setting Up Large Models",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "989b99ddd217c06dae6e6f3a3c3bbc86251e23ae77eca9e36d557f910df05bce",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "b24af8f484d458d15f63f9fc0f2aa063b5530d6eeb9f131393d19c01c1846c94",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.large_model_setup:oversized_deployment_violation",
+        "warhammer40k_core.engine.large_model_restrictions:large_model_activity_reason"
+      ]
+    },
+    {
+      "evidence_id": "core-large-model-setup-mirror:large-model-setup",
+      "rule_source_id": "gw-11e-core-large-model-setup:large-model-setup",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-large-model-setup-maintained-app-mirrors-2026-09-17",
+      "review_audit_row_id": "large-model-setup",
+      "review_audit_source_observation_sha256": "9803367ef2aedb8bb32c5a81bb016d0b35e7fc6fecd75da3350a52bfc8b4ced1",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 03.02.02 Setting Up Large Models",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/03-moving",
+      "observed_at": "2026-09-17T00:00:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "989b99ddd217c06dae6e6f3a3c3bbc86251e23ae77eca9e36d557f910df05bce",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "1d7a317a8ecafd40ce183bfbd64ed81bda50099ab32e07e362fb59cec2988c4c",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.large_model_setup:oversized_deployment_violation",
+        "warhammer40k_core.engine.large_model_restrictions:large_model_activity_reason"
+      ]
+    }
+  ],
+  "setup_policy": {
+    "source_rule_id": "gw-11e-core-large-model-setup:large-model-setup",
+    "deployment_requires_impossible_fit": true,
+    "deployment_requires_own_edge": true,
+    "restricted_activities": [
+      "normal",
+      "advance",
+      "fall_back",
+      "charge",
+      "ranged_attacks"
+    ],
+    "reserve_exempt_keyword": "AIRCRAFT",
+    "expiration": "end_of_setup_turn"
+  },
+  "package_hash": "06bd4faaa522ea3bd96e431c142be21fe9eec5a5d1a2e08b355b9b8a8f24be75"
+}

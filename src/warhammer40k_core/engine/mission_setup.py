@@ -58,6 +58,8 @@ class MissionSetupPayload(TypedDict):
     battlefield_layout_id: str | None
     deployment_map_id: str
     terrain_layout_id: str
+    attacker_battlefield_edge: str | None
+    defender_battlefield_edge: str | None
     attacker_player_id: str
     defender_player_id: str
     battlefield_width_inches: float
@@ -144,8 +146,32 @@ class MissionSetup:
     terrain_areas: tuple[PlacedTerrainArea, ...]
     terrain_features: tuple[TerrainFeatureDefinition, ...]
     objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...] = ()
+    attacker_battlefield_edge: str | None = None
+    defender_battlefield_edge: str | None = None
 
     def __post_init__(self) -> None:
+        edges = (self.attacker_battlefield_edge, self.defender_battlefield_edge)
+        if edges != (None, None) and (
+            any(
+                type(edge) is not str
+                or edge
+                not in {
+                    "north",
+                    "south",
+                    "west",
+                    "east",
+                    "north_west_corner",
+                    "north_east_corner",
+                    "south_west_corner",
+                    "south_east_corner",
+                }
+                for edge in edges
+            )
+            or edges[0] == edges[1]
+        ):
+            raise MissionSetupError(
+                "MissionSetup requires distinct explicit player battlefield edges."
+            )
         object.__setattr__(
             self,
             "mission_pack_id",
@@ -428,6 +454,12 @@ class MissionSetup:
             battlefield_layout_id=(
                 None if battlefield_layout is None else battlefield_layout.battlefield_layout_id
             ),
+            attacker_battlefield_edge=None
+            if battlefield_layout is None
+            else battlefield_layout.attacker_edge,
+            defender_battlefield_edge=None
+            if battlefield_layout is None
+            else battlefield_layout.defender_edge,
             deployment_map_id=deployment_map.deployment_map_id,
             terrain_layout_id=terrain_layout.terrain_layout_id,
             attacker_player_id=attacker_player_id,
@@ -492,6 +524,8 @@ class MissionSetup:
                 assignment.to_payload() for assignment in self.primary_mission_assignments
             ],
             "battlefield_layout_id": self.battlefield_layout_id,
+            "attacker_battlefield_edge": self.attacker_battlefield_edge,
+            "defender_battlefield_edge": self.defender_battlefield_edge,
             "deployment_map_id": self.deployment_map_id,
             "terrain_layout_id": self.terrain_layout_id,
             "attacker_player_id": self.attacker_player_id,
@@ -518,6 +552,8 @@ class MissionSetup:
             "mission_pool_entry_id",
             "primary_mission_assignments",
             "battlefield_layout_id",
+            "attacker_battlefield_edge",
+            "defender_battlefield_edge",
             "deployment_map_id",
             "terrain_layout_id",
             "attacker_player_id",
@@ -542,6 +578,8 @@ class MissionSetup:
                 for assignment in payload["primary_mission_assignments"]
             ),
             battlefield_layout_id=payload["battlefield_layout_id"],
+            attacker_battlefield_edge=payload["attacker_battlefield_edge"],
+            defender_battlefield_edge=payload["defender_battlefield_edge"],
             deployment_map_id=payload["deployment_map_id"],
             terrain_layout_id=payload["terrain_layout_id"],
             attacker_player_id=payload["attacker_player_id"],
@@ -585,6 +623,8 @@ def validate_mission_setup_source_layout_identity(
     canonical_terrain_features = _validate_terrain_features(source_terrain_features)
     actual_source_geometry = (
         mission_setup.battlefield_layout_id,
+        mission_setup.attacker_battlefield_edge,
+        mission_setup.defender_battlefield_edge,
         mission_setup.deployment_map_id,
         mission_setup.terrain_layout_id,
         mission_setup.battlefield_width_inches,
@@ -598,6 +638,8 @@ def validate_mission_setup_source_layout_identity(
     )
     canonical_source_geometry = (
         battlefield_layout.battlefield_layout_id,
+        battlefield_layout.attacker_edge,
+        battlefield_layout.defender_edge,
         battlefield_layout.deployment_map_id,
         battlefield_layout.terrain_layout_id,
         battlefield_layout.battlefield_width_inches,

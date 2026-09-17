@@ -133,7 +133,14 @@ def _movement_action_options(
         hover_mode_states=hover_mode_states,
     )
     options: list[DecisionOption] = []
+    from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
+
     for action in availability_result.available_actions:
+        if (
+            action is not MovementPhaseActionKind.REMAIN_STATIONARY
+            and large_model_activity_reason(state, movement_unit_id, "normal") is not None
+        ):
+            continue
         if disembarked_unit_state is not None:
             if (
                 action is MovementPhaseActionKind.REMAIN_STATIONARY

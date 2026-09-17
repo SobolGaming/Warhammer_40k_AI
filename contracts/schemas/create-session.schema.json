@@ -299,6 +299,14 @@
               "minProperties": 1,
               "not": {"required": ["primary_mission_id"]},
               "properties": {
+                "attacker_battlefield_edge": {"enum": [
+                  "north", "south", "east", "west", "north_west_corner",
+                  "north_east_corner", "south_west_corner", "south_east_corner", null
+                ]},
+                "defender_battlefield_edge": {"enum": [
+                  "north", "south", "east", "west", "north_west_corner",
+                  "north_east_corner", "south_west_corner", "south_east_corner", null
+                ]},
                 "primary_mission_assignments": {
                   "items": {
                     "additionalProperties": false,
@@ -330,7 +338,10 @@
                   "type": "array"
                 }
               },
-              "required": ["primary_mission_assignments", "terrain_areas"],
+              "required": [
+                "primary_mission_assignments", "terrain_areas",
+                "attacker_battlefield_edge", "defender_battlefield_edge"
+              ],
               "type": "object"
             },
             {"type": "null"}

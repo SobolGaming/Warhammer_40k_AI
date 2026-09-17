@@ -62,8 +62,12 @@ def charge_unit_ineligibility_reason(
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> str | None:
     requested_unit_id = _charge._validate_identifier("unit_instance_id", unit_instance_id)
+    from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
     from warhammer40k_core.engine.surge_movement import movement_lock_reason
 
+    locked = large_model_activity_reason(state, requested_unit_id, "charge")
+    if locked is not None:
+        return locked
     locked = movement_lock_reason(state, requested_unit_id)
     if locked is not None:
         return locked

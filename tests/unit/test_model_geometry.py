@@ -498,3 +498,63 @@ def test_spatial_index_payload_round_trips_without_object_reprs() -> None:
         SpatialIndex.from_payload(cast(SpatialIndexPayload, json.loads(blob))).to_payload()
         == index.to_payload()
     )
+
+
+@pytest.mark.parametrize(
+    ("base", "expected"),
+    [
+        (CircularBase(2), False),
+        (CircularBase(1.5), True),
+        (OvalBase(7, 2), True),
+        (RectangularBase(7, 2), True),
+        (RectangularBase(9, 4), False),
+    ],
+)
+def test_order54_fit_proves_all_orientations(base: BaseShape, expected: bool) -> None:
+    from warhammer40k_core.engine.large_model_setup import base_fits_zone
+
+    shape = DeploymentZoneShape.rectangle(min_x=0, min_y=0, max_x=3, max_y=8)
+    assert base_fits_zone(base, shape) is expected
+
+
+def test_order54_fit_uses_polygons_cutouts_and_union_not_bounds() -> None:
+    from warhammer40k_core.engine.large_model_setup import base_fits_zone
+
+    triangle = DeploymentZoneShape(
+        polygons=(
+            DeploymentZonePolygon(
+                vertices=(
+                    DeploymentZonePoint(0, 0),
+                    DeploymentZonePoint(6, 0),
+                    DeploymentZonePoint(0, 6),
+                )
+            ),
+        )
+    )
+    assert base_fits_zone(CircularBase(2), triangle) is False
+    assert base_fits_zone(CircularBase(1), triangle) is True
+    rectangle = DeploymentZoneShape.rectangle(min_x=0, min_y=0, max_x=4, max_y=4)
+    cutout = DeploymentZoneShape(
+        polygons=rectangle.polygons, cutouts=(DeploymentZoneCircleCutout(2, 2, 1),)
+    )
+    assert base_fits_zone(CircularBase(1.1), cutout) is False
+    assert base_fits_zone(CircularBase(0.5), cutout) is True
+    union = DeploymentZoneShape(
+        polygons=(
+            *DeploymentZoneShape.rectangle(min_x=0, min_y=0, max_x=2, max_y=4).polygons,
+            *DeploymentZoneShape.rectangle(min_x=2, min_y=0, max_x=4, max_y=4).polygons,
+        )
+    )
+    assert base_fits_zone(CircularBase(2), union) is True
+
+
+def test_setup_fit_unions_regions_without_applying_one_regions_cutout_to_another() -> None:
+    from warhammer40k_core.geometry.setup_fit import base_fits_regions
+
+    left = ((0.0, 0.0), (2.0, 0.0), (2.0, 4.0), (0.0, 4.0))
+    right = ((2.0, 0.0), (4.0, 0.0), (4.0, 4.0), (2.0, 4.0))
+    assert base_fits_regions(CircularBase(2), (((left,), (), ()), ((right,), (), ())))
+    assert base_fits_regions(
+        CircularBase(2),
+        (((left, right), (), ((2.0, 2.0, 1.0),)), ((left, right), (), ())),
+    )

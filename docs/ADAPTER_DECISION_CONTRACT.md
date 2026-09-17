@@ -6092,3 +6092,30 @@ all players receive them through the existing viewer-scoped projection/event API
 
 See [Contract 24 migration](../contracts/migrations/23-to-24.md) for the persistence,
 replay and required terrain-path field version boundary.
+
+
+## Order 54 — oversized setup authority
+
+Existing deployment/prebattle parameterized placements and per-model Strategic
+Reserve exception proposals remain the player choices. The engine alone proves
+that the base cannot fit, authenticates the player's edge and applies the result.
+Mission setup now requires nullable attacker/defender battlefield edges; custom
+layouts with no edge authority return `large_model_player_edge_unsupported` for
+the exception. Missing contact returns `large_model_edge_contact_missing`.
+
+All ordinary placement checks continue to run. Source AIRCRAFT exemption is
+limited to Strategic Reserves. A non-exempt exceptional model restricts its whole
+rules unit from Normal, Advance, Fall Back, Charge and ranged attacks until the
+setup turn ends, including reactive opportunities. Stale movement choices fail
+before queue pop. Existing arrival records, reserve state, viewer scoping and
+end-turn cleanup carry the result; restore authenticates restriction evidence.
+Pregame deployment imposes no first-turn lock. Edge information and placements
+are public. No new decision type, option family or hidden payload is introduced.
+
+See [Contract 25 migration](../contracts/migrations/24-to-25.md) and
+[scope/consumer audit](ORDER_54_SCOPE_PLAN.md).
+
+Source corner edges (`north_west_corner`, `north_east_corner`,
+`south_west_corner`, `south_east_corner`) designate their two adjoining
+cardinal edges. Contact with either designated edge satisfies the source corner
+edge; contact with an opposing edge does not. Source layout identity is retained.

@@ -33,6 +33,8 @@ def test_rapid_ingress_work_budget(case: str) -> None:
     else:
         assert row["submitted"] is True
         assert row["eligible_targets"] == (8 if case == "mixed" else 1)
+    if case == "placement":
+        assert counts["resolve_reserve_arrival"] == 1
 
 
 def test_rapid_ingress_target_preflight_does_not_reenumerate_all_reserves() -> None:

@@ -635,6 +635,7 @@ def _validated_reserve_arrival_occurrences(
             raise GameLifecycleError("Reserve arrival Stratagem use evidence is malformed.")
         if proposal_request.proposal_kind is not ProposalKind.CULT_AMBUSH:
             validate_primary_reserve_arrival_event_authority(
+                state=state,
                 payload=payload,
                 proposal_request=proposal_request,
                 submitted=submitted,

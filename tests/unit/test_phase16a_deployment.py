@@ -1199,3 +1199,141 @@ def _unit_selection(
             ),
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("zone_width", "x", "accepted"),
+    [(3.0, None, True), (3.0, 5.0, False), (10.0, None, True), (10.0, 9.0, False)],
+)
+def test_order54_oversized_deployment_requires_impossibility_and_own_edge(
+    zone_width: float, x: float | None, accepted: bool
+) -> None:
+    from tests.large_model_setup_helpers import oversized_deployment_case
+
+    state, request, proposal = oversized_deployment_case(zone_width=zone_width, x=x)
+    result = resolve_deployment_placement(
+        state=state,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        request=request,
+        proposal=proposal,
+    )
+    assert result.is_valid is accepted
+
+
+def test_order54_facade_deployment_restore_replay_and_pregame_duration() -> None:
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.core.datasheet import BaseSizeDefinition
+    from warhammer40k_core.core.deployment_zones import DeploymentZone
+    from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                sheet,
+                model_profiles=tuple(
+                    replace(profile, base_size=BaseSizeDefinition.circular(200))
+                    for profile in sheet.model_profiles
+                ),
+            )
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    base = _config()
+    assert base.mission_setup is not None
+    mission = replace(
+        base.mission_setup,
+        deployment_map_id="order54-custom-zone",
+        terrain_layout_id="order54-custom-terrain",
+        attacker_battlefield_edge="west",
+        defender_battlefield_edge="east",
+        deployment_zones=(
+            DeploymentZone.rectangle("narrow-a", "player-a", min_x=0, min_y=0, max_x=3, max_y=44),
+            DeploymentZone.rectangle("narrow-b", "player-b", min_x=57, min_y=0, max_x=60, max_y=44),
+        ),
+        terrain_features=(),
+    )
+    config = replace(
+        base,
+        army_catalog=catalog,
+        mission_setup=mission,
+        army_muster_requests=tuple(
+            _army_muster_request(
+                catalog=catalog,
+                player_id=player,
+                army_id=army,
+                unit_selection_id="large",
+                unit_selections=(
+                    _unit_selection(
+                        unit_selection_id="large",
+                        datasheet_id="core-character-leader",
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            )
+            for player, army in (("player-a", "army-alpha"), ("player-b", "army-beta"))
+        ),
+    )
+    session = LocalGameSession()
+    session.start(config)
+    status = session.advance_until_decision_or_terminal()
+    number = 0
+    while (
+        status.decision_request is not None
+        and session.lifecycle.state is not None
+        and session.lifecycle.state.stage is GameLifecycleStage.SETUP
+    ):
+        request = status.decision_request
+        number += 1
+        if request.decision_type == SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE:
+            payload = deployment_proposal_for_state(
+                session.lifecycle.state,
+                request=request,
+                pose_factory=lambda _i, p, _m: Pose.at(
+                    200 / 25.4 / 2 if p == "player-a" else 60 - 200 / 25.4 / 2, 20
+                ),
+            ).to_payload()
+            before = session.lifecycle.to_payload()
+            bad = cast(dict[str, JsonValue], json.loads(json.dumps(payload)))
+            cast(list[dict[str, JsonValue]], bad["model_placements"])[0]["pose"] = cast(
+                JsonValue, Pose.at(30, 20).to_payload()
+            )
+            invalid = session.submit_parameterized_payload(
+                request_id=request.request_id, payload=bad, result_id=f"bad-{number}"
+            )
+            assert invalid.status_kind is LifecycleStatusKind.INVALID
+            assert session.lifecycle.to_payload() == before
+            restored = GameLifecycle.from_payload(json.loads(json.dumps(before)))
+            assert restored.to_payload() == before
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                payload=cast(JsonValue, payload),
+                result_id=f"place-{number}",
+            )
+        else:
+            option = (
+                "fixed:assassination:bring_it_down"
+                if request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+                else request.options[0].option_id
+            )
+            status = session.submit_option(
+                request_id=request.request_id, option_id=option, result_id=f"select-{number}"
+            )
+    assert session.lifecycle.state is not None
+    assert session.lifecycle.state.stage is GameLifecycleStage.BATTLE
+    for player, army in (("player-a", "army-alpha"), ("player-b", "army-beta")):
+        assert session.view(viewer_player_id=player)
+        assert (
+            large_model_activity_reason(session.lifecycle.state, f"{army}:large", "normal") is None
+        )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order54-deployment"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )

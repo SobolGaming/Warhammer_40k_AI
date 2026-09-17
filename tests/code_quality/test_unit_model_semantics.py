@@ -191,8 +191,8 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "any_models_satisfy_distance",
         ): 1,
         (
-            "src/warhammer40k_core/engine/deployment.py",
-            "_append_geometry_violations",
+            "src/warhammer40k_core/engine/deployment_geometry.py",
+            "append_geometry_violations",
         ): 1,
         (
             "src/warhammer40k_core/engine/fight_geometry.py",
@@ -247,12 +247,12 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "geometry_models_are_physically_engaged",
         ): 1,
         (
-            "src/warhammer40k_core/engine/prebattle.py",
-            "_append_setup_geometry_violations",
+            "src/warhammer40k_core/engine/prebattle_setup_geometry.py",
+            "append_setup_geometry_violations",
         ): 1,
         (
             "src/warhammer40k_core/engine/reserves.py",
-            "_append_common_reserve_placement_violations",
+            "append_common_reserve_placement_violations",
         ): 1,
         (
             "src/warhammer40k_core/engine/return_on_death.py",
@@ -551,7 +551,7 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
         ),
         (
             RESERVES,
-            ("_append_reserve_state_violations", "_append_unit_placement_drift_violations"),
+            ("append_reserve_state_violations", "append_unit_placement_drift_violations"),
         ),
         (STRATAGEMS_GEOMETRY, ("_reserve_placement_kinds_for_unit",)),
         (

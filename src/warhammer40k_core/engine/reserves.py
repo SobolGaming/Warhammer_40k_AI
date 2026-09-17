@@ -40,7 +40,6 @@ from warhammer40k_core.engine.rules_unit_placement import (
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_coherency import (
-    UnitCoherencyContext,
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
 )
@@ -1505,6 +1504,7 @@ class ReinforcementPlacement:
     transition_batch: BattlefieldTransitionBatch | None
     large_model_exception_used: bool
     post_arrival_restrictions: tuple[ReservePostArrivalRestriction, ...]
+    aircraft_exception_model_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.candidate) is not ReserveArrivalCandidate:
@@ -1544,8 +1544,23 @@ class ReinforcementPlacement:
             raise GameLifecycleError("Invalid ReinforcementPlacement cannot have transitions.")
         if not self.violations and self.transition_batch is None:
             raise GameLifecycleError("Valid ReinforcementPlacement requires transitions.")
-        if self.large_model_exception_used and set(restrictions) != set(
-            LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS
+        exception_ids = {row.model_instance_id for row in self.candidate.large_model_exceptions}
+        exempt_ids = self.aircraft_exception_model_ids
+        if (
+            type(exempt_ids) is not tuple
+            or tuple(sorted(set(exempt_ids))) != exempt_ids
+            or not set(exempt_ids).issubset(exception_ids)
+        ):
+            raise GameLifecycleError("Large-model AIRCRAFT exemption identity drifted.")
+        all_exempt = bool(exception_ids) and set(exempt_ids) == exception_ids
+        if all_exempt and restrictions:
+            raise GameLifecycleError(
+                "Large AIRCRAFT must not receive oversized reserve restrictions."
+            )
+        if (
+            self.large_model_exception_used
+            and not all_exempt
+            and set(restrictions) != set(LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS)
         ):
             raise GameLifecycleError(
                 "Large-model ReinforcementPlacement must apply all turn restrictions."
@@ -1667,153 +1682,26 @@ def resolve_reserve_arrival(
     deep_strike_enemy_horizontal_distance_inches: float | None = None,
     additional_violations: tuple[ReservePlacementViolation, ...] = (),
 ) -> ReinforcementPlacement:
-    if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("resolve_reserve_arrival scenario must be a scenario.")
-    if type(ruleset_descriptor) is not RulesetDescriptor:
-        raise GameLifecycleError("resolve_reserve_arrival requires a RulesetDescriptor.")
-    if type(reserve_state) is not ReserveState:
-        raise GameLifecycleError("resolve_reserve_arrival reserve_state must be ReserveState.")
-    if type(attempted_placement) is UnitPlacement:
-        rules_unit_placement = RulesUnitPlacement.single(attempted_placement)
-    elif type(attempted_placement) is RulesUnitPlacement:
-        rules_unit_placement = attempted_placement
-    else:
-        raise GameLifecycleError(
-            "resolve_reserve_arrival attempted_placement must be UnitPlacement or "
-            "RulesUnitPlacement."
-        )
-    placement_kind = battlefield_placement_kind_from_token(placement_kind)
-    requested_round = _validate_positive_int("battle_round", battle_round)
-    width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
-    depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
-    features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
-    markers = _validate_objective_marker_tuple("objective_markers", objective_markers)
-    deployment_zones = _validate_deployment_zone_tuple(
-        "enemy_deployment_zones",
-        enemy_deployment_zones,
-    )
-    exceptions = _validate_large_model_exception_tuple(
-        "large_model_exceptions",
-        large_model_exceptions,
-    )
-    supplied_violations = _validate_reserve_placement_violation_tuple(
-        "additional_violations",
-        additional_violations,
-    )
-    strategic_rule = strategic_reserve_rule or StrategicReserveRule()
-    if type(strategic_rule) is not StrategicReserveRule:
-        raise GameLifecycleError("strategic_reserve_rule must be a StrategicReserveRule.")
-    deep_strike_enemy_distance = (
-        None
-        if deep_strike_enemy_horizontal_distance_inches is None
-        else _validate_positive_number(
-            "deep_strike_enemy_horizontal_distance_inches",
-            deep_strike_enemy_horizontal_distance_inches,
-        )
-    )
-    if (
-        deep_strike_enemy_distance is not None
-        and placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE
-    ):
-        raise GameLifecycleError(
-            "deep_strike_enemy_horizontal_distance_inches only applies to Deep Strike placement."
-        )
-
-    view = rules_unit_view_from_armies(
-        armies=scenario.armies,
-        unit_instance_id=reserve_state.unit_instance_id,
-    )
-    qualifying_edges = strategic_rule.qualifying_edges_for_battle_round(requested_round)
-    candidate = ReserveArrivalCandidate(
-        reserve_state=reserve_state,
-        battle_round=requested_round,
-        placement_kind=placement_kind,
-        attempted_rules_unit_placement=rules_unit_placement,
-        qualifying_edges=qualifying_edges,
-        large_model_exceptions=exceptions,
-    )
-    violations: list[ReservePlacementViolation] = list(supplied_violations)
-    _append_reserve_state_violations(
-        violations=violations,
-        reserve_state=reserve_state,
-        view=view,
-        placement_kind=placement_kind,
-        battle_round=requested_round,
-        mission_policy=ruleset_descriptor.mission_policy,
-        strategic_reserve_rule=strategic_rule,
-    )
-    _append_unit_placement_drift_violations(
-        violations=violations,
-        view=view,
-        attempted_rules_unit_placement=rules_unit_placement,
+    from warhammer40k_core.engine.reserve_arrival_resolution import (
+        resolve_reserve_arrival as resolve,
     )
 
-    models = rules_unit_placement.geometry_models(scenario)
-    if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES:
-        _append_strategic_reserves_edge_violations(
-            violations=violations,
-            models=models,
-            battle_round=requested_round,
-            battlefield_width_inches=width,
-            battlefield_depth_inches=depth,
-            strategic_reserve_rule=strategic_rule,
-            qualifying_edges=qualifying_edges,
-            large_model_exceptions=exceptions,
-        )
-        if requested_round == 2:
-            _append_enemy_deployment_zone_violations(
-                violations=violations,
-                models=models,
-                enemy_deployment_zones=deployment_zones,
-            )
-    _append_common_reserve_placement_violations(
-        violations=violations,
+    return resolve(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        view=view,
-        attempted_rules_unit_placement=rules_unit_placement,
-        models=models,
-        battlefield_width_inches=width,
-        battlefield_depth_inches=depth,
-        terrain_features=features,
-        objective_markers=markers,
-        enemy_distance_inches=(
-            strategic_rule.enemy_horizontal_distance_inches
-            if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
-            else deep_strike_enemy_distance
-            if deep_strike_enemy_distance is not None
-            else _RESERVE_ENEMY_DISTANCE_INCHES
-        ),
-    )
-    coherency_result = UnitCoherencyContext.from_ruleset_descriptor(
-        ruleset_descriptor,
-        unit_instance_id=view.unit_instance_id,
-    ).validate_models(models)
-    if not coherency_result.is_coherent:
-        violations.append(
-            ReservePlacementViolation(
-                violation_code=ReservePlacementViolationCode.UNIT_COHERENCY_BROKEN,
-                message="Reserve placement violates unit coherency.",
-            )
-        )
-
-    exception_model_ids = {exception.model_instance_id for exception in exceptions}
-    large_model_exception_used = bool(exception_model_ids)
-    restrictions = LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS if large_model_exception_used else ()
-    transition_batch = None
-    if not violations:
-        transition_batch = _reserve_arrival_transition_batch(
-            attempted_rules_unit_placement=rules_unit_placement,
-            placement_kind=placement_kind,
-            source_rule_id=_source_rule_id_for_placement_kind(placement_kind),
-        )
-    return ReinforcementPlacement(
-        candidate=candidate,
-        violations=tuple(violations),
-        coherency_result=coherency_result,
-        transition_batch=transition_batch,
-        large_model_exception_used=large_model_exception_used,
-        post_arrival_restrictions=restrictions,
+        reserve_state=reserve_state,
+        attempted_placement=attempted_placement,
+        battle_round=battle_round,
+        placement_kind=placement_kind,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+        terrain_features=terrain_features,
+        objective_markers=objective_markers,
+        enemy_deployment_zones=enemy_deployment_zones,
+        large_model_exceptions=large_model_exceptions,
+        strategic_reserve_rule=strategic_reserve_rule,
+        deep_strike_enemy_horizontal_distance_inches=deep_strike_enemy_horizontal_distance_inches,
+        additional_violations=additional_violations,
     )
 
 
@@ -2021,7 +1909,7 @@ def _default_source_rule_ids_for_reserve_kind(reserve_kind: ReserveKind) -> tupl
     return (_RESERVES_RULE_ID,)
 
 
-def _append_reserve_state_violations(
+def append_reserve_state_violations(
     *,
     violations: list[ReservePlacementViolation],
     reserve_state: ReserveState,
@@ -2118,7 +2006,7 @@ def _reserve_arrival_block_exemption_applies(
     )
 
 
-def _append_unit_placement_drift_violations(
+def append_unit_placement_drift_violations(
     *,
     violations: list[ReservePlacementViolation],
     view: RulesUnitView,
@@ -2159,7 +2047,7 @@ def _append_unit_placement_drift_violations(
         )
 
 
-def _append_strategic_reserves_edge_violations(
+def append_strategic_reserves_edge_violations(
     *,
     violations: list[ReservePlacementViolation],
     models: tuple[Model, ...],
@@ -2170,110 +2058,23 @@ def _append_strategic_reserves_edge_violations(
     qualifying_edges: tuple[BattlefieldEdge, ...],
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...],
 ) -> None:
-    if battle_round == 1:
-        return
-    exception_by_model_id = {
-        exception.model_instance_id: exception for exception in large_model_exceptions
-    }
-    model_ids = {model.model_id for model in models}
-    for exception in large_model_exceptions:
-        model = next(
-            (
-                candidate
-                for candidate in models
-                if candidate.model_id == exception.model_instance_id
-            ),
-            None,
-        )
-        if model is None:
-            violations.append(
-                ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.UNIT_PLACEMENT_DRIFT,
-                    message="Large-model exception references a model outside the placement.",
-                    model_instance_id=exception.model_instance_id,
-                )
-            )
-            continue
-        if exception.battlefield_edge not in qualifying_edges:
-            violations.append(
-                ReservePlacementViolation(
-                    violation_code=(
-                        ReservePlacementViolationCode.LARGE_MODEL_EXCEPTION_EDGE_NOT_QUALIFYING
-                    ),
-                    message="Large-model exception edge is not a qualifying edge.",
-                    model_instance_id=model.model_id,
-                    battlefield_edge=exception.battlefield_edge,
-                )
-            )
-        if _model_wholly_within_any_edge_band(
-            model,
-            edges=qualifying_edges,
-            distance_inches=strategic_reserve_rule.edge_distance_inches,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
-        ):
-            violations.append(
-                ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.LARGE_MODEL_EXCEPTION_UNNEEDED,
-                    message="Model already satisfies Strategic Reserves edge distance.",
-                    model_instance_id=model.model_id,
-                    battlefield_edge=exception.battlefield_edge,
-                )
-            )
-        if _model_can_fit_within_edge_band(
-            model,
-            edge=exception.battlefield_edge,
-            distance_inches=strategic_reserve_rule.edge_distance_inches,
-        ):
-            violations.append(
-                ReservePlacementViolation(
-                    violation_code=(
-                        ReservePlacementViolationCode.LARGE_MODEL_EXCEPTION_MODEL_CAN_FIT
-                    ),
-                    message="Model can physically fit wholly within the required edge area.",
-                    model_instance_id=model.model_id,
-                    battlefield_edge=exception.battlefield_edge,
-                )
-            )
-        if not _model_touches_edge(
-            model,
-            edge=exception.battlefield_edge,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
-        ):
-            violations.append(
-                ReservePlacementViolation(
-                    violation_code=(
-                        ReservePlacementViolationCode.LARGE_MODEL_EXCEPTION_EDGE_CONTACT_MISSING
-                    ),
-                    message="Large-model exception requires touching the battlefield edge.",
-                    model_instance_id=model.model_id,
-                    battlefield_edge=exception.battlefield_edge,
-                )
-            )
-    for model in models:
-        if model.model_id in exception_by_model_id:
-            continue
-        if _model_wholly_within_any_edge_band(
-            model,
-            edges=qualifying_edges,
-            distance_inches=strategic_reserve_rule.edge_distance_inches,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
-        ):
-            continue
-        violations.append(
-            ReservePlacementViolation(
-                violation_code=ReservePlacementViolationCode.STRATEGIC_RESERVES_EDGE_DISTANCE,
-                message="Strategic Reserves model is not wholly within 6 inches of an edge.",
-                model_instance_id=model.model_id,
-            )
-        )
-    if set(exception_by_model_id).difference(model_ids):
-        return
+    from warhammer40k_core.engine.reserve_setup_geometry import (
+        append_strategic_reserves_edge_violations as resolve,
+    )
+
+    return resolve(
+        violations=violations,
+        models=models,
+        battle_round=battle_round,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+        strategic_reserve_rule=strategic_reserve_rule,
+        qualifying_edges=qualifying_edges,
+        large_model_exceptions=large_model_exceptions,
+    )
 
 
-def _append_enemy_deployment_zone_violations(
+def append_enemy_deployment_zone_violations(
     *,
     violations: list[ReservePlacementViolation],
     models: tuple[Model, ...],
@@ -2298,7 +2099,7 @@ def _append_enemy_deployment_zone_violations(
                 )
 
 
-def _append_common_reserve_placement_violations(
+def append_common_reserve_placement_violations(
     *,
     violations: list[ReservePlacementViolation],
     scenario: BattlefieldScenario,
@@ -2410,7 +2211,7 @@ def _append_common_reserve_placement_violations(
         )
 
 
-def _reserve_arrival_transition_batch(
+def reserve_arrival_transition_batch(
     *,
     attempted_rules_unit_placement: RulesUnitPlacement,
     placement_kind: BattlefieldPlacementKind,
@@ -2432,7 +2233,7 @@ def _reserve_arrival_transition_batch(
     )
 
 
-def _source_rule_id_for_placement_kind(placement_kind: BattlefieldPlacementKind) -> str:
+def source_rule_id_for_placement_kind(placement_kind: BattlefieldPlacementKind) -> str:
     return _arrival.source_rule_id_for_placement_kind(placement_kind)
 
 
@@ -2461,7 +2262,7 @@ def _terrain_endpoint_violation(
     return None
 
 
-def _model_wholly_within_any_edge_band(
+def model_wholly_within_any_edge_band(
     model: Model,
     *,
     edges: tuple[BattlefieldEdge, ...],
@@ -2489,7 +2290,9 @@ def _model_wholly_within_edge_band(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
 ) -> bool:
-    min_x, min_y, max_x, max_y = shapely_backend.footprint_for_base(model.base, model.pose).bounds
+    from warhammer40k_core.engine.large_model_setup import model_bounds
+
+    min_x, min_y, max_x, max_y = model_bounds(model)
     if edge is BattlefieldEdge.SOUTH:
         return min_y >= 0.0 and max_y <= distance_inches
     if edge is BattlefieldEdge.NORTH:
@@ -2507,28 +2310,16 @@ def _model_wholly_within_edge_band(
     raise GameLifecycleError("Unsupported BattlefieldEdge.")
 
 
-def _model_can_fit_within_edge_band(
-    model: Model,
-    *,
-    edge: BattlefieldEdge,
-    distance_inches: float,
-) -> bool:
-    min_x, min_y, max_x, max_y = shapely_backend.footprint_for_base(model.base, model.pose).bounds
-    if edge in {BattlefieldEdge.NORTH, BattlefieldEdge.SOUTH}:
-        return (max_y - min_y) <= distance_inches
-    if edge in {BattlefieldEdge.EAST, BattlefieldEdge.WEST}:
-        return (max_x - min_x) <= distance_inches
-    raise GameLifecycleError("Unsupported BattlefieldEdge.")
-
-
-def _model_touches_edge(
+def model_touches_edge(
     model: Model,
     *,
     edge: BattlefieldEdge,
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
 ) -> bool:
-    min_x, min_y, max_x, max_y = shapely_backend.footprint_for_base(model.base, model.pose).bounds
+    from warhammer40k_core.engine.large_model_setup import model_bounds
+
+    min_x, min_y, max_x, max_y = model_bounds(model)
     if edge is BattlefieldEdge.SOUTH:
         return math.isclose(min_y, 0.0, rel_tol=0.0, abs_tol=_EPSILON)
     if edge is BattlefieldEdge.NORTH:
@@ -2546,7 +2337,9 @@ def _model_is_within_battlefield(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
 ) -> bool:
-    min_x, min_y, max_x, max_y = shapely_backend.footprint_for_base(model.base, model.pose).bounds
+    from warhammer40k_core.engine.large_model_setup import model_bounds
+
+    min_x, min_y, max_x, max_y = model_bounds(model)
     return (
         min_x >= -_EPSILON
         and min_y >= -_EPSILON
@@ -2722,7 +2515,7 @@ def _validate_battlefield_edge_tuple(
     return tuple(sorted(edges, key=lambda edge: edge.value))
 
 
-def _validate_terrain_feature_tuple(
+def validate_terrain_feature_tuple(
     field_name: str,
     values: object,
 ) -> tuple[TerrainFeatureDefinition, ...]:
@@ -2736,7 +2529,7 @@ def _validate_terrain_feature_tuple(
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
 
 
-def _validate_objective_marker_tuple(
+def validate_objective_marker_tuple(
     field_name: str,
     values: object,
 ) -> tuple[ObjectiveMarker, ...]:
@@ -2754,7 +2547,7 @@ def _validate_objective_marker_tuple(
     return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
-def _validate_deployment_zone_tuple(
+def validate_deployment_zone_tuple(
     field_name: str,
     values: object,
 ) -> tuple[DeploymentZone, ...]:
