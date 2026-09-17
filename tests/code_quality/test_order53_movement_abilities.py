@@ -43,6 +43,9 @@ def test_move_keyword_paths_share_authority_and_direct_status_owner() -> None:
     assert "MoveCompletionRuleBinding(" in completion
     assert "validate_move_keyword_history(" in completion
     assert "validate_restored_movement(" in (ENGINE / "lifecycle.py").read_text()
+    resolution = (ENGINE / "triggered_movement_resolution.py").read_text()
+    assert "choice_descriptor(move_keyword_choice) not in descriptors_for_move(" in resolution
+    assert "ability_keywords, descriptor.movement_mode.value, is_surge=is_surge" in resolution
 
 
 def test_movement_component_evidence_has_matched_inputs_and_unchanged_budgets() -> None:

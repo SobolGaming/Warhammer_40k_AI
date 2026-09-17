@@ -21,8 +21,8 @@ PYTHONPATH=src:. uv run --no-sync python scripts/measure_order53.py --revision R
 ```
 
 The final matched runs used the provisional Apple M5 Pro host, macOS 26.6.2,
-Python 3.14.5, 18 allocated CPUs and 64 GiB RAM. Base mean: 11.422 ms. Head mean:
-12.163 ms; head maximum: 13.352 ms. Both unchanged component budgets pass.
+Python 3.14.5, 18 allocated CPUs and 64 GiB RAM. Base mean: 12.713 ms. Head mean:
+12.781 ms; head maximum: 13.981 ms. Both unchanged component budgets pass.
 `base.json` pins main `53d89a28915700b8d655942c54ca6a9ff8f7f660`; `head.json`
 pins the final runtime build identity. Both retain the same driver/helper/lock
 hashes, all samples and exact path diagnostics. Each base rejection is a friendly
@@ -36,6 +36,12 @@ runtimes; the recorded booleans already show the expected rejection/acceptance
 split. Final reports correct that description and add per-path violation codes.
 No path, sample count or budget was removed or relaxed. A later authority-only
 change was followed by another head measurement for the final runtime identity.
+
+The review correction to reactive keyword validation and completion classification
+was followed by fresh base/head measurements on this unchanged workload. The
+resolver workload is a component diagnostic; it does not measure selected MOBILE
+completion orchestration. That path is covered by the reactive completion,
+continuation, restore and replay regressions, with full-game timing still deferred.
 
 The existing Order 35 Rapid Ingress work gate found one unnecessary canonical
 unit lookup for an ingress action with no movement mode: nine against its limit

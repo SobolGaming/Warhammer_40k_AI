@@ -350,9 +350,13 @@ def test_other_moves_do_not_inherit_walker_permissions(mode: MovementMode) -> No
 
 @pytest.mark.parametrize("selected", [False, True])
 @pytest.mark.parametrize("reroll", [None, "decline", "reroll:0"])
+@pytest.mark.parametrize(
+    "mode", [MovementMode.NORMAL, MovementMode.ADVANCE, MovementMode.FALL_BACK]
+)
 def test_reactive_move_retains_choice_across_rejection_restore_and_replay(
     selected: bool,
     reroll: str | None,
+    mode: MovementMode,
 ) -> None:
     import json
     from typing import cast
@@ -380,14 +384,17 @@ def test_reactive_move_retains_choice_across_rejection_restore_and_replay(
         alpha_unit_ids=("mover", "observer"),
         catalog=_walker_catalog(),
         game_id="order53-reactive",
-        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(30, 20), model_count=5),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(10, 23) if mode is MovementMode.FALL_BACK else Pose.at(30, 20),
+            model_count=5,
+        ),
     )
     state = _state(lifecycle)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     unit_id = units["mover"].unit_instance_id
     descriptor = TriggeredMovementDescriptor(
         movement_kind=TriggeredMovementKind.TRIGGERED,
-        source_rule_id="test:normal-reaction",
+        source_rule_id="test:movement-reaction",
         trigger_timing=ReactionWindow(
             phase=BattlePhase.MOVEMENT,
             window_kind=ReactionWindowKind.RULE_TRIGGER,
@@ -395,6 +402,8 @@ def test_reactive_move_retains_choice_across_rejection_restore_and_replay(
             source_event_id=None,
         ),
         max_distance_inches=4,
+        movement_mode=mode,
+        allow_within_engagement_range=mode is MovementMode.FALL_BACK,
     )
     eligible = TriggeredMovementEligibleUnit(
         unit_instance_id=unit_id,
@@ -483,7 +492,7 @@ def test_reactive_move_retains_choice_across_rejection_restore_and_replay(
                             (
                                 m.model_instance_id,
                                 m.pose,
-                                Pose.at(m.pose.position.x + distance, m.pose.position.y),
+                                Pose.at(m.pose.position.x, m.pose.position.y - distance),
                             )
                             for m in placement.model_placements
                         )
@@ -501,6 +510,19 @@ def test_reactive_move_retains_choice_across_rejection_restore_and_replay(
             request = lifecycle.decision_controller.queue.pending_requests[0]
         else:
             assert status.status_kind is not LifecycleStatusKind.INVALID
+            assert status.decision_request is not None
+            assert status.decision_request.request_id != request.request_id
+    completed = [
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "triggered_movement_resolved"
+    ]
+    assert len(completed) == 1
+    moved = state.battlefield_state.unit_placement_by_id(unit_id)
+    assert tuple(model.pose for model in moved.model_placements) == tuple(
+        Pose.at(model.pose.position.x, model.pose.position.y - 1)
+        for model in placement.model_placements
+    )
     assert sum(
         e.event_type == "move_keyword_roll_resolved"
         for e in lifecycle.decision_controller.event_log.records
@@ -738,7 +760,15 @@ def test_witnessed_normal_move_crosses_friendly_vehicle_but_not_titanic(titanic:
 
 
 @pytest.mark.parametrize("selected", [False, True])
-def test_finite_reactive_paths_offer_and_complete_the_same_keyword_choice(selected: bool) -> None:
+@pytest.mark.parametrize(
+    "mode", [MovementMode.NORMAL, MovementMode.ADVANCE, MovementMode.FALL_BACK]
+)
+def test_finite_reactive_paths_offer_and_complete_the_same_keyword_choice(
+    selected: bool, mode: MovementMode
+) -> None:
+    import json
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
     from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
     from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
     from warhammer40k_core.engine.triggered_movement import (
@@ -752,7 +782,10 @@ def test_finite_reactive_paths_offer_and_complete_the_same_keyword_choice(select
         alpha_unit_ids=("mover", "observer"),
         catalog=_walker_catalog(),
         game_id="order53-finite",
-        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(30, 20), model_count=5),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(10, 23) if mode is MovementMode.FALL_BACK else Pose.at(30, 20),
+            model_count=5,
+        ),
     )
     state = _state(lifecycle)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
@@ -774,6 +807,8 @@ def test_finite_reactive_paths_offer_and_complete_the_same_keyword_choice(select
                 source_event_id=None,
             ),
             max_distance_inches=3,
+            movement_mode=mode,
+            allow_within_engagement_range=mode is MovementMode.FALL_BACK,
         ),
         candidate_witnesses=(
             PathWitness.for_straight_line_endpoints(
@@ -802,6 +837,8 @@ def test_finite_reactive_paths_offer_and_complete_the_same_keyword_choice(select
         event.event_type == "move_keyword_roll_resolved"
         for event in lifecycle.decision_controller.event_log.records
     ) == int(selected)
+    checkpoint = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
     assert (
         ReplayRunner.from_payload(session.replay_artifact(artifact_id="finite")).run().status
         is ReplayRunStatus.REPRODUCED
@@ -854,3 +891,75 @@ def test_fall_back_enemy_vehicle_transit_preserves_titanic_exclusion(titanic: bo
         ),
     )
     assert result.is_valid is not titanic
+
+
+@pytest.mark.parametrize(
+    ("mode", "surge"),
+    [
+        (MovementMode.CHARGE, False),
+        (MovementMode.PILE_IN, False),
+        (MovementMode.CONSOLIDATE, False),
+        (MovementMode.NORMAL, True),
+    ],
+)
+def test_reactive_resolver_rejects_keyword_grants_outside_source_modes(
+    mode: MovementMode, surge: bool
+) -> None:
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.move_ability_choices import keyword_choice_context
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.triggered_movement import (
+        TriggeredMovementDescriptor,
+        TriggeredMovementKind,
+    )
+    from warhammer40k_core.engine.triggered_movement_resolution import resolve_triggered_movement
+    from warhammer40k_core.geometry.pathing import PathWitness
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_super_heavy_walker_2026_09 as source,
+    )
+
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("mover",),
+        catalog=_walker_catalog(),
+        game_id="order53-reactive-exclusions",
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(30, 20), model_count=5),
+    )
+    state = _state(lifecycle)
+    scenario = battlefield_scenario_for_state(state=state)
+    placement = scenario.battlefield_state.unit_placement_by_id(units["mover"].unit_instance_id)
+    descriptor = TriggeredMovementDescriptor(
+        movement_kind=TriggeredMovementKind.SURGE if surge else TriggeredMovementKind.TRIGGERED,
+        movement_mode=mode,
+        source_rule_id="test:excluded-move",
+        trigger_timing=ReactionWindow(
+            phase=BattlePhase.CHARGE,
+            window_kind=ReactionWindowKind.RULE_TRIGGER,
+            source_step=None,
+            source_event_id=None,
+        ),
+        max_distance_inches=4,
+    )
+    with pytest.raises(GameLifecycleError, match="descriptor's allowed move"):
+        resolve_triggered_movement(
+            scenario=scenario,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            unit_placement=placement,
+            descriptor=descriptor,
+            path_witness=PathWitness.for_straight_line_endpoints(
+                tuple(
+                    (m.model_instance_id, m.pose, Pose.at(m.pose.position.x, m.pose.position.y - 1))
+                    for m in placement.model_placements
+                )
+            ),
+            battle_round=state.battle_round,
+            move_keyword_choice=keyword_choice_context(
+                descriptor=source.movement_abilities()[0],
+                unit=rules_unit_view_by_id(
+                    state=state, unit_instance_id=placement.unit_instance_id
+                ),
+                selected=True,
+            ),
+            surge_target_unit_instance_id=units["enemy"].unit_instance_id if surge else None,
+        )

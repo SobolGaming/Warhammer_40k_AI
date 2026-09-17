@@ -141,7 +141,9 @@ def resolve_triggered_movement(
         )
     from warhammer40k_core.engine.move_ability_choices import (
         CHOICE_KEY,
+        choice_descriptor,
         chosen_move_keywords,
+        descriptors_for_move,
         movement_ability_keywords,
     )
     from warhammer40k_core.engine.phases.movement_geometry import (
@@ -154,7 +156,9 @@ def resolve_triggered_movement(
     ability_keywords = movement_ability_keywords(view)
     choice_payload = {} if move_keyword_choice is None else {CHOICE_KEY: move_keyword_choice}
     temporary_keywords = chosen_move_keywords(choice_payload)
-    if temporary_keywords and (is_surge or descriptor.movement_mode is not MovementMode.NORMAL):
+    if temporary_keywords and choice_descriptor(move_keyword_choice) not in descriptors_for_move(
+        ability_keywords, descriptor.movement_mode.value, is_surge=is_surge
+    ):
         raise GameLifecycleError("Movement keywords require their descriptor's allowed move.")
     aircraft_model_ids = aircraft_model_ids_for_scenario(
         scenario,

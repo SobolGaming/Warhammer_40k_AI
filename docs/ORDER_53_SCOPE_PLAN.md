@@ -71,6 +71,24 @@ record public shapes and visibility.
 
 ## Validation
 
+Review of `b884b712` found an invariant violation in reactive movement: an
+engine-issued MOBILE choice for Fall Back was rejected by a Normal-only resolver
+guard after recording the decision. Advance had the same mismatch. The resolver
+now validates the chosen source descriptor through the same `descriptors_for_move`
+lookup used by choice generation, pre-submit authority and movement capabilities.
+The completion-path regression also exposed a Normal-only action classification:
+reactive Advance and Fall Back were treated as generic displacement and skipped
+completion hooks. Their source modes now reach the existing completion owner.
+The separate flight restriction remains specific to its source. Charge, pile-in,
+consolidation and Surge remain excluded. The existing adapter contract already
+covers these modes and payloads, so this correction needs no contract-shape change.
+
+Reactive regressions exercise Normal, Advance and Fall Back with MOBILE selected
+and declined, finite and parameterized paths, rejected-path retries, distance
+rerolls, exact completion, continued decisions, checkpoint restore and replay.
+Direct resolver tests and a static audit preserve source-driven mode validation
+and the excluded move kinds.
+
 Focused regressions cover Normal/Advance/Fall Back, finite and parameterized
 reactive paths, accepted/declined distance rerolls, rejected-path retries, attached
 membership, native descriptors with arbitrary display names, terrain boundaries,

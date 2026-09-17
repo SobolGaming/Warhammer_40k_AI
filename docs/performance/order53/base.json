@@ -33,7 +33,7 @@
   },
   "samples": [
     {
-      "seconds": 0.012535540969111025,
+      "seconds": 0.014387333067134023,
       "accepted": [
         false,
         false,
@@ -74,7 +74,7 @@
       ]
     },
     {
-      "seconds": 0.0119964579353109,
+      "seconds": 0.01385504100471735,
       "accepted": [
         false,
         false,
@@ -115,7 +115,7 @@
       ]
     },
     {
-      "seconds": 0.01114766695536673,
+      "seconds": 0.012144292006269097,
       "accepted": [
         false,
         false,
@@ -156,7 +156,7 @@
       ]
     },
     {
-      "seconds": 0.011278041987679899,
+      "seconds": 0.012466999934986234,
       "accepted": [
         false,
         false,
@@ -197,7 +197,7 @@
       ]
     },
     {
-      "seconds": 0.011211999924853444,
+      "seconds": 0.012177290860563517,
       "accepted": [
         false,
         false,
@@ -238,7 +238,7 @@
       ]
     },
     {
-      "seconds": 0.010893791913986206,
+      "seconds": 0.011944208992645144,
       "accepted": [
         false,
         false,
@@ -279,7 +279,7 @@
       ]
     },
     {
-      "seconds": 0.01088958396576345,
+      "seconds": 0.012013665866106749,
       "accepted": [
         false,
         false,
@@ -320,9 +320,9 @@
       ]
     }
   ],
-  "mean_seconds": 0.011421869093153094,
-  "median_seconds": 0.011211999924853444,
-  "maximum_seconds": 0.012535540969111025,
+  "mean_seconds": 0.012712690247488874,
+  "median_seconds": 0.012177290860563517,
+  "maximum_seconds": 0.014387333067134023,
   "completion_rate": 1,
   "full_game_certified": false,
   "correctness_note": "Four open-terrain paths crossing friendly Vehicle models; base lacks the ability and rejects them, head accepts them.",
