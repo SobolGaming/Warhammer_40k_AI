@@ -770,6 +770,16 @@
           "audit_id": "core-empty-dedicated-transport-maintained-app-mirrors-2026-09-18",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-18T16:45:00+00:00"
+        },
+        {
+          "row_id": "emergency-disembark-placement",
+          "source_observation_sha256": "c39e87327a822139e0075c5af984b48f2fecbc0c2d5a3645507473e9e2545150",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/18-transports",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-emergency-disembark-placement-maintained-app-mirrors-2026-09-18",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-18T19:30:00+00:00"
         }
       ],
       "legacy_observations": [
@@ -1327,6 +1337,15 @@
             "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport"
           ],
           "catalog_sha256": "f5ae3409fd824ca0440f74c1408097936ed21c42d5c8da940fcf9dc1e6054096"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-emergency-disembark-placement",
+          "version": "maintained-app-mirrors-observed-2026-09-18",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement"
+          ],
+          "catalog_sha256": "4231ddfb2ba34e156b67508bb8bfa58cb1de8249fe9d054ce1138c392f7c7da3"
         }
       ]
     },

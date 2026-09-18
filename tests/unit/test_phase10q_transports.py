@@ -7,6 +7,7 @@ from typing import Any, cast
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.movement_submission_helpers import core_movement_handler
+from tests.order60_emergency_disembark_helpers import emergency_disembark_poses_around
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import ViewerContext
@@ -6558,7 +6559,7 @@ def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() ->
         passenger,
         army_id="army-alpha",
         player_id="player-a",
-        poses=_disembark_poses(),
+        poses=_emergency_disembark_poses(),
     )
     cargo_state = _cargo_state(
         transport=transport,
@@ -6975,7 +6976,7 @@ def test_p18c_transport_hazard_records_and_placement_objects_reject_drift() -> N
         passenger,
         army_id="army-alpha",
         player_id="player-a",
-        poses=_disembark_poses(),
+        poses=_emergency_disembark_poses(),
     )
     cargo_state = _cargo_state(
         transport=transport,
@@ -7629,7 +7630,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         passenger,
         army_id="army-alpha",
         player_id="player-a",
-        poses=_disembark_poses(),
+        poses=_emergency_disembark_poses(),
     )
     cargo_state = _cargo_state(
         transport=transport,
@@ -8316,7 +8317,7 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
         passenger,
         army_id="army-alpha",
         player_id="player-a",
-        poses=_disembark_poses()[:-1],
+        poses=_emergency_disembark_poses()[:-1],
     )
 
     cargo_state = _cargo_state(
@@ -8352,19 +8353,15 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
         turn_player_id="player-a",
     )
 
-    assert result.placement.is_valid
+    assert result.placement.is_valid is False
+    assert TransportOperationViolationCode.EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE in {
+        violation.violation_code for violation in result.placement.violations
+    }
     assert result.roll_threshold == HAZARD_ROLL_FAILURE_THRESHOLD
     assert result.mortal_wounds_per_failed_roll == 1
     assert len(result.model_rolls) == len(passenger.own_models)
     assert result.destroyed_model_instance_ids == (passenger.own_models[-1].model_instance_id,)
-    assert result.disembarked_unit_state is not None
-    assert result.disembarked_unit_state.battle_shocked_until == "end_of_turn"
-    assert result.disembarked_unit_state.disembark_mode is (DisembarkModeKind.EMERGENCY_DISEMBARK)
-    updated_battlefield = apply_destroyed_transport_disembark_to_battlefield(
-        battlefield_state=disembark_scenario.battlefield_state,
-        disembark=result,
-    )
-    assert passenger.own_models[-1].model_instance_id in updated_battlefield.removed_model_ids
+    assert result.disembarked_unit_state is None
 
 
 def test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible() -> None:
@@ -10268,6 +10265,15 @@ def _disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:
         Pose.at(14.0, 11.2, z_inches),
         Pose.at(13.1, 12.5, z_inches),
         Pose.at(12.8, 10.5, z_inches),
+    )
+
+
+def _emergency_disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:
+    return emergency_disembark_poses_around(
+        center_x=10.0,
+        center_y=10.0,
+        count=5,
+        z_inches=z_inches,
     )
 
 

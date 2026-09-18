@@ -6237,3 +6237,15 @@ destruction event through the existing engine path. `GameLifecycle` restore
 authenticates those setup casualties from the public destruction event and still
 rejects unrelated wound changes.
 
+## Order 60: Emergency Disembark maximal closest placement
+
+Order 60 / P18B adds no player-facing decision, option family, proposal kind, or
+viewer-visibility change. The existing destroyed-Transport
+`submit_placement_proposal` request must set up every surviving model wholly
+within 6 inches of the destroyed Transport and as close as possible, remain
+unengaged when an unengaged set-up exists, allow an engaged endpoint only when
+no unengaged endpoint exists, and destroy only a model that still cannot be set
+up. Adapters must not omit a placeable survivor or treat sampling as proof that
+no legal pose exists. Restore and replay retain the same engine-owned placement
+and omitted-casualty authority. Hidden-information redaction is unchanged.
+

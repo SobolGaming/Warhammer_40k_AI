@@ -9,6 +9,7 @@ from tests.completed_attack_fixture_helpers import (
     resolve_core_attack_completion_for_executor_fixture,
 )
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+from tests.order60_emergency_disembark_helpers import emergency_disembark_contact_poses
 from tests.phase13b_shooting_declaration_helpers import (
     _advanced_unit_state,
     _apply_shooting_declaration_without_advancing,
@@ -13707,12 +13708,10 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         passenger,
         army_id="army-beta",
         player_id="player-b",
-        poses=(
-            Pose.at(38.1, 33.5),
-            Pose.at(39.0, 34.8),
-            Pose.at(39.0, 36.2),
-            Pose.at(38.1, 37.5),
-            Pose.at(37.8, 35.5),
+        poses=emergency_disembark_contact_poses(
+            passenger.own_models,
+            center_x=35.0,
+            center_y=35.0,
         ),
     )
 
@@ -13830,12 +13829,10 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         passenger,
         army_id="army-beta",
         player_id="player-b",
-        poses=(
-            Pose.at(38.1, 33.5),
-            Pose.at(39.0, 34.8),
-            Pose.at(39.0, 36.2),
-            Pose.at(38.1, 37.5),
-            Pose.at(37.8, 35.5),
+        poses=emergency_disembark_contact_poses(
+            passenger.own_models,
+            center_x=35.0,
+            center_y=35.0,
         ),
     )
     attempted_placement = replace(
@@ -14201,12 +14198,10 @@ def test_p18c_pending_cargo_order_keeps_interleaved_attached_components_adjacent
         intermediate,
         army_id="army-beta",
         player_id="player-b",
-        poses=(
-            Pose.at(38.1, 33.5),
-            Pose.at(39.0, 34.8),
-            Pose.at(39.0, 36.2),
-            Pose.at(38.1, 37.5),
-            Pose.at(37.8, 35.5),
+        poses=emergency_disembark_contact_poses(
+            intermediate.own_models,
+            center_x=35.0,
+            center_y=35.0,
         ),
     )
     hazard_results = tuple(
@@ -14564,16 +14559,10 @@ def test_p18c_retained_attached_lineage_accepts_living_embarked_component(
         surviving_component,
         army_id="army-beta",
         player_id="player-b",
-        poses=(
-            (Pose.at(40.8, 34.8),)
-            if surviving_component is leader
-            else (
-                Pose.at(38.1, 33.5),
-                Pose.at(39.0, 34.8),
-                Pose.at(39.0, 36.2),
-                Pose.at(38.1, 37.5),
-                Pose.at(37.8, 35.5),
-            )
+        poses=emergency_disembark_contact_poses(
+            surviving_component.own_models,
+            center_x=35.0,
+            center_y=35.0,
         ),
     )
     _submit_p18c_attached_rules_unit_placement(
@@ -14688,7 +14677,11 @@ def test_p18c_hazard_destroyed_attached_component_uses_frozen_cargo_authority() 
         leader,
         army_id="army-beta",
         player_id="player-b",
-        poses=(Pose.at(40.8, 34.8),),
+        poses=emergency_disembark_contact_poses(
+            leader.own_models,
+            center_x=35.0,
+            center_y=35.0,
+        ),
     )
     _submit_p18c_attached_rules_unit_placement(
         lifecycle=lifecycle,
@@ -14861,28 +14854,22 @@ def test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot()
 
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     assert proposal_request.unit_instance_id == attached.unit_instance_id
+    grouped_poses = emergency_disembark_contact_poses(
+        (*bodyguard.own_models, *leader.own_models),
+        center_x=35.0,
+        center_y=35.0,
+    )
     bodyguard_placement = _unit_placement_at(
         bodyguard,
         army_id="army-beta",
         player_id="player-b",
-        poses=(
-            Pose.at(38.1, 33.5),
-            Pose.at(39.0, 34.8),
-            Pose.at(39.0, 36.2),
-            Pose.at(38.1, 37.5),
-            Pose.at(37.8, 35.5),
-        ),
-    )
-    omitted_bodyguard_model_id = bodyguard_placement.model_placements[-1].model_instance_id
-    bodyguard_placement = replace(
-        bodyguard_placement,
-        model_placements=bodyguard_placement.model_placements[:-1],
+        poses=grouped_poses[:5],
     )
     leader_placement = _unit_placement_at(
         leader,
         army_id="army-beta",
         player_id="player-b",
-        poses=(Pose.at(40.8, 34.8),),
+        poses=(grouped_poses[5],),
     )
     placement_result = _proposal_decision_result(
         request=request,
@@ -14925,11 +14912,10 @@ def test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot()
         bodyguard_placement
     )
     assert updated_battlefield.unit_placement_by_id(leader.unit_instance_id) == leader_placement
-    assert omitted_bodyguard_model_id in updated_battlefield.removed_model_ids
-    assert not model_by_id(
-        state=state,
-        model_instance_id=omitted_bodyguard_model_id,
-    ).is_alive
+    assert all(
+        model.model_instance_id not in updated_battlefield.removed_model_ids
+        for model in bodyguard.own_models
+    )
     disembarked_states = tuple(
         disembarked_state
         for disembarked_state in state.disembarked_unit_states
@@ -14957,7 +14943,10 @@ def test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot()
         if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
     ) == (attached.unit_instance_id,)
     assert restored_state.battlefield_state is not None
-    assert omitted_bodyguard_model_id in restored_state.battlefield_state.removed_model_ids
+    assert all(
+        model.model_instance_id not in restored_state.battlefield_state.removed_model_ids
+        for model in bodyguard.own_models
+    )
     forged_checkpoint = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(checkpoint, sort_keys=True)),
@@ -16008,12 +15997,10 @@ def test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal
         passenger_a,
         army_id="army-beta",
         player_id="player-b",
-        poses=(
-            Pose.at(38.1, 33.5),
-            Pose.at(39.0, 34.8),
-            Pose.at(39.0, 36.2),
-            Pose.at(38.1, 37.5),
-            Pose.at(37.8, 35.5),
+        poses=emergency_disembark_contact_poses(
+            passenger_a.own_models,
+            center_x=35.0,
+            center_y=35.0,
         ),
     )
     result = _proposal_decision_result(

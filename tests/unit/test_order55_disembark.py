@@ -417,12 +417,19 @@ def test_every_mode_uses_size_proof_and_requires_exceptional_models_unengaged(
                 source_rule_id="test:oversized-disembark-permission",
             ),
         )
+    attempted = large_disembark_placement(session)
+    if mode is DisembarkModeKind.EMERGENCY_DISEMBARK and not enemy_nearby:
+        from tests.order60_emergency_disembark_helpers import (
+            order60_oversized_closest_placement,
+        )
+
+        attempted = order60_oversized_closest_placement(session)
     selection = DisembarkSelection(
         player_id="player-a",
         battle_round=1,
         unit_instance_id=PASSENGER_ID,
         transport_unit_instance_id=TRANSPORT_ID,
-        attempted_placement=large_disembark_placement(session),
+        attempted_placement=attempted,
         disembark_mode=mode,
         transport_movement_status=TransportMovementStatus.NORMAL_MOVE
         if mode is DisembarkModeKind.RAPID_DISEMBARK

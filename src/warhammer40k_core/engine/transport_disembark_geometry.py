@@ -143,7 +143,10 @@ def append_disembark_endpoint_violations(
                         model_instance_id=enemy_model.model_id,
                     ),
                 ).unit_instance_id
-                if not oversized and enemy_unit_id in allowed_engagement_units:
+                if not oversized and (
+                    mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+                    or enemy_unit_id in allowed_engagement_units
+                ):
                     continue
                 violations.append(
                     TransportOperationViolation(
