@@ -682,6 +682,12 @@ Current status:
   verify it offline with
   `uv run python tools/build_core_measuring_to_destroyed_source.py` and the same
   command plus `--check`.
+- Order 58 / P05D's reviewed App-data v931 incoming Damage-to-0 timing FAQ is
+  pinned in
+  `core_failed_save_damage_timing_2026_09/artifacts/package.json`; refresh and
+  verify it offline with
+  `uv run python tools/build_core_failed_save_damage_timing_source.py` and the
+  same command plus `--check`.
 - P18C/P18D/P18E's reviewed 18.05 Emergency Disembark and App-data v931 18.06
   Assault Disembark and 18.07 Shock Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
@@ -845,3 +851,8 @@ grants no living battlefield authority. Deadly Demise uses the same measurement
 after removal. See [scope and proof](docs/ORDER_57_SCOPE_PLAN.md). Verify its
 reviewed source with
 `uv run python tools/build_core_measuring_to_destroyed_source.py --check`.
+
+Order 58 applies incoming Damage-to-0 after the saving throw. Grouped allocation
+keeps that post-save order, records the replacement, and skips infliction. See
+[scope and proof](docs/ORDER_58_SCOPE_PLAN.md). Verify its reviewed source with
+`uv run python tools/build_core_failed_save_damage_timing_source.py --check`.

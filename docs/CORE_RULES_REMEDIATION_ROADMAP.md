@@ -4839,7 +4839,7 @@ certify the deferred full-game budgets.
 ## P05C implementation evidence — Order 57
 
 Status: implemented on `codex/order-57-destroyed-referent-measurement`.
-Finding: `C05-03`. Category 05's remaining Damage-to-0 timing work stays with
+Finding: `C05-03`. Category 05's Damage-to-0 timing is certified separately by
 P05D; this is not a category-wide certificate.
 
 The invariant is source-authorized measurement to a destroyed model using that
@@ -4863,6 +4863,35 @@ The offline builder and typed loader record `loaded` /
 See [performance and final validation](performance/order57/README.md).
 Local gates on 2026-09-18: 8,350 behavioral tests at 85.13% coverage, 514
 code-quality tests, identity/contract checks against base `3384760f`, wheel
+smoke, and 342 TypeScript conformance assertions on contract 26.0.0.
+Complete-game performance remains unmeasured.
+
+## P05D implementation evidence — Order 58
+
+Status: implemented on `codex/order-58-failed-save-damage-timing`.
+Finding: `C05-04`. This certifies v931 Damage-to-0 timing; it is not a
+category-wide certificate.
+
+The invariant is that a rule changing incoming attack Damage to 0 applies after
+the saving throw. Ownership, source, and proof are in
+`docs/ORDER_58_SCOPE_PLAN.md`. Grouped allocation remains the mutation owner and
+consults the unused replacement only after a failed save. The catalog
+first-failed-save consumer is unchanged. No new player-facing decision, named
+handler, or architecture exception is introduced.
+
+Source authority is the complete v931 FAQ observation
+`gw-11e-core-failed-save-damage-timing:damage-to-0-after-saves-faq`, App-data
+931, transcription SHA-256
+`e5579ebc0e86951594e8a083c82d63f839fb435354cca9b905df89f38d57bcb0`,
+source-observation SHA-256
+`91dfafdf104dde3f2e3444b59f71360e194c8a4426280c828aa764619517b814`.
+The offline builder and typed loader record `loaded` /
+`executable_engine_runtime`. Historical official Core Rules provenance remains
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+See [performance and final validation](performance/order58/README.md).
+Local gates on 2026-09-18: 8,358 behavioral tests at 85.13% coverage, 517
+code-quality tests, identity/contract checks against base `e693fd01`, wheel
 smoke, and 342 TypeScript conformance assertions on contract 26.0.0.
 Complete-game performance remains unmeasured.
 

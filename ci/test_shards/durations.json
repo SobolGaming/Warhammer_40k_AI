@@ -85,6 +85,7 @@
     "tests/unit/test_order54_setup.py": 3.679,
     "tests/unit/test_order55_disembark.py": 127.105,
     "tests/unit/test_order57_destroyed_referent_measurement.py": 0.859,
+    "tests/unit/test_order58_failed_save_damage_timing.py": 6.74,
     "tests/unit/test_phase10a_placement.py": 0.06,
     "tests/unit/test_phase10b_movement.py": 60.143,
     "tests/unit/test_phase10d_battlefield_transitions.py": 9.55,
@@ -257,46 +258,46 @@
   "shard_count": 8,
   "shards": [
     {
-      "duration_seconds": 5057.703,
+      "duration_seconds": 5058.545,
       "shard_id": 1,
-      "test_file_count": 29
+      "test_file_count": 28
     },
     {
-      "duration_seconds": 5057.709,
+      "duration_seconds": 5058.541,
       "shard_id": 2,
-      "test_file_count": 29
+      "test_file_count": 31
     },
     {
-      "duration_seconds": 5057.703,
+      "duration_seconds": 5058.538,
       "shard_id": 3,
-      "test_file_count": 30
-    },
-    {
-      "duration_seconds": 5057.704,
-      "shard_id": 4,
-      "test_file_count": 31
-    },
-    {
-      "duration_seconds": 5057.709,
-      "shard_id": 5,
-      "test_file_count": 31
-    },
-    {
-      "duration_seconds": 5057.702,
-      "shard_id": 6,
       "test_file_count": 32
     },
     {
-      "duration_seconds": 5057.714,
+      "duration_seconds": 5058.563,
+      "shard_id": 4,
+      "test_file_count": 30
+    },
+    {
+      "duration_seconds": 5058.583,
+      "shard_id": 5,
+      "test_file_count": 30
+    },
+    {
+      "duration_seconds": 5058.537,
+      "shard_id": 6,
+      "test_file_count": 31
+    },
+    {
+      "duration_seconds": 5058.538,
       "shard_id": 7,
       "test_file_count": 32
     },
     {
-      "duration_seconds": 5057.734,
+      "duration_seconds": 5058.573,
       "shard_id": 8,
-      "test_file_count": 29
+      "test_file_count": 30
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 40461.678
+  "total_test_duration_seconds": 40468.418
 }

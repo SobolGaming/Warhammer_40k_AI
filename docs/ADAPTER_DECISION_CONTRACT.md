@@ -6204,3 +6204,16 @@ P05B; former-footprint measurement is the post-removal path. Restore and replay
 bind the former placement to the logical-death event payload. Adapters must not
 invent a destroyed-model coordinate or measure from a living stand-in.
 
+## Order 58: incoming Damage-to-0 after the saving throw
+
+Order 58 / P05D adds no player-facing decision, option family, proposal kind, or
+viewer-visibility change. A rule that changes incoming attack Damage to 0 applies
+after the allocated model's saving throw. Grouped allocation consults the unused
+failed-save replacement only after a failed save, records
+`failed_save_damage_replaced` with the v931 FAQ source rule ID, and skips
+infliction. A successful save still prevents damage. Adapters must not apply that
+incoming Damage change before the save or invent a pre-save Damage of 0.
+Restore and replay retain the replacement event and unchanged wounds through the
+existing engine path. The catalog first-failed-save consumer remains
+once-per-turn and automatic.
+

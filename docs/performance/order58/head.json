@@ -1,0 +1,85 @@
+{
+  "workload_id": "order58-failed-save-damage-timing-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:3c90bd4a5b1d19c036ad549ccc2932ec262d125835217023dc18740a2d96c9d5",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "one grouped failed-save Damage-to-0 attack sequence; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": "compact shooting attacker plus isolated defender model",
+    "units": 2,
+    "attack_count": 1
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order58.py": "609c969865c3e36433140c6bc60e156832fa640cecf19bb5bf4d59d9366a4bf8",
+    "tests/order58_failed_save_damage_timing_helpers.py": "5050ba708b88248509721546374462657e00254c185dad8a82ee24981be61522"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 5.719167900002503,
+      "matched_seconds": 0.030307900000480004,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03229039999860106,
+      "matched_seconds": 0.01513620000332594,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03082929999800399,
+      "matched_seconds": 0.01464269999996759,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03603020000446122,
+      "matched_seconds": 0.01486710000608582,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03168240000377409,
+      "matched_seconds": 0.014508899999782443,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03197530000034021,
+      "matched_seconds": 0.014745000000402797,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03343999999924563,
+      "matched_seconds": 0.017256499995710328,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.01735204285796499,
+  "median_seconds": 0.01486710000608582,
+  "maximum_seconds": 0.030307900000480004,
+  "p95_seconds": 0.017256499995710328,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 0.05,
+    "maximum_seconds": 2
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}

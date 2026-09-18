@@ -1,0 +1,85 @@
+{
+  "workload_id": "order58-failed-save-damage-timing-v1",
+  "revision": "e693fd01f38202b6ae4694326ae1abd3c66c652c",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "one grouped failed-save Damage-to-0 attack sequence; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": "compact shooting attacker plus isolated defender model",
+    "units": 2,
+    "attack_count": 1
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order58.py": "609c969865c3e36433140c6bc60e156832fa640cecf19bb5bf4d59d9366a4bf8",
+    "tests/order58_failed_save_damage_timing_helpers.py": "5050ba708b88248509721546374462657e00254c185dad8a82ee24981be61522"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 6.188273599997046,
+      "matched_seconds": 0.08679649999976391,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.042199600000458304,
+      "matched_seconds": 0.019536799998604693,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.038212499996006954,
+      "matched_seconds": 0.018188699999882374,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03438879999885103,
+      "matched_seconds": 0.016063100003520958,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03366690000257222,
+      "matched_seconds": 0.01669449999462813,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.03415040000254521,
+      "matched_seconds": 0.018053599997074343,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.032429300001240335,
+      "matched_seconds": 0.018055300002743024,
+      "defender_wounds_remaining": 2,
+      "replacement_events": 1,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.027626928570888203,
+  "median_seconds": 0.018055300002743024,
+  "maximum_seconds": 0.08679649999976391,
+  "p95_seconds": 0.019536799998604693,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 0.05,
+    "maximum_seconds": 2
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}
