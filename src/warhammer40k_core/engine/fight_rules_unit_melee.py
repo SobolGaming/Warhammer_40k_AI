@@ -59,6 +59,7 @@ def rules_unit_melee_target_unit_ids(
 
 def rules_unit_available_melee_weapons_payloads(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     rules_unit: RulesUnitView,
@@ -69,6 +70,7 @@ def rules_unit_available_melee_weapons_payloads(
     if not rules_unit.is_attached_rules_unit:
         unit = rules_unit.components[0].unit
         physical_rows = available_melee_weapons_payloads(
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit=unit,
@@ -107,6 +109,7 @@ def rules_unit_available_melee_weapons_payloads(
     rows: list[dict[str, JsonValue]] = []
     for unit in _present_component_units(state=state, rules_unit=rules_unit):
         for payload in available_melee_weapons_payloads(
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit=unit,
@@ -151,6 +154,7 @@ def rules_unit_available_melee_weapons_payloads(
 
 def validate_rules_unit_melee_declaration(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     request: MeleeDeclarationProposalRequest,
@@ -162,11 +166,23 @@ def validate_rules_unit_melee_declaration(
         state=state,
         unit_instance_id=proposal.unit_instance_id,
     )
+    expected_rows = rules_unit_available_melee_weapons_payloads(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+        state=state,
+        source_decision_result_id=request.source_decision_result_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    if expected_rows != request.available_weapons:
+        return _invalid(request=request, code="weapon_ability_inventory_drift")
     if not rules_unit.is_attached_rules_unit and not _request_has_attached_target(
         state=state,
         request=request,
     ):
         return validate_melee_declaration_rules(
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             request=request,
@@ -209,6 +225,7 @@ def validate_rules_unit_melee_declaration(
         component_id = component.unit.unit_instance_id
         declarations = tuple(declarations_by_component[component_id])
         physical_rows = available_melee_weapons_payloads(
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit=component.unit,
@@ -224,6 +241,7 @@ def validate_rules_unit_melee_declaration(
             physical_rows=physical_rows,
         )
         validation = validate_melee_declaration_rules(
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             request=replace(
@@ -291,6 +309,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
         if not declarations:
             continue
         physical_rows = available_melee_weapons_payloads(
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit=component.unit,
@@ -603,8 +622,20 @@ def _canonical_attack_pool(
             }
         )
     )
+    from warhammer40k_core.engine.weapon_selection_context import rebind_selection_targets
+
+    context = pool.weapon_selection_context
+    if context is not None:
+        context = rebind_selection_targets(
+            context,
+            {
+                target_id: _canonical_target_unit_id(state=state, unit_instance_id=target_id)
+                for target_id, _ in context.target_profiles
+            },
+        )
     return replace(
         pool,
+        weapon_selection_context=context,
         target_unit_instance_id=target.unit_instance_id,
         target_visible_model_ids=target_model_ids,
         target_in_range_model_ids=target_model_ids,

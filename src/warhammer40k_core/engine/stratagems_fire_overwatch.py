@@ -12,6 +12,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.shooting_requests import (
     request_out_of_phase_shooting_declaration,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.shooting_unit_selected_hooks import ShootingUnitSelectedGrantRegistry
 from warhammer40k_core.engine.stratagems_model import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
@@ -31,6 +32,7 @@ __all__ = ("_apply_fire_overwatch_handler",)
 
 def _apply_fire_overwatch_handler(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     state: GameState,
     decisions: DecisionController,
     context: StratagemEligibilityContext,
@@ -47,6 +49,7 @@ def _apply_fire_overwatch_handler(
         raise GameLifecycleError("Fire Overwatch requires the Movement phase.")
     shooting_unit_id = _require_target_unit_id(target_binding)
     request_out_of_phase_shooting_declaration(
+        runtime_modifier_registry=runtime_modifier_registry,
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,

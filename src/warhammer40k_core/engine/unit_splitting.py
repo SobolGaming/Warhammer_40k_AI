@@ -57,6 +57,9 @@ def build_split_army(
         source_units = tuple(
             army.unit_by_id(value) for value in formation.component_unit_instance_ids
         )
+    # A split retires the source rules unit. Successors choose their own active
+    # instances; immutable split evidence retains the source definitions.
+    source_units = tuple(replace(unit, core_ability_selections=()) for unit in source_units)
     record = UnitSplitRecord(
         request_id=request_id,
         source_id=source_id,
@@ -81,6 +84,11 @@ def build_split_army(
                     source,
                     unit_instance_id=origin.unit_instance_id,
                     split_origin=origin,
+                    core_ability_selections=(),
+                    core_keyword_sources=tuple(
+                        replace(source, owner_id=origin.unit_instance_id)
+                        for source in source.core_keyword_sources
+                    ),
                     own_models=tuple(
                         model for model in source.own_models if model.model_instance_id in chosen
                     ),

@@ -59,7 +59,6 @@ __all__ = (
     "_roll_hit",
     "_roll_wound",
     "_save_options_with_effect_invulnerable",
-    "_selected_anti_keyword_ability_id",
     "_target_has_effect_cover",
     "_target_has_effect_cover_denial",
     "_unit_instance_id_for_model",
@@ -303,7 +302,6 @@ def _critical_wound_threshold(
     threshold = anti_keyword_critical_threshold(
         profile=pool.weapon_profile,
         target_keywords=target_keywords,
-        selected_ability_id=_selected_anti_keyword_ability_id(pool),
     )
     return generic_rule_critical_wound_threshold(
         WoundRollCriticalThresholdContext(
@@ -401,24 +399,6 @@ def _reroll_wound_for_twin_linked_if_needed(
         },
     )
     return wound_roll
-
-
-def _selected_anti_keyword_ability_id(pool: RangedAttackPool) -> str | None:
-    ability_by_id = {ability.ability_id: ability for ability in pool.weapon_profile.abilities}
-    selected_ids: list[str] = []
-    for ability_id in pool.selected_weapon_ability_ids:
-        ability = ability_by_id.get(ability_id)
-        if ability is None:
-            raise GameLifecycleError(
-                "Selected weapon ability ID is not on the attack pool profile."
-            )
-        if ability.ability_kind is AbilityKind.ANTI_KEYWORD:
-            selected_ids.append(ability_id)
-    if len(selected_ids) > 1:
-        raise GameLifecycleError("Attack pool must not select multiple Anti ability IDs.")
-    if not selected_ids:
-        return None
-    return selected_ids[0]
 
 
 def _emit_damage_event(

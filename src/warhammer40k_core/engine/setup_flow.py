@@ -150,6 +150,14 @@ class SetupFlow:
         pending_request: DecisionRequest,
         reaction_frame_count: int,
     ) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.core_ability_selection import (
+            SELECT_CORE_ABILITY_INSTANCE_DECISION_TYPE,
+        )
+
+        # Global Core choices are owned and fully revalidated by their registered
+        # lifecycle dispatch handler, independently of the current setup step.
+        if pending_request.decision_type == SELECT_CORE_ABILITY_INSTANCE_DECISION_TYPE:
+            return None
         if state.stage is not GameLifecycleStage.SETUP:
             return None
         issued_request: DecisionRequest | None = None

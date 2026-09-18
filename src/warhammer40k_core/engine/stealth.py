@@ -57,6 +57,23 @@ def rules_unit_stealth_sources(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> JsonValue:
     """Return complete source commitments only when every present model has Stealth."""
+    native, covered, commitments = stealth_source_inventory(
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    if not native or covered != set(native):
+        return None
+    return {"source_rule_id": STEALTH_SOURCE_ID, "sources": commitments}
+
+
+def stealth_source_inventory(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> tuple[dict[str, tuple[str, ...]], set[str], list[JsonValue]]:
+    """Preserve partial model grants before evaluating the all-models condition."""
     view = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
     native = native_stealth_model_sources(view)
     covered = {model_id for model_id, sources in native.items() if sources}
@@ -128,6 +145,4 @@ def rules_unit_stealth_sources(
                         "model_ids": list(grant_ids),
                     }
                 )
-    if not native or covered != set(native):
-        return None
-    return {"source_rule_id": STEALTH_SOURCE_ID, "sources": commitments}
+    return native, covered, commitments

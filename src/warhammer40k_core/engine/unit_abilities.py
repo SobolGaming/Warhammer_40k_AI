@@ -3,7 +3,10 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from warhammer40k_core.core.ability_sources import AbilitySourceInstance
+from warhammer40k_core.core.core_ability_family import CoreAbilityFamily
 from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
+from warhammer40k_core.engine.core_ability_state import active_core_descriptors
 from warhammer40k_core.engine.core_catalog_ability_ids import (
     CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID,
     CORE_INFILTRATORS_CATALOG_ABILITY_ID,
@@ -19,18 +22,20 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 class CoreKeywordAbilitySpec:
     keyword: str
     ability_ids: frozenset[str]
-    name_words: tuple[str, ...]
+    family: CoreAbilityFamily
 
 
 @dataclass(frozen=True, slots=True)
 class DeadlyDemiseAbilityProfile:
     source_id: str
+    ability_source: AbilitySourceInstance
     mortal_wounds_token: str
 
 
 @dataclass(frozen=True, slots=True)
 class FeelNoPainAbilityProfile:
     source_id: str
+    ability_source: AbilitySourceInstance
     threshold: int
 
 
@@ -84,57 +89,57 @@ STEALTH_ABILITY_IDS = frozenset({"000008337", "core-stealth", "stealth"})
 _DEEP_STRIKE_SPEC = CoreKeywordAbilitySpec(
     keyword="DEEP_STRIKE",
     ability_ids=DEEP_STRIKE_ABILITY_IDS,
-    name_words=("DEEP", "STRIKE"),
+    family=CoreAbilityFamily.DEEP_STRIKE,
 )
 _INFILTRATORS_SPEC = CoreKeywordAbilitySpec(
     keyword="INFILTRATORS",
     ability_ids=INFILTRATORS_ABILITY_IDS,
-    name_words=("INFILTRATORS",),
+    family=CoreAbilityFamily.INFILTRATORS,
 )
 _LEADER_SPEC = CoreKeywordAbilitySpec(
     keyword="LEADER",
     ability_ids=LEADER_ABILITY_IDS,
-    name_words=("LEADER",),
+    family=CoreAbilityFamily.LEADER,
 )
 _SUPPORT_SPEC = CoreKeywordAbilitySpec(
     keyword="SUPPORT",
     ability_ids=SUPPORT_ABILITY_IDS,
-    name_words=("SUPPORT",),
+    family=CoreAbilityFamily.SUPPORT,
 )
 _SCOUTS_SPEC = CoreKeywordAbilitySpec(
     keyword="SCOUTS",
     ability_ids=SCOUTS_ABILITY_IDS,
-    name_words=("SCOUTS",),
+    family=CoreAbilityFamily.SCOUTS,
 )
 _FIRING_DECK_SPEC = CoreKeywordAbilitySpec(
     keyword="FIRING_DECK",
     ability_ids=FIRING_DECK_ABILITY_IDS,
-    name_words=("FIRING", "DECK"),
+    family=CoreAbilityFamily.FIRING_DECK,
 )
 _DEADLY_DEMISE_SPEC = CoreKeywordAbilitySpec(
     keyword="DEADLY_DEMISE",
     ability_ids=DEADLY_DEMISE_ABILITY_IDS,
-    name_words=("DEADLY", "DEMISE"),
+    family=CoreAbilityFamily.DEADLY_DEMISE,
 )
 _FEEL_NO_PAIN_SPEC = CoreKeywordAbilitySpec(
     keyword="FEEL_NO_PAIN",
     ability_ids=FEEL_NO_PAIN_ABILITY_IDS,
-    name_words=("FEEL", "NO", "PAIN"),
+    family=CoreAbilityFamily.FEEL_NO_PAIN,
 )
 _FIGHTS_FIRST_SPEC = CoreKeywordAbilitySpec(
     keyword="FIGHTS_FIRST",
     ability_ids=FIGHTS_FIRST_ABILITY_IDS,
-    name_words=("FIGHTS", "FIRST"),
+    family=CoreAbilityFamily.FIGHTS_FIRST,
 )
 _LONE_OPERATIVE_SPEC = CoreKeywordAbilitySpec(
     keyword="LONE_OPERATIVE",
     ability_ids=LONE_OPERATIVE_ABILITY_IDS,
-    name_words=(),
+    family=CoreAbilityFamily.LONE_OPERATIVE,
 )
 _STEALTH_SPEC = CoreKeywordAbilitySpec(
     keyword="STEALTH",
     ability_ids=STEALTH_ABILITY_IDS,
-    name_words=(),
+    family=CoreAbilityFamily.STEALTH,
 )
 
 
@@ -211,7 +216,7 @@ def scouts_distance_inches_from_descriptor(
 
 
 def firing_deck_value_for_unit(unit: UnitInstance) -> int | None:
-    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_FIRING_DECK_SPEC)
+    descriptors = active_core_descriptors(unit, CoreAbilityFamily.FIRING_DECK)
     if not descriptors:
         if unit_has_keyword(unit, _FIRING_DECK_SPEC.keyword):
             raise GameLifecycleError(
@@ -226,43 +231,78 @@ def firing_deck_value_for_unit(unit: UnitInstance) -> int | None:
     return _positive_int_token(token=token, field_name="Firing Deck descriptor value")
 
 
-def deadly_demise_profile_for_unit(unit: UnitInstance) -> DeadlyDemiseAbilityProfile | None:
+def deadly_demise_profiles_for_unit(unit: UnitInstance) -> tuple[DeadlyDemiseAbilityProfile, ...]:
     descriptors = _ability_descriptors_for_unit(unit=unit, spec=_DEADLY_DEMISE_SPEC)
-    if not descriptors:
-        if unit_has_keyword(unit, _DEADLY_DEMISE_SPEC.keyword):
-            raise GameLifecycleError(
-                "Deadly Demise keyword requires a structured datasheet ability descriptor."
+    if not descriptors and unit_has_keyword(unit, _DEADLY_DEMISE_SPEC.keyword):
+        raise GameLifecycleError(
+            "Deadly Demise keyword requires a structured datasheet ability descriptor."
+        )
+    profiles: list[DeadlyDemiseAbilityProfile] = []
+    for descriptor in descriptors:
+        _require_descriptor_only(descriptor=descriptor, ability_name="Deadly Demise")
+        profiles.append(
+            DeadlyDemiseAbilityProfile(
+                source_id=descriptor.source_id,
+                ability_source=_source_for_descriptor(unit, descriptor),
+                mortal_wounds_token=_single_parameter_token(
+                    descriptor=descriptor, ability_name="Deadly Demise"
+                ),
             )
-        return None
-    if len(descriptors) > 1:
-        raise GameLifecycleError("Datasheet must not contain duplicate Deadly Demise descriptors.")
-    descriptor = next(iter(descriptors))
-    _require_descriptor_only(descriptor=descriptor, ability_name="Deadly Demise")
-    token = _single_parameter_token(descriptor=descriptor, ability_name="Deadly Demise")
-    return DeadlyDemiseAbilityProfile(source_id=descriptor.source_id, mortal_wounds_token=token)
+        )
+    return tuple(profiles)
+
+
+def deadly_demise_profile_for_unit(unit: UnitInstance) -> DeadlyDemiseAbilityProfile | None:
+    profiles = deadly_demise_profiles_for_unit(unit)
+    if len(profiles) > 1:
+        raise GameLifecycleError("Duplicated Deadly Demise requires controlling-player selection.")
+    return profiles[0] if profiles else None
+
+
+def feel_no_pain_profiles_for_unit(unit: UnitInstance) -> tuple[FeelNoPainAbilityProfile, ...]:
+    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_FEEL_NO_PAIN_SPEC)
+    if not descriptors and unit_has_keyword(unit, _FEEL_NO_PAIN_SPEC.keyword):
+        raise GameLifecycleError(
+            "Feel No Pain keyword requires a structured datasheet ability descriptor."
+        )
+    profiles: list[FeelNoPainAbilityProfile] = []
+    for descriptor in descriptors:
+        _require_descriptor_only(descriptor=descriptor, ability_name="Feel No Pain")
+        token = _single_parameter_token(descriptor=descriptor, ability_name="Feel No Pain")
+        profiles.append(
+            FeelNoPainAbilityProfile(
+                source_id=descriptor.source_id,
+                ability_source=_source_for_descriptor(unit, descriptor),
+                threshold=_d6_target_token(
+                    token=token, field_name="Feel No Pain descriptor threshold"
+                ),
+            )
+        )
+    return tuple(profiles)
 
 
 def feel_no_pain_profile_for_unit(unit: UnitInstance) -> FeelNoPainAbilityProfile | None:
-    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_FEEL_NO_PAIN_SPEC)
-    if not descriptors:
-        if unit_has_keyword(unit, _FEEL_NO_PAIN_SPEC.keyword):
-            raise GameLifecycleError(
-                "Feel No Pain keyword requires a structured datasheet ability descriptor."
-            )
-        return None
-    if len(descriptors) > 1:
-        raise GameLifecycleError("Datasheet must not contain duplicate Feel No Pain descriptors.")
-    descriptor = next(iter(descriptors))
-    _require_descriptor_only(descriptor=descriptor, ability_name="Feel No Pain")
-    token = _single_parameter_token(descriptor=descriptor, ability_name="Feel No Pain")
-    return FeelNoPainAbilityProfile(
-        source_id=descriptor.source_id,
-        threshold=_d6_target_token(token=token, field_name="Feel No Pain descriptor threshold"),
+    profiles = feel_no_pain_profiles_for_unit(unit)
+    if len(profiles) > 1:
+        raise GameLifecycleError("Duplicated Feel No Pain requires controlling-player selection.")
+    return profiles[0] if profiles else None
+
+
+def _source_for_descriptor(
+    unit: UnitInstance, descriptor: DatasheetAbilityDescriptor
+) -> AbilitySourceInstance:
+    sources = tuple(
+        source
+        for source in unit.ability_source_instances()
+        if source.ability_id == descriptor.ability_id and source.source_id == descriptor.source_id
     )
+    if len(sources) != 1:
+        raise GameLifecycleError("Core descriptor source occurrence identity drift.")
+    return sources[0]
 
 
 def lone_operative_profile_for_unit(unit: UnitInstance) -> LoneOperativeAbilityProfile | None:
-    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_LONE_OPERATIVE_SPEC)
+    descriptors = active_core_descriptors(unit, CoreAbilityFamily.LONE_OPERATIVE)
     if not descriptors:
         if not unit_has_keyword(unit, _LONE_OPERATIVE_SPEC.keyword):
             return None
@@ -291,13 +331,11 @@ def lone_operative_profile_for_unit(unit: UnitInstance) -> LoneOperativeAbilityP
                 range_inches=range_inches,
             )
         )
-    return max(profiles, key=lambda profile: (profile.range_inches, profile.source_id))
+    return profiles[0]
 
 
 def fights_first_source_id_for_unit(unit: UnitInstance, *, fallback_source_id: str) -> str | None:
-    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_FIGHTS_FIRST_SPEC)
-    if len(descriptors) > 1:
-        raise GameLifecycleError("Datasheet must not contain duplicate Fights First descriptors.")
+    descriptors = active_core_descriptors(unit, CoreAbilityFamily.FIGHTS_FIRST)
     if descriptors:
         descriptor = next(iter(descriptors))
         _require_descriptor_only(descriptor=descriptor, ability_name="Fights First")
@@ -355,23 +393,7 @@ def _descriptor_matches_spec(
         raise GameLifecycleError("Core keyword ability lookup requires ability descriptors.")
     if type(spec) is not CoreKeywordAbilitySpec:
         raise GameLifecycleError("Core keyword ability lookup requires an ability spec.")
-    if descriptor.ability_id in spec.ability_ids:
-        return True
-    return bool(spec.name_words) and _ability_name_matches_family(
-        name=descriptor.name,
-        family_words=spec.name_words,
-    )
-
-
-def _ability_name_matches_family(
-    *,
-    name: str,
-    family_words: tuple[str, ...],
-) -> bool:
-    words = _canonical_words(name)
-    if words and words[0] == "CORE":
-        words = words[1:]
-    return len(words) >= len(family_words) and words[: len(family_words)] == family_words
+    return descriptor.core_family is spec.family
 
 
 def _require_descriptor_only(
@@ -437,13 +459,6 @@ def _canonical_token(value: str) -> str:
     if not stripped:
         raise GameLifecycleError("Ability or keyword token must not be empty.")
     return stripped.upper().replace(" ", "_").replace("-", "_")
-
-
-def _canonical_words(value: str) -> tuple[str, ...]:
-    if type(value) is not str:
-        raise GameLifecycleError("Ability name must be a string.")
-    normalized = value.upper().replace("-", " ").replace("_", " ").replace('"', " ")
-    return tuple(word for word in normalized.split() if word)
 
 
 def _normalize_source_identifier(value: str, *, field_name: str) -> str:

@@ -3,6 +3,7 @@
   "declarations": [
     {
       "attacker_model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+      "selected_weapon_ability_ids": [],
       "target_allocations": [
         {
           "target_unit_instance_id": "army-beta:intercessor-unit-2"

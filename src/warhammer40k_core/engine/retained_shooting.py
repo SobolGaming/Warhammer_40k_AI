@@ -23,6 +23,7 @@ from warhammer40k_core.engine.retained_destruction_state import (
     validate_retained_placement,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
     from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -231,6 +232,7 @@ def current_retained_shooter(*, state: GameState) -> RetainedModelDestruction | 
 
 def advance_retained_shooting(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     state: GameState,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
@@ -312,6 +314,7 @@ def advance_retained_shooting(
     decisions.event_log.append("retained_shooting_started", execution.to_payload())
     state.replace_out_of_phase_shooting_state(None)
     return request_out_of_phase_shooting_declaration(
+        runtime_modifier_registry=runtime_modifier_registry,
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,

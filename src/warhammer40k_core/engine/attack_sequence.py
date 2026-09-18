@@ -255,7 +255,6 @@ __all__ = (
     "_save_options_for_allocation",
     "_save_options_with_effect_invulnerable",
     "_select_or_request_next_gathered_group",
-    "_selected_anti_keyword_ability_id",
     "_selected_destruction_reaction_source_from_request",
     "_source_backed_attack_context_id_matches_active_pool",
     "_source_backed_attack_kind_for_phase",

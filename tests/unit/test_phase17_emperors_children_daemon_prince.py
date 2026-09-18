@@ -100,6 +100,8 @@ from warhammer40k_core.rules.wahapedia_schema import (
 
 DAEMON_PRINCE_ID = "000004086"
 TORMENTORS_ID = "000004079"
+ECSTATIC_DEATH_GAME_ID = "order56-ecstatic_death_game_id-01"
+ECSTATIC_CHAIN_GAME_ID = "order56-ecstatic_chain_game_id-01"
 EXPECTED_PACKAGE_HASH = "86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84"
 
 
@@ -352,6 +354,118 @@ def test_lord_of_excess_uses_live_friendly_slaanesh_infantry_proximity() -> None
     _move_unit(fixture.state, fixture.escort.unit_instance_id, x=23.0, y=20.0)
     _move_unit(fixture.state, fixture.enemy_prince.unit_instance_id, x=30.0, y=20.0)
     assert bindings[0].handler(context) is None
+
+
+@pytest.mark.parametrize("choose_grant", [False, True])
+def test_order56_native_and_conditional_lone_operative_share_facade_selection(
+    choose_grant: bool,
+) -> None:
+    from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
+    from warhammer40k_core.engine.unit_abilities import lone_operative_profile_for_unit
+
+    catalog = _ecstatic_death_test_catalog()
+    catalog = replace(
+        catalog,
+        detachments=tuple(
+            replace(detachment, unit_datasheet_ids=(DAEMON_PRINCE_ID, TORMENTORS_ID))
+            for detachment in catalog.detachments
+        ),
+    )
+    prince_sheet = catalog.datasheet_by_id(DAEMON_PRINCE_ID)
+    native = replace(
+        next(
+            ability
+            for ability in prince_sheet.abilities
+            if ability.source_kind is CatalogAbilitySourceKind.CORE
+        ),
+        ability_id="core-lone-operative",
+        name="Lone Operative",
+        source_id="order56:native-lone-operative",
+        parameter_tokens=("9",),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(sheet, abilities=(*sheet.abilities, native))
+            if sheet.datasheet_id == DAEMON_PRINCE_ID
+            else replace(
+                sheet, composition=(replace(sheet.composition[0], min_models=5, max_models=5),)
+            )
+            if sheet.datasheet_id == TORMENTORS_ID
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    escort_sheet = catalog.datasheet_by_id(TORMENTORS_ID)
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("prince", "escort"),
+        enemy_unit_ids=("enemy",),
+        origins={"prince": Pose.at(20, 20), "escort": Pose.at(23, 20), "enemy": Pose.at(45, 20)},
+        game_id="order56-lone-operative",
+        catalog=catalog,
+        datasheet_id=DAEMON_PRINCE_ID,
+        model_profile_id=prince_sheet.model_profiles[0].model_profile_id,
+        model_count=1,
+        alpha_unit_specs={
+            "escort": (TORMENTORS_ID, escort_sheet.model_profiles[0].model_profile_id, 5)
+        },
+        alpha_faction_id="EC",
+        enemy_faction_id="EC",
+        alpha_detachment_ids=("daemon-prince-rule-ir-test",),
+        enemy_detachment_ids=("daemon-prince-rule-ir-test",),
+    )
+    session = LocalGameSession(lifecycle)
+    request = session.advance_until_decision_or_terminal().decision_request
+    assert request is not None
+    assert request.decision_type == "select_core_ability_instance"
+    assert len(request.options) == 2
+    option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and isinstance(option.payload["ability_source"], dict)
+        and (option.payload["ability_source"]["source_id"] != native.source_id) == choose_grant
+    )
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id="order56:lone-operative-choice",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    session = LocalGameSession(GameLifecycle.from_payload(session.lifecycle.to_payload()))
+    state = session.lifecycle.state
+    assert state is not None
+    prince = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == units["prince"].unit_instance_id
+    )
+    profile = lone_operative_profile_for_unit(prince)
+    assert (profile is None) == choose_grant
+    if profile is not None:
+        assert profile.range_inches == 9
+    runtime = CatalogDatasheetRuleRuntime(
+        {
+            army.player_id: build_player_ability_index(
+                catalog_ability_records_from_catalog(catalog), army=army, catalog=catalog
+            )
+            for army in state.army_definitions
+        },
+        tuple(state.army_definitions),
+    )
+    context = ShootingTargetRestrictionContext(
+        state=state,
+        player_id="player-b",
+        battle_round=state.battle_round,
+        attacking_unit_instance_id=units["enemy"].unit_instance_id,
+        attacker_model_instance_id=units["enemy"].own_models[0].model_instance_id,
+        target_unit_instance_id=prince.unit_instance_id,
+    )
+    restrictions = tuple(
+        binding.handler(context) for binding in runtime.shooting_target_restriction_bindings()
+    )
+    assert any(restriction is not None for restriction in restrictions) == choose_grant
 
 
 def test_excessive_vigour_modifies_only_charged_friendly_slaanesh_melee_profiles() -> None:
@@ -609,7 +723,7 @@ def test_ecstatic_death_registers_idempotent_serializable_two_plus_model_source(
 
 
 def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() -> None:
-    session, attacker, target = _ecstatic_death_fight_session(game_id="ecstatic-full-p05b-002")
+    session, attacker, target = _ecstatic_death_fight_session(game_id=ECSTATIC_DEATH_GAME_ID)
     state = session.lifecycle.state
     assert state is not None
     target_model_id = target.own_models[0].model_instance_id
@@ -791,7 +905,7 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
 def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
     corruption: str,
 ) -> None:
-    session, attacker, _target = _ecstatic_death_fight_session(game_id="ecstatic-full-p05b-002")
+    session, attacker, _target = _ecstatic_death_fight_session(game_id=ECSTATIC_DEATH_GAME_ID)
     status = _advance_ecstatic_death_session(
         session=session,
         status=session.advance_until_decision_or_terminal(),
@@ -1021,7 +1135,7 @@ def _ecstatic_death_chain_session() -> tuple[
             "child": Pose.at(x=12.0, y=20.0),
         },
         # Preserve both casualty branches with Order 43 hit-record RNG history.
-        game_id="order43-ecstatic-0",
+        game_id=ECSTATIC_CHAIN_GAME_ID,
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",
         model_count=1,

@@ -526,7 +526,10 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
         FIGHT_PHASE_PATH.parent.parent / "forced_fight_queue.py"
     )
     assert "forced_activation_context" in fight_hook_source
-    assert "advance_forced_fight_activations_if_needed" in lifecycle_source
+    assert "advance_once(self)" in lifecycle_source
+    assert "advance_forced_fight_activations_if_needed" in source_for(
+        LIFECYCLE_PATH.parent / "lifecycle_advancement.py"
+    )
     assert "_validate_shock_disembark_fight_history" in restore_source
     assert "authenticated_forced_fight_selections" in restore_source
     assert "build_fight_activation_request" in restore_source

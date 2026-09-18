@@ -83,7 +83,6 @@ from warhammer40k_core.engine.prebattle import (
     prebattle_violation_code_from_token,
     redeploy_timing_state_for_state,
     resolve_prebattle_proposal,
-    scout_distance_inches_for_model_ids,
     scout_move_candidates_for_player,
 )
 from warhammer40k_core.engine.prebattle_integrity import (
@@ -114,33 +113,31 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
-def test_phase16b_scout_duplicate_distance_selection_uses_lowest_shared_cap() -> None:
+def test_order56_scout_values_are_finite_and_source_examples_are_preserved() -> None:
+    from warhammer40k_core.engine.prebattle_instance_selection import (
+        scout_distance_options_for_model_ids,
+    )
+
     model_ids = ("model-1", "model-2")
 
-    assert (
-        scout_distance_inches_for_model_ids(
-            model_instance_ids=model_ids,
-            ability_instances=(
-                ScoutAbilityInstance(model_instance_id="model-1", distance_inches=6.0),
-                ScoutAbilityInstance(model_instance_id="model-1", distance_inches=8.0),
-                ScoutAbilityInstance(model_instance_id="model-2", distance_inches=6.0),
-                ScoutAbilityInstance(model_instance_id="model-2", distance_inches=8.0),
-            ),
-        )
-        == 8.0
-    )
-    assert (
-        scout_distance_inches_for_model_ids(
-            model_instance_ids=model_ids,
-            ability_instances=(
-                ScoutAbilityInstance(model_instance_id="model-1", distance_inches=6.0),
-                ScoutAbilityInstance(model_instance_id="model-2", distance_inches=8.0),
-            ),
-        )
-        == 6.0
-    )
+    assert scout_distance_options_for_model_ids(
+        model_instance_ids=model_ids,
+        ability_instances=(
+            ScoutAbilityInstance(model_instance_id="model-1", distance_inches=6.0),
+            ScoutAbilityInstance(model_instance_id="model-1", distance_inches=8.0),
+            ScoutAbilityInstance(model_instance_id="model-2", distance_inches=6.0),
+            ScoutAbilityInstance(model_instance_id="model-2", distance_inches=8.0),
+        ),
+    ) == (6.0, 8.0)
+    assert scout_distance_options_for_model_ids(
+        model_instance_ids=model_ids,
+        ability_instances=(
+            ScoutAbilityInstance(model_instance_id="model-1", distance_inches=6.0),
+            ScoutAbilityInstance(model_instance_id="model-2", distance_inches=8.0),
+        ),
+    ) == (6.0,)
     with pytest.raises(GameLifecycleError, match="Every model must have a Scouts ability"):
-        scout_distance_inches_for_model_ids(
+        scout_distance_options_for_model_ids(
             model_instance_ids=model_ids,
             ability_instances=(
                 ScoutAbilityInstance(model_instance_id="model-1", distance_inches=8.0),
@@ -775,7 +772,10 @@ def test_phase16b_scout_cursor_skips_only_player_without_unresolved_rule() -> No
     assert "scout_move:army-beta:scout-unit-2" in _option_ids(next_request)
 
 
-def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors() -> None:
+@pytest.mark.parametrize("selected_distance", [6.0, 8.0])
+def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors(
+    selected_distance: float,
+) -> None:
     catalog = _catalog_with_datasheet_keywords(
         {"core-intercessor-like-infantry": ("Infantry", "Battleline")},
         scouts_distances_by_datasheet={"core-intercessor-like-infantry": (6.0, 8.0)},
@@ -789,9 +789,19 @@ def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors()
     request = _decision_request(status)
 
     assert request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
-    option = _option_for_prefix(request, "scout_move:")
+    scout_options = tuple(
+        option for option in request.options if option.option_id.startswith("scout_move:")
+    )
+    assert {
+        cast(dict[str, object], option.payload)["scout_distance_inches"] for option in scout_options
+    } == {6.0, 8.0}
+    option = next(
+        option
+        for option in scout_options
+        if cast(dict[str, object], option.payload)["scout_distance_inches"] == selected_distance
+    )
     assert isinstance(option.payload, dict)
-    assert option.payload["scout_distance_inches"] == 8.0
+    assert option.payload["scout_distance_inches"] == selected_distance
     scout_instances = option.payload["scout_ability_instances"]
     assert isinstance(scout_instances, list)
     assert len(scout_instances) == 10
@@ -806,11 +816,23 @@ def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors()
         "datasheet:core-intercessor-like-infantry:ability:scouts:2",
     }
 
-    proposal_request = _select_scout_move(lifecycle, request)
+    proposal_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=request,
+            option_id=option.option_id,
+            result_id="order56-scout-distance",
+        )
+    )
     request_context = PreBattleProposalRequest.from_decision_request_payload(
         proposal_request.payload
     )
-    assert request_context.scout_distance_inches == 8.0
+    assert request_context.scout_distance_inches == selected_distance
+
+    assert (
+        _restored_pending_request(lifecycle, proposal_request).to_payload()
+        == proposal_request.to_payload()
+    )
 
 
 def test_phase16b_scout_keyword_without_descriptor_fails_fast() -> None:
@@ -1714,12 +1736,16 @@ def test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible() -> No
     )
 
 
-def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action() -> None:
+@pytest.mark.parametrize("selected_distance", [6.0, 8.0])
+def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action(
+    selected_distance: float,
+) -> None:
     catalog = _catalog_with_datasheet_keywords(
         {
             "core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS"),
             "core-transport": ("Transport", "Vehicle", "DEDICATED_TRANSPORT"),
-        }
+        },
+        scouts_distances_by_datasheet={"core-intercessor-like-infantry": (6.0, 8.0)},
     )
     state = _manual_prebattle_state(
         catalog=catalog,
@@ -1759,7 +1785,18 @@ def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_a
         army_catalog=catalog,
         player_id="player-b",
     )
-    option = _option_for_prefix(selection_request, "dedicated_transport_scout_move:")
+    options = tuple(
+        option
+        for option in selection_request.options
+        if option.option_id.startswith("dedicated_transport_scout_move:")
+    )
+    assert len(options) == 2
+    option = next(
+        option
+        for option in options
+        if isinstance(option.payload, dict)
+        and option.payload["scout_distance_inches"] == selected_distance
+    )
     selection_result = DecisionResult.for_request(
         result_id="phase16b-dedicated-transport-select",
         request=selection_request,
@@ -1772,7 +1809,7 @@ def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_a
         result=selection_result,
     )
     assert proposal_request.action_kind is PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE
-    assert proposal_request.scout_distance_inches == 6.0
+    assert proposal_request.scout_distance_inches == selected_distance
     if proposal_request.scout_distance_inches is None:
         raise GameLifecycleError("Dedicated Transport Scout Move requires scout_distance_inches.")
     request = proposal_request.to_decision_request()

@@ -782,6 +782,7 @@
             "additionalProperties": false,
             "properties": {
               "attacker_model_instance_id": {"$ref": "#/$defs/identifier"},
+              "selected_weapon_ability_ids": {"$ref": "#/$defs/identifier_array"},
               "target_allocations": {
                 "items": {
                   "additionalProperties": false,

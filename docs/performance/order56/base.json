@@ -1,0 +1,79 @@
+{
+  "workload_id": "order56-select-weapons-v1",
+  "revision": "6a5e84f1f402a9aa0f0839d31c2fabec37f5f06e",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "models": 10,
+  "units": 2,
+  "terrain": "canonical shooting fixture",
+  "decision_policy": "select source unit, normal shooting, stop at Select Weapons",
+  "timing_boundary": "facade phase advancement and two finite submissions; preparation separate; first sample cold",
+  "hashes": {
+    "scripts/measure_order56.py": "82245c44c175448feb9bd71dcb7496f8d802427b8e96f427acee8c044b1d2582",
+    "tests/phase13b_shooting_declaration_helpers.py": "695ea0a50c082630b25c2cdbc53f5a90c3b75e7645a2137ccb2306bc2d6f5491",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 1.5549174170009792,
+      "request_seconds": 0.016290833009406924,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004430499859154224,
+      "request_seconds": 0.010039374930784106,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004310708027333021,
+      "request_seconds": 0.009890291839838028,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004298334009945393,
+      "request_seconds": 0.010590458055958152,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004479624796658754,
+      "request_seconds": 0.009951499989256263,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004317499930039048,
+      "request_seconds": 0.009809500072151423,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004214208107441664,
+      "request_seconds": 0.00984120904468,
+      "request_bytes": 29610,
+      "decision_count": 2,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.0109161667060107,
+  "median_seconds": 0.009951499989256263,
+  "maximum_seconds": 0.016290833009406924,
+  "p95_seconds": 0.016290833009406924,
+  "completion_rate": 1.0,
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured",
+  "budget_status": "deferred under owner performance direction; no threshold pass claimed"
+}

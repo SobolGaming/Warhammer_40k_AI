@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import attack_sequence_destruction_authority as _asda
@@ -88,6 +88,32 @@ def resolve_mandatory_destruction_reactions_before_removal(
     if retention_status is not None:
         return retention_status
     mandatory_sources = tuple(source for source in active_sources if not source.optional)
+    from warhammer40k_core.engine.attack_sequence_damage_resolution import (
+        _pre_removal_destruction_reaction_context_payload,
+    )
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        request_deadly_demise_instance_if_duplicated,
+    )
+
+    context = cast(
+        dict[str, JsonValue],
+        _pre_removal_destruction_reaction_context_payload(
+            attack_context=attack_context,
+            damage=damage,
+            saving_throw_payload=saving_throw_payload,
+            feel_no_pain=feel_no_pain,
+            destroyed_model_controller_player_id=controller_player_id,
+        ),
+    )
+    context["source_damage_completion"] = source_damage_completion
+    choice_status = request_deadly_demise_instance_if_duplicated(
+        state=state,
+        decisions=decisions,
+        context=context,
+        sources=mandatory_sources,
+    )
+    if choice_status is not None:
+        return choice_status
     for source_index, source in enumerate(mandatory_sources):
         if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE:
             status = _resolve_deadly_demise_before_removal(

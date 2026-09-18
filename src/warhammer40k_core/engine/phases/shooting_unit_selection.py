@@ -273,6 +273,7 @@ def _shooting_unit_selected_grant_options(
 def _apply_shooting_unit_selected_grant_decision(
     *,
     state: GameState,
+    runtime_modifier_registry: RuntimeModifierRegistry,
     result: DecisionResult,
     decisions: DecisionController,
     registry: ShootingUnitSelectedGrantRegistry,
@@ -340,6 +341,7 @@ def _apply_shooting_unit_selected_grant_decision(
         if ruleset_descriptor is None or army_catalog is None:
             return None
         return _request_shooting_declaration(
+            runtime_modifier_registry=runtime_modifier_registry,
             state=state,
             decisions=decisions,
             active_selection=selection,

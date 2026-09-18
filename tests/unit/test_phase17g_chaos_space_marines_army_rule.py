@@ -383,7 +383,7 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
     resolved_event_type: str,
 ) -> None:
     session, status = _daemonforge_shooting_status(
-        game_id="order32-daemonforge-positive-17",
+        game_id="order56-daemonforge-12",
         attacker_datasheet_id=army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
         choose_dark_pact=True,
     )
@@ -429,7 +429,7 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
 
 def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -> None:
     session, status = _daemonforge_fight_status(
-        game_id="daemonforge-fight-refreshed-41",
+        game_id="order56-daemonforge-fight-26",
     )
     request = _decision_request(status.decision_request)
 
@@ -475,18 +475,18 @@ def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -
     ("game_id", "attacker_datasheet_id", "choose_dark_pact", "expected_wound_roll"),
     [
         (
-            "order32-daemonforge-other-result-1",
+            "order56-daemonforge-other-roll-8",
             army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
             True,
             5,
         ),
         (
-            "daemonforge-ineligible-step3-no-pact-5",
+            "order56-daemonforge-no-pact-8",
             army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
             False,
             1,
         ),
-        ("order32-daemonforge-other-unit-2", "000004209", False, 1),
+        ("order56-daemonforge-other-unit-12", "000004209", False, 1),
     ],
 )
 def test_defiler_daemonforge_does_not_offer_ineligible_wound_rerolls(
@@ -810,6 +810,9 @@ def test_dark_pacts_shooting_decision_records_effect_and_grants_lethal_hits() ->
     )
     decisions.submit_result(result)
     _apply_shooting_unit_selected_grant_decision(
+        runtime_modifier_registry=RuntimeModifierRegistry.from_bindings(
+            weapon_profile_modifier_bindings=army_rule.runtime_contribution().weapon_profile_modifier_bindings
+        ),
         state=state,
         result=result,
         decisions=decisions,

@@ -9,11 +9,16 @@
       "source_text": "Multiple instances of the same core ability or weapon ability are not cumulative, regardless of any numbers or keywords included in them. In such cases, the controlling player must select which instance will apply at any one time. In the case of duplicated weapon abilities, this selection must be made each time that unit makes attacks, in the Select Weapons step.\nMultiple instances of core abilities that include a number are duplicated even if that number varies. However, in the case of Scouts, you must select the lowest number not shared by every model in that unit (e.g. if every model in a unit has both Scouts 6\" and Scouts 8\", you could select Scouts 8\" as it is shared by every model, but if a unit contains one model with Scouts 6\" and five with Scouts 8\", you must select Scouts 6\").\nMultiple instances of weapon abilities that include a number (e.g. [SUSTAINED HITS 1]) are duplicated even if that number varies (e.g. the controlling player would have to select between [SUSTAINED HITS 1] and [SUSTAINED HITS 2]).\nMultiple instances of weapon abilities that include a keyword are duplicated even if that keyword varies (e.g. the controlling player would have to select between [ANTI‑VEHICLE 4+] and [ANTI‑INFANTRY 2+]).",
       "transcription_sha256": "34244f9733c5d16731e52e23636b68afd931761b0077431bba2010275f980ab4",
       "load_support_status": "loaded",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "runtime_consumer_ids": [
         "warhammer40k_core.core.ability_sources:datasheet_ability_sources",
         "warhammer40k_core.core.weapon_ability_sources:weapon_ability_sources",
-        "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability"
+        "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability",
+        "warhammer40k_core.engine.core_ability_selection:core_ability_selection_dispatch_handler",
+        "warhammer40k_core.engine.weapon_selection_context:WeaponSelectionContext",
+        "warhammer40k_core.engine.core_ability_damage_selection:apply_attack_deadly_demise_instance_choice",
+        "warhammer40k_core.engine.core_ability_damage_selection:apply_rule_deadly_demise_instance_choice",
+        "warhammer40k_core.engine.prebattle_instance_selection:scout_distance_options_for_model_ids"
       ]
     }
   ],
@@ -27,11 +32,16 @@
       "official_corroborating_source_ids": [],
       "observation_sha256": "783c17fc0278255f1130be3d5c7d5015b6ce4a4e783dbbbd44aef5e2091b0548",
       "load_support_status": "loaded",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "runtime_consumer_ids": [
         "warhammer40k_core.core.ability_sources:datasheet_ability_sources",
         "warhammer40k_core.core.weapon_ability_sources:weapon_ability_sources",
-        "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability"
+        "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability",
+        "warhammer40k_core.engine.core_ability_selection:core_ability_selection_dispatch_handler",
+        "warhammer40k_core.engine.weapon_selection_context:WeaponSelectionContext",
+        "warhammer40k_core.engine.core_ability_damage_selection:apply_attack_deadly_demise_instance_choice",
+        "warhammer40k_core.engine.core_ability_damage_selection:apply_rule_deadly_demise_instance_choice",
+        "warhammer40k_core.engine.prebattle_instance_selection:scout_distance_options_for_model_ids"
       ],
       "evidence_id": "core-duplicated-abilities-review:duplicated-abilities",
       "evidence_kind": "project_reviewed_app_transcription",
@@ -58,11 +68,16 @@
       "official_corroborating_source_ids": [],
       "observation_sha256": "63b07f2a9cb04f2e21e845c266b2e38c36c12edea6f68f86311a80d0d94f4a4b",
       "load_support_status": "loaded",
-      "semantic_execution_status": "partial_engine_runtime",
+      "semantic_execution_status": "executable_engine_runtime",
       "runtime_consumer_ids": [
         "warhammer40k_core.core.ability_sources:datasheet_ability_sources",
         "warhammer40k_core.core.weapon_ability_sources:weapon_ability_sources",
-        "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability"
+        "warhammer40k_core.core.weapon_ability_sources:grant_weapon_ability",
+        "warhammer40k_core.engine.core_ability_selection:core_ability_selection_dispatch_handler",
+        "warhammer40k_core.engine.weapon_selection_context:WeaponSelectionContext",
+        "warhammer40k_core.engine.core_ability_damage_selection:apply_attack_deadly_demise_instance_choice",
+        "warhammer40k_core.engine.core_ability_damage_selection:apply_rule_deadly_demise_instance_choice",
+        "warhammer40k_core.engine.prebattle_instance_selection:scout_distance_options_for_model_ids"
       ],
       "evidence_id": "core-duplicated-abilities-mirror:duplicated-abilities:40k-app",
       "evidence_kind": "third_party_mirror",
@@ -81,5 +96,5 @@
       "provider_non_affiliation_recorded": true
     }
   ],
-  "package_hash": "ba95b6ba8a3eda769047bd7d0004becdbce5dc184d6fe54e41515ab205f5574f"
+  "package_hash": "9fe57b008009fd3f98814729634e6d60b126e7685610214df451d9541e7fc06a"
 }

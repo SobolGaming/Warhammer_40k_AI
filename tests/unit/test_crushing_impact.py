@@ -389,12 +389,13 @@ def test_crushing_impact_rejects_a_destroyed_but_retained_selected_model() -> No
     assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before
 
 
-def test_crushing_impact_finishes_deadly_demise_before_resuming_charge() -> None:
+@pytest.mark.parametrize("duplicated", [False, True])
+def test_crushing_impact_finishes_deadly_demise_before_resuming_charge(duplicated: bool) -> None:
     from tests.crushing_impact_helpers import crushing_deadly_demise_session
 
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
-    session = crushing_deadly_demise_session()
+    session = crushing_deadly_demise_session(duplicated=duplicated)
     request = complete_charge(session).decision_request
     assert request is not None
     option = next(
@@ -406,7 +407,16 @@ def test_crushing_impact_finishes_deadly_demise_before_resuming_charge() -> None
     while (request := status.decision_request) is not None:
         if request.decision_type == "select_charging_unit":
             break
-        assert request.decision_type == "select_mortal_wound_model", request
+        assert request.decision_type in {
+            "select_mortal_wound_model",
+            "select_destruction_reaction",
+        }, request
+        if request.decision_type == "select_destruction_reaction":
+            assert duplicated
+            assert len(request.options) == 2
+            assert all(
+                option.option_id.startswith("order48:deadly-demise:") for option in request.options
+            )
         saved = session.to_persistence_payload()
         session = LocalGameSession.from_persistence_payload(saved)
         assert session.to_persistence_payload() == saved

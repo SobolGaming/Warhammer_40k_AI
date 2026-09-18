@@ -849,6 +849,7 @@ def _advance_active_fight_activation(
         state=state,
     )
     available_weapons = rules_unit_available_melee_weapons_payloads(
+        runtime_modifier_registry=handler.runtime_modifier_registry,
         scenario=scenario,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         rules_unit=melee_rules_unit,
@@ -1276,6 +1277,7 @@ def invalid_melee_declaration_status(
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     proposal_request = MeleeDeclarationProposalRequest.from_decision_request(request)
     parsed = _parse_melee_declaration_or_invalid(
@@ -1294,6 +1296,7 @@ def invalid_melee_declaration_status(
             message="Melee declaration proposal does not match the pending request.",
         )
     rule_validation = validate_rules_unit_melee_declaration(
+        runtime_modifier_registry=runtime_modifier_registry,
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
         request=proposal_request,

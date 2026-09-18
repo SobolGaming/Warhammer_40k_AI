@@ -150,7 +150,16 @@ def validate_pending_model_destruction_cause_inventory(
                 ),
             )
         )
+    from warhammer40k_core.engine.core_ability_damage_selection import (
+        is_deadly_demise_instance_request,
+        pending_deadly_demise_instance_cause_id,
+    )
+
     for request in pending_decision_requests:
+        if is_deadly_demise_instance_request(request):
+            expected_cause_ids.add(
+                pending_deadly_demise_instance_cause_id(state=state, request=request)
+            )
         if request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
             child_event_id = _pending_attack_deadly_demise_child_event_id_or_none(request)
             if child_event_id is not None:

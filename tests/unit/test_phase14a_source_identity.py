@@ -3108,7 +3108,7 @@ def test_p22_p22b_source_package_pins_aura_and_psychic_use_authority() -> None:
         source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
 
 
-def test_order22_source_identity_does_not_claim_completed_duplicate_execution() -> None:
+def test_order56_source_identity_binds_completed_duplicate_execution() -> None:
     from tools.build_core_duplicated_abilities_source import (
         ARTIFACT_PATH,
         AUDIT_PATH,
@@ -3127,7 +3127,13 @@ def test_order22_source_identity_does_not_claim_completed_duplicate_execution() 
     (rule,) = source.source_rules()
     assert rule.section_id == "24.02"
     assert rule.load_support_status == "loaded"
-    assert rule.semantic_execution_status == "partial_engine_runtime"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert (
+        "warhammer40k_core.engine.weapon_selection_context:WeaponSelectionContext"
+        in rule.runtime_consumer_ids
+    )
+    assert any("core_ability_selection" in consumer for consumer in rule.runtime_consumer_ids)
+    assert any("prebattle_instance_selection" in consumer for consumer in rule.runtime_consumer_ids)
     assert package.source_catalog.source_text_by_id(rule.source_id).raw_text == rule.source_text
     assert hashlib.sha256(rule.source_text.encode()).hexdigest() == rule.transcription_sha256
     (mirror,) = (row for row in source.source_evidence_records() if row.provider_name == "40k.app")

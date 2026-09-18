@@ -272,7 +272,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v25-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v26-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -544,6 +544,7 @@ export interface components {
             battle_round: number;
             declarations: {
                 attacker_model_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+                selected_weapon_ability_ids?: components["schemas"]["proposal-payload--identifier_array.schema"];
                 target_allocations: {
                     attacks?: number; target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 }[];
@@ -636,7 +637,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v25-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v26-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -1288,7 +1289,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v19-large-model-setup";
+            schema_version: "replay-artifact-v20-ability-instances";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

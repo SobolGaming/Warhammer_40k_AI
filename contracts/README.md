@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `25.0.0`
+Contract version: `26.0.0`
+
+Order 56 / contract 26 selects one source instance of duplicated Core and weapon
+abilities through shared decisions. See [the migration](migrations/25-to-26.md).
 
 Order 54 / contract 25 commits mission edge authority and oversized setup
 placement/restriction semantics. See [the migration](migrations/24-to-25.md).

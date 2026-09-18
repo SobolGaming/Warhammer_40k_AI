@@ -16,6 +16,10 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 from warhammer40k_core.engine.transports import FiringDeckSelection, FiringDeckSelectionPayload
+from warhammer40k_core.engine.weapon_selection_context import (
+    WeaponSelectionContext,
+    WeaponSelectionContextPayload,
+)
 
 SHOOTING_DECLARATION_PROPOSAL_KIND = "shooting_declaration"
 SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
@@ -47,6 +51,7 @@ class ShootingDeclarationProposalPayload(TypedDict):
 
 
 class RangedAttackPoolPayload(TypedDict):
+    weapon_selection_context: NotRequired[WeaponSelectionContextPayload]
     weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
@@ -421,6 +426,8 @@ class RangedAttackPool:
     firing_deck_source_unit_instance_id: str | None = None
     firing_deck_source_model_instance_id: str | None = None
 
+    weapon_selection_context: WeaponSelectionContext | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -541,6 +548,29 @@ class RangedAttackPool:
                 "RangedAttackPool Firing Deck source unit and model must be supplied together."
             )
 
+        from warhammer40k_core.engine.ability_instance_selection import selected_weapon_profile
+
+        # Pools execute only an already-selected carrier. Raw duplicate inventories
+        # are valid before Select Weapons, never during resolution.
+        selected_weapon_profile(self.weapon_profile, ())
+        context = self.weapon_selection_context
+        if self.selected_weapon_ability_ids and context is None:
+            raise GameLifecycleError("Selected weapon abilities require their source inventory.")
+        if context is not None:
+            if type(context) is not WeaponSelectionContext:
+                raise GameLifecycleError("Attack pool requires a typed weapon selection context.")
+            if context.weapon_instance_id != self.weapon_instance_id:
+                raise GameLifecycleError("Attack pool weapon selection owner drift.")
+            selected = context.selected_profile(
+                self.target_unit_instance_id, self.selected_weapon_ability_ids
+            )
+            if (
+                selected.abilities != self.weapon_profile.abilities
+                or selected.keywords != self.weapon_profile.keywords
+                or selected.ability_sources != self.weapon_profile.ability_sources
+            ):
+                raise GameLifecycleError("Attack pool selected weapon ability inventory drift.")
+
     @classmethod
     def from_declaration(
         cls,
@@ -552,12 +582,14 @@ class RangedAttackPool:
         target_in_range_model_ids: tuple[str, ...],
         hit_roll_modifier: int,
         targeting_rule_ids: tuple[str, ...],
+        weapon_selection_context: WeaponSelectionContext | None = None,
     ) -> Self:
         if type(declaration) is not WeaponDeclaration:
             raise GameLifecycleError("RangedAttackPool requires a WeaponDeclaration.")
         from warhammer40k_core.engine.attack_hit_modifiers import declaration_hit_modifiers
 
         return cls(
+            weapon_selection_context=weapon_selection_context,
             weapon_instance_id=declaration.weapon_instance_id,
             attacker_model_instance_id=declaration.attacker_model_instance_id,
             wargear_id=declaration.wargear_id,
@@ -596,6 +628,8 @@ class RangedAttackPool:
         }
         if self.hit_roll_modifiers:
             payload["hit_roll_modifiers"] = [item.to_payload() for item in self.hit_roll_modifiers]
+        if self.weapon_selection_context is not None:
+            payload["weapon_selection_context"] = self.weapon_selection_context.to_payload()
         return payload
 
     @classmethod
@@ -603,6 +637,11 @@ class RangedAttackPool:
         if "hit_roll_modifiers" in payload and not payload["hit_roll_modifiers"]:
             raise GameLifecycleError("Explicit hit modifier inventory must not be empty.")
         return cls(
+            weapon_selection_context=(
+                WeaponSelectionContext.from_payload(payload["weapon_selection_context"])
+                if "weapon_selection_context" in payload
+                else None
+            ),
             weapon_instance_id=payload["weapon_instance_id"],
             attacker_model_instance_id=payload["attacker_model_instance_id"],
             wargear_id=payload["wargear_id"],

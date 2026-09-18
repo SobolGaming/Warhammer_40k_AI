@@ -191,6 +191,10 @@ def _validate_sequence_history(
                 old.wargear_id,
                 old.weapon_profile_id,
                 old.shooting_type,
+                old.selected_weapon_ability_ids,
+                None
+                if old.weapon_selection_context is None
+                else old.weapon_selection_context.target_profiles,
                 old.firing_deck_source_unit_instance_id,
                 old.firing_deck_source_model_instance_id,
             )
@@ -200,6 +204,10 @@ def _validate_sequence_history(
                 new.wargear_id,
                 new.weapon_profile_id,
                 new.shooting_type,
+                new.selected_weapon_ability_ids,
+                None
+                if new.weapon_selection_context is None
+                else new.weapon_selection_context.target_profiles,
                 new.firing_deck_source_unit_instance_id,
                 new.firing_deck_source_model_instance_id,
             )

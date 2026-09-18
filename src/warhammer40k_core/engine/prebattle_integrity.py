@@ -435,6 +435,19 @@ def _validate_unit_selection(
         expected_keys=_UNIT_SELECTION_RESULT_PAYLOAD_KEYS,
     )
     expected_option_id = f"{request_context.action_kind.value}:{request_context.unit_instance_id}"
+    if request_context.action_kind in {
+        PreBattleActionKind.SCOUT_MOVE,
+        PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE,
+    }:
+        from warhammer40k_core.engine.prebattle_instance_selection import (
+            scout_selection_distance_options,
+        )
+
+        distances = scout_selection_distance_options(selection_payload)
+        if request_context.scout_distance_inches not in distances:
+            _raise_semantic_drift("Scouts selected distance is unavailable")
+        if len(distances) > 1:
+            expected_option_id += f":distance:{request_context.scout_distance_inches:g}"
     expected_proposal_kind = (
         SCOUT_RESERVE_SETUP_PROPOSAL_KIND
         if request_context.action_kind is PreBattleActionKind.SCOUT_RESERVE_SETUP

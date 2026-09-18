@@ -336,6 +336,7 @@ def apply_catalog_setup_reactive_shoot_charge_result(
         return None
     if action == CATALOG_SETUP_REACTIVE_SHOOT_OPTION_ID:
         return _apply_setup_reactive_shoot(
+            runtime_modifier_registry=runtime_modifier_registry,
             state=state,
             decisions=decisions,
             result=result,
@@ -459,6 +460,7 @@ def _setup_reactive_options(
 
 def _apply_setup_reactive_shoot(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
@@ -467,6 +469,7 @@ def _apply_setup_reactive_shoot(
     army_catalog: ArmyCatalog,
 ) -> LifecycleStatus | None:
     status = request_out_of_phase_shooting_declaration(
+        runtime_modifier_registry=runtime_modifier_registry,
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,

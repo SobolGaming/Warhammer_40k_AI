@@ -7,6 +7,7 @@ from typing import NotRequired, Self, TypedDict, cast
 from warhammer40k_core.core.ability_sources import (
     AbilitySourceError,
     AbilitySourceInstance,
+    AbilitySourceInstancePayload,
     datasheet_ability_sources,
     validate_datasheet_ability_sources,
 )
@@ -41,6 +42,12 @@ from warhammer40k_core.core.model_keywords import (
     model_keyword_assignment,
 )
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
+from warhammer40k_core.engine.core_ability_state import (
+    CoreAbilitySelection,
+    CoreAbilitySelectionPayload,
+    validate_core_keyword_sources,
+    validate_unit_core_selections,
+)
 from warhammer40k_core.engine.dice_result_override_descriptors import (
     validate_dice_result_override_starting_resources,
 )
@@ -103,6 +110,8 @@ class ModelInstancePayload(TypedDict):
 
 
 class UnitInstancePayload(TypedDict):
+    core_keyword_sources: NotRequired[list[AbilitySourceInstancePayload]]
+    core_ability_selections: NotRequired[list[CoreAbilitySelectionPayload]]
     split_origin: NotRequired[SplitUnitOriginPayload]
     unit_instance_id: str
     datasheet_id: str
@@ -287,6 +296,9 @@ class UnitInstance:
 
     split_origin: SplitUnitOrigin | None = None
 
+    core_ability_selections: tuple[CoreAbilitySelection, ...] = ()
+    core_keyword_sources: tuple[AbilitySourceInstance, ...] = ()
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -360,6 +372,9 @@ class UnitInstance:
         )
         object.__setattr__(self, "starting_resources", starting_resources)
 
+        object.__setattr__(self, "core_keyword_sources", validate_core_keyword_sources(self))
+        object.__setattr__(self, "core_ability_selections", validate_unit_core_selections(self))
+
     @property
     def keywords(self) -> tuple[str, ...]:
         return tuple(sorted({k for model in self.alive_own_models() for k in model.keywords}))
@@ -418,11 +433,27 @@ class UnitInstance:
 
         if self.split_origin is not None:
             payload["split_origin"] = self.split_origin.to_payload()
+        if self.core_keyword_sources:
+            payload["core_keyword_sources"] = [
+                source.to_payload() for source in self.core_keyword_sources
+            ]
+        if self.core_ability_selections:
+            payload["core_ability_selections"] = [
+                choice.to_payload() for choice in self.core_ability_selections
+            ]
         return payload
 
     @classmethod
     def from_payload(cls, payload: UnitInstancePayload) -> Self:
         unit = cls(
+            core_keyword_sources=tuple(
+                AbilitySourceInstance.from_payload(source)
+                for source in payload.get("core_keyword_sources", [])
+            ),
+            core_ability_selections=tuple(
+                CoreAbilitySelection.from_payload(choice)
+                for choice in payload.get("core_ability_selections", [])
+            ),
             split_origin=(
                 SplitUnitOrigin.from_payload(payload["split_origin"])
                 if "split_origin" in payload

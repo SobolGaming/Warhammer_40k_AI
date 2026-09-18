@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
@@ -61,6 +63,7 @@ def _generic_rule_ir_from_stratagem_payload(effect_payload: JsonValue) -> object
 
 def _apply_generic_rule_ir_stratagem_handler(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     state: GameState,
     decisions: DecisionController,
     context: StratagemEligibilityContext,
@@ -110,6 +113,7 @@ def _apply_generic_rule_ir_stratagem_handler(
         raise GameLifecycleError(f"Generic Stratagem rule execution failed: {rule_result.reason}.")
     if _rule_execution_result_grants_out_of_phase_shoot(rule_result.effect_payloads):
         _request_generic_out_of_phase_shooting(
+            runtime_modifier_registry=runtime_modifier_registry,
             state=state,
             decisions=decisions,
             context=context,
@@ -918,6 +922,7 @@ def _rule_effect_source_id(effect_payload: dict[str, JsonValue]) -> str:
 
 def _request_generic_out_of_phase_shooting(
     *,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     state: GameState,
     decisions: DecisionController,
     context: StratagemEligibilityContext,
@@ -934,6 +939,7 @@ def _request_generic_out_of_phase_shooting(
     if enemy_unit_id is None:
         raise GameLifecycleError("Generic out-of-phase shooting requires just-shot unit context.")
     request_out_of_phase_shooting_declaration(
+        runtime_modifier_registry=runtime_modifier_registry,
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,

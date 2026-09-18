@@ -154,3 +154,7 @@ The client submits only the pending option ID. Source-model eligibility, 8-inch
 range, visibility, engagement, shooting restrictions and CP are revalidated by
 the engine; defender mortality decisions resume the same Shooting phase.
 See `tests/unit/test_explosives.py` and the Order 41 adapter contract.
+
+### Duplicated Core ability instances (Order 56)
+
+`select_core_ability_instance` offers one source-instance option per active occurrence of a duplicated persistent Core family. The controlling player selects one emitted ID through `FiniteOptionSubmission`. The engine authenticates owner, source inventory and opportunity before mutation. Setup requests and events are private to their owner. Scouts and Feel No Pain retain their existing use-time decisions; mandatory duplicate Deadly Demise uses `select_destruction_reaction` without decline. Weapon instances remain nested Select Weapons decisions in the Shooting and melee proposals. See `tests/unit/test_unit_abilities.py::test_order56_core_instance_decision_uses_facade_and_restores` and the adapter decision contract.

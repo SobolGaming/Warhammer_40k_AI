@@ -485,11 +485,20 @@ class CatalogDatasheetRuleRuntime:
         return tuple(bindings)
 
     def model_ability_grant_bindings(self) -> tuple[ModelAbilityGrantBinding, ...]:
+        from warhammer40k_core.engine.catalog_lone_operative_grants import (
+            lone_operative_grant_binding,
+        )
         from warhammer40k_core.engine.catalog_stealth_grants import catalog_stealth_grant_bindings
 
-        return catalog_stealth_grant_bindings(
-            aura_sources=self._sources(clause_is_stealth_aura),
-            self_sources=self._sources(clause_is_passive_self_stealth),
+        return (
+            *catalog_stealth_grant_bindings(
+                aura_sources=self._sources(clause_is_stealth_aura),
+                self_sources=self._sources(clause_is_passive_self_stealth),
+            ),
+            *(
+                lone_operative_grant_binding(source)
+                for source in self._sources(clause_is_conditional_lone_operative)
+            ),
         )
 
     def hit_roll_modifier_bindings(self) -> tuple[HitRollModifierBinding, ...]:
@@ -1109,40 +1118,11 @@ class CatalogDatasheetRuleRuntime:
     def _lone_operative_handler(
         self, sources: tuple[_CatalogClauseSource, ...]
     ) -> Callable[[ShootingTargetRestrictionContext], TargetRestriction | None]:
-        def handler(context: ShootingTargetRestrictionContext) -> TargetRestriction | None:
-            for source in sources:
-                if not _source_applies_to_rules_unit(
-                    source=source,
-                    context_unit_id=context.target_unit_instance_id,
-                    state=context.state,
-                ) or not _friendly_keyworded_unit_within(source=source, state=context.state):
-                    continue
-                if _rules_units_within(
-                    context.state,
-                    context.attacking_unit_instance_id,
-                    context.target_unit_instance_id,
-                    12,
-                    attacker_model_instance_id=context.attacker_model_instance_id,
-                ):
-                    return None
-                return TargetRestriction(
-                    hook_id=CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
-                    source_id=CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
-                    violation_code="conditional_lone_operative_range",
-                    message=(
-                        'Target has Lone Operative and the attacking model is not within 12".'
-                    ),
-                    replay_payload={
-                        "consumer_id": CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
-                        "catalog_record_id": source.record.record_id,
-                        "source_rule_id": source.rule_ir.source_id,
-                        "source_unit_instance_id": source.unit.unit_instance_id,
-                        "target_unit_instance_id": context.target_unit_instance_id,
-                    },
-                )
-            return None
+        from warhammer40k_core.engine.catalog_lone_operative_grants import (
+            lone_operative_restriction_handler,
+        )
 
-        return handler
+        return lone_operative_restriction_handler(sources)
 
     def _fight_grant_handler(
         self, *, source: _CatalogClauseSource, effect: RuleEffectSpec, hook_id: str
@@ -1440,3 +1420,6 @@ def _validate_armies(value: object) -> tuple[ArmyDefinition, ...]:
     if not all(type(army) is ArmyDefinition for army in armies):
         raise GameLifecycleError("Catalog datasheet runtime requires ArmyDefinition tuple.")
     return cast(tuple[ArmyDefinition, ...], armies)
+
+
+__all__ = ("_friendly_keyworded_unit_within", "_rules_units_within")

@@ -476,8 +476,8 @@ def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -
             "corsairs": Pose.at(94.0, 95.0),
             "enemy": Pose.at(95.0, 95.0),
         },
-        # Order 43 hit-threshold evidence participates in the recorded reroll RNG history.
-        game_id="order43-pirates-0",
+        # Order 56 source-inventory evidence participates in the recorded reroll RNG history.
+        game_id="order56-pirates-0",
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
         model_count=1,

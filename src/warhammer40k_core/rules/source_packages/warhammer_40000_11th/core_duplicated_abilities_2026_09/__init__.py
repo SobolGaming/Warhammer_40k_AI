@@ -1,4 +1,4 @@
-"""Hash-pinned 24.02 source authority for P24C1 (identity only; P24C2 remains open)."""
+"""Hash-pinned 24.02 identity and controlling-player selection authority."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "a769eb1102686b798db9f0242afa5d0a5bc6e46b81496855e68515cdb828410e"
+EXPECTED_ARTIFACT_SHA256: Final = "798df658ccb1400c93d8eb4b2371ef5dd3814a159c6b7d207ccfc131b282ab76"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-duplicated-abilities"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-06"
 DUPLICATED_ABILITIES_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:duplicated-abilities"
@@ -77,7 +77,7 @@ def validate_source_artifact_bytes(raw: bytes) -> DuplicatedAbilitiesSourceArtif
             )
         if (
             rule.load_support_status != "loaded"
-            or rule.semantic_execution_status != "partial_engine_runtime"
+            or rule.semantic_execution_status != "executable_engine_runtime"
             or not rule.runtime_consumer_ids
         ):
             raise DuplicatedAbilitiesSourceError(

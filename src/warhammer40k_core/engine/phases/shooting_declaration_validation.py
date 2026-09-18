@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.weapon_profiles import AttackProfile
+from warhammer40k_core.engine.weapon_selection_context import WeaponSelectionContext
 from warhammer40k_core.engine.shooting_target_cache import cached_target_candidate_for_model
 
 from warhammer40k_core.engine.phases.shooting_imports import *
@@ -56,6 +57,7 @@ __all__ = (
 
 def _validate_declaration_submission(
     *,
+    pending_request: DecisionRequest | None = None,
     state: GameState,
     proposal: ShootingDeclarationProposal,
     ruleset_descriptor: RulesetDescriptor,
@@ -70,6 +72,7 @@ def _validate_declaration_submission(
         and proposal.source_decision_result_id == out_of_phase_state.source_decision_result_id
     ):
         return _validate_out_of_phase_declaration_submission(
+            pending_request=pending_request,
             state=state,
             proposal=proposal,
             out_of_phase_state=out_of_phase_state,
@@ -114,6 +117,7 @@ def _validate_declaration_submission(
             field="unit_instance_id",
         )
     attack_validation = _attack_pools_or_validation(
+        pending_request=pending_request,
         state=state,
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
@@ -128,6 +132,7 @@ def _validate_declaration_submission(
 
 def _validate_out_of_phase_declaration_submission(
     *,
+    pending_request: DecisionRequest | None = None,
     state: GameState,
     proposal: ShootingDeclarationProposal,
     out_of_phase_state: OutOfPhaseShootingState,
@@ -164,6 +169,7 @@ def _validate_out_of_phase_declaration_submission(
             field="unit_instance_id",
         )
     attack_validation = _attack_pools_or_validation(
+        pending_request=pending_request,
         state=state,
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
@@ -215,6 +221,7 @@ type _AttackPoolValidationResult = (
 
 def _attack_pools_or_validation(
     *,
+    pending_request: DecisionRequest | None = None,
     state: GameState,
     proposal: ShootingDeclarationProposal,
     ruleset_descriptor: RulesetDescriptor,
@@ -228,6 +235,7 @@ def _attack_pools_or_validation(
     committed_weapon: _AvailableWeapon | None = None,
     committed_base_attacks: int | None = None,
     committed_attack_profile: AttackProfile | None = None,
+    committed_selection_context: WeaponSelectionContext | None = None,
     validate_only: bool = False,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
@@ -308,6 +316,14 @@ def _attack_pools_or_validation(
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
     shooting_weapon_selection_counts: dict[tuple[str, str, WeaponKeyword, str], int] = {}
     snap_target_unit_ids: set[str] = set()
+    from warhammer40k_core.engine.attack_weapon_inventory import (
+        shooting_weapon_selection_context,
+        shooting_weapon_selection_targets,
+    )
+
+    selection_targets = shooting_weapon_selection_targets(
+        state=state, player_id=player_id, required_target_ids=proposal_target_unit_ids
+    )
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
         key = _declaration_available_weapon_key(declaration)
         if key in seen_declaration_keys:
@@ -341,6 +357,51 @@ def _attack_pools_or_validation(
         )
         if pistol_validation is not None:
             return pistol_validation
+        target_rules_unit = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=declaration.target_unit_instance_id,
+        )
+        selection_context = shooting_weapon_selection_context(
+            state=state,
+            runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
+            attacking_unit_instance_id=source_unit.unit_instance_id,
+            attacker_model_instance_id=declaration.attacker_model_instance_id,
+            weapon_instance_id=declaration.weapon_instance_id,
+            source_request_id=proposal.proposal_request_id,
+            target_units=selection_targets,
+            player_id=player_id,
+            profile=weapon_profile,
+        )
+        from warhammer40k_core.engine.weapon_selection_context import (
+            shooting_context_matches_request,
+        )
+
+        weapon_profile = selection_context.raw_profile_for_target(
+            declaration.target_unit_instance_id
+        )
+        if committed_selection_context is not None:
+            selection_context = committed_selection_context.with_resolved_profile(
+                declaration.target_unit_instance_id, weapon_profile
+            )
+        selection_limit_validation = _validate_shooting_weapon_selection_limit(
+            proposal=proposal,
+            source_unit=source_unit,
+            declaration=declaration,
+            weapon_profile=weapon_profile,
+            selection_counts=shooting_weapon_selection_counts,
+        )
+        if selection_limit_validation is not None:
+            return selection_limit_validation
+        ability_selection_validation = _validate_duplicate_weapon_ability_selection(
+            proposal=proposal,
+            declaration=declaration,
+            selection_context=selection_context,
+        )
+        if ability_selection_validation is not None:
+            return ability_selection_validation
+        weapon_profile = selection_context.selected_profile(
+            declaration.target_unit_instance_id, declaration.selected_weapon_ability_ids
+        )
         candidate = cached_target_candidate_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -381,43 +442,15 @@ def _attack_pools_or_validation(
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )
-        target_rules_unit = rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=declaration.target_unit_instance_id,
-        )
-        weapon_profile = weapon_profile_with_character_target_ap_effects(
-            weapon_profile,
-            state.persisting_effects_for_unit(source_unit.unit_instance_id),
-            owner_player_id=player_id,
-            target_keywords=target_rules_unit.keywords,
-        )
-        weapon_profile = _modified_shooting_weapon_profile(
-            state=state,
-            runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
-            attacking_unit_instance_id=source_unit.unit_instance_id,
-            attacker_model_instance_id=declaration.attacker_model_instance_id,
-            target_unit_instance_id=declaration.target_unit_instance_id,
-            profile=weapon_profile,
-        )
-        selection_limit_validation = _validate_shooting_weapon_selection_limit(
-            proposal=proposal,
-            source_unit=source_unit,
-            declaration=declaration,
-            weapon_profile=weapon_profile,
-            selection_counts=shooting_weapon_selection_counts,
-        )
-        if selection_limit_validation is not None:
-            return selection_limit_validation
-        ability_selection_validation = _validate_duplicate_weapon_ability_selection(
-            proposal=proposal,
-            declaration=declaration,
-            declaration_index=declaration_index,
-            weapon_profile=weapon_profile,
-            target_rules_unit=target_rules_unit,
-            player_id=player_id,
-        )
-        if ability_selection_validation is not None:
-            return ability_selection_validation
+        if pending_request is not None and not shooting_context_matches_request(
+            pending_request, selection_context
+        ):
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="weapon_ability_inventory_drift",
+                message="Weapon ability sources changed after Select Weapons was requested.",
+                field="declarations",
+            )
         allowed_shooting_types = _shooting_types_for_declaration_candidate(
             state=state,
             scenario=scenario,
@@ -500,6 +533,7 @@ def _attack_pools_or_validation(
         )
         attack_pools.append(
             RangedAttackPool.from_declaration(
+                weapon_selection_context=selection_context,
                 declaration=declaration,
                 weapon_profile=weapon_profile,
                 attacks=attacks,
@@ -572,76 +606,19 @@ def _validate_duplicate_weapon_ability_selection(
     *,
     proposal: ShootingDeclarationProposal,
     declaration: WeaponDeclaration,
-    declaration_index: int,
-    weapon_profile: WeaponProfile,
-    target_rules_unit: RulesUnitView,
-    player_id: str,
+    selection_context: WeaponSelectionContext,
 ) -> ShootingProposalValidationResult | None:
-    ability_by_id: dict[str, AbilityDescriptor] = {
-        ability.ability_id: ability for ability in weapon_profile.abilities
-    }
-    selected_abilities: list[AbilityDescriptor] = []
-    for selected_id in declaration.selected_weapon_ability_ids:
-        selected_ability = ability_by_id.get(selected_id)
-        if selected_ability is None:
-            return ShootingProposalValidationResult.invalid(
-                proposal_request_id=proposal.proposal_request_id,
-                violation_code="weapon_ability_selection_unavailable",
-                message="Selected weapon ability ID is not on the declared weapon profile.",
-                field="declarations",
-            )
-        if selected_ability.ability_kind is not AbilityKind.ANTI_KEYWORD:
-            return ShootingProposalValidationResult.invalid(
-                proposal_request_id=proposal.proposal_request_id,
-                violation_code="weapon_ability_selection_unsupported",
-                message="This shooting declaration only supports duplicate Anti selections.",
-                field="declarations",
-            )
-        selected_abilities.append(selected_ability)
+    from warhammer40k_core.engine.ability_instance_selection import WeaponInstanceSelectionError
 
-    selected_anti_ids: tuple[str, ...] = tuple(
-        ability.ability_id
-        for ability in selected_abilities
-        if ability.ability_kind is AbilityKind.ANTI_KEYWORD
-    )
-    selection_request = weapon_ability_selection_request(
-        weapon_profile,
-        AbilityKind.ANTI_KEYWORD,
-        target_keywords=target_rules_unit.keywords,
-        actor_id=player_id,
-        request_id=(
-            f"{proposal.proposal_request_id}:declaration-{declaration_index:03d}:anti-keyword"
-        ),
-        source_context={
-            "phase": BattlePhase.SHOOTING.value,
-            "proposal_request_id": proposal.proposal_request_id,
-            "declaration_index": declaration_index,
-            "target_unit_instance_id": target_rules_unit.unit_instance_id,
-        },
-    )
-    if selection_request is None:
-        if selected_anti_ids:
-            return ShootingProposalValidationResult.invalid(
-                proposal_request_id=proposal.proposal_request_id,
-                violation_code="weapon_ability_selection_not_required",
-                message="Selected Anti ability ID was supplied when no duplicate choice exists.",
-                field="declarations",
-            )
-        return None
-
-    legal_ids = {option.option_id for option in selection_request.options}
-    if len(selected_anti_ids) != 1:
-        return ShootingProposalValidationResult.invalid(
-            proposal_request_id=proposal.proposal_request_id,
-            violation_code="weapon_ability_selection_required",
-            message="Duplicate matching Anti abilities require exactly one selected ability ID.",
-            field="declarations",
+    try:
+        selection_context.selected_profile(
+            declaration.target_unit_instance_id, declaration.selected_weapon_ability_ids
         )
-    if selected_anti_ids[0] not in legal_ids:
+    except WeaponInstanceSelectionError as exc:
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal.proposal_request_id,
             violation_code="weapon_ability_selection_invalid",
-            message="Selected Anti ability ID is not legal for this target.",
+            message=str(exc),
             field="declarations",
         )
     return None

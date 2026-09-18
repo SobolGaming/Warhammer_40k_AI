@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
+from warhammer40k_core.engine.weapon_selection_context import WeaponSelectionContext
+from warhammer40k_core.engine.shooting_target_cache import cached_target_candidate_for_model
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.shooting_imports import *
@@ -137,6 +139,7 @@ def _request_shooting_declaration(
     target_unit_ids: tuple[str, ...] | None = None,
     forced_shooting_type: ShootingType | None = None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
@@ -180,72 +183,76 @@ def _request_shooting_declaration(
         state=state,
         target_unit_ids=candidate_target_unit_ids,
     )
-    detection_context_fingerprint = _targeting_detection_context_fingerprint(
-        hidden_target_model_ids=hidden_target_model_ids,
-        target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
-        detection_range_bonus_by_target_id=detection_range_bonus_by_target_id,
-    )
+    request_id = state.next_decision_request_id()
     target_candidates: list[JsonValue] = []
-    target_candidate_cache: dict[
-        _ShootingUnitCandidateCacheKey,
-        tuple[ShootingTargetCandidate, ...],
-    ] = {}
+    from warhammer40k_core.engine.attack_weapon_inventory import (
+        shooting_weapon_selection_context,
+        shooting_weapon_selection_targets,
+    )
+
+    selection_targets = shooting_weapon_selection_targets(
+        state=state,
+        player_id=active_selection.player_id,
+        required_target_ids=candidate_target_unit_ids,
+    )
+
     for weapon in available_weapons:
-        profile = weapon["weapon_profile"]
-        attacker_unit = _component_unit_for_available_weapon(
-            rules_unit=rules_unit,
-            weapon=weapon,
+        attacker_unit = _component_unit_for_available_weapon(rules_unit=rules_unit, weapon=weapon)
+        if not candidate_target_unit_ids:
+            continue
+        context = shooting_weapon_selection_context(
+            state=state,
+            runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
+            attacking_unit_instance_id=attacker_unit.unit_instance_id,
+            attacker_model_instance_id=weapon["model_instance_id"],
+            weapon_instance_id=weapon["weapon_instance_id"],
+            source_request_id=request_id,
+            target_units=selection_targets,
+            player_id=active_selection.player_id,
+            profile=weapon["weapon_profile"],
         )
-        candidate_cache_key = _shooting_unit_candidate_cache_key(
-            weapon=weapon,
-            attacker_unit=attacker_unit,
-            detection_context_fingerprint=detection_context_fingerprint,
-        )
-        if candidate_cache_key not in target_candidate_cache:
-            target_candidate_cache[candidate_cache_key] = tuple(
-                _shooting_candidate_with_target_restrictions(
-                    candidate=candidate,
-                    state=state,
-                    player_id=active_selection.player_id,
-                    attacking_unit_instance_id=attacker_unit.unit_instance_id,
-                    target_unit_instance_id=candidate.target_unit_instance_id,
-                    registry=shooting_target_restriction_hooks,
-                    attacker_model_instance_id=candidate.observer_model_id,
-                    shooting_type=forced_shooting_type or selected_shooting_type,
-                )
-                for candidate in shooting_target_candidates_for_unit(
-                    scenario=scenario,
-                    ruleset_descriptor=ruleset_descriptor,
-                    attacker_unit=attacker_unit,
-                    weapon_profile=profile,
-                    target_unit_ids=candidate_target_unit_ids,
-                    terrain_features=terrain_features,
-                    terrain_areas=terrain_areas,
-                    hidden_target_model_ids=hidden_target_model_ids,
-                    target_unit_ids_with_recent_ranged_attacks=(
-                        target_unit_ids_with_recent_ranged_attacks
-                    ),
-                    target_detection_range_bonus_inches_by_unit_id=(
-                        detection_range_bonus_by_target_id
-                    ),
-                )
-            )
-        candidates = target_candidate_cache[candidate_cache_key]
-        target_candidates.extend(
-            _target_candidate_payload_for_request(
-                state=state,
+        for target_id in candidate_target_unit_ids:
+            profile = context.raw_profile_for_target(target_id)
+            candidate = cached_target_candidate_for_model(
                 scenario=scenario,
-                candidate=cast(dict[str, JsonValue], candidate.to_payload()),
-                rules_unit=rules_unit,
-                weapon=weapon,
+                ruleset_descriptor=ruleset_descriptor,
+                attacker_unit=attacker_unit,
+                attacker_model_instance_id=weapon["model_instance_id"],
                 weapon_profile=profile,
-                player_id=active_selection.player_id,
-                army_catalog=army_catalog,
-                selected_shooting_type=selected_shooting_type,
-                forced_shooting_type=forced_shooting_type,
+                target_unit_id=target_id,
+                terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
+                hidden_target_model_ids=hidden_target_model_ids,
+                target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
+                target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
+                    target_id, 0
+                ),
             )
-            for candidate in candidates
-        )
+            candidate = _shooting_candidate_with_target_restrictions(
+                candidate=candidate,
+                state=state,
+                player_id=active_selection.player_id,
+                attacking_unit_instance_id=attacker_unit.unit_instance_id,
+                target_unit_instance_id=target_id,
+                registry=shooting_target_restriction_hooks,
+                attacker_model_instance_id=weapon["model_instance_id"],
+                shooting_type=forced_shooting_type or selected_shooting_type,
+            )
+            target_candidates.append(
+                _target_candidate_payload_for_request(
+                    state=state,
+                    scenario=scenario,
+                    candidate=cast(dict[str, JsonValue], candidate.to_payload()),
+                    selection_context=context,
+                    rules_unit=rules_unit,
+                    weapon=weapon,
+                    weapon_profile=profile,
+                    player_id=active_selection.player_id,
+                    army_catalog=army_catalog,
+                    selected_shooting_type=selected_shooting_type,
+                    forced_shooting_type=forced_shooting_type,
+                )
+            )
     out_of_phase = state.out_of_phase_shooting_state
     if (
         out_of_phase is not None
@@ -264,7 +271,6 @@ def _request_shooting_declaration(
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
     )
-    request_id = state.next_decision_request_id()
     proposal_request: ShootingDeclarationProposalRequestPayload = {
         "request_id": request_id,
         "decision_type": SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -360,6 +366,7 @@ def request_out_of_phase_shooting_declaration(
     target_unit_ids: tuple[str, ...] | None = None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus:
     if state.out_of_phase_shooting_state is not None:
         raise GameLifecycleError("Out-of-phase shooting state is already active.")
@@ -409,6 +416,7 @@ def request_out_of_phase_shooting_declaration(
         state=state,
         decisions=decisions,
         active_selection=selection,
+        runtime_modifier_registry=runtime_modifier_registry,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         phase=parent_phase,
@@ -491,6 +499,7 @@ def _shooting_weapon_selection_limits_for_request(
 
 def _target_candidate_payload_for_request(
     *,
+    selection_context: WeaponSelectionContext,
     state: GameState,
     scenario: BattlefieldScenario,
     candidate: dict[str, JsonValue],
@@ -504,20 +513,14 @@ def _target_candidate_payload_for_request(
 ) -> JsonValue:
     payload = dict(candidate)
     payload["weapon_instance_id"] = weapon["weapon_instance_id"]
-    payload["required_weapon_ability_selections"] = _required_weapon_ability_selections_for_target(
-        state=state,
-        proposal_request_id=_embedded_weapon_ability_request_prefix(
-            state=state,
-            attacker_unit_id=rules_unit.unit_instance_id,
-            weapon_instance_id=weapon["weapon_instance_id"],
-            weapon_profile=weapon_profile,
-        ),
-        weapon_instance_id=weapon["weapon_instance_id"],
-        weapon_profile=weapon_profile,
-        target_unit_id=_payload_string(
-            cast(dict[str, object], payload), key="target_unit_instance_id"
-        ),
-        player_id=player_id,
+    context = selection_context
+    payload["weapon_ability_selection_context"] = validate_json_value(context.to_payload())
+    payload["required_weapon_ability_selections"] = [
+        validate_json_value(interaction_annotated_decision_request_payload(request))
+        for request in context.selection_requests(actor_id=player_id)
+    ]
+    weapon_profile = context.raw_profile_for_target(
+        _payload_string(cast(dict[str, object], payload), key="target_unit_instance_id")
     )
     payload["shooting_types"] = [
         shooting_type.value
@@ -561,22 +564,23 @@ def _required_weapon_ability_selections_for_target(
     target_unit_id: str,
     player_id: str,
 ) -> list[JsonValue]:
-    target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
-    selection_request = weapon_ability_selection_request(
-        weapon_profile,
-        AbilityKind.ANTI_KEYWORD,
-        target_keywords=target_rules_unit.keywords,
-        actor_id=player_id,
-        request_id=f"{proposal_request_id}:{target_unit_id}:anti-keyword",
-        source_context={
-            "phase": BattlePhase.SHOOTING.value,
-            "weapon_instance_id": weapon_instance_id,
-            "target_unit_instance_id": target_unit_id,
-        },
+    from warhammer40k_core.engine.ability_instance_selection import (
+        weapon_instance_selection_requests,
     )
-    if selection_request is None:
-        return []
-    return [validate_json_value(interaction_annotated_decision_request_payload(selection_request))]
+
+    return [
+        validate_json_value(interaction_annotated_decision_request_payload(request))
+        for request in weapon_instance_selection_requests(
+            weapon_profile,
+            actor_id=player_id,
+            request_id=f"{proposal_request_id}:{target_unit_id}",
+            source_context={
+                "phase": BattlePhase.SHOOTING.value,
+                "weapon_instance_id": weapon_instance_id,
+                "target_unit_instance_id": target_unit_id,
+            },
+        )
+    ]
 
 
 def _nested_interaction_requests_for_target_candidates(
