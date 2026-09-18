@@ -80,8 +80,15 @@ def validate_weapon_pool_choice(
                 row.get("attacker_model_instance_id"),
                 row.get("wargear_id"),
                 row.get("weapon_profile_id"),
-            ) == (pool.attacker_model_instance_id, pool.wargear_id, pool.weapon_profile_id):
-                matches.append((record, row))
+            ) != (pool.attacker_model_instance_id, pool.wargear_id, pool.weapon_profile_id):
+                continue
+            declared_weapon_instance_id = row.get("weapon_instance_id")
+            if (
+                record.request.decision_type == "submit_shooting_declaration"
+                and declared_weapon_instance_id != pool.weapon_instance_id
+            ):
+                continue
+            matches.append((record, row))
     if len(matches) != 1 or matches[0][1].get("selected_weapon_ability_ids", []) != list(
         pool.selected_weapon_ability_ids
     ):

@@ -54,6 +54,7 @@ from warhammer40k_core.core.datasheet import (
     DamagedEffectDefinition,
     DamagedEffectKind,
     DatasheetDefinition,
+    DatasheetWargearOption,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
@@ -90,6 +91,7 @@ from warhammer40k_core.engine.game_state import (
     GameStatePayload,
     RangedAttackHistoryRecord,
 )
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
@@ -3809,6 +3811,191 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
     )
     with pytest.raises(GameLifecycleError, match="disagree with their declaration"):
         validate_weapon_pool_choice(forged, tuple(lifecycle.decision_controller.records))
+
+
+def _duplicate_anti_infantry_profile(*, profile_id: str, name: str) -> WeaponProfile:
+    return replace(
+        _weapon_profile_by_wargear(
+            wargear_id="core-bolt-rifle",
+            weapon_profile_id="core-bolt-rifle:standard",
+        ),
+        profile_id=profile_id,
+        name=name,
+        attack_profile=AttackProfile.fixed(1),
+        keywords=(WeaponKeyword.TORRENT,),
+        abilities=(
+            AbilityDescriptor.anti_keyword("Infantry", 4),
+            AbilityDescriptor.anti_keyword("Infantry", 2),
+        ),
+        damage_profile=DamageProfile.fixed(1),
+    )
+
+
+def _catalog_with_two_bolt_rifle_copies(profile: WeaponProfile) -> ArmyCatalog:
+    catalog = _catalog_with_replaced_bolt_profiles((profile,))
+    updated_datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id != "core-intercessor-like-infantry":
+            updated_datasheets.append(datasheet)
+            continue
+        extra_option = DatasheetWargearOption(
+            option_id=f"{datasheet.datasheet_id}:second-bolt-rifle",
+            model_profile_id=datasheet.model_profiles[0].model_profile_id,
+            default_wargear_ids=("core-bolt-rifle",),
+            allowed_wargear_ids=("core-bolt-rifle",),
+            min_selections=1,
+            max_selections=1,
+        )
+        updated_datasheets.append(
+            replace(datasheet, wargear_options=(*datasheet.wargear_options, extra_option))
+        )
+    return replace(catalog, datasheets=tuple(updated_datasheets))
+
+
+def _weapon_ability_option_ids(
+    *,
+    request: DecisionRequest,
+    target_unit_id: str,
+) -> tuple[str, ...]:
+    payload = cast(dict[str, object], request.payload)
+    proposal_request = cast(dict[str, object], payload["proposal_request"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    required_selection_payloads = [
+        cast(dict[str, object], selection_payload)
+        for candidate in target_candidates
+        if candidate["target_unit_instance_id"] == target_unit_id
+        for selection_payload in cast(
+            list[object],
+            candidate["required_weapon_ability_selections"],
+        )
+    ]
+    anti_selection_request = next(
+        payload
+        for payload in required_selection_payloads
+        if payload["decision_type"] == WEAPON_ABILITY_SELECTION_DECISION_TYPE
+    )
+    return tuple(
+        cast(str, option["option_id"])
+        for option in cast(list[dict[str, object]], anti_selection_request["options"])
+    )
+
+
+def test_one_rifle_duplicate_anti_selection_restores() -> None:
+    duplicate_anti_profile = _duplicate_anti_infantry_profile(
+        profile_id="phase14i-one-copy-anti-bolt-rifle",
+        name="Phase 14I one-copy Anti bolt rifle",
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14i-one-copy-anti-restore",
+        catalog=_catalog_with_replaced_bolt_profiles((duplicate_anti_profile,)),
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase14i-one-copy-anti-select",
+    )
+    option_ids = _weapon_ability_option_ids(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+    )
+    assert len(option_ids) == 2
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=_proposal_from_request(
+            request=declaration_request,
+            target_unit_id=units["enemy"].unit_instance_id,
+            weapon_profile_id=duplicate_anti_profile.profile_id,
+            selected_weapon_ability_ids=(option_ids[0],),
+        ).to_payload(),
+        result_id="phase14i-one-copy-anti-selected",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, status.payload
+    GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_two_identical_weapon_copies_with_ability_selections_restore() -> None:
+    duplicate_anti_profile = _duplicate_anti_infantry_profile(
+        profile_id="phase14i-two-copy-anti-bolt-rifle",
+        name="Phase 14I two-copy Anti bolt rifle",
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14i-two-copy-anti",
+        catalog=_catalog_with_two_bolt_rifle_copies(duplicate_anti_profile),
+    )
+    attacker = units["intercessor-1"]
+    used_model = attacker.own_models[0]
+    assert used_model.wargear_ids.count("core-bolt-rifle") == 2
+
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase14i-two-copy-anti-select",
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    defender = units["enemy"]
+    target_candidate = next(
+        candidate
+        for candidate in target_candidates
+        if candidate["target_unit_instance_id"] == defender.unit_instance_id
+        and candidate["is_legal"] is True
+    )
+    copy_weapons = [
+        weapon
+        for weapon in weapons
+        if weapon["model_instance_id"] == used_model.model_instance_id
+        and weapon["weapon_profile_id"] == duplicate_anti_profile.profile_id
+    ]
+    assert len(copy_weapons) == 2
+    assert len({weapon["weapon_instance_id"] for weapon in copy_weapons}) == 2
+
+    option_ids = _weapon_ability_option_ids(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+    )
+    assert len(option_ids) == 2
+    shooting_type = _first_shooting_type(target_candidate)
+    declarations = tuple(
+        WeaponDeclaration(
+            attacker_model_instance_id=cast(str, weapon["model_instance_id"]),
+            weapon_instance_id=cast(str, weapon["weapon_instance_id"]),
+            wargear_id=cast(str, weapon["wargear_id"]),
+            weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
+            target_unit_instance_id=defender.unit_instance_id,
+            shooting_type=shooting_type,
+            selected_weapon_ability_ids=(choice,),
+        )
+        for weapon, choice in zip(copy_weapons, option_ids, strict=True)
+    )
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=_proposal_from_declarations(
+            request=declaration_request,
+            declarations=declarations,
+        ).to_payload(),
+        result_id="phase14i-two-copy-anti-selected",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, status.payload
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payloads = cast(list[dict[str, object]], accepted_payload["attack_pools"])
+    assert tuple(cast(str, pool["weapon_instance_id"]) for pool in pool_payloads) == tuple(
+        cast(str, weapon["weapon_instance_id"]) for weapon in copy_weapons
+    )
+    assert [pool["selected_weapon_ability_ids"] for pool in pool_payloads] == [
+        [choice] for choice in option_ids
+    ]
+
+    GameLifecycle.from_payload(lifecycle.to_payload())
 
 
 def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:
