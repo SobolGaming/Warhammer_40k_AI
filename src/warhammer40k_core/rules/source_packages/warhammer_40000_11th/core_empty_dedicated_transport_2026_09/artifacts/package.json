@@ -1,0 +1,91 @@
+{
+  "artifact_schema": "core-v2-core-empty-dedicated-transport-source-v1",
+  "source_package_id": "gw-11e-core-empty-dedicated-transport",
+  "source_version": "maintained-app-mirrors-observed-2026-09-18",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport",
+      "section_id": "18.01",
+      "source_text": "A friendly unit must be embarked within each friendly DEDICATED TRANSPORT model. At the end of this step, each friendly DEDICATED TRANSPORT model without an embarked unit is destroyed, but they do not trigger rules that are triggered when a model is destroyed.",
+      "transcription_sha256": "44160b6df089669f0044b4dbfa2ec776eb09f51559340b6f875946c8b7e4cb3f",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.empty_dedicated_transport_destruction:apply_empty_dedicated_transport_destruction",
+        "warhammer40k_core.engine.setup_flow:SetupFlow.advance",
+        "warhammer40k_core.engine.setup_completion:_append_empty_transport_manifest_violations"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-empty-dedicated-transport-review:empty-dedicated-transport",
+      "rule_source_id": "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 18.01 Transport Capacity empty Dedicated Transport",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "44160b6df089669f0044b4dbfa2ec776eb09f51559340b6f875946c8b7e4cb3f",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "0ed1fffbedcc48fa08d69f5d252f532ff754c6afe155b0bf3ea248cb4d2d1ca3",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.empty_dedicated_transport_destruction:apply_empty_dedicated_transport_destruction",
+        "warhammer40k_core.engine.setup_flow:SetupFlow.advance",
+        "warhammer40k_core.engine.setup_completion:_append_empty_transport_manifest_violations"
+      ]
+    },
+    {
+      "evidence_id": "core-empty-dedicated-transport-mirror:empty-dedicated-transport",
+      "rule_source_id": "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-empty-dedicated-transport-maintained-app-mirrors-2026-09-18",
+      "review_audit_row_id": "empty-dedicated-transport",
+      "review_audit_source_observation_sha256": "90191962421b4997f5595441ab43aed12e3f75dd2a460db1adb4d3f2b0212d1e",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 18.01 Transport Capacity empty Dedicated Transport",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/18-transports",
+      "observed_at": "2026-09-18T16:45:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "44160b6df089669f0044b4dbfa2ec776eb09f51559340b6f875946c8b7e4cb3f",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "67b80efdeb90dc50328bf9873c82f5a5a212766b3cd1ac1103b2da1ba5c86370",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.empty_dedicated_transport_destruction:apply_empty_dedicated_transport_destruction",
+        "warhammer40k_core.engine.setup_flow:SetupFlow.advance",
+        "warhammer40k_core.engine.setup_completion:_append_empty_transport_manifest_violations"
+      ]
+    }
+  ],
+  "destruction_policy": {
+    "source_rule_id": "gw-11e-core-empty-dedicated-transport:empty-dedicated-transport",
+    "destroys_at_declare_battle_formations_end": true,
+    "triggers_destroyed_model_rules": false,
+    "requires_embarked_unit": true
+  },
+  "package_hash": "204472d8b9481787017bcc40f24bc463723b6512cacd7db86edbe354d2140dd7"
+}

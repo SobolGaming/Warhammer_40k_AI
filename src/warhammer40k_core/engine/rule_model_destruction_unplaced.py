@@ -188,4 +188,34 @@ def _destroy_emergency_disembark_omitted_models(
         )
 
 
+def destroy_unplaced_model_without_reactions(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> None:
+    """Logically destroy one unplaced model without destroyed-model-rule triggers."""
+
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Unplaced model destruction requires GameState.")
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Unplaced model destruction requires battlefield state.")
+    if battlefield.model_placement_or_none(requested_model_id) is not None:
+        raise GameLifecycleError("Unplaced model destruction requires an unplaced model.")
+    if requested_model_id in battlefield.removed_model_ids:
+        raise GameLifecycleError("Unplaced model destruction cannot target a removed model.")
+    if not model_by_id(state=state, model_instance_id=requested_model_id).is_alive:
+        raise GameLifecycleError("Unplaced model destruction requires a living model.")
+    destroy_model_by_rule(
+        state=state,
+        model_instance_id=requested_model_id,
+        remove_from_battlefield=False,
+    )
+    if model_by_id(state=state, model_instance_id=requested_model_id).is_alive:
+        raise GameLifecycleError("Unplaced model destruction left a living model.")
+
+
 _validate_identifier = IdentifierValidator(GameLifecycleError)

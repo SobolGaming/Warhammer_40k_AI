@@ -688,6 +688,11 @@ Current status:
   verify it offline with
   `uv run python tools/build_core_failed_save_damage_timing_source.py` and the
   same command plus `--check`.
+- Order 59 / P18A's reviewed 18.01 empty Dedicated Transport wording is pinned in
+  `core_empty_dedicated_transport_2026_09/artifacts/package.json`; refresh and
+  verify it offline with
+  `uv run python tools/build_core_empty_dedicated_transport_source.py` and the
+  same command plus `--check`.
 - P18C/P18D/P18E's reviewed 18.05 Emergency Disembark and App-data v931 18.06
   Assault Disembark and 18.07 Shock Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
@@ -856,3 +861,8 @@ Order 58 applies incoming Damage-to-0 after the saving throw. Grouped allocation
 keeps that post-save order, records the replacement, and skips infliction. See
 [scope and proof](docs/ORDER_58_SCOPE_PLAN.md). Verify its reviewed source with
 `uv run python tools/build_core_failed_save_damage_timing_source.py --check`.
+
+Order 59 destroys empty Dedicated Transports at the end of Declare Battle
+Formations without triggering destroyed-model rules. See
+[scope and proof](docs/ORDER_59_SCOPE_PLAN.md). Verify its reviewed source with
+`uv run python tools/build_core_empty_dedicated_transport_source.py --check`.

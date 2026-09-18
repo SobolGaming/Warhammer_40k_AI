@@ -2852,7 +2852,12 @@ roster baseline. Completing the step emits one deterministic public
 `battle_formations_revealed` event with
 the final reserve, transport-cargo, Dedicated Transport consequence, and
 battle-formation faction-rule states; later deployment availability and
-battlefield projections are public. Adapters must not infer a hidden declaration
+battlefield projections are public. At that same formation boundary the engine
+destroys every empty Dedicated Transport without triggering destroyed-model
+rules, marks those unplaced models removed, and emits one public
+`empty_dedicated_transports_destroyed` event carrying the 18.01 source rule ID
+and `destroyed_model_rules_triggered: false`. This is not a player-facing
+choice. Adapters must not infer a hidden declaration
 from option counts, missing deployment candidates, cursor metadata, or another
 projection sibling.
 
@@ -6216,4 +6221,17 @@ incoming Damage change before the save or invent a pre-save Damage of 0.
 Restore and replay retain the replacement event and unchanged wounds through the
 existing engine path. The catalog first-failed-save consumer remains
 once-per-turn and automatic.
+
+## Order 59: empty Dedicated Transports die at formation reveal
+
+Order 59 / P18A adds no player-facing decision, option family, proposal kind, or
+viewer-visibility change. At the end of Declare Battle Formations the engine
+destroys every Dedicated Transport without an embarked unit, marks those
+unplaced models removed, and emits public `empty_dedicated_transports_destroyed`
+with the 18.01 source rule ID and `destroyed_model_rules_triggered: false`.
+Empty-manifest setup consequences remain owner-secret until
+`battle_formations_revealed`. Adapters must not delay that destruction until
+battle round 1 or invent a destroyed-model reaction from this path. Restore and
+replay retain the destroyed wounds, removed-model authority, and public
+destruction event through the existing engine path.
 

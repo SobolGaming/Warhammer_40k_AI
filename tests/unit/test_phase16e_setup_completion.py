@@ -224,7 +224,8 @@ def test_phase16e_gate_rejects_empty_dedicated_transport_manifest_without_conseq
         if violation.unit_instance_id == "army-alpha:transport-unit"
     ]
     assert [violation.field for violation in transport_violations] == [
-        "dedicated_transport_setup_consequences"
+        "dedicated_transport_setup_consequences",
+        "battlefield_state",
     ]
     assert state.stage is GameLifecycleStage.SETUP
     assert state.battle_round == 0
@@ -256,6 +257,7 @@ def test_phase16e_gate_rejects_empty_manifest_with_cargo_or_deployment() -> None
     assert [violation.field for violation in transport_violations] == [
         "dedicated_transport_setup_consequences",
         "transport_cargo_states",
+        "battlefield_state",
         "battlefield_state",
     ]
     assert state.stage is GameLifecycleStage.SETUP

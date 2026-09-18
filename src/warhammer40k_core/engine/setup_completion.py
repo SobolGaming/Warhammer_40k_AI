@@ -1064,6 +1064,7 @@ def _append_dedicated_transport_setup_violations(
             if not manifest.embarked_unit_selection_ids:
                 _append_empty_transport_manifest_violations(
                     violations=violations,
+                    state=state,
                     player_id=army_definition.player_id,
                     transport_unit_id=transport_unit_id,
                     source_id=manifest.source_id,
@@ -1129,6 +1130,7 @@ def _append_dedicated_transport_setup_violations(
 def _append_empty_transport_manifest_violations(
     *,
     violations: list[SetupCompletionViolation],
+    state: GameState,
     player_id: str,
     transport_unit_id: str,
     source_id: str,
@@ -1167,6 +1169,48 @@ def _append_empty_transport_manifest_violations(
                 player_id=player_id,
                 unit_instance_id=transport_unit_id,
                 detail={"source_id": source_id},
+            )
+        )
+    transport = next(
+        (
+            unit
+            for army in state.army_definitions
+            for unit in army.units
+            if unit.unit_instance_id == transport_unit_id
+        ),
+        None,
+    )
+    if transport is None:
+        raise GameLifecycleError("Empty Dedicated Transport manifest Transport is unknown.")
+    living_model_ids = tuple(
+        model.model_instance_id for model in transport.own_models if model.is_alive
+    )
+    removed_model_ids = (
+        set[str]()
+        if state.battlefield_state is None
+        else set(state.battlefield_state.removed_model_ids)
+    )
+    unremoved_model_ids = tuple(
+        model.model_instance_id
+        for model in transport.own_models
+        if model.model_instance_id not in removed_model_ids
+    )
+    if living_model_ids or unremoved_model_ids:
+        violations.append(
+            SetupCompletionViolation(
+                SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                (
+                    "Empty Dedicated Transport must be destroyed at Declare Battle "
+                    "Formations without destroyed-model rules."
+                ),
+                field="battlefield_state",
+                player_id=player_id,
+                unit_instance_id=transport_unit_id,
+                detail={
+                    "source_id": source_id,
+                    "living_model_instance_ids": list(living_model_ids),
+                    "unremoved_model_instance_ids": list(unremoved_model_ids),
+                },
             )
         )
 

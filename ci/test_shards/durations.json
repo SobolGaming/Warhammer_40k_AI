@@ -86,6 +86,7 @@
     "tests/unit/test_order55_disembark.py": 127.105,
     "tests/unit/test_order57_destroyed_referent_measurement.py": 0.859,
     "tests/unit/test_order58_failed_save_damage_timing.py": 6.74,
+    "tests/unit/test_order59_empty_dedicated_transport.py": 14.59,
     "tests/unit/test_phase10a_placement.py": 0.06,
     "tests/unit/test_phase10b_movement.py": 60.143,
     "tests/unit/test_phase10d_battlefield_transitions.py": 9.55,
@@ -258,46 +259,46 @@
   "shard_count": 8,
   "shards": [
     {
-      "duration_seconds": 5058.545,
+      "duration_seconds": 5060.372,
       "shard_id": 1,
-      "test_file_count": 28
+      "test_file_count": 29
     },
     {
-      "duration_seconds": 5058.541,
+      "duration_seconds": 5060.392,
       "shard_id": 2,
-      "test_file_count": 31
+      "test_file_count": 29
     },
     {
-      "duration_seconds": 5058.538,
+      "duration_seconds": 5060.367,
       "shard_id": 3,
-      "test_file_count": 32
-    },
-    {
-      "duration_seconds": 5058.563,
-      "shard_id": 4,
-      "test_file_count": 30
-    },
-    {
-      "duration_seconds": 5058.583,
-      "shard_id": 5,
-      "test_file_count": 30
-    },
-    {
-      "duration_seconds": 5058.537,
-      "shard_id": 6,
       "test_file_count": 31
     },
     {
-      "duration_seconds": 5058.538,
-      "shard_id": 7,
+      "duration_seconds": 5060.37,
+      "shard_id": 4,
       "test_file_count": 32
     },
     {
-      "duration_seconds": 5058.573,
+      "duration_seconds": 5060.367,
+      "shard_id": 5,
+      "test_file_count": 32
+    },
+    {
+      "duration_seconds": 5060.372,
+      "shard_id": 6,
+      "test_file_count": 32
+    },
+    {
+      "duration_seconds": 5060.384,
+      "shard_id": 7,
+      "test_file_count": 30
+    },
+    {
+      "duration_seconds": 5060.384,
       "shard_id": 8,
       "test_file_count": 30
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 40468.418
+  "total_test_duration_seconds": 40483.008
 }

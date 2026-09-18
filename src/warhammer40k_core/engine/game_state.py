@@ -340,6 +340,9 @@ from warhammer40k_core.engine.unit_keyword_queries import (
 from warhammer40k_core.engine.unit_keyword_queries import (
     unit_has_keyword as _unit_has_keyword,
 )
+from warhammer40k_core.engine.unit_keyword_queries import (
+    unit_has_roster_keyword as _unit_has_roster_keyword,
+)
 from warhammer40k_core.engine.unit_resource_state import (
     seed_unit_resources,
     unit_resource_initializations_for_army,
@@ -368,7 +371,7 @@ class SecondaryMissionMode(StrEnum):
 
 
 DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE = (
-    "empty_starting_cargo_destroyed_first_battle_round"
+    "empty_starting_cargo_destroyed_without_triggers"
 )
 DEFAULT_MAX_LIFECYCLE_TRANSITIONS = 128
 
@@ -867,7 +870,7 @@ class DedicatedTransportSetupConsequence:
     player_id: str
     transport_unit_instance_id: str
     consequence_kind: str
-    destroyed_battle_round: int
+    destroyed_model_rules_triggered: bool
     source_id: str
 
     def __post_init__(self) -> None:
@@ -894,14 +897,14 @@ class DedicatedTransportSetupConsequence:
         )
         if self.consequence_kind != DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE:
             raise GameLifecycleError("DedicatedTransportSetupConsequence kind is unsupported.")
-        object.__setattr__(
-            self,
-            "destroyed_battle_round",
-            _validate_positive_int(
-                "DedicatedTransportSetupConsequence destroyed_battle_round",
-                self.destroyed_battle_round,
-            ),
-        )
+        if type(self.destroyed_model_rules_triggered) is not bool:
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence destroyed_model_rules_triggered must be a bool."
+            )
+        if self.destroyed_model_rules_triggered:
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction must not trigger destroyed-model rules."
+            )
         object.__setattr__(
             self,
             "source_id",
@@ -920,7 +923,7 @@ class DedicatedTransportSetupConsequence:
             player_id=player_id,
             transport_unit_instance_id=transport_unit_instance_id,
             consequence_kind=DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE,
-            destroyed_battle_round=1,
+            destroyed_model_rules_triggered=False,
             source_id=source_id,
         )
 
@@ -929,7 +932,7 @@ class DedicatedTransportSetupConsequence:
             "player_id": self.player_id,
             "transport_unit_instance_id": self.transport_unit_instance_id,
             "consequence_kind": self.consequence_kind,
-            "destroyed_battle_round": self.destroyed_battle_round,
+            "destroyed_model_rules_triggered": self.destroyed_model_rules_triggered,
             "source_id": self.source_id,
         }
 
@@ -939,7 +942,7 @@ class DedicatedTransportSetupConsequence:
             player_id=payload["player_id"],
             transport_unit_instance_id=payload["transport_unit_instance_id"],
             consequence_kind=payload["consequence_kind"],
-            destroyed_battle_round=payload["destroyed_battle_round"],
+            destroyed_model_rules_triggered=payload["destroyed_model_rules_triggered"],
             source_id=payload["source_id"],
         )
 
@@ -4402,7 +4405,7 @@ class GameState:
                 raise GameLifecycleError(
                     "DedicatedTransportSetupConsequence references an unknown Transport."
                 )
-            model_ids.extend(model.model_instance_id for model in unit.own_models)
+            model_ids.extend(model.model_instance_id for model in unit.own_models if model.is_alive)
         return tuple(sorted(model_ids))
 
     def record_dedicated_transport_setup_consequence(
@@ -6332,7 +6335,7 @@ def _validate_dedicated_transport_setup_consequences(
         if owner != value.player_id:
             raise GameLifecycleError("DedicatedTransportSetupConsequence player_id drift.")
         transport = unit_by_id[value.transport_unit_instance_id]
-        if not _unit_has_keyword(transport, "DEDICATED TRANSPORT"):
+        if not _unit_has_roster_keyword(transport, "DEDICATED TRANSPORT"):
             raise GameLifecycleError(
                 "DedicatedTransportSetupConsequence requires a DEDICATED TRANSPORT unit."
             )

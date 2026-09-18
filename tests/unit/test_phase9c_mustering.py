@@ -4439,7 +4439,7 @@ def test_phase16d_empty_dedicated_transport_manifest_records_setup_consequence()
         "army-alpha:transport-unit"
     )
     assert consequence is not None
-    assert consequence.destroyed_battle_round == 1
+    assert consequence.destroyed_model_rules_triggered is False
     assert consequence.source_id == "manifest:empty"
     assert state.transport_cargo_state_for_transport("army-alpha:transport-unit") is None
     assert "army-alpha:transport-unit:core-transport:001" in state.unavailable_model_ids()
