@@ -15,6 +15,9 @@ from warhammer40k_core.engine.catalog_materialization_integrity import (
     authenticated_catalog_materialized_model_payloads_by_unit_id,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.empty_dedicated_transport_destruction import (
+    authenticated_empty_dedicated_transport_casualty_model_ids,
+)
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, SetupStep
@@ -79,11 +82,18 @@ def validate_mustered_army_consistency(
         decision_records=decision_records,
         event_records=event_records,
     )
+    setup_casualty_model_ids: frozenset[str] = frozenset()
+    if state.stage is GameLifecycleStage.SETUP:
+        setup_casualty_model_ids = authenticated_empty_dedicated_transport_casualty_model_ids(
+            state=state,
+            event_records=event_records,
+        )
     if state_armies and not _armies_match_muster_runtime_state(
         state=state,
         state_armies=state_armies,
         expected_armies=split_armies,
         materialized_model_payloads_by_unit_id=(materialized_model_payloads_by_unit_id),
+        setup_casualty_model_ids=setup_casualty_model_ids,
     ):
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
     if state_armies:
@@ -126,6 +136,7 @@ def _armies_match_muster_runtime_state(
     state_armies: tuple[ArmyDefinition, ...],
     expected_armies: tuple[ArmyDefinition, ...],
     materialized_model_payloads_by_unit_id: MaterializedModelPayloadsByUnitId,
+    setup_casualty_model_ids: frozenset[str],
 ) -> bool:
     if len(state_armies) != len(expected_armies):
         return False
@@ -140,7 +151,15 @@ def _armies_match_muster_runtime_state(
             GameLifecycleStage.BATTLE,
             GameLifecycleStage.COMPLETE,
         }:
-            if state_army != expected_army:
+            normalized_state_army = replace(
+                state_army,
+                units=_units_with_authenticated_setup_casualty_muster_wounds(
+                    state_army=state_army,
+                    expected_army=expected_army,
+                    casualty_model_ids=setup_casualty_model_ids,
+                ),
+            )
+            if normalized_state_army != expected_army:
                 return False
             continue
         if state_army.attached_units != expected_army.attached_units:
@@ -156,6 +175,44 @@ def _armies_match_muster_runtime_state(
         if normalized_state_army != expected_army:
             return False
     return True
+
+
+def _units_with_authenticated_setup_casualty_muster_wounds(
+    *,
+    state_army: ArmyDefinition,
+    expected_army: ArmyDefinition,
+    casualty_model_ids: frozenset[str],
+) -> tuple[UnitInstance, ...]:
+    expected_units_by_id = {unit.unit_instance_id: unit for unit in expected_army.units}
+    if {unit.unit_instance_id for unit in state_army.units} != set(expected_units_by_id):
+        return state_army.units
+    normalized_units: list[UnitInstance] = []
+    for state_unit in state_army.units:
+        expected_unit = expected_units_by_id[state_unit.unit_instance_id]
+        expected_models_by_id = {
+            model.model_instance_id: model for model in expected_unit.own_models
+        }
+        if {model.model_instance_id for model in state_unit.own_models} != set(
+            expected_models_by_id
+        ):
+            return state_army.units
+        normalized_models: list[ModelInstance] = []
+        for state_model in state_unit.own_models:
+            if state_model.model_instance_id not in casualty_model_ids:
+                normalized_models.append(state_model)
+                continue
+            if state_model.wounds_remaining != 0:
+                return state_army.units
+            normalized_models.append(
+                replace(
+                    state_model,
+                    wounds_remaining=expected_models_by_id[
+                        state_model.model_instance_id
+                    ].wounds_remaining,
+                )
+            )
+        normalized_units.append(replace(state_unit, own_models=tuple(normalized_models)))
+    return tuple(normalized_units)
 
 
 def _units_with_expected_muster_wounds(

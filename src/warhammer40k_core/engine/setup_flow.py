@@ -33,6 +33,9 @@ from warhammer40k_core.engine.deployment import (
     deployment_setup_state_for_state,
     deployment_unit_selection_request,
 )
+from warhammer40k_core.engine.empty_dedicated_transport_destruction import (
+    apply_empty_dedicated_transport_destruction,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     DedicatedTransportSetupConsequence,
@@ -360,6 +363,7 @@ class SetupFlow:
             )
             if reserve_status is not None:
                 return reserve_status
+            apply_empty_dedicated_transport_destruction(state=state, decisions=decisions)
         elif current_step is SetupStep.DEPLOY_ARMIES:
             deployment_status = self._advance_deploy_armies(
                 state=state,

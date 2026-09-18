@@ -18,13 +18,8 @@ def unit_has_aircraft_hover_keywords(keywords: tuple[str, ...]) -> bool:
 def unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("unit keyword check requires a UnitInstance.")
-    requested_keyword = (
-        _validate_identifier("unit keyword", keyword).upper().replace(" ", "_").replace("-", "_")
-    )
-    unit_keywords = {
-        _validate_identifier("unit keyword", value).upper().replace(" ", "_").replace("-", "_")
-        for value in unit.keywords
-    }
+    requested_keyword = _canonical_keyword(keyword)
+    unit_keywords = {_canonical_keyword(value) for value in unit.keywords}
     return requested_keyword in unit_keywords
 
 
@@ -35,4 +30,13 @@ def unit_has_roster_keyword(unit: UnitInstance, keyword: str) -> bool:
     """
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Roster keyword identity requires a UnitInstance.")
-    return any(keyword in model.keywords for model in unit.own_models)
+    requested_keyword = _canonical_keyword(keyword)
+    return any(
+        _canonical_keyword(value) == requested_keyword
+        for model in unit.own_models
+        for value in model.keywords
+    )
+
+
+def _canonical_keyword(keyword: str) -> str:
+    return _validate_identifier("unit keyword", keyword).upper().replace(" ", "_").replace("-", "_")

@@ -137,7 +137,7 @@ class DedicatedTransportSetupConsequencePayload(TypedDict):
     player_id: str
     transport_unit_instance_id: str
     consequence_kind: str
-    destroyed_battle_round: int
+    destroyed_model_rules_triggered: bool
     source_id: str
 
 

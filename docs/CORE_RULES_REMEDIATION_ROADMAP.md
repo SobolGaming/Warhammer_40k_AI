@@ -257,7 +257,7 @@ corroborate but is not required to begin that work.
 | 56 | P24C2 | C24-03B | Only duplicate Anti instances have a player-selection path; other duplicate ability instances cannot be selected through adapters. | Add the controlling-player finite instance decision, validation, replay, and viewer-safe projection; weapon choices occur each time the unit attacks during Select Weapons. Certify the Scouts exception: use the lowest non-shared value when values differ across models; a value shared by every model remains selectable. Cover the source's mixed 6/8-inch and universally shared 6/8-inch examples. | [24.02 Duplicated Abilities](https://www.40k.app/rules/24-core-abilities): duplicate abilities do not accumulate and the controlling player selects the active instance. | P24C1, P04 | APP-AUTHORITY |
 | 57 | P05C | C05-03 | Authenticated former placements exist, but no generic query can measure to a destroyed model or destroyed unit. | Add source-authorized measurement using the exact former base/hull; a destroyed-unit reference resolves to the last model destroyed and grants no living battlefield authority. [Order 57 implementation and evidence](ORDER_57_SCOPE_PLAN.md). | [05.04.06](https://www.40k.app/rules/05-attack-sequence): use the destroyed model’s former footprint, and the last destroyed model for a destroyed-unit reference. | P05B | APP-AUTHORITY |
 | 58 | P05D | C05-04 | The supported failed-save replacement path changes incoming Damage to 0 after the save, but the behavior is not certified against v931 across source, engine consumers, adapters, restore, and replay. | Pin the v931 FAQ, retain the correct post-save ordering, add an end-to-end regression, and audit every Damage-replacement consumer so no path changes Damage before the saving throw. | [Game Datamissions App-data v931, Damage-to-0 timing FAQ](https://game-datamissions.com/11th/rules/changelog): change Damage after saving throws. | S-MIRRORS | APP-AUTHORITY |
-| 59 | P18A | C18-01 | An empty Dedicated Transport receives a delayed unavailable/setup consequence associated with battle round 1. | At the end of Declare Battle Formations, immediately destroy/remove every empty Dedicated Transport without triggering destroyed-model rules. | [18.01 Transport Capacity](https://www.40k.app/rules/18-transports): empty Dedicated Transports are destroyed at the stated formation boundary without destruction triggers. | — | APP-AUTHORITY |
+| 59 | P18A | C18-01 | An empty Dedicated Transport receives a delayed unavailable/setup consequence associated with battle round 1. | At the end of Declare Battle Formations, immediately destroy/remove every empty Dedicated Transport without triggering destroyed-model rules. See [Order 59 implementation and evidence](ORDER_59_SCOPE_PLAN.md). | [18.01 Transport Capacity](https://www.40k.app/rules/18-transports): empty Dedicated Transports are destroyed at the stated formation boundary without destruction triggers. | — | APP-AUTHORITY |
 | 60 | P18B | C18-02 | Emergency Disembark accepts an arbitrary subset, destroys omitted models without proof, and rejects engaged endpoints even when no unengaged placement exists. | Place the maximum possible survivors wholly within 6″ and as close as possible; prefer unengaged placements, allow an engaged endpoint only when no unengaged endpoint exists, and destroy only genuinely unplaceable models. | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): maximal placement, closest-possible positioning, unengaged preference, engaged fallback, and casualty rules. | P03B, P18C | APP-AUTHORITY |
 | 61 | P18H | C18-09 | Embark checks same-phase disembark on the selected cargo state; the shared validator has no complete same-turn setup authority. | Reject embark after any setup on the battlefield this turn, including disembark from another Transport, Ingress and repositioning, unless a source explicitly overrides the restriction. Use canonical rules-unit setup history through all ordinary/reactive move and embark validators; verify later-turn expiry, both players, restore and replay. | [18.02 Embarking](https://www.40k.app/rules/18-transports): no setup on the battlefield this turn. | P18G, P01C | APP-DRIFT |
 | 62 | P18F | C18-07 | P18E substitutes the Transport's prior engagements for 18.07's moving-model engagement clause; C18-08/P18G separately owns Core eligibility. | Resolve only the engagement-owner interpretation and its forced-Fight consequences. Pin complete versioned mirror or official-App evidence; do not infer that embarked passengers share the Transport's prior engagements. Reconcile live validation, stored start-engagement evidence, queued opponents and replay. Core eligibility alignment proceeds independently in P18G. | [18.06–18.07 Assault and Shock Disembark](https://www.40k.app/rules/18-transports). | P18D, P18E, P18G, S-MIRRORS | EXCEPTION-PAUSE |
@@ -4894,4 +4894,29 @@ Local gates on 2026-09-18: 8,358 behavioral tests at 85.13% coverage, 517
 code-quality tests, identity/contract checks against base `e693fd01`, wheel
 smoke, and 342 TypeScript conformance assertions on contract 26.0.0.
 Complete-game performance remains unmeasured.
+
+## P18A implementation evidence — Order 59
+
+Status: implemented on `codex/order-59-empty-dedicated-transport`.
+Finding: `C18-01`. This certifies 18.01 empty Dedicated Transport destruction at
+Declare Battle Formations; it is not a category-wide certificate.
+
+The invariant is that every Dedicated Transport without an embarked unit is
+destroyed and removed at the end of Declare Battle Formations without
+destroyed-model-rule triggers. Ownership, source, and proof are in
+`docs/ORDER_59_SCOPE_PLAN.md`. SetupFlow remains the setup-step owner and
+applies the destruction owner before revealing formations. No new
+player-facing decision, named handler, or architecture exception is introduced.
+
+Source authority is the complete 18.01 observation
+`gw-11e-core-empty-dedicated-transport:empty-dedicated-transport`, observed
+2026-09-18T16:45:00+00:00, transcription SHA-256
+`44160b6df089669f0044b4dbfa2ec776eb09f51559340b6f875946c8b7e4cb3f`,
+source-observation SHA-256
+`90191962421b4997f5595441ab43aed12e3f75dd2a460db1adb4d3f2b0212d1e`.
+The offline builder and typed loader record `loaded` /
+`executable_engine_runtime`. Historical official Core Rules provenance remains
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+See [performance and final validation](performance/order59/README.md).
 

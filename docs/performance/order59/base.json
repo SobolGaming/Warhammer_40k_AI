@@ -1,0 +1,85 @@
+{
+  "workload_id": "order59-empty-dedicated-transport-v1",
+  "revision": "d90da49a98a8ebd544e2921a6127b180e85814b2",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "complete remaining Declare Battle Formations reserve declarations including empty Dedicated Transport destruction on head; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": "one empty Dedicated Transport, reservable infantry, and opposing infantry",
+    "units": 4,
+    "empty_dedicated_transports": 1
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order59.py": "a0232cb1256d18f585f7727d7573c987a0d5bed51d4112ac039290e5a60a2fdf",
+    "tests/order59_empty_dedicated_transport_helpers.py": "c5ffefdcd89dc3cbb7666a763ed4ebd14494a8d1c444118e30b968e86faf5b72"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 7.484183499997016,
+      "matched_seconds": 0.021166500002436806,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9010001000060583,
+      "matched_seconds": 0.021433699999761302,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.8982304000019212,
+      "matched_seconds": 0.020694900005764794,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9019632999988971,
+      "matched_seconds": 0.020530100002360996,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9075318000031984,
+      "matched_seconds": 0.020921099996485282,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0343906999987666,
+      "matched_seconds": 0.02917229999729898,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0761387999955332,
+      "matched_seconds": 0.021450000000186265,
+      "destroyed_model_count": 0,
+      "destruction_events": 0,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.022195514286327774,
+  "median_seconds": 0.021166500002436806,
+  "maximum_seconds": 0.02917229999729898,
+  "p95_seconds": 0.021450000000186265,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 0.45,
+    "maximum_seconds": 8
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}
