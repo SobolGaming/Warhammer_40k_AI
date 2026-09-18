@@ -45,8 +45,10 @@ destruction and coherency cleanup remain separate no-trigger families.
 
 Regressions cover immediate no-trigger destruction at Declare Battle Formations,
 preservation of embarked Dedicated Transports, owner rejection outside that
-setup step, adapter viewer-scoped event streams, and GameState restore. This PR
-adds no option family, proposal kind, or visibility change.
+setup step, adapter viewer-scoped event streams, GameState restore, and
+`GameLifecycle` restore through local session forks, persistence reload, and
+server command snapshots. Unrelated setup wound changes remain rejected.
+This PR adds no option family, proposal kind, or visibility change.
 See [performance and final gates](performance/order59/README.md).
 
 Reproduce the source with

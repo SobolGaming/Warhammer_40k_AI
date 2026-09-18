@@ -43,11 +43,15 @@ def test_empty_dedicated_transport_source_is_pinned_reproducible_and_executable(
 def test_empty_dedicated_transport_destruction_has_one_mutation_owner() -> None:
     owner = (ENGINE / "empty_dedicated_transport_destruction.py").read_text(encoding="utf-8")
     setup_flow = (ENGINE / "setup_flow.py").read_text(encoding="utf-8")
+    muster = (ENGINE / "army_muster_consistency.py").read_text(encoding="utf-8")
     assert "DESTRUCTION_POLICY" in owner
     assert "destroy_unplaced_model_without_reactions(" in owner
+    assert "authenticated_empty_dedicated_transport_casualty_model_ids(" in owner
     assert "destroyed_model_rules_triggered" in owner
     assert "replace_battlefield_state(" in owner
     assert "apply_empty_dedicated_transport_destruction(" in setup_flow
+    assert "authenticated_empty_dedicated_transport_casualty_model_ids(" in muster
+    assert "apply_empty_dedicated_transport_destruction(" not in muster
     assert "destroy_model_by_rule(" not in owner
     assert "destroy_model_by_rule(" not in setup_flow
     assert _apply_call_modules() == ("setup_flow.py",)

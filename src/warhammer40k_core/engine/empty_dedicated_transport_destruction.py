@@ -6,12 +6,15 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, TypedDict, cast
 
 from warhammer40k_core.engine.battlefield_state import PlacementError
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rule_model_destruction_unplaced import (
     destroy_unplaced_model_without_reactions,
 )
-from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
+from warhammer40k_core.engine.unit_keyword_queries import (
+    unit_has_keyword,
+    unit_has_roster_keyword,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_empty_dedicated_transport_2026_09 as empty_dedicated_transport_source,
 )
@@ -172,6 +175,136 @@ def apply_empty_dedicated_transport_destruction(
             _event_payload(state=state, result=result),
         )
     return result
+
+
+def authenticated_empty_dedicated_transport_casualty_model_ids(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+) -> frozenset[str]:
+    """Return empty Dedicated Transport models authenticated by the public event."""
+
+    from warhammer40k_core.engine.game_state import GameState
+
+    _assert_destruction_policy()
+    if type(state) is not GameState:
+        raise GameLifecycleError("Empty Dedicated Transport restore requires GameState.")
+    events = tuple(
+        event
+        for event in event_records
+        if event.event_type == EMPTY_DEDICATED_TRANSPORTS_DESTROYED_EVENT_TYPE
+    )
+    if not events:
+        return frozenset()
+    if len(events) != 1:
+        raise GameLifecycleError("Empty Dedicated Transport destruction events are duplicated.")
+    return _casualty_model_ids_from_destruction_event(state=state, event=events[0])
+
+
+def _casualty_model_ids_from_destruction_event(
+    *,
+    state: GameState,
+    event: EventRecord,
+) -> frozenset[str]:
+    payload = event.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Empty Dedicated Transport destruction event payload drifted.")
+    required = {
+        "game_id",
+        "setup_step",
+        "source_rule_id",
+        "destroyed_model_rules_triggered",
+        "destroyed_units",
+    }
+    if set(payload) != required:
+        raise GameLifecycleError("Empty Dedicated Transport destruction event payload drifted.")
+    if payload["game_id"] != state.game_id:
+        raise GameLifecycleError("Empty Dedicated Transport destruction event game_id drifted.")
+    if payload["setup_step"] != SetupStep.DECLARE_BATTLE_FORMATIONS.value:
+        raise GameLifecycleError("Empty Dedicated Transport destruction event setup step drifted.")
+    if payload["source_rule_id"] != EMPTY_DEDICATED_TRANSPORT_SOURCE_ID:
+        raise GameLifecycleError("Empty Dedicated Transport destruction event source drifted.")
+    if payload["destroyed_model_rules_triggered"] is not False:
+        raise GameLifecycleError(
+            "Empty Dedicated Transport destruction event must not trigger destroyed-model rules."
+        )
+    destroyed_units = payload["destroyed_units"]
+    if not isinstance(destroyed_units, list) or not destroyed_units:
+        raise GameLifecycleError("Empty Dedicated Transport destruction event units drifted.")
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError(
+            "Empty Dedicated Transport destruction event requires battlefield state."
+        )
+    placed_model_ids = set(battlefield.placed_model_ids())
+    removed_model_ids = set(battlefield.removed_model_ids)
+    units_by_id = {
+        unit.unit_instance_id: (army.player_id, unit)
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    casualty_model_ids: set[str] = set()
+    seen_transport_ids: set[str] = set()
+    for row in destroyed_units:
+        if not isinstance(row, dict) or set(row) != {
+            "player_id",
+            "transport_unit_instance_id",
+            "model_instance_ids",
+        }:
+            raise GameLifecycleError("Empty Dedicated Transport destruction event unit drifted.")
+        player_id = row["player_id"]
+        transport_unit_id = row["transport_unit_instance_id"]
+        model_ids = row["model_instance_ids"]
+        if type(player_id) is not str or type(transport_unit_id) is not str:
+            raise GameLifecycleError("Empty Dedicated Transport destruction event unit drifted.")
+        if not isinstance(model_ids, list) or not model_ids:
+            raise GameLifecycleError("Empty Dedicated Transport destruction event models drifted.")
+        if any(type(model_id) is not str for model_id in model_ids):
+            raise GameLifecycleError("Empty Dedicated Transport destruction event models drifted.")
+        if transport_unit_id in seen_transport_ids:
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event units duplicated."
+            )
+        seen_transport_ids.add(transport_unit_id)
+        owner = units_by_id.get(transport_unit_id)
+        if owner is None:
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event Transport unknown."
+            )
+        owner_player_id, unit = owner
+        if owner_player_id != player_id:
+            raise GameLifecycleError("Empty Dedicated Transport destruction event player drifted.")
+        if not unit_has_roster_keyword(unit, _DEDICATED_TRANSPORT_KEYWORD):
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event requires a Dedicated Transport."
+            )
+        cargo_state = state.transport_cargo_state_for_transport(transport_unit_id)
+        if cargo_state is not None and cargo_state.embarked_unit_instance_ids:
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event Transport still has cargo."
+            )
+        expected_model_ids = unit.own_model_ids()
+        if tuple(model_ids) != expected_model_ids:
+            raise GameLifecycleError("Empty Dedicated Transport destruction event models drifted.")
+        if any(model.is_alive or model.wounds_remaining != 0 for model in unit.own_models):
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event requires destroyed models."
+            )
+        if any(model_id in placed_model_ids for model_id in expected_model_ids):
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event models are still placed."
+            )
+        if any(model_id not in removed_model_ids for model_id in expected_model_ids):
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event models must be removed."
+            )
+        overlapping = casualty_model_ids.intersection(expected_model_ids)
+        if overlapping:
+            raise GameLifecycleError(
+                "Empty Dedicated Transport destruction event models duplicated."
+            )
+        casualty_model_ids.update(expected_model_ids)
+    return frozenset(casualty_model_ids)
 
 
 def _assert_destruction_policy() -> None:

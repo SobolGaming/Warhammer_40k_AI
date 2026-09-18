@@ -6233,5 +6233,7 @@ Empty-manifest setup consequences remain owner-secret until
 `battle_formations_revealed`. Adapters must not delay that destruction until
 battle round 1 or invent a destroyed-model reaction from this path. Restore and
 replay retain the destroyed wounds, removed-model authority, and public
-destruction event through the existing engine path.
+destruction event through the existing engine path. `GameLifecycle` restore
+authenticates those setup casualties from the public destruction event and still
+rejects unrelated wound changes.
 

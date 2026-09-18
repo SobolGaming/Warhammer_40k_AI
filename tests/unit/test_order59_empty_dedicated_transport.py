@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+from typing import cast
 
 import pytest
 from tests.order59_empty_dedicated_transport_helpers import (
+    COMPLETE_RESERVE_DECLARATIONS_OPTION_ID,
     EMPTY_DEDICATED_TRANSPORTS_DESTROYED_EVENT_TYPE,
     ORDER59_CARGO_TRANSPORT_UNIT_ID,
     ORDER59_EMPTY_TRANSPORT_UNIT_ID,
@@ -18,7 +20,10 @@ from tests.order59_empty_dedicated_transport_helpers import (
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.adapters.session_protocol import AuthoritativeSession
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.deployment import SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.empty_dedicated_transport_destruction import (
     DESTRUCTION_POLICY,
     EMPTY_DEDICATED_TRANSPORT_SOURCE_ID,
@@ -26,7 +31,10 @@ from warhammer40k_core.engine.empty_dedicated_transport_destruction import (
 )
 from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, SetupStep
+from warhammer40k_core.engine.reserve_declarations import SELECT_RESERVE_DECLARATION_DECISION_TYPE
+from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 
 
 def test_empty_dedicated_transport_is_destroyed_at_declare_battle_formations() -> None:
@@ -144,3 +152,150 @@ def test_empty_dedicated_transport_survives_adapter_restore_and_viewer_events() 
 
     assert viewer_count("player-a") == 1
     assert viewer_count("player-b") == 1
+
+
+def test_empty_dedicated_transport_lifecycle_restore_before_destruction_continues() -> None:
+    lifecycle, status = order59_lifecycle_at_reserve_request(game_id="order59-restore-before")
+    restored = GameLifecycle.from_payload(_lifecycle_payload(lifecycle))
+    restored_status = restored.advance_until_decision_or_terminal()
+    request = restored_status.decision_request
+    original_request = status.decision_request
+    assert original_request is not None
+    assert request is not None
+    assert request.decision_type == original_request.decision_type
+    assert request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
+    complete_order59_declare_battle_formations(restored, restored_status)
+    transport = order59_transport_unit(typed_state(restored), ORDER59_EMPTY_TRANSPORT_UNIT_ID)
+    assert transport.own_models[0].is_alive is False
+
+
+def test_empty_dedicated_transport_lifecycle_restore_continues_deployment() -> None:
+    lifecycle = order59_lifecycle_after_declare_battle_formations(
+        game_id="order59-lifecycle-restore"
+    )
+    original_status = lifecycle.advance_until_decision_or_terminal()
+    original_request = original_status.decision_request
+    assert original_request is not None
+    restored = GameLifecycle.from_payload(_lifecycle_payload(lifecycle))
+    transport = order59_transport_unit(typed_state(restored), ORDER59_EMPTY_TRANSPORT_UNIT_ID)
+    assert transport.own_models[0].is_alive is False
+    restored_status = restored.advance_until_decision_or_terminal()
+    restored_request = restored_status.decision_request
+    assert restored_request is not None
+    assert restored_request.decision_type == original_request.decision_type
+    assert restored_request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
+    option_ids = tuple(option.option_id for option in restored_request.options)
+    assert option_ids
+    assert all(ORDER59_EMPTY_TRANSPORT_UNIT_ID not in option_id for option_id in option_ids)
+    continued = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="order59-lifecycle-restore-continue",
+            request=restored_request,
+            selected_option_id=option_ids[0],
+        )
+    )
+    assert continued.decision_request is not None
+
+
+def test_empty_dedicated_transport_restore_rejects_unrelated_wound_drift() -> None:
+    lifecycle = order59_lifecycle_after_declare_battle_formations(game_id="order59-wound-drift")
+    payload = _lifecycle_payload(lifecycle)
+    _set_unit_model_wounds(
+        payload, unit_instance_id="army-alpha:bodyguard-unit", wounds_remaining=0
+    )
+    with pytest.raises(GameLifecycleError, match="army definitions do not match config"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_empty_dedicated_transport_session_fork_persistence_and_server_continue() -> None:
+    session, status = _order59_session_after_declare_battle_formations(
+        game_id="order59-adapter-restore"
+    )
+    forked = session.fork()
+    persisted = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    config = session.lifecycle.config
+    assert config is not None
+    record = AuthoritativeSession.create(
+        session_id="session:order59-empty-dt",
+        adapter_session=session,
+        config=config,
+        lifecycle_status=status,
+        created_at="2026-09-18T16:45:00Z",
+        started=True,
+    )
+    command_fork = record.fork_for_command()
+    for index, restored_session in enumerate((forked, persisted, command_fork.adapter_session)):
+        restored_status = restored_session.advance_until_decision_or_terminal()
+        request = restored_status.decision_request
+        assert request is not None
+        assert request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
+        option_ids = tuple(option.option_id for option in request.options)
+        assert option_ids
+        assert all(ORDER59_EMPTY_TRANSPORT_UNIT_ID not in option_id for option_id in option_ids)
+        continued = restored_session.submit_option(
+            request_id=request.request_id,
+            option_id=option_ids[0],
+            result_id=f"order59-adapter-continue-{index:02d}",
+        )
+        assert continued.decision_request is not None
+
+
+def _order59_session_after_declare_battle_formations(
+    *,
+    game_id: str,
+) -> tuple[LocalGameSession, LifecycleStatus]:
+    session = LocalGameSession()
+    session.start(order59_empty_transport_config(game_id=game_id))
+    status = session.advance_until_decision_or_terminal()
+    result_index = 1
+    while status.decision_request is not None:
+        request = status.decision_request
+        if request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
+            option_id = "tactical"
+        elif request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE:
+            option_id = COMPLETE_RESERVE_DECLARATIONS_OPTION_ID
+        else:
+            break
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=f"{game_id}-drive-{result_index:02d}",
+        )
+        result_index += 1
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.current_setup_step is SetupStep.DEPLOY_ARMIES
+    return session, status
+
+
+def _lifecycle_payload(lifecycle: GameLifecycle) -> GameLifecyclePayload:
+    return cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+
+
+def _set_unit_model_wounds(
+    payload: GameLifecyclePayload,
+    *,
+    unit_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    state_payload = payload["state"]
+    assert isinstance(state_payload, dict)
+    armies = state_payload["army_definitions"]
+    assert isinstance(armies, list)
+    for army in armies:
+        assert isinstance(army, dict)
+        units = army["units"]
+        assert isinstance(units, list)
+        for unit in units:
+            assert isinstance(unit, dict)
+            if unit["unit_instance_id"] != unit_instance_id:
+                continue
+            models = unit["own_models"]
+            assert isinstance(models, list)
+            first = models[0]
+            assert isinstance(first, dict)
+            first["wounds_remaining"] = wounds_remaining
+            return
+    raise AssertionError(f"missing unit {unit_instance_id}")
