@@ -676,6 +676,12 @@ Current status:
   The faction package uses its separate faction source policy and certifies these
   two executable rule consumers without claiming complete faction fieldability.
   See [the Order 30 implementation review](docs/ORDER_30_SCOPE_PLAN.md).
+- Order 57 / P05C's reviewed 05.04.06 Measuring To A Destroyed Model Or Unit
+  wording is pinned in
+  `core_measuring_to_destroyed_2026_09/artifacts/package.json`; refresh and
+  verify it offline with
+  `uv run python tools/build_core_measuring_to_destroyed_source.py` and the same
+  command plus `--check`.
 - P18C/P18D/P18E's reviewed 18.05 Emergency Disembark and App-data v931 18.06
   Assault Disembark and 18.07 Shock Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
@@ -832,3 +838,10 @@ ordinary placement impossible due to base size, with the exceptional model
 unengaged. All modes and attached components share that validation. See
 [scope and proof](docs/ORDER_55_SCOPE_PLAN.md). Verify its reviewed source with
 `uv run python tools/build_core_large_model_disembark_source.py --check`.
+
+Order 57 measures to a destroyed model using that model's authenticated former
+base or hull, and to a destroyed unit using the last model destroyed. The query
+grants no living battlefield authority. Deadly Demise uses the same measurement
+after removal. See [scope and proof](docs/ORDER_57_SCOPE_PLAN.md). Verify its
+reviewed source with
+`uv run python tools/build_core_measuring_to_destroyed_source.py --check`.

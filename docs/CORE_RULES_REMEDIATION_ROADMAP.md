@@ -255,7 +255,7 @@ corroborate but is not required to begin that work.
 | 54 | P03A | C03-01 | Every deployment model must be wholly within its deployment zone, with no oversized-base fallback. | After proving the base cannot fit, require contact with the player’s battlefield edge and impose the same-turn Normal/Advance/Fall Back/Charge/ranged-attack lock. Preserve the source-backed AIRCRAFT exception to the oversized setup restrictions. | [03.02.02 Set Up](https://www.40k.app/rules/03-moving): oversized deployment uses edge contact and the stated same-turn restrictions. | — | APP-AUTHORITY |
 | 55 | P03B | C03-02 | Every disembarking model must be wholly within the ordinary 3″/6″ distance. | Only after proving ordinary placement impossible, allow an oversized base within 1″ of the Transport base/hull and outside Engagement Range. [Order 55 implementation and evidence](ORDER_55_SCOPE_PLAN.md). | [03.02.02 Set Up](https://www.40k.app/rules/03-moving): the 1″ oversized-base exception applies to disembark placement after ordinary placement is impossible. | P03A | APP-AUTHORITY |
 | 56 | P24C2 | C24-03B | Only duplicate Anti instances have a player-selection path; other duplicate ability instances cannot be selected through adapters. | Add the controlling-player finite instance decision, validation, replay, and viewer-safe projection; weapon choices occur each time the unit attacks during Select Weapons. Certify the Scouts exception: use the lowest non-shared value when values differ across models; a value shared by every model remains selectable. Cover the source's mixed 6/8-inch and universally shared 6/8-inch examples. | [24.02 Duplicated Abilities](https://www.40k.app/rules/24-core-abilities): duplicate abilities do not accumulate and the controlling player selects the active instance. | P24C1, P04 | APP-AUTHORITY |
-| 57 | P05C | C05-03 | Authenticated former placements exist, but no generic query can measure to a destroyed model or destroyed unit. | Add source-authorized measurement using the exact former base/hull; a destroyed-unit reference resolves to the last model destroyed and grants no living battlefield authority. | [05.04.06](https://www.40k.app/rules/05-attack-sequence): use the destroyed model’s former footprint, and the last destroyed model for a destroyed-unit reference. | P05B | APP-AUTHORITY |
+| 57 | P05C | C05-03 | Authenticated former placements exist, but no generic query can measure to a destroyed model or destroyed unit. | Add source-authorized measurement using the exact former base/hull; a destroyed-unit reference resolves to the last model destroyed and grants no living battlefield authority. [Order 57 implementation and evidence](ORDER_57_SCOPE_PLAN.md). | [05.04.06](https://www.40k.app/rules/05-attack-sequence): use the destroyed model’s former footprint, and the last destroyed model for a destroyed-unit reference. | P05B | APP-AUTHORITY |
 | 58 | P05D | C05-04 | The supported failed-save replacement path changes incoming Damage to 0 after the save, but the behavior is not certified against v931 across source, engine consumers, adapters, restore, and replay. | Pin the v931 FAQ, retain the correct post-save ordering, add an end-to-end regression, and audit every Damage-replacement consumer so no path changes Damage before the saving throw. | [Game Datamissions App-data v931, Damage-to-0 timing FAQ](https://game-datamissions.com/11th/rules/changelog): change Damage after saving throws. | S-MIRRORS | APP-AUTHORITY |
 | 59 | P18A | C18-01 | An empty Dedicated Transport receives a delayed unavailable/setup consequence associated with battle round 1. | At the end of Declare Battle Formations, immediately destroy/remove every empty Dedicated Transport without triggering destroyed-model rules. | [18.01 Transport Capacity](https://www.40k.app/rules/18-transports): empty Dedicated Transports are destroyed at the stated formation boundary without destruction triggers. | — | APP-AUTHORITY |
 | 60 | P18B | C18-02 | Emergency Disembark accepts an arbitrary subset, destroys omitted models without proof, and rejects engaged endpoints even when no unengaged placement exists. | Place the maximum possible survivors wholly within 6″ and as close as possible; prefer unengaged placements, allow an engaged endpoint only when no unengaged endpoint exists, and destroy only genuinely unplaceable models. | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): maximal placement, closest-possible positioning, unengaged preference, engaged fallback, and casualty rules. | P03B, P18C | APP-AUTHORITY |
@@ -4835,3 +4835,34 @@ Behavioral additions use existing files; eight-shard membership remains unchange
 No new named handlers or architecture exceptions are introduced. Complete-game
 performance remains unmeasured; retained base/head component evidence does not
 certify the deferred full-game budgets.
+
+## P05C implementation evidence — Order 57
+
+Status: implemented on `codex/order-57-destroyed-referent-measurement`.
+Finding: `C05-03`. Category 05's remaining Damage-to-0 timing work stays with
+P05D; this is not a category-wide certificate.
+
+The invariant is source-authorized measurement to a destroyed model using that
+model's authenticated former base or hull, and to a destroyed unit using the
+last model destroyed. The query grants no living battlefield authority.
+Ownership, source, and proof are in `docs/ORDER_57_SCOPE_PLAN.md`. Deadly Demise
+is the real consumer and uses the same former-footprint query after removal.
+No new player-facing decision, named handler, or architecture exception is
+introduced.
+
+Source authority is the complete 05.04.06 observation
+`gw-11e-core-measuring-to-destroyed:measuring-to-destroyed`, observed
+2026-09-18T12:05:00+00:00, transcription SHA-256
+`ff3dc9be8b2dfb1d6ff28da5323b9a1c4e958c9c0df3de623d481ce02db82eb2`,
+source-observation SHA-256
+`0d702836fd2fe1197c45434c346be55fa4b42d406159129e11cdd6d364e5e56b`.
+The offline builder and typed loader record `loaded` /
+`executable_engine_runtime`. Historical official Core Rules provenance remains
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+See [performance and final validation](performance/order57/README.md).
+Local gates on 2026-09-18: 8,348 behavioral tests at 85.12% coverage, 514
+code-quality tests, identity/contract checks against base `3384760f`, wheel
+smoke, and 342 TypeScript conformance assertions on contract 26.0.0.
+Complete-game performance remains unmeasured.
+

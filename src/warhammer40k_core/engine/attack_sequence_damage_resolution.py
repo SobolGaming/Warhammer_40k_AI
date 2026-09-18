@@ -753,6 +753,7 @@ def _resolve_deadly_demise_before_removal(
         state=state,
         source_model_instance_id=damage.model_instance_id,
         range_inches=range_inches,
+        event_records=decisions.event_log.records,
     )
     status = _route_deadly_demise_mortal_wounds(
         state=state,
@@ -1378,11 +1379,13 @@ def _deadly_demise_target_unit_ids(
     state: GameState,
     source_model_instance_id: str,
     range_inches: float,
+    event_records: tuple[EventRecord, ...],
 ) -> tuple[str, ...]:
     return _shared_deadly_demise_target_unit_ids(
         state=state,
         source_model_instance_id=source_model_instance_id,
         range_inches=range_inches,
+        event_records=event_records,
     )
 
 

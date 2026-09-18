@@ -510,6 +510,7 @@ def _continue_rule_deadly_demise_sources(
             state=state,
             source_model_instance_id=model_id,
             range_inches=range_inches,
+            event_records=decisions.event_log.records,
         )
         status = _route_rule_deadly_demise_targets(
             state=state,
