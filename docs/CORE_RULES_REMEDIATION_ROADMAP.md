@@ -4861,7 +4861,7 @@ The offline builder and typed loader record `loaded` /
 `f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
 
 See [performance and final validation](performance/order57/README.md).
-Local gates on 2026-09-18: 8,348 behavioral tests at 85.12% coverage, 514
+Local gates on 2026-09-18: 8,350 behavioral tests at 85.13% coverage, 514
 code-quality tests, identity/contract checks against base `3384760f`, wheel
 smoke, and 342 TypeScript conformance assertions on contract 26.0.0.
 Complete-game performance remains unmeasured.

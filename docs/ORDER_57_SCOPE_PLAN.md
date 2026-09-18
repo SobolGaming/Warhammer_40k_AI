@@ -29,8 +29,11 @@ not a runtime keyword branch.
 
 A destroyed-unit lookup uses the canonical `RulesUnitView`, requires a logical-
 death record for every destroyed model in that rules unit, and selects the last
-chronological record. Living models, unknown IDs, missing or duplicate death
-records, and unplaced source models fail closed.
+chronological current occurrence. Distinct destroy → return → destroy lives are
+separate occurrences keyed by cause and boundary identity; the applicable
+footprint is the latest record for that model. Living models, unknown IDs,
+missing deaths, duplicate cause or boundary events, and unplaced source models
+fail closed.
 
 Deadly Demise is the real 05.04.06 consumer: it measures from the destroyed
 model to living units. `deadly_demise_target_unit_ids` now consumes event
@@ -62,13 +65,14 @@ scheduled.
 Regressions cover former-footprint equality with pre-removal closest distance,
 last-destroyed-model unit resolution, hull catalog geometry versus a circular
 base, fail-closed living/unknown/missing-death/unplaced-source paths, retained
-still-placed agreement, Deadly Demise after removal, and GameState/EventRecord
-payload restore. The existing Deadly Demise finite reaction remains the adapter
+still-placed agreement, Deadly Demise after removal, destroy → return → destroy
+latest-footprint selection, duplicate cause or boundary rejection, and
+GameState/EventRecord payload restore. The existing Deadly Demise finite reaction remains the adapter
 path; this PR adds no option family, proposal kind, or visibility change.
 See [performance and final gates](performance/order57/README.md). Local
-validation on 2026-09-18 recorded 8,348 behavioral tests at 85.12% coverage and
+validation on 2026-09-18 recorded 8,350 behavioral tests at 85.13% coverage and
 514 code-quality tests against runtime identity
-`d320f72cceeb1dfaf39e200ebb3f3aa8775ba73fe49a9b794a8350a3ec088d8b`.
+`9a23267ede07d6f0529fe791be21d9c0b8e683d9d8f14469f26baf925e1a23b5`.
 
 Reproduce the source with
 `uv run python tools/build_core_measuring_to_destroyed_source.py --check`.

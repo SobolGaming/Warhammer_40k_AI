@@ -241,22 +241,19 @@ def _logical_death_for_model(
     event_records: tuple[EventRecord, ...],
     model_instance_id: str,
 ) -> ModelLogicalDeathRecord:
-    matches: list[ModelLogicalDeathRecord] = []
-    for event in event_records:
-        if event.event_type != MODEL_LOGICAL_DEATH_RECORDED_EVENT:
-            continue
-        record = model_logical_death_record_from_event(event)
-        if record.model_instance_id == model_instance_id:
-            matches.append(record)
+    matches = tuple(
+        record
+        for record in _logical_death_records(
+            event_records,
+            duplicate_message="Destroyed-model measurement found duplicate logical-death records.",
+        )
+        if record.model_instance_id == model_instance_id
+    )
     if not matches:
         raise GameLifecycleError(
             "Destroyed-model measurement is missing authenticated former placement."
         )
-    if len(matches) != 1:
-        raise GameLifecycleError(
-            "Destroyed-model measurement found duplicate logical-death records."
-        )
-    return matches[0]
+    return matches[-1]
 
 
 def _logical_deaths_for_rules_unit(
@@ -268,27 +265,46 @@ def _logical_deaths_for_rules_unit(
     if not MEASUREMENT_POLICY.destroyed_unit_resolves_to_last_destroyed_model:
         raise GameLifecycleError("Destroyed-unit measurement requires last-destroyed-model policy.")
     component_ids = set(component_unit_instance_ids)
-    matches: list[ModelLogicalDeathRecord] = []
-    seen_model_ids: set[str] = set()
-    for event in event_records:
-        if event.event_type != MODEL_LOGICAL_DEATH_RECORDED_EVENT:
-            continue
-        record = model_logical_death_record_from_event(event)
+    matches = tuple(
+        record
+        for record in _logical_death_records(
+            event_records,
+            duplicate_message="Destroyed-unit measurement found duplicate logical-death records.",
+        )
         if (
-            record.rules_unit_instance_id != rules_unit_instance_id
-            and record.physical_unit_instance_id not in component_ids
-        ):
-            continue
-        if record.model_instance_id in seen_model_ids:
-            raise GameLifecycleError(
-                "Destroyed-unit measurement found duplicate logical-death records."
-            )
-        seen_model_ids.add(record.model_instance_id)
-        matches.append(record)
+            record.rules_unit_instance_id == rules_unit_instance_id
+            or record.physical_unit_instance_id in component_ids
+        )
+    )
     if not matches:
         raise GameLifecycleError(
             "Destroyed-unit measurement is missing authenticated former placement."
         )
+    latest_by_model: dict[str, ModelLogicalDeathRecord] = {}
+    for record in matches:
+        latest_by_model[record.model_instance_id] = record
+    return tuple(
+        record for record in matches if latest_by_model[record.model_instance_id] is record
+    )
+
+
+def _logical_death_records(
+    event_records: tuple[EventRecord, ...],
+    *,
+    duplicate_message: str,
+) -> tuple[ModelLogicalDeathRecord, ...]:
+    matches: list[ModelLogicalDeathRecord] = []
+    seen_cause_ids: set[str] = set()
+    seen_boundary_ids: set[str] = set()
+    for event in _typed_event_records(event_records):
+        if event.event_type != MODEL_LOGICAL_DEATH_RECORDED_EVENT:
+            continue
+        record = model_logical_death_record_from_event(event)
+        if record.cause_id in seen_cause_ids or record.boundary_id in seen_boundary_ids:
+            raise GameLifecycleError(duplicate_message)
+        seen_cause_ids.add(record.cause_id)
+        seen_boundary_ids.add(record.boundary_id)
+        matches.append(record)
     return tuple(matches)
 
 

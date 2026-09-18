@@ -34,17 +34,19 @@ A timeout or failed assertion is not a completed sample. Median, nearest-rank
 
 ## Final gates
 
-Validated on 2026-09-18 against the runtime identity in `head.json` on Windows 11
+Validated on 2026-09-18 against runtime identity
+`9a23267ede07d6f0529fe791be21d9c0b8e683d9d8f14469f26baf925e1a23b5` on Windows 11
 / AMD Ryzen Threadripper 3970X / Python 3.14.5. Both complete suites used xdist
 auto work stealing. The behavioral run included Node.js 24.18.0 on `PATH`. Wheel
 smoke used `UV_SYSTEM_CERTS=true` for this host's certificate trust chain. No
 production code changed after the final behavioral coverage gate. No behavioral
 suite was repeated without coverage as a second final gate.
 
-- Complete behavioral suite with coverage: **8,348 passed**, **85.12%**
-  coverage (85% required), 894.52 seconds. The eight-shard inventory was
-  regenerated from that JUnit profile (243 behavioral files / 8,348 cases).
-- Complete code-quality suite without coverage: **514 passed**, 346.48 seconds.
+- Complete behavioral suite with coverage: **8,350 passed**, **85.13%**
+  coverage (85% required), 960.92 seconds. The eight-shard inventory still
+  lists 243 behavioral files; the two new cases live in the existing Order 57
+  unit module.
+- Complete code-quality suite without coverage: **514 passed**, 315.37 seconds.
 - Ruff check and format check, mypy (3,102 source files), Pyright (zero errors),
   all 11 import-linter contracts, and pre-commit passed.
 - Reviewed source generator, engine build identity and external-contract checks

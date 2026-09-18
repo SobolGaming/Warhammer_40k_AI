@@ -6191,7 +6191,9 @@ exact base/hull geometry and selections and use the same engine submission path.
 Order 57 / P05C adds no player-facing decision, option family, proposal kind, or
 viewer-visibility change. Measuring to a destroyed model uses that model's
 authenticated former base or hull from the logical-death record. Measuring to a
-destroyed unit uses the last model destroyed in that rules unit. The query does
+destroyed unit uses the last model destroyed in that rules unit. Distinct
+destruction occurrences after a model returns are keyed by cause and boundary
+identity; measurement uses the latest applicable former footprint. The query does
 not restore occupancy, targeting, Objective Control, Engagement, or ability use.
 
 Deadly Demise keeps the existing `select_destruction_reaction` / mandatory

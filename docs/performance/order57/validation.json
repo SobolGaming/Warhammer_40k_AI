@@ -2,14 +2,14 @@
   "order": 57,
   "validated_on": "2026-09-18",
   "base_commit": "3384760fd6336efa6fe8d48316b5656c57d883c0",
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d320f72cceeb1dfaf39e200ebb3f3aa8775ba73fe49a9b794a8350a3ec088d8b",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9a23267ede07d6f0529fe791be21d9c0b8e683d9d8f14469f26baf925e1a23b5",
   "behavioral": {
-    "tests": 8348,
+    "tests": 8350,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 894.524,
-    "coverage_percent": 85.12,
+    "seconds": 960.917,
+    "coverage_percent": 85.13,
     "coverage_minimum_percent": 85,
     "distribution": "worksteal"
   },
@@ -18,7 +18,7 @@
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 346.48,
+    "seconds": 315.37,
     "coverage": false,
     "distribution": "worksteal"
   },

@@ -16,7 +16,11 @@ from tests.order57_destroyed_referent_helpers import (
     set_order57_model_wounds,
 )
 
-from warhammer40k_core.engine.battlefield_state import PlacementError, geometry_model_for_placement
+from warhammer40k_core.engine.battlefield_state import (
+    ModelPlacement,
+    PlacementError,
+    geometry_model_for_placement,
+)
 from warhammer40k_core.engine.damage_allocation import model_by_id
 from warhammer40k_core.engine.deadly_demise import deadly_demise_target_unit_ids
 from warhammer40k_core.engine.destroyed_referent_measurement import (
@@ -38,6 +42,7 @@ from warhammer40k_core.geometry.model_geometry import (
     HeightSourceKind,
     ModelGeometry,
 )
+from warhammer40k_core.geometry.pose import Pose
 
 
 def test_destroyed_model_measurement_uses_authenticated_former_footprint() -> None:
@@ -291,3 +296,130 @@ def test_destroyed_referent_measurement_survives_state_and_event_restore() -> No
         context.to_payload()
         == DistanceMeasurementContext.from_payload(context.to_payload()).to_payload()
     )
+
+
+def test_destroyed_referent_uses_latest_occurrence_after_return() -> None:
+    state, event_log = order57_battle_state()
+    source = order57_alpha_models(state)[0]
+    target = order57_beta_models(state)[0]
+    own_unit = order57_beta_unit(state)
+    enemy_unit_id = order57_alpha_unit(state).unit_instance_id
+    first_distance = ordinary_order57_distance(state=state, source=source, target=target)
+    starting_wounds = target.wounds_remaining
+    assert state.battlefield_state is not None
+    first_placement = state.battlefield_state.model_placement_by_id(target.model_instance_id)
+    returned_placement = first_placement.with_pose(
+        Pose.at(
+            x=20.0,
+            y=first_placement.pose.position.y,
+            z=first_placement.pose.position.z,
+            facing_degrees=first_placement.pose.facing.degrees,
+        )
+    )
+    destroy_and_remove_order57_model(
+        state=state, event_log=event_log, model=target, cause_id="cause-first-life"
+    )
+    _return_order57_model(
+        state=state,
+        model_instance_id=target.model_instance_id,
+        placement=returned_placement,
+        wounds_remaining=starting_wounds,
+    )
+    returned = model_by_id(state=state, model_instance_id=target.model_instance_id)
+    latest_distance = ordinary_order57_distance(state=state, source=source, target=returned)
+    assert not isclose(first_distance, latest_distance, abs_tol=1e-9)
+    for index, model in enumerate(order57_beta_models(state)[1:], start=2):
+        destroy_and_remove_order57_model(
+            state=state,
+            event_log=event_log,
+            model=model,
+            cause_id=f"cause-squad-{index}",
+        )
+    destroy_and_remove_order57_model(
+        state=state, event_log=event_log, model=returned, cause_id="cause-second-life"
+    )
+
+    footprint = former_footprint_for_destroyed_model(
+        state=state,
+        event_records=event_log.records,
+        model_instance_id=target.model_instance_id,
+    )
+    measured = distance_to_destroyed_model(
+        state=state,
+        event_records=event_log.records,
+        source_model_instance_id=source.model_instance_id,
+        destroyed_model_instance_id=target.model_instance_id,
+    )
+    target_ids = deadly_demise_target_unit_ids(
+        state=state,
+        source_model_instance_id=target.model_instance_id,
+        range_inches=6.0,
+        event_records=event_log.records,
+    )
+    unit_footprint = former_footprint_for_destroyed_unit(
+        state=state,
+        event_records=event_log.records,
+        unit_instance_id=own_unit.unit_instance_id,
+    )
+    unit_measured = distance_to_destroyed_unit(
+        state=state,
+        event_records=event_log.records,
+        source_model_instance_id=source.model_instance_id,
+        destroyed_unit_instance_id=own_unit.unit_instance_id,
+    )
+
+    assert footprint.logical_death.cause_id == "cause-second-life"
+    assert footprint.logical_death.boundary_id != ""
+    assert footprint.geometry.pose.to_payload() == returned_placement.pose.to_payload()
+    assert isclose(measured, latest_distance, abs_tol=1e-9)
+    assert not isclose(measured, first_distance, abs_tol=1e-9)
+    assert enemy_unit_id in target_ids
+    assert own_unit.unit_instance_id not in target_ids
+    assert unit_footprint.model_instance_id == target.model_instance_id
+    assert unit_footprint.logical_death.cause_id == "cause-second-life"
+    assert isclose(unit_measured, latest_distance, abs_tol=1e-9)
+
+
+def test_destroyed_referent_measurement_rejects_duplicate_cause_or_boundary() -> None:
+    state, event_log = order57_battle_state()
+    target = order57_beta_models(state)[0]
+    destroy_and_remove_order57_model(
+        state=state, event_log=event_log, model=target, cause_id="cause-duplicate"
+    )
+    duplicated = (*event_log.records, event_log.records[-1])
+    with pytest.raises(GameLifecycleError, match="duplicate logical-death records"):
+        former_footprint_for_destroyed_model(
+            state=state,
+            event_records=duplicated,
+            model_instance_id=target.model_instance_id,
+        )
+    for index, model in enumerate(order57_beta_models(state)[1:], start=2):
+        destroy_and_remove_order57_model(
+            state=state,
+            event_log=event_log,
+            model=model,
+            cause_id=f"cause-duplicate-squad-{index}",
+        )
+    duplicated_unit = (*event_log.records, event_log.records[-1])
+    with pytest.raises(GameLifecycleError, match="duplicate logical-death records"):
+        former_footprint_for_destroyed_unit(
+            state=state,
+            event_records=duplicated_unit,
+            unit_instance_id=order57_beta_unit(state).unit_instance_id,
+        )
+
+
+def _return_order57_model(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    placement: ModelPlacement,
+    wounds_remaining: int,
+) -> None:
+    set_order57_model_wounds(
+        state,
+        model_instance_id=model_instance_id,
+        wounds_remaining=wounds_remaining,
+    )
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_returned_model_placement(placement)

@@ -45,6 +45,9 @@ def test_destroyed_referent_query_is_the_shared_authority() -> None:
     assert "MEASUREMENT_POLICY" in query
     assert "geometry_model_for_placement" in query
     assert "destroyed_model_placement" in query
+    assert "cause_id" in query
+    assert "boundary_id" in query
+    assert "seen_model_ids" not in query
     assert "Vehicle" not in query
     assert "Walker" not in query
     assert "WALKER" not in query
