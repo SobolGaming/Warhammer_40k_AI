@@ -7,18 +7,28 @@ from warhammer40k_core.engine.attack_sequence_model import (
     deadly_demise_mortal_wounds_roll_spec,
     deadly_demise_trigger_roll_spec,
 )
-from warhammer40k_core.engine.battlefield_state import PlacementError, geometry_model_for_placement
+from warhammer40k_core.engine.battlefield_state import (
+    PlacementError,
+    geometry_model_for_placement,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
-    model_by_id,
 )
 from warhammer40k_core.engine.deadly_demise_modifiers import (
     deadly_demise_modifier_condition_is_met,
     deadly_demise_modifier_for_model,
 )
+from warhammer40k_core.engine.destroyed_referent_measurement import (
+    former_geometry_for_destroyed_or_placed_model,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventLog,
+    EventRecord,
+    JsonValue,
+    validate_json_value,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
@@ -99,19 +109,17 @@ def deadly_demise_target_unit_ids(
     state: GameState,
     source_model_instance_id: str,
     range_inches: float,
+    event_records: tuple[EventRecord, ...],
 ) -> tuple[str, ...]:
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Deadly Demise requires battlefield_state.")
     source_model_id = _validate_identifier("source_model_instance_id", source_model_instance_id)
     requested_range = _validate_positive_number("range_inches", range_inches)
-    try:
-        source_placement = battlefield.model_placement_by_id(source_model_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Deadly Demise source model must remain placed.") from exc
-    source_model = geometry_model_for_placement(
-        model=model_by_id(state=state, model_instance_id=source_model_id),
-        placement=source_placement,
+    source_model = former_geometry_for_destroyed_or_placed_model(
+        state=state,
+        event_records=event_records,
+        model_instance_id=source_model_id,
     )
     placed_model_ids = set(battlefield.placed_model_ids())
     target_unit_ids = tuple(

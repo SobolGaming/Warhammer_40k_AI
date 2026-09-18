@@ -1,0 +1,100 @@
+{
+  "workload_id": "order57-destroyed-referent-v1",
+  "revision": "3384760fd6336efa6fe8d48316b5656c57d883c0",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "50 ordinary closest-distance queries and 50 still-placed Deadly Demise target enumerations; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": 10,
+    "units": 2,
+    "query_count": 50,
+    "destroyed_query_available": false
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order57.py": "91c99a7f32db769fe53f4593afb184577a5566f75c56b1e3aa67a05ec9699048",
+    "tests/order57_destroyed_referent_helpers.py": "74dc88915f1c9b1d53b5371e351e32617ac9cf405ba39de5a36c8f06141d7c3e"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 1.2444412000040757,
+      "matched_seconds": 0.008870000005117618,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004316500002460089,
+      "matched_seconds": 0.009976400004234165,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.003941900002246257,
+      "matched_seconds": 0.012490199995227158,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004127700005483348,
+      "matched_seconds": 0.010053600002720486,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.003850500004773494,
+      "matched_seconds": 0.009547400004521478,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.004032700002426282,
+      "matched_seconds": 0.008957500001997687,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.003813700001046527,
+      "matched_seconds": 0.009489500000199769,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": null,
+      "destroyed_distance": null,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.009912085716288337,
+  "median_seconds": 0.009547400004521478,
+  "maximum_seconds": 0.012490199995227158,
+  "p95_seconds": 0.010053600002720486,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 0.05,
+    "maximum_seconds": 1
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}

@@ -15,7 +15,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def test_disembark_source_is_pinned_reproducible_and_executable() -> None:
     for path, payload in zip((ARTIFACT_PATH, AUDIT_PATH), build_payloads(), strict=True):
-        assert path.read_text() == json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+        assert path.read_text(encoding="utf-8") == (
+            json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+        )
     assert source.source_package().source_catalog == source.source_catalog()
     (rule,) = source.source_rules()
     assert source.DISEMBARK_POLICY.source_rule_id == rule.source_id

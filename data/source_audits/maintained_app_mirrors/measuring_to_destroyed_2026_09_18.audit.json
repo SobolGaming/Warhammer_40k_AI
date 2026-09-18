@@ -1,0 +1,31 @@
+{
+  "audit_id": "core-measuring-to-destroyed-maintained-app-mirrors-2026-09-18",
+  "observed_at": "2026-09-18T12:05:00+00:00",
+  "observation_time_precision": "minute",
+  "rows": [
+    {
+      "row_id": "measuring-to-destroyed",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "observed_at": "2026-09-18T12:05:00+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed",
+      "transcription_sha256": "ff3dc9be8b2dfb1d6ff28da5323b9a1c4e958c9c0df3de623d481ce02db82eb2",
+      "provider_non_affiliation_recorded": true,
+      "transcription_scope": "Complete 05.04.06 operative text.",
+      "reviewed_obligations": [
+        "Measure to a destroyed model using any point of its former base, or any part of the model if it has no base or is a Vehicle excluding Walker models that have a base.",
+        "Measure to a destroyed unit using the last model destroyed in that unit.",
+        "Former-footprint measurement grants no living battlefield authority."
+      ],
+      "source_observation_sha256": "0d702836fd2fe1197c45434c346be55fa4b42d406159129e11cdd6d364e5e56b"
+    }
+  ],
+  "observation_method": "Complete 05.04.06 operative text retrieved from the 40k.app Attack Sequence page.",
+  "co_version_comparison": "No second-provider observation asserted.",
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  }
+}

@@ -2343,8 +2343,11 @@ already-applied mortal wounds and collateral casualties. Its stages are
 and remain present for measurement, visibility, datasheet abilities, Stratagem
 targeting, enemy Engagement and current component keyword contribution. They
 may supply their granted attacks in their unit's single eligible activation.
-They cannot move or receive new damage. P02D's model-keyword schema and P05C's
-post-removal former-footprint measurement are separate work.
+They cannot move or receive new damage. P02D's model-keyword schema remains
+separate. Order 57 / P05C adds source-authorized former-footprint measurement
+after removal; it is not a new player-facing decision. Deadly Demise keeps the
+existing destruction-reaction path and measures from the authenticated former
+base or hull when the exploding model has already been removed.
 
 At `unit_fight_completed` or `phase_end`, the engine resolves the retained
 model's other destruction triggers and then removes it exactly once. Cleanup
@@ -6182,3 +6185,22 @@ No new proposal field, decision, exception flag, event shape or viewer-visible
 family is added. The current contract covers these payloads; only the authoritative
 runtime identity and its generated examples change. Restore and replay retain
 exact base/hull geometry and selections and use the same engine submission path.
+
+## Order 57: measuring to a destroyed model or unit
+
+Order 57 / P05C adds no player-facing decision, option family, proposal kind, or
+viewer-visibility change. Measuring to a destroyed model uses that model's
+authenticated former base or hull from the logical-death record. Measuring to a
+destroyed unit uses the last model destroyed in that rules unit. Distinct
+destruction occurrences after a model returns are keyed by cause and boundary
+identity; measurement uses the latest applicable former footprint. The query does
+not restore occupancy, targeting, Objective Control, Engagement, or ability use.
+
+Deadly Demise keeps the existing `select_destruction_reaction` / mandatory
+reaction path. After the exploding model is removed, range checks measure from
+the former footprint through the shared engine query and the same event log.
+Retained Fight On Death models remain present for ordinary measurement under
+P05B; former-footprint measurement is the post-removal path. Restore and replay
+bind the former placement to the logical-death event payload. Adapters must not
+invent a destroyed-model coordinate or measure from a living stand-in.
+

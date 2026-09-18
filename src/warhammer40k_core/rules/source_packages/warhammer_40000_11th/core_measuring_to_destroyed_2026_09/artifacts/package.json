@@ -1,0 +1,98 @@
+{
+  "artifact_schema": "core-v2-core-measuring-to-destroyed-source-v1",
+  "source_package_id": "gw-11e-core-measuring-to-destroyed",
+  "source_version": "maintained-app-mirrors-observed-2026-09-18",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed",
+      "section_id": "05.04.06",
+      "source_text": "When a player has to measure the distance to a destroyed model, that player can measure to any point occupied by that model's base (or any part of that model if it does not have a base or is a Vehicle, excluding Walker models that have a base) before it was destroyed.\nWhen a player has to measure the distance to a destroyed unit, they measure to the last model destroyed in that unit.",
+      "transcription_sha256": "ff3dc9be8b2dfb1d6ff28da5323b9a1c4e958c9c0df3de623d481ce02db82eb2",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_model",
+        "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_unit",
+        "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_model",
+        "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_unit",
+        "warhammer40k_core.engine.deadly_demise:deadly_demise_target_unit_ids"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-measuring-to-destroyed-review:measuring-to-destroyed",
+      "rule_source_id": "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 05.04.06 Measuring To A Destroyed Model Or Unit",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "ff3dc9be8b2dfb1d6ff28da5323b9a1c4e958c9c0df3de623d481ce02db82eb2",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "57057cc250193d0e227affa3efd4a1b0d77ad115fe8f78cd2d03b630c5db88ef",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_model",
+        "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_unit",
+        "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_model",
+        "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_unit",
+        "warhammer40k_core.engine.deadly_demise:deadly_demise_target_unit_ids"
+      ]
+    },
+    {
+      "evidence_id": "core-measuring-to-destroyed-mirror:measuring-to-destroyed",
+      "rule_source_id": "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-measuring-to-destroyed-maintained-app-mirrors-2026-09-18",
+      "review_audit_row_id": "measuring-to-destroyed",
+      "review_audit_source_observation_sha256": "0d702836fd2fe1197c45434c346be55fa4b42d406159129e11cdd6d364e5e56b",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 05.04.06 Measuring To A Destroyed Model Or Unit",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "observed_at": "2026-09-18T12:05:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "ff3dc9be8b2dfb1d6ff28da5323b9a1c4e958c9c0df3de623d481ce02db82eb2",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "b89dd551675ab09acb42f61ec276557a604cad94e9e3ba722d7c78843b2016cc",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_model",
+        "warhammer40k_core.engine.destroyed_referent_measurement:former_footprint_for_destroyed_unit",
+        "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_model",
+        "warhammer40k_core.engine.destroyed_referent_measurement:distance_to_destroyed_unit",
+        "warhammer40k_core.engine.deadly_demise:deadly_demise_target_unit_ids"
+      ]
+    }
+  ],
+  "measurement_policy": {
+    "source_rule_id": "gw-11e-core-measuring-to-destroyed:measuring-to-destroyed",
+    "uses_former_footprint": true,
+    "destroyed_unit_resolves_to_last_destroyed_model": true,
+    "grants_living_battlefield_authority": false,
+    "uses_catalog_geometry_for_base_or_hull": true
+  },
+  "package_hash": "cf892e8d90820a034d3a5cb723cb2c800d9b47f7d93eb15e84b663bcb9fddfbb"
+}

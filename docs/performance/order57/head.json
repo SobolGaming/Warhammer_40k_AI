@@ -1,0 +1,100 @@
+{
+  "workload_id": "order57-destroyed-referent-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:d320f72cceeb1dfaf39e200ebb3f3aa8775ba73fe49a9b794a8350a3ec088d8b",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "50 ordinary closest-distance queries and 50 still-placed Deadly Demise target enumerations; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": 10,
+    "units": 2,
+    "query_count": 50,
+    "destroyed_query_available": true
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order57.py": "91c99a7f32db769fe53f4593afb184577a5566f75c56b1e3aa67a05ec9699048",
+    "tests/order57_destroyed_referent_helpers.py": "74dc88915f1c9b1d53b5371e351e32617ac9cf405ba39de5a36c8f06141d7c3e"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 0.34912530000292463,
+      "matched_seconds": 0.00826989999768557,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.00838340000336757,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.0037125000017113052,
+      "matched_seconds": 0.008291999998618849,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.008306399999128189,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.0034355999960098416,
+      "matched_seconds": 0.00827700000081677,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.008376700003282167,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.003437899998971261,
+      "matched_seconds": 0.008377300000574905,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.008422000006248709,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.0035388000032980926,
+      "matched_seconds": 0.008384400003706105,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.008346100003109314,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.003513700001349207,
+      "matched_seconds": 0.008345399997779168,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.008445300001767464,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.0034746000019367784,
+      "matched_seconds": 0.008382500003790483,
+      "ordinary_distance": 34.74015748031496,
+      "deadly_demise_target_count": 1,
+      "destroyed_seconds": 0.008433000002696645,
+      "destroyed_distance": 34.74015748031496,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.008332642857567407,
+  "median_seconds": 0.008345399997779168,
+  "maximum_seconds": 0.008384400003706105,
+  "p95_seconds": 0.008382500003790483,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 0.05,
+    "maximum_seconds": 1
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}

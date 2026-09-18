@@ -1,0 +1,52 @@
+{
+  "order": 57,
+  "validated_on": "2026-09-18",
+  "base_commit": "3384760fd6336efa6fe8d48316b5656c57d883c0",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9a23267ede07d6f0529fe791be21d9c0b8e683d9d8f14469f26baf925e1a23b5",
+  "behavioral": {
+    "tests": 8350,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 960.917,
+    "coverage_percent": 85.13,
+    "coverage_minimum_percent": 85,
+    "distribution": "worksteal"
+  },
+  "code_quality": {
+    "tests": 514,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 315.37,
+    "coverage": false,
+    "distribution": "worksteal"
+  },
+  "other_gates": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "eight_shard_inventory": "passed",
+    "import_linter_11_contracts": "passed",
+    "pre_commit_all_files": "passed",
+    "source_generator_check": "passed",
+    "engine_identity_check": "passed",
+    "external_contract_exact_base_check": "passed",
+    "installed_wheel_smoke": "passed",
+    "typescript_generated_client_check": "passed"
+  },
+  "typescript_unit_tests": 5,
+  "typescript_conformance_assertions": 342,
+  "contract_version": "26.0.0",
+  "environment_note": "Wheel smoke used UV_SYSTEM_CERTS=true to use the host trust store. Node.js 24.18.0 was on PATH for viewer-renderer and TypeScript gates.",
+  "performance": {
+    "component_evidence": [
+      "base.json",
+      "head.json"
+    ],
+    "gameplay_slice": "unmeasured",
+    "complete_game": "unmeasured",
+    "deferred_budgets": "not certified"
+  }
+}

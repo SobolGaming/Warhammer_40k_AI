@@ -1215,6 +1215,7 @@ def test_deadly_demise_targets_attached_rules_unit_once() -> None:
         state=state,
         source_model_instance_id=enemy.own_models[0].model_instance_id,
         range_inches=6.0,
+        event_records=(),
     )
 
     assert target_ids == (attached_id,)
