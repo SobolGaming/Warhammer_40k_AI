@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `27.0.0`
+Contract version: `28.0.0`
+
+Order 62 / contract 28 uses passenger post-placement engagements for Shock
+Disembark forced Fights. See [the migration](migrations/27-to-28.md).
 
 Order 61 / contract 27 rejects embark after same-turn battlefield setup.
 See [the migration](migrations/26-to-27.md).

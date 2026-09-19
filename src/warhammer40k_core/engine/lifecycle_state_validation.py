@@ -241,10 +241,10 @@ def _validate_forced_fight_phase_state_consistency(
         or disembarked_state_payload.get("source_rule_id") != forced_context.source_rule_id
     ):
         raise GameLifecycleError("Forced fight_phase_state trigger context drift.")
-    start_ids = disembarked_state_payload.get("start_engaged_enemy_unit_instance_ids")
-    if not isinstance(start_ids, list) or not set(
+    post_ids = trigger_payload.get("post_engaged_enemy_unit_instance_ids")
+    if not isinstance(post_ids, list) or not set(
         forced_context.eligible_unit_instance_ids
-    ).issubset(start_ids):
+    ).issubset(post_ids):
         raise GameLifecycleError("Forced fight_phase_state engagement evidence drift.")
     start_events = tuple(
         event
@@ -373,6 +373,30 @@ def validate_disembarked_unit_state_consistency(
 ) -> None:
     if type(state) is not GameState:
         raise GameLifecycleError("Disembarked unit state validation requires GameState.")
+    from warhammer40k_core.engine.shock_disembark_history import (
+        validate_shock_disembark_engagement_history,
+    )
+
+    validate_shock_disembark_engagement_history(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+    for event in event_records:
+        if (
+            event.event_type == "unit_disembarked"
+            and isinstance(event.payload, dict)
+            and event.payload.get("disembark_mode") == DisembarkModeKind.SHOCK_DISEMBARK.value
+        ):
+            historical_state = disembarked_unit_state_from_event_payload(event.payload)
+            if historical_state not in state.disembarked_unit_states:
+                _validate_shock_disembark_fight_history(
+                    state=state,
+                    disembarked_state=historical_state,
+                    disembark_event=event,
+                    event_records=event_records,
+                    decision_records=decision_records,
+                )
     if not state.disembarked_unit_states:
         return
     if state.stage is not GameLifecycleStage.BATTLE:
@@ -585,10 +609,15 @@ def _validate_shock_disembark_fight_history(
         and selection.battle_round == disembarked_state.battle_round
         and context.source_phase.value == BattlePhase.MOVEMENT.value
     )
-    start_engaged_ids = disembarked_state.start_engaged_enemy_unit_instance_ids
+    if not isinstance(disembark_event.payload, dict):
+        raise GameLifecycleError("Shock Disembark event payload is invalid.")
+    post_ids = disembark_event.payload.get("post_engaged_enemy_unit_instance_ids")
+    if not isinstance(post_ids, list) or any(type(value) is not str for value in post_ids):
+        raise GameLifecycleError("Shock Disembark post-placement engagements are invalid.")
+    post_engaged_ids = tuple(cast(list[str], post_ids))
     expected_eligible_ids = tuple(
         unit_id
-        for unit_id in start_engaged_ids
+        for unit_id in post_engaged_ids
         if not rules_unit_identity_history_contains(
             state=state,
             identity_ids=prior_selected_unit_ids,
@@ -635,7 +664,8 @@ def _validate_shock_disembark_fight_history(
                 "trigger_event_id": disembark_event.event_id,
                 "source_unit_instance_id": disembarked_state.unit_instance_id,
                 "transport_unit_instance_id": disembarked_state.transport_unit_instance_id,
-                "start_engaged_enemy_unit_instance_ids": list(start_engaged_ids),
+                "start_engaged_enemy_unit_instance_ids": [],
+                "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
                 "already_selected_unit_instance_ids": sorted(set(prior_selected_unit_ids)),
             }
         )

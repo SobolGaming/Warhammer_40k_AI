@@ -507,12 +507,13 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "ALLOW_SHOCK_DISEMBARK" in disembark_state_source
     assert "SHOCK_DISEMBARK_PERMISSION_REQUIRED" in transport_source
     assert "SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT" in transport_source
-    assert "SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED" in transport_source
+    assert "Embarked Shock passengers cannot inherit start engagements." in disembark_state_source
     assert "SHOCK_DISEMBARK_PERMISSION_EFFECT_KIND" in shock_permission_source
     assert "transport_disembark_permission_effect" in shared_permission_source
     assert "shock_disembark_restriction_overrides" in candidate_source
     assert "start_engaged_enemy_unit_instance_ids" in candidate_source
-    assert "ruleset_descriptor=ruleset_descriptor" in candidate_source
+    assert "start_engaged_enemy_unit_instance_ids=()" in candidate_source
+    assert "current_physically_engaged_enemy_rules_unit_ids(" in placement_source
     assert "RulesetDescriptor.warhammer_40000_eleventh()" not in candidate_source
     assert "proposal_start_engagement_drift" in proposal_source
     assert "_start_shock_disembark_forced_fight_activations" in placement_source
@@ -668,9 +669,10 @@ def test_order38_eligibility_has_one_owner_and_bounded_permission_work() -> None
     for name in (
         "assault_disembark_restriction_overrides",
         "shock_disembark_restriction_overrides",
-        "scenario_physically_engaged_enemy_rules_unit_ids",
     ):
         assert calls.count(name) == 1
+    assert "scenario_physically_engaged_enemy_rules_unit_ids" not in calls
+    assert "start_engaged_enemy_unit_instance_ids=()" in candidate
     assert "assault_disembark_transport_movement_is_eligible" in candidate
     assert "unit_disembarked_this_phase" in candidate
     assert "unit_placement_or_none" in candidate

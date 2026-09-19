@@ -36,7 +36,9 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
     assert f"All {len(rows) - 2} implementation PRs; S-MIRRORS" in document
     by_pr = {row.pr_id: row for row in rows}
     assert by_pr["P18G"].gate == "APP-DRIFT"
-    assert by_pr["P18F"].gate == "EXCEPTION-PAUSE"
+    assert by_pr["P18F"].gate == "APP-AUTHORITY"
+    assert "source exception was resolved by the repository owner on 2026-09-19" in document
+    assert "[Order 62 scope](ORDER_62_SCOPE_PLAN.md)" in document
     assert by_pr["P12B"].gate == "EXCEPTION-PAUSE"
     transport = ("P18A", "P18C", "P18D", "P18E", "P18F", "P18G", "P18H", "P18B")
     for row in rows[:-1]:

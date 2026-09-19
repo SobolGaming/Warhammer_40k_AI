@@ -3856,7 +3856,7 @@ def test_assault_disembark_resolver_requires_permission_start_state_and_three_in
         )
 
 
-def test_shock_disembark_resolver_requires_permission_and_preserves_start_engagements() -> None:
+def test_shock_disembark_resolver_does_not_inherit_transport_engagements() -> None:
     scenario, passenger, transport, enemy, _catalog = _transport_scenario(enemy_attached=True)
     engaged_enemy_id = "attached-unit:army-beta:enemy-attached"
     scenario = _without_unit(scenario, passenger.unit_instance_id)
@@ -3904,7 +3904,7 @@ def test_shock_disembark_resolver_requires_permission_and_preserves_start_engage
         disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
         transport_movement_status=TransportMovementStatus.ADVANCE,
         restriction_overrides=(permission,),
-        start_engaged_enemy_unit_instance_ids=(engaged_enemy_id,),
+        start_engaged_enemy_unit_instance_ids=(),
     )
     transport_placement = scenario.battlefield_state.unit_placement_by_id(
         transport.unit_instance_id
@@ -3930,7 +3930,9 @@ def test_shock_disembark_resolver_requires_permission_and_preserves_start_engage
         scenario=scenario,
         ruleset_descriptor=_ruleset(),
         cargo_state=cargo,
-        selection=replace(valid_selection, start_engaged_enemy_unit_instance_ids=()),
+        selection=replace(
+            valid_selection, start_engaged_enemy_unit_instance_ids=(engaged_enemy_id,)
+        ),
         unit=passenger,
         transport_placement=transport_placement,
     )
@@ -3954,7 +3956,7 @@ def test_shock_disembark_resolver_requires_permission_and_preserves_start_engage
     assert valid.is_valid, valid.violations
     assert valid.disembarked_unit_state is not None
     assert valid.disembarked_unit_state.source_rule_id == SHOCK_DISEMBARK_MOVE_SOURCE_ID
-    assert valid.disembarked_unit_state.start_engaged_enemy_unit_instance_ids == (engaged_enemy_id,)
+    assert valid.disembarked_unit_state.start_engaged_enemy_unit_instance_ids == ()
     assert not valid.disembarked_unit_state.can_move_further
     assert not valid.disembarked_unit_state.can_declare_charge
     assert DisembarkResolution.from_payload(valid.to_payload()) == valid
@@ -3964,9 +3966,7 @@ def test_shock_disembark_resolver_requires_permission_and_preserves_start_engage
     assert TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT in {
         violation.violation_code for violation in snapshot_drift.violations
     }
-    assert TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED in {
-        violation.violation_code for violation in broken_engagement.violations
-    }
+    assert broken_engagement.is_valid, broken_engagement.violations
 
 
 def test_shock_disembark_candidate_uses_configured_engagement_descriptor() -> None:
@@ -4165,7 +4165,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
     assert proposal.context is not None
-    assert proposal.context["start_engaged_enemy_unit_instance_ids"] == list(engaged_enemy_ids)
+    assert proposal.context["start_engaged_enemy_unit_instance_ids"] == []
 
     shock_poses = (
         Pose.at(14.26, 9.2),
@@ -4260,7 +4260,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
         unit_instance_id=passenger.unit_instance_id,
     )
     assert disembarked_state is not None
-    assert disembarked_state.start_engaged_enemy_unit_instance_ids == engaged_enemy_ids
+    assert disembarked_state.start_engaged_enemy_unit_instance_ids == ()
     queue_start = _last_event_payload(decisions, "forced_fight_activation_queue_started")
     assert (
         queue_start["fights_first_registry"] == FightsFirstRegistry.from_state(state).to_payload()
@@ -4539,10 +4539,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
         if event["event_type"] == "unit_disembarked"
     )
     drifted_engagement_event_payload = cast(dict[str, Any], drifted_engagement_event["payload"])
-    drifted_engagement_state = cast(
-        dict[str, Any], drifted_engagement_event_payload["disembarked_unit_state"]
-    )
-    drifted_engagement_state["start_engaged_enemy_unit_instance_ids"] = []
+    drifted_engagement_event_payload["post_engaged_enemy_unit_instance_ids"] = []
     with pytest.raises(GameLifecycleError, match="engagement evidence drift"):
         GameLifecycle.from_payload(drifted_engagement_evidence_payload)
 
@@ -5518,6 +5515,21 @@ def test_assault_disembark_places_attached_rules_unit_atomically(
                 _unit_placement_at(
                     leader, army_id="army-alpha", player_id="player-a", poses=(Pose.at(13, 9),)
                 ),
+            ),
+        )
+    if mode is DisembarkModeKind.SHOCK_DISEMBARK and not oversized:
+        enemy = scenario.armies[1].units[0]
+        scenario = replace(
+            scenario,
+            battlefield_state=scenario.battlefield_state.with_unit_placement(
+                _unit_placement_at(
+                    enemy,
+                    army_id="army-beta",
+                    player_id="player-b",
+                    poses=tuple(
+                        Pose.at(14.2 + 1.4 * i, 11.8) for i in range(len(enemy.own_models))
+                    ),
+                )
             ),
         )
     rules_unit = rules_unit_view_from_armies(
@@ -10507,3 +10519,179 @@ def test_order61_attached_setup_history_uses_physical_identity(selected_componen
     assert {row.violation_code for row in resolution.violations} == {
         TransportOperationViolationCode.EMBARK_AFTER_SETUP_FORBIDDEN
     }
+
+
+@pytest.mark.parametrize("other_engagement", [False, True])
+def test_order62_new_passenger_engagements_use_facade_and_restore(other_engagement: bool) -> None:
+    from tests.order62_shock_helpers import ENEMY_ID, shock_proposal, shock_session
+
+    from warhammer40k_core.engine.physical_engagement import (
+        current_physically_engaged_enemy_rules_unit_ids,
+    )
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    session = shock_session(enemy_x=15.8, other_engagement=other_engagement)
+    state = session.lifecycle.state
+    assert state is not None
+    assert (
+        current_physically_engaged_enemy_rules_unit_ids(
+            state=state, unit_instance_id="army-alpha:transport"
+        )
+        == ()
+    )
+    initial = session.lifecycle.to_payload()
+    request, proposal = shock_proposal(session)
+    assert proposal.start_engaged_enemy_unit_instance_ids == ()
+    result = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order62:place",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID, result
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.forced_activation_context is not None
+    assert fight_state.forced_activation_context.eligible_unit_instance_ids == (ENEMY_ID,)
+    payload = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
+    artifact = ReplayArtifact.capture(
+        artifact_id="order62:engage",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=session.lifecycle,
+    )
+    replay = ReplayRunner(artifact).run()
+    assert replay.reproduced_exactly, replay
+    for viewer in ("player-a", "player-b"):
+        events = EventStreamCursor().events_since(
+            session.lifecycle.decision_controller.event_log, viewer_player_id=viewer
+        )
+        queue_events = [
+            event
+            for event in cast(list[dict[str, Any]], events["events"])
+            if event["event_type"] == "forced_fight_activation_queue_started"
+        ]
+        assert len(queue_events) == 1
+        assert queue_events[0]["payload"]["forced_activation_context"][
+            "eligible_unit_instance_ids"
+        ] == [ENEMY_ID]
+        assert "fights_first_registry" not in queue_events[0]["payload"]
+    # Resolve the actual response through the same lifecycle submission path.
+    from tests.phase15c_fight_order_helpers import (
+        drain_fight_movement_requests,
+        submit_minimal_melee_declaration,
+    )
+
+    from warhammer40k_core.engine.fight_resolution import SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+
+    status = result
+    for step in range(40):
+        status = drain_fight_movement_requests(session.lifecycle, status)
+        if state.fight_phase_state is None:
+            break
+        pending_request = status.decision_request
+        assert pending_request is not None
+        request = pending_request
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            status = submit_minimal_melee_declaration(
+                session.lifecycle, request=request, result_id=f"order62:melee:{step}"
+            )
+        else:
+            assert request.options, request
+            status = session.submit_option(
+                request_id=request.request_id,
+                result_id=f"order62:fight:{step}",
+                option_id=request.options[0].option_id,
+            )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    assert state.fight_phase_state is None
+    completed_payload = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(completed_payload).to_payload() == completed_payload
+    completed = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order62:completed",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert completed.reproduced_exactly, completed
+    forged = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    event = next(
+        event
+        for event in forged["decisions"]["event_log"]
+        if event["event_type"] == "unit_disembarked"
+    )
+    cast(dict[str, Any], event["payload"])["post_engaged_enemy_unit_instance_ids"] = []
+    with pytest.raises(GameLifecycleError, match="engagement"):
+        GameLifecycle.from_payload(forged)
+    # Matching fabricated skip and completion copies cannot erase the physical enemy.
+    forged_state = cast(dict[str, Any], forged["state"])
+    forged_state["fight_phase_state"] = None
+    started = next(
+        event
+        for event in forged["decisions"]["event_log"]
+        if event["event_type"] == "forced_fight_activation_queue_started"
+    )
+    disembark_payload = cast(dict[str, Any], event["payload"])
+    started["event_type"] = "forced_fight_activation_queue_skipped"
+    started["payload"] = {
+        "game_id": state.game_id,
+        "battle_round": 1,
+        "phase": "movement",
+        "active_player_id": "player-a",
+        "phase_body_status": "forced_fight_activation_queue_skipped",
+        "source_rule_id": SHOCK_DISEMBARK_MOVE_SOURCE_ID,
+        "trigger_event_id": event["event_id"],
+        "source_unit_instance_id": disembark_payload["unit_instance_id"],
+        "transport_unit_instance_id": disembark_payload["transport_unit_instance_id"],
+        "start_engaged_enemy_unit_instance_ids": [],
+        "post_engaged_enemy_unit_instance_ids": [],
+        "already_selected_unit_instance_ids": [],
+    }
+    with pytest.raises(GameLifecycleError, match="post-placement engagement history drift"):
+        GameLifecycle.from_payload(forged)
+
+
+def test_order62_transport_only_engagement_does_not_force_passenger_fight() -> None:
+    from tests.order62_shock_helpers import shock_proposal, shock_session
+
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    session = shock_session(enemy_x=13)
+    initial = session.lifecycle.to_payload()
+    request, proposal = shock_proposal(session)
+    assert proposal.start_engaged_enemy_unit_instance_ids == ()
+    assert proposal.attempted_placement is not None
+    placement = replace(
+        proposal.attempted_placement,
+        model_placements=tuple(
+            replace(model, pose=pose)
+            for model, pose in zip(
+                proposal.attempted_placement.model_placements,
+                _left_side_disembark_poses(),
+                strict=True,
+            )
+        ),
+    )
+    proposal = replace(proposal, attempted_placement=placement)
+    outcome = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order62:away",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert outcome.status_kind is not LifecycleStatusKind.INVALID, outcome
+    assert session.lifecycle.state is not None
+    assert session.lifecycle.state.fight_phase_state is None
+    event = _last_event_payload(
+        session.lifecycle.decision_controller, "forced_fight_activation_queue_skipped"
+    )
+    assert event["post_engaged_enemy_unit_instance_ids"] == []
+    payload = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="order62:away",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay

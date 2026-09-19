@@ -887,3 +887,8 @@ shared history expires by actual turn owner and authenticates restore/replay.
 See [scope and proof](docs/ORDER_61_SCOPE_PLAN.md),
 [contract 27 migration](contracts/migrations/26-to-27.md), and verify the reviewed
 source with `uv run python tools/build_core_embark_setup_turn_source.py --check`.
+
+Order 62 derives Shock Disembark forced Fights from enemies engaged with the
+passengers after setup, including newly engaged enemies. Starting Transport
+engagements confer no passenger obligation. See [scope and owner resolution](docs/ORDER_62_SCOPE_PLAN.md)
+and [contract 28 migration](contracts/migrations/27-to-28.md).

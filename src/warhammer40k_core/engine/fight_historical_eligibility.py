@@ -42,6 +42,7 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
 )
 from warhammer40k_core.engine.rules_units import (
     rules_unit_identity_history_contains,
+    rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -51,6 +52,51 @@ from warhammer40k_core.geometry.volume import Model as GeometryModel
 class _HistoricalGeometry:
     owner_player_id: str
     geometry_model: GeometryModel
+
+
+def historical_engaged_enemy_rules_unit_ids(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    event_index: int,
+    unit_instance_id: str,
+) -> tuple[str, ...]:
+    """Measure a rules unit's engagements at an authenticated physical boundary."""
+    geometry = _historical_geometry_by_model_id(
+        state=state,
+        physical_rows=physical_model_authority_before_event(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            event_index=event_index,
+        ),
+    )
+    source = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+
+    def models_for(unit_id: str) -> tuple[GeometryModel, ...]:
+        ids = historical_rules_unit_model_ids(
+            state=state,
+            event_records=event_records,
+            unit_instance_id=unit_id,
+        )
+        return tuple(
+            geometry[model_id].geometry_model for model_id in sorted(ids) if model_id in geometry
+        )
+
+    source_models = models_for(unit_instance_id)
+    return tuple(
+        sorted(
+            unit.unit_instance_id
+            for unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+            if unit.owner_player_id != source.owner_player_id
+            and geometry_models_are_physically_engaged(
+                first_models=source_models,
+                second_models=models_for(unit.unit_instance_id),
+                ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            )
+        )
+    )
 
 
 def forced_fight_eligibility_contexts_before_event(

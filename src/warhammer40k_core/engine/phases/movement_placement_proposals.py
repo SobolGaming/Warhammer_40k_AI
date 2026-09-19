@@ -2,8 +2,11 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-
 from typing import TYPE_CHECKING
+
+from warhammer40k_core.engine.physical_engagement import (
+    current_physically_engaged_enemy_rules_unit_ids,
+)
 
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 
@@ -447,6 +450,13 @@ def _apply_valid_disembark(
                 maximum_model_horizontal_distance_inches=0.0,
             )
         )
+    post_engaged_ids = (
+        current_physically_engaged_enemy_rules_unit_ids(
+            state=state, unit_instance_id=disembark.selection.unit_instance_id
+        )
+        if disembark.selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+        else ()
+    )
     disembark_event = record_move_completion_event(
         state=state,
         decisions=decisions,
@@ -467,6 +477,7 @@ def _apply_valid_disembark(
             "start_engaged_enemy_unit_instance_ids": list(
                 disembark.selection.start_engaged_enemy_unit_instance_ids
             ),
+            "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
             "request_id": result.request_id,
             "result_id": result.result_id,
             "phase_body_status": "unit_disembarked",
@@ -485,6 +496,7 @@ def _apply_valid_disembark(
             decisions=decisions,
             disembark=disembark,
             disembark_event_id=disembark_event.event_id,
+            post_engaged_ids=post_engaged_ids,
             ruleset_descriptor=ruleset_descriptor,
         )
     if disembark.selection.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK:
@@ -502,19 +514,19 @@ def _start_shock_disembark_forced_fight_activations(
     decisions: DecisionController,
     disembark: DisembarkResolution | RulesUnitDisembarkResolution,
     disembark_event_id: str,
+    post_engaged_ids: tuple[str, ...],
     ruleset_descriptor: RulesetDescriptor,
 ) -> None:
     disembarked_state = disembark.disembarked_unit_state
     if disembarked_state is None:
         raise GameLifecycleError("Shock Disembark requires disembarked unit state.")
-    start_engaged_ids = disembarked_state.start_engaged_enemy_unit_instance_ids
     selected_ids = _forced_fight_selected_unit_ids_for_current_phase(
         state=state,
         decisions=decisions,
     )
     pending_ids = tuple(
         unit_id
-        for unit_id in start_engaged_ids
+        for unit_id in post_engaged_ids
         if not rules_unit_identity_history_contains(
             state=state,
             identity_ids=selected_ids,
@@ -535,7 +547,8 @@ def _start_shock_disembark_forced_fight_activations(
                     "trigger_event_id": disembark_event_id,
                     "source_unit_instance_id": disembark.selection.unit_instance_id,
                     "transport_unit_instance_id": (disembark.selection.transport_unit_instance_id),
-                    "start_engaged_enemy_unit_instance_ids": list(start_engaged_ids),
+                    "start_engaged_enemy_unit_instance_ids": [],
+                    "post_engaged_enemy_unit_instance_ids": list(post_engaged_ids),
                     "already_selected_unit_instance_ids": list(selected_ids),
                 }
             ),
