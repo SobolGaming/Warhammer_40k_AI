@@ -35,7 +35,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "17ab59bd71a135e2006a4525aa69b815beb40e0e855b363181958c691e9697e0"
+EXPECTED_ARTIFACT_SHA256: Final = "1b0f790f63da545c4cd0d509bba52aa3deacaa18dda9f1402491b00beded2e76"
 
 
 def _load_artifact() -> CoreTransportsSourcePackageArtifact:

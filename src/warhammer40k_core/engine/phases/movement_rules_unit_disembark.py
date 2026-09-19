@@ -23,14 +23,8 @@ from warhammer40k_core.engine.emergency_disembark import (
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import CORE_HAZARD_ROLLS_RULE_ID
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.physical_engagement import (
-    scenario_physically_engaged_enemy_rules_unit_ids,
-)
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import RulesUnitView
-from warhammer40k_core.engine.transport_disembark_state import (
-    SHOCK_DISEMBARK_MOVE_SOURCE_ID,
-)
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
@@ -334,7 +328,6 @@ def resolve_rules_unit_disembark(
                 ),
                 terrain_features=validation_scenario.battlefield_state.terrain_features,
                 objective_markers=objective_markers,
-                enforce_shock_engagement_preservation=False,
             )
         else:
             component_resolution = resolve_disembark(
@@ -345,7 +338,6 @@ def resolve_rules_unit_disembark(
                 unit=component_unit,
                 transport_placement=transport_placement,
                 objective_markers=objective_markers,
-                enforce_shock_engagement_preservation=False,
             )
         violations.extend(
             violation
@@ -372,30 +364,6 @@ def resolve_rules_unit_disembark(
                 unit_instance_id=rules_unit.unit_instance_id,
             )
         )
-    if selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
-        post_engaged_ids = set(
-            scenario_physically_engaged_enemy_rules_unit_ids(
-                scenario=validation_scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                unit_instance_id=rules_unit.unit_instance_id,
-            )
-        )
-        for required_enemy_id in selection.start_engaged_enemy_unit_instance_ids:
-            if required_enemy_id not in post_engaged_ids:
-                violations.append(
-                    TransportOperationViolation(
-                        violation_code=(
-                            TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED
-                        ),
-                        message=(
-                            "Shock Disembark must preserve every enemy engagement "
-                            "that existed at the start of the move."
-                        ),
-                        unit_instance_id=rules_unit.unit_instance_id,
-                        blocker_id=required_enemy_id,
-                        source_rule_id=SHOCK_DISEMBARK_MOVE_SOURCE_ID,
-                    )
-                )
     if violations:
         return RulesUnitDisembarkResolution(
             selection=selection,

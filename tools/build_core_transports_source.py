@@ -76,6 +76,9 @@ ASSAULT_RUNTIME_CONSUMER_IDS = [
 ]
 
 SHOCK_RUNTIME_CONSUMER_IDS = [
+    "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
+    "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
+    "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
     "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
     "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
     "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",

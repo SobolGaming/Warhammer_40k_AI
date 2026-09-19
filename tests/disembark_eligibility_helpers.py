@@ -40,6 +40,7 @@ def disembark_session(
     modes: tuple[DisembarkModeKind, ...] = (),
     *,
     eligible: bool = True,
+    unit_poses: dict[str, tuple[Pose, ...]] | None = None,
     oversized_base_diameter_inches: float | None = None,
 ) -> LocalGameSession:
     config = _config()
@@ -97,6 +98,9 @@ def disembark_session(
         from tests.large_model_disembark_helpers import prepare_large_disembark_state
 
         prepare_large_disembark_state(state)
+    if unit_poses is not None:
+        for unit_id, poses in unit_poses.items():
+            _replace_unit_poses(state, unit_instance_id=unit_id, poses=poses)
     decisions = DecisionController()
     enter_battle_for_fixture(state, decisions=decisions)
     _record_default_fixed_secondary_choices_for_missing_players(state)

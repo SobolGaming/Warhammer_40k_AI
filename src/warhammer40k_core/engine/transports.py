@@ -40,10 +40,6 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_spec,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.physical_engagement import (
-    scenario_physically_engaged_enemy_rules_unit_ids,
-)
-from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.transport_disembark_state import (
     ASSAULT_DISEMBARK_MOVE_SOURCE_ID as ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
 )
@@ -1858,7 +1854,6 @@ def resolve_disembark(
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
-    enforce_shock_engagement_preservation: bool = True,
 ) -> DisembarkResolution:
     if selection.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
         raise GameLifecycleError("Combat Disembark requires resolve_combat_disembark.")
@@ -1882,7 +1877,6 @@ def resolve_disembark(
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
-        enforce_shock_engagement_preservation=enforce_shock_engagement_preservation,
     )
 
 
@@ -2358,7 +2352,6 @@ def _resolve_disembark(
     battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     objective_markers: tuple[ObjectiveMarker, ...],
-    enforce_shock_engagement_preservation: bool = True,
 ) -> DisembarkResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_disembark requires a BattlefieldScenario.")
@@ -2463,27 +2456,6 @@ def _resolve_disembark(
         scenario=scenario,
         unit_placement=transport_placement,
     )
-    if disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
-        actual_start_engagements = _enemy_unit_ids_engaged_with_transport(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            transport_models=transport_models,
-        )
-        if actual_start_engagements != selection.start_engaged_enemy_unit_instance_ids:
-            violations.append(
-                TransportOperationViolation(
-                    violation_code=(
-                        TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT
-                    ),
-                    message=(
-                        "Shock Disembark start engagements must match the Transport's "
-                        "authoritative engagement state."
-                    ),
-                    unit_instance_id=selection.unit_instance_id,
-                    blocker_id=selection.transport_unit_instance_id,
-                    source_rule_id=(_transport_disembark_state.SHOCK_DISEMBARK_MOVE_SOURCE_ID),
-                )
-            )
     from warhammer40k_core.engine.transport_disembark_geometry import (
         append_disembark_endpoint_violations,
     )
@@ -2502,7 +2474,6 @@ def _resolve_disembark(
         terrain_features=features,
         objective_markers=markers,
         disembark_mode=disembark_mode,
-        allowed_enemy_engagement_unit_ids=(selection.start_engaged_enemy_unit_instance_ids),
     )
     if disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK:
         from warhammer40k_core.engine.emergency_disembark_placement import (
@@ -2522,39 +2493,6 @@ def _resolve_disembark(
             terrain_features=features,
             objective_markers=markers,
         )
-    if (
-        enforce_shock_engagement_preservation
-        and disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
-    ):
-        post_placement_scenario = BattlefieldScenario(
-            armies=scenario.armies,
-            battlefield_state=scenario.battlefield_state.with_added_unit_placement(
-                selection.attempted_placement
-            ),
-        )
-        post_engaged_unit_ids = set(
-            scenario_physically_engaged_enemy_rules_unit_ids(
-                scenario=post_placement_scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                unit_instance_id=selection.unit_instance_id,
-            )
-        )
-        for required_enemy_id in selection.start_engaged_enemy_unit_instance_ids:
-            if required_enemy_id not in post_engaged_unit_ids:
-                violations.append(
-                    TransportOperationViolation(
-                        violation_code=(
-                            TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED
-                        ),
-                        message=(
-                            "Shock Disembark must preserve every enemy engagement "
-                            "that existed at the start of the move."
-                        ),
-                        unit_instance_id=selection.unit_instance_id,
-                        blocker_id=required_enemy_id,
-                        source_rule_id=(_transport_disembark_state.SHOCK_DISEMBARK_MOVE_SOURCE_ID),
-                    )
-                )
     coherency_result = unit_placement_coherency_result(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -2715,39 +2653,6 @@ def _geometry_models_for_unit_placement(
             placement=placement,
         )
         for placement in unit_placement.model_placements
-    )
-
-
-def _model_owner_unit_id(*, scenario: BattlefieldScenario, model_instance_id: str) -> str:
-    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
-    for placed_army in scenario.battlefield_state.placed_armies:
-        for unit_placement in placed_army.unit_placements:
-            for model_placement in unit_placement.model_placements:
-                if model_placement.model_instance_id == requested_model_id:
-                    return unit_placement.unit_instance_id
-    raise GameLifecycleError("model_instance_id is not placed.")
-
-
-def _enemy_unit_ids_engaged_with_transport(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    transport_models: tuple[Model, ...],
-) -> tuple[str, ...]:
-    component_ids = {
-        _model_owner_unit_id(scenario=scenario, model_instance_id=model.model_id)
-        for model in transport_models
-    }
-    if len(component_ids) != 1:
-        raise GameLifecycleError("Transport models must share one physical unit.")
-    source_id = rules_unit_view_from_armies(
-        armies=scenario.armies,
-        unit_instance_id=next(iter(component_ids)),
-    ).unit_instance_id
-    return scenario_physically_engaged_enemy_rules_unit_ids(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        unit_instance_id=source_id,
     )
 
 

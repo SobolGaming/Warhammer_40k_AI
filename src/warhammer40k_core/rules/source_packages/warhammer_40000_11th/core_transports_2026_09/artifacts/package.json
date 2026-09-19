@@ -151,6 +151,9 @@
       "review_audit_source_observation_sha256": null,
       "rule_source_id": "gw-11e-core-rules:transports:shock-disembark-move",
       "runtime_consumer_ids": [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
+        "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
+        "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
@@ -184,6 +187,9 @@
       "review_audit_source_observation_sha256": "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668",
       "rule_source_id": "gw-11e-core-rules:transports:shock-disembark-move",
       "runtime_consumer_ids": [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
+        "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
+        "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
@@ -198,7 +204,7 @@
       "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "7babbcbef60eeeaf3821a91b97eb0f84a93ad5131a0049a0d8e0deab48e53368",
+  "package_hash": "a44f8932a0a6e1e557a00e71876691858627c6c3008f519de0b00f5918375b71",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -237,6 +243,9 @@
       "load_support_status": "loaded",
       "rule_id": "shock-disembark-move",
       "runtime_consumer_ids": [
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations",
+        "warhammer40k_core.engine.phases.movement_placement_proposals:_start_shock_disembark_forced_fight_activations",
+        "warhammer40k_core.engine.shock_disembark_history:validate_shock_disembark_engagement_history",
         "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
         "warhammer40k_core.engine.phases.movement_transports:_disembark_candidates_for_movement_unit",
         "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",

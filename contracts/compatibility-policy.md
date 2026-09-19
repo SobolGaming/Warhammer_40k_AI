@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`27.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`28.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,8 +27,8 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/27.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `27`, preserving the
+   its current major, currently `compatibility/28.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `28`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
    2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, 10.0.0, 11.0.0, 12.0.0,
    13.0.0, 14.0.0, 15.0.0, 16.0.0, 17.0.0, 18.0.0, 19.0.0 and 20.0.0 baselines
@@ -48,8 +48,7 @@ must be reviewed in the same change.
 
 ## Support window
 
-Contract 27 requires authenticated setup kinds in phase movement history. Only major
-27 is supported. See [26-to-27.md](migrations/26-to-27.md); retain 26.x through
+Contract 27 introduced authenticated setup kinds in phase movement history. See [26-to-27.md](migrations/26-to-27.md); retain 26.x through
 at least 2027-09-19 and one released 27.x minor line, whichever is later.
 
 Contract 26 implemented controlling-player ability-instance selection. See [25-to-26.md](migrations/25-to-26.md); retain 25.x through
@@ -218,3 +217,8 @@ deployers covered by earlier migrations. See `migrations/9-to-10.md`,
 Unknown or mismatched request `schema_version` values fail before engine
 mutation with `schema_version_mismatch`. Servers never reinterpret a request
 using a nearby schema version.
+
+Order 62 supports major 28. Retain the major 27 deployment through at least
+2027-09-19 and one released 28.x minor line, whichever is later. Earlier
+retention obligations and immutable baselines remain in force. See
+[migration 27 to 28](migrations/27-to-28.md).

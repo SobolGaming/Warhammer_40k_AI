@@ -13,9 +13,6 @@ from warhammer40k_core.engine.phases.movement_reinforcements import *
 from warhammer40k_core.engine.assault_disembark import (
     assault_disembark_restriction_overrides,
 )
-from warhammer40k_core.engine.physical_engagement import (
-    scenario_physically_engaged_enemy_rules_unit_ids,
-)
 from warhammer40k_core.engine.shock_disembark import (
     shock_disembark_restriction_overrides,
 )
@@ -197,11 +194,7 @@ def _disembark_candidates_for_movement_unit(
                 disembark_mode=DisembarkModeKind.SHOCK_DISEMBARK,
                 transport_movement_status=movement_status,
                 restriction_overrides=shock,
-                start_engaged_enemy_unit_instance_ids=scenario_physically_engaged_enemy_rules_unit_ids(
-                    scenario=_battlefield_scenario(state),
-                    ruleset_descriptor=ruleset_descriptor,
-                    unit_instance_id=transport_id,
-                ),
+                start_engaged_enemy_unit_instance_ids=(),
             )
         )
     return tuple(candidates)

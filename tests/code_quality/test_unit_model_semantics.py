@@ -1099,7 +1099,7 @@ def test_triggered_movement_separates_living_sources_from_retained_physical_base
 
 def test_combat_disembark_uses_canonical_physical_transport_engagement() -> None:
     current_engagement = _function_node(
-        path=TRANSPORTS,
+        path=TRANSPORTS.with_name("transport_disembark_geometry.py"),
         function_name="_enemy_unit_ids_engaged_with_transport",
     )
     current_engagement_calls = {

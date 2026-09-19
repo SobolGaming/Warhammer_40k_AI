@@ -13,13 +13,14 @@ from warhammer40k_core.engine.endpoint_placement import (
     terrain_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.transports import (
     DisembarkModeKind,
     TransportOperationViolation,
     TransportOperationViolationCode,
-    _enemy_unit_ids_engaged_with_transport,
-    _model_owner_unit_id,
     disembark_mode_kind_from_token,
 )
 from warhammer40k_core.engine.transports import (
@@ -53,7 +54,6 @@ def append_disembark_endpoint_violations(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     objective_markers: tuple[ObjectiveMarker, ...],
     disembark_mode: DisembarkModeKind,
-    allowed_enemy_engagement_unit_ids: tuple[str, ...] = (),
 ) -> None:
     mode = disembark_mode_kind_from_token(disembark_mode)
     placed_models = _placed_geometry_models(scenario)
@@ -74,10 +74,7 @@ def append_disembark_endpoint_violations(
         if mode is DisembarkModeKind.COMBAT_DISEMBARK
         else ()
     )
-    allowed_engagement_units = {
-        *combat_engagement_unit_ids,
-        *allowed_enemy_engagement_unit_ids,
-    }
+    allowed_engagement_units = set(combat_engagement_unit_ids)
     for model in models:
         if not _model_is_within_battlefield(
             model,
@@ -144,7 +141,8 @@ def append_disembark_endpoint_violations(
                     ),
                 ).unit_instance_id
                 if not oversized and (
-                    mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+                    mode
+                    in {DisembarkModeKind.EMERGENCY_DISEMBARK, DisembarkModeKind.SHOCK_DISEMBARK}
                     or enemy_unit_id in allowed_engagement_units
                 ):
                     continue
@@ -276,3 +274,36 @@ def _model_pair_can_overlap_horizontally(first: Model, second: Model) -> bool:
     return first.pose.distance_2d_to(second.pose) <= (
         first.base.max_radius() + second.base.max_radius()
     )
+
+
+def _enemy_unit_ids_engaged_with_transport(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    transport_models: tuple[Model, ...],
+) -> tuple[str, ...]:
+    component_ids = {
+        _model_owner_unit_id(scenario=scenario, model_instance_id=model.model_id)
+        for model in transport_models
+    }
+    if len(component_ids) != 1:
+        raise GameLifecycleError("Transport models must share one physical unit.")
+    source_id = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=next(iter(component_ids)),
+    ).unit_instance_id
+    return scenario_physically_engaged_enemy_rules_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=source_id,
+    )
+
+
+def _model_owner_unit_id(*, scenario: BattlefieldScenario, model_instance_id: str) -> str:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    for placed_army in scenario.battlefield_state.placed_armies:
+        for unit_placement in placed_army.unit_placements:
+            for model_placement in unit_placement.model_placements:
+                if model_placement.model_instance_id == requested_model_id:
+                    return unit_placement.unit_instance_id
+    raise GameLifecycleError("model_instance_id is not placed.")

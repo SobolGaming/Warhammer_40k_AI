@@ -104,3 +104,16 @@ def append_disembark_eligibility_violations(
                 source_rule_id=SHOCK_DISEMBARK_MOVE_SOURCE_ID,
             )
         )
+
+    if (
+        selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+        and selection.start_engaged_enemy_unit_instance_ids
+    ):
+        violations.append(
+            TransportOperationViolation(
+                violation_code=TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT,
+                message="Embarked passengers have no battlefield starting engagements.",
+                unit_instance_id=unit.unit_instance_id,
+                source_rule_id=SHOCK_DISEMBARK_MOVE_SOURCE_ID,
+            )
+        )

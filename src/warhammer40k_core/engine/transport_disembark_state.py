@@ -219,6 +219,10 @@ class DisembarkedUnitState:
                     "Assault Disembark state cannot carry Shock engagement state."
                 )
         elif self.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
+            if self.start_engaged_enemy_unit_instance_ids:
+                raise GameLifecycleError(
+                    "Embarked Shock passengers cannot inherit start engagements."
+                )
             if self.permission_source_rule_id is None:
                 raise GameLifecycleError(
                     "Shock Disembark state requires a permitting source rule ID."
