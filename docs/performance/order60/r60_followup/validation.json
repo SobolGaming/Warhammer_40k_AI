@@ -1,0 +1,64 @@
+{
+  "order": 60,
+  "findings": ["R60-001 floor volumes", "R60-003 supported elevations"],
+  "disposition": "fail_closed_unresolved_floor_geometry",
+  "validated_on": "2026-09-19",
+  "base_commit": "51c64970",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:da58b26c34f363cd525cd1ab4afca9b1723db7471e509431788698d2f11e1724",
+  "behavioral": {
+    "tests": 8382,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 970.29,
+    "coverage_percent": 85.11,
+    "coverage_minimum_percent": 85,
+    "distribution": "worksteal",
+    "workers": "auto",
+    "warnings": 10,
+    "warning_note": "SQLite unclosed-database ResourceWarning messages"
+  },
+  "code_quality": {
+    "tests": 524,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 332.06,
+    "coverage": false,
+    "distribution": "worksteal",
+    "workers": "auto"
+  },
+  "focused": {
+    "order60_behavioral": 15,
+    "transport_regressions": 195,
+    "order60_code_quality": 4,
+    "new_regression_failures_before_fix": 3
+  },
+  "other_gates": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "eight_shard_inventory": "passed",
+    "import_linter_11_contracts": "passed",
+    "pre_commit_all_files": "passed",
+    "source_generator_check": "passed",
+    "engine_identity_check": "passed",
+    "external_contract_exact_base_check": "passed",
+    "installed_wheel_smoke": "passed",
+    "typescript_generated_client_check": "passed",
+    "typescript_typecheck": "passed"
+  },
+  "typescript_unit_tests": 5,
+  "typescript_conformance_assertions": 342,
+  "contract_version": "26.0.0",
+  "environment_note": "Node.js 24.19.0 on PATH; npm unavailable, equivalent package-script Node entry points executed directly. Generated TypeScript CRLF/LF mismatch normalized without a tracked content change.",
+  "remote_ci_run": null,
+  "performance": {
+    "component_evidence": ["base.json", "head.json"],
+    "gameplay_slice": "unmeasured",
+    "complete_game": "unmeasured",
+    "deferred_budgets": "not certified"
+  },
+  "limitation": "Floor collision, support permissions, overhang and alternative supported elevations remain unresolved when floors can meet the search region, including complete elevated proposals."
+}

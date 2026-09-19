@@ -434,7 +434,7 @@ def _pose_exists(
             closer_than_center=closer_than_center,
             neighbor_obstacles=neighbors,
             span_obstacles=spans,
-            rect_obstacles=_terrain_wall_rects(
+            rect_obstacles=_terrain_proof_rects(
                 terrain_features=terrain_features,
                 passenger=passenger,
                 transport=transport,
@@ -655,7 +655,7 @@ def _objective_circles(
     return tuple(circles)
 
 
-def _terrain_wall_rects(
+def _terrain_proof_rects(
     *,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     passenger: Model,
@@ -672,6 +672,25 @@ def _terrain_wall_rects(
     transport_y = Fraction(str(transport.pose.position.y))
     rects: list[AxisAlignedRectObstacle] = []
     for feature in terrain_features:
+        # The planar solver does not encode floor collision, support permissions,
+        # or overhang. Do not filter floors by the passenger's current elevation:
+        # an omitted model's synthetic ground pose cannot exclude an upper floor,
+        # and closest/unengaged alternatives also require legal supported poses.
+        for floor in feature.floors:
+            min_x, min_y, max_x, max_y = floor.bounds()
+            if _aabb_reaches_disk(
+                min_x=min_x,
+                min_y=min_y,
+                max_x=max_x,
+                max_y=max_y,
+                center_x=float(transport_x),
+                center_y=float(transport_y),
+                radius=float(search),
+            ):
+                raise VisibilityComputationError(
+                    "Emergency Disembark floor collision and supported-elevation proof "
+                    "is unresolved."
+                )
         for wall in feature.walls:
             wall_interval = (wall.bottom_z_inches, wall.bottom_z_inches + wall.height_inches)
             if _interval_gap(passenger_interval, wall_interval) != 0.0:

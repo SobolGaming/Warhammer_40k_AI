@@ -1,5 +1,9 @@
 # Order 60 performance and validation
 
+The R60-001 floor / R60-003 elevation follow-up has separate matched evidence
+and validation in [r60_followup](r60_followup/README.md). The results below
+describe the earlier wall and elevated-enemy repair.
+
 The matched component workload uses the same five-model Emergency Disembark
 contact-ring placement on base `4cb16b1d` and head. Each sample resolves one
 canonical Transport fixture. Fixture creation is excluded. The first sample is

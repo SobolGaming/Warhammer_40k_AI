@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eb5db3e0b82897101593be3c12fd1b978297ec7a20c7038fcafde08190171507",
-  "fingerprint": "eb5db3e0b82897101593be3c12fd1b978297ec7a20c7038fcafde08190171507",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:da58b26c34f363cd525cd1ab4afca9b1723db7471e509431788698d2f11e1724",
+  "fingerprint": "da58b26c34f363cd525cd1ab4afca9b1723db7471e509431788698d2f11e1724",
   "resource_count": 2872,
   "resources": [
     {
@@ -2065,9 +2065,9 @@
       "sha256": "2614600a4f7ebbec8f310e749d35ed40b4c0ad56a46b28cb08f419758ca6c642"
     },
     {
-      "byte_length": 29591,
+      "byte_length": 30501,
       "path": "warhammer40k_core/engine/emergency_disembark_placement.py",
-      "sha256": "72587319c7b43b4fc00f4618add3efbc57c6de420d75f8dff8dc8f8449249221"
+      "sha256": "b901db3772d85c1c29deb366dd0f4a9979ab0293273f88976173be980703913d"
     },
     {
       "byte_length": 14880,

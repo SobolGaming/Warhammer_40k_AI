@@ -60,6 +60,11 @@ def test_emergency_disembark_placement_has_one_proof_owner() -> None:
     assert 'decide(both(*constraints), ("x", "y"))' in fit
     assert "AxisAlignedRectObstacle" in fit
     assert "_circle_strictly_outside_rect(" in fit
+    # Every existence query must pass the floor/support guard before the planar
+    # SAT result can become a closest, unengaged, or omitted-casualty verdict.
+    assert "rect_obstacles=_terrain_proof_rects(" in owner
+    assert "for floor in feature.floors:" in owner
+    assert "floor collision and supported-elevation proof" in owner
     assert "except Exception" not in owner
     assert "except Exception" not in fit
     assert _emergency_owner_modules() == (
@@ -68,8 +73,11 @@ def test_emergency_disembark_placement_has_one_proof_owner() -> None:
     )
 
 
-def test_order60_performance_has_matched_inputs_and_passes_declared_budgets() -> None:
-    directory = ROOT / "docs/performance/order60"
+@pytest.mark.parametrize("evidence_directory", ["", "r60_followup"])
+def test_order60_performance_has_matched_inputs_and_passes_declared_budgets(
+    evidence_directory: str,
+) -> None:
+    directory = ROOT / "docs/performance/order60" / evidence_directory
     base, head = (json.loads((directory / f"{name}.json").read_text()) for name in ("base", "head"))
     for field in (
         "workload_id",

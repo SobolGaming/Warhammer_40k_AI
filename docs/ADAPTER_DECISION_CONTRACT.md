@@ -6252,3 +6252,11 @@ Engagement Range authority. Restore and replay retain the same engine-owned
 placement and omitted-casualty authority. Hidden-information redaction is
 unchanged.
 
+The planar placement proof raises the existing unresolved `GameLifecycleError`
+when a floor can intersect its horizontal search region. It cannot certify
+floor collision, support, overhang, or alternative supported elevations. A
+ground-only negative result must never authorize an omitted survivor's
+destruction, and an unsupported SAT result must never establish a closer or
+unengaged alternative. This limitation also applies to complete elevated
+proposals until support-aware proof is implemented; no submission schema changes.
+

@@ -28,6 +28,15 @@ keep 3D engagement, overlap, and coherency authority. A terrain-free SAT
 result is not a legal alternative. Non-cardinal walls that can meet the search
 region raise unresolved geometry rather than declaring the proposal illegal.
 
+R60-003 and the remaining R60-001 floor case fail closed: any floor whose
+horizontal bounds can meet the searched passenger footprint raises unresolved
+geometry before the planar solver returns a verdict. This check deliberately
+does not filter by the passenger's elevation. An omitted model's synthetic
+ground pose cannot rule out survival on a supported upper floor. The current
+solver does not certify floor collision, support permissions, or overhang;
+complete elevated placements and closest/unengaged queries near floors also
+remain unresolved. Floors wholly outside the search region do not block proof.
+
 ## Ownership and proof
 
 `geometry.emergency_disembark_fit` owns the exact circular existence query.
@@ -60,6 +69,15 @@ rules-unit complete placement, GameLifecycle restore, rejection of a
 terrain-free closer pose that lies inside solid walls, and acceptance of
 contact-ring set-up beside vertically separated enemies. This PR adds no option
 family, proposal kind, or visibility change.
+
+The follow-up regressions establish endpoint legality independently for all
+five survivors at z=6 inches, reject omission certification through both proof
+entry points, and prevent floor-slab interiors from proving closer placement.
+They check unchanged lifecycle payloads after unresolved results and retain
+passing wall, elevated-enemy, and distant-floor cases. The bug-class search
+traced all `_pose_exists` calls: omission, closest, and unengaged preference
+share the guard. The existing adapter contract covers this domain error; no
+proposal shape, source identity, or mutation owner changes.
 See [performance and final gates](performance/order60/README.md).
 
 Reproduce the source with
