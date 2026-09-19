@@ -5,6 +5,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -39,7 +40,9 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_failed,
     hazard_roll_spec,
 )
+from warhammer40k_core.engine.ingress_placement_restrictions import IngressPlacementRestrictions
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.transport_disembark_state import (
     ASSAULT_DISEMBARK_MOVE_SOURCE_ID as ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
 )
@@ -128,6 +131,7 @@ class TransportOperationViolationCode(StrEnum):
     EMBARK_FORBIDDEN_BY_EFFECT = "embark_forbidden_by_effect"
     EMBARK_DISTANCE = "embark_distance"
     DISEMBARK_DISTANCE = "disembark_distance"
+    RAPID_DISEMBARK_INGRESS_RESTRICTION = "rapid_disembark_ingress_restriction"
     TRANSPORT_ADVANCED_OR_FELL_BACK = "transport_advanced_or_fell_back"
     ASSAULT_DISEMBARK_PERMISSION_REQUIRED = "assault_disembark_permission_required"
     SHOCK_DISEMBARK_PERMISSION_REQUIRED = "shock_disembark_permission_required"
@@ -1854,29 +1858,28 @@ def resolve_disembark(
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    ingress_restrictions: IngressPlacementRestrictions | None = None,
+    enemy_deployment_zones: tuple[DeploymentZone, ...] | None = None,
+    deployment_zones: tuple[DeploymentZone, ...] | None = None,
+    ingress_rules_unit_placement: RulesUnitPlacement | None = None,
 ) -> DisembarkResolution:
-    if selection.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
-        raise GameLifecycleError("Combat Disembark requires resolve_combat_disembark.")
-    if selection.disembark_mode not in {
-        DisembarkModeKind.RAPID_DISEMBARK,
-        DisembarkModeKind.ASSAULT_DISEMBARK,
-        DisembarkModeKind.SHOCK_DISEMBARK,
-        DisembarkModeKind.TACTICAL_DISEMBARK,
-    }:
-        raise GameLifecycleError("resolve_disembark requires a standard Disembark mode.")
-    return _resolve_disembark(
+    from warhammer40k_core.engine.standard_disembark_resolution import resolve_disembark as resolve
+
+    return resolve(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         cargo_state=cargo_state,
         selection=selection,
         unit=unit,
         transport_placement=transport_placement,
-        turn_player_id=selection.player_id,
-        require_started_phase_embarked=True,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
+        ingress_restrictions=ingress_restrictions,
+        enemy_deployment_zones=enemy_deployment_zones,
+        deployment_zones=deployment_zones,
+        ingress_rules_unit_placement=ingress_rules_unit_placement,
     )
 
 

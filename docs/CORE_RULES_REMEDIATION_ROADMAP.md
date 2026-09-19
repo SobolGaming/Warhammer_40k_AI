@@ -4987,3 +4987,23 @@ Implementation and local validation are complete: 8,405 behavioral tests passed
 with 85.11% coverage, followed by 532 passing code-quality tests. Contract, client,
 package, type, lint and generation gates passed. See the linked scope and
 [validation evidence](performance/order62/validation.json) for review.
+
+
+## P20 implementation evidence — Order 63
+
+Order 63 implements C20-01 and C18-06: loaded Strategic Reserve Transports ingress
+as one reserve unit, retaining embarked cargo and existing cargo-point accounting.
+Cargo cannot ingress independently. Rapid Disembark checks every passenger model
+against the Transport's accepted placement policy. The owner approved the scoped
+migration of existing arrival providers to typed region/distance conditions on
+2026-09-19; source ownership remains with the Transport. No new faction semantics
+or named handler is introduced.
+
+The reviewed 20.01/20.04 and v946 18.04.01 observations, architecture, facade and
+provider regressions are described in [Order 63 scope](ORDER_63_SCOPE_PLAN.md).
+Contract 29 retains private source/placement evidence and an independently
+replayable pre-ingress root, with shared viewer redaction. See
+[migration 28 to 29](../contracts/migrations/28-to-29.md) and
+[component performance evidence](performance/order63/README.md).
+General reserve defaults, cleanup exceptions and post-ingress activity lifetimes
+remain Order 64; this does not close category 20 or claim final certification.

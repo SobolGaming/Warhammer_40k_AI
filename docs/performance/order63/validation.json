@@ -1,0 +1,70 @@
+{
+  "order": 63,
+  "validated_on": "2026-09-19",
+  "base_commit": "25ec75b643e0cac1276a6df84c4a4f85cbeefeeb",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:58c2128538c7082ccde3e27529110798384311e3bd73123104995601b137019d",
+  "platform": "Windows 11; Python 3.14.5; Node 24.19.0",
+  "behavioral": {
+    "tests": 8430,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1007.683,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "efa36ab18b836e6ee96d69f4ab989ef623d0fcaf179d1955600a85978569df75",
+    "coverage_percent": 85.11421790894387,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_kind": "SQLite unclosed-connection ResourceWarnings, also present in base validation"
+  },
+  "code_quality": {
+    "tests": 535,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 323.894,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "36090f447b4d57f094577b614bf5054a57fe362ed198704d9373005acd55c87a",
+    "coverage": false
+  },
+  "other_gates": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "eight_shard_inventory": "passed",
+    "import_linter_11_contracts": "passed",
+    "pre_commit_all_files": "passed",
+    "source_generator_check": "passed",
+    "engine_identity_check": "passed",
+    "external_contract_exact_base_check": "passed",
+    "typescript_generated_client_check": "passed",
+    "typescript_typecheck": "passed",
+    "typescript_unit_tests_5": "passed",
+    "typescript_conformance_scenario": "passed",
+    "installed_contract_wheel_smoke": "passed",
+    "staged_diff_check": "passed",
+    "staged_source_pin_byte_check": "passed",
+    "generated_example_identity_diff_audit": "passed"
+  },
+  "typescript_execution": "Package-script entry points executed directly with bundled Node and installed dependencies.",
+  "typescript_conformance_assertions": 342,
+  "component_performance": {
+    "evidence": [
+      "base.json",
+      "head.json",
+      "loaded-head.json"
+    ],
+    "recorded_component_limits_passed": true,
+    "loaded_path_is_unpaired_diagnostic": true,
+    "gameplay_slice_measured": false,
+    "full_game_certified": false
+  },
+  "validation_notes": [
+    "The initial coverage run passed 8429 tests with one stale source-package count expectation (39 rather than 40). After correcting that test, the complete final behavioral suite passed with coverage.",
+    "The initial code-quality run passed 533 audits with two stale expectations: the source-package count and the previous location of the extracted standard Disembark guard. The corrected audits verify the new count and delegated guard owner; the complete final code-quality suite passed.",
+    "No production code changed after the successful behavioral coverage run. The shard inventory was regenerated from its complete successful local JUnit profile."
+  ]
+}

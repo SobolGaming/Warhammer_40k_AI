@@ -11,7 +11,6 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.catalog_reserve_arrival_restriction_classification import (
     CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,
     clause_is_reserve_arrival_restriction,
@@ -166,21 +165,11 @@ def _restrictions_for_record(
         distance = reserve_arrival_restriction_distance_inches(clause)
         for source_model_id in current_model_instance_ids:
             source_model = _required_model(source_models, source_model_id)
-            source_geometry = geometry_model_for_placement(
-                model=source_model,
-                placement=battlefield_state.model_placement_by_id(source_model_id),
-            )
             for arriving_placement in context.attempted_rules_unit_placement.model_placements:
                 arriving_model = _required_model(
                     arriving_models,
                     arriving_placement.model_instance_id,
                 )
-                arriving_geometry = geometry_model_for_placement(
-                    model=arriving_model,
-                    placement=arriving_placement,
-                )
-                if arriving_geometry.range_to(source_geometry) > distance:
-                    continue
                 restrictions.append(
                     ReserveArrivalRestriction(
                         hook_id=CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,

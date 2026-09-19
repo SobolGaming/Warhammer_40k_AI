@@ -92,7 +92,13 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
 
 
 _INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset(
-    {"effect_snapshot_sha256", "psychic_modifier_history_origin"}
+    {
+        "effect_snapshot_sha256",
+        "psychic_modifier_history_origin",
+    }
+)
+_INTERNAL_INGRESS_AUTHORITY_KEYS = frozenset(
+    {"ingress_placement_history_origin", "ingress_placement_restrictions"}
 )
 _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS = frozenset(
     {"target_replacement_authority_sha256", "charge_target_authority_sha256"}
@@ -816,6 +822,7 @@ def _without_internal_authority_commitments(value: JsonValue) -> JsonValue:
             not in (
                 _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS
                 | _INTERNAL_PSYCHIC_AUTHORITY_KEYS
+                | _INTERNAL_INGRESS_AUTHORITY_KEYS
                 | _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS
             )
         }

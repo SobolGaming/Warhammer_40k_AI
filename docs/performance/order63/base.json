@@ -1,0 +1,81 @@
+{
+  "workload_id": "order63-unloaded-ingress-restore-v1",
+  "revision": "25ec75b643e0cac1276a6df84c4a4f85cbeefeeb",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "Transport selection and ingress, optional Rapid Disembark, plus exact restore; fixture excluded; first sample cold",
+  "scenario": {
+    "units": 4,
+    "models": 16,
+    "terrain": "empty",
+    "rng": "no dice in measured workload"
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order63.py": "95be6f2cb4f8e4e99a7a6ff2c20a36ba10cb02794b26cbbe135ff1f3a6db181d",
+    "tests/order63_reserve_transport_helpers.py": "0720d2d1d80996c9dd9e54bd304a76e723a795d6f39e49a81d9bb9a30c64922d",
+    "tests/disembark_eligibility_helpers.py": "e7103a47e9039662a2fc3d0d2dc45e5f16ef1eba16b27e8e993661743d9cd083"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 8.17182899999898,
+      "matched_seconds": 1.0773875000013504,
+      "queries": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0832421999948565,
+      "matched_seconds": 1.0456348000152502,
+      "queries": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0126875000132713,
+      "matched_seconds": 0.9992297999851871,
+      "queries": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.010905000002822,
+      "matched_seconds": 0.9876914999913424,
+      "queries": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0533882999734487,
+      "matched_seconds": 1.0131529000063892,
+      "queries": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0111316999827977,
+      "matched_seconds": 0.9891893000167329,
+      "queries": 1,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0006121000042185,
+      "matched_seconds": 0.9852030999900308,
+      "queries": 1,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 1.0139269857151834,
+  "median_seconds": 0.9992297999851871,
+  "maximum_seconds": 1.0773875000013504,
+  "p95_seconds": 1.0773875000013504,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 2,
+    "mean_additive_seconds": 0.02,
+    "maximum_ratio": 2,
+    "maximum_additive_seconds": 0.05
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}

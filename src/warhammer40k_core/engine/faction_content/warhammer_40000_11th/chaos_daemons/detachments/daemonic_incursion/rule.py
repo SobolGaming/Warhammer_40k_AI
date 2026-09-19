@@ -4,6 +4,10 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.arrival_placement_conditions import (
+    ArrivalAnchor,
+    ArrivalPlacementCondition,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
@@ -33,7 +37,6 @@ from warhammer40k_core.engine.reserve_arrival_hooks import (
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
@@ -87,11 +90,23 @@ def warp_rifts_distance_grants(
     if not _rules_unit_has_faction_keyword(context.rules_unit, LEGIONES_DAEMONICA):
         return ()
 
-    within_shadow = _attempted_unit_wholly_within_shadow(context=context)
-    within_anchor = _attempted_unit_wholly_within_matching_greater_daemon_anchor(
-        context=context,
-        army=army,
+    shadow = _shadow_condition(context)
+    anchors = _matching_anchor_condition(context=context, army=army)
+    zones = context.state.mission_setup
+    if zones is None:
+        raise GameLifecycleError("Warp Rifts requires MissionSetup.")
+    models = _attempted_geometry_models(context)
+    within_shadow = shadow is not None and shadow.allows(
+        models=models,
+        scenario=context.scenario,
+        deployment_zones=zones.deployment_zones,
     )
+    within_anchor = anchors is not None and anchors.allows(
+        models=models,
+        scenario=context.scenario,
+        deployment_zones=zones.deployment_zones,
+    )
+    conditions = tuple(row for row in (shadow, anchors) if row is not None)
     if not within_shadow and not within_anchor:
         return ()
 
@@ -100,6 +115,7 @@ def warp_rifts_distance_grants(
             hook_id=WARP_RIFTS_HOOK_ID,
             source_id=SOURCE_RULE_ID,
             enemy_horizontal_distance_inches=WARP_RIFTS_ENEMY_DISTANCE_INCHES,
+            placement_conditions=conditions,
             replay_payload=_warp_rifts_replay_payload(
                 context=context,
                 source=source,
@@ -148,6 +164,7 @@ def denizens_of_the_warp_distance_grants(
             hook_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID,
             source_id=DENIZENS_OF_THE_WARP_SOURCE_RULE_ID,
             enemy_horizontal_distance_inches=DENIZENS_OF_THE_WARP_ENEMY_DISTANCE_INCHES,
+            placement_conditions=(ArrivalPlacementCondition.unconditional(),),
             replay_payload=generic_rule_ability_source_context_payload(
                 source=source,
                 matching_effects=matching_effects,
@@ -210,71 +227,42 @@ def _validate_generic_rule_source(source: object) -> None:
         )
 
 
-def _attempted_unit_wholly_within_shadow(
-    *,
-    context: ReserveArrivalDistanceContext,
-) -> bool:
+def _shadow_condition(context: ReserveArrivalDistanceContext) -> ArrivalPlacementCondition | None:
     state = context.state
     if state.mission_setup is None:
         raise GameLifecycleError("Warp Rifts Shadow check requires MissionSetup.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Warp Rifts Shadow check requires battlefield_state.")
-    models = _attempted_geometry_models(context)
-    if not models:
-        return False
-    regions = shadow_regions_for_player(
-        state=state,
-        player_id=context.reserve_state.player_id,
-    )
-    shadow_surface = None
-    if ShadowRegion.OWN_DEPLOYMENT_ZONE in regions:
-        for zone in state.mission_setup.deployment_zones:
-            if zone.player_id == context.reserve_state.player_id:
-                zone_surface = shapely_backend.footprint_for_deployment_zone(zone)
-                shadow_surface = (
-                    zone_surface if shadow_surface is None else shadow_surface.union(zone_surface)
-                )
-    if ShadowRegion.OPPONENT_DEPLOYMENT_ZONE in regions:
-        for zone in state.mission_setup.deployment_zones:
-            if zone.player_id != context.reserve_state.player_id:
-                zone_surface = shapely_backend.footprint_for_deployment_zone(zone)
-                shadow_surface = (
-                    zone_surface if shadow_surface is None else shadow_surface.union(zone_surface)
-                )
-    if ShadowRegion.NO_MANS_LAND in regions:
-        no_mans_land_surface = shapely_backend.footprint_for_no_mans_land(
-            battlefield_bounds=(
-                0.0,
-                0.0,
-                state.battlefield_state.battlefield_width_inches,
-                state.battlefield_state.battlefield_depth_inches,
-            ),
-            deployment_zones=state.mission_setup.deployment_zones,
+    regions = shadow_regions_for_player(state=state, player_id=context.reserve_state.player_id)
+    zone_ids = tuple(
+        sorted(
+            zone.deployment_zone_id
+            for zone in state.mission_setup.deployment_zones
+            if (
+                zone.player_id == context.reserve_state.player_id
+                and ShadowRegion.OWN_DEPLOYMENT_ZONE in regions
+            )
+            or (
+                zone.player_id != context.reserve_state.player_id
+                and ShadowRegion.OPPONENT_DEPLOYMENT_ZONE in regions
+            )
         )
-        shadow_surface = (
-            no_mans_land_surface
-            if shadow_surface is None
-            else shadow_surface.union(no_mans_land_surface)
-        )
-    if shadow_surface is None:
-        return False
-    return all(
-        shadow_surface.covers(shapely_backend.footprint_for_base(model.base, model.pose))
-        for model in models
     )
+    includes_no_mans_land = ShadowRegion.NO_MANS_LAND in regions
+    if not zone_ids and not includes_no_mans_land:
+        return None
+    return ArrivalPlacementCondition(zone_ids, includes_no_mans_land, (), None)
 
 
-def _attempted_unit_wholly_within_matching_greater_daemon_anchor(
+def _matching_anchor_condition(
     *,
     context: ReserveArrivalDistanceContext,
     army: ArmyDefinition,
-) -> bool:
+) -> ArrivalPlacementCondition | None:
     target_god_keywords = _god_keywords_for_rules_unit(context.rules_unit)
     if not target_god_keywords:
-        return False
+        return None
     target_models = _attempted_geometry_models(context)
     if not target_models:
-        return False
+        return None
     anchor_models: list[GeometryModel] = []
     for source_unit in army.units:
         if source_unit.unit_instance_id in context.rules_unit.component_unit_instance_ids:
@@ -291,19 +279,12 @@ def _attempted_unit_wholly_within_matching_greater_daemon_anchor(
             continue
         anchor_models.extend(_geometry_models_for_placement(context.scenario, source_placement))
     if not anchor_models:
-        return False
-    return all(
-        any(
-            shapely_backend.base_footprint_distance(
-                target_model.base,
-                target_model.pose,
-                anchor_model.base,
-                anchor_model.pose,
-            )
-            <= WARP_RIFTS_ANCHOR_RANGE_INCHES
-            for anchor_model in anchor_models
-        )
-        for target_model in target_models
+        return None
+    return ArrivalPlacementCondition(
+        (),
+        False,
+        tuple(ArrivalAnchor.from_model(model) for model in anchor_models),
+        WARP_RIFTS_ANCHOR_RANGE_INCHES,
     )
 
 

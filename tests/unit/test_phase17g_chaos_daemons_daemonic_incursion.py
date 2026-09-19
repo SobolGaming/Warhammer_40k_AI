@@ -2768,6 +2768,48 @@ def test_warp_rifts_shadow_allows_deep_strike_more_than_six_from_enemy() -> None
     assert arrival_event["placement_kind"] == BattlefieldPlacementKind.DEEP_STRIKE.value
 
 
+def test_warp_rifts_retains_typed_regions_for_inherited_passenger_geometry() -> None:
+    from warhammer40k_core.engine.ingress_placement_restrictions import (
+        IngressPlacementRestrictions,
+        restrictions_for_arrival,
+        validate_inherited_placement,
+    )
+
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    context = _reserve_arrival_distance_context(
+        state=state,
+        reserve_state=reserve_state,
+        reserve_unit=reserve_unit,
+        attempted_placement=single_model_reserve_placement(
+            reserve_unit=reserve_unit, pose=Pose.at(16, 4.25)
+        ),
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+    )
+    grants = _runtime_reserve_arrival_registry(state).grants_for(context)
+    assert grants
+    policy = restrictions_for_arrival(
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        battle_round=2,
+        strategic_rule=None,
+        deep_strike_enemy_distance=6,
+        source_restrictions=(),
+        distance_grants=grants,
+    )
+    assert IngressPlacementRestrictions.from_payload(policy.to_payload()) == policy
+    assert state.mission_setup is not None
+    outside = single_model_reserve_placement(reserve_unit=reserve_unit, pose=Pose.at(30, 22))
+    assert validate_inherited_placement(
+        restrictions=policy,
+        scenario=context.scenario,
+        models=RulesUnitPlacement.single(outside).geometry_models(context.scenario),
+        player_id="player-a",
+        enemy_deployment_zones=context.enemy_deployment_zones,
+        deployment_zones=state.mission_setup.deployment_zones,
+    )
+    assert policy.enemy_distance_inches == 6
+    assert policy.distance_grant_source_ids == (rule.SOURCE_RULE_ID,)
+
+
 def test_warp_rifts_matching_greater_daemon_anchor_allows_deep_strike_outside_shadow() -> None:
     state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
     target_pose = Pose.at(x=30.0, y=22.0, z=0.0, facing_degrees=0.0)
