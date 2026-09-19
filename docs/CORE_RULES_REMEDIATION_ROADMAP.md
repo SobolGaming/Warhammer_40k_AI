@@ -4958,6 +4958,9 @@ same-phase disembark list. Attached component identity and physical model histor
 preserve the lock. Ordinary/reactive movement cannot erase it. Existing explicit
 disembark exemptions remain limited to disembark setup. Both option enumeration
 and acceptance use the shared rule; stale eligibility fails before queue pop.
+Return-on-death setup classification is independently checked against accepted
+target identity and pre-return model history, so coordinated changes to a
+completion flag and its stored setup record are rejected on restore (R61-001).
 
 The reviewed 18.02 row, source package, provenance, bug-class search, contract 27
 migration and acceptance evidence are in [Order 61 scope and proof](ORDER_61_SCOPE_PLAN.md).

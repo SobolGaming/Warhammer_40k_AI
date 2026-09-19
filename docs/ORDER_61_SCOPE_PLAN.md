@@ -18,8 +18,8 @@ second-provider agreement or official ownership of the mirror is asserted.
 including the arrivals used by repositioning. Its required `setup_kind` now
 distinguishes those placements from ordinary and reactive witnessed movement.
 The round and actual turn player determine expiry; the moving unit's owner is
-not the turn clock. Existing restore reconstructs all records from completion
-events, so setup history cannot be silently dropped or relabeled as movement.
+not the turn clock. Restore reconstructs records from completion events after
+independently authenticating return-on-death setup classification.
 
 `transport_embark_validation` is extracted from the over-budget `transports`
 module. Its required typed history and turn arguments are supplied by both
@@ -30,9 +30,23 @@ predicate before a finite choice leaves the queue. The mutation owner remains
 the ordinary movement service. Reactive movement has no separate Embark mutation
 path; its completion cannot erase earlier setup authority. Return-on-death also
 records setup when the canonical rules unit had no living models before return.
-Its completion carries the actual turn owner and explicit unit presence evidence;
-restore reconstructs this history too. Returning one model to a surviving unit
-does not create unit setup history.
+Its completion carries the actual turn owner and a derived setup flag. Restore
+checks that flag against the shared model-authority timeline, whose accepted
+decisions, pending occurrences, destruction causes and reversible model
+mutations establish whether any member of the rules unit was alive immediately
+before the return. The accepted pending target selects the canonical rules unit;
+the completion's unit ID must agree. Historical model lineage includes attached
+components and catalog model history. Returning one model to a surviving unit
+does not create unit setup history, even if that survivor dies later.
+
+R61-001 exposed coordinated edits to the completion flag and stored phase
+history. Regressions now reject both erasing whole-unit setup and inventing
+setup for a model returned to a surviving unit, including later destruction and
+completion target substitution. No new event snapshot or boolean supplies the
+independent authority. The bug-class search found this flag's only history
+consumer in `completion_phase_record`; lifecycle restore authenticates it before
+reconstructing phase history. Other setup routes retain their typed placement
+transition evidence.
 
 The same bug-class search traced all `resolve_embark`, `with_embarked_unit` and
 `apply_embark_to_battlefield` consumers. Pregame formation embarkation is before
@@ -44,7 +58,9 @@ generic hook family, faction content or alternative adapter path is added.
 
 Contract 27 versions the required private history field and the new typed
 `embark_after_setup_forbidden` diagnostic. The ordinary finite/parameterized
-submission envelopes and viewer redaction remain shared. See
+submission envelopes and viewer redaction remain shared. R61-001 strengthens
+restore validation within that existing contract and adds no payload field,
+decision family or viewer-visible behavior. See
 [the migration](../contracts/migrations/26-to-27.md) and
 [performance evidence](performance/order61/README.md).
 

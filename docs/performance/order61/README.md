@@ -33,13 +33,65 @@ uv run --no-sync python scripts/measure_order61.py --output docs/performance/ord
 Machine-readable samples, input hashes and budgets are in `base.json` and
 `head.json`. Final gate outcomes are recorded in `validation.json`.
 
+## R61-001 restore diagnostic
+
+`restore-base.json` and `restore-head.json` compare complete lifecycle restore
+on the same whole-unit return checkpoint, against PR commit `6f61af54` and the
+repaired runtime. Seven serial samples include the first cold restore. JSON
+parsing, checkpoint construction and the equality assertion are outside the
+timer. The checkpoint contains a real accepted return decision and authenticated
+destruction/placement evidence, followed by primary scoring. No coverage or
+competing test workers run during measurement. Machine, input and script hashes
+are retained in each report.
+
+The initial diagnostic is preserved in `restore-v1-base.json` and
+`restore-v1-head.json`. Its provisional two-second absolute ceiling failed on
+**both** revisions because cold catalog initialization took about six seconds;
+that ceiling is not reported as passed. Budget policy
+`order61-return-restore-regression-v2` instead applies the already chosen 20%
+plus 20 ms regression allowance to both the mean and observed maximum. This
+keeps cold initialization in the measured workload and compares the added
+restore check to the same baseline cost. It is a checkpoint regression limit,
+not a per-game budget or full-game certification.
+
+Create the fixed checkpoint from the existing canonical lifecycle fixture:
+
+```python
+import json
+import runpy
+from pathlib import Path
+
+fixtures = runpy.run_path("tests/unit/test_phase17n_primary_scoring_boundary_lifecycle.py")
+lifecycle = fixtures["_scored_command_boundary_after_mutation"](kind="return_on_death")
+Path("reports/order61-restore-checkpoint.json").write_text(
+    json.dumps(lifecycle.to_payload(), sort_keys=True), encoding="utf-8"
+)
+```
+
+Then, in an idle environment with a detached worktree at `6f61af54`:
+
+```text
+uv run --no-sync python scripts/measure_order61_restore.py --checkpoint reports/order61-restore-checkpoint.json --output docs/performance/order61/restore-base.json --revision 6f61af54e81c0acf2b47325175dc29b7a30171b3 --runtime-src <base-worktree>/src
+uv run --no-sync python scripts/measure_order61_restore.py --checkpoint reports/order61-restore-checkpoint.json --output docs/performance/order61/restore-head.json --revision <engine-build-id>
+```
+
+The matched run averaged 1.394 seconds on base and 1.336 seconds on the repaired
+runtime; observed maxima were 6.947 and 6.451 seconds. Both v2 regression limits
+passed. These small samples do not establish a speedup.
+
+The code-quality gate checks matched inputs and regression limits, and audits
+that restore uses the shared timeline once outside the completion loop. The
+original Embark-query results above describe the initial Order 61 implementation;
+R61-001 changes only restore validation.
+
 ## Final validation
 
-The complete behavioral suite passed **8,398 tests** with **85.11% coverage**
-(85% required), followed by **527 passing code-quality tests** without
+The complete behavioral suite passed **8,402 tests** with **85.11% coverage**
+(85% required), followed by **529 passing code-quality tests** without
 coverage. Both used 64 xdist workers and work stealing. The behavioral run used
-the bundled Node PATH prefix and produced the complete successful JUnit profile
-used to regenerate all eight shards. The exact fail-closed shard check passed.
+the bundled Node PATH prefix. The existing eight-shard inventory remains complete:
+this repair changes existing test files without adding or removing a behavioral
+file. The exact fail-closed shard check passed.
 
 Ruff, formatting, mypy, Pyright, all 11 import contracts and pre-commit passed.
 Source and engine generators, contract compatibility against the exact base,

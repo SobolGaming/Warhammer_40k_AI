@@ -77,3 +77,75 @@ def test_order61_component_performance_has_matched_inputs_and_budget() -> None:
         + base["budgets"]["mean_additive_seconds"]
     )
     assert head["maximum_seconds"] <= base["budgets"]["maximum_seconds"]
+
+
+def test_return_setup_restore_uses_shared_historical_model_authority() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    owner = ast.parse((engine / "phase_movement_history.py").read_text(encoding="utf-8"))
+    validator = next(
+        node
+        for node in owner.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "validate_return_on_death_setup_authority"
+    )
+    calls = [node for node in ast.walk(validator) if isinstance(node, ast.Call)]
+    timeline_builds = [
+        node
+        for node in calls
+        if isinstance(node.func, ast.Name) and node.func.id == "build_model_authority_timeline"
+    ]
+    assert len(timeline_builds) == 1
+    assert not any(
+        timeline_builds[0] in tuple(ast.walk(node))
+        for node in ast.walk(validator)
+        if isinstance(node, (ast.For, ast.While))
+    )
+    assert {arg.arg for arg in timeline_builds[0].keywords} == {
+        "state",
+        "event_records",
+        "decision_records",
+    }
+    assert any(
+        isinstance(node.func, ast.Attribute) and node.func.attr == "has_living_model_before_event"
+        for node in calls
+    )
+    restore = ast.parse((engine / "lifecycle_restore_consistency.py").read_text(encoding="utf-8"))
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == validator.name
+        for node in ast.walk(restore)
+    )
+
+
+def test_return_setup_restore_performance_is_matched_and_within_budget() -> None:
+    directory = ROOT / "docs/performance/order61"
+    base, head = (
+        json.loads((directory / f"restore-{name}.json").read_text()) for name in ("base", "head")
+    )
+    for field in (
+        "workload_id",
+        "platform",
+        "python",
+        "cpu",
+        "memory_bytes",
+        "cpu_allocation",
+        "concurrency",
+        "checkpoint_sha256",
+        "script_sha256",
+        "lock_sha256",
+        "budgets",
+    ):
+        assert base[field] == head[field], field
+    for report in (base, head):
+        assert len(report["samples_seconds"]) == 7
+        assert report["completion_rate"] == 1
+        assert report["full_game_certified"] is False
+    assert head["mean_seconds"] <= (
+        base["mean_seconds"] * base["budgets"]["mean_ratio"]
+        + base["budgets"]["mean_additive_seconds"]
+    )
+    assert head["maximum_seconds"] <= (
+        base["maximum_seconds"] * base["budgets"]["maximum_ratio"]
+        + base["budgets"]["maximum_additive_seconds"]
+    )

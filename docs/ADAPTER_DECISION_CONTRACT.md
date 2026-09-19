@@ -6281,7 +6281,11 @@ movement records null. This field is not added to viewer projections or event
 metadata. Existing shared viewer redaction and finite option rules apply.
 Return-on-death completions now carry the actual `active_player_id`, canonical
 `unit_instance_id` and boolean `unit_set_up`. Returning a model to a surviving
-rules unit does not add unit setup history. Existing return event visibility
+rules unit does not add unit setup history. Restore independently derives
+`unit_set_up` from authenticated pre-return model history and binds the canonical
+unit ID to the accepted return target before comparing stored setup history.
+Coordinated edits to the completion flag and phase history are rejected.
+Existing return event visibility
 applies to these fields. Contract 27 versions persistence and replay; see the
 [migration](../contracts/migrations/26-to-27.md). No new decision family, proposal
 kind or visibility permission is introduced.

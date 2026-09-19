@@ -14,6 +14,7 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -256,3 +257,61 @@ def validate_phase_movement_state(state: GameState) -> None:
         for row in rows
     ):
         raise GameLifecycleError("Phase movement history identity drifted.")
+
+
+def validate_return_on_death_setup_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
+    """Authenticate setup classification before trusting completion-derived history.
+
+    The shared timeline authenticates return decisions, pending occurrences and
+    destruction causes, then reverses subsequent mutations. The completion flag
+    is only an assertion of that independently reconstructed pre-return state.
+    """
+    from warhammer40k_core.engine.fight_model_authority_history import (
+        build_model_authority_timeline,
+        historical_rules_unit_model_ids,
+    )
+    from warhammer40k_core.engine.return_on_death import (
+        RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE,
+        PendingReturnOnDeath,
+        PendingReturnOnDeathPayload,
+    )
+
+    completions = tuple(
+        (index, event)
+        for index, event in enumerate(event_records)
+        if event.event_type == RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE
+    )
+    if not completions:
+        return
+    timeline = build_model_authority_timeline(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
+    for index, event in completions:
+        payload = event.payload
+        if not isinstance(payload, dict) or not isinstance(payload.get("pending"), dict):
+            raise GameLifecycleError("Return-on-death setup requires pending authority.")
+        # The timeline has bound this pending occurrence to the accepted request,
+        # roll, placement and stored pending state. Do not select the rules unit
+        # from the completion's unauthenticated unit_instance_id.
+        pending = PendingReturnOnDeath.from_payload(
+            cast(PendingReturnOnDeathPayload, payload["pending"])
+        )
+        view = rules_unit_view_by_id(
+            state=state, unit_instance_id=pending.destroyed_unit_instance_id
+        )
+        if payload.get("unit_instance_id") != view.unit_instance_id:
+            raise GameLifecycleError("Return-on-death setup rules-unit authority drifted.")
+        model_ids = historical_rules_unit_model_ids(
+            state=state, event_records=event_records, unit_instance_id=view.unit_instance_id
+        )
+        unit_set_up = not any(
+            timeline.has_living_model_before_event(model_instance_id=model_id, event_index=index)
+            for model_id in sorted(model_ids)
+        )
+        if payload.get("unit_set_up") is not unit_set_up:
+            raise GameLifecycleError("Return-on-death setup differs from pre-return authority.")

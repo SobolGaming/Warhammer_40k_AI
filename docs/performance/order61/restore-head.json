@@ -1,0 +1,37 @@
+{
+  "workload_id": "order61-r61-001-return-checkpoint-restore-v1",
+  "revision": "c74d1f0d72926d951fbc2d28c9d0526865dcc4f2e4acf7f5c9e5e2f37b8f3c89",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "GameLifecycle.from_payload; parsing and round-trip comparison excluded; first sample cold",
+  "checkpoint_sha256": "6de732374f5ca200ac29b3592a04b4def6c36f4accc64704ff8b392b6e4b01da",
+  "script_sha256": "616e48989790e57a32060aa58e1d9fdf92fca0246b73e3a7e484344f7268cad2",
+  "lock_sha256": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+  "samples_seconds": [
+    6.450942900002701,
+    0.4752955000149086,
+    0.5045758000051137,
+    0.5190770000044722,
+    0.4817832999979146,
+    0.45401489999494515,
+    0.46393980001448654
+  ],
+  "mean_seconds": 1.3356613142906488,
+  "median_seconds": 0.4817832999979146,
+  "p95_seconds": 6.450942900002701,
+  "maximum_seconds": 6.450942900002701,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "id": "order61-return-restore-regression-v2",
+    "mean_ratio": 1.2,
+    "mean_additive_seconds": 0.02,
+    "maximum_ratio": 1.2,
+    "maximum_additive_seconds": 0.02
+  }
+}
