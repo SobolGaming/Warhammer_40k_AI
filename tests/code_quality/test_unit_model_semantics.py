@@ -520,7 +520,7 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
         assert "components" not in attribute_names
 
     for path, function_names in (
-        (TRANSPORTS, ("resolve_embark",)),
+        (TRANSPORTS.with_name("transport_embark_validation.py"), ("resolve_embark",)),
         (
             MOVEMENT_TRANSPORTS,
             (
@@ -633,7 +633,9 @@ def test_p19_reserve_departure_is_prepared_before_authoritative_mutation() -> No
 
 
 def test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cleanup() -> None:
-    resolve_embark = _function_node(path=TRANSPORTS, function_name="resolve_embark")
+    resolve_embark = _function_node(
+        path=TRANSPORTS.with_name("transport_embark_validation.py"), function_name="resolve_embark"
+    )
     cargo_additions = tuple(
         node
         for node in ast.walk(resolve_embark)

@@ -31,7 +31,6 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import (
     CORE_HAZARD_ROLLS_RULE_ID,
@@ -94,11 +93,9 @@ from warhammer40k_core.engine.transport_disembark_state import (
     validate_transport_override_tuple as _validate_transport_override_tuple,
 )
 from warhammer40k_core.engine.transport_embark_groups import (
-    cargo_model_count,
-    embark_transition_batch_for_rules_unit,
-    embarking_rules_unit_placement,
     remove_embarking_rules_unit_from_battlefield,
 )
+from warhammer40k_core.engine.transport_embark_validation import resolve_embark as resolve_embark
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
@@ -106,9 +103,6 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
-from warhammer40k_core.engine.unit_rule_effects import (
-    embark_transport_forbidden_effect_source_ids,
-)
 from warhammer40k_core.engine.weapon_instances import equipped_weapon_instance_by_id
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
@@ -134,7 +128,7 @@ class TransportOperationViolationCode(StrEnum):
     UNIT_ALREADY_EMBARKED = "unit_already_embarked"
     UNIT_NOT_EMBARKED = "unit_not_embarked"
     UNIT_DID_NOT_START_PHASE_EMBARKED = "unit_did_not_start_phase_embarked"
-    EMBARK_AFTER_DISEMBARK_FORBIDDEN = "embark_after_disembark_forbidden"
+    EMBARK_AFTER_SETUP_FORBIDDEN = "embark_after_setup_forbidden"
     EMBARK_FORBIDDEN_BY_EFFECT = "embark_forbidden_by_effect"
     EMBARK_DISTANCE = "embark_distance"
     DISEMBARK_DISTANCE = "disembark_distance"
@@ -1833,172 +1827,6 @@ class FiringDeckResolution:
         return resolution
 
 
-def resolve_embark(
-    *,
-    scenario: BattlefieldScenario,
-    cargo_state: TransportCargoState,
-    selection: EmbarkSelection,
-    unit_placement: UnitPlacement,
-    transport_placement: UnitPlacement,
-    persisting_effects: tuple[PersistingEffect, ...] = (),
-) -> EmbarkResolution:
-    if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("resolve_embark requires a BattlefieldScenario.")
-    if type(cargo_state) is not TransportCargoState:
-        raise GameLifecycleError("resolve_embark requires a TransportCargoState.")
-    if type(selection) is not EmbarkSelection:
-        raise GameLifecycleError("resolve_embark requires an EmbarkSelection.")
-    if type(unit_placement) is not UnitPlacement:
-        raise GameLifecycleError("resolve_embark unit_placement must be UnitPlacement.")
-    if type(transport_placement) is not UnitPlacement:
-        raise GameLifecycleError("resolve_embark transport_placement must be UnitPlacement.")
-    if type(persisting_effects) is not tuple:
-        raise GameLifecycleError("resolve_embark persisting_effects must be a tuple.")
-    for effect in persisting_effects:
-        if type(effect) is not PersistingEffect:
-            raise GameLifecycleError("resolve_embark persisting_effects must contain effects.")
-    active_cargo = cargo_state.for_movement_phase(battle_round=selection.battle_round)
-    scenario.unit_instance_for_placement(unit_placement)
-    transport = scenario.unit_instance_for_placement(transport_placement)
-    rules_unit, rules_unit_placement = embarking_rules_unit_placement(
-        scenario=scenario,
-        selected_unit_placement=unit_placement,
-    )
-    violations: list[TransportOperationViolation] = []
-    _append_transport_common_violations(
-        violations=violations,
-        cargo_state=active_cargo,
-        selection_player_id=selection.player_id,
-        transport=transport,
-        transport_placement=transport_placement,
-    )
-    if selection.unit_instance_id not in {
-        rules_unit.unit_instance_id,
-        unit_placement.unit_instance_id,
-    }:
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Embark placement does not match the selected rules unit.",
-                unit_instance_id=selection.unit_instance_id,
-            )
-        )
-    if rules_unit_placement.player_id != selection.player_id:
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.FRIENDLY_TRANSPORT_REQUIRED,
-                message="Embarking unit must belong to the selected player.",
-                unit_instance_id=unit_placement.unit_instance_id,
-            )
-        )
-    if any(
-        active_cargo.contains_unit(component_id)
-        for component_id in rules_unit.component_unit_instance_ids
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.UNIT_ALREADY_EMBARKED,
-                message="Unit is already embarked in this Transport.",
-                unit_instance_id=rules_unit.unit_instance_id,
-            )
-        )
-    forbidden_source_ids = embark_transport_forbidden_effect_source_ids(
-        persisting_effects,
-        owner_player_id=selection.player_id,
-    )
-    for source_rule_id in forbidden_source_ids:
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.EMBARK_FORBIDDEN_BY_EFFECT,
-                message="A persisting rule effect forbids this unit from Embarking.",
-                unit_instance_id=rules_unit.unit_instance_id,
-                source_rule_id=source_rule_id,
-            )
-        )
-    if any(
-        active_cargo.unit_disembarked_this_phase(component_id)
-        for component_id in rules_unit.component_unit_instance_ids
-    ) and not (
-        selection.has_override(TransportRestrictionOverrideKind.ALLOW_EMBARK_AFTER_DISEMBARK)
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.EMBARK_AFTER_DISEMBARK_FORBIDDEN,
-                message="Unit cannot Embark after it Disembarked in the same phase.",
-                unit_instance_id=rules_unit.unit_instance_id,
-                source_rule_id=_CORE_TRANSPORT_RULE_ID,
-            )
-        )
-    if any(
-        not active_cargo.capacity_profile.allows_unit(component.unit)
-        for component in rules_unit.living_components
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.CAPACITY_EXCEEDED,
-                message="Transport capacity profile does not allow this unit.",
-                unit_instance_id=rules_unit.unit_instance_id,
-                source_rule_id=active_cargo.capacity_profile.source_id,
-            )
-        )
-    if (
-        cargo_model_count(
-            scenario=scenario,
-            embarked_unit_instance_ids=active_cargo.embarked_unit_instance_ids,
-        )
-        + len(rules_unit.alive_models())
-        > active_cargo.capacity_profile.max_model_count
-    ):
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.CAPACITY_EXCEEDED,
-                message="Transport capacity would be exceeded.",
-                unit_instance_id=rules_unit.unit_instance_id,
-                source_rule_id=active_cargo.capacity_profile.source_id,
-            )
-        )
-    transport_models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=transport_placement,
-    )
-    for model in rules_unit_placement.geometry_models(scenario):
-        if not _model_within_any_transport_model(
-            model,
-            transport_models=transport_models,
-            distance_inches=_EMBARK_DISTANCE_INCHES,
-        ):
-            violations.append(
-                TransportOperationViolation(
-                    violation_code=TransportOperationViolationCode.EMBARK_DISTANCE,
-                    message="Embark requires every model to end within 3 inches of the Transport.",
-                    unit_instance_id=rules_unit.unit_instance_id,
-                    model_instance_id=model.model_id,
-                    blocker_id=transport_placement.unit_instance_id,
-                    source_rule_id=_CORE_TRANSPORT_RULE_ID,
-                )
-            )
-    if violations:
-        return EmbarkResolution(
-            selection=selection,
-            violations=tuple(violations),
-            updated_cargo_state=None,
-            transition_batch=None,
-        )
-    updated_cargo = active_cargo
-    for component_id in rules_unit_placement.component_unit_instance_ids:
-        updated_cargo = updated_cargo.with_embarked_unit(component_id)
-    return EmbarkResolution(
-        selection=selection,
-        violations=(),
-        updated_cargo_state=updated_cargo,
-        transition_batch=embark_transition_batch_for_rules_unit(
-            rules_unit_placement=rules_unit_placement,
-            transport_unit_instance_id=transport_placement.unit_instance_id,
-            source_rule_id=_CORE_TRANSPORT_RULE_ID,
-        ),
-    )
-
-
 def apply_embark_to_battlefield(
     *,
     battlefield_state: BattlefieldRuntimeState,
@@ -2920,18 +2748,6 @@ def _enemy_unit_ids_engaged_with_transport(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=source_id,
-    )
-
-
-def _model_within_any_transport_model(
-    model: Model,
-    *,
-    transport_models: tuple[Model, ...],
-    distance_inches: float,
-) -> bool:
-    return any(
-        model.base_distance_to(transport_model) <= distance_inches
-        for transport_model in transport_models
     )
 
 

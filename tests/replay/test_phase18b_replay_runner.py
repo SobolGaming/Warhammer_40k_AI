@@ -210,7 +210,7 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v20-ability-instances"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v21-setup-turn-history"
 
 
 def test_replay_v8_round_trips_objective_control_record_boundary_authority() -> None:

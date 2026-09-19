@@ -251,6 +251,8 @@ def test_embark_removes_unit_to_transport_cargo_and_emits_records() -> None:
     cargo_state = _cargo_state(transport=transport)
 
     resolution = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=cargo_state,
         selection=EmbarkSelection(
@@ -311,6 +313,8 @@ def test_embark_rejects_unit_forbidden_by_persisting_effect() -> None:
     )
 
     resolution = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=_cargo_state(transport=transport),
         selection=EmbarkSelection(
@@ -346,6 +350,8 @@ def test_embark_validates_distance_for_every_attached_rules_unit_model() -> None
     )
 
     resolution = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=_cargo_state(transport=transport, max_model_count=6),
         selection=EmbarkSelection(
@@ -388,6 +394,8 @@ def test_embark_ignores_wholly_destroyed_attached_component(
     )
 
     resolution = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=_cargo_state(transport=transport, max_model_count=6),
         selection=EmbarkSelection(
@@ -6009,7 +6017,25 @@ def test_embark_after_disembark_needs_explicit_override() -> None:
     transport_placement = scenario.battlefield_state.unit_placement_by_id(
         transport.unit_instance_id
     )
+    from warhammer40k_core.engine.phase_movement_history import PhaseMovementRecord
+
+    history = (
+        PhaseMovementRecord(
+            event_id="test:disembark",
+            battle_round=1,
+            turn_player_id="player-a",
+            phase=BattlePhase.MOVEMENT,
+            unit_instance_id=passenger.unit_instance_id,
+            model_instance_ids=tuple(
+                sorted(model.model_instance_id for model in passenger.own_models)
+            ),
+            is_surge=False,
+            setup_kind=BattlefieldPlacementKind.DISEMBARK,
+        ),
+    )
     blocked_embark = resolve_embark(
+        movement_history=history,
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=disembarked_cargo,
         selection=EmbarkSelection(
@@ -6023,6 +6049,8 @@ def test_embark_after_disembark_needs_explicit_override() -> None:
         transport_placement=transport_placement,
     )
     allowed_embark = resolve_embark(
+        movement_history=history,
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=disembarked_cargo,
         selection=EmbarkSelection(
@@ -6042,7 +6070,7 @@ def test_embark_after_disembark_needs_explicit_override() -> None:
         transport_placement=transport_placement,
     )
 
-    assert TransportOperationViolationCode.EMBARK_AFTER_DISEMBARK_FORBIDDEN in {
+    assert TransportOperationViolationCode.EMBARK_AFTER_SETUP_FORBIDDEN in {
         violation.violation_code for violation in blocked_embark.violations
     }
     assert allowed_embark.is_valid
@@ -6062,6 +6090,8 @@ def test_embark_reports_all_local_validation_failures_without_mutation_records()
         transport.unit_instance_id
     )
     result = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=TransportCargoState(
             player_id="player-a",
@@ -7827,6 +7857,8 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         )
     with pytest.raises(GameLifecycleError, match="persisting_effects must be a tuple"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=scenario,
             cargo_state=_cargo_state(transport=transport),
             selection=embark_selection,
@@ -7840,6 +7872,8 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         )
     with pytest.raises(GameLifecycleError, match="must contain effects"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=scenario,
             cargo_state=_cargo_state(transport=transport),
             selection=embark_selection,
@@ -7852,6 +7886,8 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
             persisting_effects=cast(Any, (object(),)),
         )
     embark_result = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=_cargo_state(transport=transport),
         selection=embark_selection,
@@ -8540,6 +8576,8 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
         ),
     )
     embark_resolution = resolve_embark(
+        movement_history=(),
+        turn_player_id="player-a",
         scenario=scenario,
         cargo_state=_cargo_state(transport=transport),
         selection=EmbarkSelection(
@@ -8826,6 +8864,8 @@ def test_transport_resolvers_fail_fast_on_wrong_domain_objects() -> None:
 
     with pytest.raises(GameLifecycleError, match="BattlefieldScenario"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=cast(BattlefieldScenario, object()),
             cargo_state=cargo_state,
             selection=embark_selection,
@@ -8834,6 +8874,8 @@ def test_transport_resolvers_fail_fast_on_wrong_domain_objects() -> None:
         )
     with pytest.raises(GameLifecycleError, match="TransportCargoState"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=scenario,
             cargo_state=cast(TransportCargoState, object()),
             selection=embark_selection,
@@ -8842,6 +8884,8 @@ def test_transport_resolvers_fail_fast_on_wrong_domain_objects() -> None:
         )
     with pytest.raises(GameLifecycleError, match="EmbarkSelection"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=scenario,
             cargo_state=cargo_state,
             selection=cast(EmbarkSelection, object()),
@@ -8850,6 +8894,8 @@ def test_transport_resolvers_fail_fast_on_wrong_domain_objects() -> None:
         )
     with pytest.raises(GameLifecycleError, match="unit_placement"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=scenario,
             cargo_state=cargo_state,
             selection=embark_selection,
@@ -8858,6 +8904,8 @@ def test_transport_resolvers_fail_fast_on_wrong_domain_objects() -> None:
         )
     with pytest.raises(GameLifecycleError, match="transport_placement"):
         resolve_embark(
+            movement_history=(),
+            turn_player_id="player-a",
             scenario=scenario,
             cargo_state=cargo_state,
             selection=embark_selection,
@@ -10418,3 +10466,44 @@ def _wargear_by_id(catalog: ArmyCatalog, wargear_id: str) -> Wargear:
         if wargear.wargear_id == wargear_id:
             return wargear
     raise AssertionError(f"Missing test wargear: {wargear_id}")
+
+
+@pytest.mark.parametrize("selected_component", ["bodyguard", "leader"])
+def test_order61_attached_setup_history_uses_physical_identity(selected_component: str) -> None:
+    from warhammer40k_core.engine.phase_movement_history import PhaseMovementRecord
+
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    selected = bodyguard if selected_component == "bodyguard" else leader
+    history = (
+        PhaseMovementRecord(
+            event_id="order61:old-identity-setup",
+            battle_round=1,
+            turn_player_id="player-b",
+            phase=BattlePhase.SHOOTING,
+            unit_instance_id="historical-rules-unit",
+            model_instance_ids=(leader.own_models[0].model_instance_id,),
+            is_surge=False,
+            setup_kind=BattlefieldPlacementKind.DISEMBARK,
+        ),
+    )
+    resolution = resolve_embark(
+        scenario=scenario,
+        movement_history=history,
+        turn_player_id="player-b",
+        cargo_state=_cargo_state(transport=transport, max_model_count=6),
+        selection=EmbarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=selected.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            movement_phase_action=TransportMovementStatus.NORMAL_MOVE,
+        ),
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(selected.unit_instance_id),
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+    assert not resolution.is_valid
+    assert {row.violation_code for row in resolution.violations} == {
+        TransportOperationViolationCode.EMBARK_AFTER_SETUP_FORBIDDEN
+    }

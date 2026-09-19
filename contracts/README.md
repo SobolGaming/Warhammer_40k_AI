@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `26.0.0`
+Contract version: `27.0.0`
+
+Order 61 / contract 27 rejects embark after same-turn battlefield setup.
+See [the migration](migrations/26-to-27.md).
 
 Order 56 / contract 26 selects one source instance of duplicated Core and weapon
 abilities through shared decisions. See [the migration](migrations/25-to-26.md).

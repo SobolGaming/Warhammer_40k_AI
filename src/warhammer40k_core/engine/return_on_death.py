@@ -35,6 +35,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.return_placement_legality import (
     validate_returned_model_endpoints,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 
@@ -442,13 +443,20 @@ def apply_return_on_death_placement_decision(
         ruleset_descriptor=ruleset_descriptor,
     )
     unit_placement = submission.require_unit_placement()
+    if state.active_player_id is None:
+        raise GameLifecycleError("Return-on-death setup requires the current turn owner.")
+    view = rules_unit_view_by_id(state=state, unit_instance_id=pending.destroyed_unit_instance_id)
+    unit_set_up = not view.alive_models()
     _restore_returned_target(state=state, pending=pending, placement=unit_placement)
     resolved = state.resolve_pending_return_on_death(pending.pending_id)
-    decisions.event_log.append(
+    event = decisions.event_log.append(
         RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE,
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "unit_instance_id": view.unit_instance_id,
+            "unit_set_up": unit_set_up,
             "phase": pending.trigger_phase,
             "request_id": request.request_id,
             "result_id": result.result_id,
@@ -456,6 +464,13 @@ def apply_return_on_death_placement_decision(
             "placement": unit_placement.to_payload(),
         },
     )
+    from warhammer40k_core.engine.phase_movement_history import completion_phase_record
+
+    record = completion_phase_record(
+        state=state, event=event, turn_player_id=state.active_player_id
+    )
+    if record is not None:
+        state.phase_movement_history.append(record)
     return resolved
 
 

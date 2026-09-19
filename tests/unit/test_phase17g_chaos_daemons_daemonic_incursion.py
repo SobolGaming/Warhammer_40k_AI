@@ -1512,6 +1512,17 @@ def test_realm_of_chaos_replay_rejects_coordinated_arrival_placement_kind_tamper
     for placement in transition_placements:
         placement["placement_kind"] = BattlefieldPlacementKind.STRATEGIC_RESERVES.value
 
+    # Forge the new setup evidence too, so this still reaches proposal authority.
+    setup_records = [
+        row
+        for row in payload["state"]["phase_movement_history"]
+        if row["unit_instance_id"] == arrival_payload["unit_instance_id"]
+        and row["setup_kind"] == BattlefieldPlacementKind.DEEP_STRIKE.value
+    ]
+    assert setup_records
+    for row in setup_records:
+        row["setup_kind"] = BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+
     with pytest.raises(
         GameLifecycleError,
         match="Reserve arrival request/result proposal authority drift",
