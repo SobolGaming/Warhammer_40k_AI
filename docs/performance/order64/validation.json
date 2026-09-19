@@ -1,0 +1,75 @@
+{
+  "order": 64,
+  "validated_on": "2026-09-19",
+  "base_commit": "d3a9d3b4a738b760db974a72d09a95bc368160d5",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c225e8a822373202e37fc7859d393a1562fa37ba1d7b0759e51909d0c469d5fe",
+  "platform": "Windows 11; Python 3.14.5; Node 24.19.0",
+  "behavioral": {
+    "tests": 8467,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 978.513,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "b1f8fb042293264be39826d490c1d87eb899031cdf4a028fda26b19bee94452d",
+    "coverage_percent": 85.1171908631526,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_kind": "SQLite unclosed-connection ResourceWarnings, also present in base validation"
+  },
+  "code_quality": {
+    "tests": 545,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 331.193,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "9284ce7950d3ff192125fb691288fa8912e94189601cd8917de135d850c7297d",
+    "coverage": false
+  },
+  "other_gates": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "eight_shard_inventory": "passed",
+    "import_linter_11_contracts": "passed",
+    "pre_commit_all_files": "passed",
+    "source_generator_check": "passed",
+    "engine_identity_check": "passed",
+    "external_contract_exact_base_check": "passed",
+    "typescript_generated_client_check": "passed",
+    "typescript_typecheck": "passed",
+    "typescript_unit_tests_5": "passed",
+    "typescript_conformance_scenario": "passed",
+    "installed_contract_wheel_smoke": "passed",
+    "staged_diff_check": "passed",
+    "staged_source_pin_byte_check": "passed",
+    "generated_example_identity_diff_audit": "passed"
+  },
+  "typescript_execution": "npm package-script entry points, with bundled Node and npm 11.6.0 installed in ignored local reports tooling.",
+  "typescript_conformance_assertions": 342,
+  "component_performance": {
+    "evidence": [
+      "base-reconstruction.json",
+      "head-reconstruction.json",
+      "budgets.json"
+    ],
+    "timed_samples_per_revision": 42,
+    "independent_profile_samples_per_revision": 6,
+    "recorded_component_limits_passed": true,
+    "largest_mean_increase_percent": 0.4268169426624224,
+    "largest_maximum_increase_percent": 0.5021237390472333,
+    "largest_total_profiled_call_increase_percent": 0.030427197857929578,
+    "gameplay_slice_measured": false,
+    "full_game_certified": false
+  },
+  "validation_notes": [
+    "The initial behavioral coverage run passed 8430 tests with 36 failures: six stale identity/count/schema/deadline fixtures and thirty seeded combat paths affected by the changed rules/decision history. Required fields and explicit policies were corrected, and deterministic input identities were reselected without changing assertions or replacing RNG. All 49 affected-family regressions then passed; the complete final behavioral suite passed with coverage.",
+    "The initial quality run had one stale source-package count (40 rather than 41). Its corrected audit was included in the complete final quality run.",
+    "A preliminary component diagnostic preceded the final script/work metrics and overlapped a focused worker. It was retained locally and excluded from the qualified pair. Both final revisions were measured afresh, serially with no competing test/build workers; no incomplete sample or hard scenario was omitted.",
+    "No production code changed after the successful behavioral coverage run began. The eight-shard inventory was regenerated from its complete successful local JUnit profile."
+  ]
+}

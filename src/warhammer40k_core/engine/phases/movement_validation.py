@@ -171,7 +171,7 @@ def assert_move_units_step_complete_for_reinforcements(
     )
     if incomplete_selected_unit_ids:
         raise GameLifecycleError(message)
-    from warhammer40k_core.engine.phase_movement_history import surge_locked
+    from warhammer40k_core.engine.movement_locks import movement_lock_reason
 
     remaining_unit_ids = _remaining_move_units_unit_ids(
         scenario=_battlefield_scenario(state),
@@ -179,7 +179,7 @@ def assert_move_units_step_complete_for_reinforcements(
         selected_unit_ids=movement_state.selected_unit_ids,
         accounted_unplaced_model_ids=state.unavailable_model_ids(),
     )
-    if any(not surge_locked(state, unit_id) for unit_id in remaining_unit_ids):
+    if any(movement_lock_reason(state, unit_id) is None for unit_id in remaining_unit_ids):
         raise GameLifecycleError(message)
 
 
@@ -435,6 +435,10 @@ def _movement_unit_candidates(
                 transport_unit_instance_id=next(iter(component_transport_ids)),
             )
         else:
+            from warhammer40k_core.engine.ingress_lifetimes import ingress_movement_locked
+
+            if ingress_movement_locked(state, rules_unit.unit_instance_id):
+                continue
             if placed_component_ids_for_rules_unit != set(component_ids):
                 raise GameLifecycleError(
                     "Attached rules-unit components must share one battlefield location."

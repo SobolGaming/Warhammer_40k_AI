@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `29.0.0`
+Contract version: `30.0.0`
+
+Contract 30 applies Core reserve deadlines and post-ingress movement lifetimes.
+See [migration 29 to 30](migrations/29-to-30.md) for required historical fields,
+independent final-turn cleanup and the replay/persistence boundary.
 
 Contract 29 implements loaded reserve Transport ingress and inherited Rapid
 Disembark placement, including typed source-defined regions. The private

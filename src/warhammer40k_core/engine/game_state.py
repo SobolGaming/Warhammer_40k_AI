@@ -142,7 +142,6 @@ from warhammer40k_core.engine.mission_state_validation import (
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_scoring_policies_from_setup,
-    reserve_destruction_policy_from_scoring_policy,
 )
 from warhammer40k_core.engine.model_movement_history import (
     ModelMovementDistance,
@@ -254,7 +253,6 @@ from warhammer40k_core.engine.reserves import (
     StrategicReserveDeclaration,
     apply_reserve_destruction_to_battlefield,
     reserve_origin_from_token,
-    resolve_unarrived_reserve_destruction,
 )
 from warhammer40k_core.engine.return_on_death import (
     PendingReturnOnDeath,
@@ -5548,24 +5546,9 @@ class GameState:
         self.end_turn_cleanup_states.sort(key=lambda state: state.cleanup_id)
 
     def _resolve_unarrived_reserve_destruction_boundary(self, *, end_of_battle: bool) -> None:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Reserve destruction requires MissionSetup.")
-        if self.battlefield_state is None:
-            raise GameLifecycleError("Reserve destruction requires battlefield_state.")
-        policy = reserve_destruction_policy_from_scoring_policy(
-            mission_scoring_policies_from_setup(self.mission_setup).common_policy
-        )
-        destruction = resolve_unarrived_reserve_destruction(
-            reserve_states=tuple(self.reserve_states),
-            armies=tuple(self.army_definitions),
-            battlefield_state=self.battlefield_state,
-            policy=policy,
-            battle_round=self.battle_round,
-            end_of_battle=end_of_battle,
-        )
-        if not destruction.destroyed_model_instance_ids:
-            return
-        self._apply_unarrived_reserve_destruction(destruction=destruction)
+        from warhammer40k_core.engine.reserve_lifetime_boundary import resolve_boundary
+
+        resolve_boundary(self, end_of_battle=end_of_battle)
 
     def _apply_unarrived_reserve_destruction(
         self,

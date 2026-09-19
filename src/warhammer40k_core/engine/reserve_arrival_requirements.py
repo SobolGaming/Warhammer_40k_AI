@@ -106,6 +106,10 @@ def validate_status_fields(state: ReserveState) -> None:
         source_rule_id=state.required_arrival_source_rule_id,
         placement_kind=state.required_arrival_placement_kind,
     )
+    if type(state.destroyed_at_end_of_battle) is not bool or (
+        state.destroyed_at_end_of_battle and state.status is not ReserveStatus.DESTROYED
+    ):
+        raise GameLifecycleError("ReserveState final-turn destruction authority is invalid.")
     if state.status is ReserveStatus.IN_RESERVES:
         if state.arrived_battle_round is not None or state.arrived_phase is not None:
             raise GameLifecycleError("Unarrived ReserveState must not have arrival fields.")

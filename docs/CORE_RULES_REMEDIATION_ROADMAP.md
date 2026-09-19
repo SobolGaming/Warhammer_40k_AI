@@ -5007,3 +5007,29 @@ replayable pre-ingress root, with shared viewer redaction. See
 [component performance evidence](performance/order63/README.md).
 General reserve defaults, cleanup exceptions and post-ingress activity lifetimes
 remain Order 64; this does not close category 20 or claim final certification.
+
+
+## Order 64 / P20B implementation
+
+Core arrival/deadline defaults now follow reviewed 20.03. Accepted ingress and
+source-authorized battlefield departure history establish previously ingressed
+and repositioned exemptions; cargo follows the carrier reserve route. A
+source-bound mission policy remains an explicit override. Independent 20.01.02
+final-turn cleanup applies to all remaining reserve routes without producing
+model-destroyed reactions, and saved terminal state binds its actual boundary.
+
+The shared move lock lasts until the next actual Charge phase begins, including
+an ingress during or after Charge (which lasts into the following turn). It is
+consumed by ordinary, reactive, Charge and Fight movement, proposal validation,
+physical mutation and restore history. Cargo has independent eligibility.
+Repositioning retains same-turn movement history and timed effects; aura queries
+use current presence and geometry. Required historical fields advance the
+contract to 30, replay to v24 and persistence to v22.
+
+The dedicated loaded-Transport restore/fork guard preserves exact pre-ingress
+replay authentication. Versioned evidence covers ingress, Rapid Disembark and a
+later accepted decision, with separate serial timing and profiled work counts.
+Full-game performance is not certified. See [Order 64 scope and validation](ORDER_64_SCOPE_PLAN.md)
+and [performance evidence](performance/order64/README.md). Final local validation
+passed 8,467 behavioral tests at 85.12% coverage, all 545 quality tests and the
+required publishing gates. Order 65 and Order 66 remain separate.

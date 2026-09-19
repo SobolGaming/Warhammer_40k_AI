@@ -26,6 +26,7 @@ class PhaseMovementRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=Tru
     unit_instance_id: str
     model_instance_ids: tuple[str, ...]
     is_surge: bool
+    is_ingress: bool
     setup_kind: BattlefieldPlacementKind | None
 
     def __post_init__(self) -> None:
@@ -36,6 +37,10 @@ class PhaseMovementRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=Tru
             raise GameLifecycleError("Phase movement requires a positive round.")
         if type(self.phase) is not BattlePhase or type(self.is_surge) is not bool:
             raise GameLifecycleError("Phase movement requires a typed phase and Surge flag.")
+        if type(self.is_ingress) is not bool or (
+            self.is_ingress and (self.setup_kind is None or self.is_surge)
+        ):
+            raise GameLifecycleError("Phase movement requires a valid Ingress classification.")
         if self.setup_kind is not None and (
             type(self.setup_kind) is not BattlefieldPlacementKind or self.is_surge
         ):
@@ -57,6 +62,7 @@ class PhaseMovementRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=Tru
             "unit_instance_id": self.unit_instance_id,
             "model_instance_ids": list(self.model_instance_ids),
             "is_surge": self.is_surge,
+            "is_ingress": self.is_ingress,
             "setup_kind": None if self.setup_kind is None else self.setup_kind.value,
         }
 
@@ -106,6 +112,9 @@ def validate_battlefield_movement_locks(
     updated: BattlefieldRuntimeState,
 ) -> None:
     """Backstop all movement owners at the authoritative placement mutation boundary."""
+    from warhammer40k_core.engine.ingress_lifetimes import validate_ingress_movement_mutation
+
+    validate_ingress_movement_mutation(state=state, updated=updated)
     locked_models = {
         model_id
         for row in state.phase_movement_history
@@ -204,6 +213,7 @@ def completion_phase_record(
         model_instance_ids=model_ids,
         is_surge=event.event_type == "triggered_movement_resolved"
         and payload.get("triggered_movement_kind") == "surge",
+        is_ingress=event.event_type == "reinforcement_unit_arrived",
         setup_kind=setup_kind,
     )
 
@@ -230,6 +240,9 @@ def validate_phase_movement_history(*, state: GameState, events: tuple[EventReco
             )
         row = completion_phase_record(state=state, event=event, turn_player_id=owner)
         if row is not None:
+            from warhammer40k_core.engine.ingress_lifetimes import validate_ingress_movement_history
+
+            validate_ingress_movement_history(state, expected, row)
             for prior in expected:
                 same_occurrence = (prior.battle_round, prior.turn_player_id, prior.phase) == (
                     row.battle_round,

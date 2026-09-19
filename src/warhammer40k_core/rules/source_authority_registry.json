@@ -820,6 +820,46 @@
           "audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-19T19:06:00+00:00"
+        },
+        {
+          "row_id": "final-turn-cleanup",
+          "source_observation_sha256": "fc9ae9865a9ff5768c128a23b140896fd835e247b57a12d40581921479feb0e6",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "row_id": "reposition",
+          "source_observation_sha256": "9514885873681f10d48bfaa77bec2a5d4eaa2252ee58713a37f42269816b401f",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "row_id": "arrival",
+          "source_observation_sha256": "399d12f3d012a603c07d02cfa71d3db3d1793f9b2a1af3404d05835bd424d449",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "row_id": "ingress",
+          "source_observation_sha256": "db20f6042161945e5618e642f22c1e3950a2f26dc19dde772c9f14f143c75b25",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-19T21:33:00+00:00"
         }
       ],
       "legacy_observations": [
@@ -1406,6 +1446,18 @@
             "gw-11e-core-reserve-transport:ingress"
           ],
           "catalog_sha256": "284752ce215947df71e2d33ab66b4537cb46d84c3a90b029bbb6665a829f65f7"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-reserve-lifetimes",
+          "version": "maintained-app-mirrors-observed-2026-09-19",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-reserve-lifetimes:final-turn-cleanup",
+            "gw-11e-core-reserve-lifetimes:reposition",
+            "gw-11e-core-reserve-lifetimes:arrival",
+            "gw-11e-core-reserve-lifetimes:ingress"
+          ],
+          "catalog_sha256": "d77c1b5dac44496179649e545dd0ba130bf18b02a7f8c32c91fedf9a2b9c6672"
         }
       ]
     },

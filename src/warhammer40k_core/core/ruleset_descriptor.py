@@ -1661,12 +1661,12 @@ class MissionPolicyDescriptor:
     fixed_objective_missions_supported: bool
     terrain_objective_missions_supported: bool
     deployment_zone_source: MissionDeploymentZoneSource
-    reserves_arrival_blocked_battle_rounds: tuple[int, ...] = ()
+    reserves_arrival_blocked_battle_rounds: tuple[int, ...] = (1,)
     reserves_arrival_excludes_during_battle_strategic_reserves: bool = False
     reserve_destruction_timing: ReserveDestructionTimingKind = (
-        ReserveDestructionTimingKind.END_OF_BATTLE
+        ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N
     )
-    reserve_destruction_battle_round: int | None = None
+    reserve_destruction_battle_round: int | None = 3
     reserve_destruction_excludes_during_battle_strategic_reserves: bool = False
     reserve_destruction_only_declare_battle_formations: bool = False
 
@@ -1735,10 +1735,10 @@ class MissionPolicyDescriptor:
             fixed_objective_missions_supported=True,
             terrain_objective_missions_supported=False,
             deployment_zone_source=MissionDeploymentZoneSource.MISSION,
-            reserves_arrival_blocked_battle_rounds=(),
+            reserves_arrival_blocked_battle_rounds=(1,),
             reserves_arrival_excludes_during_battle_strategic_reserves=False,
-            reserve_destruction_timing=ReserveDestructionTimingKind.END_OF_BATTLE,
-            reserve_destruction_battle_round=None,
+            reserve_destruction_timing=ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N,
+            reserve_destruction_battle_round=3,
             reserve_destruction_excludes_during_battle_strategic_reserves=False,
             reserve_destruction_only_declare_battle_formations=False,
         )

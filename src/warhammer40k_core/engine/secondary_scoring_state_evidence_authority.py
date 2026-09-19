@@ -37,6 +37,7 @@ from warhammer40k_core.engine.primary_scoring_history_evidence import (
     primary_unit_destruction_state_ids_for_boundary,
     primary_unit_destruction_states_for_evidence,
 )
+from warhammer40k_core.engine.reserve_destruction import destruction_policy_for_terminal_state
 from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.scoring import (
@@ -431,7 +432,7 @@ def _validate_same_boundary_reserve_destructions(
             or reserve.destroyed_battle_round != record.battle_round
         ):
             continue
-        policy = reserve.destruction_deadline_policy
+        policy = destruction_policy_for_terminal_state(reserve)
         if policy.applies_at(battle_round=record.battle_round, end_of_battle=False):
             boundary_kind = "round-boundary"
         elif policy.applies_at(battle_round=record.battle_round, end_of_battle=True):

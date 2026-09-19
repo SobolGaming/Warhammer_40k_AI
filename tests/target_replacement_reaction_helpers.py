@@ -147,7 +147,7 @@ def fidelity_replacement_catalog(
 
 
 def fidelity_retained_replacement_scene(
-    *, game_id: str = "order56-retarget-05"
+    *, game_id: str = "order56-retarget-05-order64-2"
 ) -> tuple[GameLifecycle, dict[str, UnitInstance], DecisionRequest]:
     """Fight-phase Unending Fidelity shooting, paused before target revalidation."""
     from tests.phase15c_fight_order_helpers import fight_lifecycle
@@ -158,7 +158,7 @@ def fidelity_retained_replacement_scene(
     catalog, rifle, second = fidelity_replacement_catalog()
     lifecycle, units = fight_lifecycle(
         catalog=catalog,
-        # Preserve both nested casualties with the Order 56 source-inventory history.
+        # Preserve both nested casualties with the Order 64 rules identity.
         game_id=game_id,
         alpha_unit_ids=("old", "new", "unchanged"),
         enemy_unit_ids=("source",),

@@ -11,7 +11,7 @@ from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_f
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.phase_movement_history import current_unit_moves, surge_locked
+from warhammer40k_core.engine.phase_movement_history import current_unit_moves
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
     scenario_physical_enemy_rules_unit_ids,
@@ -164,7 +164,3 @@ def surge_endpoint_evidence(
         row["alternative_witness"] = validate_json_value(better.witness.to_payload())
         return row, "surge_maximum_approach_not_reached"
     return row, "surge_reachability_unresolved"
-
-
-def movement_lock_reason(state: GameState, unit_instance_id: str) -> str | None:
-    return "surge_movement_locked_this_phase" if surge_locked(state, unit_instance_id) else None

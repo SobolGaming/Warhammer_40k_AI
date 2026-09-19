@@ -4061,6 +4061,43 @@ def test_phase17d_this_model_aura_anchors_only_to_the_selected_source_model() ->
     ]
 
 
+def test_order64_repositioned_target_rechecks_aura_presence_and_distance() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_id = "army-alpha:intercessor-unit-1"
+    target_id = "army-alpha:intercessor-unit-3"
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state, unit_instance_id=source_id, pose=Pose.at(10, 10)
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state, unit_instance_id=target_id, pose=Pose.at(12, 10)
+    )
+    compiled = _compiled(
+        'Aura: while a friendly unit is within 6" of this unit, subtract 1 from wound rolls.'
+    )
+
+    def affected() -> bool:
+        result = execute_rule_ir(
+            rule_ir=compiled.rule_ir,
+            context=_execution_context(state=state, source_unit_instance_id=source_id),
+            registry=default_rule_execution_registry(),
+        )
+        return target_id in cast(
+            list[str], result.aura_evaluations[0]["affected_unit_instance_ids"]
+        )
+
+    assert affected()
+    assert state.battlefield_state is not None
+    placed = state.battlefield_state
+    state.battlefield_state = placed.without_unit_placement(target_id)
+    assert not affected()
+    state.battlefield_state = _with_unit_pose(
+        placed, unit_instance_id=target_id, pose=Pose.at(35, 30)
+    )
+    assert not affected()
+    state.battlefield_state = placed
+    assert affected()
+
+
 def test_phase17d_this_unit_aura_ignores_incidental_source_model_context() -> None:
     state = _battle_state_with_extra_friendly_unit()
     source_unit_id = "army-alpha:intercessor-unit-1"

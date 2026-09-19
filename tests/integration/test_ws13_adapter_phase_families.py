@@ -1725,7 +1725,7 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
 def test_local_session_drives_armour_of_contempt_shared_shooting_path() -> None:
     lifecycle, units = shooting_lifecycle(
         alpha_unit_ids=("attacker",),
-        game_id="ws14-armour-of-contempt-shooting-facade-step3-2",
+        game_id="ws14-armour-of-contempt-shooting-facade-step3-2-order64-0",
         enemy_unit_specs=(
             (
                 "defender",

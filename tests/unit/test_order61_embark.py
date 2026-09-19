@@ -52,6 +52,8 @@ def test_setup_blocks_every_transport_throughout_actual_turn(
             sorted(row.model_instance_id for row in placement.model_placements)
         ),
         is_surge=False,
+        is_ingress=kind
+        in {BattlefieldPlacementKind.STRATEGIC_RESERVES, BattlefieldPlacementKind.DEEP_STRIKE},
         setup_kind=kind,
     )
     state.phase_movement_history.append(record)
@@ -87,7 +89,7 @@ def test_setup_blocks_every_transport_throughout_actual_turn(
     state.battle_round = 2
     assert embark_option_ids(session) == (TRANSPORT_ID,)
     state.battle_round = 1
-    state.phase_movement_history[0] = replace(record, setup_kind=None)
+    state.phase_movement_history[0] = replace(record, setup_kind=None, is_ingress=False)
     assert embark_option_ids(session) == (TRANSPORT_ID,)
 
 
@@ -260,6 +262,7 @@ def test_embark_finite_submission_revalidates_setup_before_queue_pop(drift: bool
                     sorted(row.model_instance_id for row in placement.model_placements)
                 ),
                 is_surge=False,
+                is_ingress=True,
                 setup_kind=BattlefieldPlacementKind.DEEP_STRIKE,
             )
         )
@@ -287,6 +290,7 @@ def test_setup_history_has_no_missing_field_or_surge_fallback() -> None:
         unit_instance_id=UNIT_ID,
         model_instance_ids=("model:one",),
         is_surge=False,
+        is_ingress=False,
         setup_kind=BattlefieldPlacementKind.DISEMBARK,
     )
     assert PhaseMovementRecord.from_payload(row.to_payload()) == row

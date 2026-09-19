@@ -2888,7 +2888,7 @@ def test_counteroffensive_epic_challenge_decline_continues_reaction_to_melee() -
             "parent": Pose.at(10.0, 20.0),
             "counteroffensive-character": Pose.at(12.0, 20.0),
         },
-        game_id="phase15e-counteroffensive-epic-decline-continuation",
+        game_id="phase15e-counteroffensive-epic-decline-continuation-order64-0",
         enemy_unit_specs={
             "counteroffensive-character": (
                 "core-character-leader",
@@ -2984,7 +2984,7 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
             "interrupter": Pose.at(10.0, 20.0),
             "interrupt-target": Pose.at(12.0, 20.0),
         },
-        game_id="phase15d-interrupt-melee-continuation",
+        game_id="phase15d-interrupt-melee-continuation-order64-0",
         fight_interrupt_unit_keys=("interrupter",),
         enemy_unit_specs={
             "interrupter": (
@@ -4874,11 +4874,15 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
             "enemy-1": Pose.at(12.0 if mode is ConsolidationModeKind.ONGOING else 14.2, 9.3),
             "enemy-2": Pose.at(12.0 if mode is ConsolidationModeKind.ONGOING else 14.2, 10.7),
         },
-        game_id=f"p12-queue-{mode.value}-{source_player}"
-        + (
-            "-p02-2"
-            if source_player == "player-b" and mode is ConsolidationModeKind.ONGOING
-            else ""
+        game_id=(
+            "p12-queue--order64-0ongoing-player-a"
+            if source_player == "player-a" and mode is ConsolidationModeKind.ONGOING
+            else f"p12-queue-{mode.value}-{source_player}"
+            + (
+                "-p02-2"
+                if source_player == "player-b" and mode is ConsolidationModeKind.ONGOING
+                else ""
+            )
         ),
         charge_fights_first_unit_keys=source_keys,
         datasheet_id="core-character-leader",

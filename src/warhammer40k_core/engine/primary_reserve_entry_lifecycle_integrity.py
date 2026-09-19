@@ -62,6 +62,7 @@ from warhammer40k_core.engine.primary_reserve_entry_source_integrity import (
     validate_primary_reserve_entry_source_requirements,
     validate_primary_reserve_entry_source_terminal_semantics,
 )
+from warhammer40k_core.engine.reserve_destruction import destruction_policy_for_terminal_state
 from warhammer40k_core.engine.reserve_restriction_integrity import (
     reserve_arrival_restriction_expiry_is_proven,
 )
@@ -909,7 +910,7 @@ def _validate_reserve_deadline_destruction(
     destroyed_round = reserve_state.destroyed_battle_round
     if destroyed_round is None:
         raise GameLifecycleError("Destroyed ReserveState lacks its destruction round.")
-    policy = reserve_state.destruction_deadline_policy
+    policy = destruction_policy_for_terminal_state(reserve_state)
     boundary_kind = (
         "end-of-battle"
         if policy.timing_kind is ReserveDestructionTimingKind.END_OF_BATTLE

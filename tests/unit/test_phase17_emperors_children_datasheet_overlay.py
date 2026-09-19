@@ -4207,8 +4207,8 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     [
         # Order 43 hit-record evidence changes the later leadership RNG history.
         ("order43-icon-0", False, True, "applied"),
-        ("order43-icon-4", False, False, None),
-        ("icon-order36-capped-0", True, True, "capped"),
+        ("order43-icon-4-order64-1", False, False, None),
+        ("icon-order36-capped-0-order64-1", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(

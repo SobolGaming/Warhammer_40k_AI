@@ -100,8 +100,8 @@ from warhammer40k_core.rules.wahapedia_schema import (
 
 DAEMON_PRINCE_ID = "000004086"
 TORMENTORS_ID = "000004079"
-ECSTATIC_DEATH_GAME_ID = "order56-ecstatic_death_game_id-01"
-ECSTATIC_CHAIN_GAME_ID = "order56-ecstatic_chain_game_id-01"
+ECSTATIC_DEATH_GAME_ID = "order56-ecstatic_death_game_id-01-order64-0"
+ECSTATIC_CHAIN_GAME_ID = "order56-ecstatic_chain_game_id-01-order64-0"
 EXPECTED_PACKAGE_HASH = "86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84"
 
 
