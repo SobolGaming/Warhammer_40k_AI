@@ -170,8 +170,12 @@ def test_return_on_death_success_requests_placement_and_rejects_invalid_submissi
     assert not state.pending_return_on_death_by_id(pending.pending_id).resolved
 
 
-def test_return_on_death_full_health_restores_unit_and_battlefield_placement() -> None:
+@pytest.mark.parametrize("turn_player", ["player-a", "player-b"])
+def test_return_on_death_full_health_restores_unit_and_battlefield_placement(
+    turn_player: str,
+) -> None:
     state = _battle_state_with_destroyed_beta_unit()
+    state.active_player_id = turn_player
     pending = _pending_return_on_death(state=state, success_threshold=2)
     state.record_pending_return_on_death(pending)
     decisions = DecisionController()
@@ -192,6 +196,28 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement() -
     )
 
     assert resolved.resolved
+    from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
+    from warhammer40k_core.engine.phase_movement_history import validate_phase_movement_history
+
+    (setup,) = state.phase_movement_history
+    assert setup.setup_kind is BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD
+    assert setup.turn_player_id == turn_player
+    validate_phase_movement_history(state=state, events=decisions.event_log.records)
+    state.phase_movement_history.clear()
+    with pytest.raises(GameLifecycleError, match="history differs"):
+        validate_phase_movement_history(state=state, events=decisions.event_log.records)
+    state.phase_movement_history.append(setup)
+    from warhammer40k_core.engine.phase_movement_history import completion_phase_record
+
+    event = decisions.event_log.records[-1]
+    assert isinstance(event.payload, dict)
+    for field, message in (
+        ("unit_set_up", "unit presence evidence"),
+        ("placement", "placement evidence"),
+    ):
+        altered = replace(event, payload={**event.payload, field: None})
+        with pytest.raises(GameLifecycleError, match=message):
+            completion_phase_record(state=state, event=altered, turn_player_id=turn_player)
     assert all(
         model.wounds_remaining == model.starting_wounds for model in _beta_unit(state).own_models
     )
@@ -201,8 +227,19 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement() -
     )
 
 
-def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
+@pytest.mark.parametrize("whole_unit_destroyed", [True, False])
+def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds(
+    whole_unit_destroyed: bool,
+) -> None:
+    state = _battle_state_with_scenario()
+    beta = _beta_unit(state)
+    if whole_unit_destroyed:
+        state = _battle_state_with_destroyed_beta_unit()
+    else:
+        model_id = beta.own_models[0].model_instance_id
+        _set_model_wounds(state, model_instance_id=model_id, wounds_remaining=0)
+        assert state.battlefield_state is not None
+        state.battlefield_state = state.battlefield_state.with_removed_models((model_id,))
     pending = _pending_return_on_death(
         state=state,
         target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
@@ -240,6 +277,10 @@ def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds() -> None:
     )
     assert resolved.resolved
     assert returned_model.wounds_remaining == 1
+    assert bool(state.phase_movement_history) is whole_unit_destroyed
+    from warhammer40k_core.engine.phase_movement_history import validate_phase_movement_history
+
+    validate_phase_movement_history(state=state, events=decisions.event_log.records)
     assert state.battlefield_state is not None
     assert destroyed_model_id not in state.battlefield_state.removed_model_ids
 

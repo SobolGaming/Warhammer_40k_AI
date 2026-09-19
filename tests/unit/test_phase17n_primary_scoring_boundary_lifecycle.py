@@ -703,6 +703,117 @@ def test_authenticated_return_on_death_between_oc_and_scoring_round_trips() -> N
     _assert_scoring_commit_differs_from_oc_checkpoint(lifecycle)
 
 
+@pytest.mark.parametrize(
+    ("surviving_model", "later_destroy_survivor"), [(False, False), (True, False), (True, True)]
+)
+def test_restore_rejects_coordinated_return_setup_history_tampering(
+    surviving_model: bool, later_destroy_survivor: bool
+) -> None:
+    lifecycle = _two_model_battlefield_dominance_lifecycle(
+        phase=BattlePhase.COMMAND, battle_round=2
+    )
+    state = lifecycle.state
+    assert state is not None
+    target = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    assert state.battlefield_state is not None
+    assert state.mission_setup is not None
+    marker = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(
+            with_model_offsets(
+                state.battlefield_state.unit_placement_by_id(target.unit_instance_id),
+                marker,
+                offsets=((0.0, 0.0), (2.0, 0.0)),
+            )
+        )
+    )
+    original_placement = _destroy_unit_with_events(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id=target.unit_instance_id,
+        return_model_only=surviving_model,
+        leave_surviving_model=surviving_model,
+    )
+    _return_destroyed_unit(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        original_placement=original_placement,
+        return_model_only=surviving_model,
+    )
+    if later_destroy_survivor:
+        from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+
+        source = state.army_definitions[0].units[0]
+        destroy_rule_model_for_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            model_id=original_placement.model_placements[1].model_instance_id,
+            destroying_player_id="player-a",
+            source_unit_id=source.unit_instance_id,
+            source_model_id=source.own_models[0].model_instance_id,
+        )
+    payload = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(deepcopy(payload)).to_payload() == payload
+    completion = next(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "return_on_death_set_back_up_completed"
+    )
+    detail = completion["payload"]
+    assert isinstance(detail, dict)
+    assert detail["unit_set_up"] is not surviving_model
+    detail["unit_set_up"] = surviving_model
+    raw_state = payload["state"]
+    assert raw_state is not None
+    if surviving_model:
+        placement = detail["placement"]
+        assert isinstance(placement, dict)
+        raw_state["phase_movement_history"].append(
+            {
+                "event_id": completion["event_id"],
+                "battle_round": state.battle_round,
+                "turn_player_id": "player-a",
+                "phase": BattlePhase.COMMAND.value,
+                "unit_instance_id": target.unit_instance_id,
+                "model_instance_ids": [original_placement.model_placements[0].model_instance_id],
+                "is_surge": False,
+                "setup_kind": "return_to_battlefield",
+            }
+        )
+    else:
+        raw_state["phase_movement_history"] = []
+    with pytest.raises(GameLifecycleError, match=r"Return-on-death setup.*authority"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_return_setup_authority_is_bound_to_the_accepted_target() -> None:
+    lifecycle = _scored_command_boundary_after_mutation(kind="return_on_death")
+    payload = lifecycle.to_payload()
+    assert lifecycle.state is not None
+    completion = next(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "return_on_death_set_back_up_completed"
+    )
+    detail = completion["payload"]
+    assert isinstance(detail, dict)
+    detail["unit_instance_id"] = lifecycle.state.army_definitions[0].units[0].unit_instance_id
+    detail["unit_set_up"] = False
+    assert payload["state"] is not None
+    payload["state"]["phase_movement_history"] = []
+    with pytest.raises(GameLifecycleError, match="Return-on-death setup rules-unit authority"):
+        GameLifecycle.from_payload(payload)
+
+
 def test_partial_return_repeated_destruction_projects_only_fresh_model() -> None:
     lifecycle = _two_model_battlefield_dominance_lifecycle(
         phase=BattlePhase.COMMAND,
@@ -5477,6 +5588,7 @@ def _destroy_unit_with_events(
     decisions: DecisionController,
     unit_instance_id: str,
     return_model_only: bool = False,
+    leave_surviving_model: bool = False,
 ) -> UnitPlacement:
     assert state.battlefield_state is not None
     assert state.active_player_id is not None
@@ -5506,7 +5618,8 @@ def _destroy_unit_with_events(
     )
     destroyed_events: list[str] = []
     departures: list[PrimaryBattlefieldDepartureState] = []
-    for model in unit.own_models:
+    models_to_destroy = unit.own_models[:1] if leave_surviving_model else unit.own_models
+    for model in models_to_destroy:
         from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
 
         event = destroy_rule_model_for_fixture(
@@ -5530,26 +5643,29 @@ def _destroy_unit_with_events(
                 event_log=decisions.event_log,
                 departure=departure,
             )
-    last_event_id = destroyed_events[-1]
-    source_id = f"core-rules:primary-unit-destruction-tracking:{last_event_id}"
-    destruction_ids_before = tuple(
-        destruction.destruction_id for destruction in state.primary_unit_destruction_states
-    )
-    state.record_primary_unit_destruction(
-        destruction_attribution=attribution,
-        source_model_destroyed_event_id=last_event_id,
-        source_rules_unit_objective_proximity_witness=source_witness,
-        source_battlefield_departure_ids=tuple(departure.departure_id for departure in departures),
-        unattributed_cause=None,
-        source_mutation_id=None,
-        destroyed_unit_instance_id=unit.unit_instance_id,
-        source_id=f"{source_id}:{unit.unit_instance_id}",
-    )
-    record_new_primary_unit_destruction_events(
-        state=state,
-        event_log=decisions.event_log,
-        destruction_ids_before=destruction_ids_before,
-    )
+    if not leave_surviving_model:
+        last_event_id = destroyed_events[-1]
+        source_id = f"core-rules:primary-unit-destruction-tracking:{last_event_id}"
+        destruction_ids_before = tuple(
+            destruction.destruction_id for destruction in state.primary_unit_destruction_states
+        )
+        state.record_primary_unit_destruction(
+            destruction_attribution=attribution,
+            source_model_destroyed_event_id=last_event_id,
+            source_rules_unit_objective_proximity_witness=source_witness,
+            source_battlefield_departure_ids=tuple(
+                departure.departure_id for departure in departures
+            ),
+            unattributed_cause=None,
+            source_mutation_id=None,
+            destroyed_unit_instance_id=unit.unit_instance_id,
+            source_id=f"{source_id}:{unit.unit_instance_id}",
+        )
+        record_new_primary_unit_destruction_events(
+            state=state,
+            event_log=decisions.event_log,
+            destruction_ids_before=destruction_ids_before,
+        )
     first_model = original_placement.model_placements[0]
     pending = PendingReturnOnDeath(
         pending_id="p2-return-on-death-pending",

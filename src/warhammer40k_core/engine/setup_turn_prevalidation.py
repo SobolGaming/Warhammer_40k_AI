@@ -28,6 +28,11 @@ def invalid_setup_turn_activity(
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.transport_embark_prevalidation import invalid_embark_setup
+
+    embark_invalid = invalid_embark_setup(state=state, request=request, result=result)
+    if embark_invalid is not None:
+        return embark_invalid
     reroll = is_triggered_movement_distance_reroll_request(request)
     if reroll:
         invalid = invalid_surge_authority(

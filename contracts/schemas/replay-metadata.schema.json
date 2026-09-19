@@ -22,7 +22,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v20-ability-instances", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v21-setup-turn-history", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [

@@ -298,6 +298,10 @@ def test_reinforcements_valid_strategic_reserves_arrival_mutates_state_atomicall
     assert isinstance(transition_batch, dict)
     placements = cast(list[dict[str, object]], transition_batch["placements"])
     assert placements[0]["placement_kind"] == BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+    setup = state.phase_movement_history[-1]
+    assert setup.setup_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
+    assert setup.unit_instance_id == reserve_unit.unit_instance_id
+    assert setup.turn_player_id == state.active_player_id
 
 
 def test_declared_reserve_arrival_round_trip_rejects_route_event_tamper() -> None:
@@ -547,6 +551,10 @@ def test_rapid_ingress_arrival_uses_authenticated_stratagem_history() -> None:
     reserve_state = state.reserve_state_for_unit("army-alpha:intercessor-unit-1")
     assert reserve_state is not None
     assert reserve_state.status is ReserveStatus.ARRIVED
+    setup = state.phase_movement_history[-1]
+    assert setup.setup_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
+    assert setup.turn_player_id == "player-b"
+    assert setup.unit_instance_id == "army-alpha:intercessor-unit-1"
     replay_lifecycle = GameLifecycle(
         state=state,
         decision_controller=lifecycle.decision_controller,

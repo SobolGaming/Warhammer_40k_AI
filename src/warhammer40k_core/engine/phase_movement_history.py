@@ -7,12 +7,14 @@ from typing import TYPE_CHECKING, cast
 import msgspec
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -24,6 +26,7 @@ class PhaseMovementRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=Tru
     unit_instance_id: str
     model_instance_ids: tuple[str, ...]
     is_surge: bool
+    setup_kind: BattlefieldPlacementKind | None
 
     def __post_init__(self) -> None:
         validate = IdentifierValidator(GameLifecycleError)
@@ -33,6 +36,10 @@ class PhaseMovementRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=Tru
             raise GameLifecycleError("Phase movement requires a positive round.")
         if type(self.phase) is not BattlePhase or type(self.is_surge) is not bool:
             raise GameLifecycleError("Phase movement requires a typed phase and Surge flag.")
+        if self.setup_kind is not None and (
+            type(self.setup_kind) is not BattlefieldPlacementKind or self.is_surge
+        ):
+            raise GameLifecycleError("Phase movement setup kind is invalid.")
         if (
             not self.model_instance_ids
             or tuple(sorted(set(self.model_instance_ids))) != self.model_instance_ids
@@ -50,6 +57,7 @@ class PhaseMovementRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=Tru
             "unit_instance_id": self.unit_instance_id,
             "model_instance_ids": list(self.model_instance_ids),
             "is_surge": self.is_surge,
+            "setup_kind": None if self.setup_kind is None else self.setup_kind.value,
         }
 
     @classmethod
@@ -135,6 +143,8 @@ def completion_phase_record(
     from warhammer40k_core.engine.battlefield_state import (
         BattlefieldTransitionBatch,
         BattlefieldTransitionBatchPayload,
+        UnitPlacement,
+        UnitPlacementPayload,
     )
     from warhammer40k_core.engine.model_movement_history import distances_from_completion
 
@@ -145,7 +155,18 @@ def completion_phase_record(
         "movement_phase_action"
     ) in {"remain_stationary", "ingress", "disembark", "combat_disembark"}:
         return None
-    if event.event_type in {"unit_disembarked", "reinforcement_unit_arrived"}:
+    if event.event_type == "return_on_death_set_back_up_completed":
+        if type(payload.get("unit_set_up")) is not bool:
+            raise GameLifecycleError("Returned-unit setup requires unit presence evidence.")
+        if not payload["unit_set_up"]:
+            return None
+        raw_placement = payload.get("placement")
+        if not isinstance(raw_placement, dict):
+            raise GameLifecycleError("Returned-unit setup requires placement evidence.")
+        placement = UnitPlacement.from_payload(cast(UnitPlacementPayload, raw_placement))
+        model_ids = tuple(sorted(row.model_instance_id for row in placement.model_placements))
+        setup_kind = BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD
+    elif event.event_type in {"unit_disembarked", "reinforcement_unit_arrived"}:
         raw = payload.get("transition_batch")
         if not isinstance(raw, dict):
             raise GameLifecycleError("Phase setup history requires placement evidence.")
@@ -153,7 +174,12 @@ def completion_phase_record(
             cast(BattlefieldTransitionBatchPayload, raw)
         )
         model_ids = tuple(sorted(row.model_instance_id for row in transition.placements))
+        kinds = {row.placement_kind for row in transition.placements}
+        if len(kinds) != 1:
+            raise GameLifecycleError("Phase setup history requires one placement kind.")
+        setup_kind = kinds.pop()
     else:
+        setup_kind = None
         model_ids = tuple(
             row.model_instance_id
             for row in distances_from_completion(
@@ -178,6 +204,7 @@ def completion_phase_record(
         model_instance_ids=model_ids,
         is_surge=event.event_type == "triggered_movement_resolved"
         and payload.get("triggered_movement_kind") == "surge",
+        setup_kind=setup_kind,
     )
 
 
@@ -187,7 +214,10 @@ def validate_phase_movement_history(*, state: GameState, events: tuple[EventReco
 
     expected: list[PhaseMovementRecord] = []
     for index, event in enumerate(events):
-        if event.event_type not in MOVE_COMPLETION_EVENT_TYPES:
+        if event.event_type not in (
+            *MOVE_COMPLETION_EVENT_TYPES,
+            "return_on_death_set_back_up_completed",
+        ):
             continue
         if not isinstance(event.payload, dict) or not isinstance(
             event.payload.get("active_player_id"), str
@@ -227,3 +257,61 @@ def validate_phase_movement_state(state: GameState) -> None:
         for row in rows
     ):
         raise GameLifecycleError("Phase movement history identity drifted.")
+
+
+def validate_return_on_death_setup_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
+    """Authenticate setup classification before trusting completion-derived history.
+
+    The shared timeline authenticates return decisions, pending occurrences and
+    destruction causes, then reverses subsequent mutations. The completion flag
+    is only an assertion of that independently reconstructed pre-return state.
+    """
+    from warhammer40k_core.engine.fight_model_authority_history import (
+        build_model_authority_timeline,
+        historical_rules_unit_model_ids,
+    )
+    from warhammer40k_core.engine.return_on_death import (
+        RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE,
+        PendingReturnOnDeath,
+        PendingReturnOnDeathPayload,
+    )
+
+    completions = tuple(
+        (index, event)
+        for index, event in enumerate(event_records)
+        if event.event_type == RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE
+    )
+    if not completions:
+        return
+    timeline = build_model_authority_timeline(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
+    for index, event in completions:
+        payload = event.payload
+        if not isinstance(payload, dict) or not isinstance(payload.get("pending"), dict):
+            raise GameLifecycleError("Return-on-death setup requires pending authority.")
+        # The timeline has bound this pending occurrence to the accepted request,
+        # roll, placement and stored pending state. Do not select the rules unit
+        # from the completion's unauthenticated unit_instance_id.
+        pending = PendingReturnOnDeath.from_payload(
+            cast(PendingReturnOnDeathPayload, payload["pending"])
+        )
+        view = rules_unit_view_by_id(
+            state=state, unit_instance_id=pending.destroyed_unit_instance_id
+        )
+        if payload.get("unit_instance_id") != view.unit_instance_id:
+            raise GameLifecycleError("Return-on-death setup rules-unit authority drifted.")
+        model_ids = historical_rules_unit_model_ids(
+            state=state, event_records=event_records, unit_instance_id=view.unit_instance_id
+        )
+        unit_set_up = not any(
+            timeline.has_living_model_before_event(model_instance_id=model_id, event_index=index)
+            for model_id in sorted(model_ids)
+        )
+        if payload.get("unit_set_up") is not unit_set_up:
+            raise GameLifecycleError("Return-on-death setup differs from pre-return authority.")

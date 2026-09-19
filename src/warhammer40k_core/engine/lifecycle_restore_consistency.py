@@ -44,6 +44,9 @@ from warhammer40k_core.engine.lifecycle_state_validation import (
 )
 from warhammer40k_core.engine.normal_move_history import validate_normal_move_state_consistency
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase_movement_history import (
+    validate_return_on_death_setup_authority,
+)
 from warhammer40k_core.engine.prebattle_integrity import validate_prebattle_alternation_restore
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
@@ -93,6 +96,9 @@ def validate_payload_consistency(
         event_records=event_records,
         decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
+    )
+    validate_return_on_death_setup_authority(
+        state=state, event_records=event_records, decision_records=decision_records
     )
     _validate_battlefield_state_consistency(state=state, config=config)
     _rsi.validate_initial_reserve_destruction_policy_authority(

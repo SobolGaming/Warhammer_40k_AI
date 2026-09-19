@@ -660,6 +660,8 @@ def _post_move_embark_options(
     unit_instance_id: str,
     movement_phase_action: TransportMovementStatus,
 ) -> tuple[DecisionOption, ...]:
+    if state.active_player_id is None:
+        raise GameLifecycleError("Embark requires the current turn owner.")
     scenario = _battlefield_scenario(state)
     from warhammer40k_core.engine.phases.movement_rules_units import (
         representative_movement_placement,
@@ -697,6 +699,8 @@ def _post_move_embark_options(
             movement_phase_action=movement_phase_action,
         )
         resolution = resolve_embark(
+            movement_history=tuple(state.phase_movement_history),
+            turn_player_id=state.active_player_id,
             scenario=scenario,
             cargo_state=cargo_state,
             selection=selection,
@@ -798,6 +802,8 @@ def _apply_embark_transport_selection_decision(
     cargo_state = state.transport_cargo_state_for_transport(selection.transport_unit_instance_id)
     if cargo_state is None:
         raise GameLifecycleError("Embark requires TransportCargoState.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("Embark requires the current turn owner.")
     scenario = _battlefield_scenario(state)
     from warhammer40k_core.engine.phases.movement_rules_units import (
         representative_movement_placement,
@@ -810,6 +816,8 @@ def _apply_embark_transport_selection_decision(
         unit_instance_id=active_selection.unit_instance_id,
     )
     resolution = resolve_embark(
+        movement_history=tuple(state.phase_movement_history),
+        turn_player_id=state.active_player_id,
         scenario=scenario,
         cargo_state=cargo_state,
         selection=selection,

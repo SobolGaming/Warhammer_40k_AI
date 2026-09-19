@@ -880,3 +880,10 @@ the shared 3D Engagement Range check. Floor-dependent proofs raise unresolved
 until floor collision and supported-elevation search are implemented. See
 [scope and proof](docs/ORDER_60_SCOPE_PLAN.md). Verify its reviewed source with
 `uv run python tools/build_core_emergency_disembark_placement_source.py --check`.
+
+Order 61 rejects Embark after any rules-unit battlefield setup during the current
+turn, including another Transport's disembark and repositioned Ingress. Its
+shared history expires by actual turn owner and authenticates restore/replay.
+See [scope and proof](docs/ORDER_61_SCOPE_PLAN.md),
+[contract 27 migration](contracts/migrations/26-to-27.md), and verify the reviewed
+source with `uv run python tools/build_core_embark_setup_turn_source.py --check`.

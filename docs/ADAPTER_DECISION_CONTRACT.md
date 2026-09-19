@@ -6260,3 +6260,32 @@ destruction, and an unsupported SAT result must never establish a closer or
 unengaged alternative. This limitation also applies to complete elevated
 proposals until support-aware proof is implemented; no submission schema changes.
 
+
+
+## Order 61 — setup-turn Embark eligibility
+
+Embark options after Normal, Advance and Fall Back moves use canonical rules-unit
+setup history for the current battle round and actual turn player. Disembark
+from any Transport, Ingress and repositioned arrival prevent Embark for the rest
+of that turn. Legal subsequent movement does not erase setup history. A source
+exception for disembark does not exempt other setup kinds.
+
+The existing finite `select_embark_transport` envelope remains authoritative.
+Setup eligibility drift is rejected before queue pop, decision recording and
+mutation with `embark_after_setup_forbidden`. The shared resolver uses the same
+predicate and diagnostic. Clients cannot supply or replace history.
+
+Private phase movement history now requires `setup_kind`, reconstructed from
+accepted placement events and checked on restore. Ordinary/reactive witnessed
+movement records null. This field is not added to viewer projections or event
+metadata. Existing shared viewer redaction and finite option rules apply.
+Return-on-death completions now carry the actual `active_player_id`, canonical
+`unit_instance_id` and boolean `unit_set_up`. Returning a model to a surviving
+rules unit does not add unit setup history. Restore independently derives
+`unit_set_up` from authenticated pre-return model history and binds the canonical
+unit ID to the accepted return target before comparing stored setup history.
+Coordinated edits to the completion flag and phase history are rejected.
+Existing return event visibility
+applies to these fields. Contract 27 versions persistence and replay; see the
+[migration](../contracts/migrations/26-to-27.md). No new decision family, proposal
+kind or visibility permission is introduced.
