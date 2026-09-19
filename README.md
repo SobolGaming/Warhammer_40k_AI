@@ -875,6 +875,7 @@ Formations without triggering destroyed-model rules. See
 
 Order 60 sets up Emergency Disembark survivors wholly within 6 inches and as
 close as possible, prefers unengaged endpoints, and destroys only unplaceable
-models. See [scope and proof](docs/ORDER_60_SCOPE_PLAN.md). Verify its reviewed
-source with
+models. Closest-possible and unengaged proofs include terrain-legal set-up and
+the shared 3D Engagement Range check. See
+[scope and proof](docs/ORDER_60_SCOPE_PLAN.md). Verify its reviewed source with
 `uv run python tools/build_core_emergency_disembark_placement_source.py --check`.

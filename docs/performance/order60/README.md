@@ -8,12 +8,13 @@ Windows Threadripper 3970X host is provisional, with Python 3.14.5 and the same
 locked dependencies. Timings use one process without coverage or
 instrumentation.
 
-The final matched mean is **4.13 ms base / 21.85 ms head**, with maxima
-**8.42 ms / 109.13 ms**. All seven samples completed and were valid. Head's
+The rematched finding-fix mean is **2.99 ms base / 20.89 ms head**, with maxima
+**6.76 ms / 102.18 ms**. All seven samples completed and were valid. Head's
 added cost is the exact circular existence proof for closest-possible and
-omitted-model obligations. These are component diagnostics only. Gameplay-slice
-and full-game throughput remain unmeasured. The standing 60-second mean /
-300-second maximum complete-game goals are not certified.
+omitted-model obligations, including terrain-legal and 3D engagement filters.
+These are component diagnostics only. Gameplay-slice and full-game throughput
+remain unmeasured. The standing 60-second mean / 300-second maximum
+complete-game goals are not certified.
 
 Reproduce against base and head runtime trees with the same final benchmark and
 helper files:
@@ -34,19 +35,20 @@ A timeout or failed assertion is not a completed sample. Median, nearest-rank
 
 ## Final gates
 
-Validated on 2026-09-18 against runtime identity
-`413c41a7d28daef7af9faeb4b19c734d993d5724754e8fd93fcc06fa082ebc0e` on Windows 11
+R60-001 and R60-002 rematched component timings and revalidated on 2026-09-19
+against runtime identity
+`eb5db3e0b82897101593be3c12fd1b978297ec7a20c7038fcafde08190171507` on Windows 11
 / AMD Ryzen Threadripper 3970X / Python 3.14.5. Both complete suites used xdist
-auto work stealing. The behavioral run included Node.js 24.19.0 on `PATH`. Wheel
-smoke used `UV_SYSTEM_CERTS=true` for this host's certificate trust chain. No
+auto work stealing. The behavioral run included Node.js 24.19.0 on `PATH`. No
 production code changed after the final behavioral coverage gate. No behavioral
 suite was repeated without coverage as a second final gate. Component timings
-and helper hashes are unchanged after that coverage run.
+use the updated helper file that covers terrain-clear and vertically separated
+enemy fixtures.
 
-- Complete behavioral suite with coverage: **8,373 passed**, **85.11%**
-  coverage (85% required), 973.58 seconds. The eight-shard inventory lists 246
-  behavioral files, including the new Order 60 unit module.
-- Complete code-quality suite without coverage: **523 passed**, 316.80 seconds.
+- Complete behavioral suite with coverage: **8,376 passed**, **85.11%**
+  coverage (85% required), 965.12 seconds. The eight-shard inventory lists 246
+  behavioral files.
+- Complete code-quality suite without coverage: **523 passed**, 313.95 seconds.
 - Ruff check and format check, mypy (3,118 source files), Pyright (zero errors),
   all 11 import-linter contracts, and pre-commit passed.
 - Reviewed source generator, engine build identity and external-contract checks

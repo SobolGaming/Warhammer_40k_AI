@@ -399,6 +399,7 @@ def resolve_destroyed_transport_rules_unit_disembark(
         transport_placement=transport_placement,
         battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
+        terrain_features=scenario.battlefield_state.terrain_features,
         objective_markers=objective_markers,
     )
     filtered_view = _placed_survivor_rules_unit(

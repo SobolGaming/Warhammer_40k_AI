@@ -1,6 +1,6 @@
 {
   "workload_id": "order60-emergency-disembark-placement-v1",
-  "revision": "order-60-working-tree",
+  "revision": "31029a84-r60-001-r60-002",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
@@ -17,63 +17,63 @@
   "hashes": {
     "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
     "scripts/measure_order60.py": "880d1aca3ff5fb712acf6fb6802da38d59ab6a891e22bf7c564c3013f87ac100",
-    "tests/order60_emergency_disembark_helpers.py": "ec703369160d78ffebcf85ba796f93b7251f64583f2755d203e3a25898ba49c4"
+    "tests/order60_emergency_disembark_helpers.py": "316e0ae40bd1086787beee1b7406acb9aca932e335748ea807e77dc0203aa094"
   },
   "samples": [
     {
-      "preparation_seconds": 11.109345100005157,
-      "matched_seconds": 0.10912680000183173,
+      "preparation_seconds": 7.875654500006931,
+      "matched_seconds": 0.1021828000084497,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.4119490000011865,
-      "matched_seconds": 0.00787319999653846,
+      "preparation_seconds": 0.987506299992674,
+      "matched_seconds": 0.007268300003488548,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.2884563999978127,
-      "matched_seconds": 0.0055610000126762316,
+      "preparation_seconds": 1.0590201000013622,
+      "matched_seconds": 0.007149700002628379,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.2786211000056937,
-      "matched_seconds": 0.008067000002483837,
+      "preparation_seconds": 0.9769725000078324,
+      "matched_seconds": 0.007436599989887327,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.4051234000071418,
-      "matched_seconds": 0.007601099991006777,
+      "preparation_seconds": 0.9727210999990348,
+      "matched_seconds": 0.007230000002891757,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.3959274999942863,
-      "matched_seconds": 0.007395399996312335,
+      "preparation_seconds": 0.9765747000055853,
+      "matched_seconds": 0.007325500002480112,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.4700226999993902,
-      "matched_seconds": 0.007353200009674765,
+      "preparation_seconds": 1.0075890000007348,
+      "matched_seconds": 0.007635700007085688,
       "valid": true,
       "violation_count": 0,
       "complete": true
     }
   ],
-  "mean_seconds": 0.02185395714436059,
-  "median_seconds": 0.007601099991006777,
-  "maximum_seconds": 0.10912680000183173,
-  "p95_seconds": 0.008067000002483837,
+  "mean_seconds": 0.020889800002415932,
+  "median_seconds": 0.007325500002480112,
+  "maximum_seconds": 0.1021828000084497,
+  "p95_seconds": 0.007635700007085688,
   "completion_rate": 1,
   "full_game_certified": false,
   "budgets": {

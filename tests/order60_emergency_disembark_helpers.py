@@ -7,6 +7,8 @@ from math import cos, radians, sin
 from tests.core_stratagem_helpers import _replace_unit_poses
 from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID, disembark_session
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.damage_allocation import unit_by_id
@@ -20,11 +22,14 @@ from warhammer40k_core.engine.transports import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 
 _TRANSPORT_RADIUS_INCHES = 50.0 / 25.4
 _INTERCESSOR_RADIUS_INCHES = 16.0 / 25.4
 _CONTACT_GAP_INCHES = 0.02
 _COHERENT_STEP_DEGREES = 40.0
+ORDER60_BLOCKING_WALL_OUTER_X_INCHES = 14.0
+ORDER60_TERRAIN_CLEAR_EXTRA_INCHES = 0.01
 EMERGENCY_CONTACT_RADIUS_INCHES = (
     _TRANSPORT_RADIUS_INCHES + _INTERCESSOR_RADIUS_INCHES + _CONTACT_GAP_INCHES
 )
@@ -180,6 +185,8 @@ def order60_passenger_placement(
 def order60_resolve_emergency(
     session: LocalGameSession,
     attempted_placement: UnitPlacement,
+    *,
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> DisembarkResolution:
     state = session.lifecycle.state
     assert state is not None
@@ -203,12 +210,12 @@ def order60_resolve_emergency(
         require_started_phase_embarked=False,
         battlefield_width_inches=60,
         battlefield_depth_inches=44,
-        terrain_features=(),
+        terrain_features=terrain_features,
         objective_markers=(),
     )
 
 
-def order60_place_enemies_near_transport(state: GameState) -> None:
+def order60_place_enemies_near_transport(state: GameState, *, z_inches: float = 0.0) -> None:
     center_x, center_y = EMERGENCY_TRANSPORT_CENTER
     for army in state.army_definitions:
         if army.player_id != "player-b":
@@ -221,6 +228,7 @@ def order60_place_enemies_near_transport(state: GameState) -> None:
                     center_x=center_x,
                     center_y=center_y,
                     count=len(unit.own_models),
+                    z_inches=z_inches,
                     radius_inches=EMERGENCY_CONTACT_RADIUS_INCHES,
                     start_degrees=36.0,
                 ),
@@ -290,5 +298,80 @@ def order60_omit_unplaceable_large_placement(session: LocalGameSession) -> UnitP
                 pose=pose,
             )
             for model, pose in zip(small_models, poses, strict=True)
+        ),
+    )
+
+
+def order60_model_radius_inches(model: ModelInstance) -> float:
+    diameter_mm = model.base_size.diameter_mm
+    if diameter_mm is None:
+        raise AssertionError("Emergency Disembark wall poses require a circular base diameter.")
+    return diameter_mm / 50.8
+
+
+def order60_blocking_wall_feature() -> TerrainFeatureDefinition:
+    display = TerrainDisplayGeometry.axis_aligned_rectangle(
+        display_template_id="order60-emergency-blocking-wall",
+        center_x_inches=7.0,
+        center_y_inches=22.0,
+        width_inches=14.0,
+        depth_inches=44.0,
+    )
+    return TerrainFeatureDefinition(
+        feature_id="order60-emergency-blocking-wall",
+        feature_kind=TerrainFeatureKind.BARRICADE_AND_FUEL_PIPES,
+        footprint_center_x_inches=7.0,
+        footprint_center_y_inches=22.0,
+        footprint_width_inches=14.0,
+        footprint_depth_inches=44.0,
+        rules_footprint_polygon=display.footprint_polygon,
+        display_geometry=display,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="solid",
+                center_x_inches=7.0,
+                center_y_inches=22.0,
+                bottom_z_inches=0.0,
+                width_inches=14.0,
+                depth_inches=44.0,
+                height_inches=4.0,
+            ),
+        ),
+    )
+
+
+def order60_just_beyond_terrain_clear_placement(
+    session: LocalGameSession,
+    *,
+    extra_inches: float = ORDER60_TERRAIN_CLEAR_EXTRA_INCHES,
+) -> UnitPlacement:
+    state = session.lifecycle.state
+    assert state is not None
+    unit = unit_by_id(state=state, unit_instance_id=PASSENGER_ID)
+    radii = tuple(order60_model_radius_inches(model) for model in unit.own_models)
+    relative = [0.0]
+    for index in range(1, len(radii)):
+        relative.append(relative[-1] + radii[index - 1] + radii[index] + _CONTACT_GAP_INCHES)
+    offset = relative[-1] / 2.0
+    poses = tuple(
+        Pose.at(
+            ORDER60_BLOCKING_WALL_OUTER_X_INCHES + radius + extra_inches,
+            10.0 - offset + relative_y,
+        )
+        for radius, relative_y in zip(radii, relative, strict=True)
+    )
+    return UnitPlacement(
+        army_id="army-alpha",
+        player_id="player-a",
+        unit_instance_id=PASSENGER_ID,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=PASSENGER_ID,
+                model_instance_id=model.model_instance_id,
+                pose=pose,
+            )
+            for model, pose in zip(unit.own_models, poses, strict=True)
         ),
     )

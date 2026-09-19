@@ -52,10 +52,14 @@ def test_emergency_disembark_placement_has_one_proof_owner() -> None:
     fit = (GEOMETRY / "emergency_disembark_fit.py").read_text(encoding="utf-8")
     assert "PLACEMENT_POLICY" in owner
     assert "circular_emergency_pose_exists(" in owner
+    assert "terrain_features" in owner
+    assert "is_within_engagement_range(" in owner
     assert "append_emergency_disembark_placement_violations(" in transports
     assert "append_emergency_disembark_rules_unit_omission_violations(" in grouped
     assert "DisembarkModeKind.EMERGENCY_DISEMBARK" in geometry
     assert 'decide(both(*constraints), ("x", "y"))' in fit
+    assert "AxisAlignedRectObstacle" in fit
+    assert "_circle_strictly_outside_rect(" in fit
     assert "except Exception" not in owner
     assert "except Exception" not in fit
     assert _emergency_owner_modules() == (

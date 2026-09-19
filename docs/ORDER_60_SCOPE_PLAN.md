@@ -23,8 +23,10 @@ proof uses the pinned 0.04-inch tolerance instead of an open-set strictly-closer
 query. Exact circular existence uses `visibility_algebra.decide`; unresolved
 geometry raises rather than inventing a rules answer. Non-circular bases raise
 rather than approximating. Endpoint-only set-up is allowed because this is Set
-Up, not a path move. Existence proof ignores terrain; proposed endpoints remain
-fail-closed on terrain.
+Up, not a path move. Existence proofs include axis-aligned wall legality and
+keep 3D engagement, overlap, and coherency authority. A terrain-free SAT
+result is not a legal alternative. Non-cardinal walls that can meet the search
+region raise unresolved geometry rather than declaring the proposal illegal.
 
 ## Ownership and proof
 
@@ -54,7 +56,9 @@ Range reject for ordinary bases. P18C still owns hazard-before-placement.
 Regressions cover closest-ring set-up, rejection of a placeable omission,
 rejection of a non-closest pose, rejection of engaged set-up when unengaged
 exists, destruction of a genuinely unplaceable oversized model, attached
-rules-unit complete placement, and GameLifecycle restore. This PR adds no option
+rules-unit complete placement, GameLifecycle restore, rejection of a
+terrain-free closer pose that lies inside solid walls, and acceptance of
+contact-ring set-up beside vertically separated enemies. This PR adds no option
 family, proposal kind, or visibility change.
 See [performance and final gates](performance/order60/README.md).
 

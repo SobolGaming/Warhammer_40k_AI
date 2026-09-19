@@ -17,6 +17,7 @@ from functools import lru_cache
 from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.visibility_algebra import (
     Formula,
+    RealTerm,
     both,
     decide,
     either,
@@ -30,6 +31,18 @@ class CircleObstacle:
     x: Fraction
     y: Fraction
     radius: Fraction
+
+
+@dataclass(frozen=True, slots=True)
+class AxisAlignedRectObstacle:
+    min_x: Fraction
+    max_x: Fraction
+    min_y: Fraction
+    max_y: Fraction
+
+    def __post_init__(self) -> None:
+        if self.max_x <= self.min_x or self.max_y <= self.min_y:
+            raise GeometryError("Emergency Disembark wall obstacle requires a positive rectangle.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +60,7 @@ class CircularEmergencyPoseQuery:
     closer_than_center: Fraction | None
     neighbor_obstacles: tuple[tuple[CircleObstacle, Fraction], ...]
     span_obstacles: tuple[tuple[CircleObstacle, Fraction], ...]
+    rect_obstacles: tuple[AxisAlignedRectObstacle, ...] = ()
 
 
 @lru_cache(maxsize=512)
@@ -80,6 +94,8 @@ def circular_emergency_pose_exists(query: CircularEmergencyPoseQuery) -> bool:
         constraints.append(
             ((x - obstacle.x) ** 2 + (y - obstacle.y) ** 2).gt((passenger + obstacle.radius) ** 2)
         )
+    for rect in query.rect_obstacles:
+        constraints.append(_circle_strictly_outside_rect(x, y, passenger, rect))
     if query.require_unengaged:
         for obstacle, engagement in query.unengaged_obstacles:
             constraints.append(
@@ -105,3 +121,35 @@ def circular_emergency_pose_exists(query: CircularEmergencyPoseQuery) -> bool:
             )
         )
     return decide(both(*constraints), ("x", "y"))
+
+
+def _circle_strictly_outside_rect(
+    x: RealTerm,
+    y: RealTerm,
+    radius: Fraction,
+    rect: AxisAlignedRectObstacle,
+) -> Formula:
+    # Exact open Minkowski complement: two side strips plus four corner disks.
+    return both(
+        either(
+            x.lt(rect.min_x - radius),
+            x.gt(rect.max_x + radius),
+            y.lt(rect.min_y),
+            y.gt(rect.max_y),
+        ),
+        either(
+            y.lt(rect.min_y - radius),
+            y.gt(rect.max_y + radius),
+            x.lt(rect.min_x),
+            x.gt(rect.max_x),
+        ),
+        *(
+            ((x - corner_x) ** 2 + (y - corner_y) ** 2).gt(radius**2)
+            for corner_x, corner_y in (
+                (rect.min_x, rect.min_y),
+                (rect.min_x, rect.max_y),
+                (rect.max_x, rect.min_y),
+                (rect.max_x, rect.max_y),
+            )
+        ),
+    )

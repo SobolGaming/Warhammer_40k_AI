@@ -2691,6 +2691,7 @@ def _resolve_disembark(
             transport_models=transport_models,
             battlefield_width_inches=width,
             battlefield_depth_inches=depth,
+            terrain_features=features,
             objective_markers=markers,
         )
     if (

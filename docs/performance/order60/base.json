@@ -17,63 +17,63 @@
   "hashes": {
     "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
     "scripts/measure_order60.py": "880d1aca3ff5fb712acf6fb6802da38d59ab6a891e22bf7c564c3013f87ac100",
-    "tests/order60_emergency_disembark_helpers.py": "ec703369160d78ffebcf85ba796f93b7251f64583f2755d203e3a25898ba49c4"
+    "tests/order60_emergency_disembark_helpers.py": "316e0ae40bd1086787beee1b7406acb9aca932e335748ea807e77dc0203aa094"
   },
   "samples": [
     {
-      "preparation_seconds": 11.523112499999115,
-      "matched_seconds": 0.008416599986958317,
+      "preparation_seconds": 7.76662349999242,
+      "matched_seconds": 0.006762200006050989,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.3257394000102067,
-      "matched_seconds": 0.003385300005902536,
+      "preparation_seconds": 0.9832647000002908,
+      "matched_seconds": 0.002376899996306747,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.3621454999956768,
-      "matched_seconds": 0.002546699994127266,
+      "preparation_seconds": 0.9706273999909172,
+      "matched_seconds": 0.0024174999998649582,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.4251699000014924,
-      "matched_seconds": 0.0037331000057747588,
+      "preparation_seconds": 1.058118500004639,
+      "matched_seconds": 0.002320599989616312,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.450551899994025,
-      "matched_seconds": 0.003533600000082515,
+      "preparation_seconds": 0.9843815000058385,
+      "matched_seconds": 0.0023655999975744635,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.4470292999903904,
-      "matched_seconds": 0.0038194999942788854,
+      "preparation_seconds": 0.9968926000001375,
+      "matched_seconds": 0.002348800000618212,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.2638702000112971,
-      "matched_seconds": 0.003456300008110702,
+      "preparation_seconds": 1.0464327999943634,
+      "matched_seconds": 0.0023323999921558425,
       "valid": true,
       "violation_count": 0,
       "complete": true
     }
   ],
-  "mean_seconds": 0.004127299999319283,
-  "median_seconds": 0.003533600000082515,
-  "maximum_seconds": 0.008416599986958317,
-  "p95_seconds": 0.0038194999942788854,
+  "mean_seconds": 0.002989142854598218,
+  "median_seconds": 0.0023655999975744635,
+  "maximum_seconds": 0.006762200006050989,
+  "p95_seconds": 0.0024174999998649582,
   "completion_rate": 1,
   "full_game_certified": false,
   "budgets": {
