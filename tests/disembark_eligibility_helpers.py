@@ -40,6 +40,9 @@ def disembark_session(
     modes: tuple[DisembarkModeKind, ...] = (),
     *,
     eligible: bool = True,
+    reserve_transport: bool = False,
+    embarked_passenger: bool = True,
+    deep_strike_transport: bool = False,
     unit_poses: dict[str, tuple[Pose, ...]] | None = None,
     oversized_base_diameter_inches: float | None = None,
 ) -> LocalGameSession:
@@ -65,6 +68,26 @@ def disembark_session(
             beta,
         ),
     )
+    if deep_strike_transport:
+        catalog = config.army_catalog
+        transport_sheet = catalog.datasheet_by_id("core-transport")
+        transport_sheet = replace(
+            transport_sheet,
+            keywords=replace(
+                transport_sheet.keywords,
+                keywords=(*transport_sheet.keywords.keywords, "DEEP_STRIKE"),
+            ),
+        )
+        config = replace(
+            config,
+            army_catalog=replace(
+                catalog,
+                datasheets=tuple(
+                    transport_sheet if row.datasheet_id == transport_sheet.datasheet_id else row
+                    for row in catalog.datasheets
+                ),
+            ),
+        )
     if oversized_base_diameter_inches is not None:
         from tests.large_model_disembark_helpers import large_disembark_config
 
@@ -78,7 +101,8 @@ def disembark_session(
     _replace_unit_poses(state, unit_instance_id=TRANSPORT_ID, poses=(Pose.at(10, 10),))
     _clear_terrain(state)
     assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.without_unit_placement(PASSENGER_ID)
+    if embarked_passenger:
+        state.battlefield_state = state.battlefield_state.without_unit_placement(PASSENGER_ID)
     state.record_transport_cargo_state(
         TransportCargoState(
             player_id="player-a",
@@ -89,9 +113,9 @@ def disembark_session(
                 allowed_keywords=("INFANTRY",),
                 source_id="test:order38:capacity",
             ),
-            embarked_unit_instance_ids=(PASSENGER_ID,),
+            embarked_unit_instance_ids=(PASSENGER_ID,) if embarked_passenger else (),
             phase_battle_round=1,
-            started_phase_embarked_unit_instance_ids=(PASSENGER_ID,),
+            started_phase_embarked_unit_instance_ids=(PASSENGER_ID,) if embarked_passenger else (),
         )
     )
     if oversized_base_diameter_inches is not None:
@@ -102,7 +126,38 @@ def disembark_session(
         for unit_id, poses in unit_poses.items():
             _replace_unit_poses(state, unit_instance_id=unit_id, poses=poses)
     decisions = DecisionController()
+    if reserve_transport:
+        from warhammer40k_core.engine.reserve_arrival_requirements import (
+            reposition_destruction_policy,
+        )
+        from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+
+        assert state.battlefield_state is not None
+        state.battlefield_state = state.battlefield_state.without_unit_placement(TRANSPORT_ID)
+        reserve = ReserveState.declared_before_battle(
+            player_id="player-a",
+            unit_instance_id=TRANSPORT_ID,
+            reserve_kind=ReserveKind.DEEP_STRIKE
+            if deep_strike_transport
+            else ReserveKind.STRATEGIC_RESERVES,
+            embarked_unit_instance_ids=(PASSENGER_ID,) if embarked_passenger else (),
+            destruction_deadline_policy=reposition_destruction_policy(
+                mission_setup=state.mission_setup, destruction_deadline_policy=None
+            ),
+        )
+        state.record_reserve_state(reserve)
+        decisions.event_log.append(
+            "reserve_unit_declared",
+            {
+                "game_id": state.game_id,
+                "player_id": "player-a",
+                "unit_instance_id": TRANSPORT_ID,
+                "reserve_state": reserve.to_payload(),
+            },
+        )
     enter_battle_for_fixture(state, decisions=decisions)
+    if reserve_transport:
+        state.battle_round = 2
     _record_default_fixed_secondary_choices_for_missing_players(state)
     lifecycle = GameLifecycle.from_payload(
         {
@@ -130,10 +185,12 @@ def disembark_session(
                 owner_player_id="player-a",
                 transport_unit_instance_id=TRANSPORT_ID,
                 eligible_rules_unit_instance_ids=(PASSENGER_ID if eligible else "other-passenger",),
-                started_battle_round=1,
+                started_battle_round=state.battle_round,
                 started_phase=BattlePhase.MOVEMENT,
                 expiration=EffectExpiration.end_phase(
-                    battle_round=1, phase=BattlePhase.MOVEMENT, player_id="player-a"
+                    battle_round=state.battle_round,
+                    phase=BattlePhase.MOVEMENT,
+                    player_id="player-a",
                 ),
             )
         )

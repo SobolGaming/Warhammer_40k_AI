@@ -91,7 +91,6 @@ class ReservePlacementViolationCode(StrEnum):
     RESERVE_KIND_MISMATCH = "reserve_kind_mismatch"
     UNIT_PLACEMENT_DRIFT = "unit_placement_drift"
     RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN = "reserve_arrival_battle_round_forbidden"
-    RESERVE_EMBARKED_CARGO_UNSUPPORTED = "reserve_embarked_cargo_unsupported"
     STRATEGIC_RESERVES_BATTLE_ROUND_1 = "strategic_reserves_battle_round_1"
     STRATEGIC_RESERVES_EDGE_DISTANCE = "strategic_reserves_edge_distance"
     STRATEGIC_RESERVES_ENEMY_DEPLOYMENT_ZONE = "strategic_reserves_enemy_deployment_zone"
@@ -1945,13 +1944,6 @@ def append_reserve_state_violations(
             ReservePlacementViolation(
                 violation_code=ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN,
                 message="Reserve arrival is required in a different battle round or phase.",
-            )
-        )
-    if reserve_state.embarked_unit_instance_ids:
-        violations.append(
-            ReservePlacementViolation(
-                violation_code=ReservePlacementViolationCode.RESERVE_EMBARKED_CARGO_UNSUPPORTED,
-                message="Reserve arrival with embarked cargo is unsupported before transports.",
             )
         )
     if reserve_state.status is not ReserveStatus.IN_RESERVES:

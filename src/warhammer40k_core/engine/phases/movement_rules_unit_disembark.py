@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -22,6 +23,7 @@ from warhammer40k_core.engine.emergency_disembark import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import CORE_HAZARD_ROLLS_RULE_ID
+from warhammer40k_core.engine.ingress_placement_restrictions import IngressPlacementRestrictions
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -265,6 +267,9 @@ def resolve_rules_unit_disembark(
     transport_placement: object,
     turn_player_id: str,
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    ingress_restrictions: IngressPlacementRestrictions | None = None,
+    enemy_deployment_zones: tuple[DeploymentZone, ...] | None = None,
+    deployment_zones: tuple[DeploymentZone, ...] | None = None,
 ) -> RulesUnitDisembarkResolution:
     from warhammer40k_core.engine.battlefield_state import UnitPlacement
 
@@ -331,6 +336,10 @@ def resolve_rules_unit_disembark(
             )
         else:
             component_resolution = resolve_disembark(
+                ingress_restrictions=ingress_restrictions,
+                enemy_deployment_zones=enemy_deployment_zones,
+                deployment_zones=deployment_zones,
+                ingress_rules_unit_placement=selection.attempted_placement,
                 scenario=validation_scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 cargo_state=active_cargo,

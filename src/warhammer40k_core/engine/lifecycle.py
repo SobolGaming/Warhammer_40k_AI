@@ -24,6 +24,8 @@ from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
+from warhammer40k_core.engine import ingress_placement_history as _iph
+from warhammer40k_core.engine import lifecycle_history_origins as _history_origins
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
@@ -339,6 +341,7 @@ class GameLifecyclePayload(TypedDict):
     reaction_queue: ReactionQueuePayload
     runtime_content_audit: NotRequired[dict[str, JsonValue]]
     psychic_modifier_history_origin: NotRequired[dict[str, JsonValue]]
+    ingress_placement_history_origin: NotRequired[dict[str, JsonValue]]
 
 
 _MOVEMENT_PROPOSAL_DECISION_TYPES = frozenset(
@@ -543,6 +546,7 @@ class GameLifecycle:
     state: GameState | None = None
     parameterized_movement_proposals: bool = True
     _psychic_modifier_history_origin: _pmh.PsychicModifierHistoryOrigin | None = None
+    _ingress_placement_history_origin: _iph.IngressPlacementHistoryOrigin | None = None
     _config: GameConfig | None = None
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
@@ -767,13 +771,10 @@ class GameLifecycle:
                 request=pending_request,
                 runtime_content_bundle=self._runtime_content_bundle,
             )
-        history_origin = _pmh.capture_psychic_history_origin(
-            lifecycle=self,
-            request=pending_request,
-            existing=self._psychic_modifier_history_origin,
-        )
+        history_origin, ingress_origin = _history_origins.capture(self, pending_request)
         record = self.decision_controller.submit_result(result)
         self._psychic_modifier_history_origin = history_origin
+        self._ingress_placement_history_origin = ingress_origin
         status = self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
             record,
             result,
@@ -817,10 +818,7 @@ class GameLifecycle:
         }
         if self._runtime_content_audit is not None:
             payload["runtime_content_audit"] = dict(self._runtime_content_audit)
-        if self._psychic_modifier_history_origin is not None:
-            payload["psychic_modifier_history_origin"] = (
-                self._psychic_modifier_history_origin.to_payload()
-            )
+        _history_origins.serialize(self, payload)
         return payload
 
     @classmethod
@@ -843,13 +841,6 @@ class GameLifecycle:
             reaction_queue=ReactionQueue.from_payload(payload["reaction_queue"]),
             state=GameState.from_payload(payload["state"]),
             parameterized_movement_proposals=parameterized_movement_proposals,
-            _psychic_modifier_history_origin=(
-                _pmh.PsychicModifierHistoryOrigin.from_payload(
-                    payload["psychic_modifier_history_origin"]
-                )
-                if "psychic_modifier_history_origin" in payload
-                else None
-            ),
             _config=config,
             _runtime_content_bundle=runtime_content_bundle,
             _runtime_content_audit=_runtime_content_audit_from_payload(
@@ -875,6 +866,7 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
         )
+        _history_origins.restore(lifecycle, payload)
         validate_payload_consistency(
             state=lifecycle._require_state(),
             config=lifecycle._config,
@@ -1080,9 +1072,7 @@ class GameLifecycle:
             decisions=lifecycle.decision_controller,
             runtime_modifier_registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
         )
-        _pmh.validate_psychic_history_origin(
-            lifecycle=lifecycle, origin=lifecycle._psychic_modifier_history_origin
-        )
+        _history_origins.validate(lifecycle)
         return lifecycle
 
     def _phase_handlers(self) -> Mapping[BattlePhase, PhaseHandler]:

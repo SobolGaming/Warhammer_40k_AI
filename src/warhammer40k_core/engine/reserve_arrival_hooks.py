@@ -4,10 +4,13 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+import msgspec
+
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.arrival_placement_conditions import ArrivalPlacementCondition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
@@ -30,6 +33,7 @@ class ReserveArrivalDistanceGrantPayload(TypedDict):
     source_id: str
     enemy_horizontal_distance_inches: float
     replay_payload: JsonValue
+    placement_conditions: JsonValue
 
 
 class ReserveArrivalRestrictionPayload(TypedDict):
@@ -203,9 +207,14 @@ class ReserveArrivalDistanceGrant:
     hook_id: str
     source_id: str
     enemy_horizontal_distance_inches: float
+    placement_conditions: tuple[ArrivalPlacementCondition, ...]
     replay_payload: JsonValue = None
 
     def __post_init__(self) -> None:
+        if not self.placement_conditions or any(
+            type(row) is not ArrivalPlacementCondition for row in self.placement_conditions
+        ):
+            raise GameLifecycleError("Reserve distance grants require typed placement conditions.")
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         object.__setattr__(
@@ -224,6 +233,9 @@ class ReserveArrivalDistanceGrant:
             "source_id": self.source_id,
             "enemy_horizontal_distance_inches": self.enemy_horizontal_distance_inches,
             "replay_payload": self.replay_payload,
+            "placement_conditions": validate_json_value(
+                msgspec.to_builtins(self.placement_conditions)
+            ),
         }
 
 
@@ -391,6 +403,32 @@ class ReserveArrivalRestrictionHookRegistry:
         return self.bindings
 
     def restrictions_for(
+        self, context: ReserveArrivalRestrictionContext
+    ) -> tuple[ReserveArrivalRestriction, ...]:
+        restrictions = self.all_restrictions_for(context)
+        if not restrictions:
+            return ()
+        geometry = {model.model_id: model for model in context.scenario.placed_geometry_models()}
+        arriving = {
+            model.model_id: model
+            for model in context.attempted_rules_unit_placement.geometry_models(context.scenario)
+        }
+        if any(
+            row.arriving_model_instance_id not in arriving
+            or row.source_model_instance_id not in geometry
+            for row in restrictions
+        ):
+            raise GameLifecycleError("Reserve restriction model authority drift.")
+        return tuple(
+            row
+            for row in restrictions
+            if arriving[row.arriving_model_instance_id].range_to(
+                geometry[row.source_model_instance_id]
+            )
+            <= row.minimum_distance_inches
+        )
+
+    def all_restrictions_for(
         self,
         context: ReserveArrivalRestrictionContext,
     ) -> tuple[ReserveArrivalRestriction, ...]:

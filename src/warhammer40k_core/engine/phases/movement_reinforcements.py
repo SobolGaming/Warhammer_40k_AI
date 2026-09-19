@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 
+from warhammer40k_core.engine.reserve_arrival_hooks import ReserveArrivalDistanceGrant
 from typing import TYPE_CHECKING
+from warhammer40k_core.engine.ingress_placement_restrictions import IngressPlacementRestrictions
+from warhammer40k_core.engine.reserve_arrival_restriction_resolution import (
+    inherited_restrictions_for_arrival,
+)
 
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     placement_kinds_for_reserve_state,
@@ -38,13 +43,13 @@ if TYPE_CHECKING:
 
 __all__ = (
     "_apply_valid_reinforcement_placement",
-    "_deep_strike_enemy_distance_for_reserve_arrival",
     "_eligible_reinforcement_reserve_states",
     "_optional_proposal_context_string",
     "_overdue_required_reinforcement_reserve_states",
     "_request_placement_proposal_retry",
     "_request_reinforcement_placement",
     "_required_reinforcement_reserve_states",
+    "_reserve_arrival_distance_grants",
     "_reserve_placement_kinds_for_unit",
     "_reserve_proposal_kind",
     "_resolve_reinforcement_placement_submission",
@@ -292,7 +297,7 @@ def _resolve_reinforcement_placement_submission(
     enemy_deployment_zones = mission_setup.enemy_deployment_zones_for_player(
         reserve_state.player_id,
     )
-    deep_strike_enemy_distance = _deep_strike_enemy_distance_for_reserve_arrival(
+    distance_grants = _reserve_arrival_distance_grants(
         state=state,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -306,6 +311,16 @@ def _resolve_reinforcement_placement_submission(
         objective_markers=_objective_markers_for_state(state),
         enemy_deployment_zones=enemy_deployment_zones,
         reserve_arrival_distance_hooks=reserve_arrival_distance_hooks,
+    )
+    deep_strike_enemy_distance = (
+        min(
+            (
+                DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES,
+                *(grant.enemy_horizontal_distance_inches for grant in distance_grants),
+            )
+        )
+        if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE
+        else None
     )
     restriction_violations = reserve_arrival_restriction_violations(
         state=state,
@@ -360,7 +375,19 @@ def _resolve_reinforcement_placement_submission(
             message="Reinforcement placement is invalid.",
             payload=validate_json_value(invalid_payload),
         )
+    ingress_restrictions = inherited_restrictions_for_arrival(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        attempted_rules_unit_placement=attempted_placement,
+        placement_kind=placement_kind,
+        registry=reserve_arrival_restriction_hooks,
+        strategic_rule=_required_ingress_strategic_reserve_rule(reserve_state),
+        deep_strike_enemy_distance=deep_strike_enemy_distance,
+        distance_grants=distance_grants,
+    )
     _apply_valid_reinforcement_placement(
+        ingress_restrictions=ingress_restrictions,
         state=state,
         decisions=decisions,
         placement=placement,
@@ -384,7 +411,7 @@ def _required_ingress_strategic_reserve_rule(
     return None
 
 
-def _deep_strike_enemy_distance_for_reserve_arrival(
+def _reserve_arrival_distance_grants(
     *,
     state: GameState,
     scenario: BattlefieldScenario,
@@ -399,9 +426,9 @@ def _deep_strike_enemy_distance_for_reserve_arrival(
     objective_markers: tuple[ObjectiveMarker, ...],
     enemy_deployment_zones: tuple[DeploymentZone, ...],
     reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
-) -> float | None:
+) -> tuple[ReserveArrivalDistanceGrant, ...]:
     if placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
-        return None
+        return ()
     rules_unit = _unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state)
     context = ReserveArrivalDistanceContext(
         state=state,
@@ -419,7 +446,7 @@ def _deep_strike_enemy_distance_for_reserve_arrival(
         enemy_deployment_zones=enemy_deployment_zones,
         base_enemy_horizontal_distance_inches=DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES,
     )
-    return reserve_arrival_distance_hooks.effective_enemy_horizontal_distance_inches(context)
+    return reserve_arrival_distance_hooks.grants_for(context)
 
 
 def _unit_for_reserve_state(
@@ -441,6 +468,7 @@ def _apply_valid_reinforcement_placement(
     state: GameState,
     decisions: DecisionController,
     placement: ReinforcementPlacement,
+    ingress_restrictions: IngressPlacementRestrictions,
     result: DecisionResult,
 ) -> None:
     from warhammer40k_core.engine.move_completion_triggers import record_move_completion_event
@@ -477,6 +505,7 @@ def _apply_valid_reinforcement_placement(
         decisions=decisions,
         event_type="reinforcement_unit_arrived",
         payload={
+            "ingress_placement_restrictions": ingress_restrictions.to_payload(),
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": state.active_player_id,

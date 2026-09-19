@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
     from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_selected_to_move_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed
-    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
+    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _reserve_arrival_distance_grants, _unit_for_reserve_state, _apply_valid_reinforcement_placement
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
@@ -114,11 +114,15 @@ def _disembark_candidates_for_movement_unit(
         phase=BattlePhase.MOVEMENT,
         unit_instance_id=transport_id,
     )
-    reserve_state = state.reserve_state_for_unit(transport_id)
-    arrived_by_ingress = (
-        reserve_state is not None
-        and reserve_state.arrived_battle_round == state.battle_round
-        and reserve_state.arrived_phase == BattlePhase.MOVEMENT.value
+    from warhammer40k_core.engine.phase_movement_history import current_unit_moves
+
+    arrived_by_ingress = any(
+        row.setup_kind
+        in (
+            BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            BattlefieldPlacementKind.DEEP_STRIKE,
+        )
+        for row in current_unit_moves(state, transport_id)
     )
     if fell_back_transport is not None:
         movement_status = TransportMovementStatus.FALL_BACK
@@ -439,7 +443,32 @@ def _resolve_disembark_placement_submission(
                 },
             )
         return None
+    from warhammer40k_core.engine.ingress_placement_restrictions import (
+        transport_ingress_restrictions,
+    )
+
+    inherits = (
+        disembark_mode is DisembarkModeKind.RAPID_DISEMBARK
+        and transport_movement_status is TransportMovementStatus.INGRESS_MOVE
+    )
+    ingress_restrictions = None
+    enemy_zones = None
+    if inherits:
+        ingress_restrictions = transport_ingress_restrictions(
+            event_records=decisions.event_log.records,
+            transport_id=transport_unit_instance_id,
+            battle_round=state.battle_round,
+            turn_player_id=active_player_id,
+        )
+        if state.mission_setup is None:
+            raise GameLifecycleError("Rapid Disembark ingress requires MissionSetup.")
+        enemy_zones = state.mission_setup.enemy_deployment_zones_for_player(active_player_id)
     resolution = resolve_rules_unit_disembark(
+        ingress_restrictions=ingress_restrictions,
+        deployment_zones=state.mission_setup.deployment_zones
+        if state.mission_setup is not None
+        else None,
+        enemy_deployment_zones=enemy_zones,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         cargo_state=cargo_state,

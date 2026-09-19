@@ -1,0 +1,222 @@
+{
+  "artifact_schema": "core-v2-core-reserve-transport-source-v1",
+  "source_package_id": "gw-11e-core-reserve-transport",
+  "source_version": "maintained-app-mirrors-observed-2026-09-19",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-reserve-transport:reserve-transport",
+      "section_id": "18.04.01",
+      "source_text": "When a unit uses the rapid disembark mode after its TRANSPORT makes an ingress move, the models must follow the same rules and restrictions as that TRANSPORT did. For example, if that TRANSPORT had to be set up more than 8\" from all enemy units and not within your opponent’s deployment zone, the same applies to the disembarking unit.",
+      "transcription_sha256": "e19428a70d186098f9e5fd7a36b969c1744f4c2ac6574c6cc5471c91d0dfa597",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ingress_placement_restrictions:validate_inherited_placement"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-reserve-transport:placing-reserves",
+      "section_id": "20.01",
+      "source_text": "Before the battle, in the Declare Battle Formations step, you can select one or more friendly units (excluding FORTIFICATIONS) to place in strategic reserves. Instead of setting up these units on the battlefield during deployment, place them to one side; they are strategic reserves units, and will arrive later in the battle. Unless otherwise stated, the combined points value of all of your strategic reserves units (including those embarked within TRANSPORTS that are themselves placed in strategic reserves) cannot exceed 50% of your points limit for your battle size.",
+      "transcription_sha256": "becc8ca294dadd36ef4fb1d586320d57162141e5efde9e373aa3625534fd4202",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.reserves:StrategicReserveDeclaration"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-reserve-transport:ingress",
+      "section_id": "20.04",
+      "source_text": "When eligible: Your unit is in strategic reserves (excluding units that are embarked within TRANSPORTS that are themselves in strategic reserves) Set-up distance: 6\" Effect: Your unit is set up as described in Set Up (03.02) While moving: Set up your unit wholly within the set-up distance of one or more battlefield edges and more than 8\" horizontally from all enemy units. Before the Third Battle Round: While doing so, no models can be set up within your opponent’s deployment zone. After moving: Unless otherwise stated, until the start of the next Charge phase, your unit is not eligible to make any other type of move.",
+      "transcription_sha256": "3ebcf9f594a98f20242c6e3272a5bb3ef63345bd1aff0657560b887321464eba",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.reserve_arrival_resolution:resolve_reserve_arrival"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-reserve-transport-review:reserve-transport",
+      "rule_source_id": "gw-11e-core-reserve-transport:reserve-transport",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "Game Datamissions 18.04.01",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "e19428a70d186098f9e5fd7a36b969c1744f4c2ac6574c6cc5471c91d0dfa597",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "3d2d9397091d9fe29ca0ebf89631e8e3941aedd36fae5849474823ae6caa551a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ingress_placement_restrictions:validate_inherited_placement"
+      ]
+    },
+    {
+      "evidence_id": "core-reserve-transport-mirror:reserve-transport",
+      "rule_source_id": "gw-11e-core-reserve-transport:reserve-transport",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
+      "review_audit_row_id": "reserve-transport",
+      "review_audit_source_observation_sha256": "d400a19b74b423af4b2260d2e76126e0519ede7dbcfa482c69bd1b086f2fef66",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 18.04.01",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "946",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "e19428a70d186098f9e5fd7a36b969c1744f4c2ac6574c6cc5471c91d0dfa597",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "4d0141d138881a008b323ec51a6a298ed54e4c3ffd8cabc8a91e915ec3ab10a2",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ingress_placement_restrictions:validate_inherited_placement"
+      ]
+    },
+    {
+      "evidence_id": "core-reserve-transport-review:placing-reserves",
+      "rule_source_id": "gw-11e-core-reserve-transport:placing-reserves",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 20.01",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "becc8ca294dadd36ef4fb1d586320d57162141e5efde9e373aa3625534fd4202",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "88b1e86daab5301cfc8d7f38f59e5708af1c91acbe2d5b0153e80a1b9efcf661",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.reserves:StrategicReserveDeclaration"
+      ]
+    },
+    {
+      "evidence_id": "core-reserve-transport-mirror:placing-reserves",
+      "rule_source_id": "gw-11e-core-reserve-transport:placing-reserves",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
+      "review_audit_row_id": "placing-reserves",
+      "review_audit_source_observation_sha256": "c1d51d6e70fa3451ee43db7121bb78b106d50da08dade63c8e29c9fba4d03e6a",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 20.01",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+      "observed_at": "2026-09-19T19:06:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "becc8ca294dadd36ef4fb1d586320d57162141e5efde9e373aa3625534fd4202",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "ef319957140579ed3b6da48c65171fc58af376fcf5cdb931a157390afaa7ba26",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.reserves:StrategicReserveDeclaration"
+      ]
+    },
+    {
+      "evidence_id": "core-reserve-transport-review:ingress",
+      "rule_source_id": "gw-11e-core-reserve-transport:ingress",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 20.04",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "3ebcf9f594a98f20242c6e3272a5bb3ef63345bd1aff0657560b887321464eba",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "76928c0cdcc980b6075d064e6fbd0ca349423040b8655660a2ed744038c13f47",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.reserve_arrival_resolution:resolve_reserve_arrival"
+      ]
+    },
+    {
+      "evidence_id": "core-reserve-transport-mirror:ingress",
+      "rule_source_id": "gw-11e-core-reserve-transport:ingress",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-reserve-transport-maintained-app-mirrors-2026-09-19",
+      "review_audit_row_id": "ingress",
+      "review_audit_source_observation_sha256": "e50d5797cb8c3864f6d9e9ae13aafaf23710519c3d0ad39759e07643dd1e5ac5",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 20.04",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+      "observed_at": "2026-09-19T19:06:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "3ebcf9f594a98f20242c6e3272a5bb3ef63345bd1aff0657560b887321464eba",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "048d07a8f3a9ed6c32eed7fb48132f96a819b13993fb1e73a1ec51762623115b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.reserve_arrival_resolution:resolve_reserve_arrival"
+      ]
+    }
+  ],
+  "reserve_transport_policy": {
+    "source_rule_id": "gw-11e-core-reserve-transport:reserve-transport",
+    "inherits_ingress_placement": true,
+    "cargo_remains_embarked": true
+  },
+  "package_hash": "a0c17754e8f2ea18042f6f7c44c22973ca9813058182127be058e4876cb1d6dc"
+}

@@ -2475,6 +2475,33 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         registry=registry,
     )
 
+    from warhammer40k_core.engine.ingress_placement_restrictions import validate_inherited_placement
+    from warhammer40k_core.engine.reserve_arrival_restriction_resolution import (
+        inherited_restrictions_for_arrival,
+    )
+
+    inherited = inherited_restrictions_for_arrival(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        attempted_rules_unit_placement=RulesUnitPlacement.single(outside_placement),
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        registry=registry,
+        strategic_rule=None,
+        deep_strike_enemy_distance=None,
+        distance_grants=(),
+    )
+    assert inherited.source_distances
+    invalid_models = validate_inherited_placement(
+        restrictions=inherited,
+        scenario=scenario,
+        models=RulesUnitPlacement.single(near_placement).geometry_models(scenario),
+        player_id=target_army.player_id,
+        enemy_deployment_zones=(),
+        deployment_zones=(),
+    )
+    assert arriving_model.model_instance_id in invalid_models
+
 
 def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_effect() -> None:
     source_army, target_army = _mustered_core_armies()

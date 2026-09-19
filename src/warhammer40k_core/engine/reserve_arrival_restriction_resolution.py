@@ -4,8 +4,13 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
 )
+from warhammer40k_core.engine.ingress_placement_restrictions import (
+    IngressPlacementRestrictions,
+    restrictions_for_arrival,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceGrant,
     ReserveArrivalRestrictionContext,
     ReserveArrivalRestrictionHookRegistry,
 )
@@ -13,6 +18,7 @@ from warhammer40k_core.engine.reserves import (
     ReservePlacementViolation,
     ReservePlacementViolationCode,
     ReserveState,
+    StrategicReserveRule,
 )
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -52,4 +58,43 @@ def reserve_arrival_restriction_violations(
             blocker_id=restriction.source_model_instance_id,
         )
         for restriction in restrictions
+    )
+
+
+def inherited_restrictions_for_arrival(
+    *,
+    state: object,
+    scenario: BattlefieldScenario,
+    reserve_state: ReserveState,
+    attempted_rules_unit_placement: RulesUnitPlacement,
+    placement_kind: BattlefieldPlacementKind,
+    registry: ReserveArrivalRestrictionHookRegistry,
+    strategic_rule: StrategicReserveRule | None,
+    deep_strike_enemy_distance: float | None,
+    distance_grants: tuple[ReserveArrivalDistanceGrant, ...],
+) -> IngressPlacementRestrictions:
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Ingress inheritance requires GameState.")
+    restrictions = registry.all_restrictions_for(
+        ReserveArrivalRestrictionContext(
+            state=state,
+            scenario=scenario,
+            reserve_state=reserve_state,
+            rules_unit=rules_unit_view_from_armies(
+                armies=scenario.armies, unit_instance_id=reserve_state.unit_instance_id
+            ),
+            attempted_rules_unit_placement=attempted_rules_unit_placement,
+            placement_kind=placement_kind,
+        )
+    )
+    return restrictions_for_arrival(
+        placement_kind=placement_kind,
+        battle_round=state.battle_round,
+        strategic_rule=strategic_rule,
+        deep_strike_enemy_distance=deep_strike_enemy_distance,
+        source_restrictions=restrictions,
+        distance_grants=distance_grants,
     )

@@ -2520,40 +2520,18 @@ def test_core_rules_deep_strike_has_no_mission_pack_battle_round_1_block() -> No
     assert result.is_valid
 
 
-def test_reserve_arrival_with_embarked_units_is_deferred_until_transport_cargo_state() -> None:
-    state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
-    cargo_reserve_state = replace(
-        reserve_state,
-        embarked_unit_instance_ids=("army-alpha:intercessor-unit-2",),
-    )
-    state.replace_reserve_state(cargo_reserve_state)
-    before_battlefield = state.battlefield_state.to_payload() if state.battlefield_state else None
+def test_reserve_arrival_preserves_carrier_cargo_ownership() -> None:
+    from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID
+    from tests.order63_reserve_transport_helpers import reserve_transport_session, submit_ingress
 
-    result = resolve_reserve_arrival(
-        scenario=scenario,
-        ruleset_descriptor=_ruleset(),
-        reserve_state=cargo_reserve_state,
-        attempted_placement=_single_model_reserve_placement(
-            reserve_unit=reserve_unit,
-            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
-        ),
-        battle_round=3,
-        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-        large_model_exceptions=(
-            LargeModelReservePlacementException(
-                model_instance_id=reserve_unit.own_models[0].model_instance_id,
-                battlefield_edge=BattlefieldEdge.SOUTH,
-            ),
-        ),
-    )
-
-    assert ReservePlacementViolationCode.RESERVE_EMBARKED_CARGO_UNSUPPORTED in set(
-        _violation_codes(result)
-    )
-    assert not result.is_valid
+    session = reserve_transport_session()
+    submit_ingress(session)
+    state = session.lifecycle.state
+    assert state is not None
     assert state.battlefield_state is not None
-    assert state.battlefield_state.to_payload() == before_battlefield
-    assert state.reserve_state_for_unit(cargo_reserve_state.unit_instance_id) == cargo_reserve_state
+    assert state.battlefield_state.unit_placement_or_none(TRANSPORT_ID) is not None
+    assert state.battlefield_state.unit_placement_or_none(PASSENGER_ID) is None
+    assert state.transport_cargo_states[0].embarked_unit_instance_ids == (PASSENGER_ID,)
 
 
 def test_replay_load_rejects_arrived_reserve_with_unaccounted_embarked_units() -> None:

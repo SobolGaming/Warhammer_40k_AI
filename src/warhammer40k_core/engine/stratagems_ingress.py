@@ -4,6 +4,9 @@ from __future__ import annotations
 
 
 from typing import TYPE_CHECKING
+from warhammer40k_core.engine.reserve_arrival_restriction_resolution import (
+    inherited_restrictions_for_arrival,
+)
 
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
@@ -126,6 +129,17 @@ def _apply_rapid_ingress_placement(
                 {**invalid_payload, "next_request_id": retry_request.request_id}
             ),
         )
+    ingress_restrictions = inherited_restrictions_for_arrival(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        attempted_rules_unit_placement=rules_unit_placement,
+        placement_kind=submitted.placement_kind,
+        registry=reserve_arrival_restriction_hooks,
+        strategic_rule=_strategic_reserve_rule_for_ingress_request(proposal_request),
+        deep_strike_enemy_distance=None,
+        distance_grants=(),
+    )
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Rapid Ingress placement requires battlefield_state.")
@@ -146,6 +160,7 @@ def _apply_rapid_ingress_placement(
         )
     stratagem_use = _stratagem_use_from_proposal_context(proposal_request)
     event_payload = {
+        "ingress_placement_restrictions": ingress_restrictions.to_payload(),
         "game_id": state.game_id,
         "battle_round": state.battle_round,
         "active_player_id": state.active_player_id,

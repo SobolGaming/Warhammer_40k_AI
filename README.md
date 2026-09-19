@@ -892,3 +892,12 @@ Order 62 derives Shock Disembark forced Fights from enemies engaged with the
 passengers after setup, including newly engaged enemies. Starting Transport
 engagements confer no passenger obligation. See [scope and owner resolution](docs/ORDER_62_SCOPE_PLAN.md)
 and [contract 28 migration](contracts/migrations/27-to-28.md).
+
+
+Order 63 allows loaded reserve Transports to ingress while their cargo remains
+embarked. Rapid Disembark inherits every model's Transport ingress placement
+restriction, including source-conditioned regions. Private pre-ingress replay
+roots authenticate save/restore; shared viewer redaction protects source evidence.
+See [scope and source evidence](docs/ORDER_63_SCOPE_PLAN.md) and
+[contract migration 28 to 29](contracts/migrations/28-to-29.md). Order 64 reserve
+lifetimes and defaults remain separate.

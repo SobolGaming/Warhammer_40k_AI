@@ -1,6 +1,12 @@
 # CORE V2 external contract
 
-Contract version: `28.0.0`
+Contract version: `29.0.0`
+
+Contract 29 implements loaded reserve Transport ingress and inherited Rapid
+Disembark placement, including typed source-defined regions. The private
+pre-ingress origin authenticates saved policy and passenger placements by exact
+re-execution. See [migration 28 to 29](migrations/28-to-29.md).
+
 
 Order 62 / contract 28 uses passenger post-placement engagements for Shock
 Disembark forced Fights. See [the migration](migrations/27-to-28.md).

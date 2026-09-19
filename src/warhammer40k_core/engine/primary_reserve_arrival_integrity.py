@@ -92,6 +92,7 @@ _ARRIVAL_EVENT_COMMON_KEYS = frozenset(
         "component_unit_instance_ids",
         "game_id",
         "large_model_exception_used",
+        "ingress_placement_restrictions",
         "phase",
         "phase_body_status",
         "placement_kind",
@@ -129,6 +130,13 @@ def validate_primary_reserve_arrival_event_authority(
     )
 
     validate_arrival_restriction_evidence(state=state, submitted=submitted, payload=payload)
+    from warhammer40k_core.engine.ingress_placement_restrictions import IngressPlacementRestrictions
+
+    policy = IngressPlacementRestrictions.from_payload(
+        payload.get("ingress_placement_restrictions")
+    )
+    if policy.placement_kind is not submitted.placement_kind:
+        raise GameLifecycleError("Ingress placement restriction kind drift.")
     expected_keys: set[str] = set(_ARRIVAL_EVENT_COMMON_KEYS)
     if ingress_use is None:
         expected_keys.add("movement_phase_action")

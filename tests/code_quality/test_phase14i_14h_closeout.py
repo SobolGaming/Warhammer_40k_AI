@@ -289,7 +289,9 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     attached_unit_formation_source = source_for(ATTACHED_UNIT_FORMATION_PATH)
 
     assert "def resolve_combat_disembark(" in transport_source
-    assert "Combat Disembark requires resolve_combat_disembark." in transport_source
+    standard_disembark_source = source_for(ENGINE_ROOT / "standard_disembark_resolution.py")
+    assert "standard_disembark_resolution import resolve_disembark as resolve" in transport_source
+    assert "Combat Disembark requires resolve_combat_disembark." in standard_disembark_source
     assert "combat_disembark.hazard_roll" in transport_source
     assert "apply_transport_hazard_mortal_wounds" in transport_source
     assert "transport_hazard_mortal_wounds" in transport_source

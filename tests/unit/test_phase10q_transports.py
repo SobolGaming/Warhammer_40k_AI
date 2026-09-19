@@ -3529,6 +3529,22 @@ def test_order38_candidate_grant_and_movement_matrix(
                 post_arrival_restrictions=(),
             )
         )
+        from warhammer40k_core.engine.phase_movement_history import PhaseMovementRecord
+
+        state.phase_movement_history.append(
+            PhaseMovementRecord(
+                event_id="test:order38:ingress",
+                battle_round=1,
+                turn_player_id="player-a",
+                phase=BattlePhase.MOVEMENT,
+                unit_instance_id=transport.unit_instance_id,
+                model_instance_ids=tuple(
+                    sorted(model.model_instance_id for model in transport.own_models)
+                ),
+                is_surge=False,
+                setup_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            )
+        )
     if grant != "absent":
         factory = (
             assault_disembark_permission_effect
@@ -3647,7 +3663,9 @@ def test_order38_other_movement_states_facade_replay(
     from warhammer40k_core.engine.normal_move_history import NormalMoveSourceKind, NormalMoveState
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 
-    session = disembark_session((mode,))
+    session = disembark_session(
+        (mode,), reserve_transport=status is TransportMovementStatus.INGRESS_MOVE
+    )
     state = session.lifecycle.state
     assert state is not None
     if status is TransportMovementStatus.ADVANCE:
@@ -3670,35 +3688,9 @@ def test_order38_other_movement_states_facade_replay(
             )
         )
     if status is TransportMovementStatus.INGRESS_MOVE:
-        # Start at a typed post-arrival snapshot. The P20 carrier-arrival driver
-        # currently rejects embarked cargo and is not part of this certification.
-        declared = ReserveState.declared_before_battle(
-            player_id="player-a",
-            unit_instance_id=TRANSPORT_ID,
-            reserve_kind=ReserveKind.RESERVES,
-            embarked_unit_instance_ids=(PASSENGER_ID,),
-            destruction_deadline_policy=reposition_destruction_policy(
-                mission_setup=state.mission_setup,
-                destruction_deadline_policy=None,
-            ),
-        )
-        state.record_reserve_state(
-            declared.mark_arrived(
-                battle_round=1,
-                phase=BattlePhase.MOVEMENT,
-                large_model_exception_used=False,
-                post_arrival_restrictions=(),
-            )
-        )
-        session.lifecycle.decision_controller.event_log.append(
-            "reserve_unit_declared",
-            {
-                "game_id": state.game_id,
-                "player_id": "player-a",
-                "unit_instance_id": TRANSPORT_ID,
-                "reserve_state": declared.to_payload(),
-            },
-        )
+        from tests.order63_reserve_transport_helpers import submit_ingress
+
+        submit_ingress(session)
     request = pending_request(session)
     initial = session.lifecycle.to_payload()
     action_status = session.submit_option(
@@ -3719,7 +3711,12 @@ def test_order38_other_movement_states_facade_replay(
         unit_instance_id=PASSENGER_ID,
         placement_kind=BattlefieldPlacementKind.DISEMBARK,
         attempted_placement=_unit_placement_at(
-            passenger, army_id="army-alpha", player_id="player-a", poses=_disembark_poses()
+            passenger,
+            army_id="army-alpha",
+            player_id="player-a",
+            poses=tuple(Pose.at(9.4 + i * 1.3, 5) for i in range(5))
+            if status is TransportMovementStatus.INGRESS_MOVE
+            else _disembark_poses(),
         ),
         transport_unit_instance_id=TRANSPORT_ID,
         disembark_mode=mode,
@@ -10695,3 +10692,94 @@ def test_order62_transport_only_engagement_does_not_force_passenger_fight() -> N
         )
     ).run()
     assert replay.reproduced_exactly, replay
+
+
+@pytest.mark.parametrize(("leader_y", "valid"), [(11.8, True), (14.5, False)])
+def test_order63_attached_passengers_all_inherit_edge_distance(
+    leader_y: float, valid: bool
+) -> None:
+    from warhammer40k_core.engine.ingress_placement_restrictions import restrictions_for_arrival
+    from warhammer40k_core.engine.reserves import StrategicReserveRule
+
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    scenario = _without_unit(
+        _without_unit(scenario, bodyguard.unit_instance_id), leader.unit_instance_id
+    )
+    scenario = replace(
+        scenario,
+        battlefield_state=scenario.battlefield_state.with_unit_placement(
+            _unit_placement_at(
+                transport, army_id="army-alpha", player_id="player-a", poses=(Pose.at(30, 10),)
+            )
+        ),
+    )
+    attached_id = "attached-unit:army-alpha:attached-transport-passengers"
+    components = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    placement = RulesUnitPlacement(
+        rules_unit_instance_id=attached_id,
+        component_unit_placements=(
+            _unit_placement_at(
+                bodyguard,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=(
+                    Pose.at(28.6, 13),
+                    Pose.at(30, 13),
+                    Pose.at(31.4, 13),
+                    Pose.at(29.3, 14.2),
+                    Pose.at(30.7, 14.2),
+                ),
+            ),
+            _unit_placement_at(
+                leader, army_id="army-alpha", player_id="player-a", poses=(Pose.at(32.6, leader_y),)
+            ),
+        ),
+    )
+    policy = restrictions_for_arrival(
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        battle_round=2,
+        strategic_rule=StrategicReserveRule(edge_distance_inches=15),
+        deep_strike_enemy_distance=None,
+        source_restrictions=(),
+        distance_grants=(),
+    )
+    result = resolve_rules_unit_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=_cargo_state(
+            transport=transport,
+            embarked_unit_ids=components,
+            started_unit_ids=components,
+            battle_round=2,
+            max_model_count=6,
+        ),
+        selection=RulesUnitDisembarkSelection(
+            player_id="player-a",
+            battle_round=2,
+            unit_instance_id=attached_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=placement,
+            disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.INGRESS_MOVE,
+        ),
+        rules_unit=rules_unit_view_from_armies(
+            armies=scenario.armies, unit_instance_id=attached_id
+        ),
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+        turn_player_id="player-a",
+        ingress_restrictions=policy,
+        enemy_deployment_zones=(),
+        deployment_zones=(),
+    )
+    assert result.is_valid is valid, result.violations
+    if not valid:
+        assert result.updated_cargo_state is None
+        assert result.transition_batch is None
+        assert {
+            row.model_instance_id
+            for row in result.violations
+            if row.violation_code
+            is TransportOperationViolationCode.RAPID_DISEMBARK_INGRESS_RESTRICTION
+        } == {leader.own_models[0].model_instance_id}

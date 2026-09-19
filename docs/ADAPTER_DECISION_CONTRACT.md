@@ -6308,3 +6308,28 @@ No new decision or submission shape is introduced. Both players see the same
 public queue identities, while the existing shared redaction owner keeps
 internal continuation, registry and physical-history evidence private.
 See [migration 27 to 28](../contracts/migrations/27-to-28.md).
+
+
+## Order 63 — reserve Transports and inherited Rapid Disembark
+
+Contract 29 uses the existing finite movement-unit/action options and parameterized
+placement proposals. A loaded reserve Transport alone is eligible to ingress;
+cargo is neither placed nor released by that decision. The existing declaration
+accounting includes cargo points. Rapid Disembark then checks every passenger
+model against the Transport's accepted edge, enemy-distance, deployment-zone and
+source-defined placement conditions. Source eligibility remains owned by the
+Transport; passengers do not reacquire its grant using their own keywords.
+Attached passengers share one rules-unit condition evaluation and one atomic
+cargo/placement mutation. Rule-invalid, well-formed proposals follow the existing
+recorded rejection/fresh retry contract; stale or malformed submissions retain
+the pending request and do not mutate state.
+
+The engine derives `ingress_placement_restrictions` on arrival. It is not an
+adapter input. Both player views and public event deltas remove this internal
+source/geometry evidence through the shared redaction module. The independent
+`ingress_placement_history_origin` precedes the first loaded-Transport ingress
+attempt; restore replays from it to authenticate the policy and later passenger
+placements even after the source effect or turn expires. A missing, malformed or
+altered origin or derived policy fails closed. Ingress movement status uses the
+actual turn's phase movement history. No new decision family or proposal kind
+is introduced. See [migration 28 to 29](../contracts/migrations/28-to-29.md).
