@@ -1,0 +1,85 @@
+{
+  "workload_id": "order60-emergency-disembark-placement-v1",
+  "revision": "working-tree-da58b26c34f3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "resolve one five-model Emergency Disembark contact-ring placement on the canonical Transport fixture; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": "five Intercessors emergency-disembarking a 100mm circular Transport",
+    "units": 2,
+    "emergency_survivors": 5
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order60.py": "880d1aca3ff5fb712acf6fb6802da38d59ab6a891e22bf7c564c3013f87ac100",
+    "tests/order60_emergency_disembark_helpers.py": "316e0ae40bd1086787beee1b7406acb9aca932e335748ea807e77dc0203aa094"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 7.233522299997276,
+      "matched_seconds": 0.09686719998717308,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9516685999988113,
+      "matched_seconds": 0.006817200002842583,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0176222000009147,
+      "matched_seconds": 0.006902299995999783,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9502054000040516,
+      "matched_seconds": 0.006883800000650808,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9317022000032011,
+      "matched_seconds": 0.007050400003208779,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.945020500003011,
+      "matched_seconds": 0.006851899990579113,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9359011999913491,
+      "matched_seconds": 0.006937900005141273,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.019758671426513632,
+  "median_seconds": 0.006902299995999783,
+  "maximum_seconds": 0.09686719998717308,
+  "p95_seconds": 0.007050400003208779,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 2.5,
+    "maximum_seconds": 12
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}

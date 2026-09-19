@@ -258,7 +258,7 @@ corroborate but is not required to begin that work.
 | 57 | P05C | C05-03 | Authenticated former placements exist, but no generic query can measure to a destroyed model or destroyed unit. | Add source-authorized measurement using the exact former base/hull; a destroyed-unit reference resolves to the last model destroyed and grants no living battlefield authority. [Order 57 implementation and evidence](ORDER_57_SCOPE_PLAN.md). | [05.04.06](https://www.40k.app/rules/05-attack-sequence): use the destroyed model’s former footprint, and the last destroyed model for a destroyed-unit reference. | P05B | APP-AUTHORITY |
 | 58 | P05D | C05-04 | The supported failed-save replacement path changes incoming Damage to 0 after the save, but the behavior is not certified against v931 across source, engine consumers, adapters, restore, and replay. | Pin the v931 FAQ, retain the correct post-save ordering, add an end-to-end regression, and audit every Damage-replacement consumer so no path changes Damage before the saving throw. | [Game Datamissions App-data v931, Damage-to-0 timing FAQ](https://game-datamissions.com/11th/rules/changelog): change Damage after saving throws. | S-MIRRORS | APP-AUTHORITY |
 | 59 | P18A | C18-01 | An empty Dedicated Transport receives a delayed unavailable/setup consequence associated with battle round 1. | At the end of Declare Battle Formations, immediately destroy/remove every empty Dedicated Transport without triggering destroyed-model rules. See [Order 59 implementation and evidence](ORDER_59_SCOPE_PLAN.md). | [18.01 Transport Capacity](https://www.40k.app/rules/18-transports): empty Dedicated Transports are destroyed at the stated formation boundary without destruction triggers. | — | APP-AUTHORITY |
-| 60 | P18B | C18-02 | Emergency Disembark accepts an arbitrary subset, destroys omitted models without proof, and rejects engaged endpoints even when no unengaged placement exists. | Place the maximum possible survivors wholly within 6″ and as close as possible; prefer unengaged placements, allow an engaged endpoint only when no unengaged endpoint exists, and destroy only genuinely unplaceable models. | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): maximal placement, closest-possible positioning, unengaged preference, engaged fallback, and casualty rules. | P03B, P18C | APP-AUTHORITY |
+| 60 | P18B | C18-02 | Emergency Disembark accepts an arbitrary subset, destroys omitted models without proof, and rejects engaged endpoints even when no unengaged placement exists. | Place the maximum possible survivors wholly within 6″ and as close as possible; prefer unengaged placements, allow an engaged endpoint only when no unengaged endpoint exists, and destroy only genuinely unplaceable models. See [Order 60 implementation and evidence](ORDER_60_SCOPE_PLAN.md). | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): maximal placement, closest-possible positioning, unengaged preference, engaged fallback, and casualty rules. | P03B, P18C | APP-AUTHORITY |
 | 61 | P18H | C18-09 | Embark checks same-phase disembark on the selected cargo state; the shared validator has no complete same-turn setup authority. | Reject embark after any setup on the battlefield this turn, including disembark from another Transport, Ingress and repositioning, unless a source explicitly overrides the restriction. Use canonical rules-unit setup history through all ordinary/reactive move and embark validators; verify later-turn expiry, both players, restore and replay. | [18.02 Embarking](https://www.40k.app/rules/18-transports): no setup on the battlefield this turn. | P18G, P01C | APP-DRIFT |
 | 62 | P18F | C18-07 | P18E substitutes the Transport's prior engagements for 18.07's moving-model engagement clause; C18-08/P18G separately owns Core eligibility. | Resolve only the engagement-owner interpretation and its forced-Fight consequences. Pin complete versioned mirror or official-App evidence; do not infer that embarked passengers share the Transport's prior engagements. Reconcile live validation, stored start-engagement evidence, queued opponents and replay. Core eligibility alignment proceeds independently in P18G. | [18.06–18.07 Assault and Shock Disembark](https://www.40k.app/rules/18-transports). | P18D, P18E, P18G, S-MIRRORS | EXCEPTION-PAUSE |
 | 63 | P20 | C20-01, C18-06 | Reserve ingress rejects a Strategic Reserve Transport containing cargo as unsupported, and Rapid Disembark passengers do not inherit the ingress placement restrictions that governed their Transport. | Select and ingress the Transport as one reserve unit while cargo remains embarked; count cargo toward reserve limits but do not make it independently eligible for ingress. If a passenger then uses Rapid Disembark, apply the same ingress restrictions to every disembarking model. | [20.01/20.04 Strategic Reserves](https://www.40k.app/rules/20-strategic-reserves) and [Game Datamissions App-data v946, 18.04.01 Rapid Disembark And Limitations](https://game-datamissions.com/11th/rules/changelog). | P09A, T-TRANSPORT, S-MIRRORS | APP-AUTHORITY |
@@ -4919,4 +4919,32 @@ The offline builder and typed loader record `loaded` /
 `f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
 
 See [performance and final validation](performance/order59/README.md).
+
+## P18B implementation evidence — Order 60
+
+Status: implemented on `codex/order-60-emergency-disembark-placement`.
+Finding: `C18-02`. This certifies 18.05 Emergency Disembark maximal, closest,
+unengaged-preferring placement; it is not a category-wide certificate.
+
+The invariant is that every surviving model is set up wholly within 6 inches of
+the destroyed Transport and as close as possible, remains unengaged when an
+unengaged set-up exists, may be engaged only when no unengaged set-up exists,
+and is destroyed only when it still cannot be set up. Ownership, source, and
+proof are in `docs/ORDER_60_SCOPE_PLAN.md`. No new player-facing decision, named
+handler, or architecture exception is introduced.
+
+Source authority is the complete 18.05 while-moving placement observation
+`gw-11e-core-emergency-disembark-placement:emergency-disembark-placement`,
+observed 2026-09-18T19:30:00+00:00, transcription SHA-256
+`cc63b547abc5339f6c3f98530f53cd3a838800f9b5a89003715ebf19e7c39923`,
+source-observation SHA-256
+`c39e87327a822139e0075c5af984b48f2fecbc0c2d5a3645507473e9e2545150`.
+The offline builder and typed loader record `loaded` /
+`executable_engine_runtime`. Historical official Core Rules provenance remains
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`. The
+corroborating 18.05 rule ID
+`gw-11e-core-rules:transports:emergency-disembark-move` remains in the Core
+Transports package.
+
+See [performance and final validation](performance/order60/README.md).
 

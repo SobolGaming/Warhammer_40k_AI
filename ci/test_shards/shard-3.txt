@@ -7,6 +7,7 @@ tests/unit/test_dice.py
 tests/unit/test_faction_pack_datasheet_review.py
 tests/unit/test_lethal_hits.py
 tests/unit/test_order36_timing_authority.py
+tests/unit/test_order60_emergency_disembark.py
 tests/unit/test_phase10a_placement.py
 tests/unit/test_phase10d_battlefield_transitions.py
 tests/unit/test_phase11d_adapter_proposals.py

@@ -6,6 +6,10 @@ from typing import Any, cast
 
 import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
+from tests.order60_emergency_disembark_helpers import (
+    emergency_disembark_contact_poses,
+    emergency_disembark_poses_around,
+)
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -1831,9 +1835,10 @@ def _destroyed_transport_pending_for_test(
         passenger,
         army_id="army-beta",
         player_id="player-b",
-        poses=tuple(
-            Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
-            for index, _model in enumerate(passenger.own_models)
+        poses=emergency_disembark_poses_around(
+            center_x=35.0,
+            center_y=35.0,
+            count=len(passenger.own_models),
         ),
     )
     hazard_rolls = resolve_destroyed_transport_hazard_rolls(
@@ -1965,9 +1970,10 @@ def _destroyed_transport_placement_payload_for_test(
                 unit,
                 army_id="army-beta",
                 player_id="player-b",
-                poses=tuple(
-                    Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
-                    for index, _model in enumerate(unit.own_models)
+                poses=emergency_disembark_contact_poses(
+                    unit.own_models,
+                    center_x=35.0,
+                    center_y=35.0,
                 ),
             ),
             transport_unit_instance_id=transport.unit_instance_id,

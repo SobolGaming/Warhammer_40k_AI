@@ -6,6 +6,7 @@ from dataclasses import replace
 
 import pytest
 from tests.order32_visibility_helpers import retained_observer_session, visible_enemy_selection
+from tests.order60_emergency_disembark_helpers import emergency_disembark_contact_poses
 from tests.phase13b_shooting_declaration_helpers import (
     _destroyed_transport_placement_payload_for_test,
     _proposal_from_request,
@@ -641,6 +642,15 @@ def test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup
         unit=passenger,
         transport=transport,
     )
+    survivors = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    ).alive_models()
+    poses = emergency_disembark_contact_poses(
+        survivors,
+        center_x=35.0,
+        center_y=35.0,
+    )
     placement_payload["attempted_placement"] = validate_json_value(
         UnitPlacement(
             army_id="army-beta",
@@ -652,14 +662,9 @@ def test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup
                     player_id="player-b",
                     unit_instance_id=passenger.unit_instance_id,
                     model_instance_id=model.model_instance_id,
-                    pose=Pose.at(38, 32 + 1.5 * index),
+                    pose=pose,
                 )
-                for index, model in enumerate(
-                    rules_unit_view_by_id(
-                        state=state,
-                        unit_instance_id=passenger.unit_instance_id,
-                    ).alive_models()
-                )
+                for model, pose in zip(survivors, poses, strict=True)
             ),
         ).to_payload()
     )

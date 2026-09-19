@@ -35,7 +35,9 @@ def test_all_disembark_consumers_use_the_shared_endpoint_authority() -> None:
     engine = ROOT / "src/warhammer40k_core/engine"
     shared = (engine / "transport_disembark_geometry.py").read_text()
     assert "base_fits_disembark_distance(model.base, transport.base, distance_inches)" in shared
-    assert "if not oversized and enemy_unit_id in allowed_engagement_units:" in shared
+    assert "if not oversized and (" in shared
+    assert "mode is DisembarkModeKind.EMERGENCY_DISEMBARK" in shared
+    assert "or enemy_unit_id in allowed_engagement_units" in shared
     assert "DISEMBARK_POLICY.maximum_base_distance_inches" in shared
     assert "model.range_to(transport) <= DISEMBARK_POLICY.maximum_base_distance_inches" in shared
     assert "base_distance_to(" not in shared

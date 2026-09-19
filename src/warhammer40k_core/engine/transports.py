@@ -160,6 +160,8 @@ class TransportOperationViolationCode(StrEnum):
     FIRING_DECK_DUPLICATE_MODEL_SELECTION = "firing_deck_duplicate_model_selection"
     FIRING_DECK_MELEE_WEAPON = "firing_deck_melee_weapon"
     FIRING_DECK_ONE_SHOT_WEAPON = "firing_deck_one_shot_weapon"
+    EMERGENCY_DISEMBARK_NOT_CLOSEST = "emergency_disembark_not_closest"
+    EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE = "emergency_disembark_omitted_model_placeable"
 
 
 class TransportCapacityProfilePayload(TypedDict):
@@ -2615,7 +2617,11 @@ def _resolve_disembark(
             disembarked_unit_state=None,
             transition_batch=None,
         )
-    _append_unit_placement_drift_violations(
+    from warhammer40k_core.engine.emergency_disembark_placement import (
+        append_unit_placement_drift_violations,
+    )
+
+    append_unit_placement_drift_violations(
         violations=violations,
         unit=unit,
         attempted_placement=selection.attempted_placement,
@@ -2670,6 +2676,24 @@ def _resolve_disembark(
         disembark_mode=disembark_mode,
         allowed_enemy_engagement_unit_ids=(selection.start_engaged_enemy_unit_instance_ids),
     )
+    if disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK:
+        from warhammer40k_core.engine.emergency_disembark_placement import (
+            append_emergency_disembark_placement_violations,
+        )
+
+        append_emergency_disembark_placement_violations(
+            violations=violations,
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit=unit,
+            attempted_placement=selection.attempted_placement,
+            models=models,
+            transport_models=transport_models,
+            battlefield_width_inches=width,
+            battlefield_depth_inches=depth,
+            terrain_features=features,
+            objective_markers=markers,
+        )
     if (
         enforce_shock_engagement_preservation
         and disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
@@ -2822,46 +2846,6 @@ def _append_transport_common_violations(
                 message="Transport capacity profile datasheet does not match the Transport unit.",
                 unit_instance_id=transport.unit_instance_id,
                 source_rule_id=cargo_state.capacity_profile.source_id,
-            )
-        )
-
-
-def _append_unit_placement_drift_violations(
-    *,
-    violations: list[TransportOperationViolation],
-    unit: UnitInstance,
-    attempted_placement: UnitPlacement,
-    allow_partial: bool,
-) -> None:
-    if attempted_placement.unit_instance_id != unit.unit_instance_id:
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Transport placement unit_instance_id does not match unit.",
-                unit_instance_id=unit.unit_instance_id,
-            )
-        )
-        return
-    attempted_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in attempted_placement.model_placements)
-    )
-    expected_model_ids = tuple(sorted(model.model_instance_id for model in unit.own_models))
-    if allow_partial:
-        if set(attempted_model_ids) - set(expected_model_ids):
-            violations.append(
-                TransportOperationViolation(
-                    violation_code=TransportOperationViolationCode.UNIT_PLACEMENT_DRIFT,
-                    message="Emergency Disembark placement references an unknown model.",
-                    unit_instance_id=unit.unit_instance_id,
-                )
-            )
-        return
-    if attempted_model_ids != expected_model_ids:
-        violations.append(
-            TransportOperationViolation(
-                violation_code=TransportOperationViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Disembark placement must include every model in the unit.",
-                unit_instance_id=unit.unit_instance_id,
             )
         )
 

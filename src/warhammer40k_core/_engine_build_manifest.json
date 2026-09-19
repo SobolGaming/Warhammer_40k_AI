@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d2cca54e01a6f76e85658950da129116a78e7443a8338f5aca0a6d20f861717b",
-  "fingerprint": "d2cca54e01a6f76e85658950da129116a78e7443a8338f5aca0a6d20f861717b",
-  "resource_count": 2868,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:da58b26c34f363cd525cd1ab4afca9b1723db7471e509431788698d2f11e1724",
+  "fingerprint": "da58b26c34f363cd525cd1ab4afca9b1723db7471e509431788698d2f11e1724",
+  "resource_count": 2872,
   "resources": [
     {
       "byte_length": 113,
@@ -1990,9 +1990,9 @@
       "sha256": "29d013b2b1edd6228333a931287f463afcaf3128b038d7365e476b3442fbbf7d"
     },
     {
-      "byte_length": 25350,
+      "byte_length": 26569,
       "path": "warhammer40k_core/engine/destroyed_transport_rules_unit_disembark.py",
-      "sha256": "654b2f8264a821fabbf2a534a0f455ea9b54be6c97e4816db6095dc57b354b89"
+      "sha256": "0f05595ac962a5d262c81cc22baa3dd554b38a64a572d6501f6bd5cb846034b9"
     },
     {
       "byte_length": 14209,
@@ -2063,6 +2063,11 @@
       "byte_length": 26142,
       "path": "warhammer40k_core/engine/emergency_disembark.py",
       "sha256": "2614600a4f7ebbec8f310e749d35ed40b4c0ad56a46b28cb08f419758ca6c642"
+    },
+    {
+      "byte_length": 30501,
+      "path": "warhammer40k_core/engine/emergency_disembark_placement.py",
+      "sha256": "b901db3772d85c1c29deb366dd0f4a9979ab0293273f88976173be980703913d"
     },
     {
       "byte_length": 14880,
@@ -12275,9 +12280,9 @@
       "sha256": "df1fc326c69933cdf7e88af48b92b3abc4d39f685a0c2b370041439865ff1aab"
     },
     {
-      "byte_length": 11483,
+      "byte_length": 11592,
       "path": "warhammer40k_core/engine/transport_disembark_geometry.py",
-      "sha256": "ed2213680c8bd4a8b984ebf67566cb3c66af7e3d12c6e2bdea6b489223d952b4"
+      "sha256": "19293ba0a4574095f4970ff5e1e25d15fdd200a4a7d6f49f7a005307da75cf69"
     },
     {
       "byte_length": 6016,
@@ -12305,9 +12310,9 @@
       "sha256": "af8881a602d6ab04ab5e91447c57f41c7d8057da3b59e5e95d91270998777b31"
     },
     {
-      "byte_length": 129646,
+      "byte_length": 129011,
       "path": "warhammer40k_core/engine/transports.py",
-      "sha256": "dd89a1ef77ce03f84735211c23516499ca4ff5552ab5d8a413158db805dfd8c8"
+      "sha256": "a34a367c607eaf523e091a12535d44215b7f53a479fec763ca92482829f07309"
     },
     {
       "byte_length": 54335,
@@ -12538,6 +12543,11 @@
       "byte_length": 9366,
       "path": "warhammer40k_core/geometry/disembark_fit.py",
       "sha256": "a3f8598179e403968bdec8d35d55a8110c6f6fcc1e125e09861061b66542163d"
+    },
+    {
+      "byte_length": 5472,
+      "path": "warhammer40k_core/geometry/emergency_disembark_fit.py",
+      "sha256": "38f8bb0f7165e6fc7d3b25c2cbb230b77abf40b779af6ed42ebf9aa675f1f229"
     },
     {
       "byte_length": 19795,
@@ -12965,14 +12975,14 @@
       "sha256": "78cb8b0a5fa15dcbfe5b30b36ae1d7fb06fc7d7a2a0b0b75db2761363f765d3f"
     },
     {
-      "byte_length": 73550,
+      "byte_length": 74558,
       "path": "warhammer40k_core/rules/source_authority_registry.json",
-      "sha256": "7b50adc16946406cb6d60246087ac31204a5c056a9b9bc2992fae6320ca496d3"
+      "sha256": "858795ad70d4fccaba5772126ace77f90f69647036cd65cfdc80e93114eab39a"
     },
     {
       "byte_length": 20968,
       "path": "warhammer40k_core/rules/source_authority_registry.py",
-      "sha256": "52b8212164a2eae02896ed25b72b809494ff1aa53a3f54be519f473f70500d7e"
+      "sha256": "75266a408678100a9ca6a4082877a7a86e90b15e9de295a34a818ee37a7bc54a"
     },
     {
       "byte_length": 19955,
@@ -13198,6 +13208,16 @@
       "byte_length": 8713,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_embarked_abilities_2026_09/artifacts/package.json",
       "sha256": "3102868123dc8f612999dffcc069fad97a1d0ed1bbf6f3e663e39cc97c4d05ff"
+    },
+    {
+      "byte_length": 6644,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_emergency_disembark_placement_2026_09/__init__.py",
+      "sha256": "52e41d19633d2a7b96b174511ae0a9bea1259badc2bd6fc54f59c34d3a42f051"
+    },
+    {
+      "byte_length": 5354,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_emergency_disembark_placement_2026_09/artifacts/package.json",
+      "sha256": "81fbfdb90b7d747b99d7be582ba7a4c006dadd38fea1ccf2a0dad93f85a80bb4"
     },
     {
       "byte_length": 6294,

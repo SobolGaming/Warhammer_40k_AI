@@ -1,0 +1,94 @@
+{
+  "artifact_schema": "core-v2-core-emergency-disembark-placement-source-v1",
+  "source_package_id": "gw-11e-core-emergency-disembark-placement",
+  "source_version": "maintained-app-mirrors-observed-2026-09-18",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement",
+      "section_id": "18.05",
+      "source_text": "While moving: Set up each model in your unit: - Wholly within the set-up distance of that TRANSPORT, and as close as possible to that TRANSPORT. - Or: If the above is not possible while remaining unengaged, set up that model wholly within the set-up distance of that TRANSPORT, as close as possible to that TRANSPORT, and engaged. Each model that still cannot be set up is destroyed.",
+      "transcription_sha256": "cc63b547abc5339f6c3f98530f53cd3a838800f9b5a89003715ebf19e7c39923",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_placement_violations",
+        "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_rules_unit_omission_violations",
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "core-emergency-disembark-placement-review:emergency-disembark-placement",
+      "rule_source_id": "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "40k.app 18.05 Emergency Disembark Move placement",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cc63b547abc5339f6c3f98530f53cd3a838800f9b5a89003715ebf19e7c39923",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "6a63945d36066aa488493da8b5d5850757d7cb20ddf7a470ed00857f7252a15e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_placement_violations",
+        "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_rules_unit_omission_violations",
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+      ]
+    },
+    {
+      "evidence_id": "core-emergency-disembark-placement-mirror:emergency-disembark-placement",
+      "rule_source_id": "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-emergency-disembark-placement-maintained-app-mirrors-2026-09-18",
+      "review_audit_row_id": "emergency-disembark-placement",
+      "review_audit_source_observation_sha256": "c39e87327a822139e0075c5af984b48f2fecbc0c2d5a3645507473e9e2545150",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 18.05 Emergency Disembark Move placement",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/18-transports",
+      "observed_at": "2026-09-18T19:30:00+00:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cc63b547abc5339f6c3f98530f53cd3a838800f9b5a89003715ebf19e7c39923",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "dd0bb827686d37fd449b038702af52ce6bcc1967cab572d9bd2f4156986cf257",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_placement_violations",
+        "warhammer40k_core.engine.emergency_disembark_placement:append_emergency_disembark_rules_unit_omission_violations",
+        "warhammer40k_core.engine.transport_disembark_geometry:append_disembark_endpoint_violations"
+      ]
+    }
+  ],
+  "placement_policy": {
+    "source_rule_id": "gw-11e-core-emergency-disembark-placement:emergency-disembark-placement",
+    "setup_distance_inches": 6,
+    "requires_closest_possible": true,
+    "prefers_unengaged": true,
+    "allows_engaged_when_unengaged_impossible": true,
+    "destroys_only_unplaceable_models": true,
+    "closest_tolerance_inches": 0.04
+  },
+  "package_hash": "2ce41103cfbeb94a955a48b4a78a97b5caca7261fd727e73e8ff76d5a18e15f8"
+}

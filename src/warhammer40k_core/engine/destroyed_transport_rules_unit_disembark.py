@@ -39,6 +39,7 @@ from warhammer40k_core.engine.transports import (
     DisembarkModeKind,
     TransportCargoState,
     TransportMovementStatus,
+    TransportOperationViolation,
     TransportRestrictionOverride,
     disembarked_unit_state_from_event_payload,
 )
@@ -384,6 +385,23 @@ def resolve_destroyed_transport_rules_unit_disembark(
         raise GameLifecycleError(
             "Destroyed Transport rules-unit placement must contain living hazard survivors."
         )
+    from warhammer40k_core.engine.emergency_disembark_placement import (
+        append_emergency_disembark_rules_unit_omission_violations,
+    )
+
+    omission_violations: list[TransportOperationViolation] = []
+    append_emergency_disembark_rules_unit_omission_violations(
+        violations=omission_violations,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        rules_unit=rules_unit,
+        attempted_placement=attempted_placement,
+        transport_placement=transport_placement,
+        battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+        battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
+        terrain_features=scenario.battlefield_state.terrain_features,
+        objective_markers=objective_markers,
+    )
     filtered_view = _placed_survivor_rules_unit(
         rules_unit=rules_unit,
         placed_model_instance_ids=placed_ids,
@@ -407,6 +425,15 @@ def resolve_destroyed_transport_rules_unit_disembark(
         turn_player_id=turn_player_id,
         objective_markers=objective_markers,
     )
+    if omission_violations:
+        placement = RulesUnitDisembarkResolution(
+            selection=placement.selection,
+            violations=tuple(omission_violations) + placement.violations,
+            coherency_result=placement.coherency_result,
+            updated_cargo_state=None,
+            disembarked_unit_state=None,
+            transition_batch=None,
+        )
     if placement.is_valid:
         updated_cargo = cargo_state.for_movement_phase(battle_round=hazard_rolls.battle_round)
         for component_id in hazard_rolls.component_unit_instance_ids:
