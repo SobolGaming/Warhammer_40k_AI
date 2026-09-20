@@ -6862,6 +6862,8 @@ def test_catalog_command_point_enhancement_cost_source_binds_only_assigned_beare
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id=source_unit.own_models[0].model_profile_id,
+                model_index=1,
                 enhancement_id=enhancement_id,
                 target_unit_selection_id=source_unit.unit_instance_id.removeprefix(
                     f"{source_army.army_id}:"

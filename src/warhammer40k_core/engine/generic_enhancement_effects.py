@@ -18,7 +18,10 @@ from warhammer40k_core.engine.effects import (
     EffectExpiration,
     generic_rule_persisting_effect,
 )
-from warhammer40k_core.engine.enhancement_bearers import current_enhancement_bearer
+from warhammer40k_core.engine.enhancement_bearers import (
+    current_enhancement_bearer,
+    enhancement_bearer_model,
+)
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectContext,
@@ -234,7 +237,9 @@ def _deadly_demise_unit_destroyed_handler(
 ) -> UnitDestroyedHandler:
     def handler(context: UnitDestroyedContext) -> None:
         bearer = _bearer_unit_for_assignment(state=context.state, assignment=assignment)
-        source_model_id = _require_single_model_bearer(bearer)
+        source_model_id = bearer.own_model_by_id(
+            assignment.bearer_model_instance_id
+        ).model_instance_id
         modifier = deadly_demise_modifier_for_model(
             state=context.state,
             model_instance_id=source_model_id,
@@ -311,7 +316,9 @@ def _aura_weapon_profile(
         state=context.state,
         assignment=binding_source.assignment,
     )
-    source_model_instance_id = _source_model_instance_id(bearer)
+    source_model_instance_id = bearer.own_model_by_id(
+        binding_source.assignment.bearer_model_instance_id
+    ).model_instance_id
     if not _source_model_is_active(
         state=context.state,
         bearer=bearer,
@@ -390,8 +397,6 @@ def _generic_enhancement_effects(
         context=context,
         binding_source=binding_source,
     )
-    if _rule_ir_grants_deadly_demise_modifier(binding_source.rule_ir):
-        _require_single_model_bearer(context.target_unit)
     rule_context = _rule_execution_context(context=context, assignment=assignment)
     result = execute_rule_ir(rule_ir=binding_source.rule_ir, context=rule_context)
     if result.status is not RuleExecutionStatus.APPLIED:
@@ -626,6 +631,11 @@ def _selected_assignment_for_context(
         raise GameLifecycleError("Generic enhancement assignment source drift.")
     if selected_assignment.bearer_unit_instance_id != context.target_unit.source_unit_instance_id:
         raise GameLifecycleError("Generic enhancement assignment bearer drift.")
+    if (
+        selected_assignment.bearer_model_instance_id
+        != enhancement_bearer_model(context.army, assignment=context.assignment).model_instance_id
+    ):
+        raise GameLifecycleError("Generic enhancement assignment model drift.")
     return selected_assignment
 
 
@@ -645,7 +655,7 @@ def _rule_execution_context(
         phase=context.state.current_battle_phase,
         active_player_id=context.state.active_player_id,
         source_unit_instance_id=context.target_unit.unit_instance_id,
-        source_model_instance_id=_source_model_instance_id(context.target_unit),
+        source_model_instance_id=assignment.bearer_model_instance_id,
         target_unit_instance_ids=(context.target_unit.unit_instance_id,),
         target_player_id=context.army.player_id,
         trigger_payload=trigger_payload,
@@ -705,24 +715,6 @@ def _persisting_effect_id(
 
 def _started_battle_round(context: EnhancementEffectContext) -> int:
     return context.persisting_effect_started_battle_round
-
-
-def _source_model_instance_id(unit: UnitInstance) -> str:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Generic enhancement source unit is invalid.")
-    if not unit.own_models:
-        raise GameLifecycleError("Generic enhancement source unit has no models.")
-    return sorted(model.model_instance_id for model in unit.own_models)[0]
-
-
-def _require_single_model_bearer(unit: UnitInstance) -> str:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Generic enhancement source unit is invalid.")
-    if len(unit.own_models) != 1:
-        raise GameLifecycleError(
-            "A this_model Deadly Demise modifier requires a single-model bearer unit."
-        )
-    return unit.own_models[0].model_instance_id
 
 
 def _bearer_unit_for_assignment(

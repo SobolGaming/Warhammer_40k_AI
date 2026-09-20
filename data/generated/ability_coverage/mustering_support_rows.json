@@ -131,8 +131,8 @@
       "any"
     ],
     "display_name": "Supreme Commander",
-    "enforcement_id": "army_mustering:_append_supreme_commander_warlord_violations",
-    "enforcement_surface": "army_mustering/list_validation",
+    "enforcement_id": "roster_bearer_validation:_append_supreme_commander_warlord_violations",
+    "enforcement_surface": "roster_bearer_validation/list_validation",
     "faction_id": null,
     "notes": "Consumes structured Supreme Commander mustering descriptors and requires an eligible Supreme Commander unit to be selected as Warlord when present.",
     "rule_id": "army-mustering:supreme-commander",
@@ -145,8 +145,8 @@
       "any"
     ],
     "display_name": "Datasheet Warlord restrictions",
-    "enforcement_id": "army_mustering:_append_warlord_violations",
-    "enforcement_surface": "army_mustering",
+    "enforcement_id": "roster_bearer_validation:append_warlord_violations",
+    "enforcement_surface": "roster_bearer_validation",
     "faction_id": null,
     "notes": "Consumes structured datasheet mustering descriptors and rejects a selected Warlord when the source ability marks that datasheet as forbidden.",
     "rule_id": "army-mustering:warlord-restriction",

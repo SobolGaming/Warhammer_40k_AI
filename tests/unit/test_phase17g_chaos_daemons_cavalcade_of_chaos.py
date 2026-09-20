@@ -1915,6 +1915,8 @@ def _army_muster_request(
         enhancement_assignments=(
             tuple(
                 EnhancementAssignment(
+                    model_profile_id="core-intercessor-like",
+                    model_index=1,
                     enhancement_id=enhancement_id,
                     target_unit_selection_id=unit_selection_id,
                     source_id=f"phase17g:test:{enhancement_id}:assignment",

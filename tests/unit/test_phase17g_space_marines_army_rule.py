@@ -1945,6 +1945,8 @@ def _space_marine_muster_request(
             _unit_selection(selection_id, selection_id) for selection_id in unit_selection_ids
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id=unit_selection_ids[0],
             source_id="phase17g:space-marines:test-warlord",
         ),

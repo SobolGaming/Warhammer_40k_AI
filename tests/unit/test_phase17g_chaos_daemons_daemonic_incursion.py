@@ -4564,6 +4564,8 @@ def _assign_daemonic_enhancement(
                 army,
                 enhancement_assignments=(
                     EnhancementAssignment(
+                        model_profile_id=unit.own_models[0].model_profile_id,
+                        model_index=1,
                         enhancement_id=enhancement_id,
                         target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
                         source_id=source_id,

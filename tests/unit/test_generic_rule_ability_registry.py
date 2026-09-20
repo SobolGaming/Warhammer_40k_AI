@@ -1262,6 +1262,8 @@ def test_selected_to_fight_enhancement_bearer_and_entrypoints_require_exact_type
     unit = army.units[0]
     model = unit.own_models[0]
     assignment = EnhancementAssignment(
+        model_profile_id="selected-to-fight-datasheet-profile",
+        model_index=1,
         enhancement_id="selected-to-fight-test",
         target_unit_selection_id="selected-to-fight-unit",
         source_id="selected-to-fight-assignment",
@@ -1396,6 +1398,8 @@ def test_selected_to_fight_effect_set_validation_fails_closed(
     source = _shadow_legion_source()
     ability_id = "selected-to-fight-ability"
     assignment = EnhancementAssignment(
+        model_profile_id="selected-to-fight-datasheet-profile",
+        model_index=1,
         enhancement_id="selected-to-fight-test",
         target_unit_selection_id="selected-to-fight-unit",
         source_id="selected-to-fight-assignment",

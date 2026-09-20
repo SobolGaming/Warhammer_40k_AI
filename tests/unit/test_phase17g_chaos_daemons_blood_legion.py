@@ -1276,7 +1276,7 @@ def test_furys_cage_self_mortal_wounds_resume_through_fnp_adapter_decisions() ->
 
 
 def test_furys_cage_lethal_damage_routes_deadly_demise_through_nested_fnp_and_replay() -> None:
-    game_id = "order56-furys-cage-21"
+    game_id = "order68-furys-cage-0"
     lifecycle = _furys_cage_fight_lifecycle(
         game_id=game_id,
         attached=False,
@@ -1312,6 +1312,7 @@ def test_furys_cage_lethal_damage_routes_deadly_demise_through_nested_fnp_and_re
         result_id=f"{game_id}:grant",
     )
     assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     source_context = mortal_wound_feel_no_pain_source_context(status.decision_request)
     assert isinstance(source_context, dict)
     assert source_context["source_kind"] == RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND
@@ -1672,15 +1673,30 @@ def test_gateway_unto_damnation_rejects_non_monster_bearer() -> None:
     }
 
 
-def test_gateway_unto_damnation_rejects_multi_model_bearer() -> None:
+def test_gateway_unto_damnation_modifies_only_selected_model_in_multi_model_unit() -> None:
     config = _blood_legion_config(
         game_id="phase17g-gateway-multi-model-bearer",
         include_slaughterthirst_targets=True,
         gateway_target_unit_selection_id="khorne-monster-unit",
     )
+    request = config.army_muster_requests[0]
+    request = replace(
+        request,
+        enhancement_assignments=tuple(
+            replace(assignment, model_index=2) for assignment in request.enhancement_assignments
+        ),
+    )
+    config = replace(config, army_muster_requests=(request, *config.army_muster_requests[1:]))
 
-    with pytest.raises(GameLifecycleError, match="requires a single-model bearer unit"):
-        _blood_legion_enhancement_lifecycle(config)
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    unit = _physical_unit_by_id(state=state, unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID)
+    assert len(unit.own_models) > 1
+    for index, model in enumerate(unit.own_models):
+        modifier = deadly_demise_modifier_for_model(
+            state=state, model_instance_id=model.model_instance_id
+        )
+        assert (modifier is not None) == (index == 1)
 
 
 def test_gateway_unto_damnation_attack_destruction_upgrades_and_persists() -> None:
@@ -3176,6 +3192,8 @@ def _army_muster_request(
         enhancement_ids.append(blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID)
         enhancement_assignments.append(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
                 target_unit_selection_id=brazenmaw_target_unit_selection_id,
                 source_id=(
@@ -3188,6 +3206,8 @@ def _army_muster_request(
         enhancement_ids.append(blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID)
         enhancement_assignments.append(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID,
                 target_unit_selection_id=slaughterthirst_target_unit_selection_id,
                 source_id=(
@@ -3200,6 +3220,8 @@ def _army_muster_request(
         enhancement_ids.append(blood_legion_ir.FURYS_CAGE_ENHANCEMENT_ID)
         enhancement_assignments.append(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=blood_legion_ir.FURYS_CAGE_ENHANCEMENT_ID,
                 target_unit_selection_id=furys_cage_target_unit_selection_id,
                 source_id=(
@@ -3212,6 +3234,8 @@ def _army_muster_request(
         enhancement_ids.append(blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID)
         enhancement_assignments.append(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID,
                 target_unit_selection_id=gateway_target_unit_selection_id,
                 source_id=(

@@ -1,0 +1,148 @@
+{
+  "artifact_schema": "core-v2-core-roster-models-source-v1",
+  "source_package_id": "gw-11e-core-roster-models",
+  "source_version": "maintained-app-mirrors-observed-2026-09-20",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-roster-models:warlord",
+      "section_id": "25.04",
+      "source_text": "Select one CHARACTER unit to be your Warlord’s unit. This must be a unit that has the faction keyword you chose as your army faction. Then select one CHARACTER model in that unit to be your Warlord – the supreme leader of your army – and make a note of this on your army roster. That model gains the WARLORD keyword. Some units have a rule on their datasheet stating that they must be your WARLORD. If you want to include one or more of these units in your army, you must select one of them to be your WARLORD. Rules that state that a model cannot be your WARLORD take precedence over ones that require it to be your WARLORD.",
+      "transcription_sha256": "f1162a5e6944dd7e97e33a6b0d164beed837e58fafb22cd0ef6bfc6c1dc3ba2c",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.roster_bearer_validation:append_warlord_violations"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-roster-models:enhancement",
+      "section_id": "25.04",
+      "source_text": "SELECT ENHANCEMENTS\n\nSelect all of the enhancements you want to include from the detachments you selected and give each one to a different unit in your army. When you do, increase those units’ points values accordingly. The points values for enhancements can be found in the Warhammer 40,000 app.\n\nUnless otherwise stated:\n\n  * Only CHARACTER units can be given enhancements. If such a unit contains more than one model, select one CHARACTER model in that unit to have that enhancement.\n  * EPIC HEROES models cannot be given enhancements.\n  * Your army cannot include more than one of the same enhancement.\n\nUpgrades: Some enhancements are tagged with ‘Upgrade'. Unlike other enhancements:\n\n  * These can be given to non-Character units.\n  * You can include up to three of the same Upgrade in your army (the second and third instances of the same Upgrade do not count towards the total number of enhancements in your army, but you must still spend the stated points cost each time).\n\n** If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment.",
+      "transcription_sha256": "a2f1588a24fa30f9c1eb036fae12fc7ef454bd7b220195d9f756705460b70110",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.roster_bearer_validation:append_enhancement_violations"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-roster-models:warlord",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f1162a5e6944dd7e97e33a6b0d164beed837e58fafb22cd0ef6bfc6c1dc3ba2c",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "90f61c8e3579b95059ad990a3ac610ab20c21ab4518b673d14ada381fc47f19d",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.roster_bearer_validation:append_warlord_violations"
+      ],
+      "evidence_id": "core-roster-models-review:warlord",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P25B 25.04 warlord",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-roster-models:warlord",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f1162a5e6944dd7e97e33a6b0d164beed837e58fafb22cd0ef6bfc6c1dc3ba2c",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "fb534d02d424271207f467ec3fa87f7fa3172d9e18044e0df3582af22e3566d6",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.roster_bearer_validation:append_warlord_violations"
+      ],
+      "evidence_id": "core-roster-models-mirror:warlord:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-roster-models-maintained-app-mirrors-2026-09-20",
+      "review_audit_row_id": "warlord:40k-app",
+      "review_audit_source_observation_sha256": "bc17afb83c10d7375d6a30e25bad34d828b34ff31d77bc7fe52d7d41b299cecb",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 25.04 warlord",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T20:51:19Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-roster-models:enhancement",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "a2f1588a24fa30f9c1eb036fae12fc7ef454bd7b220195d9f756705460b70110",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "81d98ada7cff1aa8bfd1dd2f1a054390b974f2d32b2b98ea7910d7ed7816b053",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.roster_bearer_validation:append_enhancement_violations"
+      ],
+      "evidence_id": "core-roster-models-review:enhancement",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P25B 25.04 enhancement",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-roster-models:enhancement",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "a2f1588a24fa30f9c1eb036fae12fc7ef454bd7b220195d9f756705460b70110",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "c3265a33c8575dd43254a2c2931a33863ed813f9898c52812cfc1047054b0ea2",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.roster_bearer_validation:append_enhancement_violations"
+      ],
+      "evidence_id": "core-roster-models-mirror:enhancement:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-roster-models-maintained-app-mirrors-2026-09-20",
+      "review_audit_row_id": "enhancement:40k-app",
+      "review_audit_source_observation_sha256": "3bbd5b433798273835a495d36a0f473bcf16df78a2b74503d91ee91a607168d0",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 25.04 enhancement",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T20:51:19Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "8e1038b86a10c39830a61d4ae9ff46d13c5c7daf80c4afb281b8f92fda05ac36"
+}

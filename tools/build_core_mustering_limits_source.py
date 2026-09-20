@@ -84,7 +84,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "25.04",
             UPGRADE_TEXT,
             [
-                "warhammer40k_core.engine.army_mustering:_append_enhancement_violations",
+                "warhammer40k_core.engine.roster_bearer_validation:append_enhancement_violations",
                 "warhammer40k_core.engine.army_mustering:_append_unit_point_violations",
             ],
         ),

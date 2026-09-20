@@ -315,6 +315,7 @@ def test_ws14_more_dakka_generic_enhancement_ir_binds_to_assigned_bearer() -> No
     ]
     assert assignment_payloads == [
         {
+            "bearer_model_instance_id": "army-alpha:boyz-1:core-boyz-like:001",
             "assignment_id": "army-alpha:000009991004:boyz-1",
             "player_id": "player-a",
             "army_id": "army-alpha",
@@ -629,6 +630,7 @@ def test_ws14_spectacle_of_slaughter_rule_and_enhancements_bind_to_runtime_hooks
     )
     assert assignment_payloads == [
         {
+            "bearer_model_instance_id": "army-alpha:blades-1:core-boyz-like:001",
             "assignment_id": "army-alpha:000010900002:blades-1",
             "player_id": "player-a",
             "army_id": "army-alpha",
@@ -638,6 +640,7 @@ def test_ws14_spectacle_of_slaughter_rule_and_enhancements_bind_to_runtime_hooks
             "source_id": "ws14-spectacle:assignment:blades-1:000010900002",
         },
         {
+            "bearer_model_instance_id": "army-alpha:blades-2:core-boyz-like:001",
             "assignment_id": "army-alpha:000010900003:blades-2",
             "player_id": "player-a",
             "army_id": "army-alpha",
@@ -1548,6 +1551,8 @@ def _spectacle_muster_request(
         ),
         enhancement_assignments=tuple(
             EnhancementAssignment(
+                model_profile_id="core-boyz-like",
+                model_index=1,
                 enhancement_id=enhancement_id,
                 target_unit_selection_id=target_unit_selection_id,
                 source_id=(
@@ -1847,6 +1852,8 @@ def _court_muster_request(
         ),
         enhancement_assignments=tuple(
             EnhancementAssignment(
+                model_profile_id="core-boyz-like",
+                model_index=1,
                 enhancement_id=enhancement_id,
                 target_unit_selection_id=target_unit_selection_id,
                 source_id=f"ws14-court:assignment:{target_unit_selection_id}:{enhancement_id}",
@@ -1919,6 +1926,8 @@ def _more_dakka_muster_request(
         unit_selections=tuple(unit_selections),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-boyz-like",
+                model_index=1,
                 enhancement_id="000009991004",
                 target_unit_selection_id=unit_selection_id,
                 source_id=(f"ws14-more-dakka:assignment:{unit_selection_id}:000009991004"),

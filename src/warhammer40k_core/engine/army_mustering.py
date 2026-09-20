@@ -9,14 +9,9 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentTargetEligibility,
 )
 from warhammer40k_core.core.datasheet import (
-    MUSTERING_WARLORD_FORBIDDEN,
-    MUSTERING_WARLORD_REQUIRED,
-    MUSTERING_WARLORD_RULE_KEY,
-    DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetMusteringOptionEffectKind,
 )
-from warhammer40k_core.core.detachment import EnhancementDefinition, EnhancementSubtype
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
@@ -245,12 +240,16 @@ class ArmyDefinitionPayload(TypedDict):
 
 
 class EnhancementAssignmentPayload(TypedDict):
+    model_profile_id: str
+    model_index: int
     enhancement_id: str
     target_unit_selection_id: str
     source_id: str
 
 
 class WarlordSelectionPayload(TypedDict):
+    model_profile_id: str
+    model_index: int
     unit_selection_id: str
     source_id: str
 
@@ -285,11 +284,21 @@ class RosterLegalityReportPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class EnhancementAssignment:
+    model_profile_id: str
+    model_index: int
     enhancement_id: str
     target_unit_selection_id: str
     source_id: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_profile_id",
+            _validate_identifier("model_profile_id", self.model_profile_id),
+        )
+        object.__setattr__(
+            self, "model_index", _validate_positive_int("model_index", self.model_index)
+        )
         object.__setattr__(
             self,
             "enhancement_id",
@@ -316,6 +325,8 @@ class EnhancementAssignment:
 
     def to_payload(self) -> EnhancementAssignmentPayload:
         return {
+            "model_profile_id": self.model_profile_id,
+            "model_index": self.model_index,
             "enhancement_id": self.enhancement_id,
             "target_unit_selection_id": self.target_unit_selection_id,
             "source_id": self.source_id,
@@ -323,7 +334,17 @@ class EnhancementAssignment:
 
     @classmethod
     def from_payload(cls, payload: EnhancementAssignmentPayload) -> Self:
+        if set(payload) != {
+            "enhancement_id",
+            "target_unit_selection_id",
+            "source_id",
+            "model_profile_id",
+            "model_index",
+        }:
+            raise ArmyMusteringError("EnhancementAssignment payload fields are invalid.")
         return cls(
+            model_profile_id=payload["model_profile_id"],
+            model_index=payload["model_index"],
             enhancement_id=payload["enhancement_id"],
             target_unit_selection_id=payload["target_unit_selection_id"],
             source_id=payload["source_id"],
@@ -332,10 +353,20 @@ class EnhancementAssignment:
 
 @dataclass(frozen=True, slots=True)
 class WarlordSelection:
+    model_profile_id: str
+    model_index: int
     unit_selection_id: str
     source_id: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_profile_id",
+            _validate_identifier("model_profile_id", self.model_profile_id),
+        )
+        object.__setattr__(
+            self, "model_index", _validate_positive_int("model_index", self.model_index)
+        )
         object.__setattr__(
             self,
             "unit_selection_id",
@@ -353,13 +384,19 @@ class WarlordSelection:
 
     def to_payload(self) -> WarlordSelectionPayload:
         return {
+            "model_profile_id": self.model_profile_id,
+            "model_index": self.model_index,
             "unit_selection_id": self.unit_selection_id,
             "source_id": self.source_id,
         }
 
     @classmethod
     def from_payload(cls, payload: WarlordSelectionPayload) -> Self:
+        if set(payload) != {"unit_selection_id", "source_id", "model_profile_id", "model_index"}:
+            raise ArmyMusteringError("WarlordSelection payload fields are invalid.")
         return cls(
+            model_profile_id=payload["model_profile_id"],
+            model_index=payload["model_index"],
             unit_selection_id=payload["unit_selection_id"],
             source_id=payload["source_id"],
         )
@@ -1126,10 +1163,12 @@ def muster_army(
         units=tuple(units),
         datasheets_by_selection_id=datasheets_by_selection_id,
     )
+    from warhammer40k_core.engine.roster_bearer_validation import apply_warlord_keyword_if_selected
+
     roster_legality_report = validate_roster_legality(catalog=catalog, request=request)
     if request.roster_legality_required:
         roster_legality_report.assert_legal()
-    resolved_units = _apply_warlord_keyword_if_selected(
+    resolved_units = apply_warlord_keyword_if_selected(
         request=request,
         units=resolved_units,
         roster_legality_report=roster_legality_report,
@@ -1267,14 +1306,23 @@ def validate_roster_legality(
         policy=policy,
         violations=violations,
     )
-    _append_warlord_violations(
+    from warhammer40k_core.engine.roster_bearer_validation import (
+        RosterModelResolver,
+        append_enhancement_violations,
+        append_warlord_violations,
+    )
+
+    model_resolver = RosterModelResolver(catalog=catalog, request=request)
+    append_warlord_violations(
+        model_resolver=model_resolver,
         request=request,
         faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
         violations=violations,
     )
-    _append_enhancement_violations(
+    append_enhancement_violations(
         catalog=catalog,
+        model_resolver=model_resolver,
         request=request,
         selected_detachment_enhancement_ids=tuple(
             enhancement_id
@@ -1435,7 +1483,7 @@ def _append_unit_limit_violations(
                     source_id=f"phase16d:unit-limit:{datasheet_id}",
                 )
             )
-        if _datasheet_has_keyword(datasheet, "EPIC HERO") and len(selection_ids) > 1:
+        if datasheet_has_keyword(datasheet, "EPIC HERO") and len(selection_ids) > 1:
             violations.append(
                 RosterLegalityViolation(
                     violation_code="epic_hero_not_unique",
@@ -1444,478 +1492,6 @@ def _append_unit_limit_violations(
                     source_id=f"phase16d:epic-hero:{datasheet_id}",
                 )
             )
-
-
-def _append_warlord_violations(
-    *,
-    request: ArmyMusterRequest,
-    faction: FactionDefinition,
-    datasheets_by_selection_id: dict[str, DatasheetDefinition],
-    violations: list[RosterLegalityViolation],
-) -> None:
-    if request.warlord_selection is None:
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="missing_warlord_selection",
-                message="Roster requires one selected Warlord.",
-                source_id="phase16d:warlord",
-            )
-        )
-        return
-    datasheet = datasheets_by_selection_id.get(request.warlord_selection.unit_selection_id)
-    if datasheet is None:
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_unknown_unit",
-                message="WarlordSelection references an unknown unit selection.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=request.warlord_selection.source_id,
-            )
-        )
-        return
-    if not _datasheet_has_keyword(datasheet, "CHARACTER"):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_character_required",
-                message="WarlordSelection requires a CHARACTER unit.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=request.warlord_selection.source_id,
-            )
-        )
-    forbidden_source_id = _datasheet_warlord_forbidden_source_id(datasheet)
-    if forbidden_source_id is not None:
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_forbidden",
-                message="WarlordSelection target has a rule that says it cannot be Warlord.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=forbidden_source_id,
-            )
-        )
-    if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="daemonic_pact_warlord_forbidden",
-                message="Daemonic Pact Legiones Daemonica units cannot be selected as Warlord.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=DAEMONIC_PACT_SOURCE_ID,
-            )
-        )
-    elif drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
-        datasheet=datasheet,
-        faction=faction,
-    ):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_drukhari_corsairs_and_travelling_players_forbidden",
-                message=(
-                    "Corsairs and Travelling Players HARLEQUINS or ANHRATHE units cannot "
-                    "be selected as Warlord."
-                ),
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID,
-            )
-        )
-    elif freeblades_datasheet_allowed_for_faction(datasheet=datasheet, faction=faction):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_freeblades_forbidden",
-                message="Freeblades Imperial Knights models cannot be selected as Warlord.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=FREEBLADES_SOURCE_ID,
-            )
-        )
-    elif dreadblades_datasheet_allowed_for_faction(datasheet=datasheet, faction=faction):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_dreadblades_forbidden",
-                message="Dreadblades Chaos Knights models cannot be selected as Warlord.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=DREADBLADES_SOURCE_ID,
-            )
-        )
-    elif not set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="warlord_faction_keyword_required",
-                message="WarlordSelection must share the army faction keyword.",
-                unit_selection_id=request.warlord_selection.unit_selection_id,
-                source_id=request.warlord_selection.source_id,
-            )
-        )
-    _append_supreme_commander_warlord_violations(
-        warlord_selection=request.warlord_selection,
-        faction=faction,
-        datasheets_by_selection_id=datasheets_by_selection_id,
-        violations=violations,
-    )
-
-
-def _append_supreme_commander_warlord_violations(
-    *,
-    warlord_selection: WarlordSelection,
-    faction: FactionDefinition,
-    datasheets_by_selection_id: dict[str, DatasheetDefinition],
-    violations: list[RosterLegalityViolation],
-) -> None:
-    required_source_by_selection_id = {
-        selection_id: source_id
-        for selection_id, datasheet in datasheets_by_selection_id.items()
-        if (source_id := _datasheet_requires_warlord_source_id(datasheet)) is not None
-    }
-    if not required_source_by_selection_id:
-        return
-    eligible_required_selection_ids = tuple(
-        sorted(
-            selection_id
-            for selection_id in required_source_by_selection_id
-            if _datasheet_can_be_selected_warlord(
-                datasheet=datasheets_by_selection_id[selection_id],
-                faction=faction,
-            )
-        )
-    )
-    if not eligible_required_selection_ids:
-        first_required_selection_id = sorted(required_source_by_selection_id)[0]
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="supreme_commander_warlord_conflict",
-                message=(
-                    "Supreme Commander requires a Warlord from that set, but every such "
-                    "unit is blocked from being Warlord."
-                ),
-                unit_selection_id=first_required_selection_id,
-                source_id=required_source_by_selection_id[first_required_selection_id],
-            )
-        )
-        return
-    if warlord_selection.unit_selection_id in set(eligible_required_selection_ids):
-        return
-    first_eligible_selection_id = eligible_required_selection_ids[0]
-    violations.append(
-        RosterLegalityViolation(
-            violation_code="supreme_commander_warlord_required",
-            message=(
-                "When one or more eligible Supreme Commander units are in the army, "
-                "one of them must be selected as Warlord."
-            ),
-            unit_selection_id=warlord_selection.unit_selection_id,
-            source_id=required_source_by_selection_id[first_eligible_selection_id],
-        )
-    )
-
-
-def _datasheet_can_be_selected_warlord(
-    *,
-    datasheet: DatasheetDefinition,
-    faction: FactionDefinition,
-) -> bool:
-    if not _datasheet_has_keyword(datasheet, "CHARACTER"):
-        return False
-    if _datasheet_warlord_forbidden_source_id(datasheet) is not None:
-        return False
-    if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords):
-        return False
-    if drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
-        datasheet=datasheet,
-        faction=faction,
-    ):
-        return False
-    return bool(set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords))
-
-
-def _datasheet_requires_warlord_source_id(datasheet: DatasheetDefinition) -> str | None:
-    for ability in datasheet.abilities:
-        value = _ability_mustering_warlord_value(ability)
-        if value == MUSTERING_WARLORD_REQUIRED:
-            return ability.source_id
-    return None
-
-
-def _datasheet_warlord_forbidden_source_id(datasheet: DatasheetDefinition) -> str | None:
-    for ability in datasheet.abilities:
-        if _ability_mustering_warlord_value(ability) == MUSTERING_WARLORD_FORBIDDEN:
-            return ability.source_id
-    return None
-
-
-def _ability_mustering_warlord_value(ability: DatasheetAbilityDescriptor) -> str | None:
-    payload = ability.rule_ir_payload
-    if payload is None or MUSTERING_WARLORD_RULE_KEY not in payload:
-        return None
-    value = payload[MUSTERING_WARLORD_RULE_KEY]
-    if type(value) is not str:
-        raise ArmyMusteringError("mustering_warlord descriptor value must be a string.")
-    if value not in {MUSTERING_WARLORD_REQUIRED, MUSTERING_WARLORD_FORBIDDEN}:
-        raise ArmyMusteringError("mustering_warlord descriptor value is unsupported.")
-    return value
-
-
-def _append_enhancement_violations(
-    *,
-    catalog: ArmyCatalog,
-    request: ArmyMusterRequest,
-    selected_detachment_enhancement_ids: tuple[str, ...],
-    datasheets_by_selection_id: dict[str, DatasheetDefinition],
-    enhancement_limit: int,
-    violations: list[RosterLegalityViolation],
-) -> None:
-    effective_enhancement_limit = _effective_enhancement_limit(
-        request=request,
-        enhancement_limit=enhancement_limit,
-    )
-    if len(request.detachment_selection.enhancement_ids) > effective_enhancement_limit:
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="enhancement_limit_exceeded",
-                message="Roster exceeds the battle-size Enhancement limit.",
-                source_id="phase16d:enhancement-limit",
-            )
-        )
-    selected_ids = set(request.detachment_selection.enhancement_ids)
-    detachment_allowed_ids = set(selected_detachment_enhancement_ids)
-    catalog_enhancement_by_id = {
-        enhancement.enhancement_id: enhancement for enhancement in catalog.enhancements
-    }
-    attached_group_by_selection_id = _attached_group_by_selection_id(request)
-    enhancement_count_by_attached_group: dict[tuple[str, ...], int] = {}
-    assignment_count_by_enhancement_id: dict[str, int] = {}
-    for assignment in request.enhancement_assignments:
-        assignment_count_by_enhancement_id[assignment.enhancement_id] = (
-            assignment_count_by_enhancement_id.get(assignment.enhancement_id, 0) + 1
-        )
-        if assignment.enhancement_id not in selected_ids:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="enhancement_not_selected",
-                    message="EnhancementAssignment must use a selected Enhancement.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
-                )
-            )
-        if assignment.enhancement_id not in detachment_allowed_ids:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="enhancement_not_allowed_by_detachment",
-                    message="EnhancementAssignment is not granted by the selected detachment.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
-                )
-            )
-        enhancement = catalog_enhancement_by_id.get(assignment.enhancement_id)
-        if enhancement is None:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="enhancement_unknown",
-                    message="EnhancementAssignment references an unknown Enhancement.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
-                )
-            )
-        elif enhancement.points is None:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="source_awaiting_enhancement_points",
-                    message="EnhancementAssignment requires source-backed Enhancement points.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=enhancement.source_id,
-                )
-            )
-        datasheet = datasheets_by_selection_id.get(assignment.target_unit_selection_id)
-        if datasheet is None:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="enhancement_unknown_target",
-                    message="EnhancementAssignment target unit selection is unknown.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
-                )
-            )
-            continue
-        is_corsair_coterie_enhancement = (
-            enhancement is not None
-            and _request_uses_corsair_coterie(request)
-            and _is_corsair_coterie_enhancement_id(enhancement.enhancement_id)
-        )
-        is_upgrade = enhancement is not None and _enhancement_is_upgrade(enhancement)
-        if is_corsair_coterie_enhancement:
-            if enhancement is None:
-                raise ArmyMusteringError("Corsair Coterie Enhancement is missing.")
-            _append_corsair_coterie_enhancement_target_violations(
-                enhancement=enhancement,
-                datasheet=datasheet,
-                assignment=assignment,
-                violations=violations,
-            )
-        elif is_upgrade and _datasheet_has_keyword(datasheet, "CHARACTER"):
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="upgrade_character_forbidden",
-                    message="Upgrades can be assigned only to non-CHARACTER units.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
-                )
-            )
-        elif not is_upgrade and not _datasheet_has_keyword(datasheet, "CHARACTER"):
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="enhancement_character_required",
-                    message="Enhancements can be assigned only to CHARACTER units.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
-                )
-            )
-        if _datasheet_has_keyword(datasheet, "EPIC HERO"):
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="epic_hero_enhancement_forbidden",
-                    message="EPIC HERO models cannot be given Enhancements.",
-                    unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=(
-                        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
-                        "25.04-epic-hero-enhancements"
-                    ),
-                )
-            )
-        if enhancement is not None:
-            _append_enhancement_target_requirement_violations(
-                enhancement=enhancement,
-                datasheet=datasheet,
-                assignment=assignment,
-                violations=violations,
-            )
-        attached_group = attached_group_by_selection_id.get(assignment.target_unit_selection_id)
-        if attached_group is not None:
-            enhancement_count_by_attached_group[attached_group] = (
-                enhancement_count_by_attached_group.get(attached_group, 0) + 1
-            )
-    for enhancement_id, assignment_count in assignment_count_by_enhancement_id.items():
-        enhancement = catalog_enhancement_by_id.get(enhancement_id)
-        if enhancement is None:
-            continue
-        if _request_uses_corsair_coterie(request) and _is_corsair_coterie_enhancement_id(
-            enhancement_id
-        ):
-            if assignment_count > 1:
-                violations.append(
-                    RosterLegalityViolation(
-                        violation_code="enhancement_repeated_assignment_forbidden",
-                        message="A Corsair Enhancement can be assigned to only one unit.",
-                        source_id=enhancement.source_id,
-                    )
-                )
-            continue
-        if _enhancement_is_upgrade(enhancement):
-            if assignment_count > 3:
-                violations.append(
-                    RosterLegalityViolation(
-                        violation_code="upgrade_assignment_limit_exceeded",
-                        message="A selected Upgrade can be assigned to at most three units.",
-                        source_id=enhancement.source_id,
-                    )
-                )
-            continue
-        if assignment_count > 1:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="enhancement_repeated_assignment_forbidden",
-                    message="A standard Enhancement can be assigned to only one unit.",
-                    source_id=enhancement.source_id,
-                )
-            )
-    for attached_group, count in enhancement_count_by_attached_group.items():
-        if count > 1:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="attached_squad_enhancement_limit_exceeded",
-                    message="An attached squad can have at most one Enhancement or Upgrade.",
-                    unit_selection_id=attached_group[0],
-                    source_id="phase16d:attached-squad-enhancement-limit",
-                )
-            )
-
-
-def _effective_enhancement_limit(
-    *,
-    request: ArmyMusterRequest,
-    enhancement_limit: int,
-) -> int:
-    if not _request_uses_corsair_coterie(request):
-        return enhancement_limit
-    return max(enhancement_limit, len(CORSAIR_COTERIE_ENHANCEMENT_IDS))
-
-
-def _append_corsair_coterie_enhancement_target_violations(
-    *,
-    enhancement: EnhancementDefinition,
-    datasheet: DatasheetDefinition,
-    assignment: EnhancementAssignment,
-    violations: list[RosterLegalityViolation],
-) -> None:
-    if not _datasheet_has_keyword(datasheet, ANHRATHE_KEYWORD):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="corsair_coterie_anhrathe_required",
-                message="Corsair Enhancements can be assigned only to ANHRATHE units.",
-                unit_selection_id=assignment.target_unit_selection_id,
-                source_id=enhancement.source_id,
-            )
-        )
-    if enhancement.enhancement_id == "archraider" and not _datasheet_has_keyword(
-        datasheet, CHARACTER_KEYWORD
-    ):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="corsair_coterie_archraider_character_required",
-                message="Archraider can be assigned only to ANHRATHE CHARACTER units.",
-                unit_selection_id=assignment.target_unit_selection_id,
-                source_id=enhancement.source_id,
-            )
-        )
-    if enhancement.enhancement_id == "voidstone" and not _datasheet_has_keyword(
-        datasheet, INFANTRY_KEYWORD
-    ):
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="corsair_coterie_voidstone_infantry_required",
-                message="Voidstone can be assigned only to ANHRATHE INFANTRY units.",
-                unit_selection_id=assignment.target_unit_selection_id,
-                source_id=enhancement.source_id,
-            )
-        )
-
-
-def _append_enhancement_target_requirement_violations(
-    *,
-    enhancement: EnhancementDefinition,
-    datasheet: DatasheetDefinition,
-    assignment: EnhancementAssignment,
-    violations: list[RosterLegalityViolation],
-) -> None:
-    for keyword in enhancement.target_required_keywords:
-        if _datasheet_has_keyword(datasheet, keyword):
-            continue
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="enhancement_target_keyword_required",
-                message="EnhancementAssignment target unit is missing a required keyword.",
-                unit_selection_id=assignment.target_unit_selection_id,
-                source_id=enhancement.source_id,
-            )
-        )
-    for keyword in enhancement.target_required_faction_keywords:
-        if _datasheet_has_faction_keyword(datasheet, keyword):
-            continue
-        violations.append(
-            RosterLegalityViolation(
-                violation_code="enhancement_target_faction_keyword_required",
-                message=(
-                    "EnhancementAssignment target unit is missing a required faction keyword."
-                ),
-                unit_selection_id=assignment.target_unit_selection_id,
-                source_id=enhancement.source_id,
-            )
-        )
 
 
 def _append_daemonic_pact_violations(
@@ -1930,7 +1506,7 @@ def _append_daemonic_pact_violations(
         sorted(
             selection_id
             for selection_id, datasheet in datasheets_by_selection_id.items()
-            if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords)
+            if is_daemonic_pact_datasheet(datasheet, faction.faction_keywords)
         )
     )
     if not pact_selection_ids:
@@ -1983,7 +1559,7 @@ def _append_daemonic_pact_base_model_violations(
         sorted(
             selection_id
             for selection_id, datasheet in datasheets_by_selection_id.items()
-            if not _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords)
+            if not is_daemonic_pact_datasheet(datasheet, faction.faction_keywords)
             and not _datasheet_has_any_keyword(datasheet, DAEMONIC_PACT_BASE_KEYWORDS)
         )
     )
@@ -2385,7 +1961,7 @@ def _allied_keyword_model_count(
     count = 0
     for selection_id in allied_selection_ids:
         datasheet = datasheets_by_selection_id[selection_id]
-        if not _datasheet_has_keyword(datasheet, keyword):
+        if not datasheet_has_keyword(datasheet, keyword):
             continue
         selection = selection_by_id.get(selection_id)
         if selection is None:
@@ -2614,7 +2190,7 @@ def _append_black_templars_chapter_violations(
     for selection_id, datasheet in sorted(datasheets_by_selection_id.items()):
         if _datasheet_has_faction_keyword(
             datasheet, ADEPTUS_ASTARTES_KEYWORD
-        ) and _datasheet_has_keyword(datasheet, "PSYKER"):
+        ) and datasheet_has_keyword(datasheet, "PSYKER"):
             violations.append(
                 RosterLegalityViolation(
                     violation_code="space_marines_black_templars_psyker_forbidden",
@@ -2754,7 +2330,7 @@ def _datasheet_is_shadow_legion_forbidden_unit(datasheet: DatasheetDefinition) -
     canonical_name = _canonical_name(datasheet.name)
     if canonical_name in SHADOW_LEGION_FORBIDDEN_DAEMON_PRINCE_NAMES:
         return True
-    return _datasheet_has_keyword(datasheet, "EPIC HERO")
+    return datasheet_has_keyword(datasheet, "EPIC HERO")
 
 
 def _append_dedicated_transport_manifest_violations(
@@ -2770,7 +2346,7 @@ def _append_dedicated_transport_manifest_violations(
     }
     for selection_id, datasheet in datasheets_by_selection_id.items():
         if (
-            _datasheet_has_keyword(datasheet, "DEDICATED TRANSPORT")
+            datasheet_has_keyword(datasheet, "DEDICATED TRANSPORT")
             and selection_id not in manifest_by_transport_id
         ):
             violations.append(
@@ -2783,7 +2359,7 @@ def _append_dedicated_transport_manifest_violations(
             )
 
     cargo_claims: set[str] = set()
-    attached_group_by_selection_id = _attached_group_by_selection_id(request)
+    attached_group_by_selection_id = roster_attached_groups(request)
     for manifest in request.dedicated_transport_manifests:
         transport_datasheet = datasheets_by_selection_id.get(manifest.transport_unit_selection_id)
         if transport_datasheet is None:
@@ -2796,7 +2372,7 @@ def _append_dedicated_transport_manifest_violations(
                 )
             )
             continue
-        if not _datasheet_has_keyword(transport_datasheet, "TRANSPORT"):
+        if not datasheet_has_keyword(transport_datasheet, "TRANSPORT"):
             violations.append(
                 RosterLegalityViolation(
                     violation_code="transport_manifest_transport_required",
@@ -2805,7 +2381,7 @@ def _append_dedicated_transport_manifest_violations(
                     source_id=manifest.source_id,
                 )
             )
-        if not _datasheet_has_keyword(transport_datasheet, "DEDICATED TRANSPORT"):
+        if not datasheet_has_keyword(transport_datasheet, "DEDICATED TRANSPORT"):
             violations.append(
                 RosterLegalityViolation(
                     violation_code="transport_manifest_dedicated_transport_required",
@@ -2900,41 +2476,6 @@ def _append_attached_group_manifest_violations(
             )
 
 
-def _apply_warlord_keyword_if_selected(
-    *,
-    request: ArmyMusterRequest,
-    units: tuple[UnitInstance, ...],
-    roster_legality_report: RosterLegalityReport,
-) -> tuple[UnitInstance, ...]:
-    if request.warlord_selection is None:
-        return units
-    if any(
-        _warlord_violation_blocks_keyword(violation)
-        for violation in roster_legality_report.violations
-    ):
-        return units
-    target_unit_id = f"{request.army_id}:{request.warlord_selection.unit_selection_id}"
-    return tuple(
-        grant_unit_keywords(
-            unit, keywords=("WARLORD",), source_id=request.warlord_selection.source_id
-        )
-        if unit.unit_instance_id == target_unit_id
-        else unit
-        for unit in units
-    )
-
-
-def _warlord_violation_blocks_keyword(violation: RosterLegalityViolation) -> bool:
-    if type(violation) is not RosterLegalityViolation:
-        raise ArmyMusteringError("Warlord violation lookup requires a RosterLegalityViolation.")
-    return (
-        violation.violation_code == "missing_warlord_selection"
-        or violation.violation_code.startswith("warlord_")
-        or violation.violation_code.endswith("_warlord_forbidden")
-        or violation.violation_code.startswith("supreme_commander_warlord")
-    )
-
-
 def _apply_cult_of_dark_gods_faction_keyword_replacements(
     *,
     request: ArmyMusterRequest,
@@ -2994,7 +2535,7 @@ def _apply_shadow_legion_keyword_grants(
     return tuple(granted_units)
 
 
-def _attached_group_by_selection_id(
+def roster_attached_groups(
     request: ArmyMusterRequest,
 ) -> dict[str, tuple[str, ...]]:
     grouped: dict[str, set[str]] = {}
@@ -3072,7 +2613,7 @@ def _keyword_set_has_keyword(keywords: frozenset[str], keyword: str) -> bool:
     return _canonical_keyword(keyword) in keywords
 
 
-def _datasheet_has_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool:
+def datasheet_has_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool:
     return _keyword_set_has_keyword(_datasheet_keyword_set(datasheet), keyword)
 
 
@@ -3107,7 +2648,7 @@ def _faction_has_keyword(faction: FactionDefinition, keyword: str) -> bool:
     }
 
 
-def _is_daemonic_pact_datasheet(
+def is_daemonic_pact_datasheet(
     datasheet: DatasheetDefinition,
     selected_faction_keywords: tuple[str, ...],
 ) -> bool:
@@ -3118,21 +2659,6 @@ def _is_daemonic_pact_datasheet(
         _canonical_keyword(keyword) for keyword in datasheet.keywords.faction_keywords
     }
     return not bool(selected_keywords & datasheet_faction_keywords)
-
-
-def _enhancement_is_upgrade(enhancement: EnhancementDefinition) -> bool:
-    return EnhancementSubtype.UPGRADE in enhancement.subtypes
-
-
-def _request_uses_corsair_coterie(request: ArmyMusterRequest) -> bool:
-    return (
-        request.detachment_selection.faction_id == AELDARI_FACTION_ID
-        and CORSAIR_COTERIE_DETACHMENT_ID in request.detachment_selection.detachment_ids
-    )
-
-
-def _is_corsair_coterie_enhancement_id(enhancement_id: str) -> bool:
-    return enhancement_id in CORSAIR_COTERIE_ENHANCEMENT_IDS
 
 
 def _request_uses_shadow_legion(request: ArmyMusterRequest) -> bool:

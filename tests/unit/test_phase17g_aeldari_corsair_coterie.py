@@ -2342,6 +2342,8 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
         state=state,
         army=enemy_army,
         assignment=EnhancementAssignment(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             enhancement_id=enhancements.INFAMY_ENHANCEMENT_ID,
             target_unit_selection_id="enemy-raiders",
             source_id="assignment:enemy:infamy",
@@ -5972,6 +5974,8 @@ def _corsair_muster_request(
         ),
         enhancement_assignments=enhancement_assignments,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="archraider",
             source_id="phase17g:warlord:archraider",
         ),
@@ -6043,7 +6047,7 @@ def _unit(
     model = _model(
         model_instance_id=f"{unit_instance_id}:model-001",
         datasheet_id=datasheet_id,
-        model_profile_id=f"{datasheet_id}-profile",
+        model_profile_id="core-intercessor-like",
         name=f"{name} model",
         keywords=keywords,
         objective_control=objective_control,
@@ -6210,8 +6214,15 @@ def _set_unit_model_x_positions(
     )
 
 
-def _assignment(enhancement_id: str, target_unit_selection_id: str) -> EnhancementAssignment:
+def _assignment(
+    enhancement_id: str,
+    target_unit_selection_id: str,
+    *,
+    model_profile_id: str = "core-intercessor-like",
+) -> EnhancementAssignment:
     return EnhancementAssignment(
+        model_profile_id=model_profile_id,
+        model_index=1,
         enhancement_id=enhancement_id,
         target_unit_selection_id=target_unit_selection_id,
         source_id=f"assignment:{enhancement_id}:{target_unit_selection_id}",

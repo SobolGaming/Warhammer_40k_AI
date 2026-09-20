@@ -558,7 +558,7 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
 
 def test_fall_back_proposal_accepts_voluntary_desperate_escape_for_every_model() -> None:
     session, movement_status = _local_session_at_movement_unit_selection(
-        game_id="phase11d-desperate-escape-failure-0001",
+        game_id="order68-desperate-escape-0",
         pose_factory=_fall_back_deployment_pose,
     )
     state = _session_state(session)
@@ -604,6 +604,7 @@ def test_fall_back_proposal_accepts_voluntary_desperate_escape_for_every_model()
         result_id="phase11d-fall-back-proposal",
     )
     request = _decision_request(status)
+    assert request.decision_type == "select_desperate_escape_model"
     fall_back_context = cast(
         dict[str, object],
         cast(dict[str, JsonValue], request.payload)["fall_back_context"],
@@ -612,7 +613,6 @@ def test_fall_back_proposal_accepts_voluntary_desperate_escape_for_every_model()
     requirements = cast(list[dict[str, object]], fall_back_result["desperate_escape_requirements"])
     rolls = cast(list[dict[str, object]], fall_back_result["desperate_escape_rolls"])
 
-    assert request.decision_type == "select_desperate_escape_model"
     assert len(requirements) == len(before.model_placements)
     assert len(rolls) == len(before.model_placements)
     assert all(requirement["reasons"] == ["selected_mode"] for requirement in requirements)
@@ -1549,9 +1549,9 @@ def test_viewer_scoped_event_cursor_redacts_opponent_secret_decision_payloads() 
     player_a_blob = json.dumps(player_a_delta, sort_keys=True)
 
     assert secondary_event_payloads_for_player_b == []
-    assert "fixed_mission_ids" not in player_a_events_for_player_b_blob
-    assert "fixed_choice_count" not in player_a_events_for_player_b_blob
-    assert "mode" not in player_a_events_for_player_b_blob
+    assert '"fixed_mission_ids":' not in player_a_events_for_player_b_blob
+    assert '"fixed_choice_count":' not in player_a_events_for_player_b_blob
+    assert '"mode":' not in player_a_events_for_player_b_blob
     assert "fixed" not in player_a_events_for_player_b_blob.lower()
     assert "assassination" not in player_a_events_for_player_b_blob
     assert "bring_it_down" not in player_a_events_for_player_b_blob

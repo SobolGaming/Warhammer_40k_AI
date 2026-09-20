@@ -923,3 +923,9 @@ Order 67 enforces Incursion's 1,000 points, 2 DP, 2 Enhancements and 2/4-copy
 limits, preserving the single 3-DP detachment exception and paid Upgrade copies.
 See [scope and validation](docs/ORDER_67_SCOPE_PLAN.md). Reproduce source evidence
 with `uv run python tools/build_core_mustering_limits_source.py --check`.
+
+Order 68 requires explicit Warlord and Enhancement bearer model selections,
+with model-specific eligibility, keyword ownership and stable split/restore identity.
+Contract 33 requires the model fields in new roster records; old saves stay on
+their matching release. See [Order 68 scope and validation](docs/ORDER_68_SCOPE_PLAN.md)
+and [the contract migration](contracts/migrations/32-to-33.md).

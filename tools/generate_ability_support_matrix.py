@@ -1643,9 +1643,9 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             faction_id=None,
             allowed_base_faction_ids=("any",),
             source_id="core:supreme-commander",
-            enforcement_surface="army_mustering/list_validation",
+            enforcement_surface="roster_bearer_validation/list_validation",
             support_stage=MUSTERING_SUPPORT_FULL,
-            enforcement_id="army_mustering:_append_supreme_commander_warlord_violations",
+            enforcement_id="roster_bearer_validation:_append_supreme_commander_warlord_violations",
             tests_evidence=(
                 "tests/unit/test_phase9c_mustering.py::"
                 "test_mustering_requires_supreme_commander_to_be_warlord; "
@@ -1663,9 +1663,9 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             faction_id=None,
             allowed_base_faction_ids=("any",),
             source_id="core:datasheet-mustering:warlord-restriction",
-            enforcement_surface="army_mustering",
+            enforcement_surface="roster_bearer_validation",
             support_stage=MUSTERING_SUPPORT_FULL,
-            enforcement_id="army_mustering:_append_warlord_violations",
+            enforcement_id="roster_bearer_validation:append_warlord_violations",
             tests_evidence=(
                 "tests/unit/test_phase9c_mustering.py::"
                 "test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition; "

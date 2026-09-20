@@ -1,5 +1,5 @@
 {
-  "artifact_schema": "core-v2-player-army-list-v1",
+  "artifact_schema": "core-v2-player-army-list-v2-model-bearers",
   "army_list_id": "court-of-slaughter",
   "name": "Court of Slaughter",
   "faction_id": "emperors-children",
@@ -365,32 +365,44 @@
     {
       "enhancement_id": "000010900003",
       "target_unit_selection_id": "flawless-blades-lucius",
-      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons"
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons",
+      "model_profile_id": "000004089:flawless-blades",
+      "model_index": 1
     },
     {
       "enhancement_id": "000010654002",
       "target_unit_selection_id": "lord-exultant",
-      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:tears-of-the-phoenix"
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:tears-of-the-phoenix",
+      "model_profile_id": "000004078:lord-exultant",
+      "model_index": 1
     },
     {
       "enhancement_id": "000010654005",
       "target_unit_selection_id": "daemon-prince-of-slaanesh",
-      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:spiritsliver"
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:spiritsliver",
+      "model_profile_id": "000004086:daemon-prince-of-slaanesh",
+      "model_index": 1
     },
     {
       "enhancement_id": "000010900003",
       "target_unit_selection_id": "flawless-blades-2",
-      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons"
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons",
+      "model_profile_id": "000004089:flawless-blades",
+      "model_index": 1
     },
     {
       "enhancement_id": "000010900002",
       "target_unit_selection_id": "flawless-blades-3",
-      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:beguiling-grotesquerie"
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:beguiling-grotesquerie",
+      "model_profile_id": "000004089:flawless-blades",
+      "model_index": 1
     }
   ],
   "warlord_selection": {
     "unit_selection_id": "fulgrim",
-    "source_id": "player-army-list:court-of-slaughter:warlord"
+    "source_id": "player-army-list:court-of-slaughter:warlord",
+    "model_profile_id": "000004077:fulgrim-epic-hero",
+    "model_index": 1
   },
   "dedicated_transport_manifests": [],
   "provenance": {
