@@ -116,6 +116,25 @@ def _validate_declaration_submission(
             message="Selected shooting unit is no longer eligible to shoot.",
             field="unit_instance_id",
         )
+    from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
+
+    if pending_request is not None:
+        advertised = _decision_payload_object(
+            cast(JsonValue, _decision_payload_object(pending_request.payload)["proposal_request"])
+        )
+        snapshot = list(
+            firing_deck_cargo_snapshot(
+                state=state, unit_instance_id=proposal.unit_instance_id, army_catalog=army_catalog
+            )
+        )
+        expected_snapshot = snapshot if advertised["firing_deck_value"] is not None else None
+        if advertised.get("firing_deck_embarked_unit_instance_ids") != expected_snapshot:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="firing_deck_cargo_drift",
+                message="Firing Deck cargo changed after the declaration request.",
+                field="firing_deck_selection",
+            )
     attack_validation = _attack_pools_or_validation(
         pending_request=pending_request,
         state=state,

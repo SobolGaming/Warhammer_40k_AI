@@ -696,7 +696,7 @@ def test_lord_kakophonist_and_noise_marines_post_shoot_rules_use_chosen_order(
     armies, state, indexes, source_noise_marines, target, attached_id = (
         _kakophonist_runtime_fixture()
     )
-    state.game_id = "kakophonist-order36-0"
+    state.game_id = "order65-chosen-order-0"
     decisions = DecisionController()
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
     battle_shock_hooks = BattleShockHookRegistry.from_bindings(
@@ -1012,7 +1012,7 @@ def test_post_shoot_order_survives_target_set_change_after_feel_no_pain() -> Non
         target_b,
         source_attached_id,
     ) = _configured_kakophonist_multi_target_fixture(
-        game_id="kakophonist-runtime-test",
+        game_id="order65-target-change-fnp-0",
     )
     decisions = DecisionController()
     survivor_id = _leave_one_wound_on_unit(state=state, decisions=decisions, unit=target_a)
@@ -1102,9 +1102,7 @@ def test_post_shoot_order_retains_attached_target_identity_after_bodyguard_loss(
         source_attached_id,
         target_attached_id,
     ) = _configured_kakophonist_attached_target_fixture(
-        game_id=(
-            "kakophonist-attached-target-fnp-destruction-order36-1" if use_feel_no_pain else None
-        ),
+        game_id="order65-attached-loss-0",
     )
     decisions = DecisionController()
     survivor_id = _leave_one_wound_on_unit(
@@ -1247,7 +1245,7 @@ def test_doom_siren_retains_leader_support_attached_identity_after_bodyguard_los
         source_attached_id,
         target_attached_id,
     ) = _configured_kakophonist_leader_support_target_fixture(
-        game_id="kakophonist-leader-support-split-fnp-destruction",
+        game_id="order65-leader-support-loss-2",
     )
     decisions = DecisionController()
     final_bodyguard_model_id = _leave_one_wound_on_unit(
@@ -1502,7 +1500,9 @@ def test_selected_target_retains_attached_identity_in_lifecycle_replay_round_tri
 def test_leader_support_retained_identity_lifecycle_and_replay_round_trip(
     use_feel_no_pain: bool,
 ) -> None:
-    explicit_game_id = "order34-complete-boundary-support-1" if use_feel_no_pain else None
+    explicit_game_id = (
+        "order34-complete-boundary-support-1" if use_feel_no_pain else "order65-support-retained-0"
+    )
     (
         config,
         armies,
@@ -5096,7 +5096,7 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     armies, state, indexes, fulgrim, enemy = _fulgrim_runtime_fixture(
         phase=BattlePhase.SHOOTING,
         active_player_id="player-a",
-        game_id="order56-fulgrim-poison-5",
+        game_id="order65-fulgrim-poison-0",
     )
     decisions = DecisionController()
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
@@ -5540,7 +5540,7 @@ def test_fulgrim_poison_remains_on_attached_root_after_component_loss() -> None:
         armies=armies,
         phase=BattlePhase.SHOOTING,
         active_player_id="player-a",
-        game_id="fulgrim-attached-poison-replay",
+        game_id="order65-attached-poison-0",
     )
     records = catalog_ability_records_from_catalog(package.army_catalog)
     indexes = {

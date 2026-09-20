@@ -1,0 +1,76 @@
+{
+  "order": 65,
+  "validated_on": "2026-09-20",
+  "base_commit": "ca2eea9f467198fd5795838e56c9b21aad282afe",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3ebf7b8b7f46824a24960c48767647578c2b6c7af7504f5c7ad2e20060c11c6b",
+  "platform": "Windows 11; Python 3.14.5; bundled Node runtime",
+  "behavioral": {
+    "tests": 8484,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 992.075,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "25ef8be5a27afac4a0e64ba800ad29076050aaac407df0b352932c51a5c72f83",
+    "coverage_percent": 85.11750988207665,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_kind": "SQLite unclosed-connection ResourceWarnings, also present in base validation"
+  },
+  "code_quality": {
+    "tests": 549,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 328.706,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "221da030f1aaeb9fd2a5d3785998fe86eba3697a8cc4f2d12331d01a0ce6715e",
+    "coverage": false
+  },
+  "other_gates": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "eight_shard_inventory": "passed",
+    "import_linter_11_contracts": "passed",
+    "pre_commit_all_files": "passed",
+    "source_generator_check": "passed",
+    "engine_identity_check": "passed",
+    "external_contract_exact_base_check": "passed",
+    "typescript_generated_client_check": "passed",
+    "typescript_typecheck": "passed",
+    "typescript_unit_tests_5": "passed",
+    "typescript_conformance_scenario": "passed",
+    "installed_contract_wheel_smoke": "passed",
+    "staged_diff_check": "passed",
+    "staged_source_pin_byte_check": "passed"
+  },
+  "typescript_execution": "npm package-script entry points with bundled Node and the npm shim installed in ignored reports tooling.",
+  "typescript_conformance_assertions": 342,
+  "component_performance": {
+    "evidence": [
+      "base.json",
+      "head.json",
+      "budgets.json"
+    ],
+    "timed_declarations_per_revision": 14,
+    "eligibility_queries_per_revision": 1400,
+    "recorded_component_limits_passed": true,
+    "reconstruction_evidence": "../order64/head-reconstruction.json",
+    "reconstruction_timed_samples": 42,
+    "reconstruction_profile_samples": 6,
+    "reconstruction_existing_budgets_passed": true,
+    "gameplay_slice_measured": false,
+    "full_game_certified": false
+  },
+  "validation_notes": [
+    "The initial behavioral coverage run passed 8409 tests with 31 failures and 44 errors caused by a shared post-attack fixture missing required declaration metadata. The fixture now derives its Firing Deck value from real domain units and records the actual parent phase. Deterministic scenario inputs were reselected to preserve existing dice-dependent assertions; RNG and assertions were unchanged. All 1147 fixture consumers then passed, followed by the complete successful behavioral coverage suite.",
+    "Two initial 64-worker quality runs reported respectively two and one Order 64 reconstruction profile failures (five lifecycle restorations where four are required). Focused serial and parallel runs passed. A full instrumented diagnostic passed all 549 checks and also captured inconsistent caller accounting (two fork calls for one invocation). The underlying profiler cause was not established. Each live reconstruction guard now profiles exactly one real reconstruction in a fresh subprocess, retaining all correctness assertions and every numeric budget. All ten focused guards and the final uninstrumented parallel quality suite passed.",
+    "The profiler isolation changes only the quality-test harness. Runtime code, measured workloads, source artifacts and performance budgets are unchanged by that correction.",
+    "No production code changed after the successful behavioral coverage run began. The eight-shard inventory was regenerated from that successful complete JUnit profile.",
+    "Qualified component evidence was measured serially without competing workers or profiling in timing samples. Diagnostic suite profiling is separate from the qualified timing evidence. Full-game performance remains uncertified."
+  ]
+}

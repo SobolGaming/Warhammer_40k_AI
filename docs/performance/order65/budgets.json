@@ -1,0 +1,9 @@
+{
+  "workload_id": "order65-firing-deck-v1",
+  "mean_ratio": 1.3,
+  "declaration_additive_seconds": 0.05,
+  "hundred_queries_additive_seconds": 0.01,
+  "maximum_ratio": 1.5,
+  "maximum_additive_seconds": 0.1,
+  "query_payload_checks_per_effect": 1
+}

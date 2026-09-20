@@ -6013,8 +6013,8 @@ def _structured_support_sections_markdown() -> list[str]:
                     (
                         "Consumes structured Firing Deck values, exposes eligible embarked "
                         "non-One-Shot ranged weapons, binds each contribution to source "
-                        "unit/model evidence, and marks selected embarked units ineligible to "
-                        "shoot."
+                        "unit/model evidence, and snapshots every embarked unit as ineligible "
+                        "to shoot until turn end, including after disembarking."
                     ),
                 ),
                 SupportSectionRow(

@@ -909,3 +909,11 @@ cleanup. Shared movement checks enforce the next-Charge ingress lock. See
 [restore/fork performance guard](docs/performance/order64/README.md).
 Verify the reviewed source with
 `uv run python tools/build_core_reserve_lifetimes_source.py --check`.
+
+
+Order 65 restricts every unit embarked when Firing Deck resolves from shooting
+until turn end, even with no borrowed weapons and after later disembarkation.
+Shared eligibility, accepted cargo snapshots and persistent-effect expiry cover
+all adapters and replay. See [scope and evidence](docs/ORDER_65_SCOPE_PLAN.md),
+[contract 31 migration](contracts/migrations/30-to-31.md), and verify source data
+with `uv run python tools/build_core_firing_deck_source.py --check`.

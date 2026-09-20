@@ -62,6 +62,23 @@ def _declaration_source_model_id(declaration: WeaponDeclaration) -> str:
     return declaration.attacker_model_instance_id
 
 
+def firing_deck_cargo_snapshot(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    army_catalog: ArmyCatalog,
+) -> tuple[str, ...]:
+    if state.out_of_phase_shooting_state is not None:
+        return ()
+    cargo = state.transport_cargo_state_for_transport(unit_instance_id)
+    if cargo is None:
+        return ()
+    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
+    if _firing_deck_value_for_unit(unit=unit, army_catalog=army_catalog) is None:
+        return ()
+    return cargo.embarked_unit_instance_ids
+
+
 def _validate_firing_deck_selection(
     *,
     state: GameState,
@@ -71,15 +88,21 @@ def _validate_firing_deck_selection(
     firing_deck_declarations = tuple(
         declaration for declaration in proposal.declarations if declaration.uses_firing_deck
     )
-    if not firing_deck_declarations:
-        if proposal.firing_deck_selection is not None:
-            return ShootingProposalValidationResult.invalid(
-                proposal_request_id=proposal.proposal_request_id,
-                violation_code="firing_deck_selection_without_declaration",
-                message="Firing Deck selection requires Firing Deck declarations.",
-                field="firing_deck_selection",
-            )
-        return ()
+    if not firing_deck_declarations and proposal.firing_deck_selection is None:
+        return firing_deck_cargo_snapshot(
+            state=state, unit_instance_id=proposal.unit_instance_id, army_catalog=army_catalog
+        )
+    if (
+        not firing_deck_declarations
+        and proposal.firing_deck_selection is not None
+        and proposal.firing_deck_selection.weapon_selections
+    ):
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="firing_deck_selection_without_declaration",
+            message="Firing Deck selection requires Firing Deck declarations.",
+            field="firing_deck_selection",
+        )
     selection = proposal.firing_deck_selection
     if selection is None:
         return ShootingProposalValidationResult.invalid(

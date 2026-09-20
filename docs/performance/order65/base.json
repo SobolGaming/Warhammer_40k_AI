@@ -1,0 +1,159 @@
+{
+  "workload_id": "order65-firing-deck-v1",
+  "revision": "ca2eea9f",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c225e8a822373202e37fc7859d393a1562fa37ba1d7b0759e51909d0c469d5fe",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "scenario": "2 five-model infantry cargo units; 1 Transport; 5 enemy infantry; empty terrain; canonical seed and finite first-option shooting type",
+  "timing_boundary": "accepted declaration through next decision; fixture and unit-view preparation excluded; 100 shared eligibility queries separately",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order65.py": "5f08af306760aaeeace333984be7fba398b05c302906a9ef63bd29782caf6408",
+    "tests/firing_deck_helpers.py": "5aed3df4f457ab7a22c01375134ff8b082e51373c6cdb84f2efe0a1ce0470fe0"
+  },
+  "rows": [
+    {
+      "contribute": false,
+      "samples": [
+        {
+          "preparation_seconds": 7.651718700013589,
+          "declaration_seconds": 0.11950309999519959,
+          "hundred_queries_seconds": 0.0038747000216972083,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 1.0643867999897338,
+          "declaration_seconds": 0.10546200000680983,
+          "hundred_queries_seconds": 0.003874099988024682,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9678039000136778,
+          "declaration_seconds": 0.10828359998413362,
+          "hundred_queries_seconds": 0.003331400017486885,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9764864000026137,
+          "declaration_seconds": 0.10216879998915829,
+          "hundred_queries_seconds": 0.003238500008592382,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9884534000011627,
+          "declaration_seconds": 0.10471129999496043,
+          "hundred_queries_seconds": 0.0032457000052090734,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9805739999865182,
+          "declaration_seconds": 0.10255770001094788,
+          "hundred_queries_seconds": 0.0032712999964132905,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9924333000089973,
+          "declaration_seconds": 0.10481889999937266,
+          "hundred_queries_seconds": 0.0033100000000558794,
+          "restricted_queries": 0,
+          "complete": true
+        }
+      ],
+      "summary": {
+        "declaration_seconds": {
+          "mean": 0.10678648571151175,
+          "median": 0.10481889999937266,
+          "p95": 0.11950309999519959,
+          "maximum": 0.11950309999519959
+        },
+        "hundred_queries_seconds": {
+          "mean": 0.003449385719639914,
+          "median": 0.0033100000000558794,
+          "p95": 0.0038747000216972083,
+          "maximum": 0.0038747000216972083
+        }
+      }
+    },
+    {
+      "contribute": true,
+      "samples": [
+        {
+          "preparation_seconds": 0.9777138000063132,
+          "declaration_seconds": 0.08723110001301393,
+          "hundred_queries_seconds": 0.0032136999943759292,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9915934999880847,
+          "declaration_seconds": 0.08234630001243204,
+          "hundred_queries_seconds": 0.00343290000455454,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 1.0656446000211872,
+          "declaration_seconds": 0.08238029998028651,
+          "hundred_queries_seconds": 0.003454499994404614,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9728490999841597,
+          "declaration_seconds": 0.08285260002594441,
+          "hundred_queries_seconds": 0.0032915000047069043,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9716168000013568,
+          "declaration_seconds": 0.08340550001594238,
+          "hundred_queries_seconds": 0.0032863999949768186,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 1.097508300008485,
+          "declaration_seconds": 0.0910440000006929,
+          "hundred_queries_seconds": 0.0032392999855801463,
+          "restricted_queries": 0,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 1.0278768000134733,
+          "declaration_seconds": 0.08881479999399744,
+          "hundred_queries_seconds": 0.0032779000175651163,
+          "restricted_queries": 0,
+          "complete": true
+        }
+      ],
+      "summary": {
+        "declaration_seconds": {
+          "mean": 0.0854392285774728,
+          "median": 0.08340550001594238,
+          "p95": 0.0910440000006929,
+          "maximum": 0.0910440000006929
+        },
+        "hundred_queries_seconds": {
+          "mean": 0.003313742856594867,
+          "median": 0.0032863999949768186,
+          "p95": 0.003454499994404614,
+          "maximum": 0.003454499994404614
+        }
+      }
+    }
+  ],
+  "completion_rate": 1,
+  "full_game_certified": false
+}

@@ -145,7 +145,7 @@ def _shooting_declaration_ids(
         ineligible = payload.get("ineligible_unit_instance_ids")
         if not isinstance(ineligible, list) or any(type(value) is not str for value in ineligible):
             raise GameLifecycleError("Primary mission shooting causal inventory is invalid.")
-        declared.update(cast(list[str], ineligible))
+        # Firing Deck restricts passengers; they did not themselves shoot.
     return declared
 
 

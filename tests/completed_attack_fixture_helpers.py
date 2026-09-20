@@ -28,6 +28,8 @@ from warhammer40k_core.engine.fight_order import (
 )
 from warhammer40k_core.engine.game_state import GameState, RangedAttackHistoryRecord
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.unit_abilities import firing_deck_value_for_unit
 from warhammer40k_core.engine.weapon_declaration import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingDeclarationProposal,
@@ -108,9 +110,10 @@ def record_shooting_declaration_for_executor_fixture(
     sequence: AttackSequence,
     result_id: str,
 ) -> None:
+    phase = state.current_battle_phase
+    assert phase is not None
     out_of_phase = (
-        state.current_battle_phase is not BattlePhase.SHOOTING
-        or state.active_player_id != sequence.attacker_player_id
+        phase is not BattlePhase.SHOOTING or state.active_player_id != sequence.attacker_player_id
     )
     prefix = "out-of-phase-" if out_of_phase else ""
     if sequence.sequence_id != f"{prefix}attack-sequence:{result_id}":
@@ -119,7 +122,17 @@ def record_shooting_declaration_for_executor_fixture(
     visibility_cache_key = f"kakophonist-visibility:{result_id}"
     source_request_id = f"kakophonist-unit-selection-request:{result_id}"
     source_result_id = f"kakophonist-unit-selection-result:{result_id}"
-    proposal_request = {
+    rules_unit = rules_unit_view_by_id(
+        state=state, unit_instance_id=sequence.attacking_unit_instance_id
+    )
+    firing_deck_values = tuple(
+        value
+        for component in rules_unit.components
+        if (value := firing_deck_value_for_unit(component.unit)) is not None
+    )
+    assert len(firing_deck_values) <= 1
+    firing_deck_value = firing_deck_values[0] if firing_deck_values else None
+    proposal_request: dict[str, object] = {
         "request_id": request_id,
         "active_player_id": sequence.attacker_player_id,
         "battle_round": state.battle_round,
@@ -128,7 +141,15 @@ def record_shooting_declaration_for_executor_fixture(
         "source_decision_result_id": source_result_id,
         "visibility_cache_key": visibility_cache_key,
         "proposal_kind": "shooting_declaration",
+        "phase": phase.value,
+        "firing_deck_value": firing_deck_value,
     }
+    if firing_deck_value is not None:
+        cargo = state.transport_cargo_state_for_transport(sequence.attacking_unit_instance_id)
+        assert out_of_phase or cargo is None or not cargo.embarked_unit_instance_ids, (
+            "Loaded Firing Deck declarations require the complete shooting facade fixture."
+        )
+        proposal_request["firing_deck_embarked_unit_instance_ids"] = []
     request = DecisionRequest(
         request_id=request_id,
         decision_type=SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,

@@ -123,6 +123,7 @@ def validate_persisting_effects(
     player_ids: tuple[str, ...],
 ) -> list[PersistingEffect]:
     from warhammer40k_core.engine.activity_restrictions import activity_restriction_payload
+    from warhammer40k_core.engine.firing_deck_restrictions import firing_deck_restriction_payload
 
     if not isinstance(effects, list):
         raise GameLifecycleError("GameState persisting_effects must be a list.")
@@ -146,6 +147,7 @@ def validate_persisting_effects(
         if effect.effect_id in seen:
             raise GameLifecycleError("GameState persisting_effects must be unique.")
         activity_restriction_payload(effect)
+        firing_deck_restriction_payload(effect)
         seen.add(effect.effect_id)
         validated.append(effect)
     return sorted(validated, key=lambda effect: effect.effect_id)

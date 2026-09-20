@@ -3048,12 +3048,13 @@ def test_malformed_firing_deck_weapon_selection_is_invalid_without_mutation() ->
 
 def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligible() -> None:
     lifecycle, units = _shooting_lifecycle(
-        alpha_unit_ids=("passenger-1", "transport-1"),
+        alpha_unit_ids=("passenger-1", "passenger-2", "transport-1"),
         alpha_datasheets={
             "passenger-1": ("core-intercessor-like-infantry", "core-intercessor-like", 5),
+            "passenger-2": ("core-intercessor-like-infantry", "core-intercessor-like", 5),
             "transport-1": ("core-transport", "core-transport", 1),
         },
-        embarked_unit_ids=("passenger-1",),
+        embarked_unit_ids=("passenger-1", "passenger-2"),
     )
     state = _state(lifecycle)
     first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -3109,8 +3110,24 @@ def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligi
     assert firing_deck_pools[0]["weapon_instance_id"] == (
         firing_deck_declaration.weapon_instance_id
     )
-    if state.shooting_phase_state is not None:
-        assert units["passenger-1"].unit_instance_id in state.shooting_phase_state.shot_unit_ids
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.shooting_eligibility_state import (
+        shooting_state_restriction_reason,
+    )
+
+    for key in ("passenger-1", "passenger-2"):
+        assert (
+            shooting_state_restriction_reason(
+                state=state,
+                rules_unit=rules_unit_view_by_id(
+                    state=state, unit_instance_id=units[key].unit_instance_id
+                ),
+                player_id="player-a",
+            )
+            == "firing_deck"
+        )
+        if state.shooting_phase_state is not None:
+            assert units[key].unit_instance_id not in state.shooting_phase_state.shot_unit_ids
 
 
 def test_firing_deck_exposes_all_weapons_and_rejects_two_from_one_embarked_model() -> None:

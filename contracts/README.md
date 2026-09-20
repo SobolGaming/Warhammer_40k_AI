@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `30.0.0`
+Contract version: `31.0.0`
+
+Contract 31 implements turn-long Firing Deck restrictions for every embarked unit.
+See [migration 30 to 31](migrations/30-to-31.md).
 
 Contract 30 applies Core reserve deadlines and post-ingress movement lifetimes.
 See [migration 29 to 30](migrations/29-to-30.md) for required historical fields,

@@ -176,10 +176,17 @@ def _apply_shooting_declaration_decision(
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=attack_pools,
     )
+    from warhammer40k_core.engine.firing_deck_restrictions import record_firing_deck_restriction
+
+    record_firing_deck_restriction(
+        state=state,
+        transport_unit_instance_id=proposal.unit_instance_id,
+        embarked_unit_instance_ids=ineligible_unit_ids,
+        result_id=result.result_id,
+    )
     state.replace_shooting_phase_state(
         shooting_state.with_declaration(
             attack_pools=attack_pools,
-            ineligible_unit_instance_ids=ineligible_unit_ids,
             attack_sequence=attack_sequence,
         )
     )

@@ -1,0 +1,82 @@
+{
+  "artifact_schema": "core-v2-core-firing-deck-source-v1",
+  "source_package_id": "gw-11e-core-firing-deck",
+  "source_version": "maintained-app-mirrors-observed-2026-09-20",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-firing-deck:firing_deck",
+      "section_id": "24.14",
+      "source_text": "This ability always takes the form Firing Deck X. In your Shooting phase, each time this TRANSPORT is selected to shoot, if one or more units are embarked within it, resolve the following sequence: 1. Select up to X models embarked within this TRANSPORT (excluding models whose units have already been selected to shoot this phase). 2. For each selected model, select one of its ranged weapons (excluding [ONE SHOT] weapons). 3. Until this TRANSPORT has resolved all of its attacks, it has all of those selected weapons in addition to its other weapons. 4. Until the end of the turn, units embarked within this TRANSPORT are not eligible to shoot.",
+      "transcription_sha256": "b234400ffa38153cd65622cb8a64189f8a786b5ecbdf25cd09772ffcd0c178c1",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.firing_deck_restrictions:record_firing_deck_restriction",
+        "warhammer40k_core.engine.shooting_eligibility_state:shooting_state_restriction_reason"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-firing-deck:firing_deck",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "b234400ffa38153cd65622cb8a64189f8a786b5ecbdf25cd09772ffcd0c178c1",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "097f3064296b8deda9c211d83003f5d0e7edc2efe7e9b194ec22131d44300d06",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.firing_deck_restrictions:record_firing_deck_restriction",
+        "warhammer40k_core.engine.shooting_eligibility_state:shooting_state_restriction_reason"
+      ],
+      "evidence_id": "core-firing-deck-review:firing_deck",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P24B 24.14 firing_deck",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-firing-deck:firing_deck",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "b234400ffa38153cd65622cb8a64189f8a786b5ecbdf25cd09772ffcd0c178c1",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "cf930f281de2b2b21a7caf7a4891d66c43f737425a224ab123cb3802397d1b1c",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.firing_deck_restrictions:record_firing_deck_restriction",
+        "warhammer40k_core.engine.shooting_eligibility_state:shooting_state_restriction_reason"
+      ],
+      "evidence_id": "core-firing-deck-mirror:firing_deck:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-firing-deck-maintained-app-mirrors-2026-09-20",
+      "review_audit_row_id": "firing_deck:40k-app",
+      "review_audit_source_observation_sha256": "9f54ad3a7c7d78cdb3edf88d3cf08e1e13371637e3088ddf5ad2968fbe9bd34f",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 24.14 firing_deck",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-09-20T11:30:00Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "97749179ef59a1c8109a22c5ba499a0b9794058baa913da3542609e95176678f"
+}
