@@ -6427,3 +6427,6 @@ remain. There is no new decision, option, proposal, field or visibility rule.
 Strict roster rejection, serialized assignments, setup and restore all use the
 shared engine validator. Runtime identity and generated contract examples change;
 public payload shapes and the contract major remain unchanged.
+The Dedicated Transport duplication exception applies only to Incursion and
+Strike Force. Onslaught retains its prior three-copy limit unless the datasheet
+also has Battleline, which retains six; this adds no payload or visibility change.

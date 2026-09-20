@@ -25,8 +25,11 @@ Order 68 owns model-specific Warlord/Enhancement bearers and Upgrade eligibility
 Order 69 owns source-neutral detachment constraints and Support attachment.
 This PR neither certifies those paths nor imports faction rules. In particular,
 the existing Character-Upgrade rejection remains an Order 68 eligibility issue.
-The observed table lists Incursion and Strike Force; existing Onslaught settings
-are not newly certified by this observation. No out-of-scope content is ingested.
+The observed table lists Incursion and Strike Force. The Dedicated Transport
+exception is restricted to those two policies. Onslaught retains its prior limits:
+three ordinary/Dedicated Transport copies, or six when BATTLELINE is present.
+These Onslaught preservation regressions do not newly certify its rules against
+this observation. No out-of-scope content is ingested.
 
 ## Source evidence
 
@@ -107,6 +110,18 @@ was added, removed or renamed, so shard membership is unchanged and checked.
 
 ## Validation
 
+PR #487 review identified an unsupported scope expansion: the shared Dedicated
+Transport predicate also doubled Onslaught's limit. The source-backed exception
+must not change an unobserved battle-size policy. The helper now explicitly limits
+that exception to Incursion and Strike Force. A search of every duplicate-limit
+consumer confirmed the helper is the sole shared owner; no alternate validator
+needed repair. All four keyword combinations are now tested at exact and one-over
+limits for Onslaught as well. Before the fix, the new Onslaught Dedicated Transport
+case failed while eleven controls passed. The static audit records the two
+source-backed exception policies. Production scope remains one predicate; source
+artifacts and public schemas are unchanged. The runtime identity and required
+generated examples, performance evidence and final gates are refreshed below.
+
 Focused mustering, roster points and player-list tests: 147 passed.
 Focused source-artifact/module-size audits: 41 passed.
 Matched component evidence and reproduction commands: [performance/order67](performance/order67/README.md).
@@ -118,19 +133,23 @@ The first completed coverage run passed 8,521 cases at 85.13%, with one stale
 source-registry inventory assertion (43 packages instead of the new 44). Only
 that behavioral expectation and its matching static inventory assertion changed;
 both focused regressions passed before the final respective aggregate gates. Production and runtime identity remain unchanged.
-The final behavioral run passed all 8,522 tests with 85.13% coverage. The first
+The initial PR's final behavioral run passed all 8,522 tests with 85.13% coverage. The first
 full quality run passed 552 checks and rejected two stale runtime timing records
 from Orders 64/65. Both workloads were measured afresh, serially without competing
 test/build workers, on the final runtime with unchanged baselines and budgets.
 Their focused comparison guards passed before the final quality rerun.
-The final quality rerun passed all 554 checks without coverage. Both final suites
+The initial PR's final quality rerun passed all 554 checks without coverage. Both suites
 used 64 xdist workers with work stealing. Ruff, formatting, mypy, Pyright,
 11 import contracts, pre-commit, the exact eight-shard check, source/runtime
 generators and exact-base contract compatibility passed. Installed-wheel smoke
 covered 27 schemas and six request families; TypeScript client/type checks,
 five unit tests and 342 live conformance assertions passed. No production code
-changed after final behavioral validation. Machine-readable results and diagnostic
-history are retained in [validation.json](performance/order67/validation.json).
+changed after that behavioral validation and before initial publication.
+The review correction supersedes that runtime and requires fresh final gates;
+machine-readable results and diagnostic history are retained in
+[validation.json](performance/order67/validation.json).
+
+Review correction final validation: 8,526 behavioral tests passed with 85.13% coverage; all 554 quality checks passed without coverage. The 119 focused tests, seven source/performance guards and every required lint, type, shard, contract/client, conformance and wheel gate passed. No production code changed after this final behavioral run.
 
 PR URL: https://github.com/SobolGaming/Warhammer_40k_AI/pull/487.
 Merge commit: pending; not merged.

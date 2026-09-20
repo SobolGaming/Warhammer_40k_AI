@@ -7,8 +7,8 @@
   "host_role": "provisional",
   "cpu_allocation": 64,
   "concurrency": 1,
-  "revision": "order67-working-tree",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2daafb0c3e982175fa8a45c93824a1f14c25ef9b44392b181c05bd9936c3883d",
+  "revision": "order67-onslaught-review",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f5f5e58b838cbadb75e6b2da67488a605aa80d29989032fb3c284386b9d3630b",
   "timing_boundary": "100 validate_roster_legality calls; catalog/request construction excluded; no gameplay, terrain, RNG or decisions",
   "hashes": {
     "scripts/measure_order67.py": "d88f50d925ea2588e77bafb14bf3384e0c816432b3285f80c8ac915c8156d49b",
@@ -19,16 +19,16 @@
       "unit_count": 2,
       "model_count": 10,
       "samples_seconds": [
-        0.013596100005088374,
-        0.013527200004318729,
-        0.013553400000091642,
-        0.013581400009570643,
-        0.013780199980828911,
-        0.013545299996621907,
-        0.013416400004643947
+        0.013236200000392273,
+        0.01328699997975491,
+        0.01333589997375384,
+        0.01315070001874119,
+        0.013177599990740418,
+        0.013201699999626726,
+        0.013225300004705787
       ],
-      "mean_seconds": 0.013571428571594879,
-      "maximum_seconds": 0.013780199980828911,
+      "mean_seconds": 0.01323062856681645,
+      "maximum_seconds": 0.01333589997375384,
       "complete": true,
       "violation_codes": [
         "missing_warlord_selection",
@@ -39,16 +39,16 @@
       "unit_count": 4,
       "model_count": 20,
       "samples_seconds": [
-        0.021177599992370233,
-        0.021300599997630343,
-        0.021181499992962927,
-        0.02120600000489503,
-        0.021301599976141006,
-        0.021383000013884157,
-        0.021309199975803494
+        0.02091419999487698,
+        0.02092930002254434,
+        0.021123700018506497,
+        0.021056300000054762,
+        0.02097509999293834,
+        0.020899199997074902,
+        0.02090410000528209
       ],
-      "mean_seconds": 0.02126564285052674,
-      "maximum_seconds": 0.021383000013884157,
+      "mean_seconds": 0.020971700004468272,
+      "maximum_seconds": 0.021123700018506497,
       "complete": true,
       "violation_codes": [
         "missing_warlord_selection",
@@ -59,16 +59,16 @@
       "unit_count": 20,
       "model_count": 100,
       "samples_seconds": [
-        0.08322380000026897,
-        0.08341689998633228,
-        0.08359740002197213,
-        0.08357500002603047,
-        0.08361550001427531,
-        0.08345679999911226,
-        0.08358959999168292
+        0.08179009999730624,
+        0.08169689998612739,
+        0.0816769000084605,
+        0.08180700000957586,
+        0.08180269997683354,
+        0.08262450000620447,
+        0.0831338000134565
       ],
-      "mean_seconds": 0.08349642857709634,
-      "maximum_seconds": 0.08361550001427531,
+      "mean_seconds": 0.08207598571399492,
+      "maximum_seconds": 0.0831338000134565,
       "complete": true,
       "violation_codes": [
         "missing_warlord_selection",

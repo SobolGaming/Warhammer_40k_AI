@@ -19,10 +19,10 @@ base queries reproduced the missing restriction.
 
 | Borrows a weapon | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| False | Accepted declaration | 0.106786 / 0.119503 | 0.126328 / 0.140901 |
-| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000764 / 0.001071 |
-| True | Accepted declaration | 0.085439 / 0.091044 | 0.083886 / 0.088284 |
-| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000691 / 0.000728 |
+| False | Accepted declaration | 0.106786 / 0.119503 | 0.133393 / 0.144352 |
+| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000709 / 0.000763 |
+| True | Accepted declaration | 0.085439 / 0.091044 | 0.088495 / 0.095087 |
+| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000708 / 0.000785 |
 
 The declared mean budget is base × 1.30 plus 50 ms per declaration or 10 ms per
 100 queries; the maximum budget is base × 1.50 plus 100 ms. These allowances cover

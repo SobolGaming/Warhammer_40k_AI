@@ -16,9 +16,9 @@ old engine is a cost comparison, not a correctness oracle.
 
 | Units / models | Base mean ms / roster | Head mean ms / roster | Head max batch mean ms / roster |
 |---|---:|---:|---:|
-| 2 / 10 | 0.1370 | 0.1357 | 0.1378 |
-| 4 / 20 | 0.2127 | 0.2127 | 0.2138 |
-| 20 / 100 | 0.8313 | 0.8350 | 0.8362 |
+| 2 / 10 | 0.1370 | 0.1323 | 0.1334 |
+| 4 / 20 | 0.2127 | 0.2097 | 0.2112 |
+| 20 / 100 | 0.8313 | 0.8208 | 0.8313 |
 
 The versioned budget is 1.5 times base plus 20 ms per 100-call batch for both
 mean and maximum. The additive allowance is 0.2 ms per roster, allowing host timer
@@ -40,3 +40,8 @@ serially for this build, with unchanged inputs, baselines and thresholds. Their
 head reports and README results are refreshed; historical validation records
 remain intact. These required evidence refreshes do not expand gameplay scope or
 certify full-game performance.
+
+PR #487's Onslaught review correction refreshes every head report for runtime
+`f5f5e58b`, using the same host, workloads and budgets. The extra battle-size check
+keeps roster validation within the declared component limits. Onslaught's prior
+copy limits are separately preserved by the exact/one-over behavioral matrix.

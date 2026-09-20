@@ -5228,22 +5228,26 @@ def test_unit_factory_instances_and_validators_fail_fast() -> None:
 
 
 @pytest.mark.parametrize(
-    ("battle_size", "ordinary_limit"), [(BattleSize.INCURSION, 2), (BattleSize.STRIKE_FORCE, 3)]
-)
-@pytest.mark.parametrize(
-    ("keywords", "multiplier"),
+    ("battle_size", "keywords", "limit"),
     [
-        ((), 1),
-        (("BATTLELINE",), 2),
-        (("DEDICATED TRANSPORT",), 2),
-        (("BATTLELINE", "DEDICATED TRANSPORT"), 2),
+        (BattleSize.INCURSION, (), 2),
+        (BattleSize.INCURSION, ("BATTLELINE",), 4),
+        (BattleSize.INCURSION, ("DEDICATED TRANSPORT",), 4),
+        (BattleSize.INCURSION, ("BATTLELINE", "DEDICATED TRANSPORT"), 4),
+        (BattleSize.STRIKE_FORCE, (), 3),
+        (BattleSize.STRIKE_FORCE, ("BATTLELINE",), 6),
+        (BattleSize.STRIKE_FORCE, ("DEDICATED TRANSPORT",), 6),
+        (BattleSize.STRIKE_FORCE, ("BATTLELINE", "DEDICATED TRANSPORT"), 6),
+        (BattleSize.ONSLAUGHT, (), 3),
+        (BattleSize.ONSLAUGHT, ("BATTLELINE",), 6),
+        (BattleSize.ONSLAUGHT, ("DEDICATED TRANSPORT",), 3),
+        (BattleSize.ONSLAUGHT, ("BATTLELINE", "DEDICATED TRANSPORT"), 6),
     ],
 )
 def test_order67_duplicate_limits_are_independent_and_do_not_stack(
     battle_size: BattleSize,
-    ordinary_limit: int,
     keywords: tuple[str, ...],
-    multiplier: int,
+    limit: int,
 ) -> None:
     catalog = _phase16d_catalog()
     original = catalog.datasheet_by_id("core-transport")
@@ -5260,7 +5264,7 @@ def test_order67_duplicate_limits_are_independent_and_do_not_stack(
             subject if d.datasheet_id == subject.datasheet_id else d for d in catalog.datasheets
         ),
     )
-    for count in (ordinary_limit * multiplier, ordinary_limit * multiplier + 1):
+    for count in (limit, limit + 1):
         squads = tuple(
             _unit_selection(
                 unit_selection_id=f"squad-{i}",
@@ -5306,7 +5310,7 @@ def test_order67_duplicate_limits_are_independent_and_do_not_stack(
             roster_legality_required=True,
         )
         report = validate_roster_legality(catalog=catalog, request=request)
-        if count == ordinary_limit * multiplier:
+        if count == limit:
             assert report.violations == ()
             army = muster_army(catalog=catalog, request=request)
             assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()

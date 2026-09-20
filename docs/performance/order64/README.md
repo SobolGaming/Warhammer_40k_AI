@@ -56,12 +56,12 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.691 / 3.740 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.683 / 3.759 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.713 / 3.763 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.741 / 3.813 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.720 / 3.804 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.714 / 3.800 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.701 / 3.754 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.794 / 3.900 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.848 / 3.949 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.865 / 3.977 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.854 / 3.969 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.865 / 4.054 |
 
 Order 67 refreshed the 42 head timings and six independent profile samples for
 the current runtime build on 2026-09-20, retaining the qualified baseline and
@@ -71,7 +71,7 @@ and suffix counts preserved. These measurements do not establish a speedup.
 See [Order 67 validation](../order67/validation.json).
 
 At the measured checkpoint cost, ten sequential forks would consume about
-37 seconds. This is a linear estimate, not an observed planning workload;
+39 seconds. This is a linear estimate, not an observed planning workload;
 actual forks per phase/game remain unmeasured.
 
 The guard deliberately leaves the independently rooted replay authentication

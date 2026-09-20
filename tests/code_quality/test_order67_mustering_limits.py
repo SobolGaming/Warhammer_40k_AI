@@ -38,6 +38,14 @@ def test_roster_duplicate_limit_uses_shared_catalog_keyword_authority() -> None:
     assert not [node for node in ast.walk(predicate) if isinstance(node, ast.Call)]
     tokens = {node.value for node in ast.walk(predicate) if isinstance(node, ast.Constant)}
     assert {"BATTLELINE", "DEDICATED TRANSPORT"} <= tokens
+    explicit_battle_sizes = {
+        node.attr
+        for node in ast.walk(predicate)
+        if isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "BattleSize"
+    }
+    assert explicit_battle_sizes == {"INCURSION", "STRIKE_FORCE"}
 
 
 def test_order67_matched_roster_validation_cost() -> None:

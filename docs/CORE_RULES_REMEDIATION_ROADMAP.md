@@ -5078,9 +5078,11 @@ C25-01 and C25-02 now use Incursion's 1,000-point, 2-DP, 2-Enhancement and
 shared doubled allowance; both keywords do not stack. The existing single
 3-DP detachment exception and per-copy Upgrade points accounting are certified
 with exact-boundary roster and facade restore regressions.
+The Dedicated Transport exception is limited to Incursion and Strike Force;
+Onslaught's prior three-copy limit, or six with Battleline, is preserved and tested.
 
 See [Order 67 scope, source and validation](ORDER_67_SCOPE_PLAN.md). Order 68
 bearer eligibility and Order 69 detachment constraints remain separate. Final
 all-category certification is still pending.
-Final local validation passed 8,522 behavioral tests at 85.13% coverage, all
+Final local validation passed 8,526 behavioral tests at 85.13% coverage, all
 554 code-quality tests and the required contract, package and quality gates.
