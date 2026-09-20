@@ -116,5 +116,39 @@ living model authority. No production code changed for these corrections.
 The seven-case focused regression group passed, including the previously passing
 control variant; the final complete coverage run follows these test-only updates.
 
-Final local validation passed 8,544 behavioral tests at 85.13% coverage and all 558 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.
+Initial PR local validation passed 8,544 behavioral tests at 85.13% coverage and all 558 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.
 No production code changed after the final behavioral run began. Exact results, warning count and diagnostic history are in [validation.json](performance/order68/validation.json).
+
+### Corsair bearer review correction
+
+PR review identified a remaining violation of the model-specific eligibility
+invariant: the Corsair exception branch read datasheet keywords despite an explicit
+bearer selection. The shared roster resolver now passes its resolved ModelInstance
+to that branch. All four Enhancements check the bearer for ANHRATHE; Archraider
+also checks CHARACTER and Voidstone checks INFANTRY. The other Corsair Enhancements
+retain their source-authorized non-CHARACTER eligibility. An unresolved model remains
+a typed invalid selection and cannot reach bearer keyword validation.
+
+The audit traced catalog ModelKeywordAssignment through UnitFactory, the existing
+per-validation resolver and typed roster violations. Ordinary Enhancement, Upgrade,
+Epic Hero and generic target checks already use the selected model. Remaining
+datasheet checks concern whole-unit roster restrictions or Warlord candidate
+enumeration. No additional bearer keyword call site required changing. The normalized
+Corsair source package already records these four model restrictions; no new source,
+runtime handler, cache or decision path is needed. The existing adapter contract
+covers these fields and diagnostics, with the Corsair exception clarified there.
+
+Six mixed-profile regressions failed before the fix because an ineligible bearer
+was accepted. Each now checks the exact violation and source, a legal qualifying
+model, and an out-of-range index. The non-CHARACTER controls also ensure the special
+Corsair permission is preserved. A static audit forbids datasheet keyword access
+in the Corsair helper. All 220 tests in the Corsair and mustering files pass.
+The production diff is confined to the existing Corsair helper and its call;
+runtime identity and generated contract examples are refreshed for that change.
+The correction reuses an already resolved model and introduces no reconstruction
+or search work. Required exact-runtime component measurements and aggregate gates
+are rerun before publication, retaining the original validation as historical evidence.
+
+Final local validation passed 8,550 behavioral tests at 85.13% coverage and all 559 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.
+No production code changed after this review correction's final coverage run began.
+The previous PR validation remains in `prior_pr_validation` in the evidence JSON.

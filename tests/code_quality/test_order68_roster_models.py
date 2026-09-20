@@ -58,6 +58,23 @@ def test_order68_model_fields_are_required() -> None:
             assert fields[key].default is dataclasses.MISSING
 
 
+def test_order68_corsair_bearer_eligibility_cannot_use_datasheet_keywords() -> None:
+    path = ROOT / "src/warhammer40k_core/engine/roster_bearer_validation.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    helper = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_append_corsair_coterie_enhancement_target_violations"
+    )
+    assert "model" in {arg.arg for arg in helper.args.kwonlyargs}
+    assert not [
+        node
+        for node in ast.walk(helper)
+        if isinstance(node, ast.Name) and node.id in {"datasheet", "datasheet_has_keyword"}
+    ]
+
+
 def test_order68_matched_roster_validation_cost() -> None:
     folder = ROOT / "docs/performance/order68"
     base = json.loads((folder / "base.json").read_text(encoding="utf-8"))

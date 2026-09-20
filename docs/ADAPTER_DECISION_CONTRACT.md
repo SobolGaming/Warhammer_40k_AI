@@ -6447,3 +6447,9 @@ lineage and restore retain the same selected Enhancement bearer after ownership
 changes or death. Invalid or drifted saved selections fail reconstruction.
 Contract 33 rejects earlier incomplete records; see
 [the migration](../contracts/migrations/32-to-33.md).
+
+Corsair Coterie bearer restrictions use the selected model's canonical keywords:
+ANHRATHE for all four Enhancements, CHARACTER additionally for Archraider, and
+INFANTRY additionally for Voidstone. Infamy, Voidstone and Webway Pathstone retain
+their source-authorized non-CHARACTER eligibility. Invalid model selections retain
+the existing typed roster violation; this correction changes no request or payload shape.

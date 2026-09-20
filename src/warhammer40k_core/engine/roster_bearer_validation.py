@@ -412,12 +412,13 @@ def append_enhancement_violations(
         if is_corsair_coterie_enhancement:
             if enhancement is None:
                 raise ArmyMusteringError("Corsair Coterie Enhancement is missing.")
-            _append_corsair_coterie_enhancement_target_violations(
-                enhancement=enhancement,
-                datasheet=datasheet,
-                assignment=assignment,
-                violations=violations,
-            )
+            if isinstance(model, ModelInstance):
+                _append_corsair_coterie_enhancement_target_violations(
+                    enhancement=enhancement,
+                    model=model,
+                    assignment=assignment,
+                    violations=violations,
+                )
         elif (
             not is_upgrade
             and isinstance(model, ModelInstance)
@@ -514,37 +515,33 @@ def _effective_enhancement_limit(
 def _append_corsair_coterie_enhancement_target_violations(
     *,
     enhancement: EnhancementDefinition,
-    datasheet: DatasheetDefinition,
+    model: ModelInstance,
     assignment: EnhancementAssignment,
     violations: list[RosterLegalityViolation],
 ) -> None:
-    if not datasheet_has_keyword(datasheet, ANHRATHE_KEYWORD):
+    if ANHRATHE_KEYWORD not in model.keywords:
         violations.append(
             RosterLegalityViolation(
                 violation_code="corsair_coterie_anhrathe_required",
-                message="Corsair Enhancements can be assigned only to ANHRATHE units.",
+                message="Corsair Enhancements require an ANHRATHE bearer model.",
                 unit_selection_id=assignment.target_unit_selection_id,
                 source_id=enhancement.source_id,
             )
         )
-    if enhancement.enhancement_id == "archraider" and not datasheet_has_keyword(
-        datasheet, CHARACTER_KEYWORD
-    ):
+    if enhancement.enhancement_id == "archraider" and CHARACTER_KEYWORD not in model.keywords:
         violations.append(
             RosterLegalityViolation(
                 violation_code="corsair_coterie_archraider_character_required",
-                message="Archraider can be assigned only to ANHRATHE CHARACTER units.",
+                message="Archraider requires an ANHRATHE CHARACTER bearer model.",
                 unit_selection_id=assignment.target_unit_selection_id,
                 source_id=enhancement.source_id,
             )
         )
-    if enhancement.enhancement_id == "voidstone" and not datasheet_has_keyword(
-        datasheet, INFANTRY_KEYWORD
-    ):
+    if enhancement.enhancement_id == "voidstone" and INFANTRY_KEYWORD not in model.keywords:
         violations.append(
             RosterLegalityViolation(
                 violation_code="corsair_coterie_voidstone_infantry_required",
-                message="Voidstone can be assigned only to ANHRATHE INFANTRY units.",
+                message="Voidstone requires an ANHRATHE INFANTRY bearer model.",
                 unit_selection_id=assignment.target_unit_selection_id,
                 source_id=enhancement.source_id,
             )

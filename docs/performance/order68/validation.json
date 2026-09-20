@@ -2,34 +2,34 @@
   "order": 68,
   "validated_on": "2026-09-20",
   "base_commit": "6c10581d5682e814d0cd4eeea5d447a9365a8784",
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eaf70c79147c425fe839e520e16911a42dc4a7d629734a1f93e11de17fe43e35",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3311c43e735d60a8a2a35df50cf0266de6c567609c5dca2b92a80fcd43dc3a4f",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "behavioral": {
-    "tests": 8544,
+    "tests": 8550,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 981.078,
+    "seconds": 960.717,
     "workers": 64,
     "distribution": "worksteal",
-    "junit_sha256": "41091f945d1fee76d2f3cf574f1f27a2e5bfb18cf938598a4288e09115b6b1e2",
-    "coverage_percent": 85.13163594995817,
+    "junit_sha256": "30ff0d230b52cca3517e570d2de10d35365c616e93e2f9cd7b3d57a17393953f",
+    "coverage_percent": 85.1317834584477,
     "coverage_minimum_percent": 85,
     "warnings": 10,
     "warning_types": [
-      "ResourceWarning: unclosed SQLite connections in persistence tests"
+      "ResourceWarning: unclosed SQLite connections"
     ]
   },
   "code_quality": {
-    "tests": 558,
+    "tests": 559,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 343.977,
+    "seconds": 316.287,
     "workers": 64,
     "distribution": "worksteal",
-    "junit_sha256": "aca01fc0f2565d200b3e2c61c4a27b09209a1c06447384b6c50bb1b11110702b",
+    "junit_sha256": "bb0664b04491ebd2e19ebe43dceede449c74aa8424376192a0f50d70b6438475",
     "coverage": false
   },
   "gates_passed": [
@@ -48,16 +48,79 @@
     "TypeScript unit tests: 5",
     "live conformance: 342 assertions",
     "Order 68 component comparisons",
-    "Orders 64, 65 and 66 current-runtime component comparisons",
-    "ability-support matrix regenerated after validation-owner extraction"
+    "Orders 64, 65 and 66 current-runtime component comparisons"
   ],
   "earlier_attempts": [
-    "Incomplete coverage attempt stopped for allied cannot-over-must precedence; the same prohibition now excludes mandatory allied candidates.",
-    "Initial small-roster measurements exceeded the predeclared budget; per-validation reconstruction sharing fixes the duplicate work. Unchanged-budget comparisons pass; diagnostic-unshared-head.json preserves the failing measurements.",
-    "Strict typing required an explicit dictionary factory type; runtime identity, artifacts and qualified head measurements were refreshed after that correction.",
-    "Second incomplete coverage attempt stopped to migrate two stale reporting references after extraction. Runtime identity was unchanged by the reporting correction.",
-    "First completed coverage run: 8538 passed and six fixture/assertion failures, at 85.13% coverage. Required bearer field, secret-key assertions, deterministic casualty/FNP fixtures and retained-membership expectation were corrected. Seven focused cases and two strengthened membership variants passed before the final full run. No production code changed for these corrections."
+    "Focused post-fix collection first required runtime manifest regeneration; then the added invalid-index assertion was corrected to the existing enhancement_invalid_model_selection code. All 220 focused tests passed before the single final aggregate."
   ],
   "performance_scope": "Roster validation and existing reconstruction, Firing Deck and Aircraft components only. Gameplay-slice and full-game performance, including deferred Order 32 budgets, remain uncertified.",
-  "prerequisite_scope": "Order 69 detachment constraints and final all-category certification remain separate."
+  "prerequisite_scope": "Order 69 detachment constraints and final all-category certification remain separate.",
+  "review_correction": "Corsair Coterie eligibility uses the explicitly selected bearer model's ANHRATHE, CHARACTER and INFANTRY keywords, retaining source-authorized non-CHARACTER eligibility.",
+  "focused_regressions": {
+    "pre_fix": "Six mixed-profile cases accepted invalid bearers and failed their expected violations.",
+    "post_fix": "220 Corsair and mustering tests passed, including six mixed-profile legal/illegal/out-of-range cases; four source/static checks passed."
+  },
+  "prior_pr_validation": {
+    "order": 68,
+    "validated_on": "2026-09-20",
+    "base_commit": "6c10581d5682e814d0cd4eeea5d447a9365a8784",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eaf70c79147c425fe839e520e16911a42dc4a7d629734a1f93e11de17fe43e35",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.5",
+    "behavioral": {
+      "tests": 8544,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 981.078,
+      "workers": 64,
+      "distribution": "worksteal",
+      "junit_sha256": "41091f945d1fee76d2f3cf574f1f27a2e5bfb18cf938598a4288e09115b6b1e2",
+      "coverage_percent": 85.13163594995817,
+      "coverage_minimum_percent": 85,
+      "warnings": 10,
+      "warning_types": [
+        "ResourceWarning: unclosed SQLite connections in persistence tests"
+      ]
+    },
+    "code_quality": {
+      "tests": 558,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 343.977,
+      "workers": 64,
+      "distribution": "worksteal",
+      "junit_sha256": "aca01fc0f2565d200b3e2c61c4a27b09209a1c06447384b6c50bb1b11110702b",
+      "coverage": false
+    },
+    "gates_passed": [
+      "ruff check .",
+      "ruff format --check .",
+      "mypy src tests",
+      "pyright",
+      "lint-imports (11 contracts)",
+      "pre-commit run --all-files",
+      "eight-shard inventory check",
+      "Order 68 and Order 67 offline source generators",
+      "engine build identity",
+      "exact-base external contract check (6c10581d)",
+      "installed wheel: 27 schemas and six request families",
+      "TypeScript generated client and typecheck",
+      "TypeScript unit tests: 5",
+      "live conformance: 342 assertions",
+      "Order 68 component comparisons",
+      "Orders 64, 65 and 66 current-runtime component comparisons",
+      "ability-support matrix regenerated after validation-owner extraction"
+    ],
+    "earlier_attempts": [
+      "Incomplete coverage attempt stopped for allied cannot-over-must precedence; the same prohibition now excludes mandatory allied candidates.",
+      "Initial small-roster measurements exceeded the predeclared budget; per-validation reconstruction sharing fixes the duplicate work. Unchanged-budget comparisons pass; diagnostic-unshared-head.json preserves the failing measurements.",
+      "Strict typing required an explicit dictionary factory type; runtime identity, artifacts and qualified head measurements were refreshed after that correction.",
+      "Second incomplete coverage attempt stopped to migrate two stale reporting references after extraction. Runtime identity was unchanged by the reporting correction.",
+      "First completed coverage run: 8538 passed and six fixture/assertion failures, at 85.13% coverage. Required bearer field, secret-key assertions, deterministic casualty/FNP fixtures and retained-membership expectation were corrected. Seven focused cases and two strengthened membership variants passed before the final full run. No production code changed for these corrections."
+    ],
+    "performance_scope": "Roster validation and existing reconstruction, Firing Deck and Aircraft components only. Gameplay-slice and full-game performance, including deferred Order 32 budgets, remain uncertified.",
+    "prerequisite_scope": "Order 69 detachment constraints and final all-category certification remain separate."
+  }
 }

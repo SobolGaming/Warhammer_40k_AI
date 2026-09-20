@@ -5101,4 +5101,7 @@ Contract 33 makes the new roster fields mandatory. See
 [Order 68 scope, source and validation](ORDER_68_SCOPE_PLAN.md).
 Order 69 detachment constraints and final all-category certification remain separate.
 
-Final local validation passed 8,544 behavioral tests at 85.13% coverage and all 558 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.
+Corsair Coterie exceptions also validate the selected bearer's keywords, preserving
+legal non-CHARACTER bearers. Six mixed-profile regressions cover all four Enhancements.
+
+Final local validation passed 8,550 behavioral tests at 85.13% coverage and all 559 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.

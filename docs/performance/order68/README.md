@@ -37,9 +37,9 @@ Final outcomes and diagnostic history are retained in validation.json.
 
 | Units / models | Base mean ms / roster | Head mean ms / roster | Head max batch mean ms / roster |
 |---|---:|---:|---:|
-| 2 / 6 | 0.1552 | 0.3609 | 0.3658 |
-| 4 / 16 | 0.2325 | 0.4394 | 0.4414 |
-| 20 / 96 | 0.8563 | 1.0821 | 1.0920 |
+| 2 / 6 | 0.1552 | 0.3570 | 0.3602 |
+| 4 / 16 | 0.2325 | 0.4400 | 0.4433 |
+| 20 / 96 | 0.8563 | 1.0706 | 1.0817 |
 
 All mean and maximum comparisons pass. The initial unshared reconstruction exceeded
 the unchanged budget for 2- and 4-unit rosters; diagnostic-unshared-head.json
@@ -48,3 +48,6 @@ unit for Warlord and Enhancement checks, with no cross-request state. A real
 cProfile regression enforces one reconstruction for a shared bearer and verifies
 that a subsequent invalid model index is still rejected. The corrected head
 adds approximately 0.21 ms per roster for explicit model validation.
+
+The Corsair bearer review correction refreshes this evidence for runtime
+`3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.
