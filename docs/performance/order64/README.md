@@ -28,6 +28,20 @@ script, canonical fixtures, dependency lock, host and single-process workload.
 Reports retain their hashes, runtime identity, payload sizes, record counts and
 all samples. Input text hashes normalize line endings so the same workload is
 verified on Windows and Linux; CI checks these against the current files.
+
+Retained head timing evidence must describe the current verified engine build:
+CI requires `head-reconstruction.json["runtime_build_id"]` to equal
+`verified_engine_build_identity().build_id`. Any runtime identity change requires
+fresh qualified head measurements before this guard can pass, even when all live
+work counts remain unchanged. Regenerate the runtime manifest before measuring;
+never update only the report's identity to relabel old samples. Changes outside
+the runtime fingerprint and workload inputs do not require new measurements.
+Preserve the declared budgets and all replay/work-count assertions when refreshing
+evidence. Use the same baseline revision, host, dependency lock, workload inputs
+and timing boundaries; if those measurement conditions change, remeasure both
+base and head under matching conditions. Commit the qualified reports and update
+their results below.
+
 Run without coverage or competing test/build workers:
 
 ```powershell

@@ -13,6 +13,8 @@ from typing import Literal, cast
 import pytest
 from scripts.measure_ingress_reconstruction import CHECKPOINTS, prepare, sample
 
+from warhammer40k_core.build_identity import verified_engine_build_identity
+
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "docs/performance/order64"
 
@@ -52,6 +54,10 @@ def test_matched_reconstruction_timing_evidence() -> None:
     base = json.loads((EVIDENCE / "base-reconstruction.json").read_text(encoding="utf-8"))
     head = json.loads((EVIDENCE / "head-reconstruction.json").read_text(encoding="utf-8"))
     budgets = json.loads((EVIDENCE / "budgets.json").read_text(encoding="utf-8"))
+    assert head["runtime_build_id"] == verified_engine_build_identity().build_id, (
+        "Order 64 head timing evidence is stale for the current engine build. "
+        "Refresh qualified measurements as required by docs/performance/order64/README.md."
+    )
     for field in (
         "workload_id",
         "platform",
