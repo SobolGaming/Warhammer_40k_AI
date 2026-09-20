@@ -23,6 +23,7 @@ def compose_core_end_rule_registry(
     objective_control_hooks: PhaseEndObjectiveControlHookRegistry,
 ) -> TurnEndHookRegistry:
     """Use the same Core providers for boundary execution and submission authority."""
+    from warhammer40k_core.engine.aircraft_turn_end import aircraft_turn_end_binding
     from warhammer40k_core.engine.retained_phase_end_sequencing import retained_phase_end_binding
     from warhammer40k_core.engine.return_on_death_sequencing import return_phase_end_binding
     from warhammer40k_core.engine.sticky_objective_sequencing import sticky_boundary_binding
@@ -30,6 +31,7 @@ def compose_core_end_rule_registry(
     return TurnEndHookRegistry.from_bindings(
         (
             *registry.bindings,
+            aircraft_turn_end_binding(),
             sticky_boundary_binding(objective_control_hooks),
             retained_phase_end_binding(),
             return_phase_end_binding(),

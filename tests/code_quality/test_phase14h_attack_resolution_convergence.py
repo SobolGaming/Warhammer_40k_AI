@@ -118,9 +118,9 @@ PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
         "BattlefieldRemovalKind.EMBARK",
         "result.result_id",
     ),
-    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": (
+    "src/warhammer40k_core/engine/aircraft_turn_end.py": (
         "BattlefieldRemovalKind.INTO_RESERVES",
-        "result.result_id",
+        "source.event_id",
     ),
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": (
         "BattlefieldRemovalKind.DESTROYED",
@@ -138,7 +138,7 @@ PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES = {
 PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
     "src/warhammer40k_core/engine/game_state.py": "provider.occurrence_id",
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": "result.result_id",
-    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": "result.result_id",
+    "src/warhammer40k_core/engine/aircraft_turn_end.py": "source.event_id",
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": ("edge_occurrence_id"),
 }
 DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
@@ -157,7 +157,7 @@ DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
         "src/warhammer40k_core/engine/transports.py": 1,
     },
     "without_unit_placement": {
-        "src/warhammer40k_core/engine/aircraft.py": 1,
+        "src/warhammer40k_core/engine/aircraft_turn_end.py": 1,
         "src/warhammer40k_core/engine/fight_movement_source.py": 1,
         "src/warhammer40k_core/engine/prebattle.py": 1,
         "src/warhammer40k_core/engine/rules_unit_placement.py": 1,
@@ -519,15 +519,11 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     assert "replace_battlefield_state" not in fight_movement_source
     assert "replace_battlefield_state" not in fight_restore_integrity_source
 
-    aircraft_source = source_for(SRC_ROOT / "engine" / "aircraft.py")
-    aircraft_owner_source = source_for(
-        SRC_ROOT / "engine" / "phases" / "movement_resolution_flow.py"
-    )
-    assert "BattlefieldRemovalKind.INTO_RESERVES" in aircraft_source
-    assert "source_event_id=source_event_id" in aircraft_source
-    assert "source_event_id=result.result_id" in aircraft_owner_source
-    assert "apply_aircraft_reserve_transition_to_battlefield(" in aircraft_owner_source
+    aircraft_owner_source = source_for(SRC_ROOT / "engine" / "aircraft_turn_end.py")
+    assert "BattlefieldRemovalKind.INTO_RESERVES" in aircraft_owner_source
+    assert "source_event_id=source.event_id" in aircraft_owner_source
     assert "record_primary_battlefield_departure(" in aircraft_owner_source
+    assert "TimingTriggerKind.END_TURN" in aircraft_owner_source
 
     embark_helper_source = source_for(SRC_ROOT / "engine" / "transport_embark_groups.py")
     embark_owner_source = source_for(

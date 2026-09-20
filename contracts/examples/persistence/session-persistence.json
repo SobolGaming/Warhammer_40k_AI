@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "5bdddfbe212db24b503257011fc8e73bde274824ab88eb3752f8871580c5f03c",
+  "content_hash": "169b2fdf920e351358fc793db7fc76d678c8c442f17af349f268d2e602126b1f",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,21 +92,21 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3ebf7b8b7f46824a24960c48767647578c2b6c7af7504f5c7ad2e20060c11c6b",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
-  "external_contract_version": "31.0.0",
+  "external_contract_version": "32.0.0",
   "game_session_index": [
     {
       "game_id": "phase18l-contract-persistence",
       "session_id": "session-phase18l-contract-persistence"
     }
   ],
-  "schema_version": "session-persistence-v23-firing-deck",
+  "schema_version": "session-persistence-v24-aircraft",
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "f437c2d9179c0882b9d601231bf7e9d8037df7fc9d7a388a626631b2793838e2",
+        "content_hash": "cb21a4f9c81bc553416ca7fb0cf8fa31d4d2e17c80bbcff12ea8b6bf9814b2a0",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
         "initial_replay_lifecycle": {
@@ -4904,7 +4904,6 @@
             "fell_back_unit_states": [],
             "fight_phase_state": null,
             "game_id": "phase18l-contract-persistence",
-            "hover_mode_states": [],
             "mission_action_states": [],
             "mission_setup": {
               "attacker_battlefield_edge": "north",
@@ -9850,7 +9849,6 @@
             "fell_back_unit_states": [],
             "fight_phase_state": null,
             "game_id": "phase18l-contract-persistence",
-            "hover_mode_states": [],
             "mission_action_states": [],
             "mission_setup": {
               "attacker_battlefield_edge": "north",
@@ -10001,7 +9999,7 @@
             ]
           }
         },
-        "lifecycle_hash": "204230339c14b56f7d41e6452a46a2b2c0b86dcc32fc0229630fe250120d7a0e",
+        "lifecycle_hash": "c55bc198d8f780a91a6686294f9f1be88e5439b46bad704af41460d2c53e576b",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -14801,7 +14799,6 @@
               "fell_back_unit_states": [],
               "fight_phase_state": null,
               "game_id": "phase18l-contract-persistence",
-              "hover_mode_states": [],
               "mission_action_states": [],
               "mission_setup": {
                 "attacker_battlefield_edge": "north",
@@ -14969,7 +14966,7 @@
             "seed": "phase18l-contract-persistence"
           },
           "projection_checkpoints": [],
-          "schema_version": "replay-artifact-v25-firing-deck",
+          "schema_version": "replay-artifact-v26-aircraft",
           "source_identity": {
             "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
             "catalog_id": "phase9a-canonical",
@@ -15069,11 +15066,11 @@
             },
             "operation": "start_session",
             "outcome_code": "command_committed",
-            "schema_version": "session-command-outcome-v31-contract",
+            "schema_version": "session-command-outcome-v32-contract",
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3ebf7b8b7f46824a24960c48767647578c2b6c7af7504f5c7ad2e20060c11c6b",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
               "engine_version": "0.1.0",
               "event_cursor": "9n3YpdybjPuZvSCCEN9Qs-vhMd4DCUeilqLGDNrFa-jOYMX0QXmOc7ru-i74Jq2B",
               "game_id": "phase18l-contract-persistence",
@@ -15095,8 +15092,8 @@
                 "game": "warhammer_40000",
                 "version": "core-v2-setup-prebattle-ui-smoke"
               },
-              "schema_version": "session-metadata-v31-contract",
-              "server_contract_version": "31.0.0",
+              "schema_version": "session-metadata-v32-contract",
+              "server_contract_version": "32.0.0",
               "session_id": "session-phase18l-contract-persistence",
               "session_revision": 1,
               "session_state": "active",
@@ -15120,7 +15117,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "ad86e267c470b40aada48b3f261e5a474d8e7396647000c8700c0c6192681182",
+      "history_head": "1de240bda510ea6ff6a5d2a602e2b3177d275b572e6dcd02d88560f4b041675c",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -15192,8 +15189,8 @@
       "revision_history": [
         {
           "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
-          "authoritative_state_hash": "0406679532b197473df4fe2cbd67776910f9118432ac68b8129e5a6e4f4b6473",
-          "checkpoint_hash": "6767e14f1f58d8f8896edb5c01fc234d8e07e401c7094e0fcdfa36a6384380e9",
+          "authoritative_state_hash": "bec6b99a672b2e2ee5449d5d2c346a44a05b4bda254c1adddf0f592ed0a647d4",
+          "checkpoint_hash": "12cb1552ca7ea16db37f3ec35e98c9c8a5fb16cffbad55bc863b41e97bffbbfe",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -15209,7 +15206,7 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "2dc09c35db83a8b752fb60fe561245bd44c4e4812853f31ece790db46cbc7f4a",
+          "revision_commitment": "521f21536150e53710b6fe45d23940fe006943cd8bf4226bb9648ec165b56cd8",
           "rng_draw_count": 0,
           "rng_history_count": 1,
           "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
@@ -15222,8 +15219,8 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "204230339c14b56f7d41e6452a46a2b2c0b86dcc32fc0229630fe250120d7a0e",
-          "checkpoint_hash": "500349ccda9643b71ed5523393a8dda73e36ceddf3f586268730ca46b1216a5e",
+          "authoritative_state_hash": "c55bc198d8f780a91a6686294f9f1be88e5439b46bad704af41460d2c53e576b",
+          "checkpoint_hash": "080fbcbfd1f3657ee1b7a434c52c9be29a0a55787c370961f41c13613d5a3564",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -15242,7 +15239,7 @@
             },
             "token": "mn1xN1SX0Qt4aFzM6R6NVnRIeNv3eh3v_zHGK3EZxDg_ieX8yLDu4OYhesEPsInC"
           },
-          "journal_entry_hash": "a18f0836b3936ffce8f5b69d09c8cc485a49084a8a19936ae25d1a7336aa5a1a",
+          "journal_entry_hash": "9d5309de15449fd0c1dd72f4d8a56fd1367921d0baaecd6fc333ff4e31768a34",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -15259,9 +15256,9 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "2dc09c35db83a8b752fb60fe561245bd44c4e4812853f31ece790db46cbc7f4a",
-          "response_hash": "e9d14b4d4cb39122da98fbf47f4564b6537e88eef6b19fde21957843a82ffbaf",
-          "revision_commitment": "ad86e267c470b40aada48b3f261e5a474d8e7396647000c8700c0c6192681182",
+          "previous_revision_commitment": "521f21536150e53710b6fe45d23940fe006943cd8bf4226bb9648ec165b56cd8",
+          "response_hash": "4334beda433e54f7a6e281368b225fc42978cdf590d1a41aaaa854a2c4ccce24",
+          "revision_commitment": "1de240bda510ea6ff6a5d2a602e2b3177d275b572e6dcd02d88560f4b041675c",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",
@@ -15289,7 +15286,7 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "80a1e0e9abd49f35f86e22b3956fc7c606b36e5a4d05a92c9c4c393c2c7a786b",
+            "content_hash": "c57c5d6e01aa64403e1bd0ccb5919b240c7e9db7d4bca71e6375b6f402b67d8c",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5cdef2eabf7518e2abf3976239e13cbd51731553a1c5c4fd64dee7a18b529d54",
             "initial_replay_lifecycle": null,
@@ -17563,7 +17560,6 @@
                 "fell_back_unit_states": [],
                 "fight_phase_state": null,
                 "game_id": "phase18l-contract-persistence",
-                "hover_mode_states": [],
                 "mission_action_states": [],
                 "mission_setup": {
                   "attacker_battlefield_edge": "north",
@@ -17685,7 +17681,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "0406679532b197473df4fe2cbd67776910f9118432ac68b8129e5a6e4f4b6473",
+            "lifecycle_hash": "bec6b99a672b2e2ee5449d5d2c346a44a05b4bda254c1adddf0f592ed0a647d4",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -19960,7 +19956,6 @@
                   "fell_back_unit_states": [],
                   "fight_phase_state": null,
                   "game_id": "phase18l-contract-persistence",
-                  "hover_mode_states": [],
                   "mission_action_states": [],
                   "mission_setup": {
                     "attacker_battlefield_edge": "north",
@@ -20090,7 +20085,7 @@
                 "seed": "phase18l-contract-persistence"
               },
               "projection_checkpoints": [],
-              "schema_version": "replay-artifact-v25-firing-deck",
+              "schema_version": "replay-artifact-v26-aircraft",
               "source_identity": {
                 "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
                 "catalog_id": "phase9a-canonical",
@@ -20149,7 +20144,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "f437c2d9179c0882b9d601231bf7e9d8037df7fc9d7a388a626631b2793838e2",
+            "content_hash": "cb21a4f9c81bc553416ca7fb0cf8fa31d4d2e17c80bbcff12ea8b6bf9814b2a0",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
             "initial_replay_lifecycle": {
@@ -24947,7 +24942,6 @@
                 "fell_back_unit_states": [],
                 "fight_phase_state": null,
                 "game_id": "phase18l-contract-persistence",
-                "hover_mode_states": [],
                 "mission_action_states": [],
                 "mission_setup": {
                   "attacker_battlefield_edge": "north",
@@ -29893,7 +29887,6 @@
                 "fell_back_unit_states": [],
                 "fight_phase_state": null,
                 "game_id": "phase18l-contract-persistence",
-                "hover_mode_states": [],
                 "mission_action_states": [],
                 "mission_setup": {
                   "attacker_battlefield_edge": "north",
@@ -30044,7 +30037,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "204230339c14b56f7d41e6452a46a2b2c0b86dcc32fc0229630fe250120d7a0e",
+            "lifecycle_hash": "c55bc198d8f780a91a6686294f9f1be88e5439b46bad704af41460d2c53e576b",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -34844,7 +34837,6 @@
                   "fell_back_unit_states": [],
                   "fight_phase_state": null,
                   "game_id": "phase18l-contract-persistence",
-                  "hover_mode_states": [],
                   "mission_action_states": [],
                   "mission_setup": {
                     "attacker_battlefield_edge": "north",
@@ -35012,7 +35004,7 @@
                 "seed": "phase18l-contract-persistence"
               },
               "projection_checkpoints": [],
-              "schema_version": "replay-artifact-v25-firing-deck",
+              "schema_version": "replay-artifact-v26-aircraft",
               "source_identity": {
                 "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
                 "catalog_id": "phase9a-canonical",

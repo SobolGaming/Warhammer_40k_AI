@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from warhammer40k_core.engine.aircraft_rules import aircraft_rules_unit
 
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
@@ -34,7 +35,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidates_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
-    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
+    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords
     from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness, _interrupt_started_mission_actions_for_movement_activation
     from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
     from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
@@ -55,7 +56,6 @@ __all__ = (
     "_friendly_model_ids_with_keyword_any",
     "_friendly_vehicle_monster_model_ids",
     "_geometry_models_for_unit_placement",
-    "_hover_mode_state_for_unit",
     "_interpolate_pose",
     "_model_at_pose",
     "_movement_action_availability_context",
@@ -74,7 +74,6 @@ def _movement_action_availability_context(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
-    hover_mode_states: tuple[HoverModeState, ...] = (),
 ) -> MovementActionAvailabilityContext:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Movement action availability requires a scenario.")
@@ -83,21 +82,15 @@ def _movement_action_availability_context(
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Movement action availability requires a RulesetDescriptor.")
     unit = scenario.unit_instance_for_placement(unit_placement)
-    hover_mode_state = _hover_mode_state_for_unit(
-        hover_mode_states=hover_mode_states,
-        unit_instance_id=unit_placement.unit_instance_id,
-    )
     aircraft_policy = AircraftMovementPolicy.from_unit(
         unit=unit,
         ruleset_descriptor=ruleset_descriptor,
-        hover_mode_state=hover_mode_state,
     )
     enemy_engagement_model_ids, enemy_aircraft_engagement_model_ids = (
         _enemy_engagement_model_ids_for_unit(
             scenario=scenario,
             unit_placement=unit_placement,
             ruleset_descriptor=ruleset_descriptor,
-            hover_mode_states=hover_mode_states,
         )
     )
     return MovementActionAvailabilityContext(
@@ -115,7 +108,6 @@ def _enemy_engagement_model_ids_for_unit(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
-    hover_mode_states: tuple[HoverModeState, ...] = (),
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     friendly_models = physical_geometry_models_for_rules_unit(
         scenario=scenario,
@@ -126,15 +118,10 @@ def _enemy_engagement_model_ids_for_unit(
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=unit_placement.unit_instance_id,
     )
-    aircraft_model_ids = set(
-        aircraft_model_ids_for_scenario(
-            scenario,
-            hover_mode_states=hover_mode_states,
-        )
-    )
     enemy_model_ids: set[str] = set()
     enemy_aircraft_model_ids: set[str] = set()
     for enemy_unit_id in engaged_enemy_unit_ids:
+        enemy_is_aircraft = "AIRCRAFT" in aircraft_rules_unit(scenario, enemy_unit_id).keywords
         for enemy_model in physical_geometry_models_for_rules_unit(
             scenario=scenario,
             unit_instance_id=enemy_unit_id,
@@ -148,7 +135,7 @@ def _enemy_engagement_model_ids_for_unit(
                 for friendly_model in friendly_models
             ):
                 continue
-            if enemy_model.model_id in aircraft_model_ids:
+            if enemy_is_aircraft:
                 enemy_aircraft_model_ids.add(enemy_model.model_id)
             else:
                 enemy_model_ids.add(enemy_model.model_id)
@@ -172,26 +159,6 @@ def _enemy_engaged_unit_ids_for_unit_placement(
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=unit_placement.unit_instance_id,
     )
-
-
-def _hover_mode_state_for_unit(
-    *,
-    hover_mode_states: tuple[HoverModeState, ...],
-    unit_instance_id: str,
-) -> HoverModeState | None:
-    if type(hover_mode_states) is not tuple:
-        raise GameLifecycleError("hover_mode_states must be a tuple.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    found: HoverModeState | None = None
-    for hover_mode_state in cast(tuple[object, ...], hover_mode_states):
-        if type(hover_mode_state) is not HoverModeState:
-            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
-        if hover_mode_state.unit_instance_id != requested_unit_id:
-            continue
-        if found is not None:
-            raise GameLifecycleError("hover_mode_states must be unique by unit.")
-        found = hover_mode_state
-    return found if found is not None and found.active else None
 
 
 def _desperate_escape_requirements_for_fall_back(

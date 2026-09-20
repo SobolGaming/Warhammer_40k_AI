@@ -82,9 +82,6 @@ from warhammer40k_core.engine.charge_move_geometry import (
     _geometry_models_for_unit_placement as _geometry_models_for_unit_placement,
 )
 from warhammer40k_core.engine.charge_move_geometry import (
-    _hover_mode_state_for_unit as _hover_mode_state_for_unit,
-)
-from warhammer40k_core.engine.charge_move_geometry import (
     _model_groups_are_engaged as _model_groups_are_engaged,
 )
 from warhammer40k_core.engine.charge_move_geometry import (
@@ -1299,10 +1296,6 @@ def _charge_actor_can_declare_charge(
         AircraftMovementPolicy.from_unit(
             unit=component.unit,
             ruleset_descriptor=ruleset_descriptor,
-            hover_mode_state=_hover_mode_state_for_unit(
-                hover_mode_states=tuple(state.hover_mode_states),
-                unit_instance_id=component.unit.unit_instance_id,
-            ),
         ).can_declare_charge
         for component in view.living_components
     )
@@ -1923,7 +1916,6 @@ __all__ = (
     "_friendly_vehicle_monster_model_ids",
     "_geometry_models_for_unit",
     "_geometry_models_for_unit_placement",
-    "_hover_mode_state_for_unit",
     "_invalid_charging_unit_finite_decision_status",
     "_key_error_field",
     "_legal_charging_unit_ids",

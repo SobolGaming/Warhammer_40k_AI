@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine.aircraft_rules import aircraft_melee_target_ids
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -22,7 +23,6 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementRecord,
     ModelPlacement,
     UnitPlacement,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.consolidation_objectives import legal_consolidation_objective_ids
 from warhammer40k_core.engine.decision_request import (
@@ -44,9 +44,6 @@ from warhammer40k_core.engine.fight_geometry import (
 )
 from warhammer40k_core.engine.fight_geometry import (
     enemy_fight_unit_ids_within_distance as _enemy_unit_ids_within_distance,
-)
-from warhammer40k_core.engine.fight_geometry import (
-    enemy_geometry_models_for_player as _enemy_geometry_models_for_player,
 )
 from warhammer40k_core.engine.fight_geometry import (
     enemy_unit_ids_for_fight_placement as _enemy_unit_ids_for_placement,
@@ -75,6 +72,12 @@ from warhammer40k_core.engine.fight_geometry import (
 from warhammer40k_core.engine.fight_geometry import (
     unit_id_for_fight_model as _unit_id_for_model,
 )
+from warhammer40k_core.engine.fight_movement_paths import (
+    fight_terrain_volumes_for_features as fight_terrain_volumes_for_features,
+)
+from warhammer40k_core.engine.fight_movement_paths import (
+    validate_fight_paths as _validate_fight_paths,
+)
 from warhammer40k_core.engine.fight_movement_target_authority import (
     selectable_enemy_unit_ids_in_canonical_inventory,
 )
@@ -84,7 +87,6 @@ from warhammer40k_core.engine.fight_movement_witness import (
     validate_fight_witness_shape,
 )
 from warhammer40k_core.engine.fight_on_death import model_has_fight_action_authority
-from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -129,8 +131,6 @@ from warhammer40k_core.geometry.pathing import (
     TerrainPathLegalityResult,
 )
 from warhammer40k_core.geometry.pose import GeometryError, Pose
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState, OneShotWeaponUseRecord
@@ -1083,6 +1083,14 @@ def legal_pile_in_target_unit_ids(
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=unit_instance_id,
     )
+    from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
+
+    physically_engaged_ids = aircraft_movement_target_ids(
+        scenario, unit_instance_id, physically_engaged_ids
+    )
+    selectable_enemy_ids = aircraft_movement_target_ids(
+        scenario, unit_instance_id, selectable_enemy_ids
+    )
     if physically_engaged_ids:
         return selectable_enemy_unit_ids_in_canonical_inventory(
             scenario=scenario,
@@ -1119,6 +1127,14 @@ def legal_consolidation_modes(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=unit_instance_id,
+    )
+    from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
+
+    physically_engaged_ids = aircraft_movement_target_ids(
+        scenario, unit_instance_id, physically_engaged_ids
+    )
+    selectable_enemy_ids = aircraft_movement_target_ids(
+        scenario, unit_instance_id, selectable_enemy_ids
     )
     if physically_engaged_ids:
         return (
@@ -1188,11 +1204,26 @@ def melee_target_unit_ids(
     state: GameState | None = None,
 ) -> tuple[str, ...]:
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    return _attack_targetable_engaged_enemy_unit_ids(
+    targets = _attack_targetable_engaged_enemy_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         state=state,
+    )
+
+    return tuple(
+        sorted(
+            {
+                target
+                for placement in unit_placement.model_placements
+                for target in aircraft_melee_target_ids(
+                    scenario=scenario,
+                    unit_instance_id=unit_instance_id,
+                    model_instance_id=placement.model_instance_id,
+                    target_ids=targets,
+                )
+            }
+        )
     )
 
 
@@ -1446,68 +1477,6 @@ def _consolidate_endpoint_validation(
         after=after,
         state=state,
     )
-
-
-def _validate_fight_paths(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    before: UnitPlacement,
-    after: UnitPlacement,
-    witness: PathWitness,
-    movement_mode: MovementMode,
-    displacement_kind: ModelDisplacementKind,
-    distance_budget_inches: float,
-) -> tuple[tuple[PathValidationResult, ...], tuple[TerrainPathLegalityResult, ...]]:
-    path_results: list[PathValidationResult] = []
-    terrain_results: list[TerrainPathLegalityResult] = []
-    terrain_features = scenario.battlefield_state.terrain_features
-    terrain_volumes = fight_terrain_volumes_for_features(terrain_features)
-    unit = scenario.unit_instance_for_placement(before)
-    for placement in before.model_placements:
-        moving_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(placement),
-            placement=placement,
-        )
-        model_witness = PathWitness.for_paths(
-            ((placement.model_instance_id, witness.poses_for_model(placement.model_instance_id)),)
-        )
-        legality_context = MovementLegalityContext.from_keywords(
-            keywords=unit.keywords,
-            ruleset_descriptor=ruleset_descriptor,
-            movement_mode=movement_mode,
-            movement_phase_action=None,
-            displacement_kind=displacement_kind,
-        )
-        path_results.append(
-            legality_context.to_path_validation_context(
-                moving_model=moving_model,
-                witness=model_witness,
-                battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
-                battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
-                friendly_models=_friendly_geometry_models_for_path(
-                    scenario=scenario,
-                    unit_placement=before,
-                    attempted_placement=after,
-                    moving_model_instance_id=placement.model_instance_id,
-                ),
-                enemy_models=_enemy_geometry_models_for_player(
-                    scenario=scenario,
-                    player_id=before.player_id,
-                ),
-                terrain=(),
-                movement_distance_budget_inches=distance_budget_inches,
-            ).validate()
-        )
-        terrain_results.append(
-            legality_context.to_terrain_path_legality_context(
-                moving_model=moving_model,
-                witness=model_witness,
-                terrain=terrain_volumes,
-                terrain_features=terrain_features,
-            ).validate()
-        )
-    return (tuple(path_results), tuple(terrain_results))
 
 
 def _fight_movement_transition_batch(
@@ -1842,7 +1811,14 @@ def _melee_target_unit_ids_for_model(
         state=state,
         source_decision_result_id=source_decision_result_id,
     )
-    return tuple(sorted({*engaged, *extended}))
+    from warhammer40k_core.engine.aircraft_rules import aircraft_melee_target_ids
+
+    return aircraft_melee_target_ids(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
+        target_ids=tuple(sorted({*engaged, *extended})),
+    )
 
 
 def _extended_melee_target_unit_ids_for_model(
@@ -2464,36 +2440,6 @@ def _maximum_distance_for_proposal_kind(proposal_kind: ProposalKind) -> float:
     raise GameLifecycleError("Unsupported fight movement proposal kind.")
 
 
-def _friendly_geometry_models_for_path(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    attempted_placement: UnitPlacement,
-    moving_model_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[GeometryModel] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            placements = (
-                attempted_placement.model_placements
-                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
-                else current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
-
-
 def _unit_by_id(*, scenario: BattlefieldScenario, unit_instance_id: str) -> UnitInstance:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in scenario.armies:
@@ -2524,17 +2470,6 @@ def _validate_fight_witness_matches_unit(
     for placement in unit_placement.model_placements:
         if witness.poses_for_model(placement.model_instance_id)[0] != placement.pose:
             raise GameLifecycleError("Fight movement witness must start at current model poses.")
-
-
-def fight_terrain_volumes_for_features(
-    terrain_features: tuple[TerrainFeatureDefinition, ...],
-) -> tuple[TerrainVolume, ...]:
-    volumes: list[TerrainVolume] = []
-    for feature in terrain_features:
-        if type(feature) is not TerrainFeatureDefinition:
-            raise GameLifecycleError("terrain_features must contain TerrainFeatureDefinition.")
-        volumes.extend(feature.terrain_volumes())
-    return tuple(volumes)
 
 
 def _proposal_context(request: MovementProposalRequest) -> dict[str, JsonValue]:

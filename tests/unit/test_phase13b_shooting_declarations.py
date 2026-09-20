@@ -9115,6 +9115,32 @@ def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_rol
     assert towering_candidates[0].is_legal
     assert PLUNGING_FIRE_RULE_ID in towering_candidates[0].targeting_rule_ids
 
+    for source_scenario, source_attacker, features in (
+        (elevated_scenario, attacker, (plunging_ruin,)),
+        (towering_scenario, towering_attacker, ()),
+    ):
+        for aircraft_side in ("attacker", "target"):
+            replacement = with_unit_keywords(
+                source_attacker if aircraft_side == "attacker" else defender,
+                keywords=(
+                    *((source_attacker if aircraft_side == "attacker" else defender).keywords),
+                    "AIRCRAFT",
+                ),
+            )
+            aircraft_scenario = _scenario_with_replaced_unit(
+                scenario=source_scenario, replacement=replacement
+            )
+            aircraft_candidates = shooting_target_candidates_for_unit(
+                scenario=aircraft_scenario,
+                ruleset_descriptor=_ruleset(),
+                attacker_unit=replacement if aircraft_side == "attacker" else source_attacker,
+                weapon_profile=weapon_profile,
+                target_unit_ids=(defender.unit_instance_id,),
+                terrain_features=features,
+            )
+            assert aircraft_candidates[0].is_legal
+            assert PLUNGING_FIRE_RULE_ID not in aircraft_candidates[0].targeting_rule_ids
+
     for label, targeting_rule_ids, expected_target_number, expected_successful in (
         ("with-plunging-fire", (PLUNGING_FIRE_RULE_ID,), 3, True),
         ("without-plunging-fire", (), 4, False),

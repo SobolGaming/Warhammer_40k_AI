@@ -4,7 +4,6 @@ from math import isfinite
 from typing import cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -31,24 +30,6 @@ from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 CHARGE_MOVE_ACTION = "charge_move"
-
-
-def _hover_mode_state_for_unit(
-    *,
-    hover_mode_states: tuple[HoverModeState, ...],
-    unit_instance_id: str,
-) -> HoverModeState | None:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    found: HoverModeState | None = None
-    for hover_mode_state in hover_mode_states:
-        if type(hover_mode_state) is not HoverModeState:
-            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
-        if hover_mode_state.unit_instance_id != requested_unit_id:
-            continue
-        if found is not None:
-            raise GameLifecycleError("hover_mode_states must be unique by unit.")
-        found = hover_mode_state
-    return found if found is not None and found.active else None
 
 
 def _geometry_models_for_unit(
@@ -299,7 +280,6 @@ __all__ = (
     "_friendly_vehicle_monster_model_ids",
     "_geometry_models_for_unit",
     "_geometry_models_for_unit_placement",
-    "_hover_mode_state_for_unit",
     "_model_groups_are_engaged",
     "_terrain_volumes_for_features",
     "_validate_charge_witness_matches_unit",

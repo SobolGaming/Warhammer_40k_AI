@@ -149,7 +149,6 @@ def request_from_state(
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             normal_move_states=tuple(state.normal_move_states),
-            hover_mode_states=tuple(state.hover_mode_states),
         )
         for witness in candidate_witness_tuple
         for selected in selections
@@ -256,7 +255,6 @@ def apply_decision(
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
-        hover_mode_states=tuple(state.hover_mode_states),
     )
     drift_code = resolution.selected_payload_drift_code(payload)
     if drift_code is not None:
@@ -395,7 +393,6 @@ def apply_proposal_decision(
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
-        hover_mode_states=tuple(state.hover_mode_states),
     )
     if not resolution.is_valid:
         violation_code = _triggered_movement_violation_code(resolution)

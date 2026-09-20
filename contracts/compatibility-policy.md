@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`31.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`32.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,8 +27,8 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/31.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `31`, preserving the
+   its current major, currently `compatibility/32.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `32`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
    2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, 10.0.0, 11.0.0, 12.0.0,
    13.0.0, 14.0.0, 15.0.0, 16.0.0, 17.0.0, 18.0.0, 19.0.0 and 20.0.0 baselines
@@ -47,6 +47,10 @@ payload-family version changes, migration notes, and old-client support window
 must be reviewed in the same change.
 
 ## Support window
+
+Contract 32 implements ingress-only Aircraft and mandatory opponent-turn-end
+returns. Retain 31.x through at least 2027-09-20 and one released 32.x minor
+line, whichever is later; see [31-to-32.md](migrations/31-to-32.md).
 
 Contract 31 implements all-cargo Firing Deck snapshots and turn-long shooting
 restrictions. Retain 30.x through at least 2027-09-20 and one released 31.x minor

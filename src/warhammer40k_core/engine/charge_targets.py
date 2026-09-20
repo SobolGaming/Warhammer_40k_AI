@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.aircraft_rules import COMBAT_SOURCE_ID
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
     fight_present_rules_unit_views,
@@ -29,6 +30,15 @@ def charge_target_restriction(
     target_unit_instance_id: str,
     registry: ChargeTargetRestrictionHookRegistry | None,
 ) -> TargetRestriction | None:
+    mover = rules_unit_view_by_id(state=state, unit_instance_id=charging_unit_instance_id)
+    target = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+    if "AIRCRAFT" in target.keywords and "FLY" not in mover.keywords:
+        return TargetRestriction(
+            hook_id="core-aircraft-charge-target",
+            source_id=COMBAT_SOURCE_ID,
+            violation_code="aircraft_charge_target_requires_fly",
+            message="Only FLYING units can charge AIRCRAFT units.",
+        )
     if registry is None:
         return None
     if type(registry) is not ChargeTargetRestrictionHookRegistry:

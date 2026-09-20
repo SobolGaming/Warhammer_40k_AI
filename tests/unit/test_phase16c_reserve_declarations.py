@@ -1007,7 +1007,7 @@ def test_phase16c_aircraft_are_mandatory_source_backed_reserves() -> None:
     assert reserve_state is not None
     assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
     assert reserve_state.reserve_origin is ReserveOrigin.AIRCRAFT_MANDATORY_RESERVE
-    assert reserve_state.source_rule_ids == ("aircraft_mandatory_reserve",)
+    assert reserve_state.source_rule_ids == ("gw-11e-core-aircraft:deployment",)
     assert reserve_state.points_contribution == 300
     assert reserve_state.status is ReserveStatus.IN_RESERVES
 
@@ -1968,3 +1968,56 @@ def _catalog_with_datasheet_keywords(mapping: dict[str, tuple[str, ...]]) -> Arm
         for datasheet in base.datasheets
     )
     return replace(base, datasheets=datasheets)
+
+
+def test_order66_mandatory_aircraft_reserves_use_attached_identity() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {
+            "core-character-leader": ("INFANTRY", "CHARACTER", "AIRCRAFT", "FLY"),
+        }
+    )
+    config = _config(
+        catalog=catalog,
+        player_a_unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard"),
+            _unit_selection(
+                unit_selection_id="leader",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(unit_selection_id="ordinary"),
+        ),
+        reserve_unit_points=tuple(
+            ReserveUnitPointValue(
+                unit_instance_id=f"army-alpha:{name}", points=50, source_id=f"test:order66:{name}"
+            )
+            for name in ("bodyguard", "leader", "ordinary")
+        ),
+    )
+    alpha, beta = config.army_muster_requests
+    config = replace(
+        config,
+        army_muster_requests=(
+            replace(
+                alpha,
+                attachment_declarations=(
+                    AttachmentDeclaration(
+                        source_unit_selection_id="leader", bodyguard_unit_selection_id="bodyguard"
+                    ),
+                ),
+            ),
+            beta,
+        ),
+    )
+    lifecycle, _status = _advance_to_reserve_request(config)
+    state = lifecycle.state
+    assert state is not None
+    reserve = state.reserve_state_for_unit("army-alpha:bodyguard")
+    assert reserve is not None
+    assert reserve.points_contribution == 100
+    assert reserve.source_rule_ids == ("gw-11e-core-aircraft:deployment",)
+    assert state.reserve_state_for_unit("army-alpha:leader") is reserve
+    assert reserve.unit_instance_id == "attached-unit:army-alpha:bodyguard"
+    assert len(state.reserve_states) == 1
+    assert len(state.unarrived_reserve_model_ids()) == 6

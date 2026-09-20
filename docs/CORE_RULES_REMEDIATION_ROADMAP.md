@@ -5052,3 +5052,20 @@ and final validation are in [Order 65 scope and proof](ORDER_65_SCOPE_PLAN.md).
 Contract 31 advances replay to v25 and persistence to v23; see
 [migration 30 to 31](../contracts/migrations/30-to-31.md).
 Order 66 remains separate.
+
+
+## Order 66 / P23 implementation
+
+Finding `C23-01` is implemented by the Aircraft ingress-only lifecycle, mandatory
+opponent-turn-end return, shared movement/combat restrictions and removal of
+legacy Hover mode. Core 23.01-23.04 source rows are hash-pinned under the maintained
+App-data mirror policy. Hover retains AIRCRAFT and its existing distance benefit.
+
+The shared engine boundary owns departure and restore evidence, including all
+Aircraft and Transport cargo. Category-23 transit, FLY targeting and Plunging Fire
+consumers use the same engine path as adapters and replay. Contract 32 explicitly
+retires legacy Hover/edge-exit saves. Scope, source, architectural audit and
+validation links are in [Order 66 scope and proof](ORDER_66_SCOPE_PLAN.md).
+Final local validation passed 8,498 behavioral tests at 85.13% coverage, all
+551 code-quality tests and the required contract, package and quality gates.
+Final cross-category certification remains separate.

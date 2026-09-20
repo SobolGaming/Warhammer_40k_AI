@@ -1,0 +1,59 @@
+{
+  "audit_id": "core-aircraft-maintained-app-mirrors-2026-09-20",
+  "observed_at": "2026-09-20T14:34:15Z",
+  "rows": [
+    {
+      "row_id": "deployment:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/23-aircraft",
+      "observed_at": "2026-09-20T14:34:15Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-aircraft:deployment",
+      "transcription_sha256": "0121fe485981e9ddb6ddd73733ee09d133ba4b1f5e67e7909847ef5134b680e6",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "98ba2d9cb0ae31c48e5cf07f1aace55c9c6941b611d6f62dc2541b622168cefc"
+    },
+    {
+      "row_id": "movement:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/23-aircraft",
+      "observed_at": "2026-09-20T14:34:15Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-aircraft:movement",
+      "transcription_sha256": "eb8485ee6333408f13c1bf413495a1d8015354241c7227ead66e60eefae61675",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "36a5d05d32defde10ec9a157f7f341aba775c1177044defd74613e84011e45c0"
+    },
+    {
+      "row_id": "shooting:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/23-aircraft",
+      "observed_at": "2026-09-20T14:34:15Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-aircraft:shooting",
+      "transcription_sha256": "dc06fda0e274db68edabf4a46469900c61ce025958c646139716b32a3d043dfe",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "d1f86e7edde5fc73c6d87c12ed4595063b58f448dab48f4045b09f7dc93e81be"
+    },
+    {
+      "row_id": "charging-and-fighting:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/23-aircraft",
+      "observed_at": "2026-09-20T14:34:15Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-aircraft:charging-and-fighting",
+      "transcription_sha256": "93567627909c8b3bdd8e086a2ecfd0d5b8f7fa648b948be874a100d0d6992271",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "c3738676fbe8e43c300877228ae17c6362c8519abf6b7d8203f96f8e05e17593"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "23.01–23.04 retained from the 40k.app search-index observation. The direct fetch returned 403. No App-data version or co-version comparison is asserted."
+}

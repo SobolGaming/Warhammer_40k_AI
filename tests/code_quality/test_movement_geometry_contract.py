@@ -48,7 +48,7 @@ RESOLVER_GEOMETRY_READS = (
     (MOVEMENT_PHASE, "resolve_advance_move"),
     (MOVEMENT_PHASE, "resolve_fall_back_move"),
     (CHARGE_PHASE, "resolve_charge_move"),
-    (FIGHT_RESOLUTION, "_validate_fight_paths"),
+    (FIGHT_RESOLUTION.with_name("fight_movement_paths.py"), "validate_fight_paths"),
     (TRIGGERED_MOVEMENT, "resolve_triggered_movement"),
 )
 SPECIALIZED_PHYSICAL_PROPOSAL_VALIDATORS = (

@@ -71,6 +71,14 @@ def validate_consolidation(
         scenario=scenario,
         unit_placement=unit_placement,
     )
+    from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
+
+    physically_engaged_ids = aircraft_movement_target_ids(
+        scenario, proposal.unit_instance_id, physically_engaged_ids
+    )
+    selectable_enemy_ids = aircraft_movement_target_ids(
+        scenario, proposal.unit_instance_id, selectable_enemy_ids
+    )
     engaged = selectable_enemy_unit_ids_in_canonical_inventory(
         scenario=scenario,
         selectable_enemy_ids=selectable_enemy_ids,

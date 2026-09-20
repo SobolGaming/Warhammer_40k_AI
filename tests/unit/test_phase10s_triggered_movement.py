@@ -12,7 +12,6 @@ from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.active_player_scope_history import validate_active_player_history
-from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
@@ -411,7 +410,6 @@ def test_fight_end_triggered_movement_omits_fod_only_source_unit() -> None:
     ("movement_kind", "expected_violation"),
     [
         ("crossing", "friendly_model_transit_forbidden"),
-        ("aircraft_crossing", "friendly_model_transit_forbidden"),
         ("endpoint_overlap", "end_on_model_overlap"),
     ],
 )
@@ -1491,7 +1489,6 @@ def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement
         descriptor=descriptor,
         path_witness=transit_witness,
         battle_round=state.battle_round,
-        hover_mode_states=tuple(state.hover_mode_states),
     )
     endpoint_result = resolve_triggered_movement(
         scenario=scenario,
@@ -1500,7 +1497,6 @@ def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement
         descriptor=descriptor,
         path_witness=endpoint_witness,
         battle_round=state.battle_round,
-        hover_mode_states=tuple(state.hover_mode_states),
     )
 
     assert transit_result.is_valid
@@ -1508,57 +1504,6 @@ def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement
     assert endpoint_result.path_validation_results[0].violations[0].violation_code == (
         "enemy_engagement_range_end_forbidden"
     )
-
-
-def test_triggered_movement_uses_hover_effective_keywords_for_moving_aircraft() -> None:
-    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
-    state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
-    scenario = _scenario_from_state(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
-
-    request = TriggeredMovementHandler(ruleset_descriptor=_ruleset()).request_from_state(
-        state=state,
-        unit_instance_id=unit_placement.unit_instance_id,
-        descriptor=_reactive_step_descriptor(max_distance_inches=10.0),
-        candidate_witnesses=(_shift_witness(unit_placement, dx=6.0),),
-    )
-
-    option_payload = _option_payload(request, "triggered_move_001")
-    aircraft_policies = cast(dict[str, JsonValue], option_payload["aircraft_movement_policies"])
-    aircraft_policy = cast(dict[str, JsonValue], aircraft_policies[aircraft.unit_instance_id])
-    effective_keywords = cast(list[str], aircraft_policy["effective_keywords"])
-    assert aircraft_policy["hover_mode_active"] is True
-    assert aircraft_policy["uses_aircraft_rules"] is False
-    assert "AIRCRAFT" not in effective_keywords
-
-
-def test_triggered_movement_rejects_stale_hover_aircraft_policy_payload() -> None:
-    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
-    scenario = _scenario_from_state(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
-    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
-    decisions = DecisionController()
-    request = handler.request_from_state(
-        state=state,
-        unit_instance_id=unit_placement.unit_instance_id,
-        descriptor=_reactive_step_descriptor(max_distance_inches=10.0),
-        candidate_witnesses=(_shift_witness(unit_placement, dx=6.0),),
-    )
-    decisions.request_decision(request)
-    result = DecisionResult.for_request(
-        result_id="phase10s-result-stale-hover-policy-001",
-        request=request,
-        selected_option_id="triggered_move_001",
-    )
-    decisions.submit_result(result)
-    state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
-
-    status = handler.apply_decision(state=state, result=result, decisions=decisions)
-
-    assert status is not None
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    invalid_payload = _last_event_payload(decisions, "triggered_movement_invalid")
-    assert invalid_payload["violation_code"] == "triggered_movement_aircraft_policy_drift"
 
 
 def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> None:
@@ -2208,16 +2153,6 @@ def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
 
 
-def _aircraft_battle_state(*, aircraft_pose: Pose) -> tuple[GameState, UnitInstance]:
-    scenario, aircraft, _enemy = _aircraft_scenario()
-    scenario = _with_unit_first_model_pose(
-        scenario=scenario,
-        unit_instance_id=aircraft.unit_instance_id,
-        pose=aircraft_pose,
-    )
-    return _battle_state_from_scenario(scenario), aircraft
-
-
 def _aircraft_transit_battle_state() -> tuple[GameState, UnitInstance, UnitInstance]:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     alpha = muster_army(
@@ -2415,15 +2350,6 @@ def _with_unit_first_model_pose(
 
 def _first_model_radius_x(unit: UnitInstance) -> float:
     return unit.own_models[0].geometry.primary_part().radius_x_inches
-
-
-def _hover_state_for_aircraft(aircraft: UnitInstance) -> HoverModeState:
-    return HoverModeState.active_for_unit(
-        player_id="player-a",
-        unit_instance_id=aircraft.unit_instance_id,
-        decision_request_id="phase10s-hover-request",
-        decision_result_id="phase10s-hover-result",
-    )
 
 
 def _scenario_from_state(state: GameState) -> BattlefieldScenario:
@@ -2732,3 +2658,24 @@ def test_reactive_active_player_history_rejects_forged_source_authority(
     decisions = DecisionController.from_payload(cast(DecisionControllerPayload, payload))
     with pytest.raises(GameLifecycleError, match=message):
         validate_active_player_history(state=state, decisions=decisions)
+
+
+def test_order66_aircraft_reactive_movement_is_typed_invalid() -> None:
+    scenario, aircraft, _enemy = _aircraft_scenario()
+    placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    result = resolve_triggered_movement(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_placement=placement,
+        descriptor=_reactive_step_descriptor(max_distance_inches=3),
+        path_witness=_shift_witness(placement, dx=1),
+        battle_round=1,
+    )
+    assert not result.is_valid
+    assert TriggeredMovementViolationCode.AIRCRAFT_INGRESS_ONLY in {
+        row.violation_code for row in result.restriction_violations
+    }
+    assert (
+        result.to_payload()["restriction_violations"][0]["violation_code"]
+        == "aircraft_ingress_only"
+    )

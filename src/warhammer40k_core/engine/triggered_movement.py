@@ -76,6 +76,7 @@ class TriggeredMovementKind(StrEnum):
 
 
 class TriggeredMovementViolationCode(StrEnum):
+    AIRCRAFT_INGRESS_ONLY = "aircraft_ingress_only"
     BATTLE_SHOCKED_SURGE_FORBIDDEN = "battle_shocked_surge_forbidden"
     ENGAGEMENT_RANGE_SURGE_FORBIDDEN = "engagement_range_surge_forbidden"
     SURGE_MOVE_ALREADY_USED_THIS_PHASE = "surge_move_already_used_this_phase"

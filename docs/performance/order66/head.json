@@ -1,0 +1,163 @@
+{
+  "workload_id": "order66-aircraft-v1",
+  "revision": "57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "scenario": "one/two Aircraft and five enemy infantry; empty terrain; canonical seed; opponent Fight-phase end",
+  "timing_boundary": "100 unchanged battlefield submissions; then advance through opponent turn boundary to next pending decision; preparation excluded",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order66.py": "b4da55b0d7ccfc6d5216f6d94075d76c50f21d8939fdc18d2f9e5ce8e88d3a6f",
+    "tests/aircraft_helpers.py": "b21d4817ffd5ad698a439faa3c0d7f102b5c54ae0ca86344acc88ae7fe6f0baa"
+  },
+  "rows": [
+    {
+      "fleet_size": 1,
+      "samples": [
+        {
+          "preparation_seconds": 7.309915599995293,
+          "guard_seconds": 0.014391499978955835,
+          "boundary_seconds": 0.17463779999525286,
+          "returned_aircraft": 1,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8751789000234567,
+          "guard_seconds": 0.01371059997472912,
+          "boundary_seconds": 0.1589815000188537,
+          "returned_aircraft": 1,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9332427000044845,
+          "guard_seconds": 0.017496499989647418,
+          "boundary_seconds": 0.15838229999644682,
+          "returned_aircraft": 1,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.861988900025608,
+          "guard_seconds": 0.014072100020712242,
+          "boundary_seconds": 0.15734489998430945,
+          "returned_aircraft": 1,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.867409200000111,
+          "guard_seconds": 0.013812300021527335,
+          "boundary_seconds": 0.15739980002399534,
+          "returned_aircraft": 1,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.86240889999317,
+          "guard_seconds": 0.013769499986665323,
+          "boundary_seconds": 0.1560837999859359,
+          "returned_aircraft": 1,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8651103000156581,
+          "guard_seconds": 0.013809399999445304,
+          "boundary_seconds": 0.15657620001002215,
+          "returned_aircraft": 1,
+          "complete": true
+        }
+      ],
+      "summary": {
+        "guard_seconds": {
+          "mean": 0.014437414281668939,
+          "median": 0.013812300021527335,
+          "p95": 0.017496499989647418,
+          "maximum": 0.017496499989647418,
+          "operations_per_second": 69.26448050117197
+        },
+        "boundary_seconds": {
+          "mean": 0.1599151857164023,
+          "median": 0.15739980002399534,
+          "p95": 0.17463779999525286,
+          "maximum": 0.17463779999525286,
+          "operations_per_second": 6.25331481510096
+        }
+      }
+    },
+    {
+      "fleet_size": 2,
+      "samples": [
+        {
+          "preparation_seconds": 0.8836400999862235,
+          "guard_seconds": 0.016458400001283735,
+          "boundary_seconds": 0.17430089999106713,
+          "returned_aircraft": 2,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8608788000128698,
+          "guard_seconds": 0.016918000008445233,
+          "boundary_seconds": 0.18395020000752993,
+          "returned_aircraft": 2,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8654539000126533,
+          "guard_seconds": 0.01635669998358935,
+          "boundary_seconds": 0.1812289000081364,
+          "returned_aircraft": 2,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8640716999943834,
+          "guard_seconds": 0.016331400023773313,
+          "boundary_seconds": 0.17861400000401773,
+          "returned_aircraft": 2,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8652316000079736,
+          "guard_seconds": 0.016692500008502975,
+          "boundary_seconds": 0.17699639999773353,
+          "returned_aircraft": 2,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.87083800000255,
+          "guard_seconds": 0.016670300014084205,
+          "boundary_seconds": 0.17502010002499446,
+          "returned_aircraft": 2,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.8670464000024367,
+          "guard_seconds": 0.01633889999357052,
+          "boundary_seconds": 0.17319910001242533,
+          "returned_aircraft": 2,
+          "complete": true
+        }
+      ],
+      "summary": {
+        "guard_seconds": {
+          "mean": 0.016538028576178476,
+          "median": 0.016458400001283735,
+          "p95": 0.016918000008445233,
+          "maximum": 0.016918000008445233,
+          "operations_per_second": 60.46669924373023
+        },
+        "boundary_seconds": {
+          "mean": 0.17761565714941493,
+          "median": 0.17699639999773353,
+          "p95": 0.18395020000752993,
+          "maximum": 0.18395020000752993,
+          "operations_per_second": 5.630134280103324
+        }
+      }
+    }
+  ],
+  "completion_rate": 1,
+  "full_game_certified": false
+}
