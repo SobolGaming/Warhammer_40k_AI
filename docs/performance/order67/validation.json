@@ -1,0 +1,56 @@
+{
+  "order": 67,
+  "validated_on": "2026-09-20",
+  "base_commit": "7cc632e8ea75a84d097a1c1cca3df37902fbf90e",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2daafb0c3e982175fa8a45c93824a1f14c25ef9b44392b181c05bd9936c3883d",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "behavioral": {
+    "tests": 8522,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1020.23,
+    "workers": 64,
+    "distribution": "worksteal",
+    "junit_sha256": "8fb4510658089b20a00072961ffb0e33a11e37dc645a21473b08aca2d75ebdd1",
+    "coverage_percent": 85.12826790357906,
+    "coverage_minimum_percent": 85
+  },
+  "code_quality": {
+    "tests": 554,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 310.538,
+    "workers": 64,
+    "distribution": "worksteal",
+    "junit_sha256": "8866292c64a7784b257866774cdd9ce1355598005c2600dcc67859faf3f047b8",
+    "coverage": false
+  },
+  "gates_passed": [
+    "ruff check .",
+    "ruff format --check .",
+    "mypy src tests",
+    "pyright",
+    "lint-imports (11 contracts)",
+    "pre-commit run --all-files",
+    "eight-shard inventory check",
+    "Order 67 offline source generator",
+    "engine build identity",
+    "exact-base external contract check",
+    "installed wheel: 27 schemas and six request families",
+    "TypeScript generated client and typecheck",
+    "TypeScript unit tests: 5",
+    "live conformance: 342 assertions",
+    "Order 67 component comparisons",
+    "Orders 64, 65 and 66 current-runtime component comparisons"
+  ],
+  "earlier_attempts": [
+    "Interrupted after identifying Windows source-artifact line-ending drift; pins corrected before final runtime generation.",
+    "First completed coverage run: 8521 passed, one stale 43-package inventory assertion failed, coverage 85.13%. Behavioral and matching static assertions updated to 44; engine unchanged.",
+    "First full quality run found stale Order 64 and Order 65 runtime timing identities. Both workloads were remeasured serially on the final runtime with their existing baselines and unchanged budgets before rerunning quality."
+  ],
+  "performance_scope": "Roster validation and existing reconstruction, Firing Deck and Aircraft components only; full gameplay slice and full-game performance are not certified.",
+  "prerequisite_scope": "Order 68 bearer eligibility, Order 69 constraints and final cross-category certification remain separate."
+}

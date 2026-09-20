@@ -5069,3 +5069,18 @@ validation links are in [Order 66 scope and proof](ORDER_66_SCOPE_PLAN.md).
 Final local validation passed 8,498 behavioral tests at 85.13% coverage, all
 551 code-quality tests and the required contract, package and quality gates.
 Final cross-category certification remains separate.
+
+
+## Order 67 / P25A implementation
+
+C25-01 and C25-02 now use Incursion's 1,000-point, 2-DP, 2-Enhancement and
+2/4-copy limits. Battleline and Dedicated Transport independently receive the
+shared doubled allowance; both keywords do not stack. The existing single
+3-DP detachment exception and per-copy Upgrade points accounting are certified
+with exact-boundary roster and facade restore regressions.
+
+See [Order 67 scope, source and validation](ORDER_67_SCOPE_PLAN.md). Order 68
+bearer eligibility and Order 69 detachment constraints remain separate. Final
+all-category certification is still pending.
+Final local validation passed 8,522 behavioral tests at 85.13% coverage, all
+554 code-quality tests and the required contract, package and quality gates.

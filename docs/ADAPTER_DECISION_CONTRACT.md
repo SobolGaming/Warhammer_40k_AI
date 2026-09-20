@@ -6415,3 +6415,15 @@ Aircraft, while physical endpoints still respect model overlap and engagement.
 Legacy Hover mode fields and Aircraft edge-exit movement are retired. See
 [contract migration 31 to 32](../contracts/migrations/31-to-32.md). No new finite
 family, proposal kind or submission wrapper is introduced.
+
+
+## Order 67: Incursion roster validation
+
+The existing pre-game ArmyMusterRequest/ArmyDefinition contract covers Order 67.
+Incursion uses 1,000 points, 2 DP and 2 distinct Enhancements; the ordinary duplicate
+limit is 2 and either Battleline or Dedicated Transport allows 4, without stacking.
+The existing single 3-DP detachment exception and three paid copies per Upgrade
+remain. There is no new decision, option, proposal, field or visibility rule.
+Strict roster rejection, serialized assignments, setup and restore all use the
+shared engine validator. Runtime identity and generated contract examples change;
+public payload shapes and the contract major remain unchanged.

@@ -205,9 +205,9 @@ class BattleSizeMusteringPolicy:
             battlefield_width_inches=44.0,
             battlefield_depth_inches=30.0,
             detachment_point_limit=2,
-            enhancement_limit=4,
-            unit_limit=3,
-            battleline_unit_limit=6,
+            enhancement_limit=2,
+            unit_limit=2,
+            battleline_unit_limit=4,
         )
 
     @classmethod

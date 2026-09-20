@@ -31,6 +31,7 @@ from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     AttachmentDeclarationPayload,
     BattleSize,
+    BattleSizeMusteringPolicy,
     DetachmentSelection,
     DetachmentSelectionPayload,
     UnitMusterSelection,
@@ -62,6 +63,7 @@ from warhammer40k_core.engine.roster_points import (
     RosterUnitPointValue,
     RosterUnitPointValuePayload,
 )
+from warhammer40k_core.engine.roster_unit_limits import datasheet_unit_limit
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
     UnitFactoryError,
@@ -1262,8 +1264,7 @@ def validate_roster_legality(
     _append_unit_limit_violations(
         request=request,
         datasheets_by_selection_id=datasheets_by_selection_id,
-        unit_limit=policy.unit_limit,
-        battleline_unit_limit=policy.battleline_unit_limit,
+        policy=policy,
         violations=violations,
     )
     _append_warlord_violations(
@@ -1411,8 +1412,7 @@ def _append_unit_limit_violations(
     *,
     request: ArmyMusterRequest,
     datasheets_by_selection_id: dict[str, DatasheetDefinition],
-    unit_limit: int,
-    battleline_unit_limit: int,
+    policy: BattleSizeMusteringPolicy,
     violations: list[RosterLegalityViolation],
 ) -> None:
     selections_by_datasheet_id: dict[str, list[str]] = {}
@@ -1425,9 +1425,7 @@ def _append_unit_limit_violations(
         datasheet = datasheets_by_selection_id.get(first_selection_id)
         if datasheet is None:
             continue
-        limit = (
-            battleline_unit_limit if _datasheet_has_keyword(datasheet, "BATTLELINE") else unit_limit
-        )
+        limit = datasheet_unit_limit(datasheet, policy=policy)
         if len(selection_ids) > limit:
             violations.append(
                 RosterLegalityViolation(

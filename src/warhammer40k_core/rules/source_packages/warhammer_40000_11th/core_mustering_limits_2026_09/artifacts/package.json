@@ -1,0 +1,223 @@
+{
+  "artifact_schema": "core-v2-core-mustering-limits-source-v1",
+  "source_package_id": "gw-11e-core-mustering-limits",
+  "source_version": "maintained-app-mirrors-observed-2026-09-20",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-mustering-limits:battle_size",
+      "section_id": "25.03",
+      "source_text": "BATTLE SIZE | Points Total | Detachment Points (DP) | Enhancement Limit | Unit Limit*\nINCURSION | 1000 | 2 | 2 | 2\nSTRIKE FORCE | 2000 | 3 | 4 | 3\nThe unit limit for BATTLELINE and DEDICATED TRANSPORT units is double the relevant amount shown above, and every EPIC HERO has a unit limit of 1, regardless of the battle size.",
+      "transcription_sha256": "4814d68cd7b6f065e97e3d2837fddff188d7db51c63679c403628bd0ee2f78fb",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.list_validation:BattleSizeMusteringPolicy.incursion",
+        "warhammer40k_core.engine.roster_unit_limits:datasheet_unit_limit"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-mustering-limits:single_three_dp_detachment",
+      "section_id": "25.04",
+      "source_text": "If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment.",
+      "transcription_sha256": "ccdcec776c186d934bbeefe61307a9608dfa47e95b0b4e95f0f18cd3add37835",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.list_validation:validate_detachment_selection"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-mustering-limits:upgrade_accounting",
+      "section_id": "25.04",
+      "source_text": "You can include up to three of the same Upgrade in your army (the second and third instances of the same Upgrade do not count towards the total number of enhancements in your army, but you must still spend the stated points cost each time).",
+      "transcription_sha256": "498817660ab2a921958720521432effaa22aab043f571bf3224706622bbf8dc7",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.army_mustering:_append_enhancement_violations",
+        "warhammer40k_core.engine.army_mustering:_append_unit_point_violations"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-mustering-limits:battle_size",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "4814d68cd7b6f065e97e3d2837fddff188d7db51c63679c403628bd0ee2f78fb",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "4e390126930baf602e7e33f7ba97c4d50e717c7caddb17c3e7d13f7e9341221a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.list_validation:BattleSizeMusteringPolicy.incursion",
+        "warhammer40k_core.engine.roster_unit_limits:datasheet_unit_limit"
+      ],
+      "evidence_id": "core-mustering-limits-review:battle_size",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P25A 25.03 battle_size",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-mustering-limits:battle_size",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "4814d68cd7b6f065e97e3d2837fddff188d7db51c63679c403628bd0ee2f78fb",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "4d7d11426852168a7af4e046491d4a9dbaffc410c85a7ae3522aa1a936a18858",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.list_validation:BattleSizeMusteringPolicy.incursion",
+        "warhammer40k_core.engine.roster_unit_limits:datasheet_unit_limit"
+      ],
+      "evidence_id": "core-mustering-limits-mirror:battle_size:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+      "review_audit_row_id": "battle_size:40k-app",
+      "review_audit_source_observation_sha256": "99e83112d99313ae4b0de72119affe37a21d3c354a42b576653fa9bb0097ab5b",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 25.03 battle_size",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T18:08:38Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-mustering-limits:single_three_dp_detachment",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "ccdcec776c186d934bbeefe61307a9608dfa47e95b0b4e95f0f18cd3add37835",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "b7342eeb8ec09c6b751cdef5129313d50b45ba6d0ee0d1b2a8febf29bdf9147b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.list_validation:validate_detachment_selection"
+      ],
+      "evidence_id": "core-mustering-limits-review:single_three_dp_detachment",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P25A 25.04 single_three_dp_detachment",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-mustering-limits:single_three_dp_detachment",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "ccdcec776c186d934bbeefe61307a9608dfa47e95b0b4e95f0f18cd3add37835",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "dd91074ee77f598234310e9b1090b2b0c29a68f4918aaa0afd33ceaf7ffbf6d3",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.list_validation:validate_detachment_selection"
+      ],
+      "evidence_id": "core-mustering-limits-mirror:single_three_dp_detachment:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+      "review_audit_row_id": "single_three_dp_detachment:40k-app",
+      "review_audit_source_observation_sha256": "69ca00edcd589425807134307dad790b538ae083b91c4573489eb802f6f5e952",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 25.04 single_three_dp_detachment",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T18:08:38Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-mustering-limits:upgrade_accounting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "498817660ab2a921958720521432effaa22aab043f571bf3224706622bbf8dc7",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "21ab3bea94120dbb07a66b1527a80c989d690d2e1c19e029dc8b9c36bd8b2d15",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.army_mustering:_append_enhancement_violations",
+        "warhammer40k_core.engine.army_mustering:_append_unit_point_violations"
+      ],
+      "evidence_id": "core-mustering-limits-review:upgrade_accounting",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P25A 25.04 upgrade_accounting",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-mustering-limits:upgrade_accounting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "498817660ab2a921958720521432effaa22aab043f571bf3224706622bbf8dc7",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "48f6bb2d0771b54d4dee0c948d7a5887c4a303f3309cc4b445a238ad5084ca20",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.army_mustering:_append_enhancement_violations",
+        "warhammer40k_core.engine.army_mustering:_append_unit_point_violations"
+      ],
+      "evidence_id": "core-mustering-limits-mirror:upgrade_accounting:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+      "review_audit_row_id": "upgrade_accounting:40k-app",
+      "review_audit_source_observation_sha256": "4bcde0e0bcd9f41abd4989e5edbb1cbac9ac1e0e15b0dd9715c564e4f6c2f893",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 25.04 upgrade_accounting",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T18:08:38Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "c9cac0b277731e6b4036cbcac7b0b64df0e6efe9822205333afaca604e167365"
+}

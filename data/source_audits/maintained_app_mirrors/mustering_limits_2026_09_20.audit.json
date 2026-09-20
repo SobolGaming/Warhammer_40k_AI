@@ -1,0 +1,47 @@
+{
+  "audit_id": "core-mustering-limits-maintained-app-mirrors-2026-09-20",
+  "observed_at": "2026-09-20T18:08:38Z",
+  "rows": [
+    {
+      "row_id": "battle_size:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T18:08:38Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-mustering-limits:battle_size",
+      "transcription_sha256": "4814d68cd7b6f065e97e3d2837fddff188d7db51c63679c403628bd0ee2f78fb",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "99e83112d99313ae4b0de72119affe37a21d3c354a42b576653fa9bb0097ab5b"
+    },
+    {
+      "row_id": "single_three_dp_detachment:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T18:08:38Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-mustering-limits:single_three_dp_detachment",
+      "transcription_sha256": "ccdcec776c186d934bbeefe61307a9608dfa47e95b0b4e95f0f18cd3add37835",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "69ca00edcd589425807134307dad790b538ae083b91c4573489eb802f6f5e952"
+    },
+    {
+      "row_id": "upgrade_accounting:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/25-muster-armies",
+      "observed_at": "2026-09-20T18:08:38Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-mustering-limits:upgrade_accounting",
+      "transcription_sha256": "498817660ab2a921958720521432effaa22aab043f571bf3224706622bbf8dc7",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "4bcde0e0bcd9f41abd4989e5edbb1cbac9ac1e0e15b0dd9715c564e4f6c2f893"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "25.03 table/footnote and 25.04 single-detachment/Upgrade accounting clauses retained from the 40k.app search-index observation. The direct fetch returned 403. No App-data version or co-version comparison is asserted."
+}

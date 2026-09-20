@@ -1,0 +1,80 @@
+{
+  "workload": "order67-roster-validation-v1",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "host_role": "provisional",
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "revision": "order67-working-tree",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2daafb0c3e982175fa8a45c93824a1f14c25ef9b44392b181c05bd9936c3883d",
+  "timing_boundary": "100 validate_roster_legality calls; catalog/request construction excluded; no gameplay, terrain, RNG or decisions",
+  "hashes": {
+    "scripts/measure_order67.py": "d88f50d925ea2588e77bafb14bf3384e0c816432b3285f80c8ac915c8156d49b",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "unit_count": 2,
+      "model_count": 10,
+      "samples_seconds": [
+        0.013596100005088374,
+        0.013527200004318729,
+        0.013553400000091642,
+        0.013581400009570643,
+        0.013780199980828911,
+        0.013545299996621907,
+        0.013416400004643947
+      ],
+      "mean_seconds": 0.013571428571594879,
+      "maximum_seconds": 0.013780199980828911,
+      "complete": true,
+      "violation_codes": [
+        "missing_warlord_selection",
+        "source_awaiting_unit_points"
+      ]
+    },
+    {
+      "unit_count": 4,
+      "model_count": 20,
+      "samples_seconds": [
+        0.021177599992370233,
+        0.021300599997630343,
+        0.021181499992962927,
+        0.02120600000489503,
+        0.021301599976141006,
+        0.021383000013884157,
+        0.021309199975803494
+      ],
+      "mean_seconds": 0.02126564285052674,
+      "maximum_seconds": 0.021383000013884157,
+      "complete": true,
+      "violation_codes": [
+        "missing_warlord_selection",
+        "source_awaiting_unit_points"
+      ]
+    },
+    {
+      "unit_count": 20,
+      "model_count": 100,
+      "samples_seconds": [
+        0.08322380000026897,
+        0.08341689998633228,
+        0.08359740002197213,
+        0.08357500002603047,
+        0.08361550001427531,
+        0.08345679999911226,
+        0.08358959999168292
+      ],
+      "mean_seconds": 0.08349642857709634,
+      "maximum_seconds": 0.08361550001427531,
+      "complete": true,
+      "violation_codes": [
+        "missing_warlord_selection",
+        "source_awaiting_unit_points",
+        "unit_limit_exceeded"
+      ]
+    }
+  ]
+}

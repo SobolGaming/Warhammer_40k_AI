@@ -20,10 +20,10 @@ none.
 
 | Aircraft | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| 1 | 100 mutation guards | 0.008290 / 0.010731 | 0.014437 / 0.017496 |
-| 1 | Opponent turn boundary | 0.160629 / 0.170822 | 0.159915 / 0.174638 |
-| 2 | 100 mutation guards | 0.009367 / 0.012321 | 0.016538 / 0.016918 |
-| 2 | Opponent turn boundary | 0.170526 / 0.174009 | 0.177616 / 0.183950 |
+| 1 | 100 mutation guards | 0.008290 / 0.010731 | 0.014230 / 0.014958 |
+| 1 | Opponent turn boundary | 0.160629 / 0.170822 | 0.163685 / 0.185844 |
+| 2 | 100 mutation guards | 0.009367 / 0.012321 | 0.016610 / 0.017579 |
+| 2 | Opponent turn boundary | 0.170526 / 0.174009 | 0.180136 / 0.205278 |
 
 The mean budget is base x 1.5 plus 50 ms per 100 guards or 200 ms per boundary;
 the maximum budget is base x 2 plus 300 ms. These provisional allowances cover
@@ -51,4 +51,7 @@ uv run python -m scripts.measure_ingress_reconstruction --output docs/performanc
 uv run python -m scripts.measure_order65 --output docs/performance/order65/head.json --revision <current-engine-build-id>
 ```
 
-Final required gate results are retained in `validation.json`.
+Order 67 refreshes `head.json` and the table above for runtime `2daafb0c`,
+using the same workload and budgets without competing test/build workers.
+`validation.json` retains the historical Order 66 gate results; current Order 67
+validation is recorded in [its scope record](../../ORDER_67_SCOPE_PLAN.md).
