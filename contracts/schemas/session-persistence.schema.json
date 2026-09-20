@@ -13,14 +13,14 @@
     },
     "engine_version": {"minLength": 1, "type": "string"},
     "event_retention_limit": {"minimum": 1, "type": "integer"},
-    "external_contract_version": {"const": "30.0.0", "type": "string"},
+    "external_contract_version": {"const": "31.0.0", "type": "string"},
     "game_session_index": {
       "items": {"$ref": "#/$defs/game_session_index_entry"},
       "type": "array",
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "session-persistence-v22-reserve-lifetimes",
+      "const": "session-persistence-v23-firing-deck",
       "type": "string"
     },
     "sessions": {

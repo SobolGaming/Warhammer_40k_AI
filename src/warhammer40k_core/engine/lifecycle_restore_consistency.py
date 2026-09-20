@@ -83,6 +83,15 @@ def validate_payload_consistency(
     validate_activity_restriction_inventory(
         state=state, event_records=event_records, decision_records=decision_records
     )
+    from warhammer40k_core.engine.firing_deck_restore import validate_firing_deck_restrictions
+
+    validate_firing_deck_restrictions(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
+        army_catalog=None if config is None else config.army_catalog,
+    )
     _rsi.validate_reserve_state_consistency(state=state)
     from warhammer40k_core.engine.reserve_lifetime_boundary import validate_final_turn_destruction
 

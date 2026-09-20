@@ -266,6 +266,8 @@ def _request_shooting_declaration(
         return _complete_out_of_phase_shooting(
             state=state, decisions=decisions, completed_state=out_of_phase
         )
+    from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
+
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
         terrain_features=terrain_features,
@@ -299,6 +301,12 @@ def _request_shooting_declaration(
         ),
         "target_candidates": target_candidates,
     }
+    if proposal_request["firing_deck_value"] is not None:
+        proposal_request["firing_deck_embarked_unit_instance_ids"] = list(
+            firing_deck_cargo_snapshot(
+                state=state, unit_instance_id=rules_unit.unit_instance_id, army_catalog=army_catalog
+            )
+        )
     nested_interaction_requests = _nested_interaction_requests_for_target_candidates(
         target_candidates
     )
@@ -374,12 +382,21 @@ def request_out_of_phase_shooting_declaration(
         armies=tuple(state.army_definitions),
         unit_instance_id=unit_instance_id,
     )
-    if mission_action_prevents_rules_unit_from_shooting_this_phase(
+    from warhammer40k_core.engine.shooting_eligibility_state import (
+        shooting_state_restriction_reason,
+    )
+
+    restriction = shooting_state_restriction_reason(
         state=state,
         player_id=player_id,
-        unit_instance_id=selected_rules_unit_id,
-    ):
-        raise GameLifecycleError("Action restriction prevents out-of-phase shooting.")
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=selected_rules_unit_id),
+    )
+    if restriction is not None:
+        if restriction == "started_action":
+            raise GameLifecycleError("Action restriction prevents out-of-phase shooting.")
+        raise GameLifecycleError(
+            f"Shooting restriction {restriction} prevents out-of-phase shooting."
+        )
     selection = ShootingUnitSelection(
         player_id=player_id,
         battle_round=state.battle_round,

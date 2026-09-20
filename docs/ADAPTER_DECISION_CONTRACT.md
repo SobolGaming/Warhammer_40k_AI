@@ -2068,7 +2068,7 @@ Attacker shooting decisions include:
 - finite `select_shooting_unit_grant` choices after a unit is selected to shoot when source-backed selected-to-shoot grants are currently legal;
 - finite `select_shooting_type` choices for the selected unit before any in-phase shooting declaration is submitted;
 - finite or parameterized target and weapon declaration choices, depending on whether the full action space can be safely enumerated;
-- Firing Deck selections that bind each selected embarked model to at most one legal non-One-Shot ranged weapon, temporarily grant those attacks to the Transport, and mark the selected embarked units ineligible to shoot for the phase.
+- Firing Deck selections that bind each selected embarked model to at most one legal non-One-Shot ranged weapon, temporarily grant those attacks to the Transport, and snapshot every embarked unit as ineligible to shoot until turn end, including noncontributors and units that later disembark.
 
 Phase 13B implements attacker selection and declaration with these adapter-visible decisions:
 
@@ -6360,3 +6360,30 @@ are reevaluated against current presence and geometry.
 
 See [migration 29 to 30](../contracts/migrations/29-to-30.md) and the dedicated
 [reconstruction performance guard](performance/order64/README.md).
+
+
+## Order 65 / P24B: turn-long Firing Deck passenger restrictions
+
+Every Firing Deck Shooting declaration request includes
+`firing_deck_embarked_unit_instance_ids`, the complete sorted cargo snapshot for
+an applicable Firing Deck Transport. Other units omit this field. Cargo drift,
+including changes to noncontributing units, rejects before queue pop or mutation.
+The existing parameterized declaration envelope and weapon-copy choices remain;
+selecting no borrowed weapons still resolves the ability and restricts all cargo.
+
+The accepted declaration's `ineligible_unit_instance_ids` now records that entire
+snapshot. A source-linked `firing_deck_shooting_restriction` persistent effect
+binds it to the declaration result, Transport and physical cargo components;
+shared rules-unit queries resolve canonical attached identity. The effect records
+the round and owning turn. Passengers are not inserted in `shot_unit_ids`: they did
+not shoot. The shared eligibility query applies in every phase and after cargo
+membership changes; the engine's actual turn-end boundary expires the effect.
+Normal and out-of-phase proposal validation use the same query. Firing Deck itself
+remains an owner's-Shooting-phase ability.
+
+Restore checks the live restriction inventory against accepted requests/events
+and authenticated turn-end history. Existing shared viewer redaction applies to
+requests and events; operator persistence is never a player projection. No new
+player-choice family or adapter mutation path is introduced. Contract 31, replay
+v25 and persistence v23 deliberately reject prior semantic histories; see
+[the migration](../contracts/migrations/30-to-31.md).

@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Literal, cast
 
 import pytest
-from scripts.measure_ingress_reconstruction import CHECKPOINTS, prepare, sample
+from scripts.measure_ingress_reconstruction import CHECKPOINTS
 
 from warhammer40k_core.build_identity import verified_engine_build_identity
 
@@ -25,7 +25,25 @@ def test_post_ingress_reconstruction_work_budget(
     checkpoint: str, operation: Literal["restore", "fork"]
 ) -> None:
     budgets = json.loads((EVIDENCE / "budgets.json").read_text(encoding="utf-8"))
-    row = sample(prepare(checkpoint), operation, profile=True)
+    # Keep cProfile state independent of earlier audits in the xdist worker,
+    # matching the standalone evidence process. Profile exactly one real
+    # reconstruction; retain every authentication and work-budget assertion.
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import json, sys; "
+            "from scripts.measure_ingress_reconstruction import prepare, sample; "
+            "print(json.dumps(sample(prepare(sys.argv[1]), sys.argv[2], profile=True)))",
+            checkpoint,
+            operation,
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    row = json.loads(completed.stdout)
     counts = cast(dict[str, int], row["work_counts"])
     limits = budgets["work_limits"][checkpoint]
     assert row["complete"] is True

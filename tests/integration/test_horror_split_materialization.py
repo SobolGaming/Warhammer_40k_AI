@@ -1100,7 +1100,7 @@ def test_selected_target_mortal_wounds_finalize_horror_composition_handoff(
         retained_horror_kinds=("blue",),
         models_start_destroyed=False,
         emit_destruction_events=False,
-        game_id="order34-complete-boundary-horror_final-4",
+        game_id="order65-horror-final-0",
     )
     pink_model_id = scenario.bodyguard.own_models[0].model_instance_id
     fnp_source = FeelNoPainSource(

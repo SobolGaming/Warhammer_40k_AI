@@ -860,6 +860,16 @@
           "audit_id": "core-reserve-lifetimes-maintained-app-mirrors-2026-09-19",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-19T21:33:00+00:00"
+        },
+        {
+          "audit_id": "core-firing-deck-maintained-app-mirrors-2026-09-20",
+          "row_id": "firing_deck:40k-app",
+          "source_observation_sha256": "9f54ad3a7c7d78cdb3edf88d3cf08e1e13371637e3088ddf5ad2968fbe9bd34f",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-20T11:30:00Z"
         }
       ],
       "legacy_observations": [
@@ -1458,6 +1468,15 @@
             "gw-11e-core-reserve-lifetimes:ingress"
           ],
           "catalog_sha256": "d77c1b5dac44496179649e545dd0ba130bf18b02a7f8c32c91fedf9a2b9c6672"
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-firing-deck",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-firing-deck:firing_deck"
+          ],
+          "catalog_sha256": "269d9e02ff7bc13cabc08aa4b8682db278589b8369a49ec210f47663f439680b"
         }
       ]
     },

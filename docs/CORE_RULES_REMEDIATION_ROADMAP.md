@@ -5033,3 +5033,22 @@ Full-game performance is not certified. See [Order 64 scope and validation](ORDE
 and [performance evidence](performance/order64/README.md). Final local validation
 passed 8,467 behavioral tests at 85.12% coverage, all 545 quality tests and the
 required publishing gates. Order 65 and Order 66 remain separate.
+
+
+## Order 65 / P24B implementation
+
+C24-02 now snapshots every unit embarked when Firing Deck resolves and records
+one source-linked shooting restriction through the owning turn's end. This
+includes noncontributors, zero borrowed weapons and attached-unit identities;
+later cargo changes do not change the snapshot. Shared ordinary and out-of-phase
+shooting authority consumes it. Passengers are no longer recorded as actual
+shooters in phase state or mission checkpoint history.
+
+Engine declaration requests retain the full cargo snapshot and reject drift
+before queue pop. Restore authenticates the live effect against accepted
+declarations and turn-end boundaries. The existing facade and viewer-scoped
+projection/event paths remain shared. Source evidence, architecture, acceptance
+and final validation are in [Order 65 scope and proof](ORDER_65_SCOPE_PLAN.md).
+Contract 31 advances replay to v25 and persistence to v23; see
+[migration 30 to 31](../contracts/migrations/30-to-31.md).
+Order 66 remains separate.

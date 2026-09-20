@@ -1795,7 +1795,7 @@ def test_deferred_outcome_rejects_missing_parent_batch_completion() -> None:
 def test_selected_target_remaining_effect_request_requires_retained_ancestry() -> None:
     selected_target_record = _selected_target_battle_shock_then_mortal_record()
     lifecycle, bundle, _provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="order36-source-internal-mortal-1",
+        game_id="order65-source-internal-mortal-1",
         selected_target_record=selected_target_record,
     )
     state = lifecycle.state
@@ -1835,7 +1835,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         forged_request
     )
     result = DecisionResult.for_request(
-        result_id=("order36-source-internal-mortal-1:forged-result"),
+        result_id=("order65-source-internal-mortal-1:forged-result"),
         request=forged_request,
         selected_option_id="decline",
     )
@@ -1867,7 +1867,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         restored_session.submit_option(
             request_id=current_request.request_id,
             option_id="decline",
-            result_id=(f"order36-source-internal-mortal-1:nested:{nested_decision_index}"),
+            result_id=(f"order65-source-internal-mortal-1:nested:{nested_decision_index}"),
         )
     else:
         raise AssertionError("selected-target remaining effects did not complete")
@@ -2500,7 +2500,7 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     game_id = (
         "phase17g-selected-target-delirium-reroll-ordered-2"
         if reroll
-        else "order34-complete-boundary-direct-1"
+        else "order65-complete-boundary-direct-0"
     )
     selected_target_record = _selected_target_battle_shock_then_modifier_record()
     extra_contributions: tuple[RuntimeContentContribution, ...] = ()

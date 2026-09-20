@@ -140,6 +140,7 @@ class ShootingDeclarationProposalRequestPayload(TypedDict):
     ruleset_descriptor_hash: str
     visibility_cache_key: str
     firing_deck_value: int | None
+    firing_deck_embarked_unit_instance_ids: NotRequired[list[str]]
     available_weapons: list[AvailableWeaponPayload]
     shooting_weapon_selection_limits: list[ShootingWeaponSelectionLimitPayload]
     target_candidates: list[JsonValue]
@@ -504,7 +505,6 @@ class ShootingPhaseState:
         self,
         *,
         attack_pools: tuple[RangedAttackPool, ...],
-        ineligible_unit_instance_ids: tuple[str, ...] = (),
         attack_sequence: AttackSequence | None = None,
     ) -> Self:
         if self.phase_complete:
@@ -525,12 +525,8 @@ class ShootingPhaseState:
                 raise GameLifecycleError("Shooting declaration attack_sequence pool drift.")
             if attack_sequence.attacking_unit_instance_id != self.active_selection.unit_instance_id:
                 raise GameLifecycleError("Shooting declaration attack_sequence unit drift.")
-        ineligible_ids = _validate_identifier_tuple(
-            "ineligible_unit_instance_ids",
-            ineligible_unit_instance_ids,
-        )
         completed_unit_id = self.active_selection.unit_instance_id
-        shot_unit_ids = tuple(sorted({*self.shot_unit_ids, completed_unit_id, *ineligible_ids}))
+        shot_unit_ids = tuple(sorted({*self.shot_unit_ids, completed_unit_id}))
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,

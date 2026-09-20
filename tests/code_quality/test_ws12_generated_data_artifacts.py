@@ -169,6 +169,9 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "core_smokescreen_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),
+    "core_firing_deck_2026_09": (
+        "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
     "core_stealth_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),

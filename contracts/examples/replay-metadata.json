@@ -15934,7 +15934,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v24-reserve-lifetimes",
+  "schema_version": "replay-artifact-v25-firing-deck",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",

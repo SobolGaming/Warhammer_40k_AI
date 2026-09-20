@@ -15,8 +15,11 @@ from warhammer40k_core.engine.mission_action_eligibility import (
 def shooting_state_restriction_reason(
     *, state: GameState, rules_unit: RulesUnitView, player_id: str
 ) -> str | None:
+    from warhammer40k_core.engine.firing_deck_restrictions import firing_deck_prevents_shooting
     from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
 
+    if firing_deck_prevents_shooting(state=state, rules_unit=rules_unit):
+        return "firing_deck"
     reason = large_model_activity_reason(state, rules_unit.unit_instance_id, "ranged_attacks")
     if reason is not None:
         return reason
