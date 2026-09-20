@@ -1,7 +1,7 @@
 {
   "workload_id": "order65-firing-deck-v1",
-  "revision": "57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
+  "revision": "order67-onslaught-review",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f5f5e58b838cbadb75e6b2da67488a605aa80d29989032fb3c284386b9d3630b",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
@@ -21,67 +21,67 @@
       "contribute": false,
       "samples": [
         {
-          "preparation_seconds": 7.417181500000879,
-          "declaration_seconds": 0.12994239997351542,
-          "hundred_queries_seconds": 0.0009334000060334802,
+          "preparation_seconds": 7.7847903999791015,
+          "declaration_seconds": 0.1340591000043787,
+          "hundred_queries_seconds": 0.0007492000004276633,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0875593999808189,
-          "declaration_seconds": 0.1391347000026144,
-          "hundred_queries_seconds": 0.001052400009939447,
+          "preparation_seconds": 1.0877850000106264,
+          "declaration_seconds": 0.142035400000168,
+          "hundred_queries_seconds": 0.0007631999906152487,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9951071000250522,
-          "declaration_seconds": 0.12243109999690205,
-          "hundred_queries_seconds": 0.0006725000275764614,
+          "preparation_seconds": 1.0102960000222083,
+          "declaration_seconds": 0.12642489999416284,
+          "hundred_queries_seconds": 0.0007006000087130815,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9905386999889743,
-          "declaration_seconds": 0.13478350001969375,
-          "hundred_queries_seconds": 0.0007004000071901828,
+          "preparation_seconds": 0.9979865000059363,
+          "declaration_seconds": 0.1273075999924913,
+          "hundred_queries_seconds": 0.0006951999966986477,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9934926000132691,
-          "declaration_seconds": 0.12739330000476912,
-          "hundred_queries_seconds": 0.0007078000053297728,
+          "preparation_seconds": 1.010807400016347,
+          "declaration_seconds": 0.1443518000014592,
+          "hundred_queries_seconds": 0.0006769000028725713,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0316549999988638,
-          "declaration_seconds": 0.12285760001395829,
-          "hundred_queries_seconds": 0.0006807000027038157,
+          "preparation_seconds": 1.0093614000070374,
+          "declaration_seconds": 0.12772669998230413,
+          "hundred_queries_seconds": 0.0006870999932289124,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9839383999933489,
-          "declaration_seconds": 0.12250980001408607,
-          "hundred_queries_seconds": 0.0007218000246211886,
+          "preparation_seconds": 1.0152565999887884,
+          "declaration_seconds": 0.13184210000326857,
+          "hundred_queries_seconds": 0.0006935999845154583,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.12843605714650558,
-          "median": 0.12739330000476912,
-          "p95": 0.1391347000026144,
-          "maximum": 0.1391347000026144
+          "mean": 0.13339251428260468,
+          "median": 0.13184210000326857,
+          "p95": 0.1443518000014592,
+          "maximum": 0.1443518000014592
         },
         "hundred_queries_seconds": {
-          "mean": 0.0007812857261991926,
-          "median": 0.0007078000053297728,
-          "p95": 0.001052400009939447,
-          "maximum": 0.001052400009939447
+          "mean": 0.0007093999967245119,
+          "median": 0.0006951999966986477,
+          "p95": 0.0007631999906152487,
+          "maximum": 0.0007631999906152487
         }
       }
     },
@@ -89,67 +89,67 @@
       "contribute": true,
       "samples": [
         {
-          "preparation_seconds": 0.9872825000202283,
-          "declaration_seconds": 0.0841591999924276,
-          "hundred_queries_seconds": 0.0006512999825645238,
+          "preparation_seconds": 1.005581000004895,
+          "declaration_seconds": 0.08602849999442697,
+          "hundred_queries_seconds": 0.0006692000024486333,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9820469999976922,
-          "declaration_seconds": 0.08368609999888577,
-          "hundred_queries_seconds": 0.0006844999734312296,
+          "preparation_seconds": 1.011074300011387,
+          "declaration_seconds": 0.08826749998843297,
+          "hundred_queries_seconds": 0.0007190000033006072,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0753796999924816,
-          "declaration_seconds": 0.08336319998488761,
-          "hundred_queries_seconds": 0.0006543000054080039,
+          "preparation_seconds": 1.0810935999907088,
+          "declaration_seconds": 0.08714180000242777,
+          "hundred_queries_seconds": 0.0006954999989829957,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9895512000075541,
-          "declaration_seconds": 0.08387820000643842,
-          "hundred_queries_seconds": 0.0006531999970320612,
+          "preparation_seconds": 0.9998564999841619,
+          "declaration_seconds": 0.08755900000687689,
+          "hundred_queries_seconds": 0.0007207000162452459,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9944544000027236,
-          "declaration_seconds": 0.08343630001763813,
-          "hundred_queries_seconds": 0.0007040000054985285,
+          "preparation_seconds": 1.0213131000055,
+          "declaration_seconds": 0.08616119998623617,
+          "hundred_queries_seconds": 0.000671899993903935,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0021675000025425,
-          "declaration_seconds": 0.08565220001037233,
-          "hundred_queries_seconds": 0.0006639999919570982,
+          "preparation_seconds": 1.0171734000032302,
+          "declaration_seconds": 0.08921949999057688,
+          "hundred_queries_seconds": 0.0007847999804653227,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9956989000202157,
-          "declaration_seconds": 0.08349739998811856,
-          "hundred_queries_seconds": 0.00066380001953803,
+          "preparation_seconds": 1.193895700009307,
+          "declaration_seconds": 0.09508719999575987,
+          "hundred_queries_seconds": 0.0006978999881539494,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.08395322857125263,
-          "median": 0.08368609999888577,
-          "p95": 0.08565220001037233,
-          "maximum": 0.08565220001037233
+          "mean": 0.08849495713781964,
+          "median": 0.08755900000687689,
+          "p95": 0.09508719999575987,
+          "maximum": 0.09508719999575987
         },
         "hundred_queries_seconds": {
-          "mean": 0.0006678714250613536,
-          "median": 0.00066380001953803,
-          "p95": 0.0007040000054985285,
-          "maximum": 0.0007040000054985285
+          "mean": 0.0007084285690715271,
+          "median": 0.0006978999881539494,
+          "p95": 0.0007847999804653227,
+          "maximum": 0.0007847999804653227
         }
       }
     }

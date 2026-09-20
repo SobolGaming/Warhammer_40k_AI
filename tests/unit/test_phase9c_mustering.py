@@ -9,6 +9,7 @@ from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
@@ -2220,6 +2221,9 @@ def test_supported_battle_size_policies_are_source_backed() -> None:
     assert incursion.battlefield_width_inches == 44.0
     assert incursion.battlefield_depth_inches == 30.0
     assert incursion.detachment_point_limit == 2
+    assert incursion.enhancement_limit == 2
+    assert incursion.unit_limit == 2
+    assert incursion.battleline_unit_limit == 4
     assert policy.points_limit == 2000
     assert policy.battlefield_width_inches == 60.0
     assert policy.battlefield_depth_inches == 44.0
@@ -5221,3 +5225,304 @@ def test_unit_factory_instances_and_validators_fail_fast() -> None:
         replace(unit, unit_instance_id="unit:bad")
     with pytest.raises(UnitFactoryError, match="must be a string"):
         replace(model, model_instance_id=cast(str, 1))
+
+
+@pytest.mark.parametrize(
+    ("battle_size", "keywords", "limit"),
+    [
+        (BattleSize.INCURSION, (), 2),
+        (BattleSize.INCURSION, ("BATTLELINE",), 4),
+        (BattleSize.INCURSION, ("DEDICATED TRANSPORT",), 4),
+        (BattleSize.INCURSION, ("BATTLELINE", "DEDICATED TRANSPORT"), 4),
+        (BattleSize.STRIKE_FORCE, (), 3),
+        (BattleSize.STRIKE_FORCE, ("BATTLELINE",), 6),
+        (BattleSize.STRIKE_FORCE, ("DEDICATED TRANSPORT",), 6),
+        (BattleSize.STRIKE_FORCE, ("BATTLELINE", "DEDICATED TRANSPORT"), 6),
+        (BattleSize.ONSLAUGHT, (), 3),
+        (BattleSize.ONSLAUGHT, ("BATTLELINE",), 6),
+        (BattleSize.ONSLAUGHT, ("DEDICATED TRANSPORT",), 3),
+        (BattleSize.ONSLAUGHT, ("BATTLELINE", "DEDICATED TRANSPORT"), 6),
+    ],
+)
+def test_order67_duplicate_limits_are_independent_and_do_not_stack(
+    battle_size: BattleSize,
+    keywords: tuple[str, ...],
+    limit: int,
+) -> None:
+    catalog = _phase16d_catalog()
+    original = catalog.datasheet_by_id("core-transport")
+    subject = replace(
+        original,
+        keywords=DatasheetKeywordSet(
+            keywords=("VEHICLE", "TRANSPORT", *keywords),
+            faction_keywords=original.keywords.faction_keywords,
+        ),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            subject if d.datasheet_id == subject.datasheet_id else d for d in catalog.datasheets
+        ),
+    )
+    for count in (limit, limit + 1):
+        squads = tuple(
+            _unit_selection(
+                unit_selection_id=f"squad-{i}",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            )
+            for i in range(count)
+        )
+        units = (
+            *squads,
+            _unit_selection(
+                unit_selection_id="leader",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        )
+        request = _muster_request(
+            catalog,
+            battle_size=battle_size,
+            unit_selections=units,
+            unit_points=tuple(
+                RosterUnitPointValue(
+                    unit_selection_id=u.unit_selection_id, points=10, source_id="order67:points"
+                )
+                for u in units
+            ),
+            warlord_selection=WarlordSelection(
+                unit_selection_id="leader", source_id="order67:warlord"
+            ),
+            dedicated_transport_manifests=tuple(
+                DedicatedTransportManifest(
+                    transport_unit_selection_id=u.unit_selection_id,
+                    embarked_unit_selection_ids=(),
+                    capacity_profile=_transport_capacity(max_model_count=6),
+                    source_id="order67:manifest",
+                )
+                for u in squads
+            )
+            if "DEDICATED TRANSPORT" in keywords
+            else (),
+            roster_legality_required=True,
+        )
+        report = validate_roster_legality(catalog=catalog, request=request)
+        if count == limit:
+            assert report.violations == ()
+            army = muster_army(catalog=catalog, request=request)
+            assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()
+        else:
+            assert {v.violation_code for v in report.violations} == {"unit_limit_exceeded"}
+            with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+                muster_army(catalog=catalog, request=request)
+
+
+@pytest.mark.parametrize(
+    ("costs", "legal"),
+    [
+        ((2,), True),
+        ((1, 1), True),
+        ((3,), True),
+        ((2, 1), False),
+        ((1, 1, 1), False),
+        ((3, 1), False),
+    ],
+)
+def test_order67_three_dp_is_only_a_single_detachment_exception(
+    costs: tuple[int, ...], legal: bool
+) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    detachments = tuple(
+        replace(
+            catalog.detachments[0],
+            detachment_id=f"order67-detachment-{i}",
+            detachment_point_cost=cost,
+        )
+        for i, cost in enumerate(costs)
+    )
+    catalog = replace(catalog, detachments=detachments)
+    selection = DetachmentSelection(
+        faction_id="core-marine-force", detachment_ids=tuple(d.detachment_id for d in detachments)
+    )
+    if legal:
+        assert len(
+            validate_detachment_selection(
+                catalog=catalog, selection=selection, battle_size=BattleSize.INCURSION
+            )[1]
+        ) == len(costs)
+    else:
+        with pytest.raises(ListValidationError, match="Detachment Points"):
+            validate_detachment_selection(
+                catalog=catalog, selection=selection, battle_size=BattleSize.INCURSION
+            )
+
+
+def _order67_upgrade_roster(
+    *, copies: int, ordinary_count: int = 1
+) -> tuple[ArmyCatalog, ArmyMusterRequest]:
+    catalog = _phase16d_catalog(upgrade_enhancement=True, second_enhancement=True)
+    squads = tuple(_unit_selection(unit_selection_id=f"squad-{i}") for i in range(copies))
+    leaders = tuple(
+        _unit_selection(
+            unit_selection_id=f"leader-{i}",
+            datasheet_id="core-character-leader",
+            model_profile_id="core-character-leader",
+            model_count=1,
+        )
+        for i in range(ordinary_count)
+    )
+    ordinary_ids = ("core-enhancement-a", "core-enhancement-b")[:ordinary_count]
+    assignments = tuple(
+        EnhancementAssignment(
+            enhancement_id="core-upgrade",
+            target_unit_selection_id=u.unit_selection_id,
+            source_id="order67:upgrade",
+        )
+        for u in squads
+    ) + tuple(
+        EnhancementAssignment(
+            enhancement_id=e,
+            target_unit_selection_id=u.unit_selection_id,
+            source_id="order67:enhancement",
+        )
+        for e, u in zip(ordinary_ids, leaders, strict=True)
+    )
+    total_enhancement_points = copies * 20 + sum((25, 30)[:ordinary_count])
+    units = (*squads, *leaders)
+    request = _muster_request(
+        catalog,
+        battle_size=BattleSize.INCURSION,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=("core-upgrade", *ordinary_ids),
+        ),
+        unit_selections=units,
+        enhancement_assignments=assignments,
+        unit_points=tuple(
+            RosterUnitPointValue(
+                unit_selection_id=u.unit_selection_id,
+                points=(1000 - total_enhancement_points - 100 * (len(units) - 1))
+                if i == 0
+                else 100,
+                source_id="order67:points",
+            )
+            for i, u in enumerate(units)
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leader-0", source_id="order67:warlord"
+        ),
+        roster_legality_required=True,
+    )
+    return catalog, request
+
+
+@pytest.mark.parametrize("copies", [1, 2, 3, 4])
+@pytest.mark.parametrize("ordinary_count", [1, 2])
+def test_order67_upgrade_copies_count_once_but_each_pays_points(
+    copies: int, ordinary_count: int
+) -> None:
+    catalog, request = _order67_upgrade_roster(copies=copies, ordinary_count=ordinary_count)
+    report = validate_roster_legality(catalog=catalog, request=request)
+    expected: set[str] = set()
+    if copies == 4:
+        expected.add("upgrade_assignment_limit_exceeded")
+    if ordinary_count == 2:
+        expected.add("enhancement_limit_exceeded")
+    assert {v.violation_code for v in report.violations} == expected
+    over_points = replace(
+        request,
+        unit_points=(
+            replace(request.unit_points[0], points=request.unit_points[0].points + 1),
+            *request.unit_points[1:],
+        ),
+    )
+    assert {
+        v.violation_code
+        for v in validate_roster_legality(catalog=catalog, request=over_points).violations
+    } == expected | {"points_limit_exceeded"}
+    if expected:
+        with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+            muster_army(catalog=catalog, request=request)
+    else:
+        restored_request = ArmyMusterRequest.from_payload(
+            json.loads(json.dumps(request.to_payload()))
+        )
+        army = muster_army(catalog=catalog, request=restored_request)
+        assert len(army.enhancement_assignments) == copies + ordinary_count
+        assert army.roster_legality_report.is_legal
+        assert (
+            ArmyDefinition.from_payload(json.loads(json.dumps(army.to_payload()))).to_payload()
+            == army.to_payload()
+        )
+
+
+def test_order67_incursion_roster_survives_facade_restore_and_rejects_over_limit() -> None:
+    catalog, request = _order67_upgrade_roster(copies=3)
+    config = GameConfig(
+        game_id="order67-incursion",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
+        army_catalog=catalog,
+        army_muster_requests=(request, replace(request, army_id="army-beta", player_id="player-b")),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
+    )
+    session = LocalGameSession()
+    session.start(config)
+    status = session.advance_until_decision_or_terminal()
+    assert status.decision_request is not None
+    state = session.lifecycle.state
+    assert state is not None
+    assert len(state.army_definitions) == 2
+    assert all(army.roster_legality_report.is_legal for army in state.army_definitions)
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    for viewer in config.player_ids:
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+    bad_catalog, bad_request = _order67_upgrade_roster(copies=3, ordinary_count=2)
+    bad_config = replace(
+        config,
+        army_catalog=bad_catalog,
+        army_muster_requests=(
+            bad_request,
+            replace(bad_request, army_id="army-beta", player_id="player-b"),
+        ),
+    )
+    rejected = LocalGameSession()
+    rejected.start(bad_config)
+    with pytest.raises(
+        (ArmyMusteringError, GameLifecycleError), match=r"RosterLegalityReport|muster|roster"
+    ):
+        rejected.advance_until_decision_or_terminal()
+
+
+def test_order67_reviewed_source_is_pinned_and_scope_is_accounting_only() -> None:
+    from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_mustering_limits_2026_09 as source,
+    )
+
+    rows = source.source_rules()
+    assert tuple(row.source_id for row in rows) == (
+        source.BATTLE_SIZE_SOURCE_ID,
+        source.DETACHMENT_SOURCE_ID,
+        source.UPGRADE_SOURCE_ID,
+    )
+    assert all(
+        row.load_support_status == "loaded"
+        and row.semantic_execution_status == "executable_engine_runtime"
+        for row in rows
+    )
+    assert (
+        source.source_package().source_catalog.package_id.package_name == source.SOURCE_PACKAGE_ID
+    )
+    assert len(source.source_evidence_records()) == 6
+    raw = package_artifact_bytes(source.__name__, "artifacts/package.json")
+    assert source.validate_source_artifact_bytes(raw).package_hash == source.PACKAGE_HASH
+    with pytest.raises(source.MusteringLimitsSourceError, match="reviewed pin"):
+        source.validate_source_artifact_bytes(raw + b" ")

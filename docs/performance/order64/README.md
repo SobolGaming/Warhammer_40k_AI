@@ -56,20 +56,19 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.775 / 3.961 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.822 / 3.891 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.806 / 3.881 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.890 / 4.024 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.872 / 3.957 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.817 / 3.886 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.701 / 3.754 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.794 / 3.900 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.848 / 3.949 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.865 / 3.977 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.854 / 3.969 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.865 / 4.054 |
 
-Order 65 refreshed the 42 head timings and six independent profile samples for
+Order 67 refreshed the 42 head timings and six independent profile samples for
 the current runtime build on 2026-09-20, retaining the qualified baseline and
 unchanged workload and budgets. Every reconstruction completed with exact
-reproduction and parent isolation. All six comparisons pass. The largest mean
-change is -0.80%; the largest maximum change is +0.95%. Total profiled calls
-increase by at most 0.031%, with all authentication and suffix counts preserved.
-These differences do not establish a speedup. See [Order 65 validation](../order65/README.md).
+reproduction and parent isolation. All six comparisons pass, with authentication
+and suffix counts preserved. These measurements do not establish a speedup.
+See [Order 67 validation](../order67/validation.json).
 
 At the measured checkpoint cost, ten sequential forks would consume about
 39 seconds. This is a linear estimate, not an observed planning workload;
@@ -86,7 +85,7 @@ Final correctness and publishing-gate outcomes are retained in `validation.json`
 The original Order 64 suite passed 8,467 behavioral tests at 85.12% coverage and all 545
 quality tests, including the live reconstruction work guards. Required lint,
 type, import, shard, generator, compatibility, client/conformance, wheel and
-pre-commit checks passed. No production code changed after that coverage run began. Current Order 65
+pre-commit checks passed. No production code changed after that coverage run began. Current Order 67
 validation is recorded separately.
 
 The Order 65 validation exposed suite-context-dependent cProfile call accounting

@@ -917,3 +917,9 @@ Shared eligibility, accepted cargo snapshots and persistent-effect expiry cover
 all adapters and replay. See [scope and evidence](docs/ORDER_65_SCOPE_PLAN.md),
 [contract 31 migration](contracts/migrations/30-to-31.md), and verify source data
 with `uv run python tools/build_core_firing_deck_source.py --check`.
+
+
+Order 67 enforces Incursion's 1,000 points, 2 DP, 2 Enhancements and 2/4-copy
+limits, preserving the single 3-DP detachment exception and paid Upgrade copies.
+See [scope and validation](docs/ORDER_67_SCOPE_PLAN.md). Reproduce source evidence
+with `uv run python tools/build_core_mustering_limits_source.py --check`.
