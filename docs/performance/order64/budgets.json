@@ -1,0 +1,35 @@
+{
+  "budget_id": "loaded-ingress-reconstruction-budgets-v1",
+  "workload_id": "loaded-ingress-reconstruction-v1",
+  "total_profiled_call_ratio": 1.25,
+  "timing_limits": {
+    "mean_ratio": 1.3,
+    "mean_additive_seconds": 0.05,
+    "maximum_ratio": 1.4,
+    "maximum_additive_seconds": 0.1
+  },
+  "work_limits": {
+    "ingress": {
+      "replay.py:run": 1,
+      "lifecycle.py:from_payload": 4,
+      "lifecycle.py:submit_decision": 1,
+      "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+      "ingress_placement_history.py:validate_ingress_history_origin": 4
+    },
+    "rapid_disembark": {
+      "replay.py:run": 1,
+      "lifecycle.py:from_payload": 4,
+      "lifecycle.py:submit_decision": 4,
+      "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+      "ingress_placement_history.py:validate_ingress_history_origin": 4
+    },
+    "later_decision": {
+      "replay.py:run": 1,
+      "lifecycle.py:from_payload": 4,
+      "lifecycle.py:submit_decision": 5,
+      "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+      "ingress_placement_history.py:validate_ingress_history_origin": 4
+    }
+  },
+  "rationale": "Require one authentication replay and one arrival solve per reconstruction; bound replayed decisions to the checkpoint suffix. Relative provisional timing limits allow measurement variability while guarding roughly four-second reconstructions. Forks per full game are not yet measured; full-game certification remains outstanding."
+}

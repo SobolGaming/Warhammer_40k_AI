@@ -1212,6 +1212,135 @@ def test_realm_of_chaos_config_backed_replay_binds_active_runtime_catalog() -> N
     assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
 
+@pytest.mark.parametrize("prior_arrival", [False, True])
+def test_order64_reposition_exemption_uses_replay_authenticated_departure(
+    prior_arrival: bool,
+) -> None:
+    from warhammer40k_core.engine.reserve_destruction import (
+        final_turn_cleanup_policy,
+        resolve_unarrived_reserve_destruction,
+    )
+    from warhammer40k_core.engine.reserve_lifetime_boundary import reserve_round_deadline_exempt_ids
+
+    lifecycle = _config_backed_realm_of_chaos_lifecycle(prior_declared_arrival=prior_arrival)
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    state = restored.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    reserve = state.reserve_states[0]
+    exemptions = reserve_round_deadline_exempt_ids(state)
+    assert reserve.unit_instance_id in exemptions
+    assert bool(state.phase_movement_history) is prior_arrival
+    for end, battle_round, policy in (
+        (False, 3, ReserveDestructionTimingPolicy.core_rules_default()),
+        (True, 5, final_turn_cleanup_policy()),
+    ):
+        result = resolve_unarrived_reserve_destruction(
+            reserve_states=tuple(state.reserve_states),
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+            policy=policy,
+            battle_round=battle_round,
+            end_of_battle=end,
+            exempt_unit_instance_ids=exemptions,
+        )
+        assert (reserve.unit_instance_id in result.destroyed_unit_instance_ids) is end
+
+
+@pytest.mark.parametrize("action", ["advance", "fall_back"])
+def test_order64_reposition_retains_movement_history_and_unexpired_effects(action: str) -> None:
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary, PersistingEffect
+    from warhammer40k_core.engine.phases.movement import (
+        AdvancedUnitState,
+        AdvanceRollRequest,
+        AdvanceRollResult,
+        FellBackUnitState,
+        MovementDiceRecord,
+    )
+
+    state, _reserve, _unit = _daemonic_incursion_reserve_state()
+    if action == "advance":
+        request = AdvanceRollRequest.for_unit(
+            request_id="order64:advance",
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            player_id="player-a",
+            unit_instance_id=_ANCHOR_UNIT_ID,
+        )
+        roll = DiceRollManager(state.game_id).roll_fixed(request.spec, [3])
+        state.record_advanced_unit_state(
+            AdvancedUnitState(
+                player_id="player-a",
+                battle_round=state.battle_round,
+                unit_instance_id=_ANCHOR_UNIT_ID,
+                movement_dice_record=MovementDiceRecord(
+                    player_id="player-a",
+                    battle_round=state.battle_round,
+                    unit_instance_id=_ANCHOR_UNIT_ID,
+                    movement_phase_action=MovementPhaseActionKind.ADVANCE,
+                    advance_roll=AdvanceRollResult.from_roll_state(
+                        request=request, roll_state=roll
+                    ),
+                ),
+            )
+        )
+    else:
+        state.record_fell_back_unit_state(
+            FellBackUnitState(
+                player_id="player-a",
+                battle_round=state.battle_round,
+                unit_instance_id=_ANCHOR_UNIT_ID,
+            )
+        )
+    effect = PersistingEffect(
+        effect_id="order64:retained-duration",
+        source_rule_id="test:duration-fixture",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(_ANCHOR_UNIT_ID,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_turn(battle_round=state.battle_round, player_id="player-a"),
+        effect_payload={"kind": "test-duration"},
+    )
+    state.record_persisting_effect(effect)
+    before = state.to_payload()
+    definition = _daemonic_stratagem_definition_by_effect_selection_kind(
+        daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID,
+        effect_selection_kind=None,
+    )
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=DecisionController(),
+        definition=definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=_ANCHOR_UNIT_ID,
+            phase=BattlePhase.MOVEMENT,
+        ),
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.MOVEMENT,
+            trigger_kind=TimingTriggerKind.END_TURN,
+        ),
+    )
+    restored = GameState.from_payload(state.to_payload())
+    after = restored.to_payload()
+    for field in (
+        "advanced_unit_states",
+        "fell_back_unit_states",
+        "disembarked_unit_states",
+        "persisting_effects",
+    ):
+        assert after[field] == before[field]
+    restored.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.turn_end(
+            battle_round=state.battle_round,
+            player_id="player-a",
+        )
+    )
+    assert effect not in restored.persisting_effects
+
+
 def test_realm_of_chaos_replay_requires_active_runtime_catalog() -> None:
     lifecycle = _config_backed_realm_of_chaos_lifecycle()
     payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
@@ -2752,6 +2881,7 @@ def test_warp_rifts_shadow_allows_deep_strike_more_than_six_from_enemy() -> None
     target_pose = Pose.at(x=16.0, y=4.25, z=0.0, facing_degrees=0.0)
     _place_enemy_at_base_distance(state=state, target_pose=target_pose, distance_inches=7.0)
 
+    state.battle_round = 2
     status = _submit_deep_strike_arrival(
         state=state,
         reserve_state=reserve_state,
@@ -2820,6 +2950,7 @@ def test_warp_rifts_matching_greater_daemon_anchor_allows_deep_strike_outside_sh
         distance_inches=4.0,
     )
 
+    state.battle_round = 2
     status = _submit_deep_strike_arrival(
         state=state,
         reserve_state=reserve_state,
@@ -4331,7 +4462,7 @@ def _submit_deep_strike_arrival(
         reserve_unit=reserve_unit,
         target_pose=target_pose,
         placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
-        battle_round=1,
+        battle_round=2,
         result_id=result_id,
     )
 

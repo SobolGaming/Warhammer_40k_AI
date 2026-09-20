@@ -9,21 +9,16 @@ from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     MissionPolicyDescriptor,
-    ReserveDestructionTimingKind,
     RulesetDescriptor,
-    reserve_destruction_timing_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
-    BattlefieldRemovalKind,
     BattlefieldRuntimeState,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     ModelPlacementRecord,
-    ModelRemovalRecord,
     UnitPlacement,
     battlefield_placement_kind_from_token,
     geometry_model_for_placement,
@@ -33,11 +28,17 @@ from warhammer40k_core.engine.endpoint_placement import (
     terrain_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.reserve_destruction import (
+    ReserveDestructionTimingPolicy as ReserveDestructionTimingPolicy,
+)
+from warhammer40k_core.engine.reserve_destruction import (
+    resolve_unarrived_reserve_destruction as resolve_unarrived_reserve_destruction,
+)
 from warhammer40k_core.engine.rules_unit_placement import (
     RulesUnitPlacement,
     RulesUnitPlacementPayload,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
@@ -156,6 +157,7 @@ class ReserveStatePayload(TypedDict):
     arrived_battle_round: int | None
     arrived_phase: str | None
     destroyed_battle_round: int | None
+    destroyed_at_end_of_battle: bool
     large_model_exception_used: bool
     post_arrival_restrictions: list[str]
     restriction_battle_round: int | None
@@ -244,162 +246,6 @@ class ReserveDestructionResultPayload(TypedDict):
 
 
 @dataclass(frozen=True, slots=True)
-class ReserveDestructionTimingPolicy:
-    timing_kind: ReserveDestructionTimingKind
-    battle_round: int | None = None
-    exclude_during_battle_strategic_reserves: bool = False
-    only_declare_battle_formations: bool = False
-    source_id: str = "core_rules_reserve_destruction"
-
-    def __post_init__(self) -> None:
-        timing = reserve_destruction_timing_kind_from_token(self.timing_kind)
-        object.__setattr__(self, "timing_kind", timing)
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_optional_positive_int(
-                "ReserveDestructionTimingPolicy battle_round",
-                self.battle_round,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "exclude_during_battle_strategic_reserves",
-            _validate_bool(
-                "ReserveDestructionTimingPolicy exclude_during_battle_strategic_reserves",
-                self.exclude_during_battle_strategic_reserves,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "only_declare_battle_formations",
-            _validate_bool(
-                "ReserveDestructionTimingPolicy only_declare_battle_formations",
-                self.only_declare_battle_formations,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("ReserveDestructionTimingPolicy source_id", self.source_id),
-        )
-        if timing is ReserveDestructionTimingKind.END_OF_BATTLE and self.battle_round is not None:
-            raise GameLifecycleError("END_OF_BATTLE reserve destruction must not set battle_round.")
-        if (
-            timing is ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N
-            and self.battle_round is None
-        ):
-            raise GameLifecycleError(
-                "END_OF_BATTLE_ROUND_N reserve destruction requires battle_round."
-            )
-
-    @classmethod
-    def core_rules_default(cls) -> Self:
-        return cls(
-            timing_kind=ReserveDestructionTimingKind.END_OF_BATTLE,
-            battle_round=None,
-            exclude_during_battle_strategic_reserves=False,
-            only_declare_battle_formations=False,
-            source_id=(
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
-                "20.01.02-strategic-reserves"
-            ),
-        )
-
-    @classmethod
-    def chapter_approved_2026_27(cls) -> Self:
-        return cls(
-            timing_kind=ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N,
-            battle_round=3,
-            exclude_during_battle_strategic_reserves=True,
-            only_declare_battle_formations=True,
-            source_id="chapter_approved_2026_27_reserves_restrictions",
-        )
-
-    @classmethod
-    def from_mission_policy(cls, mission_policy: MissionPolicyDescriptor) -> Self:
-        if type(mission_policy) is not MissionPolicyDescriptor:
-            raise GameLifecycleError(
-                "ReserveDestructionTimingPolicy requires a MissionPolicyDescriptor."
-            )
-        source_id = (
-            "chapter_approved_2026_27_reserves_restrictions"
-            if (
-                mission_policy.reserve_destruction_timing
-                is ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N
-            )
-            else (
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
-                "20.01.02-strategic-reserves"
-            )
-        )
-        return cls(
-            timing_kind=mission_policy.reserve_destruction_timing,
-            battle_round=mission_policy.reserve_destruction_battle_round,
-            exclude_during_battle_strategic_reserves=(
-                mission_policy.reserve_destruction_excludes_during_battle_strategic_reserves
-            ),
-            only_declare_battle_formations=(
-                mission_policy.reserve_destruction_only_declare_battle_formations
-            ),
-            source_id=source_id,
-        )
-
-    def applies_at(self, *, battle_round: int, end_of_battle: bool) -> bool:
-        requested_round = _validate_positive_int("battle_round", battle_round)
-        if self.timing_kind is ReserveDestructionTimingKind.END_OF_BATTLE:
-            return _validate_bool("end_of_battle", end_of_battle)
-        return (
-            not _validate_bool("end_of_battle", end_of_battle)
-            and self.battle_round == requested_round
-        )
-
-    def applies_to_reserve_state(self, reserve_state: ReserveState) -> bool:
-        if type(reserve_state) is not ReserveState:
-            raise GameLifecycleError("reserve_state must be a ReserveState.")
-        if reserve_state.status is not ReserveStatus.IN_RESERVES:
-            return False
-        if (
-            self.exclude_during_battle_strategic_reserves
-            and reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
-            and reserve_state.reserve_origin
-            in {
-                ReserveOrigin.DURING_BATTLE_ABILITY,
-                ReserveOrigin.DURING_BATTLE_STRATAGEM,
-                ReserveOrigin.DURING_BATTLE_OTHER,
-            }
-        ):
-            return False
-        return not (
-            self.only_declare_battle_formations
-            and reserve_state.reserve_origin is not ReserveOrigin.DECLARE_BATTLE_FORMATIONS
-        )
-
-    def to_payload(self) -> ReserveDestructionTimingPolicyPayload:
-        return {
-            "timing_kind": self.timing_kind.value,
-            "battle_round": self.battle_round,
-            "exclude_during_battle_strategic_reserves": (
-                self.exclude_during_battle_strategic_reserves
-            ),
-            "only_declare_battle_formations": self.only_declare_battle_formations,
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ReserveDestructionTimingPolicyPayload) -> Self:
-        return cls(
-            timing_kind=reserve_destruction_timing_kind_from_token(payload["timing_kind"]),
-            battle_round=payload["battle_round"],
-            exclude_during_battle_strategic_reserves=payload[
-                "exclude_during_battle_strategic_reserves"
-            ],
-            only_declare_battle_formations=payload["only_declare_battle_formations"],
-            source_id=payload["source_id"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class ReserveState:
     player_id: str
     unit_instance_id: str
@@ -420,6 +266,7 @@ class ReserveState:
     arrived_battle_round: int | None = None
     arrived_phase: str | None = None
     destroyed_battle_round: int | None = None
+    destroyed_at_end_of_battle: bool = False
     large_model_exception_used: bool = False
     post_arrival_restrictions: tuple[ReservePostArrivalRestriction, ...] = ()
     restriction_battle_round: int | None = None
@@ -706,11 +553,12 @@ class ReserveState:
             restriction_battle_round=(requested_round if restrictions else None),
         )
 
-    def mark_destroyed(self, *, battle_round: int) -> Self:
+    def mark_destroyed(self, *, battle_round: int, end_of_battle: bool = False) -> Self:
         return replace(
             self,
             status=ReserveStatus.DESTROYED,
             destroyed_battle_round=_validate_positive_int("battle_round", battle_round),
+            destroyed_at_end_of_battle=end_of_battle,
             post_arrival_restrictions=(),
             restriction_battle_round=None,
         )
@@ -761,6 +609,7 @@ class ReserveState:
             "arrived_battle_round": self.arrived_battle_round,
             "arrived_phase": self.arrived_phase,
             "destroyed_battle_round": self.destroyed_battle_round,
+            "destroyed_at_end_of_battle": self.destroyed_at_end_of_battle,
             "large_model_exception_used": self.large_model_exception_used,
             "post_arrival_restrictions": [
                 restriction.value for restriction in self.post_arrival_restrictions
@@ -792,6 +641,7 @@ class ReserveState:
             arrived_battle_round=payload["arrived_battle_round"],
             arrived_phase=payload["arrived_phase"],
             destroyed_battle_round=payload["destroyed_battle_round"],
+            destroyed_at_end_of_battle=payload["destroyed_at_end_of_battle"],
             large_model_exception_used=payload["large_model_exception_used"],
             post_arrival_restrictions=tuple(
                 reserve_post_arrival_restriction_from_token(restriction)
@@ -1718,84 +1568,6 @@ def apply_reinforcement_placement_to_battlefield(
     return placement.candidate.attempted_rules_unit_placement.add_to_battlefield(battlefield_state)
 
 
-def resolve_unarrived_reserve_destruction(
-    *,
-    reserve_states: tuple[ReserveState, ...],
-    armies: tuple[ArmyDefinition, ...],
-    battlefield_state: BattlefieldRuntimeState,
-    policy: ReserveDestructionTimingPolicy,
-    battle_round: int,
-    end_of_battle: bool,
-) -> ReserveDestructionResult:
-    states = _validate_reserve_state_tuple("reserve_states", reserve_states)
-    if type(battlefield_state) is not BattlefieldRuntimeState:
-        raise GameLifecycleError("battlefield_state must be a BattlefieldRuntimeState.")
-    if type(policy) is not ReserveDestructionTimingPolicy:
-        raise GameLifecycleError("policy must be a ReserveDestructionTimingPolicy.")
-    requested_round = _validate_positive_int("battle_round", battle_round)
-    end = _validate_bool("end_of_battle", end_of_battle)
-    if not policy.applies_at(battle_round=requested_round, end_of_battle=end):
-        return ReserveDestructionResult(
-            policy=policy,
-            battle_round=requested_round,
-            end_of_battle=end,
-            destroyed_unit_instance_ids=(),
-            destroyed_model_instance_ids=(),
-            transition_batch=BattlefieldTransitionBatch(),
-            updated_reserve_states=states,
-        )
-
-    army_tuple = _validate_army_tuple("armies", armies)
-    unit_by_id = _unit_by_id(army_tuple)
-    destroyed_unit_ids: set[str] = set()
-    destroyed_model_ids: set[str] = set()
-    updated_states: list[ReserveState] = []
-    for reserve_state in states:
-        if not policy.applies_to_reserve_state(reserve_state):
-            updated_states.append(reserve_state)
-            continue
-        try:
-            reserve_view = rules_unit_view_from_armies(
-                armies=army_tuple,
-                unit_instance_id=reserve_state.unit_instance_id,
-            )
-        except GameLifecycleError as exc:
-            raise GameLifecycleError("ReserveState references an unknown unit.") from exc
-        destroyed_unit_ids.add(reserve_view.unit_instance_id)
-        destroyed_model_ids.update(model.model_instance_id for model in reserve_view.own_models)
-        for unit_id in reserve_state.embarked_unit_instance_ids:
-            unit = unit_by_id.get(unit_id)
-            if unit is None:
-                raise GameLifecycleError("ReserveState references an unknown unit.")
-            destroyed_unit_ids.add(unit_id)
-            destroyed_model_ids.update(model.model_instance_id for model in unit.own_models)
-        updated_states.append(reserve_state.mark_destroyed(battle_round=requested_round))
-
-    transition_batch = BattlefieldTransitionBatch(
-        removals=tuple(
-            ModelRemovalRecord(
-                model_instance_id=model_id,
-                removal_kind=BattlefieldRemovalKind.DESTROYED,
-                source_phase=None,
-                source_step=None,
-                source_rule_id=policy.source_id,
-                source_event_id=None,
-                destination_id=None,
-            )
-            for model_id in sorted(destroyed_model_ids)
-        )
-    )
-    return ReserveDestructionResult(
-        policy=policy,
-        battle_round=requested_round,
-        end_of_battle=end,
-        destroyed_unit_instance_ids=tuple(sorted(destroyed_unit_ids)),
-        destroyed_model_instance_ids=tuple(sorted(destroyed_model_ids)),
-        transition_batch=transition_batch,
-        updated_reserve_states=tuple(updated_states),
-    )
-
-
 def apply_reserve_destruction_to_battlefield(
     *,
     battlefield_state: BattlefieldRuntimeState,
@@ -2386,10 +2158,6 @@ def _model_owner_player_id(*, scenario: BattlefieldScenario, model_instance_id: 
     raise GameLifecycleError("model_instance_id is not placed.")
 
 
-def _unit_by_id(armies: tuple[ArmyDefinition, ...]) -> dict[str, UnitInstance]:
-    return {unit.unit_instance_id: unit for army in armies for unit in army.units}
-
-
 def _unit_has_deep_strike(unit: UnitInstance) -> bool:
     return unit_has_deep_strike(unit)
 
@@ -2418,17 +2186,6 @@ def _validate_reserve_state_tuple(field_name: str, values: object) -> tuple[Rese
         seen.add(value.unit_instance_id)
         states.append(value)
     return tuple(sorted(states, key=lambda state: state.unit_instance_id))
-
-
-def _validate_army_tuple(field_name: str, values: object) -> tuple[ArmyDefinition, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    armies: list[ArmyDefinition] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not ArmyDefinition:
-            raise GameLifecycleError(f"{field_name} must contain ArmyDefinition values.")
-        armies.append(value)
-    return tuple(sorted(armies, key=lambda army: army.army_id))
 
 
 def _validate_post_arrival_restriction_tuple(

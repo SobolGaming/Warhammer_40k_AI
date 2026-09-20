@@ -47,7 +47,7 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
         assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
     # Fixed legal result identities exercise an original critical wound in each
     # phase without replacing RNG or the engine's decision controller.
-    first_result_id = "order56:first-choice-2"
+    first_result_id = "order56:first-choice-2-order64-2"
     for current in (session, restored):
         current.submit_option(
             request_id=request.request_id, result_id=first_result_id, option_id=choice

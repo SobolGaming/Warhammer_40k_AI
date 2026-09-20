@@ -134,9 +134,9 @@ def legal_rules_unit_pile_in_target_unit_ids(
     unit_instance_id: str,
     state: GameState,
 ) -> tuple[str, ...]:
-    from warhammer40k_core.engine.phase_movement_history import surge_locked
+    from warhammer40k_core.engine.movement_locks import movement_lock_reason
 
-    if surge_locked(state, unit_instance_id):
+    if movement_lock_reason(state, unit_instance_id) is not None:
         return ()
     return _legal_pile_in_target_rules_unit_ids(
         scenario=scenario,
@@ -154,9 +154,9 @@ def legal_rules_unit_consolidation_modes(
     objective_markers: tuple[ObjectiveMarker, ...],
     state: GameState,
 ) -> tuple[ConsolidationModeKind, ...]:
-    from warhammer40k_core.engine.phase_movement_history import surge_locked
+    from warhammer40k_core.engine.movement_locks import movement_lock_reason
 
-    if surge_locked(state, unit_instance_id):
+    if movement_lock_reason(state, unit_instance_id) is not None:
         return ()
     return _legal_consolidation_modes(
         scenario=scenario,

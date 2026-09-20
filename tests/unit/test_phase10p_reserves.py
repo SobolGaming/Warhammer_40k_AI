@@ -1193,6 +1193,7 @@ def test_rapid_ingress_arrival_uses_authenticated_stratagem_history() -> None:
 
 def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() -> None:
     state, _scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
+    state.battle_round = 2
     deep_strike_unit = with_unit_keywords(
         reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE")
     )
@@ -1203,7 +1204,7 @@ def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() ->
     state.replace_reserve_state(deep_strike_state)
     handler, decisions, selection_request = _enter_reinforcements_choice(
         state=state,
-        battle_round=1,
+        battle_round=2,
     )
     placement_status = _submit_handler_decision(
         handler=handler,
@@ -1880,9 +1881,11 @@ def test_rapid_ingress_restriction_expiry_uses_arrival_active_player_turn() -> N
     )
 
 
-def test_core_policy_destroys_unarrived_reserves_only_at_end_of_battle() -> None:
+def test_final_turn_cleanup_policy_destroys_unarrived_reserves_only_at_end_of_battle() -> None:
+    from warhammer40k_core.engine.reserve_destruction import final_turn_cleanup_policy
+
     _state, scenario, reserve_state, _reserve_unit = _battle_state_with_reserve()
-    policy = ReserveDestructionTimingPolicy.from_mission_policy(_ruleset().mission_policy)
+    policy = final_turn_cleanup_policy()
 
     round_three = resolve_unarrived_reserve_destruction(
         reserve_states=(reserve_state,),
@@ -1903,9 +1906,7 @@ def test_core_policy_destroys_unarrived_reserves_only_at_end_of_battle() -> None
 
     assert round_three.destroyed_unit_instance_ids == ()
     assert end_battle.destroyed_unit_instance_ids == (reserve_state.unit_instance_id,)
-    assert policy.source_id == (
-        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves"
-    )
+    assert policy.source_id == ("gw-11e-core-reserve-lifetimes:final-turn-cleanup")
 
 
 def test_chapter_approved_policy_destroys_declare_battle_formation_reserves_at_br3() -> None:
@@ -2493,7 +2494,7 @@ def test_chapter_approved_during_battle_strategic_reserves_arrival_exemption_is_
     assert ReservePlacementViolationCode.STRATEGIC_RESERVES_BATTLE_ROUND_1 in codes
 
 
-def test_core_rules_deep_strike_has_no_mission_pack_battle_round_1_block() -> None:
+def test_core_rules_deep_strike_uses_core_battle_round_1_block() -> None:
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
     deep_strike_unit = with_unit_keywords(
         reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE")
@@ -2514,10 +2515,10 @@ def test_core_rules_deep_strike_has_no_mission_pack_battle_round_1_block() -> No
         placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
     )
 
-    assert ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN not in set(
+    assert ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN in set(
         _violation_codes(result)
     )
-    assert result.is_valid
+    assert not result.is_valid
 
 
 def test_reserve_arrival_preserves_carrier_cargo_ownership() -> None:
@@ -2572,12 +2573,14 @@ def test_replay_load_rejects_arrived_reserve_with_unaccounted_embarked_units() -
 
 
 def test_phase10p_reserve_destruction_application_marks_unplaced_models_removed() -> None:
+    from warhammer40k_core.engine.reserve_destruction import final_turn_cleanup_policy
+
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
     result = resolve_unarrived_reserve_destruction(
         reserve_states=(reserve_state,),
         armies=scenario.armies,
         battlefield_state=scenario.battlefield_state,
-        policy=ReserveDestructionTimingPolicy.core_rules_default(),
+        policy=final_turn_cleanup_policy(),
         battle_round=5,
         end_of_battle=True,
     )
@@ -2592,7 +2595,7 @@ def test_phase10p_reserve_destruction_application_marks_unplaced_models_removed(
             reserve_states=(reserve_state,),
             armies=scenario.armies,
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=3,
             end_of_battle=False,
         ),
@@ -2817,6 +2820,8 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
 
 
 def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
+    from warhammer40k_core.engine.reserve_destruction import final_turn_cleanup_policy
+
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
     placement = _single_model_reserve_placement(
         reserve_unit=reserve_unit,
@@ -2830,7 +2835,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
         reserve_states=(reserve_state,),
         armies=scenario.armies,
         battlefield_state=scenario.battlefield_state,
-        policy=ReserveDestructionTimingPolicy.core_rules_default(),
+        policy=final_turn_cleanup_policy(),
         battle_round=5,
         end_of_battle=True,
     )
@@ -2988,7 +2993,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=cast(tuple[ReserveState, ...], [reserve_state]),
             armies=scenario.armies,
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )
@@ -2997,7 +3002,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=cast(tuple[ReserveState, ...], (object(),)),
             armies=scenario.armies,
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )
@@ -3006,7 +3011,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=(reserve_state, reserve_state),
             armies=scenario.armies,
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )
@@ -3015,7 +3020,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=(reserve_state,),
             armies=scenario.armies,
             battlefield_state=cast(BattlefieldRuntimeState, object()),
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )
@@ -3033,7 +3038,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=(reserve_state,),
             armies=cast(tuple[ArmyDefinition, ...], [scenario.armies[0]]),
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )
@@ -3042,7 +3047,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=(reserve_state,),
             armies=cast(tuple[ArmyDefinition, ...], (object(),)),
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )
@@ -3051,7 +3056,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             reserve_states=(replace(reserve_state, unit_instance_id="army-alpha:missing-unit"),),
             armies=scenario.armies,
             battlefield_state=scenario.battlefield_state,
-            policy=ReserveDestructionTimingPolicy.core_rules_default(),
+            policy=final_turn_cleanup_policy(),
             battle_round=5,
             end_of_battle=True,
         )

@@ -17,6 +17,7 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
 )
+from warhammer40k_core.engine.reserve_destruction import destruction_policy_for_terminal_state
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     model_restoration_events_for_event_log_interval,
@@ -196,7 +197,7 @@ def _validated_reserve_deadline_transition_rows(
             raise GameLifecycleError("Reserve-deadline Primary destruction source drift.")
         candidates: list[ReserveState] = []
         for reserve_state in state.reserve_states:
-            policy = reserve_state.destruction_deadline_policy
+            policy = destruction_policy_for_terminal_state(reserve_state)
             boundary_kind = (
                 "end-of-battle"
                 if policy.timing_kind is ReserveDestructionTimingKind.END_OF_BATTLE

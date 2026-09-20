@@ -82,7 +82,7 @@ def test_rules_overlay_identity_participates_in_descriptor_hash_and_serializatio
 
     assert base.rules_overlay_ids == ()
     assert (
-        base.descriptor_hash == "6a0c441b9151f7e7f3a74b9024a42522f5683bef5fda1ca7f62d3d1e83fa8961"
+        base.descriptor_hash == "f1862a7da1e38e7cf5c68505b69d4ccd990a52cbd4b17145d0913730994fe83f"
     )
     assert tacoma.rules_overlay_ids == (tacoma_open_2026.RULES_OVERLAY_ID,)
     assert tacoma.descriptor_hash != base.descriptor_hash

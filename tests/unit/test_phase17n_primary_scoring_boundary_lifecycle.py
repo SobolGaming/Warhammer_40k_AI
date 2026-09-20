@@ -786,6 +786,7 @@ def test_restore_rejects_coordinated_return_setup_history_tampering(
                 "unit_instance_id": target.unit_instance_id,
                 "model_instance_ids": [original_placement.model_placements[0].model_instance_id],
                 "is_surge": False,
+                "is_ingress": False,
                 "setup_kind": "return_to_battlefield",
             }
         )

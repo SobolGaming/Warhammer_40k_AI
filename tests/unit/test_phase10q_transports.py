@@ -3542,6 +3542,7 @@ def test_order38_candidate_grant_and_movement_matrix(
                     sorted(model.model_instance_id for model in transport.own_models)
                 ),
                 is_surge=False,
+                is_ingress=True,
                 setup_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
             )
         )
@@ -6039,6 +6040,7 @@ def test_embark_after_disembark_needs_explicit_override() -> None:
                 sorted(model.model_instance_id for model in passenger.own_models)
             ),
             is_surge=False,
+            is_ingress=False,
             setup_kind=BattlefieldPlacementKind.DISEMBARK,
         ),
     )
@@ -10492,6 +10494,7 @@ def test_order61_attached_setup_history_uses_physical_identity(selected_componen
             unit_instance_id="historical-rules-unit",
             model_instance_ids=(leader.own_models[0].model_instance_id,),
             is_surge=False,
+            is_ingress=False,
             setup_kind=BattlefieldPlacementKind.DISEMBARK,
         ),
     )

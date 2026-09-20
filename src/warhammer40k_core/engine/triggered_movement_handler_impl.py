@@ -89,7 +89,6 @@ def request_from_state(
     from warhammer40k_core.engine.surge_authority import require_surge_trigger
     from warhammer40k_core.engine.surge_movement import (
         closest_surge_targets,
-        movement_lock_reason,
         surge_ineligibility,
     )
 
@@ -99,6 +98,8 @@ def request_from_state(
         )
         if reason is not None:
             raise GameLifecycleError(reason)
+    from warhammer40k_core.engine.movement_locks import movement_lock_reason
+
     lock = movement_lock_reason(state, unit_instance_id)
     if lock is not None:
         raise GameLifecycleError(lock)

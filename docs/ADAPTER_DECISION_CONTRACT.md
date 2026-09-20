@@ -6333,3 +6333,30 @@ placements even after the source effect or turn expires. A missing, malformed or
 altered origin or derived policy fails closed. Ingress movement status uses the
 actual turn's phase movement history. No new decision family or proposal kind
 is introduced. See [migration 28 to 29](../contracts/migrations/28-to-29.md).
+
+## Order 64: reserve and ingress lifetimes (contract 30)
+
+Core ingress starts in round two. The source-bound mission policy may override
+arrival/deadline rules. Round-three cleanup excludes previously ingressed rules
+units and genuinely repositioned units; cargo follows the carrier reserve route.
+Final-turn cleanup applies separately to all remaining reserves and creates no
+model-destroyed reaction window.
+
+No new player choice, finite family or proposal kind is introduced. Existing
+movement and placement submissions remain authoritative. The shared
+`ingress_movement_locked_until_next_charge` diagnostic rejects another movement
+type before the next Charge phase begins, including reactive movement. An invalid
+locked proposal does not pop its pending choice or mutate authoritative state.
+The lifetime uses the actual turn and phase, not the temporary reactive actor.
+Cargo retains independent Disembark eligibility and placement validation.
+
+Required operator history fields are `PhaseMovementRecord.is_ingress` and
+`ReserveState.destroyed_at_end_of_battle`. Accepted completion evidence authenticates
+the ingress classification. Destruction evidence binds the terminal boundary to
+its source; declaration/departure policy identity is retained. Existing shared
+redaction owns all viewer-scoped projection and event behavior. Repositioning does
+not reset Advance/Fall Back/Disembark history or effect duration; spatial effects
+are reevaluated against current presence and geometry.
+
+See [migration 29 to 30](../contracts/migrations/29-to-30.md) and the dedicated
+[reconstruction performance guard](performance/order64/README.md).

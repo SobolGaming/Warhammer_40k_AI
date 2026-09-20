@@ -210,7 +210,7 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v23-ingress-placement-history"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v24-reserve-lifetimes"
 
 
 def test_replay_v8_round_trips_objective_control_record_boundary_authority() -> None:
@@ -1029,6 +1029,7 @@ def test_replay_v6_rejects_attributed_destruction_relabelled_with_forged_deadlin
             "arrived_battle_round": None,
             "arrived_phase": None,
             "destroyed_battle_round": 1,
+            "destroyed_at_end_of_battle": False,
             "large_model_exception_used": False,
             "post_arrival_restrictions": [],
             "restriction_battle_round": None,

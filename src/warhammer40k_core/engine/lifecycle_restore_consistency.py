@@ -84,6 +84,9 @@ def validate_payload_consistency(
         state=state, event_records=event_records, decision_records=decision_records
     )
     _rsi.validate_reserve_state_consistency(state=state)
+    from warhammer40k_core.engine.reserve_lifetime_boundary import validate_final_turn_destruction
+
+    validate_final_turn_destruction(state)
     _tsi.validate_transport_cargo_state_consistency(state=state)
     validate_prebattle_alternation_restore(
         state=state,

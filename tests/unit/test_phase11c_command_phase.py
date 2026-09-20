@@ -9024,6 +9024,43 @@ def test_authenticated_reposition_rejects_cross_turn_disembark_history_and_prese
     assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
 
+def test_order64_reposition_preserves_disembark_and_battle_shock_lifetimes() -> None:
+    state, decisions, registry, request, unit, transport = _gate_of_infinity_pending_decision()
+    # Canonical typed history at the departure boundary. Both effects belong to
+    # the current opponent turn; removing the unit must not expire either one.
+    disembarked = DisembarkedUnitState.for_destroyed_transport(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        turn_player_id="player-b",
+        unit_instance_id=unit.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.DESTROYED_TRANSPORT,
+    )
+    state.record_disembarked_unit_state(disembarked)
+    shocked = BattleShockedUnitState(
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        model_instance_ids=unit.own_model_ids(),
+        source_result_id="order64:prior-failed-battle-shock",
+        battle_round_started=state.battle_round,
+    )
+    state.replace_battle_shock_state(([unit.unit_instance_id], [shocked]))
+    result, _provider = _accept_gate_of_infinity_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        unit=unit,
+        result_id="order64:preserve-disembark-and-shock",
+    )
+    assert registry.apply_result(
+        TurnEndResultContext(state=state, decisions=decisions, request=request, result=result)
+    )
+    restored = GameState.from_payload(_game_state_payload_copy(state))
+    assert restored.disembarked_unit_states == [disembarked]
+    assert restored.battle_shocked_unit_states == [shocked]
+    assert restored.battle_shocked_unit_ids == [unit.unit_instance_id]
+
+
 def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
     state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
     unit_id = unit.unit_instance_id

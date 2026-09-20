@@ -189,7 +189,6 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_unit_destructions_for_destroyed_models,
 )
 from warhammer40k_core.engine.reserves import (
-    ReserveDestructionTimingPolicy,
     ReserveOrigin,
     ReserveStatus,
     apply_reserve_destruction_to_battlefield,
@@ -2160,12 +2159,12 @@ def test_phase17n_real_destroy_restore_hunters_entry_orders_before_deadline_time
         ).to_payload()
         == actual_payload
     )
-    # No supported source-backed matched-play pack destroys this during-battle
-    # Strategic Reserves entry: Chapter Approved explicitly excludes it.  The
-    # deadline policy below is test-only and drives only the generic chronology
-    # validator after the entire destroy/restore/provider-entry chain above was real.
-    core_policy = ReserveDestructionTimingPolicy.core_rules_default()
-    state.replace_reserve_state(replace(reserve_state, destruction_deadline_policy=core_policy))
+    # The round-three repositioning exemption does not survive Core final-turn
+    # cleanup. Keep the original declaration policy while authenticating the
+    # independent final boundary after the real destroy/restore/provider chain.
+    from warhammer40k_core.engine.reserve_destruction import final_turn_cleanup_policy
+
+    core_policy = final_turn_cleanup_policy()
     state.battle_round = 5
     state.record_primary_rules_unit_turn_start_snapshot(
         build_primary_rules_unit_turn_start_snapshot(state=state)

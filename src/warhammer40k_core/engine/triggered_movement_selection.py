@@ -139,7 +139,8 @@ def _eligible_units_after_normal_move_restriction(
     eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
 ) -> tuple[TriggeredMovementEligibleUnit, ...]:
     from warhammer40k_core.engine.large_model_restrictions import large_model_activity_reason
-    from warhammer40k_core.engine.surge_movement import movement_lock_reason, surge_ineligibility
+    from warhammer40k_core.engine.movement_locks import movement_lock_reason
+    from warhammer40k_core.engine.surge_movement import surge_ineligibility
 
     living_source_units = tuple(
         unit

@@ -1709,7 +1709,7 @@ def _eligible_fight_movement_unit_ids(
     step: FightPhaseStepKind,
     player_id: str,
 ) -> tuple[str, ...]:
-    from warhammer40k_core.engine.phase_movement_history import surge_locked
+    from warhammer40k_core.engine.movement_locks import movement_lock_reason
 
     scenario = _battlefield_scenario(state)
     rules_units = tuple(
@@ -1721,7 +1721,7 @@ def _eligible_fight_movement_unit_ids(
     eligible: list[str] = []
     for rules_unit in rules_units:
         unit_id = rules_unit.unit_instance_id
-        if surge_locked(state, unit_id):
+        if movement_lock_reason(state, unit_id) is not None:
             continue
         if step is FightPhaseStepKind.PILE_IN:
             if not charged_unit_ids.intersection(

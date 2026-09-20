@@ -1403,7 +1403,9 @@ def test_reserve_deadline_retires_current_transport_cargo_and_round_trips(
 
 
 def test_end_of_battle_reserve_destruction_retires_current_transport_cargo() -> None:
-    core_policy = ReserveDestructionTimingPolicy.core_rules_default()
+    from warhammer40k_core.engine.reserve_destruction import final_turn_cleanup_policy
+
+    core_policy = final_turn_cleanup_policy()
     lifecycle, _cargo_state, route_model_ids = _transport_reserve_deadline_lifecycle(
         destruction_deadline_policy=core_policy
     )
@@ -8171,7 +8173,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         initial_lifecycle_payload=terminal_payload,
         final_lifecycle=terminal_lifecycle,
     )
-    assert terminal_artifact.schema_version == "replay-artifact-v23-ingress-placement-history"
+    assert terminal_artifact.schema_version == "replay-artifact-v24-reserve-lifetimes"
     replay_snapshot = GameLifecycle.from_payload(terminal_artifact.initial_lifecycle_payload)
     replay_snapshot_state = replay_snapshot.state
     assert replay_snapshot_state is not None

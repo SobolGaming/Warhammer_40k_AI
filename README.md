@@ -899,5 +899,13 @@ embarked. Rapid Disembark inherits every model's Transport ingress placement
 restriction, including source-conditioned regions. Private pre-ingress replay
 roots authenticate save/restore; shared viewer redaction protects source evidence.
 See [scope and source evidence](docs/ORDER_63_SCOPE_PLAN.md) and
-[contract migration 28 to 29](contracts/migrations/28-to-29.md). Order 64 reserve
-lifetimes and defaults remain separate.
+[contract migration 28 to 29](contracts/migrations/28-to-29.md).
+
+Order 64 applies Core round-two arrival and round-three unarrived-reserve cleanup,
+with authenticated ingress/repositioning exemptions and independent final-turn
+cleanup. Shared movement checks enforce the next-Charge ingress lock. See
+[scope and proof](docs/ORDER_64_SCOPE_PLAN.md),
+[contract 30 migration](contracts/migrations/29-to-30.md), and the dedicated
+[restore/fork performance guard](docs/performance/order64/README.md).
+Verify the reviewed source with
+`uv run python tools/build_core_reserve_lifetimes_source.py --check`.

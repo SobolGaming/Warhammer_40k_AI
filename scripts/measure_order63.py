@@ -126,7 +126,7 @@ def _select_runtime_src(runtime_src: Path) -> None:
 
 
 def _host_inventory() -> tuple[str, int]:
-    if sys.platform == "win32":
+    if platform.system() == "Windows":
         cpu = subprocess.check_output(
             [
                 "powershell",
@@ -146,7 +146,7 @@ def _host_inventory() -> tuple[str, int]:
             text=True,
         ).strip()
         return cpu, int(memory)
-    if sys.platform == "darwin":
+    if platform.system() == "Darwin":
         return (
             subprocess.check_output(
                 ["sysctl", "-n", "machdep.cpu.brand_string"], text=True

@@ -475,18 +475,18 @@ def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -
     ("game_id", "attacker_datasheet_id", "choose_dark_pact", "expected_wound_roll"),
     [
         (
-            "order56-daemonforge-other-roll-8",
+            "order56-daemonforge-other-roll-8-order64-2",
             army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
             True,
             5,
         ),
         (
-            "order56-daemonforge-no-pact-8",
+            "order56-daemonforge-no-pact-8-order64-3",
             army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
             False,
             1,
         ),
-        ("order56-daemonforge-other-unit-12", "000004209", False, 1),
+        ("order56-daemonforge-other-unit-12-order64-20", "000004209", False, 1),
     ],
 )
 def test_defiler_daemonforge_does_not_offer_ineligible_wound_rerolls(
