@@ -132,4 +132,5 @@ five unit tests and 342 live conformance assertions passed. No production code
 changed after final behavioral validation. Machine-readable results and diagnostic
 history are retained in [validation.json](performance/order67/validation.json).
 
-PR URL and merge commit: pending publication; not merged.
+PR URL: https://github.com/SobolGaming/Warhammer_40k_AI/pull/487.
+Merge commit: pending; not merged.
