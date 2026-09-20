@@ -5,6 +5,9 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.aircraft_deployment import (
+    apply_mandatory_aircraft_reserve_declarations as apply_mandatory_aircraft_reserve_declarations,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -26,11 +29,9 @@ from warhammer40k_core.engine.reserve_arrival_requirements import (
     reposition_destruction_policy,
 )
 from warhammer40k_core.engine.reserves import (
-    AircraftReserveDeclaration,
     DeepStrikeSetupDeclaration,
     ReserveKind,
     ReserveOrigin,
-    ReserveState,
     ReserveStatus,
     ReserveUnitPointValue,
     StrategicReserveDeclaration,
@@ -581,67 +582,6 @@ class ReserveDeclarationSelection:
             "embarked_unit_instance_ids": list(self.embarked_unit_instance_ids),
             "source_ids": list(self.source_ids),
         }
-
-
-def apply_mandatory_aircraft_reserve_declarations(
-    *,
-    state: GameState,
-    config: GameConfig,
-    decisions: DecisionController,
-) -> tuple[ReserveState, ...]:
-    if state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
-        raise GameLifecycleError("Aircraft reserve declarations require DECLARE_BATTLE_FORMATIONS.")
-    policy = reposition_destruction_policy(
-        mission_setup=state.mission_setup,
-        destruction_deadline_policy=None,
-    )
-    recorded: list[ReserveState] = []
-    for army in state.army_definitions:
-        context = reserve_legality_context_for_player(
-            state=state,
-            config=config,
-            player_id=army.player_id,
-        )
-        current_points = context.current_strategic_reserves_points
-        for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
-            if not _unit_has_keyword(unit, "AIRCRAFT"):
-                continue
-            if state.reserve_state_for_unit(unit.unit_instance_id) is not None:
-                continue
-            point_value = context.points_for_unit(unit.unit_instance_id)
-            if point_value is None:
-                raise GameLifecycleError(
-                    "Aircraft reserve declaration requires source-backed unit points."
-                )
-            if current_points + point_value.points > context.strategic_reserves_points_limit:
-                raise GameLifecycleError(
-                    "Aircraft reserve declarations exceed the player's points limit."
-                )
-            declaration = AircraftReserveDeclaration.for_unit(
-                unit=unit,
-                player_id=army.player_id,
-                unit_points=point_value.points,
-                points_limit=context.strategic_reserves_points_limit,
-            )
-            reserve_state = declaration.to_reserve_state(destruction_deadline_policy=policy)
-            state.record_reserve_state(reserve_state)
-            current_points += point_value.points
-            recorded.append(reserve_state)
-            decisions.event_log.append(
-                "aircraft_reserve_declared",
-                {
-                    "game_id": state.game_id,
-                    "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
-                    "player_id": army.player_id,
-                    "secret": True,
-                    "visibility_source": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
-                    "unit_instance_id": unit.unit_instance_id,
-                    "declaration": declaration.to_payload(),
-                    "reserve_state": reserve_state.to_payload(),
-                    "source_id": AIRCRAFT_MANDATORY_RESERVE_SOURCE_RULE_ID,
-                },
-            )
-    return tuple(sorted(recorded, key=lambda item: item.unit_instance_id))
 
 
 def reserve_declaration_state_for_state(

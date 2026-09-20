@@ -6387,3 +6387,31 @@ requests and events; operator persistence is never a player projection. No new
 player-choice family or adapter mutation path is introduced. Contract 31, replay
 v25 and persistence v23 deliberately reject prior semantic histories; see
 [the migration](../contracts/migrations/30-to-31.md).
+
+
+## Order 66: Aircraft (contract 32)
+
+Aircraft use the existing engine-enumerated reserve ingress choice and typed
+placement proposal. They expose no ordinary movement, charge, pile-in,
+consolidation, Surge, reactive or Scout move. Drift to Aircraft identity rejects
+an already-pending non-ingress proposal before mutation. Normal/Advance remain
+available when engagement is solely with enemy Aircraft.
+
+The existing mandatory END_TURN sequencing participant applies all battlefield
+Aircraft departures owned by the opponent. Any simultaneous-rule choice remains
+an existing finite sequencing decision; no adapter initiates the departure.
+The engine emits `aircraft_opponent_turn_end_departure` with game/round/phase,
+active player, owner, source rule, canonical/component/model IDs and reserve state.
+Shared source and mutation receipts authenticate restore; both viewer projections
+and public event deltas follow the same engine path. Secret mandatory initial
+reserve declarations continue through the common formation redaction owner.
+
+Target enumeration and proposal validation share category-23 keyword predicates.
+Only FLY units charge Aircraft; individual melee attackers require FLY against
+Aircraft, and Aircraft attack only FLY units. FLY status does not depend on
+choosing Take to the Skies. Non-FLY pile-in/consolidation/Surge selections ignore
+Aircraft, while physical endpoints still respect model overlap and engagement.
+
+Legacy Hover mode fields and Aircraft edge-exit movement are retired. See
+[contract migration 31 to 32](../contracts/migrations/31-to-32.md). No new finite
+family, proposal kind or submission wrapper is introduced.

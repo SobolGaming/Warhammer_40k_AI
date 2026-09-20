@@ -9,7 +9,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
-    HoverModeState,
     aircraft_model_ids_for_scenario,
 )
 from warhammer40k_core.engine.battlefield_state import (
@@ -72,7 +71,6 @@ def resolve_triggered_movement(
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...] = (),
     normal_move_states: tuple[NormalMoveState, ...] = (),
-    hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
     take_to_the_skies: bool = False,
     move_keyword_choice: JsonValue = None,
@@ -162,7 +160,6 @@ def resolve_triggered_movement(
         raise GameLifecycleError("Movement keywords require their descriptor's allowed move.")
     aircraft_model_ids = aircraft_model_ids_for_scenario(
         scenario,
-        hover_mode_states=hover_mode_states,
     )
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
@@ -181,9 +178,6 @@ def resolve_triggered_movement(
         aircraft_policy = AircraftMovementPolicy.from_unit(
             unit=unit,
             ruleset_descriptor=ruleset_descriptor,
-            hover_mode_state=_hover_mode_state_for_unit(
-                hover_mode_states=hover_mode_states, unit_instance_id=placement.unit_instance_id
-            ),
         )
         if aircraft_policy.has_aircraft_keyword:
             aircraft_policies[placement.unit_instance_id] = validate_json_value(
@@ -414,15 +408,22 @@ def _triggered_movement_restriction_violations(
     normal_move_states: tuple[NormalMoveState, ...],
 ) -> tuple[TriggeredMovementViolation, ...]:
     violations: list[TriggeredMovementViolation] = []
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    view = rules_unit_view_from_armies(
+        armies=scenario.armies, unit_instance_id=charge_placement_id(unit_placement)
+    )
+    if "AIRCRAFT" in view.keywords:
+        violations.append(
+            TriggeredMovementViolation(
+                violation_code=TriggeredMovementViolationCode.AIRCRAFT_INGRESS_ONLY,
+                message="AIRCRAFT units may only make ingress moves.",
+            )
+        )
     prior_normal_moves = _validate_normal_move_state_tuple(normal_move_states)
     if descriptor.movement_kind is TriggeredMovementKind.SURGE:
         battle_shocked_ids = set(
             _validate_identifier_tuple("battle_shocked_unit_ids", battle_shocked_unit_ids)
-        )
-        from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
-
-        view = rules_unit_view_from_armies(
-            armies=scenario.armies, unit_instance_id=charge_placement_id(unit_placement)
         )
         if battle_shocked_ids.intersection(
             {view.unit_instance_id, *view.component_unit_instance_ids}
@@ -572,26 +573,6 @@ def _enemy_vehicle_monster_model_ids_for_player(
 
 def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
     return "VEHICLE" in keywords or "MONSTER" in keywords
-
-
-def _hover_mode_state_for_unit(
-    *,
-    hover_mode_states: tuple[HoverModeState, ...],
-    unit_instance_id: str,
-) -> HoverModeState | None:
-    if type(hover_mode_states) is not tuple:
-        raise GameLifecycleError("hover_mode_states must be a tuple.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    found: HoverModeState | None = None
-    for hover_mode_state in cast(tuple[object, ...], hover_mode_states):
-        if type(hover_mode_state) is not HoverModeState:
-            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
-        if hover_mode_state.unit_instance_id != requested_unit_id:
-            continue
-        if found is not None:
-            raise GameLifecycleError("hover_mode_states must be unique by unit.")
-        found = hover_mode_state
-    return found if found is not None and found.active else None
 
 
 def _validate_normal_move_state_tuple(values: object) -> tuple[NormalMoveState, ...]:

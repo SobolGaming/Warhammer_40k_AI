@@ -77,6 +77,19 @@ def validate_ingress_movement_mutation(
     *, state: GameState, updated: BattlefieldRuntimeState
 ) -> None:
     locked = {mid for row in locked_ingress_records(state) for mid in row.model_instance_ids}
+    from warhammer40k_core.engine.rules_units import placed_alive_rules_unit_views
+
+    aircraft_models = {
+        model.model_instance_id
+        for unit in (
+            placed_alive_rules_unit_views(state=state)
+            if state.battlefield_state is not None
+            else ()
+        )
+        if "AIRCRAFT" in unit.keywords
+        for model in unit.alive_models()
+    }
+    locked.update(aircraft_models)
     if not locked:
         return
     current = state.battlefield_state
@@ -98,7 +111,13 @@ def validate_ingress_movement_mutation(
                     model.model_instance_id in before
                     and before[model.model_instance_id] != model.pose
                 ):
-                    raise GameLifecycleError(LOCK_REASON)
+                    from warhammer40k_core.engine.aircraft_rules import AIRCRAFT_INGRESS_ONLY
+
+                    raise GameLifecycleError(
+                        AIRCRAFT_INGRESS_ONLY
+                        if model.model_instance_id in aircraft_models
+                        else LOCK_REASON
+                    )
 
 
 def validate_ingress_movement_history(
@@ -106,6 +125,11 @@ def validate_ingress_movement_history(
 ) -> None:
     if current.is_ingress:
         return
+    if (
+        "AIRCRAFT"
+        in rules_unit_view_by_id(state=state, unit_instance_id=current.unit_instance_id).keywords
+    ):
+        raise GameLifecycleError("AIRCRAFT movement history contains a non-ingress move.")
     models = set(current.model_instance_ids)
     if any(
         ingress_lock_applies(

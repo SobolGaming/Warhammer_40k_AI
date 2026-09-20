@@ -403,7 +403,6 @@ def _apply_charge_move_proposal_decision(
         maximum_distance_inches=budget.maximum_distance_inches,
         take_to_the_skies=flight_selection_for_charge(state),
         path_witness=proposal.witness,
-        hover_mode_states=tuple(state.hover_mode_states),
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
         ability_index=ability_index,
     )

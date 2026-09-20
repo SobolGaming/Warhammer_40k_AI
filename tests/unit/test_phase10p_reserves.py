@@ -7,8 +7,6 @@ from typing import cast
 import pytest
 from tests.movement_submission_helpers import (
     core_movement_handler,
-    straight_line_witness_for_state,
-    submit_handler_movement_proposal,
 )
 from tests.unit_keyword_helpers import with_unit_keywords
 
@@ -19,7 +17,6 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.ruleset_descriptor import (
     MissionPolicyDescriptor,
-    MovementMode,
     ReserveDestructionTimingKind,
     RulesetDescriptor,
     TerrainFeatureKind,
@@ -339,16 +336,16 @@ def test_declared_reserve_arrival_round_trip_rejects_route_event_tamper() -> Non
         GameLifecycle.from_payload(forged_payload)
 
 
-def test_aircraft_edge_departure_arrives_next_turn_and_round_trips() -> None:
-    lifecycle, aircraft = _aircraft_edge_departure_lifecycle()
+def test_aircraft_turn_end_departure_round_trips_and_rejects_tampering() -> None:
+    lifecycle, aircraft = _aircraft_turn_end_lifecycle()
     state = lifecycle.state
     assert state is not None
     reserve_state = state.reserve_state_for_unit(aircraft.unit_instance_id)
     assert reserve_state is not None
     assert reserve_state.status is ReserveStatus.IN_RESERVES
     assert reserve_state.reserve_origin is ReserveOrigin.DURING_BATTLE_OTHER
-    assert reserve_state.required_arrival_battle_round == 2
-    assert reserve_state.required_arrival_phase == BattlePhase.MOVEMENT.value
+    assert reserve_state.required_arrival_battle_round is None
+    assert reserve_state.required_arrival_phase is None
     (departure,) = state.primary_battlefield_departure_states
     assert departure.rules_unit_instance_id == aircraft.unit_instance_id
     assert departure.removal_kind is BattlefieldRemovalKind.INTO_RESERVES
@@ -470,78 +467,16 @@ def test_aircraft_edge_departure_arrives_next_turn_and_round_trips() -> None:
 
     with pytest.raises(
         GameLifecycleError,
-        match="Primary Aircraft reserve departure lacks its accepted movement decision",
+        match="Aircraft departure lacks its prior turn-end source event",
     ):
         validate_non_destroyed_battlefield_departure_provenance(
             state=departure_state,
             departures=departure_states,
-            event_records=departure_events,
-            decision_records=tuple(
-                decision
-                for decision in departure_decisions.records
-                if decision.result.result_id != departure.source_id
+            event_records=tuple(
+                event for event in departure_events if event.event_id != departure.source_id
             ),
+            decision_records=departure_decisions.records,
         )
-
-    decisions = lifecycle.decision_controller
-    handler = core_movement_handler(state=state, ruleset_descriptor=_ruleset())
-    _set_movement_ready_for_reinforcements(state=state, battle_round=2)
-    selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
-    assert (
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=selection_request,
-            option_id=aircraft.unit_instance_id,
-            result_id="phase10p-aircraft-arrival-select",
-        )
-        is None
-    )
-    ingress_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=ingress_request,
-            option_id=MovementPhaseActionKind.INGRESS.value,
-            result_id="phase10p-aircraft-arrival-ingress",
-        )
-    )
-    diameter_mm = aircraft.own_models[0].base_size.diameter_mm
-    assert diameter_mm is not None
-    status = _submit_reserve_placement_payload(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        request=placement_request,
-        reserve_unit=aircraft,
-        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-        attempted_placement=_single_model_reserve_placement(
-            reserve_unit=aircraft,
-            pose=_south_edge_touching_pose(base_diameter_mm=diameter_mm, x=15.0),
-        ),
-        result_id="phase10p-aircraft-arrival-place",
-    )
-    if status is None:
-        status = handler.begin_phase(state=state, decisions=decisions)
-
-    assert status.status_kind is LifecycleStatusKind.ADVANCED
-    arrived_state = state.reserve_state_for_unit(aircraft.unit_instance_id)
-    assert arrived_state is not None
-    assert arrived_state.status is ReserveStatus.ARRIVED
-    assert arrived_state.arrived_battle_round == 2
-    assert state.battlefield_state is not None
-    assert state.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
-
-    arrival_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
-    )
-    restored_arrival = GameLifecycle.from_payload(arrival_payload)
-    assert restored_arrival.to_payload() == lifecycle.to_payload()
 
 
 def test_rapid_ingress_arrival_uses_authenticated_stratagem_history() -> None:
@@ -3115,92 +3050,18 @@ def _battle_state_with_reserve(
     return state, scenario, reserve_state, reserve_unit
 
 
-def _aircraft_edge_departure_lifecycle() -> tuple[GameLifecycle, UnitInstance]:
-    ruleset_descriptor = _ruleset()
-    config = _config(ruleset_descriptor=ruleset_descriptor)
-    armies = _mustered_armies(config)
-    source_unit = armies[0].unit_by_id("army-alpha:intercessor-unit-1")
-    aircraft = with_unit_keywords(
-        replace(
-            source_unit,
-            own_models=(source_unit.own_models[0],),
-        ),
-        keywords=("AIRCRAFT", "FLY", "VEHICLE"),
-    )
-    armies = _with_replaced_unit(armies, aircraft)
-    state = GameState.from_config(config)
-    for army in armies:
-        state.record_army_definition(army)
-    scenario = create_deterministic_battlefield_scenario(
-        battlefield_id="phase10p-aircraft-battlefield",
-        armies=armies,
-    )
-    scenario = _with_model_pose(
-        scenario,
-        model_instance_id=aircraft.own_models[0].model_instance_id,
-        pose=Pose.at(x=55.0, y=10.0, z=0.0, facing_degrees=0.0),
-    )
-    state.record_battlefield_state(scenario.battlefield_state)
-    state.stage = GameLifecycleStage.BATTLE
-    state.setup_step_index = None
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
-    state.battle_round = 1
-    state.active_player_id = "player-a"
-    state.movement_phase_state = MovementPhaseState(
-        battle_round=1,
-        active_player_id="player-a",
-    )
-    handler = core_movement_handler(state=state, ruleset_descriptor=ruleset_descriptor)
-    decisions = DecisionController()
-    unit_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert unit_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
-    assert (
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=unit_request,
-            option_id=aircraft.unit_instance_id,
-            result_id="phase10p-aircraft-select-move",
-        )
-        is None
-    )
-    action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
-    proposal_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=action_request,
-            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-            result_id="phase10p-aircraft-edge-departure",
-        )
-    )
-    status = submit_handler_movement_proposal(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        request=proposal_request,
-        result_id="phase10p-aircraft-edge-departure-proposal",
-        unit_instance_id=aircraft.unit_instance_id,
-        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
-        movement_mode=MovementMode.NORMAL,
-        witness=straight_line_witness_for_state(
-            state,
-            unit_instance_id=aircraft.unit_instance_id,
-            dx=6.0,
-        ),
-    )
-    assert status is None
-    return (
-        GameLifecycle(
-            state=state,
-            decision_controller=decisions,
-            _movement_phase_handler=handler,
-        ),
-        aircraft,
-    )
+def _aircraft_turn_end_lifecycle() -> tuple[GameLifecycle, UnitInstance]:
+    from tests.aircraft_helpers import aircraft_session
+
+    session = aircraft_session()
+    session.advance_until_decision_or_terminal()
+    lifecycle = session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    army = state.army_definition_for_player("player-a")
+    assert army is not None
+    aircraft = army.unit_by_id("army-alpha:aircraft")
+    return lifecycle, aircraft
 
 
 def _rapid_ingress_arrival_lifecycle() -> GameLifecycle:

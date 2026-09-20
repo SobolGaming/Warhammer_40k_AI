@@ -31,7 +31,6 @@ from warhammer40k_core.engine import primary_scoring_transaction_integrity as _p
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine import victory_point_award_service as _vp_awards
 from warhammer40k_core.engine.actions import MissionActionState
-from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyDefinitionPayload,
@@ -333,9 +332,6 @@ from warhammer40k_core.engine.turn_cleanup import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_keyword_queries import (
-    unit_has_aircraft_hover_keywords as _unit_has_aircraft_hover_keywords,
-)
-from warhammer40k_core.engine.unit_keyword_queries import (
     unit_has_keyword as _unit_has_keyword,
 )
 from warhammer40k_core.engine.unit_keyword_queries import (
@@ -435,10 +431,6 @@ def _new_reserve_states() -> list[ReserveState]:
 
 
 def _new_cult_ambush_markers() -> list[CultAmbushMarker]:
-    return []
-
-
-def _new_hover_mode_states() -> list[HoverModeState]:
     return []
 
 
@@ -1183,7 +1175,6 @@ class GameState:
     )
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     cult_ambush_markers: list[CultAmbushMarker] = field(default_factory=_new_cult_ambush_markers)
-    hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
         default_factory=_new_transport_cargo_states
     )
@@ -1458,10 +1449,6 @@ class GameState:
             self.cult_ambush_markers,
             player_ids=self.player_ids,
         )
-        self.hover_mode_states = _validate_hover_mode_states(
-            self.hover_mode_states,
-            player_ids=self.player_ids,
-        )
         self.transport_cargo_states = _validate_transport_cargo_states(
             self.transport_cargo_states,
             player_ids=self.player_ids,
@@ -1707,7 +1694,6 @@ class GameState:
                 raise GameLifecycleError(
                     "GameState tactical_secondary_replacement_player_ids must be player IDs."
                 )
-        _validate_hover_mode_state_references(self)
         _validate_state_stage_indexes(self)
         validate_command_battle_shock_state_snapshot(state=self)
 
@@ -4329,24 +4315,6 @@ class GameState:
             )
         return reserve_state
 
-    def record_hover_mode_state(self, hover_mode_state: HoverModeState) -> None:
-        if type(hover_mode_state) is not HoverModeState:
-            raise GameLifecycleError("hover_mode_state must be a HoverModeState.")
-        if hover_mode_state.player_id not in self.player_ids:
-            raise GameLifecycleError("HoverModeState player_id is not in this game.")
-        if self.hover_mode_state_for_unit(hover_mode_state.unit_instance_id) is not None:
-            raise GameLifecycleError("HoverModeState already exists for unit.")
-        _validate_hover_mode_state_reference(self, hover_mode_state)
-        self.hover_mode_states.append(hover_mode_state)
-        self.hover_mode_states.sort(key=lambda state: state.unit_instance_id)
-
-    def hover_mode_state_for_unit(self, unit_instance_id: str) -> HoverModeState | None:
-        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        for hover_mode_state in self.hover_mode_states:
-            if hover_mode_state.unit_instance_id == requested_unit_id:
-                return hover_mode_state
-        return None
-
     def unarrived_reserve_states_for_player(self, player_id: str) -> tuple[ReserveState, ...]:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         return tuple(
@@ -4788,7 +4756,6 @@ class GameState:
             ],
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "cult_ambush_markers": [marker.to_payload() for marker in self.cult_ambush_markers],
-            "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
             "dedicated_transport_setup_consequences": [
                 consequence.to_payload()
@@ -5022,6 +4989,10 @@ class GameState:
 
     @classmethod
     def from_payload(cls, payload: GameStatePayload) -> Self:
+        if "hover_mode_states" in payload:
+            raise GameLifecycleError(
+                "Retired Hover mode state requires the Order 66 contract migration."
+            )
         return cls(
             game_id=payload["game_id"],
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
@@ -5156,9 +5127,6 @@ class GameState:
             ],
             cult_ambush_markers=[
                 CultAmbushMarker.from_payload(marker) for marker in payload["cult_ambush_markers"]
-            ],
-            hover_mode_states=[
-                HoverModeState.from_payload(state) for state in payload["hover_mode_states"]
             ],
             transport_cargo_states=[
                 TransportCargoState.from_payload(state)
@@ -6208,59 +6176,6 @@ def _validate_cult_ambush_markers(
         seen.add(value.marker_id)
         validated.append(value)
     return sorted(validated, key=lambda marker: marker.marker_id)
-
-
-def _validate_hover_mode_states(
-    values: object,
-    *,
-    player_ids: tuple[str, ...],
-) -> list[HoverModeState]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState hover_mode_states must be a list.")
-    validated: list[HoverModeState] = []
-    seen: set[str] = set()
-    for value in cast(list[object], values):
-        if type(value) is not HoverModeState:
-            raise GameLifecycleError(
-                "GameState hover_mode_states must contain HoverModeState values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("HoverModeState player_id is not in this game.")
-        if value.unit_instance_id in seen:
-            raise GameLifecycleError("GameState hover_mode_states must be unique by unit.")
-        seen.add(value.unit_instance_id)
-        validated.append(value)
-    return sorted(validated, key=lambda state: state.unit_instance_id)
-
-
-def _validate_hover_mode_state_references(state: GameState) -> None:
-    if not state.hover_mode_states:
-        return
-    for hover_mode_state in state.hover_mode_states:
-        _validate_hover_mode_state_reference(state, hover_mode_state)
-
-
-def _validate_hover_mode_state_reference(
-    state: GameState,
-    hover_mode_state: HoverModeState,
-) -> None:
-    unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    unit_by_id = {
-        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
-    }
-    unit = unit_by_id.get(hover_mode_state.unit_instance_id)
-    if unit is None:
-        raise GameLifecycleError("hover_mode_states unit is unknown.")
-    if unit_owner_by_id[hover_mode_state.unit_instance_id] != hover_mode_state.player_id:
-        raise GameLifecycleError("hover_mode_states player_id does not match unit owner.")
-    if hover_mode_state.source_id != "hover":
-        raise GameLifecycleError("hover_mode_states source_id drift.")
-    if hover_mode_state.active and not _unit_has_aircraft_hover_keywords(unit.keywords):
-        raise GameLifecycleError("hover_mode_states active unit must have AIRCRAFT and HOVER.")
 
 
 def _validate_transport_cargo_states(

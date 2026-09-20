@@ -7,7 +7,6 @@ from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRe
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptorPayload
 from warhammer40k_core.engine.actions import MissionActionStatePayload
 from warhammer40k_core.engine.active_player_scopes import ActivePlayerScopePayload
-from warhammer40k_core.engine.aircraft import HoverModeStatePayload
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinitionPayload,
     ArmyMusterRequestPayload,
@@ -205,7 +204,6 @@ class GameStatePayload(TypedDict):
     model_destruction_cause_authorities: list[ModelDestructionCauseAuthorityPayload]
     reserve_states: list[ReserveStatePayload]
     cult_ambush_markers: list[CultAmbushMarkerPayload]
-    hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
     dedicated_transport_setup_consequences: list[DedicatedTransportSetupConsequencePayload]
     disembarked_unit_states: list[DisembarkedUnitStatePayload]

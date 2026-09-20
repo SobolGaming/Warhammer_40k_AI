@@ -36,11 +36,11 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidates_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
-    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
+    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords
     from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness, _interrupt_started_mission_actions_for_movement_activation
     from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
     from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
-    from warhammer40k_core.engine.phases.movement_geometry import _movement_action_availability_context, _enemy_engagement_model_ids_for_unit, _enemy_engaged_unit_ids_for_unit_placement, _hover_mode_state_for_unit, _desperate_escape_requirements_for_fall_back, _enemy_model_ids_crossed_by_witness, _sampled_witness_transit_poses, _interpolate_pose, _model_at_pose, _geometry_models_for_unit_placement, _friendly_geometry_models_for_path, _enemy_geometry_models_for_player, _friendly_vehicle_monster_model_ids, _enemy_vehicle_monster_model_ids_for_player, _unit_has_vehicle_or_monster_keyword, _unit_has_deep_strike_keyword, _canonical_keyword, _validate_ability_index_mapping, _ability_index_for_player, _validate_move_witness_matches_unit, _path_result_with_aircraft_violations, _normal_move_violation_code
+    from warhammer40k_core.engine.phases.movement_geometry import _movement_action_availability_context, _enemy_engagement_model_ids_for_unit, _enemy_engaged_unit_ids_for_unit_placement, _desperate_escape_requirements_for_fall_back, _enemy_model_ids_crossed_by_witness, _sampled_witness_transit_poses, _interpolate_pose, _model_at_pose, _geometry_models_for_unit_placement, _friendly_geometry_models_for_path, _enemy_geometry_models_for_player, _friendly_vehicle_monster_model_ids, _enemy_vehicle_monster_model_ids_for_player, _unit_has_vehicle_or_monster_keyword, _unit_has_deep_strike_keyword, _canonical_keyword, _validate_ability_index_mapping, _ability_index_for_player, _validate_move_witness_matches_unit, _path_result_with_aircraft_violations, _normal_move_violation_code
 # fmt: on
 
 __all__ = (
@@ -422,6 +422,8 @@ def _movement_unit_candidates(
                 reserve_state=reserve_state,
             )
         elif component_transport_ids:
+            if "AIRCRAFT" in rules_unit.keywords:
+                continue
             if len(component_transport_ids) != 1 or embarked_component_ids != set(component_ids):
                 raise GameLifecycleError(
                     "Attached rules-unit components must be embarked in the same Transport."
@@ -435,9 +437,13 @@ def _movement_unit_candidates(
                 transport_unit_instance_id=next(iter(component_transport_ids)),
             )
         else:
-            from warhammer40k_core.engine.ingress_lifetimes import ingress_movement_locked
+            from warhammer40k_core.engine.movement_locks import rules_unit_movement_lock_reason
+            from warhammer40k_core.engine.rules_units import rules_unit_view_with_retained_models
 
-            if ingress_movement_locked(state, rules_unit.unit_instance_id):
+            movement_view = rules_unit_view_with_retained_models(
+                view=rules_unit, retained_model_ids=scenario.present_destroyed_model_ids
+            )
+            if rules_unit_movement_lock_reason(state, movement_view) is not None:
                 continue
             if placed_component_ids_for_rules_unit != set(component_ids):
                 raise GameLifecycleError(
@@ -647,7 +653,6 @@ def _movement_modes_for_action_options(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
-    hover_mode_states: tuple[HoverModeState, ...],
     action: MovementPhaseActionKind,
 ) -> tuple[MovementMode, ...]:
     default_mode = movement_mode_for_phase_action(action)
@@ -658,7 +663,6 @@ def _movement_modes_for_action_options(
         scenario=scenario,
         unit_placement=unit_placement,
         ruleset_descriptor=ruleset_descriptor,
-        hover_mode_states=hover_mode_states,
     ):
         modes.append(MovementMode.FLY_TAKE_TO_SKIES)
     return tuple(modes)
@@ -669,7 +673,6 @@ def _unit_can_take_to_the_skies(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
-    hover_mode_states: tuple[HoverModeState, ...],
 ) -> bool:
     if not ruleset_descriptor.fly_policy.take_to_the_skies_supported:
         return False
@@ -749,10 +752,7 @@ def _model_base_movement_inches(
         raise GameLifecycleError("Movement model must be a ModelInstance.")
     if type(aircraft_policy) is not AircraftMovementPolicy:
         raise GameLifecycleError("Movement budget requires an AircraftMovementPolicy.")
-    if aircraft_policy.hover_mode_active:
-        movement = CharacteristicValue(Characteristic.MOVEMENT, 20, 20, 20)
-    else:
-        movement = model_movement_characteristic(model)
+    movement = model_movement_characteristic(model)
     return _modified_movement_inches(
         state=state,
         unit_instance_id=unit_instance_id,

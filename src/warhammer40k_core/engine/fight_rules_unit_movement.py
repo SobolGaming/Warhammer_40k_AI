@@ -9,6 +9,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
 from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -641,6 +642,9 @@ def _pile_in_rule_validation(
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=rules_unit.unit_instance_id,
     )
+    physically_engaged_ids = aircraft_movement_target_ids(
+        scenario, rules_unit.unit_instance_id, physically_engaged_ids
+    )
     if physically_engaged_ids and set(selected) != set(legal_targets):
         return _invalid(
             request=request,
@@ -688,6 +692,11 @@ def _consolidation_rule_validation(
     )
     engaged = tuple(
         target_id for target_id in physically_engaged_ids if target_id in targetable_enemy_ids
+    )
+    from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
+
+    physically_engaged_ids = aircraft_movement_target_ids(
+        scenario, rules_unit.unit_instance_id, physically_engaged_ids
     )
     if physically_engaged_ids:
         if not engaged:
@@ -1332,10 +1341,13 @@ def _enemy_rules_units(
     state: GameState,
     rules_unit: RulesUnitView,
 ) -> tuple[RulesUnitView, ...]:
+    from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_allowed
+
     return tuple(
         view
         for view in fight_present_rules_unit_views(state=state)
         if view.owner_player_id != rules_unit.owner_player_id
+        and aircraft_movement_target_allowed(rules_unit, view)
     )
 
 

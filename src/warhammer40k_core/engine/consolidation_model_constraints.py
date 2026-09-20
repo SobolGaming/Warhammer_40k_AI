@@ -10,6 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
 )
+from warhammer40k_core.engine.aircraft import aircraft_model_ids_for_scenario
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
@@ -233,6 +234,9 @@ def _query(
             friendly_models=tuple(friends),
             enemy_models=tuple(model for models in enemies.values() for model in models),
             terrain=(),
+            aircraft_model_ids=tuple(
+                mid for mid in aircraft_model_ids_for_scenario(scenario) if mid != start.model_id
+            ),
             movement_distance_budget_inches=(
                 3.0
                 if state is None

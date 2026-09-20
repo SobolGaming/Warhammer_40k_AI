@@ -18,7 +18,6 @@ from warhammer40k_core.engine.charge_model_endpoints import (
     charge_model_endpoint_witness,
     validate_charge_model_endpoint_inventory,
 )
-from warhammer40k_core.engine.charge_move_geometry import _hover_mode_state_for_unit
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.fight_model_authority_history import historical_rules_unit_model_ids
@@ -185,10 +184,6 @@ def validate_charge_endpoint_history(
             aircraft = AircraftMovementPolicy.from_unit(
                 unit=unit_at_charge,
                 ruleset_descriptor=ruleset,
-                hover_mode_state=_hover_mode_state_for_unit(
-                    hover_mode_states=tuple(state.hover_mode_states),
-                    unit_instance_id=component_id,
-                ),
             )
             capabilities = MovementCapabilitySet.from_keywords(
                 keywords=aircraft.effective_keywords,

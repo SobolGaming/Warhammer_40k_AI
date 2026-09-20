@@ -6,7 +6,15 @@ from math import isfinite
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
-from warhammer40k_core.engine.aircraft import AircraftMovementPolicy, HoverModeState
+from warhammer40k_core.engine.aircraft import (
+    AircraftMovementPolicy,
+    aircraft_model_ids_for_scenario,
+)
+from warhammer40k_core.engine.aircraft_rules import (
+    AIRCRAFT_INGRESS_ONLY,
+    aircraft_movement_target_allowed,
+    aircraft_rules_unit,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -29,7 +37,6 @@ from warhammer40k_core.engine.charge_move_geometry import (
     _friendly_geometry_models_for_charge_path,
     _friendly_vehicle_monster_model_ids,
     _geometry_models_for_unit_placement,
-    _hover_mode_state_for_unit,
     _terrain_volumes_for_features,
     _validate_charge_witness_matches_unit,
     _validate_json_object,
@@ -170,7 +177,6 @@ def resolve_charge_move(
     selected_target_unit_instance_ids: tuple[str, ...],
     maximum_distance_inches: float,
     path_witness: PathWitness,
-    hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
     unit_persisting_effects: tuple[PersistingEffect, ...] = (),
     ability_index: AbilityCatalogIndex | None = None,
@@ -207,6 +213,14 @@ def resolve_charge_move(
     enemy_ids = scenario_physical_enemy_rules_unit_ids(scenario=scenario, unit_instance_id=unit_id)
     if not set(target_ids) <= set(enemy_ids):
         raise GameLifecycleError("Charge targets require canonical battlefield enemy identities.")
+    charging_unit = aircraft_rules_unit(scenario, unit_id)
+    if "AIRCRAFT" in charging_unit.keywords:
+        raise GameLifecycleError(AIRCRAFT_INGRESS_ONLY)
+    if any(
+        not aircraft_movement_target_allowed(charging_unit, aircraft_rules_unit(scenario, target))
+        for target in target_ids
+    ):
+        raise GameLifecycleError("aircraft_charge_target_requires_fly")
     for placement in unit_placement.model_placements:
         if path_witness.poses_for_model(placement.model_instance_id)[0] != placement.pose:
             raise GameLifecycleError("Charge Move witness start drifted from current placement.")
@@ -243,9 +257,6 @@ def resolve_charge_move(
         aircraft_policy = AircraftMovementPolicy.from_unit(
             unit=unit,
             ruleset_descriptor=ruleset_descriptor,
-            hover_mode_state=_hover_mode_state_for_unit(
-                hover_mode_states=hover_mode_states, unit_instance_id=placement.unit_instance_id
-            ),
         )
         aircraft_policies.append(aircraft_policy)
         model = scenario.model_instance_for_placement(placement)
@@ -298,6 +309,11 @@ def resolve_charge_move(
                 moving_model_instance_id=placement.model_instance_id,
             ),
             enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
+            aircraft_model_ids=tuple(
+                mid
+                for mid in aircraft_model_ids_for_scenario(scenario)
+                if mid != placement.model_instance_id
+            ),
             movement_distance_budget_inches=float(maximum_distance_inches),
         )
         path_context = charge_path_context_with_rule_effect_permissions(

@@ -820,7 +820,7 @@ def test_fly_take_to_the_skies_rejects_non_fly_and_wrong_action_mode() -> None:
         )
 
 
-def test_aircraft_normal_move_records_cost_free_aircraft_rotation() -> None:
+def test_aircraft_normal_move_is_invalid_even_with_cost_free_rotation() -> None:
     scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
         keywords=("Aircraft", "Vehicle"),
         base_size=BaseSizeDefinition.oval(length_mm=120.0, width_mm=80.0),
@@ -841,7 +841,7 @@ def test_aircraft_normal_move_records_cost_free_aircraft_rotation() -> None:
 
     movement_distance_witness = resolution.path_validation_results[0].movement_distance_witness
     assert movement_distance_witness is not None
-    assert resolution.is_valid
+    assert not resolution.is_valid
     assert movement_distance_witness.total_distance_inches == movement_inches
     assert len(movement_distance_witness.rotation_events) == 1
     assert movement_distance_witness.rotation_events[0].facing_delta_degrees == 90.0

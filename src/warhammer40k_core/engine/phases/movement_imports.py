@@ -68,11 +68,7 @@ from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
     AircraftMovementPolicyPayload,
     AircraftMovementViolation,
-    AircraftReserveTransitionReason,
-    HoverModeState,
     aircraft_model_ids_for_scenario,
-    apply_aircraft_reserve_transition_to_battlefield,
-    resolve_aircraft_reserve_transition,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError
 from warhammer40k_core.engine.battle_shock_hooks import (
@@ -334,7 +330,6 @@ __all__ = (
     "AircraftMovementPolicy",
     "AircraftMovementPolicyPayload",
     "AircraftMovementViolation",
-    "AircraftReserveTransitionReason",
     "ArmyCatalog",
     "ArmyMusteringError",
     "BattlePhase",
@@ -389,7 +384,6 @@ __all__ = (
     "GameLifecycleError",
     "GameLifecycleStage",
     "GeometryError",
-    "HoverModeState",
     "IdentifierValidator",
     "JUST_FELL_BACK_UNIT_CONTEXT_KEY",
     "JsonValue",
@@ -503,7 +497,6 @@ __all__ = (
     "WeaponKeyword",
     "aircraft_model_ids_for_scenario",
     "annotations",
-    "apply_aircraft_reserve_transition_to_battlefield",
     "apply_combat_disembark_to_battlefield",
     "apply_disembark_to_battlefield",
     "apply_embark_to_battlefield",
@@ -537,7 +530,6 @@ __all__ = (
     "parameterized_decision_option",
     "replace",
     "record_primary_battlefield_departure",
-    "resolve_aircraft_reserve_transition",
     "resolve_combat_disembark",
     "resolve_disembark",
     "resolve_embark",

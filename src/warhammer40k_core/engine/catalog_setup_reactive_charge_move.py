@@ -251,7 +251,6 @@ def apply_catalog_setup_reactive_charge_move(
         maximum_distance_inches=maximum_distance,
         path_witness=proposal.witness,
         take_to_the_skies=roll.request.take_to_the_skies,
-        hover_mode_states=tuple(state.hover_mode_states),
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
         ability_index=ability_index,
     )

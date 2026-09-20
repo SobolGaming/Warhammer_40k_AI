@@ -1,0 +1,75 @@
+{
+  "order": 66,
+  "validated_on": "2026-09-20",
+  "base_commit": "48b691133ee89fa9ff7495c9157f1cad9aad8131",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57d311ec524f79b55cfa34d180042d23e9ae67a3e182f007f7eec367ace4ae43",
+  "platform": "Windows 11; Python 3.14.5; bundled Node runtime",
+  "behavioral": {
+    "tests": 8498,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 945.217,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "cc4e5d148de6ef89eeb598ad951e5fa96de4ff5dd9463dfe47f360ab37dd826a",
+    "coverage_percent": 85.12631627716114,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_kind": "SQLite unclosed-connection ResourceWarnings, also present in base validation"
+  },
+  "code_quality": {
+    "tests": 551,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 328.153,
+    "distribution": "worksteal",
+    "workers": 64,
+    "junit_sha256": "c5ce205be9206ad87cb3a062a8e6329247b0a856846f30c8c11f040a0b3f4727",
+    "coverage": false
+  },
+  "other_gates": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "eight_shard_inventory": "passed",
+    "import_linter_11_contracts": "passed",
+    "pre_commit_all_files": "passed",
+    "source_generator_check": "passed",
+    "engine_identity_check": "passed",
+    "external_contract_exact_base_check": "passed",
+    "typescript_generated_client_check": "passed",
+    "typescript_typecheck": "passed",
+    "typescript_unit_tests_5": "passed",
+    "typescript_conformance_scenario": "passed",
+    "installed_contract_wheel_smoke": "passed",
+    "staged_diff_check": "passed",
+    "staged_source_pin_byte_check": "passed"
+  },
+  "typescript_execution": "Official npm CLI bootstrapped in ignored reports tooling with registry SHA512 verification; bundled Node runtime and package-script entry points.",
+  "typescript_conformance_assertions": 342,
+  "component_performance": {
+    "evidence": [
+      "base.json",
+      "head.json",
+      "budgets.json"
+    ],
+    "boundary_samples_per_revision": 14,
+    "mutation_guard_calls_per_revision": 1400,
+    "recorded_component_limits_passed": true,
+    "reconstruction_evidence": "../order64/head-reconstruction.json",
+    "firing_deck_evidence": "../order65/head.json",
+    "existing_budgets_passed": true,
+    "gameplay_slice_measured": false,
+    "full_game_certified": false
+  },
+  "validation_notes": [
+    "An intermediate aggregate attempt was cancelled during the final caller audit when a mixed-unit engagement regression exposed classification by contacting model rather than canonical Aircraft unit. The corrected runtime and every performance/contract identity were regenerated before final validation.",
+    "The first completed coverage run had 8496 passes and two obsolete tests expecting ordinary Aircraft movement and edge-exit departure. Tests were migrated to ingress-only rejection and the mandatory turn-end departure; rotation evidence and provider/origin/transition/removal/source tamper checks were retained. The migrated tests passed before the successful complete coverage rerun.",
+    "A subsequent coverage run passed all 8498 tests at 85.13%, but the full quality gate found two stale inventories and four redundant canonical view lookups above the unchanged Order 35 Rapid Ingress work limit. Movement enumeration now reuses its current canonical view, preserving retained model presence. All 73 focused checks passed; runtime artifacts, head measurements and both aggregate gates were repeated for that production repair.",
+    "The FLY consumer regression also explicitly checks canonical pile-in selection, consolidation modes and closest Surge targets. No behavioral test file was added, deleted, moved or renamed; the exact eight-shard inventory check passed.",
+    "No production code changed after the final runtime measurements or during the successful behavioral coverage and quality gates. Component timing was serial with no competing test/build workers; complete gameplay and full-game performance remain uncertified."
+  ]
+}

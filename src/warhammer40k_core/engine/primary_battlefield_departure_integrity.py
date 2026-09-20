@@ -8,7 +8,6 @@ from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement_model import (
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
-    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -108,8 +107,15 @@ def validate_non_destroyed_battlefield_departure_provenance(
     evidence: both can be cloned and re-identified together.  Embark departures
     therefore bind to the accepted transport decision and ``unit_embarked`` event;
     reserve departures bind one-to-one to the engine-owned reserve mutation event,
-    the persisted ReserveState, and the movement decision for Aircraft transitions.
+    the persisted ReserveState, and the mandatory end-turn rule occurrence for Aircraft transitions.
     """
+    from warhammer40k_core.engine.aircraft_turn_end import AIRCRAFT_RETURN_EVENT
+
+    aircraft_sources = {
+        record.event_id for record in event_records if record.event_type == AIRCRAFT_RETURN_EVENT
+    }
+    if any(sum(row.source_id == source for row in departures) != 1 for source in aircraft_sources):
+        raise GameLifecycleError("Aircraft departure requires exactly one authenticated receipt.")
     non_destroyed = tuple(
         departure
         for departure in departures
@@ -354,24 +360,17 @@ def _validate_reserve_departures(
                 payload=transition,
                 departure=departure,
             )
-            aircraft_decision = decision_by_result_id.get(departure.source_id)
-            if (
-                departure.occurrence_id != departure.source_id
-                or aircraft_decision is None
-                or aircraft_decision.request.decision_type != SELECT_MOVEMENT_ACTION_DECISION_TYPE
-                or aircraft_decision.result.decision_type != SELECT_MOVEMENT_ACTION_DECISION_TYPE
-                or aircraft_decision.result.actor_id != departure.owner_player_id
-                or aircraft_decision.result.selected_option_id != "normal_move"
-            ):
-                raise GameLifecycleError(
-                    "Primary Aircraft reserve departure lacks its accepted movement decision."
-                )
-            _validate_accepted_decision_event_closure(
-                decision=aircraft_decision,
-                terminal_event=mutation,
+            from warhammer40k_core.engine.aircraft_departure_integrity import (
+                validate_aircraft_departure_source,
+            )
+
+            validate_aircraft_departure_source(
+                state=state,
+                departure=departure,
+                mutation=mutation,
+                reserve_entry=reserve_entry,
                 event_records=event_records,
                 event_index_by_id=event_index_by_id,
-                authority_name="Primary Aircraft reserve departure",
             )
         mutation_index = event_index_by_id[mutation.event_id]
         state_occurrences.append(
@@ -1064,6 +1063,9 @@ def _validate_aircraft_reserve_transition(
             removal.get("removal_kind") != BattlefieldRemovalKind.INTO_RESERVES.value
             or removal.get("source_phase") != departure.phase
             or removal.get("source_event_id") != departure.source_id
+            or removal.get("source_rule_id") != "gw-11e-core-aircraft:movement"
+            or removal.get("source_step") != "player_turn_end"
+            or removal.get("destination_id") != "strategic_reserves"
         ):
             raise GameLifecycleError("Aircraft reserve transition removal identity drift.")
     if tuple(sorted(model_ids)) != departure.removed_model_instance_ids:

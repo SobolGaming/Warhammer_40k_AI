@@ -196,7 +196,12 @@ def invalid_physical_proposal_spatial_context_status(
     from warhammer40k_core.engine.movement_proposals import ProposalKind
 
     locked = movement_lock_reason(state, proposal_request.unit_instance_id)
-    ingress_retry = locked == LOCK_REASON and proposal_request.proposal_kind in {
+    from warhammer40k_core.engine.aircraft_rules import AIRCRAFT_INGRESS_ONLY
+
+    ingress_retry = locked in {
+        LOCK_REASON,
+        AIRCRAFT_INGRESS_ONLY,
+    } and proposal_request.proposal_kind in {
         ProposalKind.STRATEGIC_RESERVES,
         ProposalKind.DEEP_STRIKE,
         ProposalKind.REINFORCEMENT,

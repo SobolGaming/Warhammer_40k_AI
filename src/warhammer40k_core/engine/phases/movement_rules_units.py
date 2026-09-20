@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
-from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
@@ -141,7 +140,6 @@ def resolve_rules_unit_normal_move(
     witness: PathWitness,
     movement_mode: MovementMode,
     objective_markers: tuple[ObjectiveMarker, ...],
-    hover_mode_states: tuple[HoverModeState, ...],
     movement_bonus_inches: int,
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_index: AbilityCatalogIndex,
@@ -159,7 +157,6 @@ def resolve_rules_unit_normal_move(
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         action_label="Normal Move",
         objective_markers=objective_markers,
-        hover_mode_states=hover_mode_states,
         movement_bonus_inches=movement_bonus_inches,
         runtime_modifier_registry=runtime_modifier_registry,
         ability_index=ability_index,
@@ -188,7 +185,6 @@ def resolve_rules_unit_advance_move(
     advance_roll: AdvanceRollResult,
     movement_mode: MovementMode,
     objective_markers: tuple[ObjectiveMarker, ...],
-    hover_mode_states: tuple[HoverModeState, ...],
     movement_bonus_inches: int,
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_index: AbilityCatalogIndex,
@@ -209,7 +205,6 @@ def resolve_rules_unit_advance_move(
         displacement_kind=ModelDisplacementKind.ADVANCE,
         action_label="Advance",
         objective_markers=objective_markers,
-        hover_mode_states=hover_mode_states,
         movement_bonus_inches=advance_roll.value + movement_bonus_inches,
         runtime_modifier_registry=runtime_modifier_registry,
         ability_index=ability_index,
@@ -246,7 +241,6 @@ def resolve_rules_unit_fall_back_move(
     battle_shocked_unit_ids: tuple[str, ...],
     forced_desperate_escape_source_rule_ids: tuple[str, ...],
     objective_markers: tuple[ObjectiveMarker, ...],
-    hover_mode_states: tuple[HoverModeState, ...],
     movement_bonus_inches: int,
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_index: AbilityCatalogIndex,
@@ -264,7 +258,6 @@ def resolve_rules_unit_fall_back_move(
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         action_label="Fall Back",
         objective_markers=objective_markers,
-        hover_mode_states=hover_mode_states,
         movement_bonus_inches=movement_bonus_inches,
         runtime_modifier_registry=runtime_modifier_registry,
         ability_index=ability_index,
@@ -335,7 +328,6 @@ def _resolve_rules_unit_move(
     displacement_kind: ModelDisplacementKind,
     action_label: str,
     objective_markers: tuple[ObjectiveMarker, ...],
-    hover_mode_states: tuple[HoverModeState, ...],
     movement_bonus_inches: int,
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_index: AbilityCatalogIndex,
@@ -395,7 +387,6 @@ def _resolve_rules_unit_move(
             displacement_kind=displacement_kind,
             action_label=action_label,
             rollback_on_endpoint_coherency=False,
-            hover_mode_states=hover_mode_states,
             runtime_modifier_registry=runtime_modifier_registry,
             ability_index=ability_index,
             temporary_movement_keywords=temporary_movement_keywords,

@@ -1,0 +1,1 @@
+{"workload_id":"order66-aircraft-v1","mean_ratio":1.5,"maximum_ratio":2.0,"guard_additive_seconds":0.05,"boundary_additive_seconds":0.2,"maximum_additive_seconds":0.3}

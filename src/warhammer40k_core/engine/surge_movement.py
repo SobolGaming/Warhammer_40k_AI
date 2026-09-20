@@ -7,6 +7,7 @@ from math import isclose
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_allowed
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -45,7 +46,7 @@ def closest_surge_targets(
         scenario=scenario, unit_instance_id=view.unit_instance_id
     ):
         enemy = rules_unit_view_from_armies(armies=scenario.armies, unit_instance_id=enemy_id)
-        if "AIRCRAFT" in enemy.keywords and "FLY" not in view.keywords:
+        if not aircraft_movement_target_allowed(view, enemy):
             continue
         targets = physical_geometry_models_for_rules_unit(
             scenario=scenario, unit_instance_id=enemy_id

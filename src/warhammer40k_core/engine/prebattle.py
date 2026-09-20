@@ -11,7 +11,7 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZoneError,
     DeploymentZonePayload,
 )
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -41,9 +41,6 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.endpoint_placement import (
-    objective_marker_endpoint_placement_violation,
-)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_setup import (
@@ -51,7 +48,6 @@ from warhammer40k_core.engine.mission_setup import (
     MissionSetupError,
     MissionSetupPayload,
 )
-from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
@@ -105,6 +101,9 @@ from warhammer40k_core.engine.scout_abilities import (
 )
 from warhammer40k_core.engine.scout_abilities import (
     scout_ability_instances_for_rules_unit as scout_ability_instances_for_rules_unit,
+)
+from warhammer40k_core.engine.scout_movement_paths import (
+    append_scout_path_violations as _append_scout_path_violations,
 )
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
@@ -1516,6 +1515,8 @@ def scout_move_candidates_for_player(
     unavailable_ids = set(state.unarrived_reserve_model_ids()) | set(state.embarked_model_ids())
     candidates: list[RulesUnitView] = []
     for view in _rules_unit_views_for_player(state=state, player_id=requested_player_id):
+        if "AIRCRAFT" in view.keywords:
+            continue
         if not _rules_unit_all_components_have_scouts(
             state=state,
             view=view,
@@ -1561,6 +1562,8 @@ def dedicated_transport_scout_move_candidates_for_player(
     zones = _deployment_zones_for_player(mission_setup, requested_player_id)
     candidates: list[RulesUnitView] = []
     for view in _rules_unit_views_for_player(state=state, player_id=requested_player_id):
+        if "AIRCRAFT" in view.keywords:
+            continue
         if not _rules_unit_any_component_has_keyword(view, "DEDICATED_TRANSPORT"):
             continue
         cargo_state = state.transport_cargo_state_for_transport(view.unit_instance_id)
@@ -2142,120 +2145,6 @@ def _validate_placement_models(
     return coherency_result, tuple(models)
 
 
-def _append_scout_path_violations(
-    *,
-    violations: list[PreBattleViolation],
-    state: GameState,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    current: UnitPlacement,
-    attempted: UnitPlacement,
-    witness: PathWitness,
-    scout_distance_inches: float,
-) -> None:
-    mission_setup = _require_mission_setup(state)
-    battlefield_state = scenario.battlefield_state
-    terrain_volumes = tuple(
-        volume
-        for feature in battlefield_state.terrain_features
-        for volume in feature.terrain_volumes()
-    )
-    aircraft_model_ids: tuple[str, ...] = ()
-    for placement in current.model_placements:
-        model = scenario.model_instance_for_placement(placement)
-        moving_model = geometry_model_for_placement(model=model, placement=placement)
-        model_witness = PathWitness.for_paths(
-            ((placement.model_instance_id, witness.poses_for_model(placement.model_instance_id)),)
-        )
-        legality_context = MovementLegalityContext.from_keywords(
-            keywords=scenario.unit_instance_for_placement(current).keywords,
-            ruleset_descriptor=ruleset_descriptor,
-            movement_mode=MovementMode.NORMAL,
-            movement_phase_action=None,
-            displacement_kind=ModelDisplacementKind.SCOUT_MOVE,
-        )
-        path_result = legality_context.to_path_validation_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            battlefield_width_inches=battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
-            friendly_models=_friendly_geometry_models_for_path(
-                scenario=scenario,
-                unit_placement=current,
-                attempted_placement=attempted,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_models=_enemy_geometry_models_for_player(
-                scenario=scenario,
-                player_id=current.player_id,
-            ),
-            terrain=terrain_volumes,
-            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
-                scenario=scenario,
-                player_id=current.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
-                scenario=scenario,
-                player_id=current.player_id,
-            ),
-            aircraft_model_ids=aircraft_model_ids,
-            movement_distance_budget_inches=scout_distance_inches,
-        ).validate()
-        if not path_result.is_valid:
-            first_violation = path_result.violations[0]
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.PATH_VALIDATION_FAILED,
-                    message=first_violation.message,
-                    field="witness",
-                    model_instance_id=first_violation.model_id,
-                    blocker_id=first_violation.blocker_id,
-                )
-            )
-        terrain_result = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            terrain=terrain_volumes,
-            terrain_features=battlefield_state.terrain_features,
-        ).validate()
-        if not terrain_result.is_valid:
-            first_terrain_violation = terrain_result.violations[0]
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.TERRAIN_PATH_VALIDATION_FAILED,
-                    message=first_terrain_violation.message,
-                    field="witness",
-                    model_instance_id=placement.model_instance_id,
-                    blocker_id=first_terrain_violation.terrain_id,
-                )
-            )
-        end_model = geometry_model_for_placement(
-            model=model,
-            placement=placement.with_pose(
-                witness.final_pose_for_model(placement.model_instance_id)
-            ),
-        )
-        objective_violation = objective_marker_endpoint_placement_violation(
-            model=end_model,
-            objective_markers=tuple(
-                marker.to_objective_marker() for marker in mission_setup.objective_markers
-            ),
-            violation_code=PreBattleViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP.value,
-            placement_label="Scout Move endpoint",
-        )
-        if objective_violation is not None:
-            violations.append(
-                PreBattleViolation(
-                    violation_code=PreBattleViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP,
-                    message=objective_violation.message,
-                    field="witness",
-                    model_instance_id=objective_violation.model_instance_id,
-                    blocker_id=objective_violation.blocker_id,
-                )
-            )
-
-
 def _append_scout_enemy_distance_violations(
     *,
     violations: list[PreBattleViolation],
@@ -2561,36 +2450,6 @@ def _dedicated_transport_cargo_scout_instances(
     return tuple(instances)
 
 
-def _friendly_geometry_models_for_path(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    attempted_placement: UnitPlacement,
-    moving_model_instance_id: str,
-) -> tuple[Model, ...]:
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    friendly_models: list[Model] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != unit_placement.player_id:
-            continue
-        for current_unit_placement in placed_army.unit_placements:
-            placements = (
-                attempted_placement.model_placements
-                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
-                else current_unit_placement.model_placements
-            )
-            for placement in placements:
-                if placement.model_instance_id == moving_model_id:
-                    continue
-                friendly_models.append(
-                    geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(placement),
-                        placement=placement,
-                    )
-                )
-    return tuple(friendly_models)
-
-
 def _enemy_geometry_models_for_player(
     *,
     scenario: BattlefieldScenario,
@@ -2612,50 +2471,6 @@ def _enemy_geometry_models_for_player(
     return tuple(enemy_models)
 
 
-def _friendly_vehicle_monster_model_ids(
-    *,
-    scenario: BattlefieldScenario,
-    player_id: str,
-    moving_model_instance_id: str,
-) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id
-                for placement in unit_placement.model_placements
-                if placement.model_instance_id != moving_model_id
-            )
-    return tuple(sorted(model_ids))
-
-
-def _enemy_vehicle_monster_model_ids_for_player(
-    *,
-    scenario: BattlefieldScenario,
-    player_id: str,
-) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id for placement in unit_placement.model_placements
-            )
-    return tuple(sorted(model_ids))
-
-
 def unit_for_model(*, view: RulesUnitView, model_instance_id: str) -> UnitInstance:
     requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
     for component in view.components:
@@ -2664,11 +2479,6 @@ def unit_for_model(*, view: RulesUnitView, model_instance_id: str) -> UnitInstan
         ):
             return component.unit
     raise GameLifecycleError("model_instance_id is not in the rules unit.")
-
-
-def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
-    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
-    return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
 
 
 def _rules_unit_all_components_have_keyword(view: RulesUnitView, keyword: str) -> bool:

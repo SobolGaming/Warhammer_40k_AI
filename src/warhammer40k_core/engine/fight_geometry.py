@@ -252,11 +252,14 @@ def enemy_fight_unit_ids_within_distance(
     distance_inches: float,
     state: GameState | None = None,
 ) -> tuple[str, ...]:
+    from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
+
     return tuple(
         enemy_id
-        for enemy_id in enemy_unit_ids_for_fight_placement(
-            scenario=scenario,
-            unit_placement=unit_placement,
+        for enemy_id in aircraft_movement_target_ids(
+            scenario,
+            unit_placement.unit_instance_id,
+            enemy_unit_ids_for_fight_placement(scenario=scenario, unit_placement=unit_placement),
         )
         if closest_fight_unit_distance_inches(
             scenario=scenario,

@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `31.0.0`
+Contract version: `32.0.0`
+
+Contract 32 implements ingress-only Aircraft and mandatory opponent-turn-end
+returns. Legacy Hover mode and edge-exit saves require the explicit
+[migration 31 to 32](migrations/31-to-32.md).
 
 Contract 31 implements turn-long Firing Deck restrictions for every embarked unit.
 See [migration 30 to 31](migrations/30-to-31.md).

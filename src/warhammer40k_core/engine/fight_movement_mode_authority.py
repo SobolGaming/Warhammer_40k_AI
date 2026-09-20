@@ -8,6 +8,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_allowed
 from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.consolidation_objectives import legal_consolidation_objective_ids
@@ -50,6 +51,9 @@ def legal_pile_in_target_rules_unit_ids(
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=rules_unit.unit_instance_id,
     )
+    physically_engaged_ids = tuple(
+        target_id for target_id in physically_engaged_ids if target_id in targetable_ids
+    )
     if physically_engaged_ids:
         return tuple(
             target_id for target_id in physically_engaged_ids if target_id in targetable_ids
@@ -89,6 +93,9 @@ def legal_consolidation_modes(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=rules_unit.unit_instance_id,
+    )
+    physically_engaged_ids = tuple(
+        target_id for target_id in physically_engaged_ids if target_id in targetable_ids
     )
     if physically_engaged_ids:
         return (
@@ -143,6 +150,7 @@ def _targetable_enemy_rules_units(
         candidate
         for candidate in fight_present_rules_unit_views(state=state)
         if candidate.owner_player_id != rules_unit.owner_player_id
+        and aircraft_movement_target_allowed(rules_unit, candidate)
     )
 
 
