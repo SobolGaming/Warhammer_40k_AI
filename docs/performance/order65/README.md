@@ -1,5 +1,10 @@
 # Order 65 Firing Deck component assessment
 
+Order 71 refreshed the head JSON for runtime `b1f357d7` with unchanged
+workloads, baselines and budgets. The tables and prior validation below are
+historical; current gate results are recorded in
+[Order 71 validation](../order71/validation.json).
+
 The workload measures an accepted facade declaration through the next pending
 decision, then 100 shared eligibility queries for a noncontributing passenger.
 It covers zero borrowed weapons and one borrowed weapon, with two five-model

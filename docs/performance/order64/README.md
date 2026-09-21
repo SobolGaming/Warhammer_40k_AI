@@ -1,5 +1,10 @@
 # Order 64 authenticated reconstruction guard
 
+Order 71 refreshed the head JSON for runtime `b1f357d7` with unchanged
+workloads, baselines and budgets. The tables and prior validation below are
+historical; current gate results are recorded in
+[Order 71 validation](../order71/validation.json).
+
 The workload isolates `GameLifecycle.from_payload()` and `LocalGameSession.fork()`
 after a loaded Transport's Ingress, after its cargo's Rapid Disembark, and after
 the next accepted unit-selection decision. Each reconstruction starts from the

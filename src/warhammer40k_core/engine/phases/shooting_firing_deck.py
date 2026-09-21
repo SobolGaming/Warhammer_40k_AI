@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.shooting_engagement import is_monster_or_vehicle
+
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
@@ -392,14 +394,12 @@ def _available_weapons_for_unit(
             for weapon in weapons
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT)
         ]
-    if (
-        selected_shooting_type is ShootingType.CLOSE_QUARTERS
-        and not _unit_has_vehicle_or_monster_keyword(unit)
-    ):
+    if selected_shooting_type is ShootingType.CLOSE_QUARTERS:
         weapons = [
             weapon
             for weapon in weapons
-            if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
+            if is_monster_or_vehicle(unit.own_model_by_id(weapon["model_instance_id"]).keywords)
+            or has_close_quarters_weapon_keyword(weapon["weapon_profile"])
         ]
     if selected_shooting_type is ShootingType.NORMAL and _unit_advanced_this_turn(
         state=state,
@@ -479,14 +479,12 @@ def _available_weapons_for_rules_unit(
             for weapon in weapons
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT)
         ]
-    if (
-        selected_shooting_type is ShootingType.CLOSE_QUARTERS
-        and not _rules_unit_has_vehicle_or_monster_keyword(rules_unit)
-    ):
+    if selected_shooting_type is ShootingType.CLOSE_QUARTERS:
         weapons = [
             weapon
             for weapon in weapons
-            if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
+            if is_monster_or_vehicle(rules_unit.model_by_id(weapon["model_instance_id"]).keywords)
+            or has_close_quarters_weapon_keyword(weapon["weapon_profile"])
         ]
     if selected_shooting_type is ShootingType.NORMAL and _rules_unit_advanced_this_turn(
         state=state,

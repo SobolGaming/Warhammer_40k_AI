@@ -1,0 +1,59 @@
+# Order 71 engaged shooting assessment
+
+The versioned `order71-engaged-shooting-v1` workload measures ten uncached,
+complete model-target candidates per sample, including geometry, engagement,
+target legality and penalty construction. Four cases cover third-party
+CLOSE-QUARTERS fire, both penalty causes, the mutual-engagement exemption and an
+attached target with a VEHICLE Leader. The first three scenes contain four units
+and four models; the attached scene contains five units and five models. They
+use the canonical shooting fixture's seed, empty terrain and deterministic
+positions; no attack dice or decision policy is timed.
+
+Seven serial samples per case ran without coverage, profiling or competing
+workers on the same provisional Windows 11 host, Python 3.14.5, AMD Ryzen
+Threadripper 3970X, 64 logical CPUs and 137,327,259,648 bytes RAM. Fixture/catalog
+preparation is excluded. Script, helper and dependency-lock hashes, exact runtime
+identities and every sample are retained in `base.json` and `head.json`.
+
+The exact base is `ec32e01f1c8ee9d903976f2b392b40ea0700d49c`. Its incorrect
+exemption and collapsed penalty are a cost comparison, not a correctness oracle.
+The regression matrix against that base produced 11 expected failures and ten
+passes. Correctness is established by the current facade and replay tests.
+
+The committed component threshold is `head <= base * 2 + 0.02 seconds` for both
+the mean and maximum of each ten-candidate sample. The 2 ms additive per-query
+allowance tolerates host scheduling variation while bounding this changed
+component. It does not predict queries per game or certify the 60-second game
+objective. The required code-quality suite verifies matched inputs, seven
+completed samples, current runtime identity and all eight comparisons.
+
+| Case | Base mean (s) | Head mean (s) | Base max (s) | Head max (s) |
+| --- | ---: | ---: | ---: | ---: |
+| Third-party CLOSE-QUARTERS | 0.007939 | 0.007082 | 0.009198 | 0.008199 |
+| Both causes | 0.007228 | 0.007058 | 0.007798 | 0.007736 |
+| Mutual CLOSE-QUARTERS | 0.007308 | 0.007183 | 0.008137 | 0.007905 |
+| Attached third-party | 0.008310 | 0.008197 | 0.008959 | 0.008949 |
+
+All 560 base/head candidate calculations completed. All eight mean/maximum
+comparisons pass; current mean cost is 0.71–0.82 ms per candidate. Nearest-rank
+p95 equals the maximum for seven samples. Head medians and throughput are
+recorded in `summary.json`, derived directly from the retained samples.
+
+Reproduce serially with the corresponding source trees and no competing workers:
+
+```powershell
+uv run python -m scripts.measure_order71 --output docs/performance/order71/base.json --revision ec32e01f --runtime-src reports/order71-base/src
+uv run python -m scripts.measure_order71 --output docs/performance/order71/head.json --revision order71-final
+```
+
+The archived base must include `src`, `contracts/schemas` and `pyproject.toml` so
+authenticated reconstruction can verify its schema root. Runtime identity is
+checked before interpreting a saved result.
+
+The inherited Orders 64, 65, 66, 69 and 70 guards also require the exact current
+runtime. Their head reports were refreshed serially with unchanged scripts,
+fixtures, baselines and budgets. Final gate outcomes are in `validation.json`.
+
+Complete gameplay-slice and head-to-head performance remain unmeasured. The
+60-second mean / 300-second maximum complete-game targets and deferred Order 32
+budgets remain uncertified.

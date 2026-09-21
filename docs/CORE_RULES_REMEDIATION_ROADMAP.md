@@ -5149,3 +5149,15 @@ Published in [PR #490](https://github.com/SobolGaming/Warhammer_40k_AI/pull/490)
 8,668 behavioral tests at 85.14% coverage and all 567 code-quality checks.
 The scope record retains source evidence, the corrected work-budget finding,
 fresh component measurements and all publishing-gate results.
+
+## Order 71 / P17 implementation
+
+C17-01 applies the CLOSE-QUARTERS exemption only against a target engaged with
+the attacking rules unit. Core 10.06's attacking-model penalty and 17.03's
+target-unit penalty retain separate stable source IDs and add before other
+modifiers and the final hit cap. Model-owned permissions, third-party targeting,
+Firing Deck, reactions, retained shooting, adapters and replay share the same
+candidate and attack path. See [scope and evidence](ORDER_71_SCOPE_PLAN.md).
+Orders 72–73 and final cross-category certification remain separate.
+
+Final local validation: 8,712 behavioral tests, 85.14% coverage and 570 code-quality checks passed. Source, performance and publishing-gate results are retained in the linked scope record. Review and merge remain pending.

@@ -2465,7 +2465,7 @@ If a shooting declaration is parameterized, the request must embed a typed propo
 - the ruleset descriptor hash and line-of-sight/cache evidence required by target validation;
 - visible viewer payloads that do not leak hidden opponent information.
 
-Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, `duplicate_weapon_declaration`, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B/14F does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate the engine-emitted physical weapon instance and its profile/source declaration key, previously selected shooting type, target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Close-quarters/Pistol, Blast engagement bans, Assault/Advanced weapon gating, Indirect mode eligibility and per-weapon visibility, Cover and no-Hit-reroll policy, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
+Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, `duplicate_weapon_declaration`, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B/14F does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate the engine-emitted physical weapon instance and its profile/source declaration key, previously selected shooting type, target legality, range, visibility, Lone Operative, Locked in Combat, Core 10.06/17.03 Monster/Vehicle shooting, Close-quarters/Pistol, Blast engagement bans, Assault/Advanced weapon gating, Indirect mode eligibility and per-weapon visibility, Cover and no-Hit-reroll policy, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
 
 Hidden target validation is engine-owned. The 11th Edition ruleset descriptor
 uses a 15" base Detection Range for Hidden and a 3" Gone to Ground detection
@@ -6501,3 +6501,27 @@ registry remains historical Charge/forced-Fight evidence, not live ability
 authority. No public payload shape or visibility policy changes. The existing
 runtime build fingerprint rejects old operator persistence; missing native scope
 is a typed error, never inferred as a unit grant. Replay runs the same engine path.
+
+## Order 71 — source-scoped engaged shooting
+
+Existing shooting proposals and finite shooting-type choices cover this change;
+there are no new fields, decision types or visibility rules. An unengaged shooter
+can use Normal Shooting against an engaged MONSTER/VEHICLE target. An engaged
+non-MONSTER/non-VEHICLE model can use only CLOSE-QUARTERS weapons against its
+own rules unit's engaged enemies. MONSTER/VEHICLE model permissions do not spread
+to other models through an attached unit's keyword union.
+
+Candidate and pool `targeting_rule_ids` now use
+`gw-11e-core-actions:close-quarters-shooting` for 10.06 and
+`gw-11e-core-engaged-shooting:engaged-monster-vehicle-target` for 17.03.
+The legacy `big_guns_never_tire` value is removed. Both penalties are recorded
+when applicable; the existing source-linked `hit_roll_modifiers` keep them
+independent through Psychic selection, grouped attacks and final hit capping.
+The CLOSE-QUARTERS/PISTOL exemption requires engagement with the actual target.
+Clients must consume engine-produced options, candidates and modifier evidence.
+
+The existing shared declaration validation rejects illegal or stale model/target
+permissions before queue pop. Ordinary, reaction, Snap/Overwatch, retained and
+Firing Deck attacks retain that same path. Source values change within existing
+string fields, so Contract 34's schemas remain valid; the exact runtime identity
+continues to reject old persistence and bind replay. See [Order 71](ORDER_71_SCOPE_PLAN.md).
