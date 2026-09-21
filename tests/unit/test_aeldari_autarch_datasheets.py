@@ -144,6 +144,7 @@ def _mustering_catalog() -> ArmyCatalog:
         army_rules=generated.army_rules,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id=TEST_DETACHMENT_ID,
                 detachment_id=TEST_DETACHMENT_ID,
                 name="Autarch Aspect Training Test",
                 faction_id="aeldari",

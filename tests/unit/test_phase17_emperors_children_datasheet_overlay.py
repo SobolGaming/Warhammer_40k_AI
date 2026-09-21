@@ -5765,6 +5765,7 @@ def _fulgrim_opponent_turn_fight_session(
         package.army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="fulgrim-lifecycle-test",
                 detachment_id="fulgrim-lifecycle-test",
                 name="Fulgrim lifecycle test",
                 faction_id="EC",
@@ -5774,6 +5775,7 @@ def _fulgrim_opponent_turn_fight_session(
                 source_ids=("test:fulgrim-lifecycle:detachment:emperors-children",),
             ),
             DetachmentDefinition(
+                canonical_detachment_id="night-spinner-lifecycle-test",
                 detachment_id="night-spinner-lifecycle-test",
                 name="Night Spinner lifecycle test",
                 faction_id="AE",
@@ -6501,6 +6503,7 @@ def _configured_kakophonist_fixture(
         base_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="kakophonist-sequencing-test",
                 detachment_id="kakophonist-sequencing-test",
                 name="Kakophonist sequencing test",
                 faction_id="EC",
@@ -7214,6 +7217,7 @@ def _battleline_lifecycle_session(
     target_detachment_id = source_detachment_id
     detachment_definitions: tuple[DetachmentDefinition, ...] = (
         DetachmentDefinition(
+            canonical_detachment_id=source_detachment_id,
             detachment_id=source_detachment_id,
             name="Battleline lifecycle test",
             faction_id="EC",
@@ -7237,6 +7241,7 @@ def _battleline_lifecycle_session(
         target_detachment_id = "battleline-lifecycle-target-ec"
         detachment_definitions = (
             DetachmentDefinition(
+                canonical_detachment_id=source_detachment_id,
                 detachment_id=source_detachment_id,
                 name="Cross-faction source lifecycle test",
                 faction_id=source_faction_id,
@@ -7246,6 +7251,7 @@ def _battleline_lifecycle_session(
                 source_ids=("test:maulerfiend:cross-faction-source-lifecycle",),
             ),
             DetachmentDefinition(
+                canonical_detachment_id=target_detachment_id,
                 detachment_id=target_detachment_id,
                 name="Cross-faction target lifecycle test",
                 faction_id="EC",

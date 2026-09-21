@@ -18,7 +18,7 @@
       "any"
     ],
     "display_name": "Leader and Support attachment declarations",
-    "enforcement_id": "army_mustering:_resolve_attached_unit_formations",
+    "enforcement_id": "roster_attachment_validation:resolve_attached_unit_formations",
     "enforcement_surface": "catalog_generation/army_mustering",
     "faction_id": null,
     "notes": "Consumes every structured attachment target through the shared army-mustering path, preserves target-specific source IDs on the attached-unit formation, and rejects catalog targets that are not present in the same catalog.",

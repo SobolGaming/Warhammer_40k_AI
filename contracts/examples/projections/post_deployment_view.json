@@ -15119,7 +15119,7 @@
     }
   ],
   "projection_schema": "game-view-v12-model-keywords",
-  "projection_state_hash": "5c30ee59b0a04011c7511924404aff6cbea9325e3d49977bcda8320aa3a60349",
+  "projection_state_hash": "7c816be9a0f4e9535131fa44a5aa5660c8d1e1029fe609055f100e2660b89f57",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
@@ -15245,7 +15245,7 @@
       "game": "warhammer_40000",
       "version": "core-v2-phase9a"
     },
-    "source_hash": "775a6d117a0cfe36b5434a44008f361223ff968057faa13c9d4941ba04551655",
+    "source_hash": "45f1d4e11704787aea7893186a0f6001cb7e31da19df9c402bdddf13230515dd",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   },
   "stage": "battle",

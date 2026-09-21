@@ -691,6 +691,7 @@ def _package() -> Any:
             army_rules=catalog.army_rules,
             detachments=(
                 DetachmentDefinition(
+                    canonical_detachment_id=TEST_DETACHMENT_ID,
                     detachment_id=TEST_DETACHMENT_ID,
                     name="Aeldari Four Datasheets Test",
                     faction_id="AE",

@@ -1884,6 +1884,7 @@ def _death_guard_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="plague-company",
                 detachment_id="plague-company",
                 name="Plague Company",
                 faction_id=army_rule.DEATH_GUARD_FACTION_ID,

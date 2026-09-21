@@ -2496,6 +2496,7 @@ def _catalog_with_duplicate_runtime_enhancement_owner() -> ArmyCatalog:
     primary_detachment = catalog.detachments[0]
     duplicate_detachment = replace(
         primary_detachment,
+        canonical_detachment_id="core-combined-arms-duplicate",
         detachment_id="core-combined-arms-duplicate",
     )
     return replace(catalog, detachments=(primary_detachment, duplicate_detachment))

@@ -2109,6 +2109,7 @@ def _tyranids_lifecycle_catalog(
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=TYRANIDS_DETACHMENT_ID,
                 detachment_id=TYRANIDS_DETACHMENT_ID,
                 name="Synaptic Test Swarm",
                 faction_id=army_rule.TYRANIDS_FACTION_ID,
@@ -2123,6 +2124,7 @@ def _tyranids_lifecycle_catalog(
             *(
                 (
                     DetachmentDefinition(
+                        canonical_detachment_id="phase17g-tyranids-test-daemonic-incursion",
                         detachment_id="phase17g-tyranids-test-daemonic-incursion",
                         name="Daemonic Incursion",
                         faction_id=chaos_daemons_army_rule.CHAOS_DAEMONS_FACTION_ID,

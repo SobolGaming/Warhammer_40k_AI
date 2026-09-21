@@ -1171,6 +1171,7 @@ def _ecstatic_death_test_catalog() -> Any:
         _package().army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="daemon-prince-rule-ir-test",
                 detachment_id="daemon-prince-rule-ir-test",
                 name="Daemon Prince RuleIR Test",
                 faction_id="EC",

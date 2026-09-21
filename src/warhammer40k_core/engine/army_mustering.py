@@ -4,10 +4,6 @@ from dataclasses import dataclass, field
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attachment_eligibility import (
-    AttachmentRole,
-    AttachmentTargetEligibility,
-)
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetMusteringOptionEffectKind,
@@ -50,7 +46,6 @@ from warhammer40k_core.engine.list_validation_errors import (
 from warhammer40k_core.engine.model_keyword_grants import (
     grant_unit_keywords,
     replace_unit_faction_keywords,
-    unit_with_attached_role_evidence,
 )
 from warhammer40k_core.engine.roster_points import (
     RosterEnhancementPointValue,
@@ -1158,7 +1153,12 @@ def muster_army(
             )
         except (ListValidationError, UnitFactoryError) as exc:
             raise ArmyMusteringError("ArmyMusterRequest unit selection is invalid.") from exc
-    resolved_units, attached_units = _resolve_attached_unit_formations(
+    from warhammer40k_core.engine.roster_attachment_validation import (
+        resolve_attached_unit_formations,
+    )
+    from warhammer40k_core.engine.roster_construction_validation import assert_construction_legal
+
+    resolved_units, attached_units = resolve_attached_unit_formations(
         request=request,
         units=tuple(units),
         datasheets_by_selection_id=datasheets_by_selection_id,
@@ -1166,6 +1166,7 @@ def muster_army(
     from warhammer40k_core.engine.roster_bearer_validation import apply_warlord_keyword_if_selected
 
     roster_legality_report = validate_roster_legality(catalog=catalog, request=request)
+    assert_construction_legal(roster_legality_report)
     if request.roster_legality_required:
         roster_legality_report.assert_legal()
     resolved_units = apply_warlord_keyword_if_selected(
@@ -1306,13 +1307,30 @@ def validate_roster_legality(
         policy=policy,
         violations=violations,
     )
+    from warhammer40k_core.engine.roster_attachment_validation import append_attachment_violations
     from warhammer40k_core.engine.roster_bearer_validation import (
         RosterModelResolver,
         append_enhancement_violations,
         append_warlord_violations,
     )
+    from warhammer40k_core.engine.roster_construction_validation import (
+        append_construction_violations,
+    )
 
     model_resolver = RosterModelResolver(catalog=catalog, request=request)
+    append_construction_violations(
+        request=request,
+        detachments=detachments,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        model_resolver=model_resolver,
+        violations=violations,
+    )
+    append_attachment_violations(
+        request=request,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        model_resolver=model_resolver,
+        violations=violations,
+    )
     append_warlord_violations(
         model_resolver=model_resolver,
         request=request,
@@ -2704,163 +2722,6 @@ def _roster_violation_sort_key(
         "" if violation.source_id is None else violation.source_id,
         violation.message,
     )
-
-
-def _resolve_attached_unit_formations(
-    *,
-    request: ArmyMusterRequest,
-    units: tuple[UnitInstance, ...],
-    datasheets_by_selection_id: dict[str, DatasheetDefinition],
-) -> tuple[tuple[UnitInstance, ...], tuple[AttachedUnitFormation, ...]]:
-    if not request.attachment_declarations:
-        _validate_required_support_attachments(
-            request=request,
-            datasheets_by_selection_id=datasheets_by_selection_id,
-            attached_source_selection_ids=set(),
-        )
-        return units, ()
-    units_by_selection_id = {
-        unit.unit_instance_id.removeprefix(f"{request.army_id}:"): unit for unit in units
-    }
-    grouped: dict[
-        str,
-        dict[AttachmentRole, tuple[UnitInstance, AttachmentTargetEligibility]],
-    ] = {}
-    for declaration in request.attachment_declarations:
-        source_unit = units_by_selection_id.get(declaration.source_unit_selection_id)
-        bodyguard_unit = units_by_selection_id.get(declaration.bodyguard_unit_selection_id)
-        if source_unit is None:
-            raise ArmyMusteringError("AttachmentDeclaration source unit was not mustered.")
-        if bodyguard_unit is None:
-            raise ArmyMusteringError("AttachmentDeclaration bodyguard unit was not mustered.")
-        source_datasheet = datasheets_by_selection_id[declaration.source_unit_selection_id]
-        bodyguard_datasheet = datasheets_by_selection_id[declaration.bodyguard_unit_selection_id]
-        eligibility = _attachment_mustering.required_attachment_eligibility(
-            source_datasheet,
-            error_type=ArmyMusteringError,
-        )
-        target = eligibility.target_for_bodyguard_datasheet_id(bodyguard_datasheet.datasheet_id)
-        if target is None:
-            raise ArmyMusteringError(
-                "AttachmentDeclaration bodyguard datasheet is not allowed by source datasheet."
-            )
-        selected_source_wargear_ids = {
-            wargear_id for model in source_unit.own_models for wargear_id in model.wargear_ids
-        }
-        if not set(target.required_wargear_ids).issubset(selected_source_wargear_ids):
-            raise ArmyMusteringError(
-                "AttachmentDeclaration source unit does not satisfy the target wargear "
-                "requirements."
-            )
-        role_group = grouped.setdefault(declaration.bodyguard_unit_selection_id, {})
-        if eligibility.role in role_group:
-            raise ArmyMusteringError(
-                "AttachmentDeclaration exceeds one Leader or one Support per bodyguard."
-            )
-        role_group[eligibility.role] = (source_unit, target)
-
-    _validate_required_support_attachments(
-        request=request,
-        datasheets_by_selection_id=datasheets_by_selection_id,
-        attached_source_selection_ids={
-            declaration.source_unit_selection_id for declaration in request.attachment_declarations
-        },
-    )
-
-    formations: list[AttachedUnitFormation] = []
-    roles_by_unit_id: dict[str, str] = {}
-    claimed_component_ids: set[str] = set()
-    for bodyguard_selection_id in sorted(grouped):
-        bodyguard_unit = units_by_selection_id[bodyguard_selection_id]
-        role_group = grouped[bodyguard_selection_id]
-        leader_ids = tuple(
-            sorted(
-                unit.unit_instance_id
-                for role, (unit, _target) in role_group.items()
-                if role is AttachmentRole.LEADER
-            )
-        )
-        support_ids = tuple(
-            sorted(
-                unit.unit_instance_id
-                for role, (unit, _target) in role_group.items()
-                if role is AttachmentRole.SUPPORT
-            )
-        )
-        component_ids = tuple(sorted((bodyguard_unit.unit_instance_id, *leader_ids, *support_ids)))
-        overlap = claimed_component_ids.intersection(component_ids)
-        if overlap:
-            raise ArmyMusteringError(
-                "AttachmentDeclaration cannot place a unit in multiple attached units."
-            )
-        claimed_component_ids.update(component_ids)
-        attached_unit_id = f"attached-unit:{request.army_id}:{bodyguard_selection_id}"
-        source_id = f"attached-unit-join:{request.army_id}:{bodyguard_selection_id}"
-        attachment_source_ids = tuple(
-            sorted(
-                {
-                    attachment_source_id
-                    for _unit, target in role_group.values()
-                    for attachment_source_id in target.source_ids
-                }
-            )
-        )
-        formations.append(
-            AttachedUnitFormation(
-                attached_unit_instance_id=attached_unit_id,
-                bodyguard_unit_instance_id=bodyguard_unit.unit_instance_id,
-                leader_unit_instance_ids=leader_ids,
-                support_unit_instance_ids=support_ids,
-                component_unit_instance_ids=component_ids,
-                source_id=source_id,
-                attachment_source_ids=attachment_source_ids,
-            )
-        )
-        roles_by_unit_id[bodyguard_unit.unit_instance_id] = "bodyguard"
-        for unit_id in leader_ids:
-            roles_by_unit_id[unit_id] = "leader"
-        for unit_id in support_ids:
-            roles_by_unit_id[unit_id] = "support"
-
-    return (
-        tuple(
-            unit_with_attached_role_evidence(
-                unit,
-                role=roles_by_unit_id.get(unit.unit_instance_id),
-            )
-            for unit in units
-        ),
-        tuple(sorted(formations, key=lambda formation: formation.attached_unit_instance_id)),
-    )
-
-
-def _validate_required_support_attachments(
-    *,
-    request: ArmyMusterRequest,
-    datasheets_by_selection_id: dict[str, DatasheetDefinition],
-    attached_source_selection_ids: set[str],
-) -> None:
-    for selection in request.unit_selections:
-        datasheet = datasheets_by_selection_id[selection.unit_selection_id]
-        if (
-            _datasheet_has_attachment_role(datasheet=datasheet, role=AttachmentRole.SUPPORT)
-            and selection.unit_selection_id not in attached_source_selection_ids
-        ):
-            raise ArmyMusteringError(
-                "Support units must be declared as part of an attached unit during mustering."
-            )
-
-
-def _datasheet_has_attachment_role(
-    *,
-    datasheet: DatasheetDefinition,
-    role: AttachmentRole,
-) -> bool:
-    if type(datasheet) is not DatasheetDefinition:
-        raise ArmyMusteringError("Attachment role lookup requires a DatasheetDefinition.")
-    if type(role) is not AttachmentRole:
-        raise ArmyMusteringError("Attachment role lookup requires an AttachmentRole.")
-    return any(eligibility.role is role for eligibility in datasheet.attachment_eligibilities)
 
 
 def _validate_request_matches_catalog(

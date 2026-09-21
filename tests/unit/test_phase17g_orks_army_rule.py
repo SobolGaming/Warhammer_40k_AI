@@ -527,6 +527,7 @@ def _orks_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="war-horde",
                 detachment_id="war-horde",
                 name="War Horde",
                 faction_id=army_rule.ORKS_FACTION_ID,

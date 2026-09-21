@@ -1354,6 +1354,7 @@ def _spirit_mark_session(*, engaged: bool = False) -> tuple[LocalGameSession, st
         package.army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="aspect-host",
                 detachment_id="aspect-host",
                 name="Spirit Mark test detachment",
                 faction_id="AE",

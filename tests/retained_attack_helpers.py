@@ -72,6 +72,7 @@ def unending_fidelity_catalog() -> ArmyCatalog:
     profile = retained_sources.stratagem_profile()
     detachment = replace(
         catalog.detachments[0],
+        canonical_detachment_id=profile.detachment_id,
         detachment_id=profile.detachment_id,
         name="Hallowed Conclave rule consumer fixture",
         stratagem_ids=(profile.stratagem_id,),

@@ -960,6 +960,46 @@
           "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-20T20:51:19Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "duplicate-detachment:40k-app",
+          "source_observation_sha256": "1bd57e637ceaca8718a28c6537754c2de0973d46c8eeab939e191279c2a1aad8",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "constraints:40k-app",
+          "source_observation_sha256": "01fe922e7f260460c0f846940fc24dffbb8e4d82a59422851e042b69bd074a6b",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "unit-admission:40k-app",
+          "source_observation_sha256": "ec3047f355fb03ecf4e8db275e799f2a7bd6dcf413377b272c0e9880129081fb",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
+        },
+        {
+          "audit_id": "core-roster-construction-maintained-app-mirrors-2026-09-20",
+          "row_id": "support-attachment:40k-app",
+          "source_observation_sha256": "fb3f5ba5984e0f406f45e8000b8da52317f06bf180f9ea729f06e337d4cf508e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/25-muster-armies",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-21T00:32:52Z"
         }
       ],
       "legacy_observations": [
@@ -1598,6 +1638,18 @@
           "allowed_rule_source_ids": [
             "gw-11e-core-roster-models:enhancement",
             "gw-11e-core-roster-models:warlord"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-roster-construction",
+          "version": "maintained-app-mirrors-observed-2026-09-20",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-roster-construction:constraints",
+            "gw-11e-core-roster-construction:duplicate-detachment",
+            "gw-11e-core-roster-construction:support-attachment",
+            "gw-11e-core-roster-construction:unit-admission"
           ],
           "catalog_sha256": null
         }

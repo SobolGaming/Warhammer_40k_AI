@@ -319,15 +319,17 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "class AttachmentEligibility" in attachment_eligibility_source
     assert "class AttachmentDeclaration" in list_validation_source
     assert "class AttachedUnitFormation" in attached_unit_formation_source
-    assert "def _resolve_attached_unit_formations(" in army_mustering_source
-    assert "def _validate_required_support_attachments(" in army_mustering_source
+    attachment_mustering_source = source_for(ENGINE_ROOT / "roster_attachment_validation.py")
+    assert "resolve_attached_unit_formations" in army_mustering_source
+    assert "def resolve_attached_unit_formations(" in attachment_mustering_source
+    assert "def _validate_required_support_attachments(" in attachment_mustering_source
     assert (
         "Support units must be declared as part of an attached unit during mustering."
-        in army_mustering_source
+        in attachment_mustering_source
     )
-    assert "AttachmentRole.LEADER" in army_mustering_source
-    assert "AttachmentRole.SUPPORT" in army_mustering_source
-    assert "with_attached_role_evidence" in army_mustering_source
+    assert "AttachmentRole.LEADER" in attachment_mustering_source
+    assert "AttachmentRole.SUPPORT" in attachment_mustering_source
+    assert "with_attached_role_evidence" in attachment_mustering_source
     assert '"runtime-attached-unit:{role}"' in source_for(ENGINE_ROOT / "model_keyword_grants.py")
     strength_inventory_source = source_for(ENGINE_ROOT / "unit_strength_inventory.py")
     assert "starting_strength_records_for_army(army_definition)" in game_state_source

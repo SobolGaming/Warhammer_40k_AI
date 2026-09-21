@@ -1041,6 +1041,8 @@
         ],
         "detachments": [
           {
+            "canonical_detachment_id": "core-combined-arms",
+            "construction_constraints": [],
             "content_scope": "matched_play",
             "detachment_id": "core-combined-arms",
             "detachment_point_cost": 1,
@@ -15933,11 +15935,11 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v27-roster-models",
+  "schema_version": "replay-artifact-v28-construction",
   "source_identity": {
-    "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
+    "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "8de7b3c13c0e03331032df6d843af44df17212423d3e149d1d5bcaf4b2863b50",
+    "game_config_hash": "9b9d8e992e034604efa859ade69d31621295c66fea6c6f82c6328fed3bb638e5",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
     "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",

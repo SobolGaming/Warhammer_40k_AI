@@ -1295,6 +1295,7 @@ def _more_dakka_catalog() -> ArmyCatalog:
         ),
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="more-dakka",
                 detachment_id="more-dakka",
                 name="More Dakka",
                 faction_id="orks",
@@ -1467,6 +1468,7 @@ def _spectacle_catalog() -> ArmyCatalog:
         ),
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="spectacle-of-slaughter",
                 detachment_id="spectacle-of-slaughter",
                 name="Spectacle of Slaughter",
                 faction_id="emperors-children",
@@ -1726,6 +1728,7 @@ def _court_catalog() -> ArmyCatalog:
         ),
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="court-of-the-phoenician",
                 detachment_id="court-of-the-phoenician",
                 name="Court of the Phoenician",
                 faction_id="emperors-children",

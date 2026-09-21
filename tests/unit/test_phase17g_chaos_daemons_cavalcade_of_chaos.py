@@ -1736,6 +1736,7 @@ def _cavalcade_catalog(
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=rule.CAVALCADE_DETACHMENT_ID,
                 detachment_id=rule.CAVALCADE_DETACHMENT_ID,
                 name="Cavalcade of Chaos",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
@@ -1815,6 +1816,7 @@ def _catalog_with_other_daemon_detachment(catalog: ArmyCatalog) -> ArmyCatalog:
         detachments=(
             *catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
                 detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
                 name="Other Daemon Detachment",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,

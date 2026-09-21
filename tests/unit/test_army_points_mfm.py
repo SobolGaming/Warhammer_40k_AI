@@ -776,6 +776,7 @@ def _catalog() -> ArmyCatalog:
         factions=(faction, other_faction),
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="test-detachment",
                 detachment_id="test-detachment",
                 name="Test Detachment",
                 faction_id=faction.faction_id,

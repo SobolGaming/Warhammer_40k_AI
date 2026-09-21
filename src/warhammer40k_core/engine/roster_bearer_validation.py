@@ -60,14 +60,12 @@ class RosterModelResolver:
     request: ArmyMusterRequest
     _units: dict[str, UnitInstance] = field(default_factory=dict[str, UnitInstance], init=False)
 
-    def selected_model(
+    def unit(
         self,
         *,
         datasheet: DatasheetDefinition,
         unit_selection_id: str,
-        model_profile_id: str,
-        model_index: int,
-    ) -> ModelInstance:
+    ) -> UnitInstance:
         if unit_selection_id not in self._units:
             selection = next(
                 row
@@ -77,6 +75,17 @@ class RosterModelResolver:
             self._units[unit_selection_id] = UnitFactory(catalog=self.catalog).instantiate_unit(
                 army_id=self.request.army_id, selection=selection, datasheet=datasheet
             )
+        return self._units[unit_selection_id]
+
+    def selected_model(
+        self,
+        *,
+        datasheet: DatasheetDefinition,
+        unit_selection_id: str,
+        model_profile_id: str,
+        model_index: int,
+    ) -> ModelInstance:
+        self.unit(datasheet=datasheet, unit_selection_id=unit_selection_id)
         return selected_roster_model(
             self._units[unit_selection_id],
             model_profile_id=model_profile_id,

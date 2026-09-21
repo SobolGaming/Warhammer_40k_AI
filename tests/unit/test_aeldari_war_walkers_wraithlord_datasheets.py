@@ -1562,6 +1562,7 @@ def _fated_hero_catalog() -> ArmyCatalog:
         detachments=(
             *base.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=TEST_DETACHMENT_ID,
                 detachment_id=TEST_DETACHMENT_ID,
                 name="War Walkers and Wraithlord Test",
                 faction_id="AE",

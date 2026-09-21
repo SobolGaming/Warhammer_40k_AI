@@ -1266,6 +1266,7 @@ def _world_eaters_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="berzerker-warband",
                 detachment_id="berzerker-warband",
                 name="Berzerker Warband",
                 faction_id=army_rule.WORLD_EATERS_FACTION_ID,

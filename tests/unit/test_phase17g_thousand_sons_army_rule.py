@@ -648,6 +648,7 @@ def _thousand_sons_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=THOUSAND_SONS_DETACHMENT_ID,
                 detachment_id=THOUSAND_SONS_DETACHMENT_ID,
                 name="Grand Coven",
                 faction_id=army_rule.THOUSAND_SONS_FACTION_ID,
@@ -657,6 +658,7 @@ def _thousand_sons_catalog() -> ArmyCatalog:
                 source_ids=("phase17g:thousand-sons:detachment:grand-coven",),
             ),
             DetachmentDefinition(
+                canonical_detachment_id=OPFOR_DETACHMENT_ID,
                 detachment_id=OPFOR_DETACHMENT_ID,
                 name="Opposing Force",
                 faction_id="core-marine-force",

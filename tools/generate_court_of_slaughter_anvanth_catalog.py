@@ -363,6 +363,7 @@ def _detachment_definitions(
         raise ValueError("Paired-roster detachment source closure drifted.")
     return tuple(
         DetachmentDefinition(
+            canonical_detachment_id=row.detachment_id,
             detachment_id=row.detachment_id,
             name=row.name,
             faction_id=row.faction_id,

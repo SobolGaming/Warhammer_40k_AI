@@ -175,6 +175,9 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "core_roster_models_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),
+    "core_roster_construction_2026_09": (
+        "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
     "core_mustering_limits_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),

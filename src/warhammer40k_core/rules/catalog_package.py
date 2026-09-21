@@ -66,9 +66,11 @@ class CanonicalCatalogPackage:
     army_catalog: ArmyCatalog
     model_geometries: tuple[ModelGeometryCatalogRecord, ...]
     diagnostics: tuple[ModelGeometryImportDiagnostic, ...] = ()
-    schema_version: str = "phase17b-canonical-catalog-v1"
+    schema_version: str = "canonical-catalog-v2-construction"
 
     def __post_init__(self) -> None:
+        if self.schema_version != "canonical-catalog-v2-construction":
+            raise CanonicalCatalogPackageError("Unsupported canonical catalog schema version.")
         if type(self.package_id) is not DataPackageId:
             raise CanonicalCatalogPackageError(
                 "CanonicalCatalogPackage package_id must be DataPackageId."

@@ -2986,6 +2986,7 @@ def _chaos_daemons_lifecycle_catalog(
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="warptide",
                 detachment_id="warptide",
                 name="Warptide",
                 faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,
@@ -4011,6 +4012,7 @@ def _kairos_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=detachment_id,
                 detachment_id=detachment_id,
                 name="Daemonic Incursion",
                 faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,

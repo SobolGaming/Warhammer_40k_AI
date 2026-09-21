@@ -11,6 +11,21 @@ from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, Pr
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.construction_constraints import (
+    AllUnitSelector,
+    AnyUnitSelector,
+    CharacteristicComparison,
+    CharacteristicUnitSelector,
+    ConstructionConstraint,
+    ConstructionConstraintKind,
+    DatasheetUnitSelector,
+    DetachmentSelector,
+    ExcludeUnitSelector,
+    KeywordUnitSelector,
+    ModelQuantifier,
+    UnitSelector,
+)
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
@@ -140,6 +155,105 @@ def _unit_selection(
     )
 
 
+@pytest.mark.parametrize("required", [True, False])
+@pytest.mark.parametrize("select_alias", [False, True])
+def test_order69_unit_constraints_are_enforced_by_report_and_mustering(
+    required: bool, select_alias: bool
+) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    constraint = ConstructionConstraint(
+        constraint_id="order69:unit-rule",
+        source_id="order69:reviewed-unit-rule",
+        kind=(
+            ConstructionConstraintKind.REQUIRED_UNIT
+            if required
+            else ConstructionConstraintKind.PROHIBITED_UNIT
+        ),
+        unit_selector=DatasheetUnitSelector(
+            datasheet_ids=(
+                "core-character-leader" if required else "core-intercessor-like-infantry",
+            )
+        ),
+    )
+    catalog = replace(
+        catalog,
+        detachments=(
+            replace(
+                catalog.detachments[0],
+                construction_constraints=(constraint,),
+            ),
+        ),
+    )
+    owner = catalog.detachments[0]
+    alias = replace(owner, detachment_id="order69-alias", name="Alternate label")
+    catalog = replace(catalog, detachments=(owner, alias))
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id=owner.faction_id,
+            detachment_ids=(alias.detachment_id if select_alias else owner.detachment_id,),
+        ),
+    )
+    report = validate_roster_legality(catalog=catalog, request=request)
+    matches = [row for row in report.violations if row.source_id == constraint.source_id]
+    assert len(matches) == 1
+    assert matches[0].violation_code == constraint.kind.value
+    assert constraint.constraint_id in matches[0].message
+    # Structural construction rules cannot be disabled by the points/Warlord test switch.
+    with pytest.raises(ArmyMusteringError, match="construction"):
+        muster_army(catalog=catalog, request=request)
+
+
+@pytest.mark.parametrize("required", [True, False])
+def test_order69_other_detachment_excludes_its_owner(required: bool) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    owner = catalog.detachments[0]
+    constraint = ConstructionConstraint(
+        constraint_id="order69:other-rule",
+        source_id="order69:reviewed-other-rule",
+        kind=(
+            ConstructionConstraintKind.REQUIRED_OTHER_DETACHMENT
+            if required
+            else ConstructionConstraintKind.PROHIBITED_OTHER_DETACHMENT
+        ),
+        detachment_selector=DetachmentSelector(detachment_ids=(owner.canonical_detachment_id,)),
+    )
+    catalog = replace(
+        catalog, detachments=(replace(owner, construction_constraints=(constraint,)),)
+    )
+    report = validate_roster_legality(catalog=catalog, request=_muster_request(catalog))
+    assert any(row.source_id == constraint.source_id for row in report.violations) is required
+
+
+def test_order69_aliases_cannot_select_the_same_source_detachment_twice() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    owner = replace(catalog.detachments[0], detachment_point_cost=1)
+    alias = replace(owner, detachment_id="order69-alias", name="Different label")
+    catalog = replace(catalog, detachments=(owner, alias))
+    selection = DetachmentSelection(
+        faction_id=owner.faction_id,
+        detachment_ids=(owner.detachment_id, alias.detachment_id),
+    )
+    with pytest.raises(ListValidationError, match="same detachment"):
+        validate_detachment_selection(catalog=catalog, selection=selection)
+
+
+def test_order69_empty_grants_and_stratagem_inventory_are_legal() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = replace(
+        catalog,
+        detachments=(
+            replace(
+                catalog.detachments[0],
+                unit_datasheet_ids=(),
+                stratagem_ids=(),
+            ),
+        ),
+    )
+    army = muster_army(catalog=catalog, request=_muster_request(catalog))
+    assert len(army.units) == 1
+
+
 def _muster_request(
     catalog: ArmyCatalog,
     *,
@@ -205,6 +319,7 @@ def _phase16_source_detachment(
     unit_datasheet_ids: tuple[str, ...],
 ) -> DetachmentDefinition:
     return DetachmentDefinition(
+        canonical_detachment_id=row.detachment_id,
         detachment_id=row.detachment_id,
         name=row.name,
         faction_id=row.faction_id,
@@ -519,6 +634,7 @@ def _daemonic_pact_catalog() -> ArmyCatalog:
     )
     detachments = (
         DetachmentDefinition(
+            canonical_detachment_id="phase17g-csm-detachment",
             detachment_id="phase17g-csm-detachment",
             name="Phase 17G CSM Detachment",
             faction_id="chaos-space-marines",
@@ -621,6 +737,7 @@ def _dreadblades_catalog() -> ArmyCatalog:
     )
     detachments = (
         DetachmentDefinition(
+            canonical_detachment_id="phase17g-csm-detachment",
             detachment_id="phase17g-csm-detachment",
             name="Phase 17G CSM Detachment",
             faction_id="chaos-space-marines",
@@ -718,6 +835,7 @@ def _cult_of_dark_gods_catalog() -> ArmyCatalog:
     )
     detachments = (
         DetachmentDefinition(
+            canonical_detachment_id="phase17g-csm-detachment",
             detachment_id="phase17g-csm-detachment",
             name="Phase 17G CSM Detachment",
             faction_id="chaos-space-marines",
@@ -766,6 +884,7 @@ def _forbidden_pact_faction_catalog() -> ArmyCatalog:
     )
     detachments = tuple(
         DetachmentDefinition(
+            canonical_detachment_id=f"phase17g-{faction_id}-detachment",
             detachment_id=f"phase17g-{faction_id}-detachment",
             name=f"Phase 17G {name} Detachment",
             faction_id=faction_id,
@@ -851,6 +970,7 @@ def _drukhari_corsairs_and_travelling_players_catalog() -> ArmyCatalog:
     )
     detachments = (
         DetachmentDefinition(
+            canonical_detachment_id="phase17g-drukhari-detachment",
             detachment_id="phase17g-drukhari-detachment",
             name="Phase 17G Drukhari Detachment",
             faction_id="drukhari",
@@ -957,6 +1077,7 @@ def _aeldari_disparate_paths_catalog() -> ArmyCatalog:
         source_ids=("test-source:aeldari:faction",),
     )
     detachment = DetachmentDefinition(
+        canonical_detachment_id="phase17g-aeldari-detachment",
         detachment_id="phase17g-aeldari-detachment",
         name="Phase 17G Aeldari Detachment",
         faction_id=faction.faction_id,
@@ -1063,6 +1184,7 @@ def _freeblades_catalog() -> ArmyCatalog:
     )
     detachments = (
         DetachmentDefinition(
+            canonical_detachment_id="phase17g-adeptus-astartes-detachment",
             detachment_id="phase17g-adeptus-astartes-detachment",
             name="Phase 17G Adeptus Astartes Detachment",
             faction_id="adeptus-astartes",
@@ -1073,6 +1195,7 @@ def _freeblades_catalog() -> ArmyCatalog:
             source_ids=("phase17g:adeptus-astartes-detachment",),
         ),
         DetachmentDefinition(
+            canonical_detachment_id="phase17g-tau-detachment",
             detachment_id="phase17g-tau-detachment",
             name="Phase 17G Tau Detachment",
             faction_id="tau-empire",
@@ -1773,6 +1896,10 @@ def test_support_units_must_be_declared_attached_but_leaders_can_muster_solo() -
     with pytest.raises(ArmyMusteringError, match="Support units must be declared"):
         muster_army(catalog=catalog, request=support_request)
 
+    report = validate_roster_legality(catalog=catalog, request=support_request)
+    assert any(row.violation_code == "attachment_declaration_invalid" for row in report.violations)
+    assert not report.is_legal
+
     leader_army = muster_army(catalog=catalog, request=leader_request)
     leader = leader_army.unit_by_id("army-alpha:leader-unit")
     assert leader_army.attached_units == ()
@@ -2032,6 +2159,12 @@ def test_attachment_declarations_reject_missing_eligibility_and_illegal_bodyguar
     with pytest.raises(ArmyMusteringError, match="bodyguard datasheet"):
         muster_army(catalog=catalog, request=illegal_bodyguard_request)
 
+    for request in (missing_eligibility_request, illegal_bodyguard_request):
+        report = validate_roster_legality(catalog=catalog, request=request)
+        assert any(
+            row.violation_code == "attachment_declaration_invalid" for row in report.violations
+        )
+
 
 def test_attachment_declarations_reject_duplicate_sources_and_duplicate_roles() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
@@ -2258,6 +2391,7 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
     base_detachment = catalog.detachments[0]
     vanguard_detachment = replace(
         base_detachment,
+        canonical_detachment_id="core-vanguard",
         detachment_id="core-vanguard",
         name="CORE Vanguard",
         detachment_point_cost=2,
@@ -2267,6 +2401,7 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
     )
     support_detachment = replace(
         base_detachment,
+        canonical_detachment_id="core-support",
         detachment_id="core-support",
         name="CORE Support",
         detachment_point_cost=1,
@@ -2332,8 +2467,9 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
             catalog=multi_detachment_catalog,
             selection=over_limit_selection,
         )
-    with pytest.raises(ArmyMusteringError, match="unit selection"):
-        muster_army(catalog=multi_detachment_catalog, request=unsupported_unit_request)
+    # A legal faction unit needs no separate detachment grant under Core 25.04.
+    faction_army = muster_army(catalog=multi_detachment_catalog, request=unsupported_unit_request)
+    assert faction_army.units[0].datasheet_id == "core-transport"
 
 
 def test_incursion_allows_one_three_detachment_point_detachment_only() -> None:
@@ -2344,6 +2480,7 @@ def test_incursion_allows_one_three_detachment_point_detachment_only() -> None:
     )
     one_point_detachment = replace(
         catalog.detachments[0],
+        canonical_detachment_id="core-incursion-support",
         detachment_id="core-incursion-support",
         name="CORE Incursion Support",
         detachment_point_cost=1,
@@ -5454,6 +5591,7 @@ def test_order67_three_dp_is_only_a_single_detachment_exception(
     detachments = tuple(
         replace(
             catalog.detachments[0],
+            canonical_detachment_id=f"order67-detachment-{i}",
             detachment_id=f"order67-detachment-{i}",
             detachment_point_cost=cost,
         )
@@ -5929,3 +6067,429 @@ def test_order68_model_selection_facade_restore_rejects_bearer_drift() -> None:
     assignment["model_index"] = 1
     with pytest.raises(GameLifecycleError, match="do not match config"):
         type(session.lifecycle).from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("selector", "matches"),
+    [
+        (KeywordUnitSelector(all_of=("INFANTRY", "CORE MARINES")), True),
+        (KeywordUnitSelector(any_of=("CHARACTER", "INFANTRY")), True),
+        (KeywordUnitSelector(all_of=("CHARACTER",)), False),
+        (KeywordUnitSelector(all_of=("BATTLELINE",)), True),
+        (KeywordUnitSelector(all_of=("EPIC HERO",)), False),
+        (KeywordUnitSelector(none_of=("CHARACTER",)), True),
+        (KeywordUnitSelector(none_of=("INFANTRY",)), False),
+        (KeywordUnitSelector(any_of=("CHARACTER", "EPIC HERO")), False),
+        (
+            AllUnitSelector(
+                selectors=(
+                    KeywordUnitSelector(all_of=("INFANTRY",)),
+                    KeywordUnitSelector(none_of=("BATTLELINE",)),
+                )
+            ),
+            False,
+        ),
+        (
+            AnyUnitSelector(
+                selectors=(
+                    KeywordUnitSelector(all_of=("CHARACTER",)),
+                    KeywordUnitSelector(all_of=("BATTLELINE",)),
+                )
+            ),
+            True,
+        ),
+        (
+            ExcludeUnitSelector(
+                selector=KeywordUnitSelector(all_of=("INFANTRY",)),
+                excluded=KeywordUnitSelector(all_of=("BATTLELINE",)),
+            ),
+            False,
+        ),
+        (
+            ExcludeUnitSelector(
+                selector=KeywordUnitSelector(all_of=("INFANTRY",)),
+                excluded=KeywordUnitSelector(all_of=("CHARACTER",)),
+            ),
+            True,
+        ),
+        (
+            CharacteristicUnitSelector(
+                characteristic=Characteristic.WOUNDS,
+                comparison=CharacteristicComparison.AT_LEAST,
+                value=2,
+                models=ModelQuantifier.ALL,
+            ),
+            True,
+        ),
+        (
+            CharacteristicUnitSelector(
+                characteristic=Characteristic.WOUNDS,
+                comparison=CharacteristicComparison.AT_LEAST,
+                value=3,
+                models=ModelQuantifier.ANY,
+            ),
+            False,
+        ),
+        (
+            CharacteristicUnitSelector(
+                characteristic=Characteristic.WOUNDS,
+                comparison=CharacteristicComparison.AT_MOST,
+                value=1,
+                models=ModelQuantifier.ALL,
+            ),
+            False,
+        ),
+        (
+            CharacteristicUnitSelector(
+                characteristic=Characteristic.WOUNDS,
+                comparison=CharacteristicComparison.EQUAL,
+                value=2,
+                models=ModelQuantifier.ANY,
+            ),
+            True,
+        ),
+    ],
+)
+def test_order69_selector_semantics_through_mustering(
+    selector: UnitSelector, matches: bool
+) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    constraint = ConstructionConstraint(
+        constraint_id="order69:selector",
+        source_id="order69:selector-source",
+        kind=ConstructionConstraintKind.REQUIRED_UNIT,
+        unit_selector=selector,
+    )
+    catalog = replace(
+        catalog,
+        detachments=(replace(catalog.detachments[0], construction_constraints=(constraint,)),),
+    )
+    request = _muster_request(catalog)
+    report = validate_roster_legality(catalog=catalog, request=request)
+    failures = [row for row in report.violations if row.source_id == constraint.source_id]
+    assert bool(failures) is not matches
+    assert RosterLegalityReport.from_payload(json.loads(json.dumps(report.to_payload()))) == report
+    if matches:
+        assert muster_army(catalog=catalog, request=request).units
+    else:
+        with pytest.raises(ArmyMusteringError, match="construction"):
+            muster_army(catalog=catalog, request=request)
+
+
+@pytest.mark.parametrize("required", [True, False])
+def test_order69_other_detachment_matches_canonical_identity(required: bool) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    owner = replace(catalog.detachments[0], detachment_point_cost=1)
+    other = replace(owner, detachment_id="catalog-other", canonical_detachment_id="canonical-other")
+    constraint = ConstructionConstraint(
+        constraint_id="order69:other",
+        source_id="order69:other-source",
+        kind=ConstructionConstraintKind.REQUIRED_OTHER_DETACHMENT
+        if required
+        else ConstructionConstraintKind.PROHIBITED_OTHER_DETACHMENT,
+        detachment_selector=DetachmentSelector(
+            detachment_ids=(owner.canonical_detachment_id, other.canonical_detachment_id),
+            excluded_detachment_ids=(owner.canonical_detachment_id,),
+        ),
+    )
+    owner = replace(owner, construction_constraints=(constraint,))
+    catalog = replace(catalog, detachments=(owner, other))
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id=owner.faction_id, detachment_ids=(owner.detachment_id, other.detachment_id)
+        ),
+    )
+    report = validate_roster_legality(catalog=catalog, request=request)
+    failures = [row for row in report.violations if row.source_id == constraint.source_id]
+    assert bool(failures) is not required
+    if required:
+        assert muster_army(catalog=catalog, request=request).units
+    else:
+        with pytest.raises(ArmyMusteringError, match="construction"):
+            muster_army(catalog=catalog, request=request)
+
+
+def test_order69_keywords_include_selected_mustering_grants() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    sheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    sheet = replace(
+        sheet,
+        mustering_options=(
+            DatasheetMusteringOption(
+                option_id="order69:grant",
+                label="Reviewed test grant",
+                selection_group_id="order69:group",
+                effects=(
+                    DatasheetMusteringOptionEffect(
+                        kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD, keyword="ORDER69 GRANT"
+                    ),
+                ),
+                source_ids=("order69:grant-source",),
+            ),
+        ),
+    )
+    constraint = ConstructionConstraint(
+        constraint_id="order69:grant-rule",
+        source_id="order69:grant-rule-source",
+        kind=ConstructionConstraintKind.REQUIRED_UNIT,
+        unit_selector=KeywordUnitSelector(all_of=("ORDER69 GRANT",)),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            sheet if row.datasheet_id == sheet.datasheet_id else row for row in catalog.datasheets
+        ),
+        detachments=(replace(catalog.detachments[0], construction_constraints=(constraint,)),),
+    )
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                mustering_option_selections=(MusteringOptionSelection(option_id="order69:grant"),)
+            ),
+        ),
+    )
+    assert muster_army(catalog=catalog, request=request).units
+    missing = replace(request, unit_selections=(_unit_selection(),))
+    with pytest.raises(ArmyMusteringError, match="construction"):
+        muster_army(catalog=catalog, request=missing)
+
+
+@pytest.mark.parametrize("quantifier", [ModelQuantifier.ANY, ModelQuantifier.ALL])
+def test_order69_characteristic_selector_uses_selected_models(quantifier: ModelQuantifier) -> None:
+    catalog, request = _order68_model_roster()
+    sheet = catalog.datasheet_by_id("core-character-leader")
+    other = replace(
+        sheet.model_profiles[0],
+        model_profile_id="order69-other",
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.WOUNDS, 14)
+            if row.characteristic is Characteristic.WOUNDS
+            else row
+            for row in sheet.model_profiles[0].characteristics
+        ),
+    )
+    sheet = replace(
+        sheet,
+        model_profiles=(*sheet.model_profiles, other),
+        composition=(
+            *sheet.composition,
+            UnitCompositionDefinition(
+                model_profile_id=other.model_profile_id,
+                min_models=0,
+                max_models=1,
+                allows_zero_models=True,
+            ),
+        ),
+    )
+    constraint = ConstructionConstraint(
+        constraint_id="order69:threshold",
+        source_id="order69:threshold-source",
+        kind=ConstructionConstraintKind.REQUIRED_UNIT,
+        unit_selector=CharacteristicUnitSelector(
+            characteristic=Characteristic.WOUNDS,
+            comparison=CharacteristicComparison.AT_LEAST,
+            value=14,
+            models=quantifier,
+        ),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            sheet if row.datasheet_id == sheet.datasheet_id else row for row in catalog.datasheets
+        ),
+        detachments=(replace(catalog.detachments[0], construction_constraints=(constraint,)),),
+    )
+    report = validate_roster_legality(catalog=catalog, request=request)
+    assert any(row.source_id == constraint.source_id for row in report.violations)
+    selection = request.unit_selections[0]
+    request = replace(
+        request,
+        unit_selections=(
+            replace(
+                selection,
+                model_profile_selections=(
+                    *selection.model_profile_selections,
+                    ModelProfileSelection(model_profile_id=other.model_profile_id, model_count=1),
+                ),
+            ),
+        ),
+    )
+    failures = [
+        row
+        for row in validate_roster_legality(catalog=catalog, request=request).violations
+        if row.source_id == constraint.source_id
+    ]
+    assert bool(failures) is (quantifier is ModelQuantifier.ALL)
+
+
+def test_order69_constrained_roster_facade_restore_and_report_determinism() -> None:
+    catalog, request = _order68_model_roster()
+    constraints = (
+        ConstructionConstraint(
+            constraint_id="order69:required",
+            source_id="order69:source-required",
+            kind=ConstructionConstraintKind.REQUIRED_UNIT,
+            unit_selector=KeywordUnitSelector(all_of=("CHARACTER",)),
+        ),
+        ConstructionConstraint(
+            constraint_id="order69:forbidden",
+            source_id="order69:source-forbidden",
+            kind=ConstructionConstraintKind.PROHIBITED_UNIT,
+            unit_selector=KeywordUnitSelector(all_of=("EPIC HERO",)),
+        ),
+    )
+    catalog = replace(
+        catalog,
+        detachments=(replace(catalog.detachments[0], construction_constraints=constraints),),
+    )
+    assert ArmyCatalog.from_payload(json.loads(json.dumps(catalog.to_payload()))) == catalog
+    config = GameConfig(
+        game_id="order69-construction",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
+        army_catalog=catalog,
+        army_muster_requests=(request, replace(request, army_id="army-beta", player_id="player-b")),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
+    )
+    session = LocalGameSession()
+    session.start(config)
+    assert session.advance_until_decision_or_terminal().decision_request is not None
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    for viewer in config.player_ids:
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+    invalid_catalog = replace(
+        catalog,
+        detachments=(
+            replace(
+                catalog.detachments[0],
+                construction_constraints=(
+                    ConstructionConstraint(
+                        constraint_id="order69:invalid",
+                        source_id="order69:invalid-source",
+                        kind=ConstructionConstraintKind.PROHIBITED_UNIT,
+                        unit_selector=KeywordUnitSelector(all_of=("CHARACTER",)),
+                    ),
+                ),
+            ),
+        ),
+    )
+    invalid_session = LocalGameSession()
+    invalid_session.start(replace(config, army_catalog=invalid_catalog))
+    with pytest.raises(GameLifecycleError, match=r"mustering|construction|invalid"):
+        invalid_session.advance_until_decision_or_terminal()
+
+
+def test_order69_all_selected_detachments_apply_even_when_constraints_contradict() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    selector = KeywordUnitSelector(all_of=("INFANTRY",))
+    required = ConstructionConstraint(
+        constraint_id="order69:required",
+        source_id="order69:required-source",
+        kind=ConstructionConstraintKind.REQUIRED_UNIT,
+        unit_selector=selector,
+    )
+    prohibited = ConstructionConstraint(
+        constraint_id="order69:prohibited",
+        source_id="order69:prohibited-source",
+        kind=ConstructionConstraintKind.PROHIBITED_UNIT,
+        unit_selector=selector,
+    )
+    owner = replace(
+        catalog.detachments[0], detachment_point_cost=1, construction_constraints=(required,)
+    )
+    other = replace(
+        owner,
+        detachment_id="order69-other",
+        canonical_detachment_id="order69-other",
+        construction_constraints=(prohibited,),
+    )
+    catalog = replace(catalog, detachments=(owner, other))
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id=owner.faction_id, detachment_ids=(other.detachment_id, owner.detachment_id)
+        ),
+        unit_selections=(
+            _unit_selection(unit_selection_id="z"),
+            _unit_selection(unit_selection_id="a"),
+        ),
+    )
+    report = validate_roster_legality(catalog=catalog, request=request)
+    assert not report.is_legal
+    assert any(
+        row.violation_code == "prohibited_unit" and row.unit_selection_id == "a"
+        for row in report.violations
+    )
+    assert not any(row.source_id == required.source_id for row in report.violations)
+    assert report == validate_roster_legality(
+        catalog=catalog,
+        request=replace(request, unit_selections=tuple(reversed(request.unit_selections))),
+    )
+
+
+def test_order69_invalid_selected_profile_produces_typed_constraint_diagnostic() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    constraint = ConstructionConstraint(
+        constraint_id="order69:invalid-model",
+        source_id="order69:invalid-model-source",
+        kind=ConstructionConstraintKind.PROHIBITED_UNIT,
+        unit_selector=KeywordUnitSelector(all_of=("INFANTRY",)),
+    )
+    catalog = replace(
+        catalog,
+        detachments=(replace(catalog.detachments[0], construction_constraints=(constraint,)),),
+    )
+    request = _muster_request(
+        catalog, unit_selections=(_unit_selection(model_profile_id="missing"),)
+    )
+    report = validate_roster_legality(catalog=catalog, request=request)
+    assert any(row.violation_code == "construction_constraint_invalid" for row in report.violations)
+    assert not report.is_legal
+
+
+def test_order69_non_numeric_atom_is_not_hidden_by_successful_alternative() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    sheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    profile = sheet.model_profiles[0]
+    profile = replace(
+        profile,
+        characteristics=tuple(
+            CharacteristicValue.source_dash(Characteristic.MOVEMENT)
+            if row.characteristic is Characteristic.MOVEMENT
+            else row
+            for row in profile.characteristics
+        ),
+    )
+    sheet = replace(sheet, model_profiles=(profile,))
+    constraint = ConstructionConstraint(
+        constraint_id="order69:dash",
+        source_id="order69:dash-source",
+        kind=ConstructionConstraintKind.REQUIRED_UNIT,
+        unit_selector=AnyUnitSelector(
+            selectors=(
+                KeywordUnitSelector(all_of=("INFANTRY",)),
+                CharacteristicUnitSelector(
+                    characteristic=Characteristic.MOVEMENT,
+                    comparison=CharacteristicComparison.AT_LEAST,
+                    value=1,
+                    models=ModelQuantifier.ANY,
+                ),
+            )
+        ),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            sheet if row.datasheet_id == sheet.datasheet_id else row for row in catalog.datasheets
+        ),
+        detachments=(replace(catalog.detachments[0], construction_constraints=(constraint,)),),
+    )
+    report = validate_roster_legality(catalog=catalog, request=_muster_request(catalog))
+    assert any(row.violation_code == "construction_constraint_invalid" for row in report.violations)
+    with pytest.raises(ArmyMusteringError, match="construction"):
+        muster_army(catalog=catalog, request=_muster_request(catalog))

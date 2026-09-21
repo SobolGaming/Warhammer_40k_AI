@@ -1059,6 +1059,7 @@ def _warptide_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=warptide_ir.WARPTIDE_DETACHMENT_ID,
                 detachment_id=warptide_ir.WARPTIDE_DETACHMENT_ID,
                 name="Warptide",
                 faction_id=warptide_ir.CHAOS_DAEMONS_FACTION_ID,

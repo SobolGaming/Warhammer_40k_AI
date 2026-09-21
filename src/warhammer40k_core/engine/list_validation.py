@@ -482,6 +482,11 @@ def validate_detachment_selection(
         for detachment_id in selection.detachment_ids
     )
     detachment_point_costs: list[int] = []
+    canonical_ids = [row.canonical_detachment_id for row in detachments]
+    if len(set(canonical_ids)) != len(canonical_ids):
+        raise ListValidationError(
+            "DetachmentSelection cannot select the same detachment more than once."
+        )
     for detachment in detachments:
         if detachment.faction_id != faction.faction_id:
             raise ListValidationError("DetachmentSelection detachment does not belong to faction.")
@@ -490,10 +495,6 @@ def validate_detachment_selection(
                 "DetachmentSelection detachment point cost is awaiting source."
             )
         detachment_point_costs.append(detachment.detachment_point_cost)
-        if not detachment.unit_datasheet_ids:
-            raise ListValidationError(
-                "DetachmentSelection detachment unit grants are awaiting source."
-            )
         if not detachment.force_disposition_ids:
             raise ListValidationError(
                 "DetachmentSelection detachment force disposition is awaiting source."
@@ -662,6 +663,7 @@ def validate_unit_selection_for_army(
     }
     if (
         datasheet.datasheet_id not in allowed_datasheet_ids
+        and not shares_selected_faction
         and not daemonic_pact_allowed
         and not dreadblades_allowed
         and not cult_of_dark_gods_allowed

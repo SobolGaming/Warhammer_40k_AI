@@ -372,6 +372,7 @@ def _generated_snarling_protector_charge_lifecycle(
     )
     thousand_sons_detachment = replace(
         base_detachment,
+        canonical_detachment_id="phase15a-thousand-sons-detachment",
         detachment_id="phase15a-thousand-sons-detachment",
         name="Phase 15A Thousand Sons Detachment",
         faction_id="TS",

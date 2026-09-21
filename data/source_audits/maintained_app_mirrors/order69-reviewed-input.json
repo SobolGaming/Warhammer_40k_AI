@@ -1,0 +1,6 @@
+{
+  "duplicate-detachment": "You cannot select the same detachment more than once.",
+  "constraints": "Note that some detachment rules list units and other detachments that your army either must include or cannot include; you must follow all such rules when building your army for the detachments you have selected.",
+  "unit-admission": "You can only select units with your faction keyword and units available to your army faction.",
+  "support-attachment": "For each leader and support unit in your roster, you can attach them to a bodyguard unit that they can join, following the rules for Forming Attached Units (19.01). Each support unit in your roster must be attached to a bodyguard unit."
+}

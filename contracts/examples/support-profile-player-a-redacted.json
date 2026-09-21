@@ -985,17 +985,17 @@
     },
     "identities": {
       "catalog": {
-        "identity_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
+        "identity_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "33.0.0",
+        "contract_version": "34.0.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "629e40239b910888109b5df996895816dca1cb3d891db22d142caa3dc3bb1e46",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3311c43e735d60a8a2a35df50cf0266de6c567609c5dca2b92a80fcd43dc3a4f"
+        "identity_hash": "d99f5534cd29b808a40cc8fb6f91f262fa3420a0ce6d65233272ed609ad2a4ee",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:12dd8fabcd2d83ba124e29f39572e6864090a59a06bac0d715567d1f51977dec"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -1007,7 +1007,7 @@
       },
       "source_packages": [
         {
-          "identity_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
+          "identity_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
           "identity_id": "data-package:core-v2:phase9a-canonical:0.1.0",
           "source_kind": "army_catalog"
         },

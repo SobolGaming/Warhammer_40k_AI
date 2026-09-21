@@ -1,0 +1,7 @@
+{
+  "workload": "order68-roster-validation-v1",
+  "inherited_budget": "docs/performance/order68/budgets.json",
+  "ratio": 1.5,
+  "additive_seconds": 0.02,
+  "metrics": ["mean_seconds", "maximum_seconds"]
+}

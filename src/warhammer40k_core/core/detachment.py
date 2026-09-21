@@ -4,11 +4,17 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.construction_constraints import (
+    ConstructionConstraint,
+    ConstructionConstraintError,
+    validate_construction_constraints,
+)
 from warhammer40k_core.core.content_scope import (
     CatalogContentScope,
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
+from warhammer40k_core.core.datasheet import CatalogJsonObject
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 
 
@@ -44,6 +50,8 @@ class StratagemDefinitionPayload(TypedDict):
 
 class DetachmentDefinitionPayload(TypedDict):
     detachment_id: str
+    canonical_detachment_id: str
+    construction_constraints: list[CatalogJsonObject]
     name: str
     faction_id: str
     content_scope: str
@@ -261,6 +269,7 @@ class DetachmentDefinition:
     detachment_id: str
     name: str
     faction_id: str
+    canonical_detachment_id: str
     content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
     detachment_point_cost: int | None = None
     unit_datasheet_ids: tuple[str, ...] = ()
@@ -269,8 +278,23 @@ class DetachmentDefinition:
     enhancement_ids: tuple[str, ...] = ()
     stratagem_ids: tuple[str, ...] = ()
     source_ids: tuple[str, ...] = ()
+    construction_constraints: tuple[ConstructionConstraint, ...] = ()
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "canonical_detachment_id",
+            _validate_unprefixed_identifier(
+                "DetachmentDefinition canonical_detachment_id",
+                self.canonical_detachment_id,
+                "detachment:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "construction_constraints",
+            validate_construction_constraints(self.construction_constraints),
+        )
         object.__setattr__(
             self,
             "detachment_id",
@@ -355,6 +379,8 @@ class DetachmentDefinition:
     def to_payload(self) -> DetachmentDefinitionPayload:
         return {
             "detachment_id": self.detachment_id,
+            "canonical_detachment_id": self.canonical_detachment_id,
+            "construction_constraints": [row.to_payload() for row in self.construction_constraints],
             "name": self.name,
             "faction_id": self.faction_id,
             "content_scope": self.content_scope.value,
@@ -369,8 +395,25 @@ class DetachmentDefinition:
 
     @classmethod
     def from_payload(cls, payload: DetachmentDefinitionPayload) -> Self:
+        if "canonical_detachment_id" not in payload or "construction_constraints" not in payload:
+            raise DetachmentCatalogError("Detachment construction payload fields are required.")
+        if type(payload["construction_constraints"]) is not list:
+            raise DetachmentCatalogError(
+                "Detachment construction constraints payload must be a list."
+            )
+        try:
+            constraints = tuple(
+                ConstructionConstraint.from_payload(row)
+                for row in payload["construction_constraints"]
+            )
+        except ConstructionConstraintError as exc:
+            raise DetachmentCatalogError(
+                "Detachment construction constraint payload is invalid."
+            ) from exc
         return cls(
             detachment_id=payload["detachment_id"],
+            canonical_detachment_id=payload["canonical_detachment_id"],
+            construction_constraints=constraints,
             name=payload["name"],
             faction_id=payload["faction_id"],
             content_scope=catalog_content_scope_from_token(payload["content_scope"]),

@@ -982,6 +982,7 @@ def _army_rule_from_faction_row(row: NormalizedSourceRow) -> ArmyRuleDefinition:
 
 def _detachment_from_row(row: NormalizedSourceRow) -> DetachmentDefinition:
     return DetachmentDefinition(
+        canonical_detachment_id=row.source_row_id,
         detachment_id=row.source_row_id,
         name=_required_field(row=row, column_name="name"),
         faction_id=_required_field(row=row, column_name="faction_id"),
@@ -989,11 +990,15 @@ def _detachment_from_row(row: NormalizedSourceRow) -> DetachmentDefinition:
         detachment_point_cost=_required_non_negative_int(
             row=row, column_name="detachment_point_cost"
         ),
-        unit_datasheet_ids=_required_split_field(row=row, column_name="unit_datasheet_ids"),
+        unit_datasheet_ids=_required_split_field(
+            row=row, column_name="unit_datasheet_ids", allow_empty=True
+        ),
         force_disposition_ids=_required_split_field(row=row, column_name="force_disposition_ids"),
         rule_source_ids=_source_ids_from_row(row),
-        enhancement_ids=_required_split_field(row=row, column_name="enhancement_ids"),
-        stratagem_ids=_required_split_field(row=row, column_name="stratagem_ids"),
+        enhancement_ids=_required_split_field(
+            row=row, column_name="enhancement_ids", allow_empty=True
+        ),
+        stratagem_ids=_required_split_field(row=row, column_name="stratagem_ids", allow_empty=True),
         source_ids=_source_ids_from_row(row),
     )
 

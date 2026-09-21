@@ -1,0 +1,144 @@
+{
+  "order": 69,
+  "validated_on": "2026-09-21",
+  "status": "passed",
+  "base_commit": "28df017e9dfad7b5f5db7212fb7dfbf92954eb96",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:12dd8fabcd2d83ba124e29f39572e6864090a59a06bac0d715567d1f51977dec",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "gates_passed": [
+    "ruff check .",
+    "ruff format --check .",
+    "mypy src tests",
+    "pyright",
+    "lint-imports (11 contracts)",
+    "eight-shard inventory check",
+    "Order 69 offline source generator",
+    "both canonical catalog generators",
+    "engine build identity",
+    "exact-base external contract check (28df017e)",
+    "installed wheel: 27 schemas and six request families",
+    "TypeScript generated client and typecheck",
+    "TypeScript unit tests: 5",
+    "live conformance: 342 assertions",
+    "pre-commit run --all-files",
+    "Order 69 retained component comparisons",
+    "Order 64/65/66 component timings refreshed with unchanged baselines and budgets",
+    "behavioral coverage: 8637 tests, 85.13978508826968 percent",
+    "code-quality suite: 564 tests, no coverage"
+  ],
+  "first_aggregate_attempt": {
+    "tests": 8610,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1005.02,
+    "coverage_percent": 85.13883018070379,
+    "junit_sha256": "d2828b91530803be88f16bd36c62ba1e36f1f436248e104fe7862f732417345c",
+    "correction": "Updated the exact source-package count from 45 to 46 and regenerated the projection fixture (catalog and state hashes only). Both focused regressions passed. No production code changed."
+  },
+  "diagnostic_history": [
+    "Strict tests preceded implementation; focused iteration corrected canonical fixture keywords, selected-profile options and lifecycle validation timing. All 269 focused tests passed.",
+    "Direct npm was unavailable; the installed Node runtime executed the package script equivalents for generated-client checking, TypeScript typechecking, unit tests and live conformance.",
+    "An early client unit test ran while contract regeneration temporarily removed the manifest; after generation completed, all five tests passed.",
+    "A stale zero-byte Git index lock was removed after confirming no active Git process; staging and pre-commit then succeeded.",
+    "Alias review: 24 negative catalog regressions failed before the guard; all 246 focused catalog/mustering tests passed after it. The first adapter test collection correctly rejected the changed runtime before manifest regeneration; it was regenerated before the passing focused and aggregate runs."
+  ],
+  "performance_scope": "Roster validation and existing reconstruction, Firing Deck and Aircraft components only. Arbitrary future constraint workloads, complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
+  "prerequisite_scope": "No faction-specific constraint records were populated; FM0 and final cross-category certification remain separate.",
+  "second_aggregate_attempt": {
+    "tests": 8610,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 976.468,
+    "workers": 64,
+    "coverage_percent": 85.13949064778612,
+    "junit_sha256": "92fbbb9967426832d86d237f8dc1235661ee0ee52729398239c7ad760824cbbb",
+    "failure": "Hypothesis input-generation FailedHealthCheck.too_slow in unchanged test_polygon_geometry.py: two integer inputs generated in 1.84 seconds. No geometry assertion failed.",
+    "diagnostic": "All 16 geometry tests passed serially in 0.37 seconds with reported seed 172265360105466738155989759282791140891. No code or test settings changed.",
+    "next_run": "Retain -n auto --dist=worksteal with PYTEST_XDIST_AUTO_NUM_WORKERS=32 to reduce host scheduling contention. No suppressed health checks, deadlines, dropped tests or changed budgets."
+  },
+  "behavioral": {
+    "tests": 8637,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1332.076,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "de7bc21d3d95e75677c523851f38111e008e8ad8b714e7093a95663e221903bc",
+    "coverage_percent": 85.13978508826968,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_types": [
+      "ResourceWarning: unclosed SQLite connections"
+    ]
+  },
+  "first_quality_attempt": {
+    "tests": 564,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 314.467,
+    "workers": 64,
+    "distribution": "worksteal",
+    "coverage": false,
+    "junit_sha256": "0558190651aa0589e9ac4799d2b66c78a577579f01595db331dfdbbd2aa59086",
+    "correction": "Updated the second exact source-package count and explicitly classified core_roster_construction_2026_09 as reviewed transcription with project-authoritative App mirror evidence. Both focused checks passed. No production or behavioral test changes."
+  },
+  "code_quality": {
+    "tests": 564,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 326.367,
+    "workers": 64,
+    "distribution": "worksteal",
+    "coverage": false,
+    "junit_sha256": "5e54d8a00198a38af09bf3231f48192ee85fa206fc81d548ac9eab201aa6d9d2"
+  },
+  "previous_qualified_validation": {
+    "commit": "f92291eb1c0689373d54c735ab25dcec926820f6",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b258a14e4e9829a050f07db933fa5cb83595ae2d31feb67babb383181d5b14a8",
+    "behavioral": {
+      "tests": 8610,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1296.58,
+      "workers": 32,
+      "distribution": "worksteal",
+      "junit_sha256": "c5fd344089fd1c9c7c26e58e52b35a7aced470d5640e10369280759e5a0b398d",
+      "coverage_percent": 85.13949064778612,
+      "coverage_minimum_percent": 85,
+      "warnings": 10,
+      "warning_types": [
+        "ResourceWarning: unclosed SQLite connections"
+      ]
+    },
+    "code_quality": {
+      "tests": 564,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 337.585,
+      "workers": 64,
+      "distribution": "worksteal",
+      "coverage": false,
+      "junit_sha256": "bfe36ae868ead3c72215c0ee973d24de9b44960cc9b0a59d395484c8737533ec"
+    }
+  },
+  "alias_review": {
+    "violated_invariant": "Catalog rows sharing a canonical detachment identity must carry identical normalized construction records and source identities.",
+    "owner": "ArmyCatalog._validate_detachment_links, reached by direct construction and payload loading before roster selection.",
+    "production_change_lines": 7,
+    "red_regressions": 24,
+    "focused_tests_passed": 246,
+    "added_behavioral_cases": 27,
+    "regression_scope": "Removed constraints, changed kinds, unit/detachment selectors, constraint/source identity drift; both row orders and both construction boundaries. Valid aliases preserve normalized ordering, JSON round-trip and selected-row mustering enforcement.",
+    "scope_audit": "No additional construction-loading authority found. No payload-shape, decision, faction-content, named-handler or architecture-boundary changes. Existing published-catalog audit retains explicit canonical identities and empty faction constraints.",
+    "performance_assessment": "One dictionary lookup and record comparison per catalog row; no pairwise scan or added roster-query work. Fresh Order 64 restore/fork measurements include catalog loading; fresh Order 65/66/69 evidence retains the same host, workloads, baselines and budgets. Future alias-volume extremes remain uncertified.",
+    "validation": "Complete behavioral coverage and complete code-quality suites each passed once after the production fix. Runtime artifacts were regenerated before aggregate validation. All required publishing checks passed."
+  }
+}

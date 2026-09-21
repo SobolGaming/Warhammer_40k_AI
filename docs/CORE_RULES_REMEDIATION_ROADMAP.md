@@ -5105,3 +5105,28 @@ Corsair Coterie exceptions also validate the selected bearer's keywords, preserv
 legal non-CHARACTER bearers. Six mixed-profile regressions cover all four Enhancements.
 
 Final local validation passed 8,550 behavioral tests at 85.13% coverage and all 559 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.
+
+
+## Order 69 / P25C implementation
+
+C25-04 now has a source-neutral typed construction grammar and shared fail-closed
+roster evaluation. All four unit/other-detachment requirement and prohibition
+families are source-linked; canonical detachment identity prevents duplicate
+selection through catalog aliases. Support attachment reports and construction
+share the existing formation owner. Explicit empty unit, Enhancement and Stratagem
+inventories are legal; missing source columns and unknown references still fail.
+
+Faction-specific records remain unpopulated for FM0. The T4 survey remains read-only.
+Its proposed disposition intersection is resolved against Core 25.04, the official
+Event Companion and Games Workshop's explicit mixed-disposition example: the engine
+retains one selection from the union. See [scope, source resolution and validation](ORDER_69_SCOPE_PLAN.md).
+Contract 34 and canonical catalog v2 preserve explicit identity and reject old
+payloads. Final cross-category certification remains separate.
+
+Final Order 69 validation passed 8,610 behavioral tests at 85.14% coverage and all
+564 code-quality checks. Behavioral coverage used 32 xdist workers after a
+64-worker Hypothesis input-generation timing failure; quality used 64 workers,
+with work stealing for both. No tests, health checks or budgets were suppressed.
+Required lint, type, import, shard, source/runtime/contract generation, installed
+wheel, client/conformance and pre-commit gates passed. Diagnostic history and
+matched component evidence are retained in the Order 69 scope record.

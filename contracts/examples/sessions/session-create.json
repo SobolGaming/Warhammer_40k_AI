@@ -1037,6 +1037,8 @@
       ],
       "detachments": [
         {
+          "canonical_detachment_id": "core-combined-arms",
+          "construction_constraints": [],
           "content_scope": "matched_play",
           "detachment_id": "core-combined-arms",
           "detachment_point_cost": 1,

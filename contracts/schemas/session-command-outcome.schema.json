@@ -43,7 +43,7 @@
       "enum": ["command_committed", "proposal_invalid", "rule_path_unsupported"],
       "type": "string"
     },
-    "schema_version": {"const": "session-command-outcome-v33-contract", "type": "string"},
+    "schema_version": {"const": "session-command-outcome-v34-contract", "type": "string"},
     "session": {"$ref": "https://warhammer40k-core.local/contracts/v18/session-metadata.schema.json"}
   },
   "required": [

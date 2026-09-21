@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `33.0.0`
+Contract version: `34.0.0`
+
+Contract 34 requires canonical detachment identities and typed construction constraints in catalog payloads.
+See [migration 33 to 34](migrations/33-to-34.md).
 
 Contract 33 requires explicit model-level Warlord and Enhancement selections.
 See [migration 32 to 33](migrations/32-to-33.md).

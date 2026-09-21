@@ -1171,6 +1171,7 @@ def _screamers_scenario() -> BattlefieldScenario:
         package.army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id=detachment_id,
                 detachment_id=detachment_id,
                 name="Phase 17N Screamers movement fixture",
                 faction_id="CD",

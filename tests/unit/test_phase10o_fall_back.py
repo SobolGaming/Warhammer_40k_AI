@@ -2303,6 +2303,7 @@ def _catalog_with_chaos_knights_delirium(catalog: ArmyCatalog) -> ArmyCatalog:
         detachments=(
             *catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="phase17g-chaos-knights-delirium",
                 detachment_id="phase17g-chaos-knights-delirium",
                 name="P09B Delirium Test Detachment",
                 faction_id=chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_ID,

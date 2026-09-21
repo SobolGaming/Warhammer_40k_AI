@@ -1101,6 +1101,7 @@ def _votann_runtime_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=VOTANN_DETACHMENT_ID,
                 detachment_id=VOTANN_DETACHMENT_ID,
                 name="Hearthband",
                 faction_id=army_rule.LEAGUES_OF_VOTANN_FACTION_ID,
