@@ -1,7 +1,7 @@
 {
   "workload_id": "order65-firing-deck-v1",
-  "revision": "b258a14e",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b258a14e4e9829a050f07db933fa5cb83595ae2d31feb67babb383181d5b14a8",
+  "revision": "12dd8fab",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:12dd8fabcd2d83ba124e29f39572e6864090a59a06bac0d715567d1f51977dec",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
@@ -21,67 +21,67 @@
       "contribute": false,
       "samples": [
         {
-          "preparation_seconds": 7.364932399999816,
-          "declaration_seconds": 0.1293920999742113,
-          "hundred_queries_seconds": 0.0007073000015225261,
+          "preparation_seconds": 7.436967400019057,
+          "declaration_seconds": 0.1306730000069365,
+          "hundred_queries_seconds": 0.0006882000016048551,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.056573700014269,
-          "declaration_seconds": 0.12516599998343736,
-          "hundred_queries_seconds": 0.0006835000240243971,
+          "preparation_seconds": 1.0586403000052087,
+          "declaration_seconds": 0.12209759996039793,
+          "hundred_queries_seconds": 0.0007022999925538898,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9960006999899633,
-          "declaration_seconds": 0.12259630000335164,
-          "hundred_queries_seconds": 0.0007334999972954392,
+          "preparation_seconds": 0.9720056999940425,
+          "declaration_seconds": 0.12512889999197796,
+          "hundred_queries_seconds": 0.0007246999884955585,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9719133999897167,
-          "declaration_seconds": 0.12049170001409948,
-          "hundred_queries_seconds": 0.0006604999944102019,
+          "preparation_seconds": 1.0049809000338428,
+          "declaration_seconds": 0.12287329998798668,
+          "hundred_queries_seconds": 0.0006807000027038157,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.991368799994234,
-          "declaration_seconds": 0.12143189998460002,
-          "hundred_queries_seconds": 0.0006642000225838274,
+          "preparation_seconds": 0.9802451999858022,
+          "declaration_seconds": 0.12858129997039214,
+          "hundred_queries_seconds": 0.0006817000103183091,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.989279000001261,
-          "declaration_seconds": 0.12479140001232736,
-          "hundred_queries_seconds": 0.0009445000032428652,
+          "preparation_seconds": 0.9674868999863975,
+          "declaration_seconds": 0.1214878000319004,
+          "hundred_queries_seconds": 0.0007166999857872725,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9754626000067219,
-          "declaration_seconds": 0.12110489999759011,
-          "hundred_queries_seconds": 0.000755899993237108,
+          "preparation_seconds": 0.973068899998907,
+          "declaration_seconds": 0.12126689997967333,
+          "hundred_queries_seconds": 0.0006802999996580184,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.12356775713851675,
-          "median": 0.12259630000335164,
-          "p95": 0.1293920999742113,
-          "maximum": 0.1293920999742113
+          "mean": 0.12458697141846642,
+          "median": 0.12287329998798668,
+          "p95": 0.1306730000069365,
+          "maximum": 0.1306730000069365
         },
         "hundred_queries_seconds": {
-          "mean": 0.0007356285766166236,
-          "median": 0.0007073000015225261,
-          "p95": 0.0009445000032428652,
-          "maximum": 0.0009445000032428652
+          "mean": 0.0006963714258745313,
+          "median": 0.0006882000016048551,
+          "p95": 0.0007246999884955585,
+          "maximum": 0.0007246999884955585
         }
       }
     },
@@ -89,67 +89,67 @@
       "contribute": true,
       "samples": [
         {
-          "preparation_seconds": 0.971459499996854,
-          "declaration_seconds": 0.08448640001006424,
-          "hundred_queries_seconds": 0.0007053999870549887,
+          "preparation_seconds": 0.982666700030677,
+          "declaration_seconds": 0.08340549998683855,
+          "hundred_queries_seconds": 0.0006595999584533274,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9713663999864366,
-          "declaration_seconds": 0.08545830001821741,
-          "hundred_queries_seconds": 0.0006507000070996583,
+          "preparation_seconds": 1.0146749999839813,
+          "declaration_seconds": 0.08788720000302419,
+          "hundred_queries_seconds": 0.0006836999673396349,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0571268000057898,
-          "declaration_seconds": 0.08490330001222901,
-          "hundred_queries_seconds": 0.0006683999963570386,
+          "preparation_seconds": 1.063728200038895,
+          "declaration_seconds": 0.08136739995097741,
+          "hundred_queries_seconds": 0.0007045000093057752,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9743451999966055,
-          "declaration_seconds": 0.08312719999230467,
-          "hundred_queries_seconds": 0.0006745000137016177,
+          "preparation_seconds": 0.9719573000329547,
+          "declaration_seconds": 0.08361849997891113,
+          "hundred_queries_seconds": 0.0009399999980814755,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0158194999967236,
-          "declaration_seconds": 0.08239669998874888,
-          "hundred_queries_seconds": 0.0006634000164922327,
+          "preparation_seconds": 0.9847487999941222,
+          "declaration_seconds": 0.08332669996889308,
+          "hundred_queries_seconds": 0.0007051000138744712,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9743037000007462,
-          "declaration_seconds": 0.08304330002283677,
-          "hundred_queries_seconds": 0.0006969999813009053,
+          "preparation_seconds": 1.0050337000284344,
+          "declaration_seconds": 0.08580850000726059,
+          "hundred_queries_seconds": 0.0006927000358700752,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.973958099988522,
-          "declaration_seconds": 0.0869214000122156,
-          "hundred_queries_seconds": 0.000689499982399866,
+          "preparation_seconds": 0.9865736999781802,
+          "declaration_seconds": 0.08577090001199394,
+          "hundred_queries_seconds": 0.0006745999562554061,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.08433380000808809,
-          "median": 0.08448640001006424,
-          "p95": 0.0869214000122156,
-          "maximum": 0.0869214000122156
+          "mean": 0.08445495712969985,
+          "median": 0.08361849997891113,
+          "p95": 0.08788720000302419,
+          "maximum": 0.08788720000302419
         },
         "hundred_queries_seconds": {
-          "mean": 0.0006784142834866154,
-          "median": 0.0006745000137016177,
-          "p95": 0.0007053999870549887,
-          "maximum": 0.0007053999870549887
+          "mean": 0.0007228857055971665,
+          "median": 0.0006927000358700752,
+          "p95": 0.0009399999980814755,
+          "maximum": 0.0009399999980814755
         }
       }
     }

@@ -9,7 +9,7 @@ P25C completion; selector correctness is covered by behavioral regressions.
 This assesses the cost added to ordinary roster validation, not a maximum over
 arbitrary future constraint records.
 
-Base `28df017e` was measured before implementation. Head runtime `b258a14e` was
+Base `28df017e` was measured before implementation. Head runtime `12dd8fab` was
 measured after the final production change, on the same Windows 11 host,
 Python 3.14.5, Threadripper 3970X, dependency lock and workload source. Both
 measurements ran without competing test/build workers. Raw samples, machine
@@ -18,9 +18,9 @@ and `head.json`.
 
 | Units / models | Base mean (s) | Head mean (s) | Base maximum (s) | Head maximum (s) |
 | --- | ---: | ---: | ---: | ---: |
-| 2 / 6 | 0.035546 | 0.036161 | 0.036263 | 0.036410 |
-| 4 / 16 | 0.043717 | 0.044054 | 0.044404 | 0.044152 |
-| 20 / 96 | 0.107525 | 0.108386 | 0.108750 | 0.109057 |
+| 2 / 6 | 0.035546 | 0.036251 | 0.036263 | 0.036866 |
+| 4 / 16 | 0.043717 | 0.043989 | 0.044404 | 0.044155 |
+| 20 / 96 | 0.107525 | 0.109024 | 0.108750 | 0.110100 |
 
 Every mean and maximum passes the unchanged inherited budget:
 `head <= base * 1.5 + 0.02 seconds` per 100-call batch. The code-quality audit
@@ -31,7 +31,7 @@ Reproduce with the corresponding checkout and no competing workers:
 
 ```powershell
 uv run python -m scripts.measure_order68 --output docs/performance/order69/base.json --revision 28df017e
-uv run python -m scripts.measure_order68 --output docs/performance/order69/head.json --revision b258a14e
+uv run python -m scripts.measure_order68 --output docs/performance/order69/head.json --revision 12dd8fab
 ```
 
 The exact-runtime reconstruction, Firing Deck and Aircraft evidence in Orders
@@ -40,3 +40,9 @@ baselines and budgets. These are component results on provisional hardware.
 Complete gameplay-slice and full-game performance, the 60-second mean and
 300-second maximum game targets, and deferred Order 32 budgets remain
 uncertified. Final checks and diagnostic history are recorded in `validation.json`.
+
+The canonical-alias guard adds one dictionary lookup and normalized record comparison
+per detachment during catalog validation. It adds no pairwise scan or roster-query
+work. Order 64 restore/fork timings include catalog loading; Order 69 roster timings
+exclude it. These refreshed component reports cover ordinary shipped catalogs,
+not arbitrary future alias or constraint volumes.

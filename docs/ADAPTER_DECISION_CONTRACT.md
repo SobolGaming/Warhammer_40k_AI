@@ -6463,7 +6463,10 @@ not an additional player decision. Contract 34 requires canonical_detachment_id
 and construction_constraints on serialized detachment definitions; unknown identity
 references, malformed selector domains and absent fields are rejected. Other-detachment
 selectors use canonical identities and exclude the constraint owner. Aliases cannot
-select the same detachment twice. Generic unit selectors use selected model inventory
+select the same detachment twice, and all rows sharing a canonical ID must have
+identical construction records (including constraint/source IDs) after constraint-list
+ordering is normalized. Divergence fails catalog construction and payload loading.
+Generic unit selectors use selected model inventory
 and effective canonical keywords after structured mustering grants.
 
 RosterLegalityReport adds source-attributed required_unit, prohibited_unit,

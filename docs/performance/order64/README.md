@@ -56,15 +56,15 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.689 / 3.770 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.668 / 3.765 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.744 / 3.797 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.725 / 3.827 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.702 / 3.789 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.711 / 3.782 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.809 / 4.073 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.805 / 3.862 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.900 / 4.255 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.766 / 3.971 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.724 / 3.777 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.964 / 4.104 |
 
 Order 69 refreshed the 42 head timings and six independent profile samples for
-runtime `b258a14e` on 2026-09-21, retaining the qualified baseline and
+runtime `12dd8fab` on 2026-09-21, retaining the qualified baseline and
 unchanged workload and budgets. Every reconstruction completed with exact
 reproduction and parent isolation. All six comparisons pass, with authentication
 and suffix counts preserved. These measurements do not establish a speedup.
@@ -98,7 +98,7 @@ the failed attempts and focused diagnostic results.
 The Corsair bearer review correction refreshes this evidence for runtime
 `3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.
 
-Order 69 refreshes the head measurements and table for runtime `b258a14e`,
+Order 69 refreshes the head measurements and table for runtime `12dd8fab`,
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 69 validation](../order69/validation.json);
 the earlier gate records above remain historical.

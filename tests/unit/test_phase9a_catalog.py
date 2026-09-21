@@ -1192,6 +1192,97 @@ def test_order69_catalog_rejects_unknown_constraint_identity(detachment: bool) -
         )
 
 
+@pytest.mark.parametrize("from_payload", [False, True])
+@pytest.mark.parametrize("alias_first", [False, True])
+@pytest.mark.parametrize(
+    "drift",
+    ["remove", "kind", "unit_selector", "detachment_selector", "constraint_id", "source_id"],
+)
+def test_order69_canonical_aliases_cannot_change_construction_records(
+    from_payload: bool, alias_first: bool, drift: str
+) -> None:
+    from warhammer40k_core.core.construction_constraints import ConstructionConstraint
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    record: dict[str, Any] = {
+        "constraint_id": "order69:alias-rule",
+        "source_id": "order69:alias-source",
+        "kind": "prohibited_unit",
+        "unit_selector": {"type": "keywords", "all_of": ["INFANTRY"]},
+    }
+    if drift == "detachment_selector":
+        record.pop("unit_selector")
+        record["kind"] = "prohibited_other_detachment"
+        record["detachment_selector"] = {
+            "detachment_ids": [catalog.detachments[0].canonical_detachment_id, "other-canonical"]
+        }
+    owner = replace(
+        catalog.detachments[0],
+        construction_constraints=(ConstructionConstraint.from_payload(record),),
+    )
+    if drift == "kind":
+        record["kind"] = "required_unit"
+    elif drift == "unit_selector":
+        record["unit_selector"] = {"type": "keywords", "all_of": ["CHARACTER"]}
+    elif drift == "detachment_selector":
+        record["detachment_selector"] = {"detachment_ids": ["other-canonical"]}
+    elif drift in {"constraint_id", "source_id"}:
+        record[drift] = "order69:changed-identity"
+    alias = replace(
+        owner,
+        detachment_id="order69-alias",
+        name="Alternate catalog representation",
+        construction_constraints=(
+            () if drift == "remove" else (ConstructionConstraint.from_payload(record),)
+        ),
+    )
+    other = replace(
+        catalog.detachments[0],
+        detachment_id="order69-other",
+        canonical_detachment_id="other-canonical",
+    )
+    rows = (alias, owner, other) if alias_first else (owner, alias, other)
+    if from_payload:
+        payload = catalog.to_payload()
+        payload["detachments"] = [row.to_payload() for row in rows]
+        with pytest.raises(ArmyCatalogError, match=r"canonical.*construction"):
+            ArmyCatalog.from_payload(json.loads(json.dumps(payload)))
+    else:
+        with pytest.raises(ArmyCatalogError, match=r"canonical.*construction"):
+            replace(catalog, detachments=rows)
+
+
+def test_order69_canonical_aliases_share_normalized_construction_records() -> None:
+    from warhammer40k_core.core.construction_constraints import (
+        ConstructionConstraint,
+        ConstructionConstraintKind,
+        KeywordUnitSelector,
+    )
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    constraints = tuple(
+        ConstructionConstraint(
+            constraint_id=f"order69:{keyword}",
+            source_id="order69:alias-source",
+            kind=ConstructionConstraintKind.PROHIBITED_UNIT,
+            unit_selector=KeywordUnitSelector(all_of=(keyword,)),
+        )
+        for keyword in ("VEHICLE", "MONSTER")
+    )
+    owner = replace(catalog.detachments[0], construction_constraints=constraints)
+    alias = replace(
+        owner,
+        detachment_id="order69-alias",
+        name="Alternate catalog representation",
+        construction_constraints=tuple(reversed(constraints)),
+    )
+    catalog = replace(catalog, detachments=(owner, alias))
+    restored = ArmyCatalog.from_payload(json.loads(json.dumps(catalog.to_payload())))
+    assert restored == catalog
+    assert restored.detachments[0].construction_constraints == owner.construction_constraints
+    assert restored.detachments[1].construction_constraints == owner.construction_constraints
+
+
 def test_order69_constructor_rejects_untyped_cross_domain_and_duplicate_records() -> None:
     from warhammer40k_core.core.construction_constraints import (
         ConstructionConstraint,

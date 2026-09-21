@@ -156,7 +156,10 @@ def _unit_selection(
 
 
 @pytest.mark.parametrize("required", [True, False])
-def test_order69_unit_constraints_are_enforced_by_report_and_mustering(required: bool) -> None:
+@pytest.mark.parametrize("select_alias", [False, True])
+def test_order69_unit_constraints_are_enforced_by_report_and_mustering(
+    required: bool, select_alias: bool
+) -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     constraint = ConstructionConstraint(
         constraint_id="order69:unit-rule",
@@ -181,7 +184,16 @@ def test_order69_unit_constraints_are_enforced_by_report_and_mustering(required:
             ),
         ),
     )
-    request = _muster_request(catalog)
+    owner = catalog.detachments[0]
+    alias = replace(owner, detachment_id="order69-alias", name="Alternate label")
+    catalog = replace(catalog, detachments=(owner, alias))
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id=owner.faction_id,
+            detachment_ids=(alias.detachment_id if select_alias else owner.detachment_id,),
+        ),
+    )
     report = validate_roster_legality(catalog=catalog, request=request)
     matches = [row for row in report.violations if row.source_id == constraint.source_id]
     assert len(matches) == 1

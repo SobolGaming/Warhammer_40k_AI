@@ -998,7 +998,14 @@ def _validate_detachment_links(
     enhancement_ids = {enhancement.enhancement_id for enhancement in enhancements}
     stratagem_ids = {stratagem.stratagem_id for stratagem in stratagems}
     canonical_detachment_ids = {row.canonical_detachment_id for row in detachments}
+    canonical_rows: dict[str, DetachmentDefinition] = {}
     for detachment in detachments:
+        canonical = canonical_rows.setdefault(detachment.canonical_detachment_id, detachment)
+        if detachment.construction_constraints != canonical.construction_constraints:
+            raise ArmyCatalogError(
+                f"Rows for canonical detachment {detachment.canonical_detachment_id!r} "
+                "must have identical construction constraints, including source identities."
+            )
         for constraint in detachment.construction_constraints:
             if constraint.unit_selector is not None and not selector_datasheet_ids(
                 constraint.unit_selector

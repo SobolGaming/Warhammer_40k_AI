@@ -66,6 +66,13 @@ serialized list, empty in shipped content. Stable constraint/source IDs survive
 round-trip and appear in deterministic violations. Unknown referenced datasheets
 and canonical detachments fail catalog validation.
 
+Rows sharing a canonical detachment ID must carry identical construction records,
+including constraint IDs, source IDs, kinds and selectors. Constraint-list order
+is normalized by ID before comparison. This deliberately requires the same typed
+records, rather than trying to prove logical equivalence between different selector
+expressions. Catalog construction and payload loading reject divergence in either
+row order, so selecting an alias alone cannot remove or alter canonical rules.
+
 The closed UnitSelector union contains datasheet IDs, canonical keyword all/any/none
 filters (including CHARACTER, EPIC HERO and BATTLELINE), numeric characteristic
 thresholds with explicit any/all selected-model quantifiers, conjunction,
@@ -100,6 +107,14 @@ cross-domain records, unknown references, empty inventories, Support attachment,
 deterministic payloads and session persistence. Existing behavioral files are
 extended; the eight-shard file inventory remains unchanged.
 
+The canonical-alias review adds regressions for removed records, changed kinds,
+unit/detachment selectors and constraint/source identities through construction
+and JSON loading in both row orders. Valid aliases round-trip with normalized
+constraint ordering and retain required/prohibited unit enforcement when selected
+alone. The shared catalog boundary owns the seven-line fix; the bug-class search
+found no additional construction-loading authority. The existing published-catalog
+audit still enforces explicit identities and empty faction constraint records.
+
 Performance assessment reuses the existing Order 68 small/medium/large roster
 workload and its unchanged ratio/additive budget. Base was measured before
 implementation. Current-runtime Order 64/65/66 evidence has also been refreshed.
@@ -116,7 +131,7 @@ in 0.37 seconds. The final complete coverage run retained every test and health
 check, using xdist work stealing with `PYTEST_XDIST_AUTO_NUM_WORKERS=32` to reduce
 host contention. No production code or performance budget changed.
 
-Final local validation passed **8,610 behavioral tests at 85.14% coverage** and
+Final local validation passed **8,637 behavioral tests at 85.14% coverage** and
 **564 code-quality tests**. Behavioral coverage used 32 workers for the diagnosed
 host-contention issue; quality used the default 64. Both used work stealing;
 quality ran without coverage. The source-inventory quality checks were updated

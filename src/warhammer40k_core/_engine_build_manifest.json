@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b258a14e4e9829a050f07db933fa5cb83595ae2d31feb67babb383181d5b14a8",
-  "fingerprint": "b258a14e4e9829a050f07db933fa5cb83595ae2d31feb67babb383181d5b14a8",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:12dd8fabcd2d83ba124e29f39572e6864090a59a06bac0d715567d1f51977dec",
+  "fingerprint": "12dd8fabcd2d83ba124e29f39572e6864090a59a06bac0d715567d1f51977dec",
   "resource_count": 2915,
   "resources": [
     {
@@ -335,9 +335,9 @@
       "sha256": "5651155dddf7837961852e8491bf170d005d0e120f65bdd166261cd6d6b7733d"
     },
     {
-      "byte_length": 43906,
+      "byte_length": 44375,
       "path": "warhammer40k_core/core/army_catalog.py",
-      "sha256": "64db52977c4438a7f421efa6a1da542c53a2331e5b7a448980bb973ce1ed8ffc"
+      "sha256": "76b4b8f51c3c334669906fa10258e7530e4f5c7c8e35ff4015c0c4b053bc5065"
     },
     {
       "byte_length": 5525,
