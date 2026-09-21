@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, ConsolidationModeKind
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.consolidation_continuation_history import (
     consolidation_continuation_before_event,
 )
@@ -27,8 +27,7 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_identity_history_contains
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_fight_2026_09 import (
-    CONSOLIDATION_SOURCE_ID,
-    ONGOING_SOURCE_ID,
+    consolidation_response_source_id,
 )
 
 
@@ -45,8 +44,23 @@ def validate_consolidation_fight_history(
         and isinstance(event.payload, dict)
         and event.payload.get("proposal_kind") == "consolidate"
     )
-    if not triggers:
-        return
+    responses: dict[str, list[tuple[int, EventRecord]]] = {}
+    for index, event in enumerate(event_records):
+        if event.event_type not in {
+            "forced_fight_activation_queue_started",
+            "forced_fight_activation_queue_skipped",
+            "forced_fight_activation_queue_completed",
+        }:
+            continue
+        payload = _object(event.payload)
+        raw_context = payload.get("forced_activation_context")
+        source_phase = raw_context.get("source_phase") if isinstance(raw_context, dict) else None
+        if payload.get("phase") != "fight" and source_phase != "fight":
+            continue
+        trigger_id = _trigger_id(payload)
+        if not isinstance(trigger_id, str):
+            raise GameLifecycleError("Consolidation response requires its movement trigger.")
+        responses.setdefault(trigger_id, []).append((index, event))
     records_by_result = {record.result.result_id: record for record in decision_records}
     for trigger_index, trigger in triggers:
         payload = _object(trigger.payload)
@@ -54,10 +68,13 @@ def validate_consolidation_fight_history(
         if not isinstance(result_id, str) or result_id not in records_by_result:
             raise GameLifecycleError("Consolidation response lacks its movement decision.")
         proposal = fight_movement_proposal_from_payload(records_by_result[result_id].result.payload)
-        if proposal.consolidation_mode not in {
-            ConsolidationModeKind.ONGOING,
-            ConsolidationModeKind.ENGAGING,
-        }:
+        response_events = responses.pop(trigger.event_id, [])
+        expected_source = consolidation_response_source_id(proposal.consolidation_mode)
+        if expected_source is None:
+            if response_events:
+                raise GameLifecycleError(
+                    "Consolidation mode does not permit a forced-Fight response."
+                )
             continue
         resolution = _object(payload.get("resolution"))
         endpoint = _object(resolution.get("endpoint_witness"))
@@ -82,14 +99,12 @@ def validate_consolidation_fight_history(
         )
         queue_events = tuple(
             (index, event)
-            for index, event in enumerate(event_records)
+            for index, event in response_events
             if event.event_type
             in {
                 "forced_fight_activation_queue_started",
                 "forced_fight_activation_queue_skipped",
             }
-            and isinstance(event.payload, dict)
-            and _trigger_id(event.payload) == trigger.event_id
         )
         boundary_index = _consolidation_response_boundary(
             event_records=event_records, trigger_index=trigger_index, result_id=result_id
@@ -98,13 +113,11 @@ def validate_consolidation_fight_history(
             raise GameLifecycleError("Consolidation requires one response boundary after movement.")
         start_index, start = queue_events[0]
         start_payload = _object(start.payload)
-        expected_source = (
-            ONGOING_SOURCE_ID
-            if proposal.consolidation_mode is ConsolidationModeKind.ONGOING
-            else CONSOLIDATION_SOURCE_ID
-        )
         if not pending:
-            if start.event_type != "forced_fight_activation_queue_skipped":
+            if (
+                start.event_type != "forced_fight_activation_queue_skipped"
+                or len(response_events) != 1
+            ):
                 raise GameLifecycleError("Consolidation cannot queue already-selected enemy units.")
             if start_payload != {
                 "game_id": state.game_id,
@@ -148,6 +161,12 @@ def validate_consolidation_fight_history(
             raise GameLifecycleError(
                 "Consolidation response selecting player differs from canonical owner."
             )
+        if any(
+            event.event_type == "forced_fight_activation_queue_completed"
+            and _object(event.payload).get("forced_activation_context") != context.to_payload()
+            for _, event in response_events
+        ):
+            raise GameLifecycleError("Consolidation response completion source context drift.")
         suspended = FightPhaseState.from_payload(
             cast(
                 FightPhaseStatePayload,
@@ -164,6 +183,8 @@ def validate_consolidation_fight_history(
             context=context,
             suspended=suspended,
         )
+    if responses:
+        raise GameLifecycleError("Consolidation response has no authorized Engaging movement.")
 
 
 def _consolidation_response_boundary(

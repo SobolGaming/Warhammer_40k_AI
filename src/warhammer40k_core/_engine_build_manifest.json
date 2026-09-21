@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
-  "fingerprint": "1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
-  "resource_count": 2921,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4fef0c52c5374e2b83fc1c4e881573ac584e2d3ff377cea5b55ef8379e1f7a41",
+  "fingerprint": "4fef0c52c5374e2b83fc1c4e881573ac584e2d3ff377cea5b55ef8379e1f7a41",
+  "resource_count": 2922,
   "resources": [
     {
       "byte_length": 113,
@@ -1795,14 +1795,14 @@
       "sha256": "7d16f987c3c9ff3fae765ac2eb5b4f3c571fc70d39d4edf1783a9cb21ab3217d"
     },
     {
-      "byte_length": 12764,
+      "byte_length": 14012,
       "path": "warhammer40k_core/engine/consolidation_fight_history.py",
-      "sha256": "ea3dd15947c718a05375c606b1ed25d25871fede78defbaf5e13ed00e8632959"
+      "sha256": "b719cbb59d356ec5b86abde4c2e58a86d5c9c08c336397e84ba7efd9fa509c8f"
     },
     {
-      "byte_length": 5014,
+      "byte_length": 4771,
       "path": "warhammer40k_core/engine/consolidation_fight_queue.py",
-      "sha256": "8b2521f54a8d1f7a83cf14bdb2401bc33a8054c08f8f13a8ac9f0624fe4fe76a"
+      "sha256": "1f2e0375a481c9d5c9270827dbf2b7857ab3674b14e311d0a000a9a49be88292"
     },
     {
       "byte_length": 11644,
@@ -13120,14 +13120,14 @@
       "sha256": "78cb8b0a5fa15dcbfe5b30b36ae1d7fb06fc7d7a2a0b0b75db2761363f765d3f"
     },
     {
-      "byte_length": 92783,
+      "byte_length": 92794,
       "path": "warhammer40k_core/rules/source_authority_registry.json",
-      "sha256": "3fcb6ec0fa133053f28767d2df32273920650fcc247625463b92dc016dc5d910"
+      "sha256": "5a3869d2f12a2198f30d188128ff6c41be57627d2980abb06708c2aa40f6347b"
     },
     {
       "byte_length": 20968,
       "path": "warhammer40k_core/rules/source_authority_registry.py",
-      "sha256": "504a82238473be348464de93f0e09ec470514fe3f3b9d8f27eca6e7b1d5843f9"
+      "sha256": "a49628dc28c5b9defffb931970900dcf12b0eaa86a2852262603183368c5c2b5"
     },
     {
       "byte_length": 19955,
@@ -13415,14 +13415,19 @@
       "sha256": "e3928ede0f5a5cad6fa01cbd0237b7f55d28a7ec68449df4b54887bb5c6ceed1"
     },
     {
-      "byte_length": 5176,
+      "byte_length": 7299,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fight_2026_09/__init__.py",
-      "sha256": "625f61801175650781ddefa1e57ad1c19d6f4241766722257c41b96b2bfa5997"
+      "sha256": "67f86539e4f790d301df8c351c66450d80b444ccb59f647aca90e948b87d1a77"
     },
     {
       "byte_length": 13114,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fight_2026_09/artifacts/package.json",
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fight_2026_09/artifacts/historical-package-2026-09-05.json",
       "sha256": "daf37b84e0ca0a7fb653db6ae7b4d6aabf93b180fcb948688aae5fc9fbcf5d7d"
+    },
+    {
+      "byte_length": 14435,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_fight_2026_09/artifacts/package.json",
+      "sha256": "df45dfddbb5e851346fa355063b9cd92298c0c68f2491c6b312dc594c8ee15a9"
     },
     {
       "byte_length": 5200,

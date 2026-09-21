@@ -1,8 +1,8 @@
-"""Engine-owned response boundary for both enemy-engaging consolidation modes."""
+"""Engine-owned response boundary for source-authorized consolidation modes."""
 
 from __future__ import annotations
 
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, ConsolidationModeKind
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
     scenario_rules_unit_has_present_model,
@@ -24,8 +24,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_fight_2026_09 import (
-    CONSOLIDATION_SOURCE_ID,
-    ONGOING_SOURCE_ID,
+    consolidation_response_source_id,
 )
 
 
@@ -36,14 +35,10 @@ def start_consolidation_fight_queue(
     proposal: FightMovementProposal,
     movement_event: EventRecord,
 ) -> None:
-    if (
-        proposal.proposal_kind is not ProposalKind.CONSOLIDATE
-        or proposal.consolidation_mode
-        not in {
-            ConsolidationModeKind.ONGOING,
-            ConsolidationModeKind.ENGAGING,
-        }
-    ):
+    if proposal.proposal_kind is not ProposalKind.CONSOLIDATE:
+        return
+    source_rule_id = consolidation_response_source_id(proposal.consolidation_mode)
+    if source_rule_id is None:
         return
     suspended = state.fight_phase_state
     if suspended is None or suspended.forced_activation_context is not None:
@@ -74,11 +69,6 @@ def start_consolidation_fight_queue(
             identity_ids=selected,
             unit_instance_id=unit_id,
         )
-    )
-    source_rule_id = (
-        ONGOING_SOURCE_ID
-        if proposal.consolidation_mode is ConsolidationModeKind.ONGOING
-        else CONSOLIDATION_SOURCE_ID
     )
     if not pending:
         decisions.event_log.append(

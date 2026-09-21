@@ -1,9 +1,9 @@
 # Order 66 Aircraft component assessment
 
-Order 71 refreshed the head JSON for runtime `1418bd17` with unchanged
+Order 72 refreshed the head JSON for runtime `4fef0c52` with unchanged
 workloads, baselines and budgets. The tables and prior validation below are
 historical; current gate results are recorded in
-[Order 71 validation](../order71/validation.json).
+[Order 72 validation](../order72/validation.json).
 
 The matched workload measures 100 unchanged battlefield submissions through the
 shared mutation guard and one opponent turn boundary through the next decision.

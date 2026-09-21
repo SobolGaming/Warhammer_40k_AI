@@ -147,7 +147,7 @@ non-closable grouping label, not a finding ID or closure key.
   authority rather than the superseded living-only plan. `C05-04` separately
   certifies post-save Damage-to-0 ordering.
 - `C12-03` records the v931-labeled Ongoing Consolidation queue implementation;
-  `C12-04` reopens its source-mode certification under P12B;
+  `C12-04` resolves its source-mode certification under P12B using owner-confirmed App v946;
   `C14-02` owns the non-Core “objective marker” terminology alias; `C15-06`
   owns Insane Bravery's prohibition on already Battle-shocked targets.
 - `C22-02` owns the per-PSYKER-rules-unit, per-phase psychic-ability-use ledger,
@@ -217,7 +217,7 @@ corroborate but is not required to begin that work.
 | 16 | P24G | C24-07 | Pre-battle sequencing repeatedly returns the first unresolved player until that player completes every Scout action. | Persist an alternating player/unit-resolution cursor beginning with the first-turn player, skip only players with no unresolved pre-battle rule, and preserve decisions, restore, replay, and adapters. | [Game Datamissions App-data v931, alternating Scout moves FAQ](https://game-datamissions.com/11th/rules/changelog): players alternate resolving pre-battle rules, starting with the player taking the first turn. | P19, S-MIRRORS | APP-DRIFT |
 | 17 | P24D | C24-04 | Hazardous pools are deduplicated by profile ID and exactly one hazard roll is made. | Count selected physical Hazardous weapon instances and roll once per selected weapon after all of the unit’s attacks, preserving Shooting/Fight origin. | [24.15 Hazardous](https://www.40k.app/rules/24-core-abilities): roll once for each selected Hazardous weapon after the unit finishes its attacks. | P05A, P06B | APP-AUTHORITY |
 | 18 | P14 | C14-01, C14-02 | Objective consumers duplicate point-marker geometry and no data-boundary rule treats non-Core references to an “objective marker” as an “objective.” | Provide one model-group-aware geometry query for markers and terrain objectives, make Objective Control its first consumer, and normalize the non-Core terminology alias once at the source boundary without rewriting Core Rules text. | [14.01/14.01.01](https://www.40k.app/rules/14-objectives) and [v931 objective terminology FAQ](https://game-datamissions.com/11th/rules/changelog): use closest-part objective geometry, and outside Core Rules treat “objective marker” as “objective.” | S-MIRRORS | APP-AUTHORITY |
-| 19 | P12 | C12-01, C12-02, C12-03 | Objective Consolidation has incomplete geometry/final-position semantics; Ongoing Consolidation preserves prior engagements but does not queue every affected unselected enemy unit for opponent-controlled Fight selection. | Consume P14 geometry and complete Engaging, Ongoing and Objective Consolidation per-model/final-unit rules. Extend P18E’s shared forced-Fight queue to suspend and resume ordinary Fight state, activation order and pending continuations; select each affected unselected enemy exactly once through the opponent’s decision path. The shipped both-mode queue remains history; C12-04/P12B reopens source-mode certification. | [12.08](https://www.40k.app/rules/12-fight-phase), [14.01.01](https://www.40k.app/rules/14-objectives), and [v931 Ongoing Consolidation erratum](https://game-datamissions.com/11th/rules/changelog). | P14, P18E, S-MIRRORS | APP-DRIFT |
+| 19 | P12 | C12-01, C12-02, C12-03 | Objective Consolidation has incomplete geometry/final-position semantics; Ongoing Consolidation preserves prior engagements but does not queue every affected unselected enemy unit for opponent-controlled Fight selection. | Consume P14 geometry and complete Engaging, Ongoing and Objective Consolidation per-model/final-unit rules. Extend P18E’s shared forced-Fight queue to suspend and resume ordinary Fight state, activation order and pending continuations; select each affected unselected enemy exactly once through the opponent’s decision path. The shipped both-mode queue remains history; C12-04/P12B resolves v946 responses as Engaging-only. | [12.08](https://www.40k.app/rules/12-fight-phase), [14.01.01](https://www.40k.app/rules/14-objectives), and [v931 Ongoing Consolidation erratum](https://game-datamissions.com/11th/rules/changelog). | P14, P18E, S-MIRRORS | APP-DRIFT |
 | 20 | P22 | C22-01 | Generic Aura resolution excludes the source unless each descriptor opts in and can apply the same Aura more than once through overlapping models. | Include a model in its own Aura by default and apply the same Aura to a target once, unless source-backed wording expressly excludes self-application. | [22.01 Aura Abilities](https://www.40k.app/rules/22-other-rules-and-abilities): a model is within its own Aura and duplicate applications do not accumulate. | — | APP-AUTHORITY |
 | 21 | P22B | C22-02 | Psychic abilities with levels have no authoritative same-ability-use ledger. | Key each use by canonical PSYKER rules-unit ID, canonical psychic ability identity, and phase. Derive ability identity from its stable source rule/descriptor rather than its physical source instance; retain the selected source-instance and component identities as audit evidence only. Reject a second use exposed by duplicate instances or different attached components, and validate the canonical key plus evidence against authoritative lineage on restore/replay. | [Game Datamissions App-data v931, 22.03.01 Psychic Abilities with a Psychic Level](https://game-datamissions.com/11th/rules/changelog): a PSYKER unit cannot use the same psychic ability more than once per phase. | P08A, P19, S-MIRRORS | APP-AUTHORITY |
 | 22 | P24C1 | C24-03A | Duplicate non-Anti weapon abilities are rejected; distinct source instances are not preserved. | Preserve stable source identity for every duplicate core/weapon ability instance without yet adding the player-facing selection. | [24.02 Duplicated Abilities](https://www.40k.app/rules/24-core-abilities): duplicate abilities do not accumulate and the controlling player chooses which instance applies. | — | APP-AUTHORITY |
@@ -270,7 +270,7 @@ corroborate but is not required to begin that work.
 | 69 | P25C | C25-04 | `DetachmentDefinition` cannot express generic required/prohibited units or required/prohibited other detachments. | Add typed source-neutral constraints and fail-closed roster validation, including duplicate-detachment prohibition; do not populate or evaluate faction-specific records here. Certify the existing requirement that every Support unit is attached to an eligible Bodyguard. Use the T4 army-construction grammar survey as the read-only family catalog: `docs/factions/taxonomy/T4_ARMY_CONSTRUCTION_GRAMMAR.md`. | [25.04 Fill Your Army Roster](https://www.40k.app/rules/25-muster-armies): apply the stated unit/detachment requirements and prohibitions. | — | APP-AUTHORITY |
 | 70 | P24J | C24-10 | Intrinsic component Fights First effects are promoted to the attached rules unit by FightsFirstRegistry.from_state without proving every model has the ability. | Require every rules-present model to have Fights First. Distinguish intrinsic model/component sources and conditional Leader model grants from source-authorized whole-unit grants, including Charge. Recompute after ordinary/retained casualties, cleanup, revival and splitting; certify fight order, Counteroffensive, restored source scope and replay. | [24.13 Fights First](https://www.40k.app/rules/24-core-abilities) and [01.02](https://www.40k.app/rules/01-core-concepts): every-model test and unit-wide grants. | P02D, P05B, P24A | APP-DRIFT |
 | 71 | P17 | C17-01 | The shared shooting candidate exempts every CLOSE-QUARTERS weapon from the engaged Monster/Vehicle penalty and records the legacy big_guns_never_tire ID. | Exempt a CLOSE-QUARTERS attack only when the attacker's rules unit is engaged with that target. Preserve the distinct 10.06 attacking-model and 17.03 target-unit scopes, cumulative modifiers and final hit cap. Audit targeting and attack modifiers together; use stable current source IDs, regenerate affected identities and test third-party shooting, attached units, both penalty causes, all shared attack hosts and replay. | [10.06](https://www.40k.app/rules/10-shooting-phase) and [17.03](https://www.40k.app/rules/17-monsters-and-vehicles): weapon AND target-engagement exception. | P10, P02D, P02B | APP-DRIFT |
-| 72 | P12B | C12-04 | P12 queues forced fights for both modes, combining the 40k.app Engaging body clause with the v931 Ongoing erratum. Their version equivalence is not established. | Resolve the affected rule body/erratum against a selected App version through the exception workflow. Record the exact resolution and supersession scope before changing or certifying either mode. Revalidate P12's shared queue, suspension, retained presence and historical replay against the resolved source; the union is not a source resolution. | [12.08](https://www.40k.app/rules/12-fight-phase) and retained gw-11e-core-fight:ongoing-consolidation-erratum (Game Datamissions v931). | P12, S-MIRRORS | EXCEPTION-PAUSE |
+| 72 | P12B | C12-04 | P12 combined the unversioned Engaging body clause and v931 Ongoing erratum. | Resolved by the owner's official App v946 transcription: only Engaging forces enemy fights. Ongoing preserves prior engagements; Objective remains unengaged/in range. Shared source-mode authority governs queue creation and historical restore; superseded/orphan responses fail closed. See [scope, source resolution and validation](ORDER_72_SCOPE_PLAN.md). | [12.08](https://www.40k.app/rules/12-fight-phase), owner-confirmed official App v946 (2026-09-21), and preserved historical v931 erratum. | P12, S-MIRRORS | APP-AUTHORITY |
 | 73 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 71 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
 Categories 07 and 13 have no standalone remediation PR in this
@@ -298,13 +298,15 @@ T-TRANSPORT milestone includes both plus the new C18-09/P18H setup restriction.
 No grant is inferred from Core move availability, and this planning change does
 not certify the existing Shock interpretation.
 
-C12-04/P12B records an unresolved body/erratum conflict. Current 40k.app 12.08
+At the September 10 review, C12-04/P12B recorded an unresolved body/erratum conflict. Current 40k.app 12.08
 places forced enemy selection under Engaging; the retained v931 erratum labels
 it Ongoing. P12's shipped union is implementation history, not an approved source
 resolution. The unversioned browser observation does not establish co-versioned
 mirror disagreement. The affected semantics require the exception workflow and
 selected-version evidence before certification. Objective Consolidation's
 unengaged endpoint is explicitly present in current 12.08 and is not disputed.
+Order 72 subsequently resolves this exception using the owner's official App
+v946 transcription; see the implementation record below.
 
 New independent owners also cover general sequencing (C01-04), the CP-cost bound
 (C02-05), per-model Charge constraints (C11-04), every-model Fights First
@@ -3119,6 +3121,10 @@ roadmap.
 
 ## P12 implementation evidence - Order 19
 
+Historical P12 implementation record. Order 72 below supersedes its both-mode
+response certification using the owner-confirmed official App v946 clauses.
+The original source observations and package bytes remain preserved.
+
 P12 consumes P14 objective geometry and P18E forced-Fight execution. Reviewed
 12.07/12.08 and the v931 Ongoing Consolidation erratum are committed in
 `core_fight_2026_09/artifacts/package.json`, with a hash-pinned loader and
@@ -5163,3 +5169,61 @@ Orders 72–73 and final cross-category certification remain separate.
 Review corrections close the remaining physical-unit keyword promotion in declaration exclusivity and add immutable clause-to-consumer proof without altering source observations.
 
 Final local validation: 8,720 behavioral tests, 85.14% coverage and 572 code-quality checks passed. Source, performance and publishing-gate results are retained in the linked scope record. Review and merge remain pending.
+
+
+## Order 72 / P12B implementation — C12-04
+
+- **Status:** implemented and locally validated.
+- **Finding IDs:** C12-04.
+- **Dependencies and evidence gate:** P12 and S-MIRRORS merged; base
+  `5befbb928fb938c4faa2bef8cd52ffc677e6294f`. The owner's official App v946
+  confirmation resolves EXCEPTION-PAUSE to APP-AUTHORITY on 2026-09-21.
+- **Violated invariant:** forced enemy selection must have a resolved,
+  mode-specific source grant during live execution and historical restore.
+- **How it is currently done:** historical P12 combined the unversioned
+  Engaging clause and the v931 Ongoing erratum, granting both modes a response.
+- **How it should be done:** only Engaging grants forced enemy selections.
+  Ongoing preserves prior model engagements; Objective remains unengaged and
+  in range. The live queue and historical validator consume one typed source
+  query. Superseded and orphan responses fail closed.
+- **Specific authoritative maintained direct App-data mirror rule/statement
+  and source ID:** complete 12.08 After moving clauses, confirmed by the owner
+  from the official App v946; `gw-11e-core-fight:consolidation-move`.
+- **Provider, URL, App-data version or observation timestamp, transcription
+  SHA-256, and source-observation fingerprint:** the corroborating
+  [40k.app 12.08](https://www.40k.app/rules/12-fight-phase) observation is
+  unversioned, dated `2026-09-05T18:32:47-04:00`, with transcription
+  `cfcace8bd96251a0b11c8eb24ccb20ea64a69f72d33a9a7cc8a6993c17f7ae89`
+  and observation
+  `25194f1eb4ba53e9bc431353e1dc921d3dd17c40a96d8cc4b3ee91c7e17dcfa3`.
+  The distinct owner-supplied v946 transcription and resolution hashes, honest
+  provenance and exact supersession appear in [the scope record](ORDER_72_SCOPE_PLAN.md).
+  No retained official App capture or co-versioned mirror agreement is claimed.
+- **Scope and explicit exclusions:** C12-04 only. The v931 Ongoing response
+  clause is superseded for v946; original observations and the full P12 package
+  remain immutable history. Shock Disembark, movement geometry and Order 73
+  category-wide certification are unchanged.
+- **Owning state/validation/mutation/event/replay path:** typed source artifact
+  -> accepted witnessed Fight movement -> consolidation queue -> existing
+  opponent decision and ordinary continuation -> authenticated history/replay.
+- **Decision and viewer-visibility impact:** existing decision/event envelopes,
+  engine mutation and shared viewer redaction remain authoritative. The adapter
+  contract records the narrower response boundary; old saves retain their exact
+  engine-build requirement.
+- **Regression scenarios and same-bug-class search:** the new Ongoing facade
+  assertion failed before the fix. Both duplicated source/mode owners now share
+  one query. Tests cover both players, Engaging queues, already-selected enemies,
+  Normal/Overrun, retained and attached models, forged response/source history,
+  continuation, restore, replay and viewer projections.
+- **Generated artifacts/documentation:** current and historical source JSON,
+  authority registry, runtime manifest and contract examples; README, adapter
+  contract, comparison, source/scope and performance records updated.
+- **Validation results:** [Order 72 validation](performance/order72/README.md)
+  records 8,730 behavioral passes with 85.1512% coverage, 575 code-quality passes,
+  lint/type/import/shard/generator checks, exact-base contract and installed-wheel
+  checks, five TypeScript unit tests, 342 live HTTP assertions and all declared
+  component performance comparisons. The initial renderer/roadmap-test failures
+  were corrected and the affected complete suites rerun. `npm ci` could not run
+  because npm is unavailable; direct Node client checks passed.
+- **PR URL and merge commit:** [PR #492](https://github.com/SobolGaming/Warhammer_40k_AI/pull/492);
+  open for review, not merged.

@@ -1,0 +1,28 @@
+{
+  "workload": "order72-engaging-full-fight-restore-replay-v1",
+  "revision": "5befbb928fb938c4faa2bef8cd52ffc677e6294f",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "Fresh pytest process, real facade fixture, full Fight, restore and replay",
+  "scenario": "tests/unit/test_phase15c_fight_order.py::test_p12_full_fight_phase_reconstructs_ordinary_continuation_and_forced_overrun",
+  "hashes": {
+    "scripts/measure_order72.py": "996a8a4ceaccc9f06ef40be864cc7b8c93cbd3e5b917fa243ab4d3b2deefa2a4",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "samples_seconds": [
+    19.09207409998635,
+    19.0043082999764,
+    18.539351499988697
+  ],
+  "mean_seconds": 18.878577966650482,
+  "median_seconds": 19.0043082999764,
+  "maximum_seconds": 19.09207409998635,
+  "completion_rate": 1,
+  "full_game_certified": false
+}

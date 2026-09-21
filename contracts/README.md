@@ -2,6 +2,13 @@
 
 Contract version: `34.0.0`
 
+Order 72 narrows forced enemy Fight responses to Engaging Consolidation under
+owner-confirmed official App data v946. Ongoing and Objective moves grant no
+response. Existing decision and event envelopes remain compatible; old saves and
+replays retain their exact engine-build requirement. See the source resolution
+and response contract in `docs/ADAPTER_DECISION_CONTRACT.md`. No schema version
+change or old-queue conversion is introduced.
+
 Contract 34 requires canonical detachment identities and typed construction constraints in catalog payloads.
 See [migration 33 to 34](migrations/33-to-34.md).
 

@@ -1,0 +1,100 @@
+{
+  "order": 72,
+  "finding_ids": [
+    "C12-04"
+  ],
+  "validated_on": "2026-09-21",
+  "status": "passed_with_documented_environment_limitation",
+  "base_commit": "5befbb928fb938c4faa2bef8cd52ffc677e6294f",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4fef0c52c5374e2b83fc1c4e881573ac584e2d3ff377cea5b55ef8379e1f7a41",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "behavioral": {
+    "tests": 8730,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1287.526,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "e004d0d2ca34f32e36d76297164d6aae39c576c5350c6d2af5825741cd601bd1",
+    "coverage_percent": 85.15120625212369,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_types": [
+      "ResourceWarning: unclosed SQLite connections"
+    ]
+  },
+  "initial_behavioral_attempt": {
+    "tests": 8730,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1355.55,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "cf2b2044e990f3e4089d208c9d271304f846ab7f6be6cfb8513f390344129f51",
+    "coverage_percent": 85.15120625212369,
+    "warnings": 9,
+    "failed_test": "tests/unit/reporting/test_support_renderers.py::test_core_rules_40k_app_audit_retains_exact_review_only_category_inventory",
+    "correction": "Updated the comparison-report renderer to reproduce the new owner-resolution paragraph. The focused regression and generator check passed; the complete behavioral coverage gate was then rerun. No engine runtime code changed."
+  },
+  "code_quality": {
+    "tests": 575,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 332.626,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "5db4e6a5c862a021a9cb572cc14cc7026107198c3ee3d3ed81478e590276ef17",
+    "coverage": false
+  },
+  "initial_code_quality_attempt": {
+    "tests": 575,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 323.781,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "07e4e3dd8c5b92e59dbdd6380f2803ec98af5b492a15f0fe200f5da8b7b306ca",
+    "failed_test": "tests/code_quality/test_core_rules_roadmap.py::test_core_roadmap_gives_review_findings_unique_owners_before_certification",
+    "correction": "The roadmap guard still required P12B to remain EXCEPTION-PAUSE. It now requires APP-AUTHORITY, the dated official-App v946 confirmation and the source-resolution link. All five focused roadmap checks passed, followed by a complete quality rerun. Only the test expectation changed."
+  },
+  "commands_not_run": {
+    "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised with bundled Node 24.19.0 through the direct package-script commands. A clean dependency installation remains for CI."
+  },
+  "gates_passed": [
+    "uv run ruff check .",
+    "uv run ruff format --check .: 3356 files",
+    "uv run mypy src tests: 3180 source files",
+    "uv run pyright: 0 errors, 0 warnings",
+    "uv run lint-imports: 11 contracts",
+    "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+    "uv run pre-commit run --all-files",
+    "Order 72 source generator: current package, immutable historical package and original mirror audit",
+    "Core Rules comparison-report renderer reproducibility",
+    "Both canonical Chaos Daemons and Court of Slaughter catalog generators",
+    "Engine build identity and exact-base external contract check against 5befbb928fb938c4faa2bef8cd52ffc677e6294f",
+    "Installed wheel smoke: 2922 runtime resources, 27 schemas, six request families",
+    "TypeScript generated-client check and typecheck",
+    "TypeScript unit tests: 5 passed",
+    "Live HTTP conformance: 342 assertions and cross-server replay equivalence",
+    "Order 72 matched Engaging Fight/restore/replay evidence: three successful base and head samples; mean and maximum within unchanged budgets",
+    "Orders 64, 65, 66, 69, 70 and 71: refreshed current-runtime head evidence with unchanged baselines, scripts, workloads and budgets"
+  ],
+  "scope": "Order 72 / P12B / C12-04 only. No production code changed after the final behavioral run began. Final all-category certification remains Order 73.",
+  "source_resolution": "Owner supplied the official App v946 After moving transcription on 2026-09-21. Only Engaging grants forced enemy selection. Historical v931 evidence and original observation hashes remain unchanged; no official capture or co-versioned mirror agreement is claimed.",
+  "performance_scope": "Matched real Engaging full-Fight regression workload, including fresh pytest process, fixture, assertions, authenticated restore and replay. Inherited component guards also refreshed. Whole-game throughput, the 60-second mean / 300-second maximum goals and deferred Order 32 budgets remain uncertified.",
+  "diagnostic_history": [
+    "The new Ongoing facade assertion reproduced the base defect before production edits: an accepted Ongoing move queued two unselected enemies.",
+    "Same-bug-class search found duplicated mode/source decisions in the live queue and historical validator; both now consume the source artifact grant.",
+    "Focused regressions cover both players, historical forbidden/orphan response events, completed-context source tampering, already-selected exclusions, retained and attached model presence, restore and exact replay.",
+    "Initial retained Ongoing fixture expected an obsolete forced activation; it now completes the ordinary phase-end cleanup through canonical sequencing decisions. All four retained mode/attachment cases passed before aggregate validation.",
+    "An initial archived-base measurement lacked its pyproject/schema root and failed closed. The qualified base snapshot includes both. The final runner remeasured base and head with matching script and lock hashes; no failed measurement is represented as a successful sample.",
+    "The initial coverage run had one generated-document mismatch and 8729 passing tests. After correcting its renderer and passing the focused test, the final behavioral tests ran once with coverage, followed by final code-quality tests once without coverage; both used -n auto --dist=worksteal and PYTEST_XDIST_AUTO_NUM_WORKERS=32.",
+    "The initial quality run had 574 passes and one roadmap-gate expectation failure. The updated source-resolution guard passed its focused five-test file, and the complete quality suite was rerun without production changes.",
+    "All qualified performance reports were measured serially without competing test/build workers. Budgets and historical baselines were not raised or relabeled."
+  ]
+}

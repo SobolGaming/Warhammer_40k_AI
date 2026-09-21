@@ -309,9 +309,11 @@ def core_rules_forty_k_app_audit_markdown(
         "the August audit retains its historical policy and fingerprints.",
         "",
         "Current 12.08 explicitly requires Objective Consolidation to finish unengaged and "
-        "within objective range, superseding the old observation's uncertainty below. The "
-        "Engaging body clause versus retained v931 Ongoing erratum remains unresolved under "
-        "C12-04/P12B; their version equivalence is unproven. P18G separately owns clear "
+        "within objective range, superseding the old observation's uncertainty below. Order 72 "
+        "resolves C12-04/P12B using the owner's official App v946 transcription: only Engaging "
+        "grants forced enemy fights. The unversioned body and historical v931 erratum retain "
+        "their original provenance; co-version equivalence is not claimed. See "
+        "[the source resolution](ORDER_72_SCOPE_PLAN.md). P18G separately owns clear "
         "Assault/Shock eligibility, while P18F retains the engagement-owner pause. Category 17 "
         "now has C17-01/P17 and cannot be treated as REVALIDATE-only.",
         "",

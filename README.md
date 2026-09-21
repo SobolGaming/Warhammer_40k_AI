@@ -2,6 +2,14 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 72 resolves consolidation responses against owner-confirmed official App
+data v946: only Engaging Consolidation forces enemy Fight selections. Ongoing
+preserves prior engagements without a response queue. Shared source authority,
+restore and replay reject superseded Ongoing responses. See
+[scope and source resolution](docs/ORDER_72_SCOPE_PLAN.md). Reproduce both the
+current source package and its immutable historical copy with
+`uv run python tools/build_core_fight_source.py --check`.
+
 Order 70 requires Fights First on every rules-present model. Intrinsic component
 sources and conditional Leader model grants keep their model ownership; unit grants, Charge,
 casualties, retained cleanup and split lineage use the shared live coverage query.
@@ -283,9 +291,10 @@ scope, and validation.
 Order 19 (P12) consumes that geometry for Objective Consolidation and enforces
 per-model destinations for all consolidation modes. Mandatory endpoint queries
 validate complete paths and cache immutable geometry/policy snapshots in a bounded
-512-entry cache. Ongoing and Engaging consolidation suspend ordinary Fight state
+512-entry cache. Engaging consolidation suspends ordinary Fight state
 while each affected unselected enemy fights through the opponent's decision path,
-then resume the interrupted consolidation order. Internal continuation snapshots
+then resumes the interrupted consolidation order. Order 72's v946 source
+resolution excludes Ongoing Consolidation from this response. Internal continuation snapshots
 remain outside public event projections. Check the reviewed 12.07/12.08 and v931
 source artifact with `uv run --no-sync python tools/build_core_fight_source.py --check`.
 The P12 roadmap entry records the conservative reachability diagnostic and scope.

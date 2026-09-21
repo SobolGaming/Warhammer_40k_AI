@@ -15,9 +15,11 @@ ARTIFACT_PATH = (
     / "core_fight_2026_09/artifacts/package.json"
 )
 AUDIT_PATH = ROOT / "data/source_audits/maintained_app_mirrors/fight_2026_09_05.audit.json"
+HISTORICAL_PATH = ARTIFACT_PATH.with_name("historical-package-2026-09-05.json")
 POLICY = "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
 PACKAGE_ID = "gw-11e-core-fight"
 VERSION = "maintained-app-mirrors-observed-2026-09-05"
+RESOLVED_VERSION = "maintained-app-mirrors-owner-resolved-v946-2026-09-21"
 OBSERVED_AT = "2026-09-05T18:32:47-04:00"
 AUDIT_ID = "core-fight-maintained-app-mirrors-2026-09-05"
 FORTY_K_URL = "https://www.40k.app/rules/12-fight-phase"
@@ -82,7 +84,7 @@ def _observation(evidence: dict[str, object]) -> str:
     return _hash(value)
 
 
-def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
+def build_historical_payloads() -> tuple[dict[str, object], dict[str, object]]:
     rules: list[dict[str, object]] = []
     evidence: list[dict[str, object]] = []
     audit_rows: list[dict[str, object]] = []
@@ -207,11 +209,68 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
     return payload, audit_payload
 
 
+def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
+    payload, audit = build_historical_payloads()
+    # The owner supplied these three complete clauses from the official v946 App.
+    # Keep this resolution separate from the immutable, unversioned mirror observation.
+    transcription = CONSOLIDATE_TEXT.split("After moving:\n", 1)[1]
+    resolution = {
+        "resolution_id": "order72-c12-04-official-app-v946-2026-09-21",
+        "recorded_at": "2026-09-21T21:50:58+00:00",
+        "evidence_kind": "owner_supplied_official_app_confirmation",
+        "provider_name": "Games Workshop (reported by repository owner)",
+        "source_platform": "Warhammer 40,000 App (device platform not supplied)",
+        "source_url": None,
+        "app_version": "946",
+        "app_build": None,
+        "locale": None,
+        "capture_sha256": None,
+        "source_id": f"{PACKAGE_ID}:consolidation-move",
+        "mirror_observation_sha256": (
+            "25194f1eb4ba53e9bc431353e1dc921d3dd17c40a96d8cc4b3ee91c7e17dcfa3"
+        ),
+        "after_moving_text": transcription,
+        "transcription_sha256": hashlib.sha256(transcription.encode()).hexdigest(),
+        "superseded_source_id": f"{PACKAGE_ID}:ongoing-consolidation-erratum",
+        "supersession_scope": (
+            "v946 after-moving forced enemy selection only; historical v931 evidence retained"
+        ),
+        "forced_fight_modes": ["engaging"],
+        "observation_sha256": "",
+    }
+    resolution["observation_sha256"] = _hash(resolution)
+    # Execution metadata is not part of the immutable mirror fingerprints.
+    for key in ("rules", "evidence"):
+        rows = payload[key]
+        assert isinstance(rows, list)
+        for row in rows:
+            if (
+                row.get("source_id", row.get("rule_source_id"))
+                == resolution["superseded_source_id"]
+            ):
+                row["semantic_execution_status"] = "not_certified"
+                row["runtime_consumer_ids"] = []
+    payload.update(
+        artifact_schema="core-v2-core-fight-source-v2",
+        source_version=RESOLVED_VERSION,
+        resolution=resolution,
+        package_hash="",
+    )
+    payload["package_hash"] = _hash(payload)
+    return payload, audit
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    for path, payload in zip((ARTIFACT_PATH, AUDIT_PATH), build_payloads(), strict=True):
+    current, audit = build_payloads()
+    historical, _ = build_historical_payloads()
+    for path, payload in (
+        (ARTIFACT_PATH, current),
+        (AUDIT_PATH, audit),
+        (HISTORICAL_PATH, historical),
+    ):
         raw = (json.dumps(payload, indent=2, ensure_ascii=False) + "\n").encode()
         if args.check:
             if path.read_bytes() != raw:
