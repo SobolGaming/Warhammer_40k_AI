@@ -5160,4 +5160,6 @@ Firing Deck, reactions, retained shooting, adapters and replay share the same
 candidate and attack path. See [scope and evidence](ORDER_71_SCOPE_PLAN.md).
 Orders 72–73 and final cross-category certification remain separate.
 
-Final local validation: 8,712 behavioral tests, 85.14% coverage and 570 code-quality checks passed. Source, performance and publishing-gate results are retained in the linked scope record. Review and merge remain pending.
+Review corrections close the remaining physical-unit keyword promotion in declaration exclusivity and add immutable clause-to-consumer proof without altering source observations.
+
+Final local validation: 8,720 behavioral tests, 85.14% coverage and 572 code-quality checks passed. Source, performance and publishing-gate results are retained in the linked scope record. Review and merge remain pending.

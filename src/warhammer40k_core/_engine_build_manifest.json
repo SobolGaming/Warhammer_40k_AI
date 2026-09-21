@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1f357d7e496c222eaac137c7f9a6205c25de48d6e8d18bf06dd1158f2fae11b",
-  "fingerprint": "b1f357d7e496c222eaac137c7f9a6205c25de48d6e8d18bf06dd1158f2fae11b",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
+  "fingerprint": "1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
   "resource_count": 2921,
   "resources": [
     {
@@ -10960,9 +10960,9 @@
       "sha256": "2b14892d35ffe92aae8d54d238beb1cab1bdedc9b7693d654d3e9d1f326aba95"
     },
     {
-      "byte_length": 48034,
+      "byte_length": 48172,
       "path": "warhammer40k_core/engine/phases/shooting_declaration_validation.py",
-      "sha256": "96e44a819bb9b6fbdccfe7e81517706f93c1491e18cf6d6f48400cbd811de87a"
+      "sha256": "1638af2a723185cc791e08bbac0c946d5f0d1b514b1a48a13b0fe3f8fb83a8ef"
     },
     {
       "byte_length": 36792,

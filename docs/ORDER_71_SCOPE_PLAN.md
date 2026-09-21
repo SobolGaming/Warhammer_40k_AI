@@ -117,4 +117,61 @@ Matched component evidence and the unchanged inherited guards are recorded in
 the 60-second mean/300-second maximum targets and deferred Order 32 budgets are
 not certified. Final validation results are recorded there before publication.
 
-Final local validation passed 8,712 behavioral tests with 85.1428% coverage and all 570 code-quality tests without coverage. Lint, both type checkers, import boundaries, shard inventory, generated artifacts, exact-base contract compatibility, installed-wheel smoke, five TypeScript tests, 342 live conformance assertions and all-files pre-commit passed. The first quality attempt found a missing test-side source-package classification; adding that entry resolved the failure without changing production code. `npm ci` was unavailable; direct Node package-script equivalents passed with installed dependencies.
+The first published head (`cee6f5bb`) passed 8,712 behavioral tests with 85.1428%
+coverage and all 570 code-quality tests. Its results are retained as historical
+evidence in the validation record; the review corrections below require fresh
+runtime identity, measurements and full validation before publication.
+
+## Review corrections: model scope and execution-consumer proof
+
+P2 identified the last live physical-unit MONSTER/VEHICLE union check in shooting:
+`_validate_model_pistol_exclusivity`. Model-specific permission must come from the
+declaring source model. The shared validator now resolves the source model ID
+(including borrowed-weapon source identity) and reads that model's canonical
+keywords through the existing `is_monster_or_vehicle` predicate.
+
+Eight facade cases use one physical unit with two catalog-authenticated model
+profiles: ordinary infantry and a MONSTER or VEHICLE model. They cover both
+CLOSE-QUARTERS and PISTOL, both declaration orders, rejection before queue pop
+without state mutation, legal mixed weapons on the exceptional model alongside
+the infantry model's separate declaration, persistence, both viewers and replay.
+Before the fix, the first case reproduced acceptance of the infantry model's
+illegal mixed declaration. The existing homogeneous and Firing Deck cases remain
+part of the focused consumer run.
+
+The bug-class audit finds no remaining call to the physical-unit union helper
+in shooting modules. The rules-unit helper in shooting-mode eligibility remains
+deliberately unit-scoped and consumes model-validated candidate types. Movement
+and terrain predicates are separate unit rules, outside this shooting invariant.
+A static audit prevents reintroducing the physical-unit helper into shooting
+and pins the declaring-model authority of the exclusivity guard.
+
+P3 is addressed by the separately versioned, hash-pinned
+[runtime consumer proof](../data/source_audits/order71-runtime-consumer-proof-v1.json).
+It links each of these operative clause families to concrete runtime symbols and
+regression functions:
+
+| Source clause | Runtime owners |
+| --- | --- |
+| 10.06 model weapon and target permission | `_locked_in_combat_validation`, `_target_engagement_validation`, `_validate_model_pistol_exclusivity`, both model-owned weapon inventories |
+| 10.06 attacking-model penalty and target-specific exemption | `engaged_shooting_penalty_sources`, `declaration_hit_modifiers` |
+| 10.06 BLAST against the attacker's engaged target | `_blast_engaged_target_validation` |
+| 17.03 engaged target-unit selection | `_target_engagement_validation` |
+| 17.03 BLAST target exclusion | `_blast_engaged_target_validation` |
+| 17.03 target-unit penalty and target-specific exemption | `engaged_shooting_penalty_sources`, `declaration_hit_modifiers` |
+
+The typed code-quality loader validates the proof hash, both complete source
+artifact hashes, transcription and mirror-observation hashes, exact clause
+inventory, owner/regression symbols, and the shared candidate's consumer calls.
+Both source packages and their authenticated observations remain byte-for-byte
+unchanged. This supplements their original execution metadata; it does not
+upgrade the preserved partial 10.06 record or certify unrelated Action clauses,
+all Making Attacks semantics, or an entire category. A later proof revision must
+use a new versioned record rather than rewriting these observation identities.
+
+The review changes one existing runtime validator and adds no decision envelope,
+schema, mutation path, handler or registry. The existing mixed-declaration
+diagnostic and adapter contract apply unchanged. Refreshed performance and final
+validation are recorded in [Order 71 validation](performance/order71/validation.json).
+
+Review validation passed 8,720 behavioral tests with 85.1425% coverage and all 572 code-quality tests without coverage. Lint, both type checkers, import boundaries, shard inventory, generated artifacts, exact-base contract compatibility, installed-wheel smoke, five TypeScript tests, 342 live conformance assertions and all-files pre-commit passed. All six refreshed component evidence sets pass their unchanged guards. `npm ci` was unavailable; direct Node package-script equivalents passed with installed dependencies. No production code changed after the behavioral run began.

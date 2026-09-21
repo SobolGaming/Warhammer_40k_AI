@@ -6,19 +6,24 @@
   "validated_on": "2026-09-21",
   "status": "passed",
   "base_commit": "ec32e01f1c8ee9d903976f2b392b40ea0700d49c",
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1f357d7e496c222eaac137c7f9a6205c25de48d6e8d18bf06dd1158f2fae11b",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
+  "commands_not_run": {
+    "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised through the bundled Node runtime using each package script's direct command."
+  },
+  "performance_scope": "Matched uncached shooting candidates and inherited reconstruction, Firing Deck, Aircraft, roster and Fights First components on provisional hardware. Complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
+  "scope": "Only Order 71 / P17 / C17-01. Orders 72-73 and final all-category certification remain separate. No production code changed after the final behavioral run began.",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
   "behavioral": {
-    "tests": 8712,
+    "tests": 8720,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 1302.114,
+    "seconds": 1270.811,
     "workers": 32,
     "distribution": "worksteal",
-    "junit_sha256": "2c6edf169b44b072c1418c7a5e620c36377b9b520f3826f5e4290befb2923e38",
-    "coverage_percent": 85.14277795009536,
+    "junit_sha256": "4f342fffaf0d69ddf786e8e7c8ed35280801bee7e66457e285c3e729f7de5e4f",
+    "coverage_percent": 85.14254603048902,
     "coverage_minimum_percent": 85,
     "warnings": 9,
     "warning_types": [
@@ -26,26 +31,25 @@
     ]
   },
   "code_quality": {
-    "tests": 570,
+    "tests": 572,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 332.585,
+    "seconds": 325.408,
     "workers": 32,
     "distribution": "worksteal",
-    "junit_sha256": "b0ce6cb364faacc78d7e87b5fa99f1c249a732926d45d302dfc4013fb793cc28",
+    "junit_sha256": "c71d6297a5018bd5d0eca5311474c3350cee33e5e5e6f690ffbf8510aa06c1df",
     "coverage": false
   },
-  "first_code_quality_attempt": {
-    "tests": 570,
-    "failures": 1,
-    "correction": "Added the reviewed core_engaged_shooting_2026_09 package to the explicit test-side source-package classification inventory. No production code changed.",
-    "junit_sha256": "610e9648483c05aace56e39a6bb3c06a8fec1abe48b33365ed6c4669e7fc3669"
+  "review_corrections": {
+    "P2": "Declaration exclusivity resolves the actual source model's canonical keywords. Eight heterogeneous physical-unit cases cover MONSTER/VEHICLE, CLOSE-QUARTERS/PISTOL, both declaration orders, pre-pop rejection, legal mixed weapons, restore, viewer projections and replay.",
+    "P3": "Separate typed, hash-pinned clause-consumer proof covers 10.06 shooting permissions/modifiers/BLAST and every operative 17.03 clause. Both source package byte hashes and authenticated observations remain unchanged; the original 10.06 partial status is preserved.",
+    "consumer_proof_sha256": "8cf6c6cbe36ed768d88402ffeca855cf058dc5c6456b1cf617ffc00f870d0f8d"
   },
   "gates_passed": [
     "ruff check .",
     "ruff format --check .",
-    "mypy src tests: 3178 source files",
+    "mypy src tests: 3179 source files",
     "pyright: 0 errors, 0 warnings",
     "lint-imports: 11 contracts",
     "eight-shard inventory check",
@@ -58,19 +62,94 @@
     "live HTTP conformance: 342 assertions",
     "Order 71 matched component evidence: four cases, all eight mean/maximum comparisons",
     "Orders 64, 65, 66, 69 and 70 head evidence refreshed with unchanged baselines and budgets",
-    "focused source and performance checks: 141 tests",
-    "shooting and retained-shooting regression files: 393 tests, plus two added alias cases"
+    "P2 eight-case facade matrix passed; surrounding Pistol/Firing Deck subset: 20 tests",
+    "P3 source/consumer and shooting-scope static checks: 4 tests",
+    "Refreshed matched performance evidence: Orders 64, 65, 66, 69, 70 and 71"
   ],
-  "commands_not_run": {
-    "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised through the bundled Node runtime using each package script's direct command."
-  },
-  "performance_scope": "Matched uncached shooting candidates and inherited reconstruction, Firing Deck, Aircraft, roster and Fights First components on provisional hardware. Complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
-  "scope": "Only Order 71 / P17 / C17-01. Orders 72-73 and final all-category certification remain separate. No production code changed after the final behavioral run began.",
   "diagnostic_history": [
-    "The 21-case engagement matrix against archived base ec32e01f produced 11 expected failures and ten passes, reproducing the exemption, targeting and cumulative-penalty defects.",
-    "Focused fixture corrections used canonical catalog model ownership, the selected session's actual weapon profile, exact restored fixtures and explicit Psychic keep/ignore choices. Candidate casualty checks use the actual catalog model ID.",
-    "Source inventory assertions were advanced from 47 to 48 reviewed packages; Ruff normalized the edited test files before final validation. Pyright annotation findings were corrected before the aggregate runs.",
-    "Qualified base/head and inherited head measurements ran serially with no competing test workers. No existing workload, baseline or budget was relaxed.",
-    "Both final suites use -n auto --dist=worksteal with PYTEST_XDIST_AUTO_NUM_WORKERS=32, retaining the established host allocation. The behavioral suite ran once with coverage. The first quality run found the missing test-side source classification; its focused regression passed after correction and the full quality suite was rerun without coverage. No behavioral rerun was needed because runtime and behavioral tests were unchanged."
-  ]
+    "The first heterogeneous-unit regression reproduced the defect against cee6f5bb: an ordinary infantry model's mixed declaration was accepted. The model-scoped fix made all eight cases pass.",
+    "The same-bug-class audit found no remaining physical-unit union helper calls in shooting. Rules-unit mode eligibility and unrelated movement/terrain unit checks retain their intended scopes.",
+    "Before the final suites, fixture construction used the canonical catalog wargear collection and a targeted Pyright annotation for the existing private fixture builder. No production code changed after the final behavioral run began.",
+    "Both final suites use -n auto --dist=worksteal with PYTEST_XDIST_AUTO_NUM_WORKERS=32. The complete behavioral suite ran once with coverage, followed by the complete quality suite without coverage.",
+    "All six refreshed head measurements ran serially without competing build/test workers. Existing scripts, fixtures, base reports and budgets are unchanged. Order 65's accepted facade declaration exercises the changed validator."
+  ],
+  "published_head_validation": {
+    "commit": "cee6f5bb413b2da1acd67d293afcad0ef135c9f7",
+    "result": {
+      "order": 71,
+      "finding_ids": [
+        "C17-01"
+      ],
+      "validated_on": "2026-09-21",
+      "status": "passed",
+      "base_commit": "ec32e01f1c8ee9d903976f2b392b40ea0700d49c",
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1f357d7e496c222eaac137c7f9a6205c25de48d6e8d18bf06dd1158f2fae11b",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.14.5",
+      "behavioral": {
+        "tests": 8712,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 1302.114,
+        "workers": 32,
+        "distribution": "worksteal",
+        "junit_sha256": "2c6edf169b44b072c1418c7a5e620c36377b9b520f3826f5e4290befb2923e38",
+        "coverage_percent": 85.14277795009536,
+        "coverage_minimum_percent": 85,
+        "warnings": 9,
+        "warning_types": [
+          "ResourceWarning: unclosed SQLite connections"
+        ]
+      },
+      "code_quality": {
+        "tests": 570,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 332.585,
+        "workers": 32,
+        "distribution": "worksteal",
+        "junit_sha256": "b0ce6cb364faacc78d7e87b5fa99f1c249a732926d45d302dfc4013fb793cc28",
+        "coverage": false
+      },
+      "first_code_quality_attempt": {
+        "tests": 570,
+        "failures": 1,
+        "correction": "Added the reviewed core_engaged_shooting_2026_09 package to the explicit test-side source-package classification inventory. No production code changed.",
+        "junit_sha256": "610e9648483c05aace56e39a6bb3c06a8fec1abe48b33365ed6c4669e7fc3669"
+      },
+      "gates_passed": [
+        "ruff check .",
+        "ruff format --check .",
+        "mypy src tests: 3178 source files",
+        "pyright: 0 errors, 0 warnings",
+        "lint-imports: 11 contracts",
+        "eight-shard inventory check",
+        "pre-commit run --all-files",
+        "Order 71 source generator and both canonical catalog generators",
+        "engine build identity and exact-base external contract compatibility (ec32e01f)",
+        "installed wheel: 2921 runtime resources, 27 schemas, six request families",
+        "TypeScript generated client and typecheck",
+        "TypeScript unit tests: 5",
+        "live HTTP conformance: 342 assertions",
+        "Order 71 matched component evidence: four cases, all eight mean/maximum comparisons",
+        "Orders 64, 65, 66, 69 and 70 head evidence refreshed with unchanged baselines and budgets",
+        "focused source and performance checks: 141 tests",
+        "shooting and retained-shooting regression files: 393 tests, plus two added alias cases"
+      ],
+      "commands_not_run": {
+        "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised through the bundled Node runtime using each package script's direct command."
+      },
+      "performance_scope": "Matched uncached shooting candidates and inherited reconstruction, Firing Deck, Aircraft, roster and Fights First components on provisional hardware. Complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
+      "scope": "Only Order 71 / P17 / C17-01. Orders 72-73 and final all-category certification remain separate. No production code changed after the final behavioral run began.",
+      "diagnostic_history": [
+        "The 21-case engagement matrix against archived base ec32e01f produced 11 expected failures and ten passes, reproducing the exemption, targeting and cumulative-penalty defects.",
+        "Focused fixture corrections used canonical catalog model ownership, the selected session's actual weapon profile, exact restored fixtures and explicit Psychic keep/ignore choices. Candidate casualty checks use the actual catalog model ID.",
+        "Source inventory assertions were advanced from 47 to 48 reviewed packages; Ruff normalized the edited test files before final validation. Pyright annotation findings were corrected before the aggregate runs.",
+        "Qualified base/head and inherited head measurements ran serially with no competing test workers. No existing workload, baseline or budget was relaxed.",
+        "Both final suites use -n auto --dist=worksteal with PYTEST_XDIST_AUTO_NUM_WORKERS=32, retaining the established host allocation. The behavioral suite ran once with coverage. The first quality run found the missing test-side source classification; its focused regression passed after correction and the full quality suite was rerun without coverage. No behavioral rerun was needed because runtime and behavioral tests were unchanged."
+      ]
+    }
+  }
 }

@@ -1,0 +1,91 @@
+{
+  "artifact_schema": "order71-runtime-consumer-proof-v1",
+  "proof_id": "order71:shooting-clause-consumers:v1",
+  "scope": "10.06 targeting, model weapon permission and attack modifiers; all 17.03 operative clauses. No whole-10.06 or category certification, and no source-observation supersession.",
+  "sources": [
+    {
+      "source_id": "gw-11e-core-actions:close-quarters-shooting",
+      "source_artifact_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_actions_2026_09/artifacts/package.json",
+      "source_artifact_sha256": "b9027d83c608961b9cde5baae546bbb97336235b8b9a6297b182cf0e93fad8aa",
+      "transcription_sha256": "c44508145d53b35217bab6049826848d84569409feb52ab41e3644aa94f6dc78",
+      "observation_sha256": "9c38991edc7ed3024dbea227c81a49cc2d9eb6b83fea2b338a6ffe835b68a763",
+      "clauses": [
+        {
+          "clause_id": "10.06:model-weapon-and-target-permission",
+          "runtime_consumer_ids": [
+            "warhammer40k_core.engine.shooting_targets:_locked_in_combat_validation",
+            "warhammer40k_core.engine.shooting_targets:_target_engagement_validation",
+            "warhammer40k_core.engine.phases.shooting_declaration_validation:_validate_model_pistol_exclusivity",
+            "warhammer40k_core.engine.phases.shooting_firing_deck:_available_weapons_for_unit",
+            "warhammer40k_core.engine.phases.shooting_firing_deck:_available_weapons_for_rules_unit"
+          ],
+          "regression_ids": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_attached_model_permissions_and_target_unit_keywords",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_mixed_physical_unit_exclusivity_uses_declaring_model",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_engagement_causes_and_weapon_exception"
+          ]
+        },
+        {
+          "clause_id": "10.06:attacking-model-penalty-and-target-specific-exemption",
+          "runtime_consumer_ids": [
+            "warhammer40k_core.engine.shooting_engagement:engaged_shooting_penalty_sources",
+            "warhammer40k_core.engine.attack_hit_modifiers:declaration_hit_modifiers"
+          ],
+          "regression_ids": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_both_penalties_survive_facade_modifiers_restore_and_replay",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_psychic_can_ignore_one_engagement_source_without_erasing_the_other"
+          ]
+        },
+        {
+          "clause_id": "10.06:blast-against-own-engaged-target",
+          "runtime_consumer_ids": [
+            "warhammer40k_core.engine.shooting_targets:_blast_engaged_target_validation"
+          ],
+          "regression_ids": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-engaged-shooting:engaged-monster-vehicle-target",
+      "source_artifact_path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_engaged_shooting_2026_09/artifacts/package.json",
+      "source_artifact_sha256": "0dfed05d9cf2d7b842f66b9e7375a636e6b45ed73a09f8831521dc43e38692ab",
+      "transcription_sha256": "12806475dcbcab62cd737334b032c0f214dff4fd11720161cdbaeb4405eee26e",
+      "observation_sha256": "fe8800c2b4aaa318418101e797fd98bce387f07dc15d995e992f287e1aecba4a",
+      "clauses": [
+        {
+          "clause_id": "17.03:engaged-target-unit-selection",
+          "runtime_consumer_ids": [
+            "warhammer40k_core.engine.shooting_targets:_target_engagement_validation"
+          ],
+          "regression_ids": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_attached_model_permissions_and_target_unit_keywords",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_third_party_close_quarters_penalty_through_shared_attack_hosts"
+          ]
+        },
+        {
+          "clause_id": "17.03:blast-target-exclusion",
+          "runtime_consumer_ids": [
+            "warhammer40k_core.engine.shooting_targets:_blast_engaged_target_validation"
+          ],
+          "regression_ids": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_blast_cannot_target_engaged_monster_vehicle"
+          ]
+        },
+        {
+          "clause_id": "17.03:target-unit-penalty-and-target-specific-exemption",
+          "runtime_consumer_ids": [
+            "warhammer40k_core.engine.shooting_engagement:engaged_shooting_penalty_sources",
+            "warhammer40k_core.engine.attack_hit_modifiers:declaration_hit_modifiers"
+          ],
+          "regression_ids": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_third_party_close_quarters_penalty_through_shared_attack_hosts",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_both_penalties_survive_facade_modifiers_restore_and_replay",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py:test_order71_attached_target_alias_uses_rules_unit_engagement_for_exemption"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -6509,7 +6509,10 @@ there are no new fields, decision types or visibility rules. An unengaged shoote
 can use Normal Shooting against an engaged MONSTER/VEHICLE target. An engaged
 non-MONSTER/non-VEHICLE model can use only CLOSE-QUARTERS weapons against its
 own rules unit's engaged enemies. MONSTER/VEHICLE model permissions do not spread
-to other models through an attached unit's keyword union.
+to other models through an attached unit's or physical unit's keyword union.
+The existing `mixed_close_quarters_non_close_quarters_declaration` rejection
+likewise uses the declaring source model's keywords, including when different
+model profiles share one physical unit. No new diagnostic or payload field is added.
 
 Candidate and pool `targeting_rule_ids` now use
 `gw-11e-core-actions:close-quarters-shooting` for 10.06 and

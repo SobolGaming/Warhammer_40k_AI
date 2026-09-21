@@ -38,34 +38,34 @@
       ]
     },
     "head": {
-      "report_sha256": "956f16d7d25255a0f665d20953ab43b4a0d7e2e1052a4225fe4c1ae02b75a1c9",
+      "report_sha256": "6601352c497402cc384e730cc23f18eb56b75561f881c0e996122ebfe74dbd9e",
       "rows": [
         {
           "case": "third-party-close",
-          "median_seconds": 0.006932599993888289,
-          "p95_seconds": 0.008198500028811395,
-          "candidates_per_second": 1411.9308161687725,
+          "median_seconds": 0.007294400013051927,
+          "p95_seconds": 0.008228499966207892,
+          "candidates_per_second": 1370.6301374837863,
           "completion_rate": 1.0
         },
         {
           "case": "both-causes",
-          "median_seconds": 0.00694719998864457,
-          "p95_seconds": 0.007736100000329316,
-          "candidates_per_second": 1416.7516709965707,
+          "median_seconds": 0.007727099990006536,
+          "p95_seconds": 0.009956799971405417,
+          "candidates_per_second": 1247.6873233662393,
           "completion_rate": 1.0
         },
         {
           "case": "mutual-close",
-          "median_seconds": 0.006889600015711039,
-          "p95_seconds": 0.007905200007371604,
-          "candidates_per_second": 1392.2064293559536,
+          "median_seconds": 0.00709690002258867,
+          "p95_seconds": 0.008361500047612935,
+          "candidates_per_second": 1360.5283506026756,
           "completion_rate": 1.0
         },
         {
           "case": "attached-third-party",
-          "median_seconds": 0.008137499971780926,
-          "p95_seconds": 0.008949499984737486,
-          "candidates_per_second": 1219.9478918409013,
+          "median_seconds": 0.00844219996361062,
+          "p95_seconds": 0.009256099991034716,
+          "candidates_per_second": 1186.4567666399464,
           "completion_rate": 1.0
         }
       ]

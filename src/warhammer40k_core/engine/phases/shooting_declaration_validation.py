@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.weapon_profiles import AttackProfile
+from warhammer40k_core.engine.shooting_engagement import is_monster_or_vehicle
 from warhammer40k_core.engine.weapon_selection_context import WeaponSelectionContext
 from warhammer40k_core.engine.shooting_target_cache import cached_target_candidate_for_model
 
@@ -870,9 +871,10 @@ def _validate_model_pistol_exclusivity(
         selected_unit=selected_unit,
         declaration=declaration,
     )
-    if _unit_has_vehicle_or_monster_keyword(source_unit):
-        return None
     source_model_id = _declaration_source_model_id(declaration)
+    source_model = source_unit.own_model_by_id(source_model_id)
+    if is_monster_or_vehicle(source_model.keywords):
+        return None
     model_key = (source_unit.unit_instance_id, source_model_id)
     is_close_quarters = has_close_quarters_weapon_keyword(weapon_profile)
     existing = model_pistol_declaration_kind.get(model_key)

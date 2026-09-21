@@ -1,6 +1,6 @@
 # Order 65 Firing Deck component assessment
 
-Order 71 refreshed the head JSON for runtime `b1f357d7` with unchanged
+Order 71 refreshed the head JSON for runtime `1418bd17` with unchanged
 workloads, baselines and budgets. The tables and prior validation below are
 historical; current gate results are recorded in
 [Order 71 validation](../order71/validation.json).

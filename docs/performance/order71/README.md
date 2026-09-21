@@ -29,13 +29,13 @@ completed samples, current runtime identity and all eight comparisons.
 
 | Case | Base mean (s) | Head mean (s) | Base max (s) | Head max (s) |
 | --- | ---: | ---: | ---: | ---: |
-| Third-party CLOSE-QUARTERS | 0.007939 | 0.007082 | 0.009198 | 0.008199 |
-| Both causes | 0.007228 | 0.007058 | 0.007798 | 0.007736 |
-| Mutual CLOSE-QUARTERS | 0.007308 | 0.007183 | 0.008137 | 0.007905 |
-| Attached third-party | 0.008310 | 0.008197 | 0.008959 | 0.008949 |
+| Third-party CLOSE-QUARTERS | 0.007939 | 0.007296 | 0.009198 | 0.008228 |
+| Both causes | 0.007228 | 0.008015 | 0.007798 | 0.009957 |
+| Mutual CLOSE-QUARTERS | 0.007308 | 0.007350 | 0.008137 | 0.008362 |
+| Attached third-party | 0.008310 | 0.008428 | 0.008959 | 0.009256 |
 
 All 560 base/head candidate calculations completed. All eight mean/maximum
-comparisons pass; current mean cost is 0.71–0.82 ms per candidate. Nearest-rank
+comparisons pass; current mean cost is 0.73–0.84 ms per candidate. Nearest-rank
 p95 equals the maximum for seven samples. Head medians and throughput are
 recorded in `summary.json`, derived directly from the retained samples.
 
@@ -43,7 +43,7 @@ Reproduce serially with the corresponding source trees and no competing workers:
 
 ```powershell
 uv run python -m scripts.measure_order71 --output docs/performance/order71/base.json --revision ec32e01f --runtime-src reports/order71-base/src
-uv run python -m scripts.measure_order71 --output docs/performance/order71/head.json --revision order71-final
+uv run python -m scripts.measure_order71 --output docs/performance/order71/head.json --revision order71-review-final
 ```
 
 The archived base must include `src`, `contracts/schemas` and `pyproject.toml` so
@@ -51,8 +51,11 @@ authenticated reconstruction can verify its schema root. Runtime identity is
 checked before interpreting a saved result.
 
 The inherited Orders 64, 65, 66, 69 and 70 guards also require the exact current
-runtime. Their head reports were refreshed serially with unchanged scripts,
-fixtures, baselines and budgets. Final gate outcomes are in `validation.json`.
+runtime. Their head reports were refreshed serially after the P2 correction with
+unchanged scripts, fixtures, baselines and budgets. The Order 65 facade declaration exercises the
+changed model-exclusivity validator, including borrowed-weapon source ownership.
+Final gate outcomes and the historical first published validation are in
+`validation.json`.
 
 Complete gameplay-slice and head-to-head performance remain unmeasured. The
 60-second mean / 300-second maximum complete-game targets and deferred Order 32

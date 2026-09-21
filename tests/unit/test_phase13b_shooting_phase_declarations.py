@@ -4730,3 +4730,113 @@ def test_order71_attached_target_alias_uses_rules_unit_engagement_for_exemption(
     )
     assert candidate.hit_roll_modifier == 0
     assert not set(candidate.targeting_rule_ids) & {ATTACKER_SOURCE, TARGET_SOURCE}
+
+
+@pytest.mark.parametrize("monster_vehicle_keyword", ["MONSTER", "VEHICLE"])
+@pytest.mark.parametrize(
+    "close_quarters_keyword", [WeaponKeyword.CLOSE_QUARTERS, WeaponKeyword.PISTOL]
+)
+@pytest.mark.parametrize("reverse", [False, True])
+def test_order71_mixed_physical_unit_exclusivity_uses_declaring_model(
+    monster_vehicle_keyword: str,
+    close_quarters_keyword: WeaponKeyword,
+    reverse: bool,
+) -> None:
+    from tests.order71_declaration_helpers import mixed_model_shooting_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+    session = mixed_model_shooting_session(
+        monster_vehicle_keyword=monster_vehicle_keyword,
+        close_quarters_keyword=close_quarters_keyword,
+    )
+    state = _state(session.lifecycle)
+    shooter = state.army_definitions[0].units[0]
+    assert len(shooter.own_models) == 2
+    assert monster_vehicle_keyword in shooter.keywords
+    ordinary = next(m for m in shooter.own_models if monster_vehicle_keyword not in m.keywords)
+    exceptional = next(m for m in shooter.own_models if monster_vehicle_keyword in m.keywords)
+    initial = session.lifecycle.to_payload()
+    request = pending_request(session)
+    session.submit_option(request_id=request.request_id, result_id="mixed:unit", option_id=SHOOTER)
+    request = pending_request(session)
+    session.submit_option(request_id=request.request_id, result_id="mixed:mode", option_id="normal")
+    request = pending_request(session)
+    request_payload = cast(dict[str, object], request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    payload = _proposal_from_request(request=request, target_unit_id=TARGET).to_payload()
+    order = (
+        ("order71-close-weapon", "core-bolt-rifle")
+        if reverse
+        else ("core-bolt-rifle", "order71-close-weapon")
+    )
+    payload["declarations"] = [
+        _weapon_payload_to_declaration_payload(
+            weapon=next(
+                w
+                for w in weapons
+                if w["model_instance_id"] == ordinary.model_instance_id
+                and w["wargear_id"] == wargear_id
+            ),
+            target_unit_id=TARGET,
+        )
+        for wargear_id in order
+    ]
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    for current in (session, restored):
+        rejected = current.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="mixed:invalid",
+            payload=validate_json_value(payload),
+        )
+        assert rejected.status_kind is LifecycleStatusKind.INVALID, rejected
+        validation = cast(
+            dict[str, object], cast(dict[str, object], rejected.payload)["proposal_validation"]
+        )
+        assert (
+            cast(list[dict[str, object]], validation["violations"])[0]["violation_code"]
+            == "mixed_close_quarters_non_close_quarters_declaration"
+        )
+        assert current.to_persistence_payload() == checkpoint
+        valid = dict(payload)
+        valid["declarations"] = [
+            _weapon_payload_to_declaration_payload(
+                weapon=next(
+                    w
+                    for w in weapons
+                    if w["model_instance_id"] == model_id and w["wargear_id"] == wargear_id
+                ),
+                target_unit_id=TARGET,
+            )
+            for model_id, wargear_id in (
+                *((exceptional.model_instance_id, wargear_id) for wargear_id in order),
+                (ordinary.model_instance_id, "core-bolt-rifle"),
+            )
+        ]
+        accepted = current.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="mixed:valid",
+            payload=validate_json_value(valid),
+        )
+        assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted
+        pools = cast(
+            list[dict[str, object]],
+            _last_event_payload(current.lifecycle, "shooting_declaration_accepted")["attack_pools"],
+        )
+        assert len(pools) == 3
+    assert session.to_persistence_payload() == restored.to_persistence_payload()
+    for viewer in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id="mixed:replay",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
