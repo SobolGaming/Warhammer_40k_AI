@@ -5710,7 +5710,10 @@ def test_order70_whole_unit_grants_and_expiration_are_live(effect_kind: str) -> 
     )
 
 
-@pytest.mark.parametrize("drift", ["scope", "missing_scope", "source", "target", "identity"])
+@pytest.mark.parametrize(
+    "drift",
+    ["scope", "missing_scope", "source", "target", "identity", "deleted", "identity_and_scope"],
+)
 def test_order70_restore_rejects_native_source_scope_drift(drift: str) -> None:
     lifecycle, units = _order70_native_lifecycle(("leader",))
     payload = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
@@ -5728,10 +5731,50 @@ def test_order70_restore_rejects_native_source_scope_drift(drift: str) -> None:
         effect["source_rule_id"] = "forged-source"
     elif drift == "target":
         effect["target_unit_instance_ids"] = [units["bodyguard"].unit_instance_id]
+    elif drift == "deleted":
+        payload["state"]["persisting_effects"].remove(effect)
     else:
         effect["effect_id"] = "forged-native-effect"
+        if drift == "identity_and_scope":
+            del details["native_model_ids"]
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        GameState.from_payload(payload["state"])
     with pytest.raises(GameLifecycleError, match="Native Fights First"):
         GameLifecycle.from_payload(payload)
+
+
+def test_order70_native_restore_requires_materialized_setup_inventory() -> None:
+    lifecycle, _ = _order70_native_lifecycle(("leader",))
+    state = GameState.from_config(lifecycle.config)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    for army in _state(lifecycle).army_definitions:
+        state.record_army_definition(army)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    state.remove_persisting_effects_by_id(
+        tuple(effect.effect_id for effect in state.persisting_effects)
+    )
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        GameState.from_payload(state.to_payload())
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        FightsFirstRegistry.from_state(state)
+
+
+def test_order70_native_restore_allows_expiration_after_battle_completion() -> None:
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+
+    lifecycle, _ = _order70_native_lifecycle(("leader",))
+    state = _state(lifecycle)
+    expired = state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.battle_end())
+    assert any(
+        effect.source_rule_id == "order70:core-character-leader:fights-first" for effect in expired
+    )
+    # A completed snapshot has passed the battle-end expiration boundary.
+    state.stage = GameLifecycleStage.COMPLETE
+    state.battle_phase_index = None
+    state.active_player_id = None
+    restored = GameState.from_payload(state.to_payload())
+    assert restored.to_payload() == state.to_payload()
+    assert not FightsFirstRegistry.from_state(restored).sources
 
 
 @pytest.mark.parametrize("native_components", [("leader",), ("bodyguard", "leader")])
@@ -5893,14 +5936,17 @@ def test_order70_counteroffensive_uses_current_model_complete_band(native: bool)
 
 
 @pytest.mark.parametrize("destroyed_component", ["leader", "bodyguard"])
-def test_order70_conditional_leader_grant_uses_retained_presence(destroyed_component: str) -> None:
+@pytest.mark.parametrize("bodyguard_native", [False, True])
+def test_order70_conditional_leader_grant_uses_retained_presence(
+    destroyed_component: str, bodyguard_native: bool
+) -> None:
     from warhammer40k_core.engine.catalog_conditional_leader_queries import (
         CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
         conditional_not_leading_source_applies,
     )
     from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND
 
-    lifecycle, units = _order70_native_lifecycle(())
+    lifecycle, units = _order70_native_lifecycle(("bodyguard",) if bodyguard_native else ())
     state = _state(lifecycle)
     leader = units["leader"]
     view = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
@@ -5922,11 +5968,14 @@ def test_order70_conditional_leader_grant_uses_retained_presence(destroyed_compo
                     "parameters": [{"key": "ability", "value": "fights_first"}],
                 },
                 "target": {"kind": "this_model"},
-                "context": {"source_unit_instance_id": leader.unit_instance_id},
+                "context": {
+                    "source_unit_instance_id": leader.unit_instance_id,
+                    "source_model_instance_id": leader.own_models[0].model_instance_id,
+                },
             },
         )
     )
-    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is bodyguard_native
     unit = units[destroyed_component]
     for model in unit.own_models:
         _retain_model_for_fight_on_death(
@@ -5935,12 +5984,14 @@ def test_order70_conditional_leader_grant_uses_retained_presence(destroyed_compo
             model_instance_id=model.model_instance_id,
             effect_id=f"order70:retained:{model.model_instance_id}",
         )
-    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is bodyguard_native
     assert not conditional_not_leading_source_applies(
         state=state, source_unit_instance_id=leader.unit_instance_id
     )
     _record_fight_on_death_cleanup(lifecycle=lifecycle, unit=unit, reason="unit_fight_completed")
-    assert not FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is (
+        bodyguard_native and destroyed_component == "leader"
+    )
     assert conditional_not_leading_source_applies(
         state=state, source_unit_instance_id=leader.unit_instance_id
     ) is (destroyed_component == "bodyguard")

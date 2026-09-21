@@ -18,9 +18,9 @@ and `head.json`.
 
 | Units / models | Base mean (s) | Head mean (s) | Base maximum (s) | Head maximum (s) |
 | --- | ---: | ---: | ---: | ---: |
-| 2 / 6 | 0.035546 | 0.036171 | 0.036263 | 0.036468 |
-| 4 / 16 | 0.043717 | 0.044658 | 0.044404 | 0.044910 |
-| 20 / 96 | 0.107525 | 0.108705 | 0.108750 | 0.110143 |
+| 2 / 6 | 0.035546 | 0.036165 | 0.036263 | 0.036618 |
+| 4 / 16 | 0.043717 | 0.044203 | 0.044404 | 0.044607 |
+| 20 / 96 | 0.107525 | 0.107975 | 0.108750 | 0.109244 |
 
 Every mean and maximum passes the unchanged inherited budget:
 `head <= base * 1.5 + 0.02 seconds` per 100-call batch. The code-quality audit
@@ -47,7 +47,7 @@ work. Order 64 restore/fork timings include catalog loading; Order 69 roster tim
 exclude it. These refreshed component reports cover ordinary shipped catalogs,
 not arbitrary future alias or constraint volumes.
 
-Order 70 refreshes the head measurements and table for runtime `584cb851`,
+Order 70 review corrections refresh the head measurements and table for runtime `fd6608be`,
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 70 validation](../order70/validation.json);
 earlier validation records and runtime-specific notes remain historical.

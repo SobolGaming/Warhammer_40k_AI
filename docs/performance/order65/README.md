@@ -19,10 +19,10 @@ base queries reproduced the missing restriction.
 
 | Borrows a weapon | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| False | Accepted declaration | 0.106786 / 0.119503 | 0.142229 / 0.180370 |
-| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000782 / 0.001057 |
-| True | Accepted declaration | 0.085439 / 0.091044 | 0.089049 / 0.094010 |
-| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000744 / 0.000891 |
+| False | Accepted declaration | 0.106786 / 0.119503 | 0.124444 / 0.130824 |
+| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000711 / 0.000808 |
+| True | Accepted declaration | 0.085439 / 0.091044 | 0.084919 / 0.091208 |
+| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000693 / 0.000748 |
 
 The declared mean budget is base × 1.30 plus 50 ms per declaration or 10 ms per
 100 queries; the maximum budget is base × 1.50 plus 100 ms. These allowances cover
@@ -66,7 +66,7 @@ with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 69 validation](../order69/validation.json);
 the earlier gate records above remain historical.
 
-Order 70 refreshes the head measurements and table for runtime `584cb851`,
+Order 70 review corrections refresh the head measurements and table for runtime `fd6608be`,
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 70 validation](../order70/validation.json);
 earlier validation records and runtime-specific notes remain historical.

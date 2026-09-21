@@ -20,10 +20,10 @@ none.
 
 | Aircraft | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| 1 | 100 mutation guards | 0.008290 / 0.010731 | 0.014595 / 0.014916 |
-| 1 | Opponent turn boundary | 0.160629 / 0.170822 | 0.168279 / 0.175704 |
-| 2 | 100 mutation guards | 0.009367 / 0.012321 | 0.017087 / 0.017805 |
-| 2 | Opponent turn boundary | 0.170526 / 0.174009 | 0.184264 / 0.190646 |
+| 1 | 100 mutation guards | 0.008290 / 0.010731 | 0.014805 / 0.018405 |
+| 1 | Opponent turn boundary | 0.160629 / 0.170822 | 0.161887 / 0.189568 |
+| 2 | 100 mutation guards | 0.009367 / 0.012321 | 0.016476 / 0.017398 |
+| 2 | Opponent turn boundary | 0.170526 / 0.174009 | 0.175972 / 0.181464 |
 
 The mean budget is base x 1.5 plus 50 ms per 100 guards or 200 ms per boundary;
 the maximum budget is base x 2 plus 300 ms. These provisional allowances cover
@@ -64,7 +64,7 @@ with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 69 validation](../order69/validation.json);
 the earlier gate records above remain historical.
 
-Order 70 refreshes the head measurements and table for runtime `584cb851`,
+Order 70 review corrections refresh the head measurements and table for runtime `fd6608be`,
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 70 validation](../order70/validation.json);
 earlier validation records and runtime-specific notes remain historical.

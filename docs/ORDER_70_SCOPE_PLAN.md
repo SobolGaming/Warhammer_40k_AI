@@ -59,16 +59,21 @@ Counteroffensive validation -> existing engine mutation, events, adapters and re
 `fights_first_native.py` owns intrinsic source identities and model footprints.
 Materialization and restored-effect validation use the same inventory. Restore
 rejects changed source, target, identity or model scope, including removal of the
-scope field from a known native occurrence. Historical split origins preserve
+scope field from a known native occurrence. It also requires every expected
+native occurrence after army materialization during setup and battle, rejecting
+deletion and combined identity/scope drift. Completed states allow the native
+effects to have expired at the battle-end boundary. Historical split origins preserve
 the original source inventory; the live query intersects its footprint with
 each successor's actual models.
 
 `fights_first_model_inventory` combines partial native and model grants before
 the all-model test. Core duplicate-source enumeration consumes those partial
 footprints instead of pretending a partial grant belongs to other components.
-Conditional Leader grants retain their descriptor-authorized unit scope and
-recheck current leading conditions. The not-leading model grant now records its
-explicit source model. Its start-of-Fight condition remains a snapshot, with its
+Conditional Leader grants recheck current leading conditions and preserve their
+RuleIR target scope. Leading and not-leading `this_model` grants record their
+explicit source model through one shared producer helper. A Leader-only grant
+cannot cover Bodyguards; their own native/model grants must complete the union.
+The not-leading grant's start-of-Fight condition remains a snapshot, with its
 existing phase lifetime. Charge and selected whole-unit grants retain unit scope.
 
 The frozen Fight-start registry remains historical evidence, including Charge
@@ -78,7 +83,7 @@ grant expiry therefore need no invalidation callbacks or cache. Historical
 builders continue to use event-time evidence. No named handler, hook family,
 architecture exception, new faction content or excluded content is introduced.
 
-The first quality run exposed unnecessary membership/effect-target work when no
+The initial implementation quality run exposed unnecessary membership/effect-target work when no
 Fights First grant exists. After validating native source integrity, the registry
 now returns an explicit empty inventory for that case before constructing unit
 views. A shared structural payload predicate covers both the empty-inventory test
@@ -128,6 +133,13 @@ and source records. New modules are below the size limit. Existing oversized
 modules only delegate or remove the replaced responsibility. No new behavioral
 test file or speculative runtime registry is added.
 
+The first review-correction quality run caught a one-line increase beyond the
+frozen GameState budget (7,045 against 7,044). Validation context access now lives
+in the existing persisting-effect helper; the caller shrinks GameState to 7,039
+lines. Eleven focused restore/size checks pass. The budget stays unchanged, and
+runtime artifacts, component measurements and both aggregate suites are refreshed
+after this extraction.
+
 Matched query and inherited component evidence is recorded in
 [performance/order70](performance/order70/README.md). Complete-game performance,
 the 60-second mean/300-second maximum targets and deferred Order 32 budgets are
@@ -136,14 +148,10 @@ not certified. Final local results and diagnostic history are retained in
 
 ## Validation results
 
-8,662 behavioral tests passed with 85.1418% coverage; all 567 code-quality tests passed without coverage. Ruff check/format, mypy (3,174 files), Pyright, 11 import contracts, eight-shard inventory, source/catalog generators, exact-base contract compatibility, installed-wheel smoke, generated TypeScript client/typecheck, five client tests, 342 live conformance assertions and all-files pre-commit passed. All retained component/work budgets pass unchanged. `npm ci` was unavailable locally; package-script equivalents ran through Node with the installed dependencies.
+Review of head `138cf6de` found two correctness gaps despite passing validation: the conditional-Leader descriptor bypassed `this_model` scope, and native restore validated present effects without requiring completeness. Five new regression failures reproduced these gaps before the correction. The real Autarch footprint, complementary Bodyguard coverage, deletion/combined drift, and setup/completed lifecycle cases now pass.
 
-Both final suites use 32 automatically allocated xdist work-stealing workers,
-following Order 69's recorded host-scheduling assessment. No production code
-changed after the final behavioral run began. The first behavioral run passed;
-the first quality run found two work-budget failures. The empty-inventory
-correction, fresh runtime/component evidence and passing full reruns are recorded
-separately in the validation JSON. Ten pre-existing SQLite ResourceWarnings were
-reported during the final behavioral suite.
+8,668 behavioral tests passed with 85.1424% coverage; all 567 code-quality tests passed without coverage. Ruff check/format, mypy (3,174 files), Pyright, 11 import contracts, eight-shard inventory, source/catalog generators, exact-base contract compatibility, installed-wheel smoke, generated TypeScript client/typecheck, five client tests, 342 live conformance assertions and all-files pre-commit passed. All retained component/work budgets pass unchanged. `npm ci` was unavailable locally; package-script equivalents ran through Node with the installed dependencies.
+
+Both final suites use 32 automatically allocated xdist work-stealing workers. No production code changed after the final behavioral run began. The reviewed-head validation, original Order 34 work-budget correction, and first review cycle's module-size failure are retained in `validation.json`. After extracting the validation context, runtime artifacts, component measurements and both full suites were refreshed. The final behavioral suite reported 10 SQLite ResourceWarnings.
 
 PR URL: [#490](https://github.com/SobolGaming/Warhammer_40k_AI/pull/490). Merge commit: pending; merge remains owner-controlled.

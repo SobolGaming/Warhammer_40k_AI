@@ -56,12 +56,12 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.788 / 3.848 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.892 / 4.044 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.840 / 3.908 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.902 / 4.172 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.763 / 3.883 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.911 / 4.159 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.663 / 3.778 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.705 / 3.813 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.813 / 3.922 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.719 / 3.795 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.732 / 3.812 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.762 / 3.976 |
 
 Order 69 refreshed the 42 head timings and six independent profile samples for
 runtime `12dd8fab` on 2026-09-21, retaining the qualified baseline and
@@ -103,7 +103,7 @@ with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 69 validation](../order69/validation.json);
 the earlier gate records above remain historical.
 
-Order 70 refreshes the head measurements and table for runtime `584cb851`,
+Order 70 review corrections refresh the head measurements and table for runtime `fd6608be`,
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 70 validation](../order70/validation.json);
 earlier validation records and runtime-specific notes remain historical.

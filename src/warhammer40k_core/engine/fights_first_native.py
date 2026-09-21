@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.core_ability_family import CoreAbilityFamily
 from warhammer40k_core.engine.core_ability_state import core_instance_groups
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -69,6 +69,7 @@ def validate_native_fights_first_effects(
     *,
     armies: tuple[ArmyDefinition, ...],
     effects: tuple[PersistingEffect, ...],
+    stage: GameLifecycleStage,
 ) -> None:
     """Bind native effect scope to catalog/model authority, including split origins."""
     expected = {
@@ -93,3 +94,11 @@ def validate_native_fights_first_effects(
             or payload != source.effect_payload()
         ):
             raise GameLifecycleError("Native Fights First source scope drift.")
+    # Recording an army materializes every intrinsic occurrence before returning,
+    # including during setup. Only the battle-end boundary expires these effects.
+    if stage is not GameLifecycleStage.COMPLETE:
+        missing = expected.keys() - {effect.effect_id for effect in effects}
+        if missing:
+            raise GameLifecycleError(
+                f"Native Fights First occurrences are missing: {', '.join(sorted(missing))}."
+            )

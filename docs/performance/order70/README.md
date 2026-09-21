@@ -22,11 +22,11 @@ threshold without dropping a workload case.
 
 | Unit grants | Base mean (s) | Head mean (s) | Base maximum (s) | Head maximum (s) |
 | --- | ---: | ---: | ---: | ---: |
-| 0 | 0.000151 | 0.003793 | 0.000171 | 0.004159 |
-| 1 | 0.003990 | 0.030259 | 0.004031 | 0.033781 |
-| 4 | 0.014797 | 0.035146 | 0.014864 | 0.038746 |
+| 0 | 0.000151 | 0.003850 | 0.000171 | 0.004198 |
+| 1 | 0.003990 | 0.029864 | 0.004031 | 0.033669 |
+| 4 | 0.014797 | 0.034356 | 0.014864 | 0.038009 |
 
-All six mean/maximum comparisons pass. The head measures 0.04–0.35 ms per
+All six mean/maximum comparisons pass. The head measures 0.04–0.34 ms per
 query in this scene. This quantifies the new proof cost without implying a
 complete-game result.
 
@@ -34,7 +34,7 @@ Reproduce with the corresponding runtime and no competing workers:
 
 ```powershell
 uv run python -m scripts.measure_order70 --output docs/performance/order70/base.json --revision 6ee55f30 --runtime-src reports/order70-base/src
-uv run python -m scripts.measure_order70 --output docs/performance/order70/head.json --revision order70-working-tree
+uv run python -m scripts.measure_order70 --output docs/performance/order70/head.json --revision order70-review
 ```
 
 The exact-runtime reconstruction, Firing Deck, Aircraft and roster-validation
@@ -49,5 +49,6 @@ budgets are not certified.
 The empty-inventory correction preserves native-source validation before avoiding
 unit membership/target scans when no Fights First grant exists. It resolves the
 existing Order 34 live work-guard failures without raising their limits. These
-head reports were freshly measured for final runtime `584cb851`; the first
-aggregate results and correction are retained in `validation.json`.
+head reports were freshly measured after the scope/completeness review corrections
+for runtime `fd6608be`. The first aggregate results and the superseded
+reviewed-head validation remain in `validation.json`.

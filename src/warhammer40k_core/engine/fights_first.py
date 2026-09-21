@@ -103,7 +103,9 @@ class FightsFirstRegistry:
     @classmethod
     def from_state(cls, state: GameState) -> Self:
         effects = tuple(state.persisting_effects)
-        validate_native_fights_first_effects(armies=tuple(state.army_definitions), effects=effects)
+        validate_native_fights_first_effects(
+            armies=tuple(state.army_definitions), effects=effects, stage=state.stage
+        )
         if not any(_is_fights_first_payload(effect.effect_payload) for effect in effects):
             return cls()
         sources: list[FightsFirstSource] = []
@@ -208,7 +210,7 @@ def fights_first_model_inventory(
             if not isinstance(raw_ids, list) or any(type(value) is not str for value in raw_ids):
                 raise GameLifecycleError("Native Fights First model scope is malformed.")
             ids.intersection_update(cast(list[str], raw_ids))
-        elif descriptor != CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID:
+        else:
             target = payload.get("target")
             if isinstance(target, dict) and target.get("kind") == "this_model":
                 context = payload.get("context")

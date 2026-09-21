@@ -1,7 +1,7 @@
 {
   "workload_id": "order65-firing-deck-v1",
-  "revision": "order70-empty-inventory",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:584cb851d2ec13d8371680059a244f83bec87039cd65a34edc89b979bc3b8d11",
+  "revision": "order70-review-final",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fd6608be023165bf4e8e2ed4dbc1635250d06ddca2da666018c5893220a35656",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
@@ -21,67 +21,67 @@
       "contribute": false,
       "samples": [
         {
-          "preparation_seconds": 7.7278281999751925,
-          "declaration_seconds": 0.17649370001163334,
-          "hundred_queries_seconds": 0.001057000015862286,
+          "preparation_seconds": 7.467918699956499,
+          "declaration_seconds": 0.13082369999028742,
+          "hundred_queries_seconds": 0.000701500044669956,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.1445566000184044,
-          "declaration_seconds": 0.12745329999597743,
-          "hundred_queries_seconds": 0.0007193000055849552,
+          "preparation_seconds": 1.0711596999899484,
+          "declaration_seconds": 0.12304779997793958,
+          "hundred_queries_seconds": 0.0006917999708093703,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.1656385000096634,
-          "declaration_seconds": 0.18036950001260266,
-          "hundred_queries_seconds": 0.0009467999916523695,
+          "preparation_seconds": 0.9965326000237837,
+          "declaration_seconds": 0.1253228000132367,
+          "hundred_queries_seconds": 0.0007122999522835016,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0562283999752253,
-          "declaration_seconds": 0.12729169998783618,
-          "hundred_queries_seconds": 0.0006738000083714724,
+          "preparation_seconds": 0.9938665999798104,
+          "declaration_seconds": 0.12261730001773685,
+          "hundred_queries_seconds": 0.0006800999981351197,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.009217799990438,
-          "declaration_seconds": 0.12654249998740852,
-          "hundred_queries_seconds": 0.0006846999749541283,
+          "preparation_seconds": 1.0035792000126094,
+          "declaration_seconds": 0.12311859999317676,
+          "hundred_queries_seconds": 0.0006917999708093703,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0074064999935217,
-          "declaration_seconds": 0.128450799966231,
-          "hundred_queries_seconds": 0.0006754000205546618,
+          "preparation_seconds": 0.9862322999979369,
+          "declaration_seconds": 0.1236227999906987,
+          "hundred_queries_seconds": 0.0006891000084578991,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0063464000122622,
-          "declaration_seconds": 0.1290022999746725,
-          "hundred_queries_seconds": 0.0007169999880716205,
+          "preparation_seconds": 0.9922672000247985,
+          "declaration_seconds": 0.12255849997745827,
+          "hundred_queries_seconds": 0.0008083999855443835,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.14222911427662308,
-          "median": 0.128450799966231,
-          "p95": 0.18036950001260266,
-          "maximum": 0.18036950001260266
+          "mean": 0.12444449999436204,
+          "median": 0.12311859999317676,
+          "p95": 0.13082369999028742,
+          "maximum": 0.13082369999028742
         },
         "hundred_queries_seconds": {
-          "mean": 0.000782000000721642,
-          "median": 0.0007169999880716205,
-          "p95": 0.001057000015862286,
-          "maximum": 0.001057000015862286
+          "mean": 0.0007107142758156572,
+          "median": 0.0006917999708093703,
+          "p95": 0.0008083999855443835,
+          "maximum": 0.0008083999855443835
         }
       }
     },
@@ -89,67 +89,67 @@
       "contribute": true,
       "samples": [
         {
-          "preparation_seconds": 1.0138603000086732,
-          "declaration_seconds": 0.08584159996826202,
-          "hundred_queries_seconds": 0.0006849999772384763,
+          "preparation_seconds": 0.9768818000447936,
+          "declaration_seconds": 0.08443389995954931,
+          "hundred_queries_seconds": 0.0007101999945007265,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0207023000111803,
-          "declaration_seconds": 0.0940104000037536,
-          "hundred_queries_seconds": 0.0006779999821446836,
+          "preparation_seconds": 0.9757051999913529,
+          "declaration_seconds": 0.08287750004092231,
+          "hundred_queries_seconds": 0.0006887000054121017,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.099479800031986,
-          "declaration_seconds": 0.08974440000019968,
-          "hundred_queries_seconds": 0.0006849999772384763,
+          "preparation_seconds": 1.0616877000429668,
+          "declaration_seconds": 0.0836400999687612,
+          "hundred_queries_seconds": 0.0006709999870508909,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0309649999835528,
-          "declaration_seconds": 0.09043370001018047,
-          "hundred_queries_seconds": 0.0008081999840214849,
+          "preparation_seconds": 0.978689800016582,
+          "declaration_seconds": 0.08418020000681281,
+          "hundred_queries_seconds": 0.000686999992467463,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.006912300013937,
-          "declaration_seconds": 0.08616070001153275,
-          "hundred_queries_seconds": 0.0007111000013537705,
+          "preparation_seconds": 0.9738591999630444,
+          "declaration_seconds": 0.08373509999364614,
+          "hundred_queries_seconds": 0.0006764999707229435,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0088391000172123,
-          "declaration_seconds": 0.0890137999667786,
-          "hundred_queries_seconds": 0.0007466999813914299,
+          "preparation_seconds": 0.9798643000540324,
+          "declaration_seconds": 0.08435709995683283,
+          "hundred_queries_seconds": 0.0006712999893352389,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0196457999991253,
-          "declaration_seconds": 0.08813620003638789,
-          "hundred_queries_seconds": 0.0008909999742172658,
+          "preparation_seconds": 1.0295314000104554,
+          "declaration_seconds": 0.09120800002710894,
+          "hundred_queries_seconds": 0.0007475999882444739,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.08904868571387071,
-          "median": 0.0890137999667786,
-          "p95": 0.0940104000037536,
-          "maximum": 0.0940104000037536
+          "mean": 0.08491884285051908,
+          "median": 0.08418020000681281,
+          "p95": 0.09120800002710894,
+          "maximum": 0.09120800002710894
         },
         "hundred_queries_seconds": {
-          "mean": 0.0007435714110865124,
-          "median": 0.0007111000013537705,
-          "p95": 0.0008909999742172658,
-          "maximum": 0.0008909999742172658
+          "mean": 0.000693185703961977,
+          "median": 0.000686999992467463,
+          "p95": 0.0007475999882444739,
+          "maximum": 0.0007475999882444739
         }
       }
     }

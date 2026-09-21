@@ -54,6 +54,19 @@ def test_order70_live_order_does_not_use_start_snapshot_as_ability_authority() -
         ]
     effects = (engine / "rules_unit_effects.py").read_text(encoding="utf-8")
     assert "validate_native_fights_first_effects(" in effects
+    # Conditional descriptors may decide applicability, never exempt a grant
+    # from the common model-scope restriction.
+    inventory = ast.parse((engine / "fights_first.py").read_text(encoding="utf-8"))
+    assert not [
+        node
+        for node in ast.walk(inventory)
+        if isinstance(node, ast.Compare)
+        and any(isinstance(operator, ast.NotEq) for operator in node.ops)
+        and any(
+            isinstance(value, ast.Name) and value.id == "CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID"
+            for value in (node.left, *node.comparators)
+        )
+    ]
 
 
 def test_order70_matched_live_query_cost() -> None:

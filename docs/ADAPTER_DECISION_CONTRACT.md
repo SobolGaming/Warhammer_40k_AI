@@ -6491,8 +6491,12 @@ before queue pop. Retained Fight On Death models participate until cleanup.
 
 Native persisting effects now carry explicit `native_model_ids`, authenticated
 against intrinsic source/model ownership and historical split origins on restore.
-Conditional not-leading model grants preserve an explicit source model; unit-wide
-Leader and Charge grants keep their authorized scope. The frozen Fight-start
+Native occurrence completeness is required after army materialization during
+setup and battle; completed snapshots allow battle-end expiration. Deletion or
+combined identity/model-scope drift is a typed error. Conditional leading and
+not-leading `this_model` grants preserve an explicit source model and combine
+with Bodyguard-native coverage. Charge and explicit unit grants keep unit scope.
+The frozen Fight-start
 registry remains historical Charge/forced-Fight evidence, not live ability
 authority. No public payload shape or visibility policy changes. The existing
 runtime build fingerprint rejects old operator persistence; missing native scope
