@@ -10,8 +10,9 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.roster_model_identity import selected_roster_model
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitFactoryError, UnitInstance
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.faction_content.activation import RuntimeEnhancementAssignment
@@ -60,7 +61,7 @@ def enhancement_bearer_unit(
 def current_enhancement_bearer(
     army: ArmyDefinition, *, source_unit_instance_id: str
 ) -> UnitInstance:
-    """Keep the existing canonical first-model bearer stable across partitions.
+    """Keep the explicitly selected model bearer stable across partitions.
 
     Source inventory supplies identity only. The returned unit and model state
     always come from the live inventory authenticated by ArmyDefinition lineage.
@@ -69,7 +70,24 @@ def current_enhancement_bearer(
         source = army.source_unit_by_id(source_unit_instance_id)
     except ArmyMusteringError as exc:
         raise GameLifecycleError("Enhancement assignment references unknown bearer unit.") from exc
-    bearer_model_id = min(source.own_model_ids())
+    assignments = tuple(
+        row
+        for row in army.enhancement_assignments
+        if f"{army.army_id}:{row.target_unit_selection_id}" == source_unit_instance_id
+    )
+    if len(assignments) != 1:
+        raise GameLifecycleError("Enhancement source requires a unique roster assignment.")
+    assignment = assignments[0]
+    try:
+        bearer_model_id = selected_roster_model(
+            source,
+            model_profile_id=assignment.model_profile_id,
+            model_index=assignment.model_index,
+        ).model_instance_id
+    except UnitFactoryError as exc:
+        raise GameLifecycleError(
+            "Enhancement selected model is absent from source inventory."
+        ) from exc
     matches = tuple(
         unit
         for unit in army.units
@@ -79,3 +97,16 @@ def current_enhancement_bearer(
     if len(matches) != 1:
         raise GameLifecycleError("Enhancement bearer lacks unique current model ownership.")
     return matches[0]
+
+
+def enhancement_bearer_model(
+    army: ArmyDefinition, *, assignment: EnhancementAssignment
+) -> ModelInstance:
+    unit = enhancement_bearer_unit(army, assignment=assignment)
+    source = army.source_unit_by_id(f"{army.army_id}:{assignment.target_unit_selection_id}")
+    model_id = selected_roster_model(
+        source,
+        model_profile_id=assignment.model_profile_id,
+        model_index=assignment.model_index,
+    ).model_instance_id
+    return unit.own_model_by_id(model_id)

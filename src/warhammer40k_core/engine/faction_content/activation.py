@@ -14,7 +14,10 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     muster_army,
 )
-from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
+from warhammer40k_core.engine.enhancement_bearers import (
+    enhancement_bearer_model,
+    enhancement_bearer_unit,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
@@ -22,6 +25,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 
 
 class RuntimeEnhancementAssignmentPayload(TypedDict):
+    bearer_model_instance_id: str
     assignment_id: str
     player_id: str
     army_id: str
@@ -54,6 +58,7 @@ class RuntimeContentActivationPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class RuntimeEnhancementAssignment:
+    bearer_model_instance_id: str
     assignment_id: str
     player_id: str
     army_id: str
@@ -63,6 +68,11 @@ class RuntimeEnhancementAssignment:
     source_id: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "bearer_model_instance_id",
+            _validate_identifier("bearer_model_instance_id", self.bearer_model_instance_id),
+        )
         object.__setattr__(
             self,
             "assignment_id",
@@ -89,6 +99,7 @@ class RuntimeEnhancementAssignment:
 
     def to_payload(self) -> RuntimeEnhancementAssignmentPayload:
         return {
+            "bearer_model_instance_id": self.bearer_model_instance_id,
             "assignment_id": self.assignment_id,
             "player_id": self.player_id,
             "army_id": self.army_id,
@@ -101,6 +112,7 @@ class RuntimeEnhancementAssignment:
     @classmethod
     def from_payload(cls, payload: RuntimeEnhancementAssignmentPayload) -> Self:
         return cls(
+            bearer_model_instance_id=payload["bearer_model_instance_id"],
             assignment_id=payload["assignment_id"],
             player_id=payload["player_id"],
             army_id=payload["army_id"],
@@ -460,6 +472,9 @@ def _runtime_enhancement_assignment_from_army(
 ) -> RuntimeEnhancementAssignment:
     bearer_unit = _bearer_unit_for_assignment(army=army, assignment=assignment)
     return RuntimeEnhancementAssignment(
+        bearer_model_instance_id=enhancement_bearer_model(
+            army, assignment=assignment
+        ).model_instance_id,
         assignment_id=(
             f"{army.army_id}:{assignment.enhancement_id}:{assignment.target_unit_selection_id}"
         ),

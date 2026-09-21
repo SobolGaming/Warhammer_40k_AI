@@ -23,7 +23,7 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "9880544d1885d07f0f3ef2b1262cfb29c2b204f88bc7cb0084fba7b4bd91815f"
+EXPECTED_ARTIFACT_SHA256: Final = "cd6eb80ebdc43a1561d4823f4dec0b7a9834a70e27da4a4bf6e462840cbc1abc"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-mustering-limits"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-20"
 BATTLE_SIZE_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:battle_size"

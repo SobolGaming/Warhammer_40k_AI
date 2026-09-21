@@ -2549,6 +2549,8 @@ def test_shadow_legion_mustering_grants_keywords_and_deep_strike() -> None:
             ("damned-unit", _DAMNED_DATASHEET_ID),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="belakor",
             source_id="phase17g:shadow-legion:warlord",
         ),
@@ -2598,6 +2600,8 @@ def test_shadow_legion_roster_reports_thralls_and_forbidden_units() -> None:
             _unit_points("chaos-lord", 1001),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="daemon-unit",
             source_id="phase17g:shadow-legion:warlord",
         ),
@@ -3877,6 +3881,8 @@ def _assign_fade_to_darkness(state: GameState, *, unit: UnitInstance) -> None:
                 army,
                 enhancement_assignments=(
                     EnhancementAssignment(
+                        model_profile_id=unit.own_models[0].model_profile_id,
+                        model_index=1,
                         enhancement_id=enhancements.ENHANCEMENT_ID,
                         target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
                         source_id=enhancements.SOURCE_RULE_ID,
@@ -3901,6 +3907,8 @@ def _assign_leaping_shadows(state: GameState, *, unit: UnitInstance) -> None:
                 army,
                 enhancement_assignments=(
                     EnhancementAssignment(
+                        model_profile_id=unit.own_models[0].model_profile_id,
+                        model_index=1,
                         enhancement_id=enhancements.LEAPING_SHADOWS_ENHANCEMENT_ID,
                         target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
                         source_id=enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID,
@@ -3925,6 +3933,8 @@ def _assign_mantle_of_gloom(state: GameState, *, unit: UnitInstance) -> None:
                 army,
                 enhancement_assignments=(
                     EnhancementAssignment(
+                        model_profile_id=unit.own_models[0].model_profile_id,
+                        model_index=1,
                         enhancement_id=enhancements.MANTLE_OF_GLOOM_ENHANCEMENT_ID,
                         target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
                         source_id=enhancements.MANTLE_OF_GLOOM_SOURCE_RULE_ID,
@@ -4008,6 +4018,8 @@ def _assign_malice_made_manifest(state: GameState, *, unit: UnitInstance) -> Non
                 army,
                 enhancement_assignments=(
                     EnhancementAssignment(
+                        model_profile_id=unit.own_models[0].model_profile_id,
+                        model_index=1,
                         enhancement_id=enhancements.MALICE_MADE_MANIFEST_ENHANCEMENT_ID,
                         target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
                         source_id=enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID,

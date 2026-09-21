@@ -29,6 +29,7 @@ from warhammer40k_core.core.datasheet import (
     BaseSizeDefinition,
     DatasheetDefinition,
     DatasheetKeywordSet,
+    UnitCompositionDefinition,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementDefinition
 from warhammer40k_core.core.dice import (
@@ -300,6 +301,106 @@ def test_veterans_of_the_void_enforces_unique_and_target_restrictions() -> None:
     assert "corsair_coterie_anhrathe_required" in violation_codes
     assert "corsair_coterie_archraider_character_required" in violation_codes
     assert "corsair_coterie_voidstone_infantry_required" in violation_codes
+
+
+@pytest.mark.parametrize(
+    ("enhancement_id", "bearer_keywords", "missing_keyword", "violation_code"),
+    [
+        ("archraider", ("ANHRATHE", "CHARACTER"), "ANHRATHE", "corsair_coterie_anhrathe_required"),
+        ("infamy", ("ANHRATHE",), "ANHRATHE", "corsair_coterie_anhrathe_required"),
+        ("voidstone", ("ANHRATHE", "INFANTRY"), "ANHRATHE", "corsair_coterie_anhrathe_required"),
+        ("webway-pathstone", ("ANHRATHE",), "ANHRATHE", "corsair_coterie_anhrathe_required"),
+        (
+            "archraider",
+            ("ANHRATHE", "CHARACTER"),
+            "CHARACTER",
+            "corsair_coterie_archraider_character_required",
+        ),
+        (
+            "voidstone",
+            ("ANHRATHE", "INFANTRY"),
+            "INFANTRY",
+            "corsair_coterie_voidstone_infantry_required",
+        ),
+    ],
+)
+def test_order68_corsair_enhancement_checks_selected_bearer_keywords(
+    enhancement_id: str,
+    bearer_keywords: tuple[str, ...],
+    missing_keyword: str,
+    violation_code: str,
+) -> None:
+    catalog = _corsair_mustering_catalog()
+    sheet = catalog.datasheet_by_id("phase17g-corsairs")
+    other = replace(sheet.model_profiles[0], model_profile_id="other-corsair")
+    sheet = replace(
+        sheet,
+        keywords=replace(sheet.keywords, keywords=bearer_keywords),
+        model_profiles=(*sheet.model_profiles, other),
+        composition=(
+            *sheet.composition,
+            UnitCompositionDefinition(
+                model_profile_id=other.model_profile_id, min_models=1, max_models=1
+            ),
+        ),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            sheet if row.datasheet_id == sheet.datasheet_id else row for row in catalog.datasheets
+        ),
+        model_keyword_assignments=tuple(
+            ModelKeywordAssignment(
+                datasheet_id=sheet.datasheet_id,
+                model_profile_id=profile_id,
+                keywords=keywords,
+                faction_keywords=sheet.keywords.faction_keywords,
+                source_ids=("order68:corsair-bearer-keywords",),
+            )
+            for profile_id, keywords in (
+                (sheet.model_profiles[0].model_profile_id, bearer_keywords),
+                (other.model_profile_id, tuple(k for k in bearer_keywords if k != missing_keyword)),
+            )
+        ),
+    )
+    assignment = replace(_assignment(enhancement_id, "corsairs"), model_index=2)
+    request = _corsair_muster_request(catalog, enhancement_assignments=(assignment,))
+    request = replace(
+        request,
+        unit_selections=tuple(
+            replace(
+                selection,
+                model_profile_selections=(
+                    *selection.model_profile_selections,
+                    ModelProfileSelection(model_profile_id=other.model_profile_id, model_count=1),
+                ),
+            )
+            if selection.unit_selection_id == "corsairs"
+            else selection
+            for selection in request.unit_selections
+        ),
+    )
+    assert validate_roster_legality(catalog=catalog, request=request).violations == ()
+    invalid = replace(
+        request,
+        enhancement_assignments=(
+            replace(assignment, model_profile_id=other.model_profile_id, model_index=1),
+        ),
+    )
+    report = validate_roster_legality(catalog=catalog, request=invalid)
+    assert [violation.violation_code for violation in report.violations] == [violation_code]
+    assert report.violations[0].unit_selection_id == "corsairs"
+    assert report.violations[0].source_id == next(
+        row.source_id for row in catalog.enhancements if row.enhancement_id == enhancement_id
+    )
+    unresolved = replace(
+        invalid,
+        enhancement_assignments=(replace(invalid.enhancement_assignments[0], model_index=2),),
+    )
+    unresolved_report = validate_roster_legality(catalog=catalog, request=unresolved)
+    assert [row.violation_code for row in unresolved_report.violations] == [
+        "enhancement_invalid_model_selection"
+    ]
 
 
 def test_corsair_coterie_runtime_contribution_registers_rule_and_enhancement_hooks() -> None:
@@ -2342,6 +2443,8 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
         state=state,
         army=enemy_army,
         assignment=EnhancementAssignment(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             enhancement_id=enhancements.INFAMY_ENHANCEMENT_ID,
             target_unit_selection_id="enemy-raiders",
             source_id="assignment:enemy:infamy",
@@ -5972,6 +6075,8 @@ def _corsair_muster_request(
         ),
         enhancement_assignments=enhancement_assignments,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="archraider",
             source_id="phase17g:warlord:archraider",
         ),
@@ -6043,7 +6148,7 @@ def _unit(
     model = _model(
         model_instance_id=f"{unit_instance_id}:model-001",
         datasheet_id=datasheet_id,
-        model_profile_id=f"{datasheet_id}-profile",
+        model_profile_id="core-intercessor-like",
         name=f"{name} model",
         keywords=keywords,
         objective_control=objective_control,
@@ -6210,8 +6315,15 @@ def _set_unit_model_x_positions(
     )
 
 
-def _assignment(enhancement_id: str, target_unit_selection_id: str) -> EnhancementAssignment:
+def _assignment(
+    enhancement_id: str,
+    target_unit_selection_id: str,
+    *,
+    model_profile_id: str = "core-intercessor-like",
+) -> EnhancementAssignment:
     return EnhancementAssignment(
+        model_profile_id=model_profile_id,
+        model_index=1,
         enhancement_id=enhancement_id,
         target_unit_selection_id=target_unit_selection_id,
         source_id=f"assignment:{enhancement_id}:{target_unit_selection_id}",

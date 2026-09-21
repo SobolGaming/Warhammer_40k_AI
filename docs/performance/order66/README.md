@@ -20,10 +20,10 @@ none.
 
 | Aircraft | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| 1 | 100 mutation guards | 0.008290 / 0.010731 | 0.014881 / 0.015798 |
-| 1 | Opponent turn boundary | 0.160629 / 0.170822 | 0.167539 / 0.175202 |
-| 2 | 100 mutation guards | 0.009367 / 0.012321 | 0.016886 / 0.017639 |
-| 2 | Opponent turn boundary | 0.170526 / 0.174009 | 0.187837 / 0.196998 |
+| 1 | 100 mutation guards | 0.008290 / 0.010731 | 0.014484 / 0.015143 |
+| 1 | Opponent turn boundary | 0.160629 / 0.170822 | 0.173242 / 0.211642 |
+| 2 | 100 mutation guards | 0.009367 / 0.012321 | 0.016820 / 0.017411 |
+| 2 | Opponent turn boundary | 0.170526 / 0.174009 | 0.182818 / 0.184359 |
 
 The mean budget is base x 1.5 plus 50 ms per 100 guards or 200 ms per boundary;
 the maximum budget is base x 2 plus 300 ms. These provisional allowances cover
@@ -51,7 +51,10 @@ uv run python -m scripts.measure_ingress_reconstruction --output docs/performanc
 uv run python -m scripts.measure_order65 --output docs/performance/order65/head.json --revision <current-engine-build-id>
 ```
 
-Order 67 refreshes `head.json` and the table above for runtime `f5f5e58b`,
+Order 68 refreshes `head.json` and the table above for runtime `3311c43e`,
 using the same workload and budgets without competing test/build workers.
-`validation.json` retains the historical Order 66 gate results; current Order 67
-validation is recorded in [its scope record](../../ORDER_67_SCOPE_PLAN.md).
+`validation.json` retains the historical Order 66 gate results; current Order 68
+validation is recorded in [its scope record](../../ORDER_68_SCOPE_PLAN.md).
+
+The Corsair bearer review correction refreshes this evidence for runtime
+`3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.

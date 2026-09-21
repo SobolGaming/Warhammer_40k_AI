@@ -56,19 +56,19 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.701 / 3.754 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.794 / 3.900 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.848 / 3.949 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.865 / 3.977 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.854 / 3.969 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.865 / 4.054 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.901 / 4.355 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.799 / 3.881 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.821 / 3.900 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.897 / 3.975 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.833 / 3.922 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.889 / 3.983 |
 
-Order 67 refreshed the 42 head timings and six independent profile samples for
+Order 68 refreshed the 42 head timings and six independent profile samples for
 the current runtime build on 2026-09-20, retaining the qualified baseline and
 unchanged workload and budgets. Every reconstruction completed with exact
 reproduction and parent isolation. All six comparisons pass, with authentication
 and suffix counts preserved. These measurements do not establish a speedup.
-See [Order 67 validation](../order67/validation.json).
+See [Order 68 validation](../order68/validation.json).
 
 At the measured checkpoint cost, ten sequential forks would consume about
 39 seconds. This is a linear estimate, not an observed planning workload;
@@ -94,3 +94,6 @@ profile in a fresh subprocess, matching standalone evidence execution. It retain
 the same real fixtures, exact replay/equality checks and every existing work
 limit; no performance budget was raised. See the Order 65 validation record for
 the failed attempts and focused diagnostic results.
+
+The Corsair bearer review correction refreshes this evidence for runtime
+`3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.

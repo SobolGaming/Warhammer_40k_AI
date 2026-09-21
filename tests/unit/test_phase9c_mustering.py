@@ -33,6 +33,7 @@ from warhammer40k_core.core.detachment import (
     StratagemDefinition,
 )
 from warhammer40k_core.core.faction import ArmyRuleDefinition, FactionDefinition
+from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
@@ -44,8 +45,10 @@ from warhammer40k_core.engine.army_mustering import (
     DedicatedTransportCapacityProfile,
     DedicatedTransportManifest,
     EnhancementAssignment,
+    EnhancementAssignmentPayload,
     RosterLegalityReport,
     WarlordSelection,
+    WarlordSelectionPayload,
     muster_army,
     validate_roster_legality,
 )
@@ -59,6 +62,7 @@ from warhammer40k_core.engine.datasheet_faction_access import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.deployment import deployment_unit_selection_request
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import EventRecordPayload
 from warhammer40k_core.engine.faction_content.datasheet_faction_access import (
     default_datasheet_faction_access_registry,
@@ -1248,6 +1252,8 @@ def _cult_of_dark_gods_request(
         ),
         unit_points=unit_points,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="legionaries",
             source_id="phase17g:warlord",
         ),
@@ -1423,6 +1429,8 @@ def _phase16d_transport_roster_request(
     assignments = (
         (
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-enhancement-a",
                 target_unit_selection_id="leader-unit",
                 source_id="assignment:leader",
@@ -1474,6 +1482,8 @@ def _phase16d_transport_roster_request(
         ),
         enhancement_assignments=assignments,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="leader-unit",
             source_id="warlord:leader-unit",
         ),
@@ -2458,6 +2468,8 @@ def test_mustering_allows_multiple_supreme_commanders_when_one_is_warlord() -> N
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="leader-two",
             source_id="warlord:leader-two",
         ),
@@ -2503,6 +2515,8 @@ def test_mustering_requires_warlord_to_be_an_eligible_supreme_commander() -> Non
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="regular-character",
             source_id="warlord:regular-character",
         ),
@@ -2550,6 +2564,8 @@ def test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commande
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="eligible-supreme",
             source_id="warlord:eligible-supreme",
         ),
@@ -2558,6 +2574,8 @@ def test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commande
     forbidden_request = replace(
         legal_request,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="forbidden-supreme",
             source_id="warlord:forbidden-supreme",
         ),
@@ -2578,7 +2596,7 @@ def test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commande
     assert {"supreme_commander_warlord_required", "warlord_forbidden"} <= forbidden_codes
 
 
-def test_mustering_reports_conflict_when_all_supreme_commanders_cannot_be_warlord() -> None:
+def test_mustering_cannot_be_warlord_overrides_all_mandatory_candidates() -> None:
     catalog = _supreme_commander_catalog(
         forbidden_datasheet_ids=(
             "test-supreme-commander-alpha",
@@ -2625,6 +2643,8 @@ def test_mustering_reports_conflict_when_all_supreme_commanders_cannot_be_warlor
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="regular-character",
             source_id="warlord:regular-character",
         ),
@@ -2634,8 +2654,9 @@ def test_mustering_reports_conflict_when_all_supreme_commanders_cannot_be_warlor
     army = muster_army(catalog=catalog, request=request)
     violation_codes = {violation.violation_code for violation in report.violations}
 
-    assert "supreme_commander_warlord_conflict" in violation_codes
-    assert all("WARLORD" not in unit.keywords for unit in army.units)
+    assert "supreme_commander_warlord_conflict" not in violation_codes
+    assert "supreme_commander_warlord_required" not in violation_codes
+    assert "WARLORD" in army.unit_by_id("army-alpha:regular-character").keywords
 
 
 def test_mustering_reports_conflict_when_supreme_commander_is_not_a_character() -> None:
@@ -2690,6 +2711,8 @@ def test_mustering_reports_conflict_when_supreme_commander_is_not_a_character() 
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="regular-character",
             source_id="warlord:regular-character",
         ),
@@ -2732,6 +2755,8 @@ def test_mustering_rejects_unsupported_warlord_mustering_descriptor() -> None:
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="regular-character",
             source_id="warlord:regular-character",
         ),
@@ -2778,6 +2803,8 @@ def test_mustering_rejects_non_string_warlord_mustering_descriptor() -> None:
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="regular-character",
             source_id="warlord:regular-character",
         ),
@@ -2806,6 +2833,8 @@ def test_mustering_allied_supreme_commander_cannot_override_warlord_restriction(
             _unit_points("bloodthirster", 250),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="legionaries",
             source_id="phase17g:warlord",
         ),
@@ -2813,7 +2842,7 @@ def test_mustering_allied_supreme_commander_cannot_override_warlord_restriction(
 
     report = validate_roster_legality(catalog=catalog, request=request)
 
-    assert "supreme_commander_warlord_conflict" in {
+    assert "supreme_commander_warlord_conflict" not in {
         violation.violation_code for violation in report.violations
     }
 
@@ -2836,6 +2865,8 @@ def test_mustering_drukhari_allied_supreme_commander_cannot_override_warlord_res
             _unit_points("voidscarred", 0),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="archon",
             source_id="phase17g:warlord",
         ),
@@ -2843,7 +2874,7 @@ def test_mustering_drukhari_allied_supreme_commander_cannot_override_warlord_res
 
     report = validate_roster_legality(catalog=catalog, request=request)
 
-    assert "supreme_commander_warlord_conflict" in {
+    assert "supreme_commander_warlord_conflict" not in {
         violation.violation_code for violation in report.violations
     }
 
@@ -2858,6 +2889,8 @@ def test_phase17g_daemonic_pact_allows_legiones_daemonica_allies() -> None:
             _unit_points("bloodthirster", 250),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="legionaries",
             source_id="phase17g:warlord",
         ),
@@ -2885,12 +2918,16 @@ def test_phase17g_daemonic_pact_reports_roster_violations() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="phase17g-dark-gift",
                 target_unit_selection_id="bloodthirster",
                 source_id="phase17g:enhancement-assignment",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="bloodthirster",
             source_id="phase17g:warlord",
         ),
@@ -2913,6 +2950,8 @@ def test_phase17g_daemonic_pact_counts_selected_mustering_god_keywords() -> None
         detachment_ids=("phase17g-csm-detachment",),
     )
     warlord_selection = WarlordSelection(
+        model_profile_id="core-intercessor-like",
+        model_index=1,
         unit_selection_id="legionaries",
         source_id="phase17g:warlord",
     )
@@ -3004,6 +3043,8 @@ def test_phase17g_roster_legality_reports_missing_required_mustering_option() ->
             _unit_points("soul-grinder", 150),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="legionaries",
             source_id="phase17g:warlord",
         ),
@@ -3041,6 +3082,8 @@ def test_phase17g_daemonic_pact_points_cap_scales_by_battle_size(
             _unit_points("bloodthirster", cap),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="legionaries",
             source_id="phase17g:warlord",
         ),
@@ -3073,6 +3116,8 @@ def test_phase17g_dreadblades_allows_one_titanic_or_three_war_dogs_for_chaos_arm
             _unit_points("knight-abominant", 400),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="chaos-lord",
             source_id="phase17g:warlord",
         ),
@@ -3087,6 +3132,8 @@ def test_phase17g_dreadblades_allows_one_titanic_or_three_war_dogs_for_chaos_arm
             _unit_points("war-dog-3", 140),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="chaos-lord",
             source_id="phase17g:warlord",
         ),
@@ -3119,12 +3166,16 @@ def test_phase17g_dreadblades_reports_roster_violations() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="phase17g-dark-panoply",
                 target_unit_selection_id="war-dog-1",
                 source_id="phase17g:enhancement-assignment",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="knight-abominant",
             source_id="phase17g:warlord",
         ),
@@ -3240,6 +3291,8 @@ def test_phase17g_pact_army_factions_are_forbidden_by_default(
         ),
         unit_points=(_unit_points("daemonettes", 100),),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="daemonettes",
             source_id="phase17g:warlord",
         ),
@@ -3274,6 +3327,8 @@ def test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army
             _unit_points("solitaire", 115),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="autarch",
             source_id="phase17g:warlord",
         ),
@@ -3363,6 +3418,8 @@ def test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition
             _unit_points("solitaire", 115),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="solitaire",
             source_id="phase17g:warlord",
         ),
@@ -3383,6 +3440,8 @@ def test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies() -> No
             _unit_points("voidscarred", 250),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="archon",
             source_id="phase17g:warlord",
         ),
@@ -3419,6 +3478,8 @@ def test_phase17g_drukhari_corsairs_points_cap_scales_by_battle_size(
             _unit_points("voidscarred", 0),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="archon",
             source_id="phase17g:warlord",
         ),
@@ -3453,12 +3514,16 @@ def test_phase17g_drukhari_corsairs_reports_roster_violations() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="phase17g-soul-trap",
                 target_unit_selection_id="troupe-master",
                 source_id="phase17g:enhancement-assignment",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="troupe-master",
             source_id="phase17g:warlord",
         ),
@@ -3484,6 +3549,8 @@ def test_phase17g_drukhari_corsairs_rejects_other_faction_allies() -> None:
             _unit_points("outsider", 50),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="archon",
             source_id="phase17g:warlord",
         ),
@@ -3504,6 +3571,8 @@ def test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_imperium_a
             _unit_points("knight-crusader", 400),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="captain",
             source_id="phase17g:warlord",
         ),
@@ -3518,6 +3587,8 @@ def test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_imperium_a
             _unit_points("armiger-3", 140),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="captain",
             source_id="phase17g:warlord",
         ),
@@ -3550,12 +3621,16 @@ def test_phase17g_freeblades_reports_roster_violations() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="phase17g-master-crafted",
                 target_unit_selection_id="armiger-1",
                 source_id="phase17g:enhancement-assignment",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="knight-crusader",
             source_id="phase17g:warlord",
         ),
@@ -3581,6 +3656,8 @@ def test_phase17g_freeblades_rejects_non_imperium_faction_access() -> None:
             _unit_points("armiger-1", 140),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="commander",
             source_id="phase17g:warlord",
         ),
@@ -3630,6 +3707,8 @@ def test_phase16d_upgrade_assignments_share_one_selection_and_pay_per_unit() -> 
     catalog = _phase16d_catalog(upgrade_enhancement=True)
     assignments = tuple(
         EnhancementAssignment(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             enhancement_id="core-upgrade",
             target_unit_selection_id=selection_id,
             source_id=f"assignment:{selection_id}",
@@ -3678,6 +3757,8 @@ def test_phase16d_upgrade_assignments_share_one_selection_and_pay_per_unit() -> 
         ),
         enhancement_assignments=assignments,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="leader-unit",
             source_id="warlord:leader-unit",
         ),
@@ -3734,6 +3815,8 @@ def test_phase16d_upgrade_assignment_limits_and_targets_are_validated() -> None:
     catalog = _phase16d_catalog(upgrade_enhancement=True)
     too_many_assignments = tuple(
         EnhancementAssignment(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             enhancement_id="core-upgrade",
             target_unit_selection_id=selection_id,
             source_id=f"assignment:{selection_id}",
@@ -3788,6 +3871,8 @@ def test_phase16d_upgrade_assignment_limits_and_targets_are_validated() -> None:
         ),
         enhancement_assignments=too_many_assignments,
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="leader-unit",
             source_id="warlord:leader-unit",
         ),
@@ -3812,6 +3897,8 @@ def test_phase16d_upgrade_assignment_limits_and_targets_are_validated() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-upgrade",
                 target_unit_selection_id="leader-unit",
                 source_id="assignment:leader-unit",
@@ -3836,7 +3923,7 @@ def test_phase16d_upgrade_assignment_limits_and_targets_are_validated() -> None:
 
     assert "upgrade_assignment_limit_exceeded" in too_many_codes
     assert "enhancement_limit_exceeded" not in too_many_codes
-    assert "upgrade_character_forbidden" in character_codes
+    assert "upgrade_character_forbidden" not in character_codes
 
 
 def test_phase16d_standard_enhancements_remain_single_assignment() -> None:
@@ -3876,17 +3963,23 @@ def test_phase16d_standard_enhancements_remain_single_assignment() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-enhancement-a",
                 target_unit_selection_id="leader-one",
                 source_id="assignment:leader-one",
             ),
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-enhancement-a",
                 target_unit_selection_id="leader-two",
                 source_id="assignment:leader-two",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="leader-one",
             source_id="warlord:leader-one",
         ),
@@ -3938,12 +4031,16 @@ def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> N
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-enhancement-a",
                 target_unit_selection_id="epic-one",
                 source_id="assignment:epic-one",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-character-leader",
+            model_index=1,
             unit_selection_id="epic-one",
             source_id="warlord:epic-one",
         ),
@@ -3954,11 +4051,15 @@ def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> N
         attached_catalog,
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-enhancement-a",
                 target_unit_selection_id="leader-unit",
                 source_id="assignment:leader",
             ),
             EnhancementAssignment(
+                model_profile_id="core-character-support",
+                model_index=1,
                 enhancement_id="core-enhancement-b",
                 target_unit_selection_id="support-unit",
                 source_id="assignment:support",
@@ -3996,11 +4097,15 @@ def test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad(
         catalog,
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="core-upgrade",
                 target_unit_selection_id="bodyguard-unit",
                 source_id="assignment:bodyguard",
             ),
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="core-enhancement-a",
                 target_unit_selection_id="leader-unit",
                 source_id="assignment:leader",
@@ -4022,6 +4127,8 @@ def test_phase16d_attached_unit_can_receive_one_upgrade_enhancement() -> None:
         catalog,
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="core-upgrade",
                 target_unit_selection_id="bodyguard-unit",
                 source_id="assignment:bodyguard",
@@ -4043,6 +4150,8 @@ def test_phase16d_epic_hero_can_attach_to_unit_with_upgrade_enhancement() -> Non
         catalog,
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="core-upgrade",
                 target_unit_selection_id="bodyguard-unit",
                 source_id="assignment:bodyguard",
@@ -4229,12 +4338,16 @@ def test_phase16d_roster_reports_source_reference_diagnostics() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-character-leader",
+                model_index=1,
                 enhancement_id="missing-enhancement",
                 target_unit_selection_id="leader-unit",
                 source_id="assignment:missing",
             ),
         ),
         warlord_selection=WarlordSelection(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             unit_selection_id="bodyguard-unit",
             source_id="warlord:bodyguard",
         ),
@@ -5294,7 +5407,10 @@ def test_order67_duplicate_limits_are_independent_and_do_not_stack(
                 for u in units
             ),
             warlord_selection=WarlordSelection(
-                unit_selection_id="leader", source_id="order67:warlord"
+                model_profile_id="core-character-leader",
+                model_index=1,
+                unit_selection_id="leader",
+                source_id="order67:warlord",
             ),
             dedicated_transport_manifests=tuple(
                 DedicatedTransportManifest(
@@ -5377,6 +5493,8 @@ def _order67_upgrade_roster(
     ordinary_ids = ("core-enhancement-a", "core-enhancement-b")[:ordinary_count]
     assignments = tuple(
         EnhancementAssignment(
+            model_profile_id=u.model_profile_selections[0].model_profile_id,
+            model_index=1,
             enhancement_id="core-upgrade",
             target_unit_selection_id=u.unit_selection_id,
             source_id="order67:upgrade",
@@ -5384,6 +5502,8 @@ def _order67_upgrade_roster(
         for u in squads
     ) + tuple(
         EnhancementAssignment(
+            model_profile_id=u.model_profile_selections[0].model_profile_id,
+            model_index=1,
             enhancement_id=e,
             target_unit_selection_id=u.unit_selection_id,
             source_id="order67:enhancement",
@@ -5413,7 +5533,10 @@ def _order67_upgrade_roster(
             for i, u in enumerate(units)
         ),
         warlord_selection=WarlordSelection(
-            unit_selection_id="leader-0", source_id="order67:warlord"
+            model_profile_id="core-character-leader",
+            model_index=1,
+            unit_selection_id="leader-0",
+            source_id="order67:warlord",
         ),
         roster_legality_required=True,
     )
@@ -5526,3 +5649,283 @@ def test_order67_reviewed_source_is_pinned_and_scope_is_accounting_only() -> Non
     assert source.validate_source_artifact_bytes(raw).package_hash == source.PACKAGE_HASH
     with pytest.raises(source.MusteringLimitsSourceError, match="reviewed pin"):
         source.validate_source_artifact_bytes(raw + b" ")
+
+
+def _order68_model_roster() -> tuple[ArmyCatalog, ArmyMusterRequest]:
+    catalog = _phase16d_catalog(upgrade_enhancement=True)
+    leader = catalog.datasheet_by_id("core-character-leader")
+    leader = replace(
+        leader,
+        composition=tuple(replace(row, max_models=2) for row in leader.composition),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            leader if row.datasheet_id == leader.datasheet_id else row for row in catalog.datasheets
+        ),
+    )
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="leaders",
+                datasheet_id=leader.datasheet_id,
+                model_profile_id="core-character-leader",
+                model_count=2,
+            ),
+        ),
+        unit_points=(_unit_points("leaders", 100),),
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=("core-enhancement-a",),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leaders",
+            model_profile_id="core-character-leader",
+            model_index=2,
+            source_id="order68:warlord",
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="leaders",
+                model_profile_id="core-character-leader",
+                model_index=2,
+                source_id="order68:enhancement",
+            ),
+        ),
+        roster_legality_required=True,
+    )
+    return catalog, request
+
+
+def test_order68_selected_model_owns_warlord_and_enhancement() -> None:
+    catalog, request = _order68_model_roster()
+    army = muster_army(catalog=catalog, request=request)
+    unit = army.units[0]
+    assert "WARLORD" not in unit.own_models[0].keywords
+    assert "WARLORD" in unit.own_models[1].keywords
+    assert "WARLORD" in unit.keywords
+    assert ArmyMusterRequest.from_payload(request.to_payload()) == request
+    assert ArmyDefinition.from_payload(army.to_payload()) == army
+    assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]) == unit
+    casualty = replace(unit.own_models[1], wounds_remaining=0)
+    unit = replace(unit, own_models=(unit.own_models[0], casualty))
+    assert "WARLORD" not in unit.keywords
+    assert "WARLORD" in casualty.keywords
+
+
+def test_order68_reconstructs_shared_bearer_once_per_validation() -> None:
+    import cProfile
+
+    catalog, request = _order68_model_roster()
+    profiler = cProfile.Profile()
+    with profiler:
+        report = validate_roster_legality(catalog=catalog, request=request)
+    assert report.is_legal
+    assert (
+        sum(
+            entry.callcount
+            for entry in profiler.getstats()
+            if not isinstance(entry.code, str)
+            and entry.code.co_filename.endswith("unit_factory.py")
+            and entry.code.co_name == "instantiate_unit"
+        )
+        == 1
+    )
+    changed = replace(
+        request,
+        enhancement_assignments=(replace(request.enhancement_assignments[0], model_index=3),),
+    )
+    assert "enhancement_invalid_model_selection" in {
+        row.violation_code
+        for row in validate_roster_legality(catalog=catalog, request=changed).violations
+    }
+
+
+@pytest.mark.parametrize("upgrade", [False, True])
+@pytest.mark.parametrize("model_index", [0, 3, True])
+def test_order68_rejects_invalid_bearer_model_index(upgrade: bool, model_index: int) -> None:
+    catalog, request = _order68_model_roster()
+    if upgrade:
+        request = replace(
+            request,
+            detachment_selection=replace(
+                request.detachment_selection, enhancement_ids=("core-upgrade",)
+            ),
+            enhancement_assignments=(
+                replace(request.enhancement_assignments[0], enhancement_id="core-upgrade"),
+            ),
+        )
+    if type(model_index) is not int or model_index < 1:
+        with pytest.raises(ArmyMusteringError):
+            replace(request.enhancement_assignments[0], model_index=model_index)
+        return
+    assignment = replace(request.enhancement_assignments[0], model_index=model_index)
+    request = replace(request, enhancement_assignments=(assignment,))
+    with pytest.raises(ArmyMusteringError):
+        muster_army(catalog=catalog, request=request)
+
+
+def test_order68_upgrade_is_allowed_on_character_unit() -> None:
+    catalog, request = _order68_model_roster()
+    request = replace(
+        request,
+        detachment_selection=replace(
+            request.detachment_selection, enhancement_ids=("core-upgrade",)
+        ),
+        enhancement_assignments=(
+            replace(request.enhancement_assignments[0], enhancement_id="core-upgrade"),
+        ),
+    )
+    assert muster_army(catalog=catalog, request=request).roster_legality_report.is_legal
+
+
+@pytest.mark.parametrize(
+    ("profile", "index"), [("absent-profile", 1), ("core-character-leader", 3)]
+)
+def test_order68_unknown_warlord_model_never_grants_keyword(profile: str, index: int) -> None:
+    catalog, request = _order68_model_roster()
+    assert request.warlord_selection is not None
+    request = replace(
+        request,
+        roster_legality_required=False,
+        warlord_selection=replace(
+            request.warlord_selection, model_profile_id=profile, model_index=index
+        ),
+    )
+    army = muster_army(catalog=catalog, request=request)
+    assert "warlord_invalid_model_selection" in {
+        row.violation_code for row in army.roster_legality_report.violations
+    }
+    assert all("WARLORD" not in model.keywords for unit in army.units for model in unit.own_models)
+
+
+def test_order68_reviewed_source_rejects_artifact_drift() -> None:
+    from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_roster_models_2026_09 as source,
+    )
+
+    raw = package_artifact_bytes(source.__name__, "artifacts/package.json")
+    assert source.validate_source_artifact_bytes(raw).package_hash == source.PACKAGE_HASH
+    with pytest.raises(source.RosterModelsSourceError, match="reviewed pin"):
+        source.validate_source_artifact_bytes(raw + b" ")
+
+
+@pytest.mark.parametrize("field", ["model_profile_id", "model_index"])
+def test_order68_payload_requires_explicit_model_fields(field: str) -> None:
+    _, request = _order68_model_roster()
+    assert request.warlord_selection is not None
+    warlord = dict(request.warlord_selection.to_payload())
+    enhancement = dict(request.enhancement_assignments[0].to_payload())
+    del warlord[field]
+    del enhancement[field]
+    with pytest.raises(ArmyMusteringError, match="payload fields"):
+        WarlordSelection.from_payload(cast(WarlordSelectionPayload, warlord))
+    with pytest.raises(ArmyMusteringError, match="payload fields"):
+        EnhancementAssignment.from_payload(cast(EnhancementAssignmentPayload, enhancement))
+
+
+@pytest.mark.parametrize("other_epic", [False, True])
+def test_order68_mixed_unit_checks_selected_model_keywords(other_epic: bool) -> None:
+    catalog, request = _order68_model_roster()
+    sheet = catalog.datasheet_by_id("core-character-leader")
+    other = replace(sheet.model_profiles[0], model_profile_id="other-model")
+    other_keywords = tuple(k for k in sheet.keywords.keywords if k != "CHARACTER")
+    if other_epic:
+        other_keywords = (*other_keywords, "EPIC HERO")
+    sheet = replace(
+        sheet,
+        model_profiles=(*sheet.model_profiles, other),
+        composition=(
+            *sheet.composition,
+            UnitCompositionDefinition(
+                model_profile_id=other.model_profile_id, min_models=1, max_models=1
+            ),
+        ),
+        keywords=replace(
+            sheet.keywords, keywords=tuple(sorted({*sheet.keywords.keywords, *other_keywords}))
+        ),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            sheet if row.datasheet_id == sheet.datasheet_id else row for row in catalog.datasheets
+        ),
+        model_keyword_assignments=(
+            ModelKeywordAssignment(
+                datasheet_id=sheet.datasheet_id,
+                model_profile_id="core-character-leader",
+                keywords=tuple(k for k in sheet.keywords.keywords if k != "EPIC HERO"),
+                faction_keywords=sheet.keywords.faction_keywords,
+                source_ids=("order68:character",),
+            ),
+            ModelKeywordAssignment(
+                datasheet_id=sheet.datasheet_id,
+                model_profile_id="other-model",
+                keywords=other_keywords,
+                faction_keywords=sheet.keywords.faction_keywords,
+                source_ids=("order68:other",),
+            ),
+        ),
+    )
+    request = replace(
+        request,
+        unit_selections=(
+            replace(
+                request.unit_selections[0],
+                model_profile_selections=(
+                    *request.unit_selections[0].model_profile_selections,
+                    ModelProfileSelection(model_profile_id="other-model", model_count=1),
+                ),
+            ),
+        ),
+    )
+    assert muster_army(catalog=catalog, request=request).roster_legality_report.is_legal
+    assert request.warlord_selection is not None
+    bad = replace(
+        request,
+        warlord_selection=replace(
+            request.warlord_selection, model_profile_id="other-model", model_index=1
+        ),
+        enhancement_assignments=(
+            replace(
+                request.enhancement_assignments[0], model_profile_id="other-model", model_index=1
+            ),
+        ),
+    )
+    codes = {
+        row.violation_code
+        for row in validate_roster_legality(catalog=catalog, request=bad).violations
+    }
+    assert {"warlord_character_required", "enhancement_character_required"} <= codes
+    assert ("epic_hero_enhancement_forbidden" in codes) == other_epic
+
+
+def test_order68_model_selection_facade_restore_rejects_bearer_drift() -> None:
+    catalog, request = _order68_model_roster()
+    config = GameConfig(
+        game_id="order68-models",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
+        army_catalog=catalog,
+        army_muster_requests=(request, replace(request, army_id="army-beta", player_id="player-b")),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
+    )
+    session = LocalGameSession()
+    session.start(config)
+    assert session.advance_until_decision_or_terminal().decision_request is not None
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    for viewer in config.player_ids:
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+    payload = session.lifecycle.to_payload()
+    assert payload["state"] is not None
+    assignment = payload["state"]["army_definitions"][0]["enhancement_assignments"][0]
+    assignment["model_index"] = 1
+    with pytest.raises(GameLifecycleError, match="do not match config"):
+        type(session.lifecycle).from_payload(payload)

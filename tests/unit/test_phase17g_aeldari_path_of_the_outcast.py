@@ -142,11 +142,15 @@ def test_path_of_the_outcast_generic_runtime_bundle_materializes_upgrade_hooks()
     state, _army, _rangers, _shroud_runners, _enemy = _path_state(
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
                 target_unit_selection_id="rangers",
                 source_id="assignment:camouflaged-snipers",
             ),
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=enhancements.ASSASSINS_EYE_ENHANCEMENT_ID,
                 target_unit_selection_id="shroud-runners",
                 source_id="assignment:assassins-eye",
@@ -934,6 +938,8 @@ def test_eldritch_suppression_records_loaded_and_source_modifier_applications() 
 
 def test_apply_enhancement_effects_records_persisting_grant_once() -> None:
     assignment = EnhancementAssignment(
+        model_profile_id="aeldari-rangers-profile",
+        model_index=1,
         enhancement_id=enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
         target_unit_selection_id="rangers",
         source_id="assignment:camouflaged-snipers",
@@ -1595,6 +1601,7 @@ def _runtime_assignment(
     assignment: EnhancementAssignment,
 ) -> RuntimeEnhancementAssignment:
     return RuntimeEnhancementAssignment(
+        bearer_model_instance_id=f"{army.army_id}:{assignment.target_unit_selection_id}:{assignment.model_profile_id}:{assignment.model_index:03d}",
         assignment_id=(
             f"{army.army_id}:{assignment.enhancement_id}:{assignment.target_unit_selection_id}"
         ),
@@ -1749,6 +1756,8 @@ def _enhancement_context(
         state=state,
         army=army,
         assignment=EnhancementAssignment(
+            model_profile_id="core-intercessor-like",
+            model_index=1,
             enhancement_id=enhancement_id,
             target_unit_selection_id="path-enhancement-target",
             source_id=f"assignment:{enhancement_id}",

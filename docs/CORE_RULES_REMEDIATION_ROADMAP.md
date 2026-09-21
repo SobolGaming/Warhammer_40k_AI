@@ -5086,3 +5086,22 @@ bearer eligibility and Order 69 detachment constraints remain separate. Final
 all-category certification is still pending.
 Final local validation passed 8,526 behavioral tests at 85.13% coverage, all
 554 code-quality tests and the required contract, package and quality gates.
+
+
+## Order 68 / P25B implementation
+
+C25-03 now requires explicit model selections for Warlords and Enhancement
+bearers. Only the chosen Character model receives WARLORD; P02D derives unit
+keywords from membership. Ordinary bearer eligibility and Epic Hero exclusion
+are model-specific, Upgrades permit Character and non-Character units, and
+cannot-be-Warlord overrides a conflicting mandatory selection.
+
+Shared bearer identity survives split, death and authenticated restoration.
+Contract 33 makes the new roster fields mandatory. See
+[Order 68 scope, source and validation](ORDER_68_SCOPE_PLAN.md).
+Order 69 detachment constraints and final all-category certification remain separate.
+
+Corsair Coterie exceptions also validate the selected bearer's keywords, preserving
+legal non-CHARACTER bearers. Six mixed-profile regressions cover all four Enhancements.
+
+Final local validation passed 8,550 behavioral tests at 85.13% coverage and all 559 code-quality checks. Both suites used 64 xdist workers with work stealing; quality ran without coverage. Required lint, type, import, shard, source/runtime/contract generator, package, client and live-conformance gates passed.

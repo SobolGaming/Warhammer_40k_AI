@@ -1102,7 +1102,7 @@ def test_post_shoot_order_retains_attached_target_identity_after_bodyguard_loss(
         source_attached_id,
         target_attached_id,
     ) = _configured_kakophonist_attached_target_fixture(
-        game_id="order65-attached-loss-0",
+        game_id="order68-attached-loss-0",
     )
     decisions = DecisionController()
     survivor_id = _leave_one_wound_on_unit(
@@ -1245,7 +1245,9 @@ def test_doom_siren_retains_leader_support_attached_identity_after_bodyguard_los
         source_attached_id,
         target_attached_id,
     ) = _configured_kakophonist_leader_support_target_fixture(
-        game_id="order65-leader-support-loss-2",
+        game_id=(
+            "order68-leader-support-loss-0" if use_feel_no_pain else "order65-leader-support-loss-2"
+        ),
     )
     decisions = DecisionController()
     final_bodyguard_model_id = _leave_one_wound_on_unit(
@@ -1331,6 +1333,8 @@ def test_doom_siren_retains_leader_support_attached_identity_after_bodyguard_los
         ),
     )
     battle_shock_result = cast(dict[str, Any], battle_shock_payload["battle_shock_result"])
+    if not use_feel_no_pain:
+        assert not battle_shock_result["passed"]
     battle_shock_request = cast(dict[str, Any], battle_shock_result["request"])
     assert battle_shock_request["unit_instance_id"] == target_attached_id
     assert battle_shock_payload["target_identity_resolution"] == "unchanged"
@@ -1348,10 +1352,25 @@ def test_doom_siren_retains_leader_support_attached_identity_after_bodyguard_los
         assert shocked_state.model_instance_ids == tuple(
             sorted(
                 model.model_instance_id
-                for unit in (target_leader, target_support)
+                for unit in (target_bodyguard, target_leader, target_support)
                 for model in unit.own_models
             )
         )
+    # Persisted membership retains casualties; live model authority excludes them.
+    assert tuple(
+        sorted(
+            model.model_instance_id
+            for model in rules_unit_view_by_id(
+                state=state, unit_instance_id=target_attached_id
+            ).alive_models()
+        )
+    ) == tuple(
+        sorted(
+            model.model_instance_id
+            for unit in (target_leader, target_support)
+            for model in unit.own_models
+        )
+    )
     _assert_attached_rules_unit_authoritative_state(
         state=state,
         decisions=decisions,

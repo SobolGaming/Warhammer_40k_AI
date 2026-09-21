@@ -808,6 +808,7 @@ def test_oc_provider_validators_fail_closed_before_registry_lookup(
         "enhancement_id": "enhancement",
         "target_unit_selection_id": "selection",
         "bearer_unit_instance_id": effect.target_unit_instance_ids[0],
+        "bearer_model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
         "source_id": effect.source_rule_id,
     }
     with pytest.raises(GameLifecycleError, match="lacks provider authority"):

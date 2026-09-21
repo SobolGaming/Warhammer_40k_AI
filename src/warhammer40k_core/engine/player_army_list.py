@@ -39,7 +39,7 @@ from warhammer40k_core.engine.list_validation_errors import (
 )
 from warhammer40k_core.rules.mfm_source import MfmSourcePackage
 
-PLAYER_ARMY_LIST_ARTIFACT_SCHEMA = "core-v2-player-army-list-v1"
+PLAYER_ARMY_LIST_ARTIFACT_SCHEMA = "core-v2-player-army-list-v2-model-bearers"
 
 
 class PlayerArmyListError(ValueError):

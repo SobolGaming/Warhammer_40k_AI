@@ -19,10 +19,10 @@ base queries reproduced the missing restriction.
 
 | Borrows a weapon | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| False | Accepted declaration | 0.106786 / 0.119503 | 0.133393 / 0.144352 |
-| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000709 / 0.000763 |
-| True | Accepted declaration | 0.085439 / 0.091044 | 0.088495 / 0.095087 |
-| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000708 / 0.000785 |
+| False | Accepted declaration | 0.106786 / 0.119503 | 0.134532 / 0.149058 |
+| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000764 / 0.001200 |
+| True | Accepted declaration | 0.085439 / 0.091044 | 0.092117 / 0.101540 |
+| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000749 / 0.000883 |
 
 The declared mean budget is base × 1.30 plus 50 ms per declaration or 10 ms per
 100 queries; the maximum budget is base × 1.50 plus 100 ms. These allowances cover
@@ -52,8 +52,11 @@ for this engine build with its unchanged baseline and budgets.
 
 Original Order 65 local validation passed 8,484 behavioral tests at 85.12% coverage and all 549 code-quality tests. The required lint, type, shard, import, generated-contract, TypeScript conformance and installed-wheel checks passed. Exact results and diagnostic history are retained in [validation.json](validation.json).
 
-Order 67 refreshed the head measurements for the current runtime build on
+Order 68 refreshed the head measurements for the current runtime build on
 2026-09-20, retaining the same host, workload, baseline and budgets. Every
 comparison passes. Current validation is recorded in
-[Order 67 validation](../order67/validation.json); the original validation record
+[Order 68 validation](../order68/validation.json); the original validation record
 remains unchanged.
+
+The Corsair bearer review correction refreshes this evidence for runtime
+`3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.

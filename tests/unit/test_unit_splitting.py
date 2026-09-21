@@ -50,6 +50,7 @@ from warhammer40k_core.engine.effects import (
 )
 from warhammer40k_core.engine.enhancement_bearers import (
     current_enhancement_bearer,
+    enhancement_bearer_model,
     enhancement_bearer_unit,
     runtime_assignment_for_current_bearer,
 )
@@ -928,6 +929,8 @@ def _attached_split_config_with_enhancement(*, aura: bool = False) -> GameConfig
                 config.army_muster_requests[0],
                 enhancement_assignments=(
                     EnhancementAssignment(
+                        model_profile_id="core-character-leader",
+                        model_index=1,
                         enhancement_id=enhancement_id,
                         target_unit_selection_id="leader",
                         source_id="test:split-enhancement-assignment",
@@ -1206,3 +1209,36 @@ def test_split_generic_numerical_effects_apply_after_restore(target_scope: str) 
                         source_phase=BattlePhase.SHOOTING,
                     )
                 ) == (1 if whole_unit or model.model_instance_id == model_id else 0)
+
+
+def test_order68_explicit_nonfirst_bearer_retains_identity_after_split_and_restore() -> None:
+    config = _attached_split_config_with_enhancement()
+    request = config.army_muster_requests[0]
+    assignment = replace(
+        request.enhancement_assignments[0],
+        target_unit_selection_id="bodyguard",
+        model_profile_id="core-intercessor-like",
+        model_index=2,
+    )
+    config = replace(
+        config,
+        army_muster_requests=(
+            replace(request, enhancement_assignments=(assignment,)),
+            config.army_muster_requests[1],
+        ),
+    )
+    session = _session_at_split(config)
+    assert session.lifecycle.state is not None
+    before = enhancement_bearer_model(
+        session.lifecycle.state.army_definitions[0], assignment=assignment
+    )
+    _complete_split(session)
+    restored = session.fork()
+    assert restored.lifecycle.state is not None
+    army = restored.lifecycle.state.army_definitions[0]
+    after = enhancement_bearer_model(army, assignment=assignment)
+    assert after.model_instance_id == before.model_instance_id
+    owner = enhancement_bearer_unit(army, assignment=assignment)
+    assert owner.unit_instance_id != "army-alpha:bodyguard"
+    assert after.model_instance_id in owner.own_model_ids()
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()

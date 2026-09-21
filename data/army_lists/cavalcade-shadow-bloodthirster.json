@@ -1,5 +1,5 @@
 {
-  "artifact_schema": "core-v2-player-army-list-v1",
+  "artifact_schema": "core-v2-player-army-list-v2-model-bearers",
   "army_list_id": "cavalcade-shadow-bloodthirster",
   "name": "Cavalcade Shadow Bloodthirster",
   "faction_id": "chaos-daemons",
@@ -234,17 +234,23 @@
     {
       "enhancement_id": "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
       "target_unit_selection_id": "bloodcrushers-1",
-      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds",
+      "model_profile_id": "000001115:bloodcrushers",
+      "model_index": 1
     },
     {
       "enhancement_id": "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
       "target_unit_selection_id": "bloodcrushers-2",
-      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds",
+      "model_profile_id": "000001115:bloodcrushers",
+      "model_index": 1
     }
   ],
   "warlord_selection": {
     "unit_selection_id": "belakor",
-    "source_id": "player-army-list:cavalcade-shadow-bloodthirster:warlord"
+    "source_id": "player-army-list:cavalcade-shadow-bloodthirster:warlord",
+    "model_profile_id": "000001148:belakor-epic-hero",
+    "model_index": 1
   },
   "dedicated_transport_manifests": [],
   "provenance": {

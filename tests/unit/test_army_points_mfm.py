@@ -109,6 +109,8 @@ def test_calculate_mfm_army_points_handles_variable_add_on_wargear_and_enhanceme
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="test-enhancement",
                 target_unit_selection_id="variable-one",
                 source_id="test:enhancement-assignment",
@@ -351,6 +353,8 @@ def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() 
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="test-enhancement",
                 target_unit_selection_id="variable-one",
                 source_id="test:enhancement-assignment",
@@ -427,6 +431,8 @@ def test_mfm_enhancement_pricing_resolves_canonical_id_by_exact_source_id() -> N
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id=canonical_enhancement_id,
                 target_unit_selection_id="variable-one",
                 source_id=mfm_enhancement.source_id,
@@ -482,6 +488,8 @@ def test_catalog_with_mfm_points_feeds_roster_legality_enhancement_prices() -> N
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="test-enhancement",
                 target_unit_selection_id="leader-one",
                 source_id="test:enhancement-assignment",
@@ -600,6 +608,8 @@ def test_calculate_mfm_army_points_rejects_missing_enhancement_target() -> None:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="test-enhancement",
                 target_unit_selection_id="missing-unit",
                 source_id="test:enhancement-assignment",

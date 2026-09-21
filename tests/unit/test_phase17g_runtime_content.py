@@ -200,6 +200,7 @@ def test_runtime_content_activation_derives_selected_sources_from_real_armies() 
         assignment.to_payload() for assignment in activation.selected_enhancement_assignments
     ] == [
         {
+            "bearer_model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
             "assignment_id": "army-alpha:runtime-enhancement:intercessor-unit-1",
             "player_id": "player-a",
             "army_id": "army-alpha",
@@ -2097,6 +2098,8 @@ def _muster_request(catalog: ArmyCatalog) -> ArmyMusterRequest:
         ),
         enhancement_assignments=(
             EnhancementAssignment(
+                model_profile_id="core-intercessor-like",
+                model_index=1,
                 enhancement_id="runtime-enhancement",
                 target_unit_selection_id="intercessor-unit-1",
                 source_id="source:runtime-enhancement-assignment",

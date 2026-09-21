@@ -247,8 +247,8 @@ def _modifier_from_persisting_effect(
         state=state,
         unit_instance_id=source_unit_id,
     )
-    if source_model_ids != (source_model_id,):
-        raise GameLifecycleError("Deadly Demise modifier requires an exact single-model bearer.")
+    if source_model_id not in source_model_ids:
+        raise GameLifecycleError("Deadly Demise modifier bearer is absent from its source unit.")
     current_unit_id = state.unit_instance_id_for_model(source_model_id)
     bearer = rules_unit_view_by_id(
         state=state, unit_instance_id=current_unit_id

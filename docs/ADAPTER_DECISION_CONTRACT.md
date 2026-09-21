@@ -6430,3 +6430,26 @@ public payload shapes and the contract major remain unchanged.
 The Dedicated Transport duplication exception applies only to Incursion and
 Strike Force. Onslaught retains its prior three-copy limit unless the datasheet
 also has Battleline, which retains six; this adds no payload or visibility change.
+
+## Order 68: model-specific roster selections
+
+Fixed pre-game roster inputs now require `model_profile_id` and positive
+one-based `model_index` on Warlord and Enhancement selections, including
+single-model units. The index selects from the immutable source unit's models
+of that profile in model-ID order. The engine validates the selected composition,
+model keywords and source restrictions before mustering. No new in-game decision
+family is introduced; adapters continue to submit the same fixed roster through
+the shared setup path. Runtime activation records the resolved physical model ID.
+
+Only the selected Warlord model receives WARLORD. The existing viewer-scoped
+model/rules-unit projections derive keywords from actual model presence. Split
+lineage and restore retain the same selected Enhancement bearer after ownership
+changes or death. Invalid or drifted saved selections fail reconstruction.
+Contract 33 rejects earlier incomplete records; see
+[the migration](../contracts/migrations/32-to-33.md).
+
+Corsair Coterie bearer restrictions use the selected model's canonical keywords:
+ANHRATHE for all four Enhancements, CHARACTER additionally for Archraider, and
+INFANTRY additionally for Voidstone. Infamy, Voidstone and Webway Pathstone retain
+their source-authorized non-CHARACTER eligibility. Invalid model selections retain
+the existing typed roster violation; this correction changes no request or payload shape.

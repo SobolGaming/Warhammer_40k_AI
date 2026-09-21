@@ -1,6 +1,9 @@
 # CORE V2 external contract
 
-Contract version: `32.0.0`
+Contract version: `33.0.0`
+
+Contract 33 requires explicit model-level Warlord and Enhancement selections.
+See [migration 32 to 33](migrations/32-to-33.md).
 
 Contract 32 implements ingress-only Aircraft and mandatory opponent-turn-end
 returns. Legacy Hover mode and edge-exit saves require the explicit

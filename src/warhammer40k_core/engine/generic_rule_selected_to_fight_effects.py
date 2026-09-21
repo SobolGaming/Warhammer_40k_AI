@@ -5,7 +5,10 @@ from dataclasses import dataclass
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.effects import PersistingEffect
-from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
+from warhammer40k_core.engine.enhancement_bearers import (
+    enhancement_bearer_model,
+    enhancement_bearer_unit,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
@@ -237,10 +240,6 @@ def _selected_to_fight_enhancement_bearer(
     assignment = assignments[0]
     bearer_unit = enhancement_bearer_unit(army, assignment=assignment)
     bearer_unit_id = bearer_unit.unit_instance_id
-    if len(bearer_unit.own_models) != 1:
-        raise GameLifecycleError(
-            "Selected-to-fight Enhancement requires a single-model bearer unit."
-        )
     selected_rules_unit = rules_unit_view_by_id(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
@@ -253,7 +252,7 @@ def _selected_to_fight_enhancement_bearer(
         army=army,
         assignment=assignment,
         physical_unit=bearer_unit,
-        model=bearer_unit.own_models[0],
+        model=enhancement_bearer_model(army, assignment=assignment),
         selected_rules_unit_instance_id=selected_rules_unit.unit_instance_id,
     )
 
