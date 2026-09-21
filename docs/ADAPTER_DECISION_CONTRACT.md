@@ -5199,13 +5199,19 @@ may retry with a compliant endpoint or decline. Other new per-model diagnostics 
 fresh-request retry semantics apply. Queries use peers' proposed final positions
 and the submitted path's movement permissions; adapters cannot supply verdicts.
 
-Accepted Ongoing/Engaging consolidation freezes the physically engaged, living,
+Accepted Engaging consolidation freezes the physically engaged, living,
 not-yet-selected enemy rules-unit inventory and requests `select_fight_activation`
 from its owner one unit at a time. That owner is the consolidating player's
 opponent, including when the inactive player consolidates. Existing Normal/Overrun
 options, attack decisions and continuations remain authoritative; passing a forced
 selection is unavailable. Resolved selections enter ordinary Fight history and
 cannot be selected twice.
+
+Order 72 resolves this boundary against owner-confirmed official App data v946.
+Ongoing Consolidation preserves each model's prior engagements but emits no
+forced-response start, skip or completion event. Objective Consolidation likewise
+grants no response. Restore rejects response events attached to either mode,
+as well as response events without an authenticated Engaging movement trigger.
 
 Forced eligibility is recorded as `eligibility_reasons: [ ..., "forced_activation" ]`.
 It does not imply `engaged_at_fight_step_start`: consolidation responses retain the
@@ -5222,10 +5228,14 @@ Adapters must preserve the full witness; endpoint equality cannot hide movement.
 
 `ForcedFightActivationContext.source_phase` is `fight` for these responses, and
 `transport_unit_instance_id` is null only in that context. Shock Disembark retains
-its required Transport identity. Source IDs are
-`gw-11e-core-fight:consolidation-move` and
-`gw-11e-core-fight:ongoing-consolidation-erratum`, with the completed movement event
-as `trigger_event_id`.
+its required Transport identity. The current consolidation response source is
+`gw-11e-core-fight:consolidation-move`, with the completed movement event as
+`trigger_event_id`. The v931 `gw-11e-core-fight:ongoing-consolidation-erratum`
+is retained as historical evidence only. Existing finite/proposal and event
+envelopes are unchanged; no schema migration is required. Saves/replays from
+the old both-mode implementation require their matching engine build, and are
+not silently reinterpreted under v946. Current-build historical Engaging queues
+retain the exact authentication described below.
 
 Internal `FightPhaseState` persistence may carry one `suspended_state`, only for a
 Fight-phase forced queue; nested forced suspension is invalid. Queue-start and

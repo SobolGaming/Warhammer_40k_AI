@@ -1336,7 +1336,7 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-fight",
-          "version": "maintained-app-mirrors-observed-2026-09-05",
+          "version": "maintained-app-mirrors-owner-resolved-v946-2026-09-21",
           "allowed_rule_source_ids": [
             "gw-11e-core-fight:consolidate-step",
             "gw-11e-core-fight:consolidation-move",

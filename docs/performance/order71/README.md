@@ -1,5 +1,10 @@
 # Order 71 engaged shooting assessment
 
+Order 72 refreshed the head JSON for runtime `4fef0c52` with unchanged
+workloads, baselines and budgets. The tables and prior validation below are
+historical; current gate results are recorded in
+[Order 72 validation](../order72/validation.json).
+
 The versioned `order71-engaged-shooting-v1` workload measures ten uncached,
 complete model-target candidates per sample, including geometry, engagement,
 target legality and penalty construction. Four cases cover third-party

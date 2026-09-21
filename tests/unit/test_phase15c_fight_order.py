@@ -3636,8 +3636,10 @@ def test_fight_on_death_models_and_survivors_share_one_normal_activation(
 
 
 @pytest.mark.parametrize("attached", [False, True])
+@pytest.mark.parametrize("mode", [ConsolidationModeKind.ONGOING, ConsolidationModeKind.ENGAGING])
 def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_and_replay(
     attached: bool,
+    mode: ConsolidationModeKind,
 ) -> None:
     alpha_unit_ids = ("bodyguard", "leader") if attached else ("retained",)
     origins = (
@@ -3652,6 +3654,9 @@ def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_
             "enemy": Pose.at(18.5, 20.0),
         }
     )
+    if mode is ConsolidationModeKind.ENGAGING:
+        enemy_origin = origins["enemy"]
+        origins["enemy"] = Pose.at(enemy_origin.position.x + 1.0, enemy_origin.position.y)
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=("enemy",),
@@ -3734,21 +3739,16 @@ def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_
         )
         > 6.0
     )
-    assert (
-        min(
-            source_pose.position.distance_2d_to(retained_pose.position)
-            for source_pose in source_living_poses
-            for retained_pose in enemy_retained_poses.values()
-        )
-        <= 3.0
-    )
+    assert min(
+        source_pose.position.distance_2d_to(retained_pose.position)
+        for source_pose in source_living_poses
+        for retained_pose in enemy_retained_poses.values()
+    ) <= (3.0 if mode is ConsolidationModeKind.ONGOING else 4.0)
     assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert proposal_request.proposal_kind is ProposalKind.CONSOLIDATE
     assert proposal_request.unit_instance_id == rules_unit.unit_instance_id
     assert proposal_request.context is not None
-    assert proposal_request.context["legal_consolidation_modes"] == [
-        ConsolidationModeKind.ONGOING.value
-    ]
+    assert proposal_request.context["legal_consolidation_modes"] == [mode.value]
     assert destroyed_model.model_instance_id not in living_model_ids
 
     moved_model_id = max(
@@ -3772,7 +3772,7 @@ def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_
         unit_instance_id=rules_unit.unit_instance_id,
         movement_phase_action=CONSOLIDATE_ACTION,
         movement_mode=MovementMode.CONSOLIDATE,
-        consolidation_mode=ConsolidationModeKind.ONGOING,
+        consolidation_mode=mode,
         consolidate_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
         witness=witness,
     )
@@ -3847,17 +3847,35 @@ def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_
     assert displacement_ids == {moved_model_id}
     assert destroyed_model.model_instance_id not in displacement_ids
 
-    forced_request = _decision_request(submitted)
-    assert forced_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
-    submitted = _submit_option(
-        lifecycle,
-        request=forced_request,
-        option_id=_first_fight_activation_option(forced_request).option_id,
-        result_id=f"p12-retained-response:{attached}",
-    )
-    submitted = _resolve_phase15d_activation(lifecycle, submitted, drain_movement=False)
+    if mode is ConsolidationModeKind.ENGAGING:
+        forced_request = _decision_request(submitted)
+        assert forced_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+        submitted = _submit_option(
+            lifecycle,
+            request=forced_request,
+            option_id=_first_fight_activation_option(forced_request).option_id,
+            result_id=f"p12-retained-response:{attached}",
+        )
+        submitted = _resolve_phase15d_activation(lifecycle, submitted, drain_movement=False)
+    else:
+        assert not _event_payloads(lifecycle, "forced_fight_activation_queue_started")
+        assert not _event_payloads(lifecycle, "forced_fight_activation_queue_skipped")
     submitted = _drain_fight_movement_requests(lifecycle, submitted)
     assert submitted.status_kind is not LifecycleStatusKind.INVALID
+    # Without an Ongoing forced activation the enemy's retained models reach
+    # phase-end cleanup together, through the ordinary sequencing decisions.
+    for index in range(10):
+        if not retained_model_ids(state=state):
+            break
+        cleanup_request = _decision_request(submitted)
+        assert cleanup_request.decision_type == "resolve_sequencing_order"
+        submitted = LocalGameSession(lifecycle=lifecycle).submit_option(
+            request_id=cleanup_request.request_id,
+            option_id=cleanup_request.options[0].option_id,
+            result_id=f"order72-retained-cleanup:{index}",
+        )
+    else:
+        pytest.fail("Retained model cleanup did not finish.")
     battlefield = state.battlefield_state
     assert battlefield is not None
     assert battlefield.model_placement_or_none(destroyed_model.model_instance_id) is None
@@ -3904,6 +3922,10 @@ def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_
     )
     replay_result = ReplayRunner(artifact).run()
     assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+    session = LocalGameSession(lifecycle=lifecycle)
+    for player in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=player) is not None
 
 
 def test_fight_on_death_only_enemy_requires_engaging_consolidation_and_replays() -> None:
@@ -4870,7 +4892,11 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
         enemy_unit_ids=target_keys if source_player == "player-a" else source_keys,
         origins={
             "a-source": Pose.at(10.0, 10.0),
-            "z-later": Pose.at(10.0, 12.0),
+            "z-later": (
+                Pose.at(11.0, 12.8)
+                if mode is ConsolidationModeKind.ENGAGING
+                else Pose.at(10.0, 12.0)
+            ),
             "enemy-1": Pose.at(12.0 if mode is ConsolidationModeKind.ONGOING else 14.2, 9.3),
             "enemy-2": Pose.at(12.0 if mode is ConsolidationModeKind.ONGOING else 14.2, 10.7),
         },
@@ -4940,6 +4966,58 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
     forced = _state(lifecycle).fight_phase_state
     assert forced is not None
+    if mode is ConsolidationModeKind.ONGOING:
+        # Order 72: v946 preserves engagement but grants no enemy Fight response.
+        assert forced.forced_activation_context is None
+        assert forced.suspended_state is None
+        assert forced.current_step is FightPhaseStepKind.CONSOLIDATE
+        assert forced.fight_order_state == ordinary.fight_order_state
+        assert not _event_payloads(lifecycle, "forced_fight_activation_queue_started")
+        assert not _event_payloads(lifecycle, "forced_fight_activation_queue_skipped")
+        next_move = MovementProposalRequest.from_decision_request_payload(
+            _decision_request(status).payload
+        )
+        assert next_move.unit_instance_id == units["z-later"].unit_instance_id
+        checkpoint = lifecycle.to_payload()
+        assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+        completed_move = next(
+            event
+            for event in lifecycle.decision_controller.event_log.records
+            if event.event_type == "fight_movement_completed"
+        )
+        for event_type in (
+            "forced_fight_activation_queue_started",
+            "forced_fight_activation_queue_skipped",
+            "forced_fight_activation_queue_completed",
+        ):
+            for trigger_id in (completed_move.event_id, "absent-movement"):
+                forged = cast(GameLifecyclePayload, json.loads(json.dumps(checkpoint)))
+                events = forged["decisions"]["event_log"]
+                events.append(
+                    {
+                        "event_id": f"event-{len(events) + 1:06d}",
+                        "event_type": event_type,
+                        "payload": {
+                            "phase": "fight",
+                            "source_rule_id": "gw-11e-core-fight:ongoing-consolidation-erratum",
+                            "trigger_event_id": trigger_id,
+                        },
+                    }
+                )
+                with pytest.raises(GameLifecycleError, match=r"does not permit|no authorized"):
+                    GameLifecycle.from_payload(forged)
+        artifact = ReplayArtifact.capture(
+            artifact_id=f"order72-ongoing:{source_player}",
+            initial_lifecycle_payload=replay_initial,
+            final_lifecycle=lifecycle,
+        )
+        assert ReplayRunner(artifact).run().reproduced_exactly
+        _p12_advance_to_second_round(session, status)
+        final = lifecycle.to_payload()
+        assert GameLifecycle.from_payload(final).to_payload() == final
+        for player in ("player-a", "player-b"):
+            assert session.view(viewer_player_id=player) is not None
+        return
     assert forced.suspended_state is not None
     assert forced.suspended_state.current_step is FightPhaseStepKind.CONSOLIDATE
     assert forced.suspended_state.fight_order_state == ordinary.fight_order_state
@@ -4988,16 +5066,14 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
             for option in activation_request.options
         }
         if index == 0:
-            assert offered_types == (
-                {"normal"} if mode is ConsolidationModeKind.ONGOING else {"normal", "overrun"}
-            )
+            assert offered_types == {"normal", "overrun"}
         option = (
             next(
                 option
                 for option in activation_request.options
                 if cast(dict[str, JsonValue], option.payload)["fight_type"] == "overrun"
             )
-            if index == 0 and mode is ConsolidationModeKind.ENGAGING
+            if index == 0
             else _first_fight_activation_option(activation_request)
         )
         payload = cast(dict[str, JsonValue], option.payload)
@@ -5057,6 +5133,20 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
     assert set(resumed.fight_order_state.selected_to_fight_unit_ids) == set(selected)
     assert resumed.consolidate_state == forced.suspended_state.consolidate_state
     assert len(_event_payloads(lifecycle, "forced_fight_activation_queue_completed")) == 1
+    source_drift = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+    completion_event = next(
+        event
+        for event in source_drift["decisions"]["event_log"]
+        if event["event_type"] == "forced_fight_activation_queue_completed"
+    )
+    completion_context = cast(dict[str, JsonValue], completion_event["payload"])[
+        "forced_activation_context"
+    ]
+    cast(dict[str, JsonValue], completion_context)["source_rule_id"] = (
+        "gw-11e-core-fight:ongoing-consolidation-erratum"
+    )
+    with pytest.raises(GameLifecycleError, match="completion source context drift"):
+        GameLifecycle.from_payload(source_drift)
     forged_completion = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
     for raw_event in forged_completion["decisions"]["event_log"]:
         if raw_event["event_type"] in {
@@ -5124,9 +5214,26 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
         ),
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
-    skipped = _last_event_payload(lifecycle, "forced_fight_activation_queue_skipped")
-    assert skipped["engaged_enemy_unit_instance_ids"] == list(later_targets)
-    assert skipped["already_selected_unit_instance_ids"] == sorted(selected)
+    if later_mode is ConsolidationModeKind.ENGAGING:
+        skipped = _last_event_payload(lifecycle, "forced_fight_activation_queue_skipped")
+        assert skipped["engaged_enemy_unit_instance_ids"] == list(later_targets)
+        assert skipped["already_selected_unit_instance_ids"] == sorted(selected)
+        forged_skip = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+        forged_events = forged_skip["decisions"]["event_log"]
+        forged_events.append(
+            {
+                "event_id": f"event-{len(forged_events) + 1:06d}",
+                "event_type": "forced_fight_activation_queue_completed",
+                "payload": {
+                    "phase": "fight",
+                    "trigger_event_id": cast(str, skipped["trigger_event_id"]),
+                },
+            }
+        )
+        with pytest.raises(GameLifecycleError, match="already-selected"):
+            GameLifecycle.from_payload(forged_skip)
+    else:
+        assert not _event_payloads(lifecycle, "forced_fight_activation_queue_skipped")
     assert len(_event_payloads(lifecycle, "forced_fight_activation_queue_started")) == 1
     _p12_advance_to_second_round(session, status)
     assert _state(lifecycle).battle_round == 2

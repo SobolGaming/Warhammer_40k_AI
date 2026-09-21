@@ -1,7 +1,7 @@
 {
-  "artifact_schema": "core-v2-core-fight-source-v2",
+  "artifact_schema": "core-v2-core-fight-source-v1",
   "source_package_id": "gw-11e-core-fight",
-  "source_version": "maintained-app-mirrors-owner-resolved-v946-2026-09-21",
+  "source_version": "maintained-app-mirrors-observed-2026-09-05",
   "rules": [
     {
       "source_id": "gw-11e-core-fight:consolidation-move",
@@ -22,8 +22,10 @@
       "source_text": "Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight",
       "transcription_sha256": "97f1acc3a1e4eda12ffcb286908efb993ce95800ba33ad0a3d526964cb8aeafd",
       "load_support_status": "loaded",
-      "semantic_execution_status": "not_certified",
-      "runtime_consumer_ids": []
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ]
     },
     {
       "source_id": "gw-11e-core-fight:consolidate-step",
@@ -109,8 +111,10 @@
       "official_corroborating_source_ids": [],
       "observation_sha256": "761ea1f5d8cf9ce36bc34d34cf64d3db3621e093fe13cc33560071cfb59d2cb9",
       "load_support_status": "loaded",
-      "semantic_execution_status": "not_certified",
-      "runtime_consumer_ids": [],
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ],
       "evidence_id": "core-fight-review:ongoing-consolidation-erratum",
       "evidence_kind": "project_reviewed_app_transcription",
       "authority": "unverified_transcription_only",
@@ -136,8 +140,10 @@
       "official_corroborating_source_ids": [],
       "observation_sha256": "1f548d6c73dc3b9b2dc329a478b19d3561f0c5f7c1c3cb8049f26b7da40cdeee",
       "load_support_status": "loaded",
-      "semantic_execution_status": "not_certified",
-      "runtime_consumer_ids": [],
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ],
       "evidence_id": "core-fight-mirror:ongoing-consolidation-erratum",
       "evidence_kind": "third_party_mirror",
       "authority": "project_authoritative_app_mirror",
@@ -213,27 +219,5 @@
       "provider_non_affiliation_recorded": true
     }
   ],
-  "package_hash": "58d2af327089d2b5cdfe850fa72d9dd49f7e212f11e033d4f6e80a87a4e885e3",
-  "resolution": {
-    "resolution_id": "order72-c12-04-official-app-v946-2026-09-21",
-    "recorded_at": "2026-09-21T21:50:58+00:00",
-    "evidence_kind": "owner_supplied_official_app_confirmation",
-    "provider_name": "Games Workshop (reported by repository owner)",
-    "source_platform": "Warhammer 40,000 App (device platform not supplied)",
-    "source_url": null,
-    "app_version": "946",
-    "app_build": null,
-    "locale": null,
-    "capture_sha256": null,
-    "source_id": "gw-11e-core-fight:consolidation-move",
-    "mirror_observation_sha256": "25194f1eb4ba53e9bc431353e1dc921d3dd17c40a96d8cc4b3ee91c7e17dcfa3",
-    "after_moving_text": "Ongoing Consolidation: Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit.\nEngaging Consolidation: Your unit must be engaged with all of the selected enemy units. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight (12.04).\nObjective Consolidation: Your unit must be unengaged and within range of the selected objective.",
-    "transcription_sha256": "fdde240dcfcef2fb76864cb27474b5964dfca6786b45e123090e61586ae72d02",
-    "superseded_source_id": "gw-11e-core-fight:ongoing-consolidation-erratum",
-    "supersession_scope": "v946 after-moving forced enemy selection only; historical v931 evidence retained",
-    "forced_fight_modes": [
-      "engaging"
-    ],
-    "observation_sha256": "d3a6ae1b0f6b5cd992d292f3f6fa3f6db2182b3ac03971f5dd0f716b7781b71d"
-  }
+  "package_hash": "c23bfa0f4e85c499b3736907db22bcf9ccf792ade1c4facf52482773da2e511e"
 }

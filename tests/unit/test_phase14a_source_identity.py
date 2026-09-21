@@ -3049,8 +3049,12 @@ def test_p12_source_package_records_current_consolidation_and_ongoing_erratum() 
         assert text.raw_text == rule.source_text
         assert hashlib.sha256(text.raw_text.encode()).hexdigest() == rule.transcription_sha256
         assert rule.load_support_status == "loaded"
-        assert rule.semantic_execution_status == "executable_engine_runtime"
-        assert rule.runtime_consumer_ids
+        if rule.source_id == source.ONGOING_SOURCE_ID:
+            assert rule.semantic_execution_status == "not_certified"
+            assert rule.runtime_consumer_ids == ()
+        else:
+            assert rule.semantic_execution_status == "executable_engine_runtime"
+            assert rule.runtime_consumer_ids
     erratum = package.source_catalog.source_text_by_id(source.ONGOING_SOURCE_ID)
     assert "your opponent must select each of those units" in erratum.raw_text
     assert "one at a time" in erratum.raw_text
@@ -3065,6 +3069,72 @@ def test_p12_source_package_records_current_consolidation_and_ongoing_erratum() 
     assert audit["observed_at"]
     with pytest.raises(source.FightSourceError, match="reviewed pin"):
         source.validate_fight_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
+
+
+def test_order72_v946_resolution_preserves_observations_and_retires_ongoing_execution() -> None:
+    from tools.build_core_fight_source import HISTORICAL_PATH, build_historical_payloads
+
+    from warhammer40k_core.core.ruleset_descriptor import ConsolidationModeKind
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_fight_2026_09 as source,
+    )
+
+    historical, _ = build_historical_payloads()
+    assert json.loads(HISTORICAL_PATH.read_bytes()) == historical
+    assert hashlib.sha256(HISTORICAL_PATH.read_bytes()).hexdigest() == (
+        "daf37b84e0ca0a7fb653db6ae7b4d6aabf93b180fcb948688aae5fc9fbcf5d7d"
+    )
+    resolution = source.source_resolution()
+    assert resolution.app_version == "946"
+    assert resolution.evidence_kind == "owner_supplied_official_app_confirmation"
+    assert resolution.capture_sha256 is None
+    assert resolution.app_build is None
+    assert resolution.forced_fight_modes == (ConsolidationModeKind.ENGAGING,)
+    assert resolution.superseded_source_id == source.ONGOING_SOURCE_ID
+    for mode in (*ConsolidationModeKind, None):
+        assert source.consolidation_response_source_id(mode) == (
+            source.CONSOLIDATION_SOURCE_ID if mode is ConsolidationModeKind.ENGAGING else None
+        )
+    original_evidence = cast(list[dict[str, object]], historical["evidence"])
+    original_hashes = {row["evidence_id"]: row["observation_sha256"] for row in original_evidence}
+    for record in source.source_evidence_records():
+        assert record.observation_sha256 == original_hashes[record.evidence_id]
+        if record.rule_source_id == source.ONGOING_SOURCE_ID:
+            assert record.semantic_execution_status == "not_certified"
+            assert record.runtime_consumer_ids == ()
+
+
+@pytest.mark.stubbed
+@pytest.mark.parametrize(
+    "drift", ["schema", "identity", "text", "status", "mode", "version", "proof"]
+)
+def test_order72_source_resolution_rejects_rehashed_invalid_data(
+    monkeypatch: pytest.MonkeyPatch, drift: str
+) -> None:
+    from tools.build_core_fight_source import ARTIFACT_PATH
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_fight_2026_09 as source,
+    )
+
+    data = json.loads(ARTIFACT_PATH.read_bytes())
+    if drift == "identity":
+        data["source_version"] = "931"
+    elif drift == "text":
+        data["rules"][0]["source_text"] += " drift"
+    elif drift == "status":
+        data["rules"][1]["semantic_execution_status"] = "executable_engine_runtime"
+    elif drift == "mode":
+        data["resolution"]["forced_fight_modes"] = ["ongoing", "engaging"]
+    elif drift == "version":
+        data["resolution"]["app_version"] = "931"
+    elif drift == "proof":
+        data["resolution"]["observation_sha256"] = "0" * 64
+    raw = b"{" if drift == "schema" else json.dumps(data).encode()
+    # Only the pure byte validator's pin is replaced; no engine object is stubbed.
+    monkeypatch.setattr(source, "EXPECTED_ARTIFACT_SHA256", hashlib.sha256(raw).hexdigest())
+    with pytest.raises(source.FightSourceError):
+        source.validate_fight_source_artifact_bytes(raw)
 
 
 def test_p22_p22b_source_package_pins_aura_and_psychic_use_authority() -> None:
