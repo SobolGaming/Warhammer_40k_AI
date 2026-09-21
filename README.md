@@ -943,3 +943,9 @@ Empty inventories remain legal and faction-specific records remain unpopulated.
 See [scope and source resolution](docs/ORDER_69_SCOPE_PLAN.md) and
 [contract 34 migration](contracts/migrations/33-to-34.md). Verify the reviewed
 source with `uv run python tools/build_core_roster_construction_source.py --check`.
+
+Order 71 preserves the distinct attacking-model and target-unit engagement
+penalties, exempting CLOSE-QUARTERS attacks only against an engaged target.
+Third-party shooting, attached ownership, modifiers and replay share the engine
+path. See [scope and validation](docs/ORDER_71_SCOPE_PLAN.md). Verify source data
+with `uv run python tools/build_core_engaged_shooting_source.py --check`.

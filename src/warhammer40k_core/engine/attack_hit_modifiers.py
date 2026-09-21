@@ -15,8 +15,11 @@ if TYPE_CHECKING:
 
 
 def declaration_hit_modifiers(rule_ids: tuple[str, ...]) -> tuple[RollModifier, ...]:
+    from warhammer40k_core.engine.shooting_engagement import (
+        CLOSE_QUARTERS_SHOOTING_SOURCE_ID,
+        ENGAGED_TARGET_SOURCE_ID,
+    )
     from warhammer40k_core.engine.shooting_targets import (
-        BIG_GUNS_NEVER_TIRE_RULE_ID,
         FORTIFICATION_ENGAGEMENT_RULE_ID,
     )
     from warhammer40k_core.engine.weapon_abilities import (
@@ -24,7 +27,8 @@ def declaration_hit_modifiers(rule_ids: tuple[str, ...]) -> tuple[RollModifier, 
     )
 
     values = {
-        BIG_GUNS_NEVER_TIRE_RULE_ID: -1,
+        CLOSE_QUARTERS_SHOOTING_SOURCE_ID: -1,
+        ENGAGED_TARGET_SOURCE_ID: -1,
         FORTIFICATION_ENGAGEMENT_RULE_ID: -1,
         heavy_rule_id(): 1,
     }

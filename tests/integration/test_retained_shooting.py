@@ -1644,3 +1644,115 @@ def test_r34_001_retained_action_exclusions_are_strict_and_cannot_be_selected() 
     del payload["excluded_actions"]
     with pytest.raises(GameLifecycleError, match="fields"):
         type(record).from_payload(payload)
+
+
+def test_order71_retained_shooting_preserves_engaged_target_penalty_and_replay() -> None:
+    from tests.order71_helpers import TARGET_SOURCE
+    from tests.phase13b_shooting_declaration_helpers import (
+        _compact_intercessor_catalog,
+        _scenario_with_unit_pose,
+    )
+    from tests.retained_attack_helpers import lethal_retained_attack_catalog
+
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.damage_allocation import DestructionReactionSource
+
+    catalog = _compact_intercessor_catalog(lethal_retained_attack_catalog())
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                row, keywords=replace(row.keywords, keywords=(*row.keywords.keywords, "VEHICLE"))
+            )
+            if row.datasheet_id == "core-intercessor-like-infantry"
+            else row
+            for row in catalog.datasheets
+        ),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+        alpha_unit_specs=(
+            ("intercessor-1", "core-intercessor-like-infantry", "core-intercessor-like", 1),
+        ),
+        enemy_unit_specs=(
+            ("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 3),
+            ("other", "core-intercessor-like-infantry", "core-intercessor-like", 1),
+        ),
+        game_id="order71-retained",
+    )
+    state = lifecycle.state
+    assert state is not None
+    other = units["other"]
+    scenario = _scenario_with_unit_pose(
+        scenario=battlefield_scenario_for_state(state=state),
+        unit=other,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(10.0, 33.2),),
+    )
+    state.battlefield_state = scenario.battlefield_state
+    for model in units["enemy"].own_models:
+        state.record_model_destruction_reaction_sources(
+            model_instance_id=model.model_instance_id,
+            sources=(
+                DestructionReactionSource(
+                    source_id="order71:retained",
+                    source_rule_id="order71:retained",
+                    reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+                ),
+            ),
+        )
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    initial = session.lifecycle.to_payload()
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id,
+        result_id="order71:retained-unit",
+        option_id=units["intercessor-1"].unit_instance_id,
+    )
+    reached = False
+    for _ in range(25):
+        request = pending_request(session)
+        if request.decision_type == "select_destruction_reaction":
+            status = session.submit_option(
+                request_id=request.request_id,
+                result_id="order71:retained-choice",
+                option_id="order71:retained",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        elif (
+            request.decision_type == "submit_shooting_declaration"
+            and request.actor_id == "player-b"
+        ):
+            proposal = _proposal_from_request(
+                request=request, target_unit_id=units["intercessor-1"].unit_instance_id
+            )
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id="order71:retained-declare",
+                payload=validate_json_value(proposal.to_payload()),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+            reached = True
+            break
+        else:
+            submit_fixture_request(session, request)
+    assert reached
+    accepted = next(
+        event.payload
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "out_of_phase_shooting_declaration_accepted"
+    )
+    assert isinstance(accepted, dict)
+    pools = cast(list[dict[str, object]], accepted["attack_pools"])
+    assert pools[0]["hit_roll_modifier"] == -1
+    assert TARGET_SOURCE in cast(list[str], pools[0]["targeting_rule_ids"])
+    result = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id="order71:retained-replay",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert result.status is ReplayRunStatus.REPRODUCED, result

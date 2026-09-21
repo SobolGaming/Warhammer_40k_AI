@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fd6608be023165bf4e8e2ed4dbc1635250d06ddca2da666018c5893220a35656",
-  "fingerprint": "fd6608be023165bf4e8e2ed4dbc1635250d06ddca2da666018c5893220a35656",
-  "resource_count": 2918,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
+  "fingerprint": "1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
+  "resource_count": 2921,
   "resources": [
     {
       "byte_length": 113,
@@ -770,9 +770,9 @@
       "sha256": "a0be32ea85edd0626c1d6de3ec3803067bdc4dfc9f79f35e4a147b63ea76513d"
     },
     {
-      "byte_length": 1991,
+      "byte_length": 2144,
       "path": "warhammer40k_core/engine/attack_hit_modifiers.py",
-      "sha256": "76e5e82b2b79e14c911e2ba2cb62d5c42e1bd6dde60de13f2e8b94341cdbb724"
+      "sha256": "e941fe894270ba0022151276f825cc8ca7c5f5478639ba5301e13ca56b9ae95b"
     },
     {
       "byte_length": 5999,
@@ -10960,9 +10960,9 @@
       "sha256": "2b14892d35ffe92aae8d54d238beb1cab1bdedc9b7693d654d3e9d1f326aba95"
     },
     {
-      "byte_length": 48034,
+      "byte_length": 48172,
       "path": "warhammer40k_core/engine/phases/shooting_declaration_validation.py",
-      "sha256": "96e44a819bb9b6fbdccfe7e81517706f93c1491e18cf6d6f48400cbd811de87a"
+      "sha256": "1638af2a723185cc791e08bbac0c946d5f0d1b514b1a48a13b0fe3f8fb83a8ef"
     },
     {
       "byte_length": 36792,
@@ -10970,9 +10970,9 @@
       "sha256": "4bb86e0a548ee564e1b17d9fd0202eb793443c44e4153d89086f8d164892baae"
     },
     {
-      "byte_length": 31745,
+      "byte_length": 31859,
       "path": "warhammer40k_core/engine/phases/shooting_firing_deck.py",
-      "sha256": "6ae8c5c387b251efb4b9f52f25bb47a563e337e3acf49e3231a9628dfc99e67a"
+      "sha256": "6a8f8b88d2727d7edaf73f5e15218c2dde5ebd6479e28937b9379d9726fe0a17"
     },
     {
       "byte_length": 59223,
@@ -12050,6 +12050,11 @@
       "sha256": "2ba4fc2651e45d8fc09740368e154605448ed5985fab62fd175f43a7427e1e51"
     },
     {
+      "byte_length": 1647,
+      "path": "warhammer40k_core/engine/shooting_engagement.py",
+      "sha256": "4a5ee531cbbb9ec7f0d6e3ee0627111e27cde09ecc9fddcd3d2554e8a548a40c"
+    },
+    {
       "byte_length": 1767,
       "path": "warhammer40k_core/engine/shooting_model_blockers.py",
       "sha256": "4e0844197a0d35c1133a00a7707ca428ace1d74c5f770985c2019bd4674fcf72"
@@ -12080,9 +12085,9 @@
       "sha256": "37fec2b2095bd5eda266005e87737c2a912400cfe5152a9d582fa2486660c876"
     },
     {
-      "byte_length": 59474,
+      "byte_length": 58746,
       "path": "warhammer40k_core/engine/shooting_targets.py",
-      "sha256": "4dd9d7854ffeacdb77c558b43077edc3a90a58b44478b17822da05273e8d0966"
+      "sha256": "a3307db53454734da9d71987e47f139362d3cda6628c25c092e2e66ea16de6ce"
     },
     {
       "byte_length": 7747,
@@ -13115,14 +13120,14 @@
       "sha256": "78cb8b0a5fa15dcbfe5b30b36ae1d7fb06fc7d7a2a0b0b75db2761363f765d3f"
     },
     {
-      "byte_length": 91860,
+      "byte_length": 92783,
       "path": "warhammer40k_core/rules/source_authority_registry.json",
-      "sha256": "a0fa80f9d9f2081622e9902f37ce81ffa6fc36386e8fc4e57833bb69b5396cde"
+      "sha256": "3fcb6ec0fa133053f28767d2df32273920650fcc247625463b92dc016dc5d910"
     },
     {
       "byte_length": 20968,
       "path": "warhammer40k_core/rules/source_authority_registry.py",
-      "sha256": "95c8c887317f9e746c899d20023d0392d74e98ea6be23b4b8d75fb8c7a704f5f"
+      "sha256": "504a82238473be348464de93f0e09ec470514fe3f3b9d8f27eca6e7b1d5843f9"
     },
     {
       "byte_length": 19955,
@@ -13388,6 +13393,16 @@
       "byte_length": 4905,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_empty_dedicated_transport_2026_09/artifacts/package.json",
       "sha256": "6ae167dd10b45bda9ed5335d98630fe8b90a6048ac54fd7ed26bd53744da50b3"
+    },
+    {
+      "byte_length": 5188,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_engaged_shooting_2026_09/__init__.py",
+      "sha256": "3e4eeceadb0650fd4ff106859efb26cb94cde20454c06c6621d77a4a459fca32"
+    },
+    {
+      "byte_length": 4123,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_engaged_shooting_2026_09/artifacts/package.json",
+      "sha256": "0dfed05d9cf2d7b842f66b9e7375a636e6b45ed73a09f8831521dc43e38692ab"
     },
     {
       "byte_length": 6145,

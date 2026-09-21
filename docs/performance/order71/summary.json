@@ -1,0 +1,75 @@
+{
+  "workload": "order71-engaged-shooting-v1",
+  "sample_count_per_case": 7,
+  "candidates_per_sample": 10,
+  "percentile_method": "nearest-rank",
+  "reports": {
+    "base": {
+      "report_sha256": "7cabd1c80094cafba2ce7db03924e7ac9119de7175500fb7a3a4715f4339ea7f",
+      "rows": [
+        {
+          "case": "third-party-close",
+          "median_seconds": 0.0076151000102981925,
+          "p95_seconds": 0.009197899955324829,
+          "candidates_per_second": 1259.5682199523412,
+          "completion_rate": 1.0
+        },
+        {
+          "case": "both-causes",
+          "median_seconds": 0.007132700004149228,
+          "p95_seconds": 0.007798100006766617,
+          "candidates_per_second": 1383.5960858567141,
+          "completion_rate": 1.0
+        },
+        {
+          "case": "mutual-close",
+          "median_seconds": 0.00714719999814406,
+          "p95_seconds": 0.008137400029227138,
+          "candidates_per_second": 1368.3821618764457,
+          "completion_rate": 1.0
+        },
+        {
+          "case": "attached-third-party",
+          "median_seconds": 0.008162600046489388,
+          "p95_seconds": 0.008959400001913309,
+          "candidates_per_second": 1203.3259932356993,
+          "completion_rate": 1.0
+        }
+      ]
+    },
+    "head": {
+      "report_sha256": "6601352c497402cc384e730cc23f18eb56b75561f881c0e996122ebfe74dbd9e",
+      "rows": [
+        {
+          "case": "third-party-close",
+          "median_seconds": 0.007294400013051927,
+          "p95_seconds": 0.008228499966207892,
+          "candidates_per_second": 1370.6301374837863,
+          "completion_rate": 1.0
+        },
+        {
+          "case": "both-causes",
+          "median_seconds": 0.007727099990006536,
+          "p95_seconds": 0.009956799971405417,
+          "candidates_per_second": 1247.6873233662393,
+          "completion_rate": 1.0
+        },
+        {
+          "case": "mutual-close",
+          "median_seconds": 0.00709690002258867,
+          "p95_seconds": 0.008361500047612935,
+          "candidates_per_second": 1360.5283506026756,
+          "completion_rate": 1.0
+        },
+        {
+          "case": "attached-third-party",
+          "median_seconds": 0.00844219996361062,
+          "p95_seconds": 0.009256099991034716,
+          "candidates_per_second": 1186.4567666399464,
+          "completion_rate": 1.0
+        }
+      ]
+    }
+  },
+  "report_hash_algorithm": "sha256-normalized-text-lf"
+}

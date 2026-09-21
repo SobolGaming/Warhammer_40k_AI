@@ -1,5 +1,10 @@
 # Order 70 Fights First query assessment
 
+Order 71 refreshed the head JSON for runtime `1418bd17` with unchanged
+workloads, baselines and budgets. The tables and prior validation below are
+historical; current gate results are recorded in
+[Order 71 validation](../order71/validation.json).
+
 The versioned `order70-fights-first-v1` workload measures 100 complete live
 registry queries with zero, one and four unit grants in the existing canonical
 Firing Deck fixture (four units, sixteen models). Preparation is outside the

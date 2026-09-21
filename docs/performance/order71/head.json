@@ -1,0 +1,89 @@
+{
+  "workload": "order71-engaged-shooting-v1",
+  "revision": "order71-review-final",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1418bd1776522930dcdd3bbb2a29276aebd74e2bcafa0e941b5365d0acd4d2b4",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "10 uncached complete model-target candidates, including geometry and engagement; canonical scene preparation excluded; seven serial samples without coverage",
+  "hashes": {
+    "scripts/measure_order71.py": "9b0a052057c76cc0b4804d2b082bc2e1980213708b4b9a6a396d8351753b7a41",
+    "tests/order71_helpers.py": "6ebdb38d566aa9a5bceaf3dfe215c3eba3e2c7dd1e844545b130ac86b1b7ae9f",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "third-party-close",
+      "samples_seconds": [
+        0.008228499966207892,
+        0.007734200044069439,
+        0.006792800035327673,
+        0.007294400013051927,
+        0.006854999985080212,
+        0.006854299979750067,
+        0.007312199973966926
+      ],
+      "mean_seconds": 0.007295914285350591,
+      "maximum_seconds": 0.008228499966207892,
+      "complete": true,
+      "legal": true,
+      "hit_modifier": -1
+    },
+    {
+      "case": "both-causes",
+      "samples_seconds": [
+        0.008281300019007176,
+        0.006821099959779531,
+        0.007322300050873309,
+        0.006955099990591407,
+        0.007727099990006536,
+        0.009040099976118654,
+        0.009956799971405417
+      ],
+      "mean_seconds": 0.008014828565397434,
+      "maximum_seconds": 0.009956799971405417,
+      "complete": true,
+      "legal": true,
+      "hit_modifier": -2
+    },
+    {
+      "case": "mutual-close",
+      "samples_seconds": [
+        0.008361500047612935,
+        0.007024099992122501,
+        0.007673899992369115,
+        0.006905399961397052,
+        0.007065000012516975,
+        0.0073238000040873885,
+        0.00709690002258867
+      ],
+      "mean_seconds": 0.007350085718956377,
+      "maximum_seconds": 0.008361500047612935,
+      "complete": true,
+      "legal": true,
+      "hit_modifier": 0
+    },
+    {
+      "case": "attached-third-party",
+      "samples_seconds": [
+        0.009256099991034716,
+        0.008100199978798628,
+        0.008522799995262176,
+        0.00810010003624484,
+        0.008586199954152107,
+        0.007991600024979562,
+        0.00844219996361062
+      ],
+      "mean_seconds": 0.00842845713486895,
+      "maximum_seconds": 0.009256099991034716,
+      "complete": true,
+      "legal": true,
+      "hit_modifier": -1
+    }
+  ],
+  "full_game_certified": false
+}

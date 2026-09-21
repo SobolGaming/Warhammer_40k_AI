@@ -1,5 +1,10 @@
 # Order 69 roster construction validation
 
+Order 71 refreshed the head JSON for runtime `1418bd17` with unchanged
+workloads, baselines and budgets. The tables and prior validation below are
+historical; current gate results are recorded in
+[Order 71 validation](../order71/validation.json).
+
 These measurements reuse the unchanged `order68-roster-validation-v1` workload:
 100 calls to the shared roster validator, with two, four and twenty units
 (six, sixteen and ninety-six models). Each case has seven serial samples.

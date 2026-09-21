@@ -1,0 +1,79 @@
+{
+  "artifact_schema": "core-v2-core-engaged-shooting-source-v1",
+  "source_package_id": "gw-11e-core-engaged-shooting",
+  "source_version": "maintained-app-mirrors-observed-2026-09-21",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-engaged-shooting:engaged-monster-vehicle-target",
+      "section_id": "17.03",
+      "source_text": "In your Shooting phase, enemy MONSTER/VEHICLE units that are engaged can be selected as targets of ranged attacks (excluding attacks made with [BLAST] weapons).\nEach time a model makes a ranged attack that targets such a unit, subtract 1 from the hit roll (excluding attacks made with [CLOSE‑QUARTERS] weapons by models in a unit engaged with the target).",
+      "transcription_sha256": "12806475dcbcab62cd737334b032c0f214dff4fd11720161cdbaeb4405eee26e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.shooting_engagement:engaged_shooting_penalty_sources"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-engaged-shooting:engaged-monster-vehicle-target",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "12806475dcbcab62cd737334b032c0f214dff4fd11720161cdbaeb4405eee26e",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "e38d44c5740925b58bfb8e738a175ab7daaeb1593d18a3111f3dea82bc65ffb9",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.shooting_engagement:engaged_shooting_penalty_sources"
+      ],
+      "evidence_id": "core-engaged-shooting-review:engaged-monster-vehicle-target",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P17 17.03 engaged-monster-vehicle-target",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-engaged-shooting:engaged-monster-vehicle-target",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "12806475dcbcab62cd737334b032c0f214dff4fd11720161cdbaeb4405eee26e",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "fe8800c2b4aaa318418101e797fd98bce387f07dc15d995e992f287e1aecba4a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.shooting_engagement:engaged_shooting_penalty_sources"
+      ],
+      "evidence_id": "core-engaged-shooting-mirror:engaged-monster-vehicle-target:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-engaged-shooting-maintained-app-mirrors-2026-09-21",
+      "review_audit_row_id": "engaged-monster-vehicle-target:40k-app",
+      "review_audit_source_observation_sha256": "71dded5a559844c3f96399ef560988c8d422954d65a9c4a5c668d7daabd09d5e",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 17.03 engaged-monster-vehicle-target",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/17-monsters-and-vehicles",
+      "observed_at": "2026-09-21T18:41:25Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "cf3c22e31431065964541452e521e4aea29125f1622cda5606a35159f051cee3"
+}

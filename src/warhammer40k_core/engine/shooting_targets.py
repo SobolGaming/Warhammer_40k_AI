@@ -47,6 +47,10 @@ from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.shooting_engagement import (
+    engaged_shooting_penalty_sources,
+    is_monster_or_vehicle,
+)
 from warhammer40k_core.engine.shooting_model_blockers import shooting_dynamic_model_blockers
 from warhammer40k_core.engine.shooting_selection_range import (
     attacker_geometry_models as _attacker_geometry_models,
@@ -93,7 +97,6 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 
 BENEFIT_OF_COVER_RULE_ID = "core-rules:benefit-of-cover"
-BIG_GUNS_NEVER_TIRE_RULE_ID = "big_guns_never_tire"
 FORTIFICATION_ENGAGEMENT_RULE_ID = "core-rules:fortification-engagement"
 LONE_OPERATIVE_RULE_ID = "lone_operative"
 STEALTH_RULE_ID = "stealth"
@@ -866,6 +869,7 @@ def _target_candidate(
             observer_model_id=None if witness is None else witness.observer_model_id,
         )
     witness = evidence.witness
+    attacker_model = attacker_unit.own_model_by_id(witness.observer_model_id)
 
     locked_context = _locked_in_combat_context(
         scenario=scenario,
@@ -881,7 +885,7 @@ def _target_candidate(
     )
     if locked_context.is_locked:
         locked_validation = _locked_in_combat_validation(
-            attacker_unit=attacker_unit,
+            attacker_model_keywords=attacker_model.keywords,
             weapon_profile=weapon_profile,
             target_unit_id=target_unit_id,
             engaged_target_unit_ids=locked_context.engaged_target_unit_ids,
@@ -901,7 +905,7 @@ def _target_candidate(
                 observer_model_id=witness.observer_model_id,
             )
     target_engagement_validation = _target_engagement_validation(
-        attacker_unit=attacker_unit,
+        attacker_model_keywords=attacker_model.keywords,
         target_keywords=target_rules_unit.keywords,
         target_unit_id=target_unit_id,
         weapon_profile=weapon_profile,
@@ -990,17 +994,16 @@ def _target_candidate(
         terrain_features=terrain_features,
     ):
         targeting_rule_ids.append(PLUNGING_FIRE_RULE_ID)
-    if (
-        locked_context.is_locked
-        and _unit_has_vehicle_or_monster_keyword(attacker_unit)
-        and not has_close_quarters_weapon_keyword(weapon_profile)
-    ) or (
-        target_engagement_context.is_engaged_by_friendly
-        and _keywords_include_vehicle_or_monster(target_rules_unit.keywords)
-        and not has_close_quarters_weapon_keyword(weapon_profile)
-    ):
-        hit_roll_modifier -= 1
-        targeting_rule_ids.append(BIG_GUNS_NEVER_TIRE_RULE_ID)
+    engagement_sources = engaged_shooting_penalty_sources(
+        attacker_model_keywords=attacker_model.keywords,
+        attacker_engaged=locked_context.is_locked,
+        attacker_engaged_with_target=target_unit_id in locked_context.engaged_target_unit_ids,
+        target_keywords=target_rules_unit.keywords,
+        target_engaged=target_engagement_context.is_engaged_by_friendly,
+        weapon_profile=weapon_profile,
+    )
+    hit_roll_modifier -= len(engagement_sources)
+    targeting_rule_ids.extend(engagement_sources)
     if (
         target_engagement_context.is_engaged_only_by_friendly_fortifications
         and not has_weapon_keyword(weapon_profile, WeaponKeyword.PISTOL)
@@ -1026,7 +1029,6 @@ def _target_candidate(
         shooting_types=_shooting_types_for_target_candidate(
             indirect_no_visible=indirect_no_visible,
             locked_context=locked_context,
-            target_engagement_context=target_engagement_context,
         ),
         hit_roll_modifier=hit_roll_modifier,
         targeting_rule_ids=tuple(targeting_rule_ids),
@@ -1304,7 +1306,7 @@ def _target_engagement_context(
 
 def _target_engagement_validation(
     *,
-    attacker_unit: UnitInstance,
+    attacker_model_keywords: tuple[str, ...],
     target_keywords: tuple[str, ...],
     target_unit_id: str,
     weapon_profile: WeaponProfile,
@@ -1315,19 +1317,19 @@ def _target_engagement_validation(
         return None
     if target_engagement_context.is_engaged_only_by_friendly_fortifications:
         return None
-    if _keywords_include_vehicle_or_monster(target_keywords):
+    if is_monster_or_vehicle(target_keywords):
         return None
     target_is_engaged_with_attacker = target_unit_id in locked_context.engaged_target_unit_ids
     if target_is_engaged_with_attacker and has_close_quarters_weapon_keyword(weapon_profile):
         return None
-    if target_is_engaged_with_attacker and _unit_has_vehicle_or_monster_keyword(attacker_unit):
+    if target_is_engaged_with_attacker and is_monster_or_vehicle(attacker_model_keywords):
         return None
     return "Enemy units within Engagement Range of friendly units cannot be selected as targets."
 
 
 def _locked_in_combat_validation(
     *,
-    attacker_unit: UnitInstance,
+    attacker_model_keywords: tuple[str, ...],
     weapon_profile: WeaponProfile,
     target_unit_id: str,
     engaged_target_unit_ids: tuple[str, ...],
@@ -1335,14 +1337,13 @@ def _locked_in_combat_validation(
 ) -> str | None:
     if indirect_no_visible:
         return "Indirect Shooting requires the firing rules unit to be unengaged."
-    is_close_quarters = has_close_quarters_weapon_keyword(weapon_profile)
-    if is_close_quarters:
-        if target_unit_id not in engaged_target_unit_ids:
-            return "Close-quarters attacks from locked units must target engaged enemy units."
+    if is_monster_or_vehicle(attacker_model_keywords):
         return None
-    if _unit_has_vehicle_or_monster_keyword(attacker_unit):
-        return None
-    return "Units locked in combat cannot shoot non-close-quarters ranged weapons."
+    if not has_close_quarters_weapon_keyword(weapon_profile):
+        return "Engaged non-Monster/non-Vehicle models require Close-quarters weapons."
+    if target_unit_id not in engaged_target_unit_ids:
+        return "Engaged non-Monster/non-Vehicle models must target their engaged enemies."
+    return None
 
 
 def _blast_engaged_target_validation(
@@ -1364,14 +1365,10 @@ def _shooting_types_for_target_candidate(
     *,
     indirect_no_visible: bool,
     locked_context: _LockedInCombatContext,
-    target_engagement_context: _TargetEngagementContext,
 ) -> tuple[ShootingType, ...]:
     if indirect_no_visible:
         return (ShootingType.INDIRECT,)
-    if locked_context.is_locked or (
-        target_engagement_context.is_engaged_by_friendly
-        and not target_engagement_context.is_engaged_only_by_friendly_fortifications
-    ):
+    if locked_context.is_locked:
         return (ShootingType.CLOSE_QUARTERS,)
     return (ShootingType.NORMAL,)
 
@@ -1390,26 +1387,12 @@ def _rules_unit_has_fortification_keyword(rules_unit: RulesUnitView) -> bool:
     )
 
 
-def _unit_has_vehicle_or_monster_keyword(unit: UnitInstance) -> bool:
-    return _unit_has_keyword(unit, "VEHICLE") or _unit_has_keyword(unit, "MONSTER")
-
-
-def _keywords_include_vehicle_or_monster(keywords: tuple[str, ...]) -> bool:
-    return _keywords_include(keywords, "VEHICLE") or _keywords_include(keywords, "MONSTER")
-
-
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+    return keyword in unit.keywords
 
 
 def _keywords_include(keywords: tuple[str, ...], keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in keywords}
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return keyword.strip().upper().replace(" ", "_").replace("-", "_")
+    return keyword in keywords
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

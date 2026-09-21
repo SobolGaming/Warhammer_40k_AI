@@ -5,6 +5,14 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.order71_helpers import (
+    ATTACKER_SOURCE,
+    SHOOTER,
+    TARGET,
+    TARGET_SOURCE,
+    engaged_shooting_session,
+    shooting_profile,
+)
 from tests.phase13b_shooting_declaration_helpers import (
     _advanced_unit_state,
     _assert_waiting_for_movement_unit,
@@ -115,6 +123,7 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.shooting_targets import (
     LONE_OPERATIVE_RULE_ID,
     STEALTH_RULE_ID,
+    ShootingTargetCandidate,
     ShootingTargetViolationCode,
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
@@ -2585,7 +2594,7 @@ def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state
     )
     assert vehicle_candidates[0].is_legal
     assert vehicle_candidates[0].hit_roll_modifier == -1
-    assert "big_guns_never_tire" in vehicle_candidates[0].targeting_rule_ids
+    assert ATTACKER_SOURCE in vehicle_candidates[0].targeting_rule_ids
     assert vehicle_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)
 
     infantry_lifecycle, infantry_units = _shooting_lifecycle(
@@ -2888,8 +2897,8 @@ def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() 
     )
     assert monster_candidates[0].is_legal
     assert monster_candidates[0].hit_roll_modifier == -1
-    assert "big_guns_never_tire" in monster_candidates[0].targeting_rule_ids
-    assert monster_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)
+    assert TARGET_SOURCE in monster_candidates[0].targeting_rule_ids
+    assert monster_candidates[0].shooting_types == (ShootingType.NORMAL,)
 
     close_quarters_profile = replace(profile, keywords=(WeaponKeyword.CLOSE_QUARTERS,))
     close_quarters_candidates = shooting_target_candidates_for_unit(
@@ -2900,7 +2909,7 @@ def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() 
         target_unit_ids=(monster_target.unit_instance_id,),
     )
     assert close_quarters_candidates[0].is_legal
-    assert close_quarters_candidates[0].hit_roll_modifier == 0
+    assert close_quarters_candidates[0].hit_roll_modifier == -1
 
     blast_profile = replace(profile, keywords=(WeaponKeyword.BLAST,))
     blast_candidates = shooting_target_candidates_for_unit(
@@ -4215,3 +4224,619 @@ def _ctan_power_profile(
         abilities=(),
         source_ids=(f"datasheet:tesseract-vault:wargear:{profile_id}",),
     )
+
+
+@pytest.mark.parametrize(
+    "weapon_keyword", [None, WeaponKeyword.CLOSE_QUARTERS, WeaponKeyword.PISTOL]
+)
+@pytest.mark.parametrize(
+    ("attacker_vehicle", "target_vehicle", "attacker_engaged", "target_engaged", "mutual"),
+    [
+        (False, True, False, True, False),
+        (True, False, True, False, False),
+        (True, True, True, True, False),
+        (True, True, False, False, True),
+        (True, False, False, False, True),
+        (False, True, False, False, True),
+        (True, True, False, False, False),
+    ],
+)
+def test_order71_engagement_causes_and_weapon_exception(
+    weapon_keyword: WeaponKeyword | None,
+    attacker_vehicle: bool,
+    target_vehicle: bool,
+    attacker_engaged: bool,
+    target_engaged: bool,
+    mutual: bool,
+) -> None:
+    session = engaged_shooting_session(
+        attacker_vehicle=attacker_vehicle,
+        target_vehicle=target_vehicle,
+        attacker_engaged=attacker_engaged,
+        target_engaged=target_engaged,
+        mutual=mutual,
+        keywords=() if weapon_keyword is None else (weapon_keyword,),
+    )
+    state = _state(session.lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions), battlefield_state=state.battlefield_state
+    )
+    attacker = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == SHOOTER
+    )
+    candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=shooting_profile(session),
+        target_unit_id=TARGET,
+    )
+    if mutual and not attacker_vehicle and weapon_keyword is None:
+        assert candidate.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+        return
+    assert candidate.is_legal, candidate
+    exempt = mutual and weapon_keyword is not None
+    expected_sources: set[str] = set()
+    if not exempt and attacker_vehicle and (attacker_engaged or mutual):
+        expected_sources.add(ATTACKER_SOURCE)
+    if not exempt and target_vehicle and (target_engaged or mutual):
+        expected_sources.add(TARGET_SOURCE)
+    assert candidate.hit_roll_modifier == -len(expected_sources)
+    assert set(candidate.targeting_rule_ids) == expected_sources
+    assert candidate.shooting_types == (
+        ShootingType.CLOSE_QUARTERS if attacker_engaged or mutual else ShootingType.NORMAL,
+    )
+    assert type(candidate).from_payload(json.loads(json.dumps(candidate.to_payload()))) == candidate
+
+
+@pytest.mark.parametrize("attached_attacker", [False, True])
+@pytest.mark.parametrize("close_quarters", [False, True])
+def test_order71_attached_model_permissions_and_target_unit_keywords(
+    attached_attacker: bool,
+    close_quarters: bool,
+) -> None:
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+
+    session = engaged_shooting_session(
+        attached_attacker=attached_attacker,
+        attached_target=True,
+        attacker_engaged=attached_attacker,
+        keywords=(WeaponKeyword.CLOSE_QUARTERS,) if close_quarters else (),
+    )
+    state = _state(session.lifecycle)
+    scenario = battlefield_scenario_for_state(state=state)
+    for unit in state.army_definitions[0].units:
+        if unit.unit_instance_id not in {SHOOTER, "army-alpha:shooter-leader"}:
+            continue
+        profile = shooting_profile(session)
+        candidate = shooting_target_candidate_for_model(
+            scenario=scenario,
+            ruleset_descriptor=_ruleset(),
+            attacker_unit=unit,
+            attacker_model_instance_id=unit.own_models[0].model_instance_id,
+            weapon_profile=profile,
+            target_unit_id="army-beta:enemy-leader",
+        )
+        model_is_vehicle = "VEHICLE" in unit.own_models[0].keywords
+        if attached_attacker and not model_is_vehicle:
+            assert candidate.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+        else:
+            assert candidate.is_legal, candidate.message
+            expected: set[str] = {TARGET_SOURCE}
+            if attached_attacker:
+                expected.add(ATTACKER_SOURCE)
+            assert set(candidate.targeting_rule_ids) == expected
+            assert candidate.hit_roll_modifier == -len(expected)
+
+
+@pytest.mark.parametrize("bonus", [0, 1, 2, 3])
+@pytest.mark.parametrize("psychic", [False, True])
+def test_order71_both_penalties_survive_facade_modifiers_restore_and_replay(
+    bonus: int,
+    psychic: bool,
+) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+    session = engaged_shooting_session(
+        attacker_vehicle=True,
+        attacker_engaged=True,
+        keywords=(WeaponKeyword.PSYCHIC,) if psychic else (),
+    )
+    state = _state(session.lifecycle)
+    if bonus:
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id="order71:bonus",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(SHOOTER,),
+                target_kind="this_unit",
+                effect_kind="modify_dice_roll",
+                parameters={"roll_type": "hit", "delta": bonus, "attack_role": "attacker"},
+            )
+        )
+    initial = session.lifecycle.to_payload()
+    request = pending_request(session)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="order71:unit", option_id=SHOOTER
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    request = pending_request(session)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="order71:type", option_id="close_quarters"
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    request = pending_request(session)
+    proposal = _proposal_from_request(request=request, target_unit_id=TARGET)
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    for current in (session, restored):
+        malformed = current.submit_parameterized_payload(
+            request_id=request.request_id, result_id="order71:bad", payload={"bad": True}
+        )
+        assert malformed.status_kind is LifecycleStatusKind.INVALID
+        assert current.to_persistence_payload() == checkpoint
+        status = current.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="order71:declare",
+            payload=validate_json_value(proposal.to_payload()),
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        for _ in range(25):
+            if _attack_step_payloads(current.lifecycle, AttackSequenceStep.HIT):
+                break
+            next_request = pending_request(current)
+            if next_request.decision_type == "select_psychic_attack_modifier_ignores":
+                status = current.submit_option(
+                    request_id=next_request.request_id,
+                    result_id=f"{next_request.request_id}:keep",
+                    option_id="keep-all-modifiers",
+                )
+                assert status.status_kind is not LifecycleStatusKind.INVALID, status
+            else:
+                submit_fixture_request(current, next_request)
+        else:
+            raise AssertionError("Order 71 attack did not finish")
+        accepted = _last_event_payload(current.lifecycle, "shooting_declaration_accepted")
+        pools = cast(list[dict[str, object]], accepted["attack_pools"])
+        assert pools[0]["hit_roll_modifier"] == -2
+        modifiers = cast(list[dict[str, object]], pools[0]["hit_roll_modifiers"])
+        assert {row["source_id"] for row in modifiers} == {ATTACKER_SOURCE, TARGET_SOURCE}
+        hits = _attack_step_payloads(current.lifecycle, AttackSequenceStep.HIT)
+        assert hits
+        for hit in hits:
+            roll = cast(dict[str, object], hit["payload"])
+            assert roll["modifier"] == bonus - 2, roll
+            assert roll["capped_modifier"] == max(-1, min(1, bonus - 2)), roll
+    assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()
+    for viewer in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id="order71:replay",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+@pytest.mark.parametrize("host", ["ordinary", "reaction", "overwatch"])
+def test_order71_third_party_close_quarters_penalty_through_shared_attack_hosts(host: str) -> None:
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.phases.shooting_requests import (
+        request_out_of_phase_shooting_declaration,
+    )
+    from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
+
+    session = engaged_shooting_session(keywords=(WeaponKeyword.CLOSE_QUARTERS,))
+    state = _state(session.lifecycle)
+    if host == "ordinary":
+        request = pending_request(session)
+        session.submit_option(
+            request_id=request.request_id, result_id="order71:host-unit", option_id=SHOOTER
+        )
+        request = pending_request(session)
+        assert {option.option_id for option in request.options} == {"normal"}
+        session.submit_option(
+            request_id=request.request_id, result_id="order71:host-mode", option_id="normal"
+        )
+        request = pending_request(session)
+    else:
+        state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+        state.active_player_id = "player-b"
+        request = _decision_request(
+            request_out_of_phase_shooting_declaration(
+                state=state,
+                decisions=session.lifecycle.decision_controller,
+                ruleset_descriptor=_ruleset(),
+                army_catalog=session.lifecycle.config.army_catalog,
+                player_id="player-a",
+                unit_instance_id=SHOOTER,
+                parent_phase=BattlePhase.MOVEMENT,
+                source_rule_id=FIRE_OVERWATCH_RULE_ID
+                if host == "overwatch"
+                else "order71:reaction",
+                source_decision_request_id="order71:trigger-request",
+                source_decision_result_id="order71:trigger-result",
+                source_context={"triggering_enemy_unit_instance_id": TARGET},
+                target_unit_ids=(TARGET,),
+            )
+        )
+    proposal = _proposal_from_request(request=request, target_unit_id=TARGET)
+    checkpoint = session.lifecycle.to_payload()
+    invalid = proposal.to_payload()
+    invalid["declarations"][0]["shooting_type"] = "close_quarters"
+    rejected = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order71:wrong-mode",
+        payload=validate_json_value(invalid),
+    )
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == checkpoint
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order71:host-attack",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    event = (
+        "shooting_declaration_accepted"
+        if host == "ordinary"
+        else "out_of_phase_shooting_declaration_accepted"
+    )
+    pools = cast(
+        list[dict[str, object]], _last_event_payload(session.lifecycle, event)["attack_pools"]
+    )
+    assert pools[0]["hit_roll_modifier"] == -1
+    assert TARGET_SOURCE in cast(list[str], pools[0]["targeting_rule_ids"])
+    hits: tuple[dict[str, object], ...] = ()
+    for _ in range(20):
+        hits = _attack_step_payloads(session.lifecycle, AttackSequenceStep.HIT)
+        if hits:
+            break
+        submit_fixture_request(session, pending_request(session))
+    assert hits
+    roll = cast(dict[str, object], hits[0]["payload"])
+    assert roll["modifier"] == -1
+    if host == "overwatch":
+        assert roll["minimum_unmodified_success"] == 6
+
+
+@pytest.mark.parametrize(
+    "keywords", [(WeaponKeyword.BLAST,), (WeaponKeyword.BLAST, WeaponKeyword.CLOSE_QUARTERS)]
+)
+def test_order71_blast_cannot_target_engaged_monster_vehicle(
+    keywords: tuple[WeaponKeyword, ...],
+) -> None:
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    session = engaged_shooting_session(keywords=keywords)
+    state = _state(session.lifecycle)
+    attacker = rules_unit_view_by_id(state=state, unit_instance_id=SHOOTER).components[0].unit
+    candidate = shooting_target_candidate_for_model(
+        scenario=battlefield_scenario_for_state(state=state),
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=shooting_profile(session),
+        target_unit_id=TARGET,
+    )
+    assert candidate.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+
+
+def test_order71_firing_deck_uses_transport_model_for_engaged_penalty() -> None:
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.event_log import validate_json_value
+
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("passenger-1", "transport-1"),
+        alpha_datasheets={
+            "passenger-1": ("core-intercessor-like-infantry", "core-intercessor-like", 5),
+            "transport-1": ("core-transport", "core-transport", 1),
+        },
+        embarked_unit_ids=("passenger-1",),
+        enemy_pose=Pose.at(11.0, 35.0),
+    )
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    request = _decision_request(session.advance_until_decision_or_terminal())
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            result_id="order71:deck-unit",
+            option_id=units["transport-1"].unit_instance_id,
+        )
+    )
+    request = _decision_request(
+        session.submit_option(
+            request_id=request.request_id,
+            result_id="order71:deck-type",
+            option_id="close_quarters",
+        )
+    )
+    proposal = _proposal_from_request(
+        request=request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        firing_deck_unit=units["passenger-1"],
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order71:deck-declare",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    pools = cast(
+        list[dict[str, object]],
+        _last_event_payload(session.lifecycle, "shooting_declaration_accepted")["attack_pools"],
+    )
+    borrowed = [pool for pool in pools if pool["firing_deck_source_model_instance_id"] is not None]
+    assert borrowed
+    for pool in borrowed:
+        assert (
+            pool["attacker_model_instance_id"]
+            == units["transport-1"].own_models[0].model_instance_id
+        )
+        assert pool["hit_roll_modifier"] == -1
+        assert ATTACKER_SOURCE in cast(list[str], pool["targeting_rule_ids"])
+
+
+def test_order71_psychic_can_ignore_one_engagement_source_without_erasing_the_other() -> None:
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.event_log import validate_json_value
+
+    session = engaged_shooting_session(
+        attacker_vehicle=True, attacker_engaged=True, keywords=(WeaponKeyword.PSYCHIC,)
+    )
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id, result_id="order71:ignore-unit", option_id=SHOOTER
+    )
+    request = pending_request(session)
+    session.submit_option(
+        request_id=request.request_id, result_id="order71:ignore-mode", option_id="close_quarters"
+    )
+    request = pending_request(session)
+    proposal = _proposal_from_request(request=request, target_unit_id=TARGET)
+    session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order71:ignore-declare",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    request = pending_request(session)
+    assert request.decision_type == "select_psychic_attack_modifier_ignores"
+    first = next(
+        option for option in request.options if option.option_id.startswith("ignore-modifier:")
+    )
+    status = session.submit_option(
+        request_id=request.request_id, result_id="order71:ignore-one", option_id=first.option_id
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    request = pending_request(session)
+    assert request.decision_type == "select_psychic_attack_modifier_ignores"
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order71:keep-other",
+        option_id="keep-all-modifiers",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    hits: tuple[dict[str, object], ...] = ()
+    for _ in range(15):
+        hits = _attack_step_payloads(session.lifecycle, AttackSequenceStep.HIT)
+        if hits:
+            break
+        submit_fixture_request(session, pending_request(session))
+    assert hits
+    assert cast(dict[str, object], hits[0]["payload"])["modifier"] == -1
+
+
+def test_order71_candidate_cache_rechecks_attached_vehicle_keyword_after_casualty() -> None:
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.engine.shooting_target_cache import cached_target_candidate_for_model
+
+    session = engaged_shooting_session(
+        attached_target=True, keywords=(WeaponKeyword.CLOSE_QUARTERS,)
+    )
+    state = _state(session.lifecycle)
+    attacker = rules_unit_view_by_id(state=state, unit_instance_id=SHOOTER).components[0].unit
+
+    def candidate() -> ShootingTargetCandidate:
+        return cached_target_candidate_for_model(
+            scenario=battlefield_scenario_for_state(state=state),
+            ruleset_descriptor=_ruleset(),
+            attacker_unit=attacker,
+            attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+            weapon_profile=shooting_profile(session),
+            target_unit_id=TARGET,
+            terrain_features=(),
+            terrain_areas=(),
+            hidden_target_model_ids=(),
+            target_unit_ids_with_recent_ranged_attacks=(),
+            target_detection_range_bonus_inches=0,
+        )
+
+    before = candidate()
+
+    assert isinstance(before, ShootingTargetCandidate)
+    assert before.is_legal
+    assert before.hit_roll_modifier == -1
+    assert candidate() == before
+    leader = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == "army-beta:enemy-leader"
+    )
+    model = leader.own_models[0]
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=leader.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    after = candidate()
+    assert isinstance(after, ShootingTargetCandidate)
+    assert after.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+    assert after != before
+
+
+@pytest.mark.parametrize("attached_attacker", [False, True])
+def test_order71_attached_target_alias_uses_rules_unit_engagement_for_exemption(
+    attached_attacker: bool,
+) -> None:
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    session = engaged_shooting_session(
+        attached_attacker=attached_attacker,
+        attached_target=True,
+        mutual=True,
+        keywords=(WeaponKeyword.CLOSE_QUARTERS,),
+    )
+    state = _state(session.lifecycle)
+    attacker = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == SHOOTER
+    )
+    candidate = shooting_target_candidate_for_model(
+        scenario=battlefield_scenario_for_state(state=state),
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=shooting_profile(session),
+        target_unit_id="army-beta:enemy-leader",
+    )
+    assert candidate.is_legal, candidate.message
+    assert (
+        candidate.target_unit_instance_id
+        == rules_unit_view_by_id(state=state, unit_instance_id=TARGET).unit_instance_id
+    )
+    assert candidate.hit_roll_modifier == 0
+    assert not set(candidate.targeting_rule_ids) & {ATTACKER_SOURCE, TARGET_SOURCE}
+
+
+@pytest.mark.parametrize("monster_vehicle_keyword", ["MONSTER", "VEHICLE"])
+@pytest.mark.parametrize(
+    "close_quarters_keyword", [WeaponKeyword.CLOSE_QUARTERS, WeaponKeyword.PISTOL]
+)
+@pytest.mark.parametrize("reverse", [False, True])
+def test_order71_mixed_physical_unit_exclusivity_uses_declaring_model(
+    monster_vehicle_keyword: str,
+    close_quarters_keyword: WeaponKeyword,
+    reverse: bool,
+) -> None:
+    from tests.order71_declaration_helpers import mixed_model_shooting_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+    session = mixed_model_shooting_session(
+        monster_vehicle_keyword=monster_vehicle_keyword,
+        close_quarters_keyword=close_quarters_keyword,
+    )
+    state = _state(session.lifecycle)
+    shooter = state.army_definitions[0].units[0]
+    assert len(shooter.own_models) == 2
+    assert monster_vehicle_keyword in shooter.keywords
+    ordinary = next(m for m in shooter.own_models if monster_vehicle_keyword not in m.keywords)
+    exceptional = next(m for m in shooter.own_models if monster_vehicle_keyword in m.keywords)
+    initial = session.lifecycle.to_payload()
+    request = pending_request(session)
+    session.submit_option(request_id=request.request_id, result_id="mixed:unit", option_id=SHOOTER)
+    request = pending_request(session)
+    session.submit_option(request_id=request.request_id, result_id="mixed:mode", option_id="normal")
+    request = pending_request(session)
+    request_payload = cast(dict[str, object], request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    payload = _proposal_from_request(request=request, target_unit_id=TARGET).to_payload()
+    order = (
+        ("order71-close-weapon", "core-bolt-rifle")
+        if reverse
+        else ("core-bolt-rifle", "order71-close-weapon")
+    )
+    payload["declarations"] = [
+        _weapon_payload_to_declaration_payload(
+            weapon=next(
+                w
+                for w in weapons
+                if w["model_instance_id"] == ordinary.model_instance_id
+                and w["wargear_id"] == wargear_id
+            ),
+            target_unit_id=TARGET,
+        )
+        for wargear_id in order
+    ]
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    for current in (session, restored):
+        rejected = current.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="mixed:invalid",
+            payload=validate_json_value(payload),
+        )
+        assert rejected.status_kind is LifecycleStatusKind.INVALID, rejected
+        validation = cast(
+            dict[str, object], cast(dict[str, object], rejected.payload)["proposal_validation"]
+        )
+        assert (
+            cast(list[dict[str, object]], validation["violations"])[0]["violation_code"]
+            == "mixed_close_quarters_non_close_quarters_declaration"
+        )
+        assert current.to_persistence_payload() == checkpoint
+        valid = dict(payload)
+        valid["declarations"] = [
+            _weapon_payload_to_declaration_payload(
+                weapon=next(
+                    w
+                    for w in weapons
+                    if w["model_instance_id"] == model_id and w["wargear_id"] == wargear_id
+                ),
+                target_unit_id=TARGET,
+            )
+            for model_id, wargear_id in (
+                *((exceptional.model_instance_id, wargear_id) for wargear_id in order),
+                (ordinary.model_instance_id, "core-bolt-rifle"),
+            )
+        ]
+        accepted = current.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="mixed:valid",
+            payload=validate_json_value(valid),
+        )
+        assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted
+        pools = cast(
+            list[dict[str, object]],
+            _last_event_payload(current.lifecycle, "shooting_declaration_accepted")["attack_pools"],
+        )
+        assert len(pools) == 3
+    assert session.to_persistence_payload() == restored.to_persistence_payload()
+    for viewer in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id="mixed:replay",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
