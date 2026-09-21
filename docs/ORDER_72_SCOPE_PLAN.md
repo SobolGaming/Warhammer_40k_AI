@@ -135,4 +135,5 @@ corrected and their complete affected suites rerun; both attempts remain in the
 validation record. npm is unavailable locally, so `npm ci` remains for CI; the
 installed TypeScript dependencies passed their direct package-script checks.
 
-PR URL and merge commit: recorded on publication; not merged by this task.
+PR URL and merge commit: [PR #492](https://github.com/SobolGaming/Warhammer_40k_AI/pull/492);
+open for review, not merged.

@@ -5225,4 +5225,5 @@ Final local validation: 8,720 behavioral tests, 85.14% coverage and 572 code-qua
   component performance comparisons. The initial renderer/roadmap-test failures
   were corrected and the affected complete suites rerun. `npm ci` could not run
   because npm is unavailable; direct Node client checks passed.
-- **PR URL and merge commit:** recorded on publication; not merged by this task.
+- **PR URL and merge commit:** [PR #492](https://github.com/SobolGaming/Warhammer_40k_AI/pull/492);
+  open for review, not merged.
