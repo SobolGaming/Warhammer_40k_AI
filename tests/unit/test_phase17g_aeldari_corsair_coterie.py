@@ -5951,6 +5951,7 @@ def _corsair_mustering_catalog() -> ArmyCatalog:
         ),
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="corsair-coterie",
                 detachment_id="corsair-coterie",
                 name="Corsair Coterie",
                 faction_id="aeldari",

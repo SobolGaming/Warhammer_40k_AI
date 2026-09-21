@@ -5144,6 +5144,7 @@ def _daemonic_incursion_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=rule.DAEMONIC_INCURSION_DETACHMENT_ID,
                 detachment_id=rule.DAEMONIC_INCURSION_DETACHMENT_ID,
                 name="Daemonic Incursion",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
@@ -5156,6 +5157,7 @@ def _daemonic_incursion_catalog() -> ArmyCatalog:
                 ),
             ),
             DetachmentDefinition(
+                canonical_detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
                 detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
                 name="Warptide",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,

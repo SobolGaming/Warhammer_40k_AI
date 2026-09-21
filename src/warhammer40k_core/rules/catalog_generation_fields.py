@@ -40,7 +40,12 @@ def split_field_value(value: str) -> tuple[str, ...]:
     return tuple(unique)
 
 
-def required_split_field(row: NormalizedSourceRow, column_name: str) -> tuple[str, ...]:
+def required_split_field(
+    row: NormalizedSourceRow, column_name: str, *, allow_empty: bool = False
+) -> tuple[str, ...]:
+    fields = row.runtime_fields_payload()
+    if allow_empty and column_name in fields and not fields[column_name].strip():
+        return ()
     return split_field_value(required_field(row=row, column_name=column_name))
 
 

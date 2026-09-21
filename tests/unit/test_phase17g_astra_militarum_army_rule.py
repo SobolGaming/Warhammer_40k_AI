@@ -1448,6 +1448,7 @@ def _catalog_with_non_astra_auxiliary_detachment(catalog: ArmyCatalog) -> ArmyCa
         detachments=(
             *catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=NON_ASTRA_DETACHMENT_ID,
                 detachment_id=NON_ASTRA_DETACHMENT_ID,
                 name="Non-Astra Auxiliary Detachment",
                 faction_id=NON_ASTRA_FACTION_ID,
@@ -1579,6 +1580,7 @@ def _astra_lifecycle_catalog(
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="combined-regiment",
                 detachment_id="combined-regiment",
                 name="Combined Regiment",
                 faction_id=army_rule.ASTRA_MILITARUM_FACTION_ID,

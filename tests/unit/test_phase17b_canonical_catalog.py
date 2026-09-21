@@ -1248,3 +1248,68 @@ def _catalog_version() -> CatalogVersion:
         version_id="warhammer-40000-11th-phase17b",
         source_date=date(2026, 6, 10),
     )
+
+
+@pytest.mark.parametrize("field", ["unit_datasheet_ids", "enhancement_ids", "stratagem_ids"])
+def test_order69_generator_allows_explicit_empty_inventories_but_not_absent_columns(
+    field: str,
+) -> None:
+    from warhammer40k_core.rules.catalog_generation_fields import required_split_field
+
+    columns = [
+        "id",
+        "name",
+        "content_scope",
+        "faction_id",
+        "detachment_point_cost",
+        "unit_datasheet_ids",
+        "force_disposition_ids",
+        "enhancement_ids",
+        "stratagem_ids",
+    ]
+    values = [
+        "plague-company",
+        "Test",
+        "matched_play",
+        "death-guard",
+        "1",
+        "dg-plague-marines",
+        "purge-the-foe",
+        "deadly-pathogen",
+        "cloud-of-flies",
+    ]
+    values[columns.index(field)] = ""
+    row = _artifact(
+        table_name="Detachments", csv_text=",".join(columns) + "\n" + ",".join(values) + "\n"
+    ).rows[0]
+    artifact = _artifact(
+        table_name="Detachments", csv_text=",".join(columns) + "\n" + ",".join(values) + "\n"
+    )
+    artifacts = _source_artifacts_from_text_overrides({})
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=tuple(
+            artifact if item.source_table == "Detachments" else item for item in artifacts
+        ),
+    )
+    record = package.army_catalog.detachments[0]
+    assert dict(record.to_payload())[field] == []
+    assert record.construction_constraints == ()
+    index = columns.index(field)
+    columns.pop(index)
+    values.pop(index)
+    row = _artifact(
+        table_name="Detachments", csv_text=",".join(columns) + "\n" + ",".join(values) + "\n"
+    ).rows[0]
+    with pytest.raises(CatalogGenerationError, match="missing"):
+        required_split_field(row, field, allow_empty=True)
+
+
+def test_order69_old_catalog_schema_cannot_be_loaded() -> None:
+    from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackageError
+
+    payload = _catalog_package().to_payload()
+    payload["schema_version"] = "phase17b-canonical-catalog-v1"
+    with pytest.raises(CanonicalCatalogPackageError, match="schema version"):
+        CanonicalCatalogPackage.from_payload(payload)

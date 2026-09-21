@@ -1707,6 +1707,7 @@ def _daemonforge_catalog() -> ArmyCatalog:
     )
     detachments = (
         DetachmentDefinition(
+            canonical_detachment_id="pactbound-zealots",
             detachment_id="pactbound-zealots",
             name="Pactbound Zealots",
             faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
@@ -1716,6 +1717,7 @@ def _daemonforge_catalog() -> ArmyCatalog:
             source_ids=("test:daemonforge:pactbound-zealots",),
         ),
         DetachmentDefinition(
+            canonical_detachment_id="champions-of-contagion",
             detachment_id="champions-of-contagion",
             name="Champions of Contagion",
             faction_id="death-guard",

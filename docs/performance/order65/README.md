@@ -19,10 +19,10 @@ base queries reproduced the missing restriction.
 
 | Borrows a weapon | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| False | Accepted declaration | 0.106786 / 0.119503 | 0.134532 / 0.149058 |
-| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000764 / 0.001200 |
-| True | Accepted declaration | 0.085439 / 0.091044 | 0.092117 / 0.101540 |
-| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000749 / 0.000883 |
+| False | Accepted declaration | 0.106786 / 0.119503 | 0.123568 / 0.129392 |
+| False | 100 eligibility queries | 0.003449 / 0.003875 | 0.000736 / 0.000945 |
+| True | Accepted declaration | 0.085439 / 0.091044 | 0.084334 / 0.086921 |
+| True | 100 eligibility queries | 0.003314 / 0.003454 | 0.000678 / 0.000705 |
 
 The declared mean budget is base × 1.30 plus 50 ms per declaration or 10 ms per
 100 queries; the maximum budget is base × 1.50 plus 100 ms. These allowances cover
@@ -60,3 +60,8 @@ remains unchanged.
 
 The Corsair bearer review correction refreshes this evidence for runtime
 `3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.
+
+Order 69 refreshes the head measurements and table for runtime `b258a14e`,
+with unchanged baselines, workloads and budgets and no competing workers.
+Current validation is recorded in [Order 69 validation](../order69/validation.json);
+the earlier gate records above remain historical.

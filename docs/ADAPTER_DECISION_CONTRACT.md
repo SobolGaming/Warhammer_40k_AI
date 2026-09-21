@@ -6453,3 +6453,27 @@ ANHRATHE for all four Enhancements, CHARACTER additionally for Archraider, and
 INFANTRY additionally for Voidstone. Infamy, Voidstone and Webway Pathstone retain
 their source-authorized non-CHARACTER eligibility. Invalid model selections retain
 the existing typed roster violation; this correction changes no request or payload shape.
+
+
+## Order 69 / source-neutral roster construction
+
+The existing fixed pre-game ArmyMusterRequest path continues to own roster
+selection for all adapters. Detachment constraints are engine-owned catalog data,
+not an additional player decision. Contract 34 requires canonical_detachment_id
+and construction_constraints on serialized detachment definitions; unknown identity
+references, malformed selector domains and absent fields are rejected. Other-detachment
+selectors use canonical identities and exclude the constraint owner. Aliases cannot
+select the same detachment twice. Generic unit selectors use selected model inventory
+and effective canonical keywords after structured mustering grants.
+
+RosterLegalityReport adds source-attributed required_unit, prohibited_unit,
+required_other_detachment, prohibited_other_detachment, construction_constraint_invalid,
+and attachment_declaration_invalid diagnostics. The report shares attachment formation
+validation with army construction. Construction constraints are enforced even when
+a test request relaxes points/Warlord certification. Hidden information, viewer
+scoping and in-game decision envelopes do not change. Persistence and replay require
+the new catalog/engine identity; see [migration 33 to 34](../contracts/migrations/33-to-34.md).
+
+Force-disposition validation retains one choice from the selected detachments' union,
+consistent with the reviewed source resolution in [Order 69](ORDER_69_SCOPE_PLAN.md).
+Faction-specific constraint population remains FM0 work.

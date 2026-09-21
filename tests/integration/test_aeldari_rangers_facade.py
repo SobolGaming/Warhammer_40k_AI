@@ -315,6 +315,7 @@ def _rangers_facade_catalog() -> ArmyCatalog:
         source_ids=faction_row.source_ids,
     )
     path_of_the_outcast = DetachmentDefinition(
+        canonical_detachment_id=detachment_row.detachment_id,
         detachment_id=detachment_row.detachment_id,
         name=detachment_row.name,
         faction_id=detachment_row.faction_id,

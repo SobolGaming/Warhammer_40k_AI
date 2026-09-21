@@ -527,6 +527,7 @@ def config_backed_flesh_hounds_armies(
         package.army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="phase17k-daemons",
                 detachment_id="phase17k-daemons",
                 name="Phase 17K Daemons",
                 faction_id=package.army_catalog.factions[0].faction_id,

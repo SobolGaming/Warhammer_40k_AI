@@ -3313,6 +3313,7 @@ def _command_delirium_catalog(
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="phase17g-chaos-knights-delirium",
                 detachment_id="phase17g-chaos-knights-delirium",
                 name="Phase 17G Delirium Test Detachment",
                 faction_id=army_rule.CHAOS_KNIGHTS_FACTION_ID,

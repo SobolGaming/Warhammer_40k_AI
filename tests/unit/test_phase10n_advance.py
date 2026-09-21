@@ -1142,6 +1142,7 @@ def _quicksilver_grace_catalog() -> ArmyCatalog:
             *base_catalog.detachments,
             *tuple(
                 DetachmentDefinition(
+                    canonical_detachment_id=detachment_id,
                     detachment_id=detachment_id,
                     name=detachment_name,
                     faction_id="emperors-children",

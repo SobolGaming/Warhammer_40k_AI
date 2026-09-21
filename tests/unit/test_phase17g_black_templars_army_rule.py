@@ -558,6 +558,7 @@ def _black_templars_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="marshals-household",
                 detachment_id="marshals-household",
                 name="Marshal's Household",
                 faction_id=army_rule.BLACK_TEMPLARS_FACTION_ID,
@@ -567,6 +568,7 @@ def _black_templars_lifecycle_catalog() -> ArmyCatalog:
                 source_ids=("phase17g:black-templars:detachment:marshals-household",),
             ),
             DetachmentDefinition(
+                canonical_detachment_id="phase17g-black-templars-enemy-force",
                 detachment_id="phase17g-black-templars-enemy-force",
                 name="Black Templars Enemy Force",
                 faction_id="core-marine-force",

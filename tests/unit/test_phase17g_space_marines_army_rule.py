@@ -1816,6 +1816,7 @@ def _space_marines_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="gladius-task-force",
                 detachment_id="gladius-task-force",
                 name="Gladius Task Force",
                 faction_id=army_rule.SPACE_MARINES_FACTION_ID,
@@ -1857,6 +1858,7 @@ def _space_marines_roster_catalog() -> ArmyCatalog:
         ),
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="gladius-task-force",
                 detachment_id="gladius-task-force",
                 name="Gladius Task Force",
                 faction_id=army_rule.SPACE_MARINES_FACTION_ID,

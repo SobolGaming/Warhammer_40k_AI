@@ -942,6 +942,7 @@ def _tau_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="kauyon",
                 detachment_id="kauyon",
                 name="Kauyon",
                 faction_id=army_rule.TAU_EMPIRE_FACTION_ID,
@@ -957,6 +958,7 @@ def _tau_lifecycle_catalog() -> ArmyCatalog:
                 source_ids=("phase17g:tau:detachment:kauyon",),
             ),
             DetachmentDefinition(
+                canonical_detachment_id=NON_TAU_DETACHMENT_ID,
                 detachment_id=NON_TAU_DETACHMENT_ID,
                 name="Non-Tau Detachment",
                 faction_id=NON_TAU_FACTION_ID,

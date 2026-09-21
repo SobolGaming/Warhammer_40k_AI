@@ -1568,6 +1568,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=_AELDARI_DETACHMENT_ID,
                 detachment_id=_AELDARI_DETACHMENT_ID,
                 name="Warhost",
                 faction_id=army_rule.AELDARI_FACTION_ID,
@@ -1582,6 +1583,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
                 source_ids=("gw-11e-faction-detachments-2026-27:detachment:aeldari:warhost",),
             ),
             DetachmentDefinition(
+                canonical_detachment_id=_OTHER_AELDARI_DETACHMENT_ID,
                 detachment_id=_OTHER_AELDARI_DETACHMENT_ID,
                 name="Guardian Battlehost",
                 faction_id=army_rule.AELDARI_FACTION_ID,

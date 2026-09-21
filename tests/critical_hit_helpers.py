@@ -151,6 +151,7 @@ def critical_hit_session(*, phase: BattlePhase = BattlePhase.SHOOTING) -> LocalG
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     detachment = replace(
         catalog.detachments[0],
+        canonical_detachment_id=profile.detachment_id,
         detachment_id=profile.detachment_id,
         name="Threshold consumer fixture",
         stratagem_ids=(profile.stratagem_id,),

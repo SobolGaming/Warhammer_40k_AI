@@ -339,6 +339,7 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
         ability_descriptor_ids=("ability:core-stratagem",),
     )
     detachment = DetachmentDefinition(
+        canonical_detachment_id="core-detachment",
         detachment_id="core-detachment",
         name="Core Detachment",
         faction_id="core-marine-force",
@@ -1040,3 +1041,186 @@ def test_phase_sequence_descriptors_reject_driver_local_ambiguity() -> None:
         BattlePhaseSequenceDescriptor(phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.COMMAND))
     with pytest.raises(RulesetDescriptorError):
         SetupSequenceDescriptor.from_payload({"steps": ["unsupported"]})
+
+
+@pytest.mark.parametrize(
+    "selector",
+    [
+        {"type": "datasheet", "datasheet_ids": []},
+        {"type": "datasheet", "datasheet_ids": ["x", "x"]},
+        {"type": "datasheet", "datasheet_ids": [3]},
+        {"type": "keywords"},
+        {"type": "keywords", "all_of": ["Infantry"]},
+        {"type": "keywords", "all_of": ["INFANTRY"], "none_of": ["INFANTRY"]},
+        {
+            "type": "characteristic",
+            "characteristic": "unknown",
+            "comparison": "at_least",
+            "value": 1,
+            "models": "all",
+        },
+        {
+            "type": "characteristic",
+            "characteristic": "strength",
+            "comparison": "at_least",
+            "value": 1,
+            "models": "all",
+        },
+        {
+            "type": "characteristic",
+            "characteristic": "wounds",
+            "comparison": "unknown",
+            "value": 1,
+            "models": "all",
+        },
+        {
+            "type": "characteristic",
+            "characteristic": "wounds",
+            "comparison": "at_least",
+            "value": True,
+            "models": "all",
+        },
+        {
+            "type": "characteristic",
+            "characteristic": "wounds",
+            "comparison": "at_least",
+            "value": -1,
+            "models": "all",
+        },
+        {
+            "type": "characteristic",
+            "characteristic": "wounds",
+            "comparison": "at_least",
+            "value": 1,
+        },
+        {"type": "all", "selectors": []},
+        {"type": "any", "selectors": [{"detachment_ids": ["x"]}]},
+        {"type": "exclude", "selector": {"type": "keywords", "all_of": ["INFANTRY"]}},
+        {"type": "unknown"},
+    ],
+)
+def test_order69_constraint_payload_rejects_malformed_selectors(selector: dict[str, Any]) -> None:
+    from warhammer40k_core.core.construction_constraints import (
+        ConstructionConstraint,
+        ConstructionConstraintError,
+    )
+
+    with pytest.raises(ConstructionConstraintError):
+        ConstructionConstraint.from_payload(
+            {
+                "constraint_id": "order69:test",
+                "source_id": "order69:test-source",
+                "kind": "required_unit",
+                "unit_selector": selector,
+            }
+        )
+
+
+@pytest.mark.parametrize("field", ["canonical_detachment_id", "construction_constraints"])
+def test_order69_detachment_payload_rejects_missing_construction_fields(field: str) -> None:
+    from warhammer40k_core.core.detachment import DetachmentDefinitionPayload
+
+    payload = dict(ArmyCatalog.phase9a_canonical_content_pack().detachments[0].to_payload())
+    del payload[field]
+    with pytest.raises(DetachmentCatalogError, match="payload fields"):
+        DetachmentDefinition.from_payload(cast(DetachmentDefinitionPayload, payload))
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "required_unit",
+        "prohibited_unit",
+        "required_other_detachment",
+        "prohibited_other_detachment",
+    ],
+)
+def test_order69_constraint_selector_domains_cannot_be_crossed(kind: str) -> None:
+    from warhammer40k_core.core.construction_constraints import (
+        ConstructionConstraint,
+        ConstructionConstraintError,
+    )
+
+    wrong = (
+        {"detachment_selector": {"detachment_ids": ["a"]}}
+        if kind.endswith("unit")
+        else {"unit_selector": {"type": "datasheet", "datasheet_ids": ["a"]}}
+    )
+    with pytest.raises(ConstructionConstraintError):
+        ConstructionConstraint.from_payload(
+            cast(
+                Any,
+                {
+                    "constraint_id": "order69:test",
+                    "source_id": "order69:source",
+                    "kind": kind,
+                    **wrong,
+                },
+            )
+        )
+
+
+@pytest.mark.parametrize("detachment", [False, True])
+def test_order69_catalog_rejects_unknown_constraint_identity(detachment: bool) -> None:
+    from warhammer40k_core.core.construction_constraints import (
+        ConstructionConstraint,
+        ConstructionConstraintKind,
+        DatasheetUnitSelector,
+        DetachmentSelector,
+    )
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    constraint = (
+        ConstructionConstraint(
+            constraint_id="order69:test",
+            source_id="order69:source",
+            kind=ConstructionConstraintKind.REQUIRED_OTHER_DETACHMENT,
+            detachment_selector=DetachmentSelector(detachment_ids=("missing",)),
+        )
+        if detachment
+        else ConstructionConstraint(
+            constraint_id="order69:test",
+            source_id="order69:source",
+            kind=ConstructionConstraintKind.PROHIBITED_UNIT,
+            unit_selector=DatasheetUnitSelector(datasheet_ids=("missing",)),
+        )
+    )
+    with pytest.raises(ArmyCatalogError, match="unknown"):
+        replace(
+            catalog,
+            detachments=(replace(catalog.detachments[0], construction_constraints=(constraint,)),),
+        )
+
+
+def test_order69_constructor_rejects_untyped_cross_domain_and_duplicate_records() -> None:
+    from warhammer40k_core.core.construction_constraints import (
+        ConstructionConstraint,
+        ConstructionConstraintError,
+        ConstructionConstraintKind,
+        DetachmentSelector,
+        KeywordUnitSelector,
+    )
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    constraint = ConstructionConstraint(
+        constraint_id="order69:test",
+        source_id="order69:source",
+        kind=ConstructionConstraintKind.REQUIRED_UNIT,
+        unit_selector=KeywordUnitSelector(all_of=("CHARACTER",)),
+    )
+    with pytest.raises(ConstructionConstraintError, match="unique"):
+        replace(catalog.detachments[0], construction_constraints=(constraint, constraint))
+    with pytest.raises(ConstructionConstraintError, match="UnitSelector"):
+        ConstructionConstraint(
+            constraint_id="order69:bad",
+            source_id="order69:source",
+            kind=ConstructionConstraintKind.REQUIRED_UNIT,
+            unit_selector=cast(Any, DetachmentSelector(detachment_ids=("x",))),
+        )
+    with pytest.raises(ConstructionConstraintError, match="typed"):
+        ConstructionConstraint(
+            constraint_id="order69:bad",
+            source_id="order69:source",
+            kind=cast(Any, "required_unit"),
+            unit_selector=KeywordUnitSelector(all_of=("CHARACTER",)),
+        )

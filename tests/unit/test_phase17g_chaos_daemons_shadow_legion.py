@@ -4249,6 +4249,7 @@ def _shadow_legion_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=rule.DETACHMENT_ID,
                 detachment_id=rule.DETACHMENT_ID,
                 name="Shadow Legion",
                 faction_id=CHAOS_DAEMONS_FACTION_ID,

@@ -929,3 +929,11 @@ with model-specific eligibility, keyword ownership and stable split/restore iden
 Contract 33 requires the model fields in new roster records; old saves stay on
 their matching release. See [Order 68 scope and validation](docs/ORDER_68_SCOPE_PLAN.md)
 and [the contract migration](contracts/migrations/32-to-33.md).
+
+
+Order 69 adds typed required/prohibited unit and other-detachment constraints,
+canonical duplicate-detachment checks, and shared Support attachment certification.
+Empty inventories remain legal and faction-specific records remain unpopulated.
+See [scope and source resolution](docs/ORDER_69_SCOPE_PLAN.md) and
+[contract 34 migration](contracts/migrations/33-to-34.md). Verify the reviewed
+source with `uv run python tools/build_core_roster_construction_source.py --check`.

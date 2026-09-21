@@ -2191,6 +2191,7 @@ def _armour_of_contempt_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="gladius-task-force",
                 detachment_id="gladius-task-force",
                 name="Gladius Task Force",
                 faction_id="space-marines",

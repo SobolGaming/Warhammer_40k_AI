@@ -9,6 +9,7 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentTargetEligibility,
 )
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.construction_constraints import selector_datasheet_ids
 from warhammer40k_core.core.content_scope import (
     SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES,
     CatalogContentScope,
@@ -269,6 +270,7 @@ class ArmyCatalog:
             source_ids=("faction:core-marine-force",),
         )
         detachment = DetachmentDefinition(
+            canonical_detachment_id="core-combined-arms",
             detachment_id="core-combined-arms",
             name="CORE Combined Arms",
             faction_id=faction.faction_id,
@@ -995,7 +997,19 @@ def _validate_detachment_links(
     faction_ids = {faction.faction_id for faction in factions}
     enhancement_ids = {enhancement.enhancement_id for enhancement in enhancements}
     stratagem_ids = {stratagem.stratagem_id for stratagem in stratagems}
+    canonical_detachment_ids = {row.canonical_detachment_id for row in detachments}
     for detachment in detachments:
+        for constraint in detachment.construction_constraints:
+            if constraint.unit_selector is not None and not selector_datasheet_ids(
+                constraint.unit_selector
+            ).issubset(datasheet_ids):
+                raise ArmyCatalogError("Construction constraint references an unknown datasheet.")
+            if constraint.detachment_selector is not None and not set(
+                constraint.detachment_selector.detachment_ids
+            ).issubset(canonical_detachment_ids):
+                raise ArmyCatalogError(
+                    "Construction constraint references an unknown canonical detachment."
+                )
         if detachment.faction_id not in faction_ids:
             raise ArmyCatalogError("ArmyCatalog detachment references an unknown faction.")
         for datasheet_id in detachment.unit_datasheet_ids:

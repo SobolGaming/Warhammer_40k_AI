@@ -1658,6 +1658,7 @@ def _emperors_children_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id="frenzied-host",
                 detachment_id="frenzied-host",
                 name="Frenzied Host",
                 faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
@@ -1698,6 +1699,7 @@ def _emperors_children_defiler_catalog() -> ArmyCatalog:
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=EMPERORS_CHILDREN_DEFILER_DETACHMENT_ID,
                 detachment_id=EMPERORS_CHILDREN_DEFILER_DETACHMENT_ID,
                 name="Defiler Runtime Test",
                 faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,

@@ -2973,6 +2973,7 @@ def _blood_legion_catalog(
         detachments=(
             *base_catalog.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=rule.BLOOD_LEGION_DETACHMENT_ID,
                 detachment_id=rule.BLOOD_LEGION_DETACHMENT_ID,
                 name="Blood Legion",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
@@ -2994,6 +2995,7 @@ def _blood_legion_catalog(
                 ),
             ),
             DetachmentDefinition(
+                canonical_detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
                 detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
                 name="Warptide",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,

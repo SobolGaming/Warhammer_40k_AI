@@ -56,22 +56,22 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.901 / 4.355 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.799 / 3.881 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.821 / 3.900 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.897 / 3.975 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.833 / 3.922 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.889 / 3.983 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.689 / 3.770 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.668 / 3.765 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.744 / 3.797 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.725 / 3.827 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.702 / 3.789 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.711 / 3.782 |
 
-Order 68 refreshed the 42 head timings and six independent profile samples for
-the current runtime build on 2026-09-20, retaining the qualified baseline and
+Order 69 refreshed the 42 head timings and six independent profile samples for
+runtime `b258a14e` on 2026-09-21, retaining the qualified baseline and
 unchanged workload and budgets. Every reconstruction completed with exact
 reproduction and parent isolation. All six comparisons pass, with authentication
 and suffix counts preserved. These measurements do not establish a speedup.
-See [Order 68 validation](../order68/validation.json).
+See [Order 69 validation](../order69/validation.json).
 
 At the measured checkpoint cost, ten sequential forks would consume about
-39 seconds. This is a linear estimate, not an observed planning workload;
+37 seconds. This is a linear estimate, not an observed planning workload;
 actual forks per phase/game remain unmeasured.
 
 The guard deliberately leaves the independently rooted replay authentication
@@ -97,3 +97,8 @@ the failed attempts and focused diagnostic results.
 
 The Corsair bearer review correction refreshes this evidence for runtime
 `3311c43e` on 2026-09-20, with unchanged workloads, baselines and budgets.
+
+Order 69 refreshes the head measurements and table for runtime `b258a14e`,
+with unchanged baselines, workloads and budgets and no competing workers.
+Current validation is recorded in [Order 69 validation](../order69/validation.json);
+the earlier gate records above remain historical.

@@ -1840,6 +1840,7 @@ def _piratical_raiders_lifecycle_catalog() -> ArmyCatalog:
         detachments=(
             *base.detachments,
             DetachmentDefinition(
+                canonical_detachment_id=PIRATICAL_TEST_DETACHMENT_ID,
                 detachment_id=PIRATICAL_TEST_DETACHMENT_ID,
                 name="Piratical Raiders Test",
                 faction_id="AE",

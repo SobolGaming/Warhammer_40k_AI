@@ -1450,7 +1450,7 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             source_id=ATTACHMENT_ELIGIBILITY_SOURCE_ID,
             enforcement_surface="catalog_generation/army_mustering",
             support_stage=MUSTERING_SUPPORT_FULL,
-            enforcement_id="army_mustering:_resolve_attached_unit_formations",
+            enforcement_id="roster_attachment_validation:resolve_attached_unit_formations",
             tests_evidence=(
                 "tests/unit/test_phase9c_mustering.py::"
                 "test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog; "

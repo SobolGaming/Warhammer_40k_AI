@@ -822,6 +822,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
         package.army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="phase17k-daemons",
                 detachment_id="phase17k-daemons",
                 name="Phase 17K Daemons",
                 faction_id=package.army_catalog.factions[0].faction_id,
@@ -1765,6 +1766,7 @@ def _daemonic_patrons_session(
         package.army_catalog,
         detachments=(
             DetachmentDefinition(
+                canonical_detachment_id="phase17k-daemons",
                 detachment_id="phase17k-daemons",
                 name="Phase 17K Daemons",
                 faction_id=package.army_catalog.factions[0].faction_id,
