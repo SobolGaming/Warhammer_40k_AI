@@ -5144,3 +5144,8 @@ restored-source validation and facade/replay proof are recorded in
 [Order 70 scope and evidence](ORDER_70_SCOPE_PLAN.md). Existing finite decisions
 and viewer scoping remain shared. Orders 71–73 and final all-category
 certification remain separate. Final validation is recorded in the linked scope.
+
+Published in [PR #490](https://github.com/SobolGaming/Warhammer_40k_AI/pull/490); merge pending. Final local validation passed
+8,662 behavioral tests at 85.14% coverage and all 567 code-quality checks.
+The scope record retains source evidence, the corrected work-budget finding,
+fresh component measurements and all publishing-gate results.

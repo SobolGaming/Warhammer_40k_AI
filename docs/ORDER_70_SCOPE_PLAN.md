@@ -1,6 +1,6 @@
 # Order 70 / P24J — model-complete Fights First
 
-Status: implemented and locally validated; PR publication pending.
+Status: implemented and locally validated; published in [PR #490](https://github.com/SobolGaming/Warhammer_40k_AI/pull/490). Merge pending.
 Finding: C24-10. Dependencies P02D, P05B and P24A are merged. Evidence gate:
 APP-DRIFT. Base: `6ee55f30` (Order 69). This closes only the Fights First finding,
 not category 24 or final Core Rules certification.
@@ -146,4 +146,4 @@ correction, fresh runtime/component evidence and passing full reruns are recorde
 separately in the validation JSON. Ten pre-existing SQLite ResourceWarnings were
 reported during the final behavioral suite.
 
-PR URL and merge commit: publication pending; merge remains owner-controlled.
+PR URL: [#490](https://github.com/SobolGaming/Warhammer_40k_AI/pull/490). Merge commit: pending; merge remains owner-controlled.

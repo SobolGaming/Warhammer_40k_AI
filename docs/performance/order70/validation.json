@@ -112,5 +112,7 @@
     "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised through the bundled Node runtime using each package script's direct command."
   },
   "performance_scope": "Matched Fights First query and inherited reconstruction, Firing Deck, Aircraft and roster components on provisional hardware. Complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
-  "scope": "Only Order 70 / C24-10. Orders 71-73 and final all-category certification remain separate. No production code changed after the final behavioral run began."
+  "scope": "Only Order 70 / C24-10. Orders 71-73 and final all-category certification remain separate. No production code changed after the final behavioral run began.",
+  "pr_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/490",
+  "merge_commit": null
 }
