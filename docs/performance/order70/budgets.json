@@ -1,0 +1,6 @@
+{
+  "workload": "order70-fights-first-v1",
+  "ratio": 3.0,
+  "additive_seconds": 0.05,
+  "rationale": "100 complete live registry queries now prove per-model coverage and intrinsic source ownership. A 0.5 ms per-query additive allowance bounds the previously empty query, with a 3x relative allowance for the new proof. Component regression budget only; query counts per complete game and full-game budgets remain unmeasured."
+}

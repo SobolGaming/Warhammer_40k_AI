@@ -160,7 +160,12 @@ def conditional_leader_grant_effect_applies(
     required_bodyguard_keyword = _required_bodyguard_keyword(payload)
     view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
     return any(
-        component.role == "bodyguard" and required_bodyguard_keyword in component.unit.keywords
+        component.role == "bodyguard"
+        and any(
+            required_bodyguard_keyword in model.keywords
+            for model in component.unit.own_models
+            if model.is_alive or model.model_instance_id in view.retained_model_ids
+        )
         for component in view.rules_present_components
     )
 
@@ -178,20 +183,17 @@ def conditional_not_leading_source_applies(
     )
     if len(views) != 1:
         raise GameLifecycleError("Conditional not-leading model source has ambiguous membership.")
-    (view,) = views
+    (identity,) = views
+    view = rules_unit_view_by_id(state=state, unit_instance_id=identity.unit_instance_id)
     source_components = tuple(
         component
-        for component in view.components
+        for component in view.rules_present_components
         if source_unit_instance_id
         in {component.unit.unit_instance_id, component.unit.source_unit_instance_id}
-        and any(model.is_alive for model in component.unit.own_models)
     )
     if len(source_components) != 1:
         return False
-    return not any(
-        component.role == "bodyguard" and any(model.is_alive for model in component.unit.own_models)
-        for component in view.components
-    )
+    return not any(component.role == "bodyguard" for component in view.rules_present_components)
 
 
 def conditional_not_leading_grant_effect_applies(*, effect: PersistingEffect) -> bool:

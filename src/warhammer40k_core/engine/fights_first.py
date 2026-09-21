@@ -10,14 +10,21 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     conditional_leader_grant_effect_applies,
     conditional_not_leading_grant_effect_applies,
 )
+from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fights_first_native import validate_native_fights_first_effects
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_unit_effects import rules_unit_effect_applications
 from warhammer40k_core.engine.rules_units import (
-    current_rules_unit_views_for_identity,
+    RulesUnitView,
     rules_unit_identities_share_lineage,
     rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_fights_first_2026_09 import (
+    FIGHTS_FIRST_SOURCE_ID as FIGHTS_FIRST_SOURCE_ID,
 )
 
 if TYPE_CHECKING:
@@ -95,59 +102,18 @@ class FightsFirstRegistry:
 
     @classmethod
     def from_state(cls, state: GameState) -> Self:
-        sources_by_identity: dict[tuple[str, str], FightsFirstSource] = {}
-        for effect in state.persisting_effects:
-            effect_payload = effect.effect_payload
-            if not isinstance(effect_payload, dict):
-                continue
-            base_effect_kind = effect_payload.get("effect_kind")
-            for unit_instance_id in effect.target_unit_instance_ids:
-                for rules_unit in current_rules_unit_views_for_identity(
-                    state=state,
-                    unit_instance_id=unit_instance_id,
-                ):
-                    effect_kind = base_effect_kind
-                    if (
-                        effect_payload.get("descriptor_id")
-                        == CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID
-                        and generic_rule_effect_payload_grants_ability(
-                            effect_payload,
-                            ability="fights_first",
-                        )
-                        and conditional_leader_grant_effect_applies(
-                            state=state,
-                            effect=effect,
-                            rules_unit_instance_id=rules_unit.unit_instance_id,
-                        )
-                    ):
-                        effect_kind = FIGHTS_FIRST_EFFECT_KIND
-                    if (
-                        effect_payload.get("descriptor_id")
-                        == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
-                        and generic_rule_effect_payload_grants_ability(
-                            effect_payload,
-                            ability="fights_first",
-                        )
-                        and conditional_not_leading_grant_effect_applies(effect=effect)
-                    ):
-                        effect_kind = FIGHTS_FIRST_EFFECT_KIND
-                    if effect_kind not in {
-                        FIGHTS_FIRST_EFFECT_KIND,
-                        CHARGE_FIGHTS_FIRST_EFFECT_KIND,
-                    }:
-                        continue
-                    source = FightsFirstSource(
-                        unit_instance_id=rules_unit.unit_instance_id,
-                        effect_id=effect.effect_id,
-                        source_rule_id=effect.source_rule_id,
-                        effect_kind=effect_kind,
-                    )
-                    identity = (source.unit_instance_id, source.effect_id)
-                    existing = sources_by_identity.get(identity)
-                    if existing is not None and existing != source:
-                        raise GameLifecycleError("Canonical Fights First source identity drifted.")
-                    sources_by_identity[identity] = source
-        return cls(tuple(sources_by_identity.values()))
+        effects = tuple(state.persisting_effects)
+        validate_native_fights_first_effects(armies=tuple(state.army_definitions), effects=effects)
+        if not any(_is_fights_first_payload(effect.effect_payload) for effect in effects):
+            return cls()
+        sources: list[FightsFirstSource] = []
+        for identity in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+            view = rules_unit_view_by_id(state=state, unit_instance_id=identity.unit_instance_id)
+            present, grants = fights_first_model_inventory(state=state, view=view)
+            covered = {model_id for _, ids in grants for model_id in ids}
+            if present and covered == set(present):
+                sources.extend(source for source, _ in grants)
+        return cls(tuple(sources))
 
     def has_unit(self, unit_instance_id: str) -> bool:
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
@@ -197,6 +163,85 @@ class FightsFirstRegistry:
     @classmethod
     def from_payload(cls, payload: FightsFirstRegistryPayload) -> Self:
         return cls(tuple(FightsFirstSource.from_payload(source) for source in payload["sources"]))
+
+
+def fights_first_model_inventory(
+    *,
+    state: GameState,
+    view: RulesUnitView,
+) -> tuple[tuple[str, ...], tuple[tuple[FightsFirstSource, tuple[str, ...]], ...]]:
+    """Keep partial grants model-scoped before applying the every-model predicate."""
+    present = tuple(
+        sorted(
+            model.model_instance_id
+            for model in view.own_models
+            if model.is_alive or model.model_instance_id in view.retained_model_ids
+        )
+    )
+    grants: list[tuple[FightsFirstSource, tuple[str, ...]]] = []
+    for application in rules_unit_effect_applications(state, view.unit_instance_id):
+        effect = application.effect
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        kind = payload.get("effect_kind")
+        if not _is_fights_first_payload(payload):
+            continue
+        descriptor = payload.get("descriptor_id")
+        if (
+            descriptor == CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID
+            and not conditional_leader_grant_effect_applies(
+                state=state,
+                effect=effect,
+                rules_unit_instance_id=view.unit_instance_id,
+            )
+        ):
+            continue
+        if (
+            descriptor == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
+            and not conditional_not_leading_grant_effect_applies(effect=effect)
+        ):
+            continue
+        ids = set(present)
+        if "native_model_ids" in payload:
+            raw_ids = payload["native_model_ids"]
+            if not isinstance(raw_ids, list) or any(type(value) is not str for value in raw_ids):
+                raise GameLifecycleError("Native Fights First model scope is malformed.")
+            ids.intersection_update(cast(list[str], raw_ids))
+        elif descriptor != CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID:
+            target = payload.get("target")
+            if isinstance(target, dict) and target.get("kind") == "this_model":
+                context = payload.get("context")
+                if (
+                    not isinstance(context, dict)
+                    or type(context.get("source_model_instance_id")) is not str
+                ):
+                    raise GameLifecycleError(
+                        "Model Fights First grant requires explicit source model."
+                    )
+                ids.intersection_update((cast(str, context["source_model_instance_id"]),))
+        if ids:
+            grants.append(
+                (
+                    FightsFirstSource(
+                        unit_instance_id=view.unit_instance_id,
+                        effect_id=effect.effect_id,
+                        source_rule_id=effect.source_rule_id,
+                        effect_kind=CHARGE_FIGHTS_FIRST_EFFECT_KIND
+                        if kind == CHARGE_FIGHTS_FIRST_EFFECT_KIND
+                        else FIGHTS_FIRST_EFFECT_KIND,
+                    ),
+                    tuple(sorted(ids)),
+                )
+            )
+    return present, tuple(grants)
+
+
+def _is_fights_first_payload(payload: JsonValue) -> bool:
+    return isinstance(payload, dict) and (
+        payload.get("effect_kind") in {FIGHTS_FIRST_EFFECT_KIND, CHARGE_FIGHTS_FIRST_EFFECT_KIND}
+        or generic_rule_effect_payload_grants_ability(payload, ability="fights_first")
+    )
 
 
 def _validate_fights_first_sources(values: object) -> tuple[FightsFirstSource, ...]:

@@ -8,6 +8,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities_2026_09 as app_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_fights_first_2026_09 as fights_first_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_stealth_2026_09 as stealth_source,
 )
 
@@ -207,10 +210,11 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     ability_id="core-fights-first",
                     name="Fights First",
                     source_kind="core",
-                    source_id=f"{source_prefix}:fights-first",
+                    source_id=fights_first_source.FIGHTS_FIRST_SOURCE_ID,
                     when_descriptor="fight phase activation order",
                     effect_descriptor="eligible unit fights in the Fights First ordering band",
                     restrictions_descriptor=(
+                        "every rules-present model must have the ability; "
                         "fight eligibility and alternating activation rules apply"
                     ),
                     trigger_kind="start_phase",

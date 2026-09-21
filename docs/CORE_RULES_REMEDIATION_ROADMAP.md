@@ -5130,3 +5130,17 @@ with work stealing for both. No tests, health checks or budgets were suppressed.
 Required lint, type, import, shard, source/runtime/contract generation, installed
 wheel, client/conformance and pre-commit gates passed. Diagnostic history and
 matched component evidence are retained in the Order 69 scope record.
+
+## Order 70 / P24J implementation
+
+C24-10 uses every rules-present model to determine Fights First. Intrinsic
+component sources retain explicit model ownership; conditional Leader, Charge
+and other unit grants retain their authorized unit scope. Live ordering and
+Counteroffensive recheck coverage after casualties, retained cleanup, revival,
+splitting and grant expiration. Frozen Fight-start evidence remains historical.
+
+The source observations, complete ownership path, same-bug-class audit,
+restored-source validation and facade/replay proof are recorded in
+[Order 70 scope and evidence](ORDER_70_SCOPE_PLAN.md). Existing finite decisions
+and viewer scoping remain shared. Orders 71–73 and final all-category
+certification remain separate. Final validation is recorded in the linked scope.

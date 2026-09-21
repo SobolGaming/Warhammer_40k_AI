@@ -671,6 +671,7 @@ def eligible_fight_contexts_for_player(
         for rules_unit in placed_rules_units
         if rules_unit.owner_player_id == requested_player_id
     )
+    live_fights_first = FightsFirstRegistry.from_state(state)
     contexts: list[FightEligibilityContext] = []
     for rules_unit in player_rules_units:
         unit_id = rules_unit.unit_instance_id
@@ -695,10 +696,7 @@ def eligible_fight_contexts_for_player(
         if not reasons:
             continue
         band = fight_state.current_ordering_band
-        has_fights_first = fight_state.fight_order_state.fights_first_registry.has_unit_lineage(
-            state=state,
-            unit_instance_id=unit_id,
-        )
+        has_fights_first = live_fights_first.has_unit(unit_id)
         if forced_context is None:
             if band is FightOrderingBandKind.FIGHTS_FIRST and not has_fights_first:
                 continue

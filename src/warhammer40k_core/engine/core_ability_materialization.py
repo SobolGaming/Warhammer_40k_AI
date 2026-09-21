@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.core_ability_family import CoreAbilityFamily
-from warhammer40k_core.engine.core_ability_state import core_instance_groups
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
@@ -20,7 +17,6 @@ from warhammer40k_core.engine.unit_abilities import (
     FeelNoPainAbilityProfile,
     deadly_demise_profiles_for_unit,
     feel_no_pain_profiles_for_unit,
-    fights_first_source_id_for_unit,
 )
 
 if TYPE_CHECKING:
@@ -32,7 +28,6 @@ __all__ = (
     "_deadly_demise_source_for_model",
     "_deadly_demise_source_payload",
     "_feel_no_pain_source_for_model",
-    "_fights_first_effect_for_unit",
     "_record_model_destruction_reaction_source",
     "_record_model_feel_no_pain_source",
     "_record_static_persisting_effect",
@@ -107,30 +102,26 @@ def record_core_fights_first_sources_for_unit(
     unit: UnitInstance,
 ) -> tuple[PersistingEffect, ...]:
     from warhammer40k_core.engine.catalog_rule_consumption import (
-        CORE_FIGHTS_FIRST_SOURCE_ID,
+        _owner_player_id_for_unit,
         _validate_game_state,
         _validate_unit,
     )
+    from warhammer40k_core.engine.fights_first_native import native_fights_first_sources
 
     _validate_game_state(state)
     _validate_unit(unit)
-    occurrences = dict(core_instance_groups(unit)).get(CoreAbilityFamily.FIGHTS_FIRST, ())
-    effects: tuple[PersistingEffect, ...]
-    if not occurrences:
-        source_id = fights_first_source_id_for_unit(
-            unit, fallback_source_id=CORE_FIGHTS_FIRST_SOURCE_ID
+    effects = tuple(
+        PersistingEffect(
+            effect_id=source.effect_id,
+            source_rule_id=source.source_rule_id,
+            owner_player_id=_owner_player_id_for_unit(state=state, unit=unit),
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            started_battle_round=_static_ability_started_battle_round(state),
+            expiration=EffectExpiration.end_of_battle(),
+            effect_payload=source.effect_payload(),
         )
-        if source_id is None:
-            return ()
-        effects = (_fights_first_effect_for_unit(state=state, unit=unit, source_id=source_id),)
-    else:
-        effects = tuple(
-            replace(
-                _fights_first_effect_for_unit(state=state, unit=unit, source_id=source.source_id),
-                effect_id=f"{source.instance_id}:fights-first",
-            )
-            for source in occurrences
-        )
+        for source in native_fights_first_sources(unit)
+    )
     for effect in effects:
         _record_static_persisting_effect(state=state, effect=effect)
     return effects
@@ -200,35 +191,6 @@ def _feel_no_pain_source_for_model(
     return FeelNoPainSource(
         source_id=f"{profile.source_id}:{profile.ability_source.instance_id}:{model_id}:feel-no-pain",
         threshold=profile.threshold,
-    )
-
-
-def _fights_first_effect_for_unit(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-    source_id: str,
-) -> PersistingEffect:
-    from warhammer40k_core.engine.catalog_rule_consumption import (
-        CORE_FIGHTS_FIRST_EFFECT_KIND,
-        _owner_player_id_for_unit,
-        _string_identifier,
-    )
-
-    unit_id = _string_identifier("Fights First unit_instance_id", unit.unit_instance_id)
-    source = _string_identifier("Fights First source_id", source_id)
-    owner = _owner_player_id_for_unit(state=state, unit=unit)
-    return PersistingEffect(
-        effect_id=f"{source}:{unit_id}:fights-first",
-        source_rule_id=source,
-        owner_player_id=owner,
-        target_unit_instance_ids=(unit_id,),
-        started_battle_round=_static_ability_started_battle_round(state),
-        expiration=EffectExpiration.end_of_battle(),
-        effect_payload={
-            "effect_kind": CORE_FIGHTS_FIRST_EFFECT_KIND,
-            "source_rule_id": source,
-        },
     )
 
 

@@ -293,6 +293,8 @@ def _fight_phase_not_leading_effect_for_source(
     if event.phase is not BattlePhaseKind.FIGHT or event.active_player_id is None:
         raise GameLifecycleError("Conditional not-leading event requires a Fight phase owner.")
     effect = source.clause.effects[0]
+    if len(source.unit.own_models) != 1:
+        raise GameLifecycleError("Not-leading model grant requires one explicit source model.")
     execution_context = RuleExecutionContext(
         game_id=context.state.game_id,
         player_id=source.player_id,
@@ -301,6 +303,7 @@ def _fight_phase_not_leading_effect_for_source(
         active_player_id=event.active_player_id,
         timing_window_id=event.event_id,
         source_unit_instance_id=source.unit.unit_instance_id,
+        source_model_instance_id=source.unit.own_models[0].model_instance_id,
         source_keywords=tuple(sorted({*source.unit.keywords, *source.unit.faction_keywords})),
         state=context.state,
         event_log=context.decisions.event_log,

@@ -1,0 +1,75 @@
+{
+  "workload": "order70-fights-first-v1",
+  "revision": "6ee55f30",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:12dd8fabcd2d83ba124e29f39572e6864090a59a06bac0d715567d1f51977dec",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "100 live registry queries; canonical Firing Deck fixture preparation excluded; no RNG, geometry queries or decisions in timer",
+  "hashes": {
+    "scripts/measure_order70.py": "10af90d9111e485e30a3b0c8662ccd558bc4a42e695ad949e06568402ff99385",
+    "tests/firing_deck_helpers.py": "5aed3df4f457ab7a22c01375134ff8b082e51373c6cdb84f2efe0a1ce0470fe0",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "grant_count": 0,
+      "unit_count": 4,
+      "model_count": 16,
+      "source_count": 0,
+      "samples_seconds": [
+        0.00017060001846402884,
+        0.0001482999650761485,
+        0.00014760001795366406,
+        0.0001466000103391707,
+        0.00014669995289295912,
+        0.0001469000126235187,
+        0.0001534000039100647
+      ],
+      "mean_seconds": 0.00015144285446565066,
+      "maximum_seconds": 0.00017060001846402884,
+      "complete": true
+    },
+    {
+      "grant_count": 1,
+      "unit_count": 4,
+      "model_count": 16,
+      "source_count": 1,
+      "samples_seconds": [
+        0.004010999982710928,
+        0.0039647999801672995,
+        0.004030500014778227,
+        0.0039789999718777835,
+        0.003969500015955418,
+        0.003960600006394088,
+        0.004016899969428778
+      ],
+      "mean_seconds": 0.003990328563044646,
+      "maximum_seconds": 0.004030500014778227,
+      "complete": true
+    },
+    {
+      "grant_count": 4,
+      "unit_count": 4,
+      "model_count": 16,
+      "source_count": 4,
+      "samples_seconds": [
+        0.014812499983236194,
+        0.014718500024173409,
+        0.014710400020703673,
+        0.014817100018262863,
+        0.014853999949991703,
+        0.014863900025375187,
+        0.014804699982050806
+      ],
+      "mean_seconds": 0.014797300000541977,
+      "maximum_seconds": 0.014863900025375187,
+      "complete": true
+    }
+  ],
+  "full_game_certified": false
+}

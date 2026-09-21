@@ -150,4 +150,7 @@ def validate_persisting_effects(
         firing_deck_restriction_payload(effect)
         seen.add(effect.effect_id)
         validated.append(effect)
+    from warhammer40k_core.engine.fights_first_native import validate_native_fights_first_effects
+
+    validate_native_fights_first_effects(armies=tuple(army_definitions), effects=tuple(validated))
     return sorted(validated, key=lambda effect: effect.effect_id)

@@ -56,12 +56,12 @@ empty terrain and no dice in the measured workload.
 
 | Checkpoint | Operation | Base mean / max (s) | Head mean / max (s) |
 | --- | --- | ---: | ---: |
-| Loaded ingress | Restore | 3.847 / 4.064 | 3.809 / 4.073 |
-| Loaded ingress | Fork | 3.862 / 3.916 | 3.805 / 3.862 |
-| Rapid Disembark | Restore | 3.889 / 3.982 | 3.900 / 4.255 |
-| Rapid Disembark | Fork | 3.921 / 3.986 | 3.766 / 3.971 |
-| Later accepted decision | Restore | 3.905 / 4.019 | 3.724 / 3.777 |
-| Later accepted decision | Fork | 3.930 / 3.995 | 3.964 / 4.104 |
+| Loaded ingress | Restore | 3.847 / 4.064 | 3.788 / 3.848 |
+| Loaded ingress | Fork | 3.862 / 3.916 | 3.892 / 4.044 |
+| Rapid Disembark | Restore | 3.889 / 3.982 | 3.840 / 3.908 |
+| Rapid Disembark | Fork | 3.921 / 3.986 | 3.902 / 4.172 |
+| Later accepted decision | Restore | 3.905 / 4.019 | 3.763 / 3.883 |
+| Later accepted decision | Fork | 3.930 / 3.995 | 3.911 / 4.159 |
 
 Order 69 refreshed the 42 head timings and six independent profile samples for
 runtime `12dd8fab` on 2026-09-21, retaining the qualified baseline and
@@ -71,7 +71,7 @@ and suffix counts preserved. These measurements do not establish a speedup.
 See [Order 69 validation](../order69/validation.json).
 
 At the measured checkpoint cost, ten sequential forks would consume about
-37 seconds. This is a linear estimate, not an observed planning workload;
+39 seconds. This is a linear estimate, not an observed planning workload;
 actual forks per phase/game remain unmeasured.
 
 The guard deliberately leaves the independently rooted replay authentication
@@ -102,3 +102,8 @@ Order 69 refreshes the head measurements and table for runtime `12dd8fab`,
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 69 validation](../order69/validation.json);
 the earlier gate records above remain historical.
+
+Order 70 refreshes the head measurements and table for runtime `584cb851`,
+with unchanged baselines, workloads and budgets and no competing workers.
+Current validation is recorded in [Order 70 validation](../order70/validation.json);
+earlier validation records and runtime-specific notes remain historical.

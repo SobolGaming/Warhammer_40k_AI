@@ -6480,3 +6480,20 @@ the new catalog/engine identity; see [migration 33 to 34](../contracts/migration
 Force-disposition validation retains one choice from the selected detachments' union,
 consistent with the reviewed source resolution in [Order 69](ORDER_69_SCOPE_PLAN.md).
 Faction-specific constraint population remains FM0 work.
+
+## Order 70 — live model-complete Fights First
+
+The existing finite Fight activation and Counteroffensive submission contracts
+remain unchanged. The engine reevaluates Fights First from every rules-present
+model and current native/model/unit grant scope before presenting or accepting
+an activation. A grant lost after enumeration invalidates the pending choice
+before queue pop. Retained Fight On Death models participate until cleanup.
+
+Native persisting effects now carry explicit `native_model_ids`, authenticated
+against intrinsic source/model ownership and historical split origins on restore.
+Conditional not-leading model grants preserve an explicit source model; unit-wide
+Leader and Charge grants keep their authorized scope. The frozen Fight-start
+registry remains historical Charge/forced-Fight evidence, not live ability
+authority. No public payload shape or visibility policy changes. The existing
+runtime build fingerprint rejects old operator persistence; missing native scope
+is a typed error, never inferred as a unit grant. Replay runs the same engine path.
