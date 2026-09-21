@@ -1608,12 +1608,7 @@ class GameState:
             self.scoring_window_states,
             game_id=self.game_id,
         )
-        self.persisting_effects = _validate_persisting_effects(
-            self.persisting_effects,
-            army_definitions=self.army_definitions,
-            starting_strength_records=self.starting_strength_records,
-            player_ids=self.player_ids,
-        )
+        self.persisting_effects = _validate_persisting_effects(self.persisting_effects, state=self)
         self.tracked_target_records = _validate_tracked_target_records(
             self.tracked_target_records,
             army_definitions=self.army_definitions,

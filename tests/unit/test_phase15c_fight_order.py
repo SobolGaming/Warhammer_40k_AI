@@ -5615,6 +5615,478 @@ def test_p12_forced_fight_owner_derivation_rejects_mixed_friendly_and_unknown_un
             )
 
 
+@pytest.mark.parametrize(
+    "native_components", [(), ("bodyguard",), ("leader",), ("bodyguard", "leader")]
+)
+def test_order70_native_fights_first_requires_every_attached_model(
+    native_components: tuple[str, ...],
+) -> None:
+    lifecycle, units = _order70_native_lifecycle(native_components)
+    state = _state(lifecycle)
+    view = rules_unit_view_by_id(state=state, unit_instance_id=units["leader"].unit_instance_id)
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is (
+        len(native_components) == 2
+    )
+
+
+@pytest.mark.parametrize("retained", [False, True])
+def test_order70_fight_order_rechecks_casualties_and_retained_cleanup(retained: bool) -> None:
+    lifecycle, units = _order70_native_lifecycle(("bodyguard",))
+    state = _state(lifecycle)
+    leader = units["leader"]
+    view = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    fight = FightPhaseState.start(
+        battle_round=1,
+        active_player_id="player-a",
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(view.unit_instance_id,),
+        fights_first_registry=FightsFirstRegistry.from_state(state),
+    )
+    assert not eligible_fight_contexts_for_player(
+        state=state,
+        fight_state=fight,
+        player_id="player-a",
+        policy=policy,
+    )
+    if retained:
+        _retain_model_for_fight_on_death(
+            lifecycle=lifecycle,
+            unit=leader,
+            model_instance_id=leader.own_models[0].model_instance_id,
+            effect_id="order70:retained-non-first",
+        )
+        assert not FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+        _record_fight_on_death_cleanup(
+            lifecycle=lifecycle,
+            unit=leader,
+            reason="unit_fight_completed",
+        )
+    else:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=leader.unit_instance_id,
+            model_instance_id=leader.own_models[0].model_instance_id,
+            damage=leader.own_models[0].wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    # The immutable start snapshot remains false; selection must use current presence.
+    assert not fight.fight_order_state.fights_first_registry.has_unit(view.unit_instance_id)
+    assert [
+        c.unit_instance_id
+        for c in eligible_fight_contexts_for_player(
+            state=state,
+            fight_state=fight,
+            player_id="player-a",
+            policy=policy,
+        )
+    ] == [view.unit_instance_id]
+
+
+@pytest.mark.parametrize("effect_kind", [FIGHTS_FIRST_EFFECT_KIND, CHARGE_FIGHTS_FIRST_EFFECT_KIND])
+def test_order70_whole_unit_grants_and_expiration_are_live(effect_kind: str) -> None:
+    lifecycle, units = _order70_native_lifecycle(("leader",))
+    state = _state(lifecycle)
+    leader = units["leader"]
+    view = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
+    _record_fights_first_effect(state=state, unit=leader, effect_kind=effect_kind)
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    fight = FightPhaseState.start(
+        battle_round=1,
+        active_player_id="player-a",
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(view.unit_instance_id,),
+        fights_first_registry=FightsFirstRegistry.from_state(state),
+    )
+    state.remove_persisting_effects_by_id((f"{leader.unit_instance_id}:{effect_kind}",))
+    assert not FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    assert not eligible_fight_contexts_for_player(
+        state=state,
+        fight_state=fight,
+        player_id="player-a",
+        policy=policy,
+    )
+
+
+@pytest.mark.parametrize(
+    "drift",
+    ["scope", "missing_scope", "source", "target", "identity", "deleted", "identity_and_scope"],
+)
+def test_order70_restore_rejects_native_source_scope_drift(drift: str) -> None:
+    lifecycle, units = _order70_native_lifecycle(("leader",))
+    payload = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+    effect = next(
+        e
+        for e in payload["state"]["persisting_effects"]
+        if e["source_rule_id"] == "order70:core-character-leader:fights-first"
+    )
+    details = cast(dict[str, JsonValue], effect["effect_payload"])
+    if drift == "scope":
+        details["native_model_ids"] = list(units["bodyguard"].own_model_ids())
+    elif drift == "missing_scope":
+        del details["native_model_ids"]
+    elif drift == "source":
+        effect["source_rule_id"] = "forged-source"
+    elif drift == "target":
+        effect["target_unit_instance_ids"] = [units["bodyguard"].unit_instance_id]
+    elif drift == "deleted":
+        payload["state"]["persisting_effects"].remove(effect)
+    else:
+        effect["effect_id"] = "forged-native-effect"
+        if drift == "identity_and_scope":
+            del details["native_model_ids"]
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        GameState.from_payload(payload["state"])
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_order70_native_restore_requires_materialized_setup_inventory() -> None:
+    lifecycle, _ = _order70_native_lifecycle(("leader",))
+    state = GameState.from_config(lifecycle.config)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    for army in _state(lifecycle).army_definitions:
+        state.record_army_definition(army)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    state.remove_persisting_effects_by_id(
+        tuple(effect.effect_id for effect in state.persisting_effects)
+    )
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        GameState.from_payload(state.to_payload())
+    with pytest.raises(GameLifecycleError, match="Native Fights First"):
+        FightsFirstRegistry.from_state(state)
+
+
+def test_order70_native_restore_allows_expiration_after_battle_completion() -> None:
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+
+    lifecycle, _ = _order70_native_lifecycle(("leader",))
+    state = _state(lifecycle)
+    expired = state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.battle_end())
+    assert any(
+        effect.source_rule_id == "order70:core-character-leader:fights-first" for effect in expired
+    )
+    # A completed snapshot has passed the battle-end expiration boundary.
+    state.stage = GameLifecycleStage.COMPLETE
+    state.battle_phase_index = None
+    state.active_player_id = None
+    restored = GameState.from_payload(state.to_payload())
+    assert restored.to_payload() == state.to_payload()
+    assert not FightsFirstRegistry.from_state(restored).sources
+
+
+@pytest.mark.parametrize("native_components", [("leader",), ("bodyguard", "leader")])
+def test_order70_native_order_uses_facade_restore_and_replay(
+    native_components: tuple[str, ...],
+) -> None:
+    lifecycle, _ = _order70_native_lifecycle(native_components)
+    request = _advance_to_fight_order_request(lifecycle)
+    session = LocalGameSession(lifecycle=lifecycle)
+    expected_band = "fights_first" if len(native_components) == 2 else "remaining_combats"
+    assert cast(dict[str, JsonValue], request.payload)["ordering_band"] == expected_band
+    assert request.actor_id == "player-a"
+    initial = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+    assert session.fork().lifecycle.to_payload() == initial
+    for player in ("player-a", "player-b"):
+        assert request.request_id in json.dumps(session.view(viewer_player_id=player))
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=_first_fight_activation_option(request).option_id,
+        result_id="order70:facade-fight",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert session.fork().lifecycle.to_payload() == lifecycle.to_payload()
+    artifact = ReplayArtifact.capture(
+        artifact_id="order70:replay",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=lifecycle,
+    )
+    replay = ReplayRunner(ReplayArtifact.from_payload(artifact.to_payload())).run()
+    assert replay.reproduced_exactly, replay.to_payload()
+
+
+def test_order70_stale_grant_rejected_before_queue_pop() -> None:
+    lifecycle, units = _order70_native_lifecycle(("leader",))
+    state = _state(lifecycle)
+    _record_fights_first_effect(
+        state=state, unit=units["leader"], effect_kind=FIGHTS_FIRST_EFFECT_KIND
+    )
+    request = _advance_to_fight_order_request(lifecycle)
+    assert cast(dict[str, JsonValue], request.payload)["ordering_band"] == "fights_first"
+    state.remove_persisting_effects_by_id((f"{units['leader'].unit_instance_id}:fights_first",))
+    before = state.to_payload()
+    record_count = len(lifecycle.decision_controller.records)
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=_first_fight_activation_option(request).option_id,
+        result_id="order70:stale-grant",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert state.to_payload() == before
+    assert len(lifecycle.decision_controller.records) == record_count
+
+
+@pytest.mark.parametrize("target_kind", ["this_model", "this_unit"])
+def test_order70_generic_grant_preserves_model_scope(target_kind: str) -> None:
+    lifecycle, units = _order70_native_lifecycle(())
+    state = _state(lifecycle)
+    unit = units["bodyguard"]
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
+    from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND
+
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="order70:generic-grant",
+            source_rule_id="order70:grant",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(view.unit_instance_id,),
+            started_battle_round=1,
+            expiration=EffectExpiration.end_of_battle(),
+            effect_payload={
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "effect": {
+                    "kind": "grant_ability",
+                    "source_span": {"text": "Fights First", "start": 0, "end": 12},
+                    "parameters": [{"key": "ability", "value": "fights_first"}],
+                },
+                "target": {"kind": target_kind},
+                "context": {"source_model_instance_id": unit.own_models[0].model_instance_id},
+            },
+        )
+    )
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is (
+        target_kind == "this_unit"
+    )
+
+
+def test_order70_revival_reintroduces_every_model_obligation() -> None:
+    from warhammer40k_core.engine.healing import healing_army_definitions_with_model_wounds
+
+    lifecycle, units = _order70_native_lifecycle(("bodyguard",))
+    state = _state(lifecycle)
+    leader = units["leader"]
+    model = leader.own_models[0]
+    view = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=view.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+    # Isolate the ability query at the restoration owner's returned-model boundary.
+    state.replace_army_definitions(
+        list(
+            healing_army_definitions_with_model_wounds(
+                armies=tuple(state.army_definitions),
+                model_instance_id=model.model_instance_id,
+                wounds_remaining=model.starting_wounds,
+            )
+        )
+    )
+    assert not FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+
+
+@pytest.mark.parametrize("native", [False, True])
+def test_order70_counteroffensive_uses_current_model_complete_band(native: bool) -> None:
+    from warhammer40k_core.engine.stratagems_geometry import _counteroffensive_target_context_error
+    from warhammer40k_core.engine.stratagems_model import StratagemEligibilityContext
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    lifecycle, units = _order70_native_lifecycle(("bodyguard", "leader") if native else ("leader",))
+    state = _state(lifecycle)
+    view = rules_unit_view_by_id(state=state, unit_instance_id=units["leader"].unit_instance_id)
+    descriptor = state.runtime_ruleset_descriptor()
+    fight = FightPhaseState.start(
+        battle_round=1,
+        active_player_id="player-a",
+        policy=descriptor.fight_policy,
+        engaged_at_fight_step_start_unit_ids=(view.unit_instance_id,),
+        fights_first_registry=FightsFirstRegistry.from_state(state),
+    )
+    context = StratagemEligibilityContext(
+        game_id=state.game_id,
+        player_id="player-a",
+        battle_round=1,
+        phase=BattlePhaseKind.FIGHT,
+        active_player_id="player-a",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+    )
+    binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_instance_id=view.unit_instance_id,
+    )
+    for band in descriptor.fight_policy.ordering_bands:
+        state.replace_fight_phase_state(
+            fight.with_ordering_band(ordering_band=band, next_player_id="player-a")
+        )
+        error = _counteroffensive_target_context_error(
+            state=state,
+            context=context,
+            target_binding=binding,
+            ruleset_descriptor=descriptor,
+        )
+        assert (error is None) is ((band.value == "fights_first") == native)
+
+
+@pytest.mark.parametrize("destroyed_component", ["leader", "bodyguard"])
+@pytest.mark.parametrize("bodyguard_native", [False, True])
+def test_order70_conditional_leader_grant_uses_retained_presence(
+    destroyed_component: str, bodyguard_native: bool
+) -> None:
+    from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+        CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
+        conditional_not_leading_source_applies,
+    )
+    from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND
+
+    lifecycle, units = _order70_native_lifecycle(("bodyguard",) if bodyguard_native else ())
+    state = _state(lifecycle)
+    leader = units["leader"]
+    view = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="order70:conditional-leader",
+            source_rule_id="order70:conditional-grant",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(leader.unit_instance_id,),
+            started_battle_round=1,
+            expiration=EffectExpiration.end_of_battle(),
+            effect_payload={
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "descriptor_id": CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
+                "required_bodyguard_keyword": "INFANTRY",
+                "effect": {
+                    "kind": "grant_ability",
+                    "source_span": {"text": "Fights First", "start": 0, "end": 12},
+                    "parameters": [{"key": "ability", "value": "fights_first"}],
+                },
+                "target": {"kind": "this_model"},
+                "context": {
+                    "source_unit_instance_id": leader.unit_instance_id,
+                    "source_model_instance_id": leader.own_models[0].model_instance_id,
+                },
+            },
+        )
+    )
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is bodyguard_native
+    unit = units[destroyed_component]
+    for model in unit.own_models:
+        _retain_model_for_fight_on_death(
+            lifecycle=lifecycle,
+            unit=unit,
+            model_instance_id=model.model_instance_id,
+            effect_id=f"order70:retained:{model.model_instance_id}",
+        )
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is bodyguard_native
+    assert not conditional_not_leading_source_applies(
+        state=state, source_unit_instance_id=leader.unit_instance_id
+    )
+    _record_fight_on_death_cleanup(lifecycle=lifecycle, unit=unit, reason="unit_fight_completed")
+    assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id) is (
+        bodyguard_native and destroyed_component == "leader"
+    )
+    assert conditional_not_leading_source_applies(
+        state=state, source_unit_instance_id=leader.unit_instance_id
+    ) is (destroyed_component == "bodyguard")
+
+
+def test_order70_model_keyword_does_not_promote_component_keyword_union() -> None:
+    lifecycle, units = _order70_native_lifecycle(())
+    state = _state(lifecycle)
+    bodyguard = units["bodyguard"]
+    first, *others = bodyguard.own_models
+    updated = replace(
+        bodyguard,
+        own_models=(
+            replace(
+                first,
+                keyword_assignment=replace(
+                    first.keyword_assignment,
+                    keywords=tuple(sorted((*first.keywords, "FIGHTS_FIRST"))),
+                ),
+            ),
+            *others,
+        ),
+    )
+    state.replace_army_definitions(
+        [
+            replace(
+                army,
+                units=tuple(
+                    updated if unit.unit_instance_id == updated.unit_instance_id else unit
+                    for unit in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ]
+    )
+    effects = record_core_fights_first_sources_for_unit(state=state, unit=updated)
+    assert len(effects) == 1
+    assert cast(dict[str, JsonValue], effects[0].effect_payload)["native_model_ids"] == [
+        first.model_instance_id
+    ]
+    view = rules_unit_view_by_id(state=state, unit_instance_id=updated.unit_instance_id)
+    assert not FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
+
+
+def _order70_native_lifecycle(
+    native_components: tuple[str, ...],
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    native_ids = {
+        "core-character-leader" if key == "leader" else "core-intercessor-like-infantry"
+        for key in native_components
+    }
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                row,
+                abilities=(
+                    *row.abilities,
+                    DatasheetAbilityDescriptor(
+                        ability_id="core-fights-first",
+                        name="Fights First",
+                        source_id=f"order70:{row.datasheet_id}:fights-first",
+                        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                        source_kind=CatalogAbilitySourceKind.CORE,
+                        effect_description="Intrinsic Fights First on this component's models.",
+                        timing_tags=("fight_phase", "fights_first"),
+                    ),
+                ),
+            )
+            if row.datasheet_id in native_ids
+            else row
+            for row in catalog.datasheets
+        ),
+    )
+    return _fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 22.0),
+            "enemy": Pose.at(13.0, 20.0),
+        },
+        game_id="order70-native-" + "-".join(native_components or ("none",)),
+        alpha_unit_specs={"leader": ("core-character-leader", "core-character-leader", 1)},
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+        catalog=catalog,
+    )
+
+
 def _fight_lifecycle(
     *,
     alpha_unit_ids: tuple[str, ...],

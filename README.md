@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 70 requires Fights First on every rules-present model. Intrinsic component
+sources and conditional Leader model grants keep their model ownership; unit grants, Charge,
+casualties, retained cleanup and split lineage use the shared live coverage query.
+See [scope and validation](docs/ORDER_70_SCOPE_PLAN.md). Verify the reviewed source
+with `uv run python tools/build_core_fights_first_source.py --check`.
+
 Order 50 resolves Heroic Intervention through the ordinary Charge declaration,
 reroll, modifier, target-selection and witnessed-movement sequence. Into the Fray
 caps the modified roll before separate movement-distance effects; Leap to Defend

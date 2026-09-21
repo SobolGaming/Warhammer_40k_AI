@@ -1,0 +1,233 @@
+{
+  "order": 70,
+  "finding_ids": [
+    "C24-10"
+  ],
+  "validated_on": "2026-09-21",
+  "status": "passed",
+  "base_commit": "6ee55f30ad70cdf1766bb5c6f27fdf7fa82d3422",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fd6608be023165bf4e8e2ed4dbc1635250d06ddca2da666018c5893220a35656",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "behavioral": {
+    "tests": 8668,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1276.237,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "652a6fd9e50ad2394816c024ce475d9227a7f8ce6f7d0bec14ce0ed49a5adce7",
+    "coverage_percent": 85.14235169085953,
+    "coverage_minimum_percent": 85,
+    "warnings": 10,
+    "warning_types": [
+      "ResourceWarning: unclosed SQLite connections"
+    ]
+  },
+  "code_quality": {
+    "tests": 567,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 325.102,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "e8e6a5aa0cac98ff12396c9d133532df07a71de77d38a45b631642af2f12f070",
+    "coverage": false
+  },
+  "gates_passed": [
+    "ruff check .",
+    "ruff format --check .",
+    "mypy src tests: 3174 source files",
+    "pyright: 0 errors, 0 warnings",
+    "lint-imports: 11 contracts",
+    "eight-shard inventory check",
+    "pre-commit run --all-files",
+    "Order 70 source generator and both canonical catalog generators",
+    "engine build identity and exact-base external contract compatibility (6ee55f30)",
+    "installed wheel: 2918 runtime resources, 27 schemas, six request families",
+    "TypeScript generated client and typecheck",
+    "TypeScript unit tests: 5",
+    "live HTTP conformance: 342 assertions",
+    "Order 70 matched component evidence",
+    "Orders 64, 65, 66 and 69 head evidence refreshed with unchanged baselines and budgets",
+    "Order 34 live work guards: all three scenarios, unchanged budgets",
+    "review regressions: 37 focused checks",
+    "Fight, splitting and Aeldari consumers: 188 tests",
+    "post-extraction restoration and module-size checks: 11 tests"
+  ],
+  "commands_not_run": {
+    "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised through the bundled Node runtime using each package script's direct command."
+  },
+  "performance_scope": "Matched Fights First query and inherited reconstruction, Firing Deck, Aircraft and roster components on provisional hardware. Complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
+  "scope": "Only Order 70 / C24-10. Orders 71-73 and final all-category certification remain separate. No production code changed after the final behavioral run began.",
+  "pr_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/490",
+  "merge_commit": null,
+  "reviewed_head": "138cf6defef923efe4641f2e1eb3d0295995ebbd",
+  "review_corrections": [
+    {
+      "finding": "P1: conditional Leader this_model grant promoted to the attached unit",
+      "invariant": "Every rules-present model must be independently covered by a source-authorized grant.",
+      "correction": "Leading and not-leading producers share explicit model identity; every this_model grant uses the common model footprint restriction.",
+      "regressions": "Leader-only negative, Bodyguard-native plus Leader-only positive, both retained-cleanup directions, real Autarch payload and complementary native Banshee footprints."
+    },
+    {
+      "finding": "P2: native occurrence deletion and combined identity/scope drift accepted on restore",
+      "invariant": "A materialized native inventory must contain every authoritative occurrence throughout setup and battle.",
+      "correction": "Shared restore/live validation compares expected occurrence IDs with supplied effects; completed snapshots permit battle-end expiration.",
+      "regressions": "Deletion and combined identity/scope drift through GameState and GameLifecycle restore; setup before/after materialization; live missing inventory; completed snapshot expiration."
+    }
+  ],
+  "diagnostic_history": [
+    "Before production edits, the new regressions reproduced five failures: two Leader-only coverage cases, the real Autarch model-identity assertion, native deletion, and combined native identity/scope drift.",
+    "The corrected implementation passed 37 focused tests and then 188 full-file consumer tests before final aggregates.",
+    "Existing Order 34 live work guards passed all three scenarios with unchanged budgets. Orders 64, 65, 66, 69 and 70 head measurements were refreshed serially with no competing test workers.",
+    "The reviewed-head validation remains below as historical evidence. Its claim of descriptor-authorized Leader unit scope was incorrect and is superseded by P1.",
+    "Final suites use -n auto --dist=worksteal with PYTEST_XDIST_AUTO_NUM_WORKERS=32, retaining the documented host allocation. No production changes followed the start of the final behavioral run."
+  ],
+  "first_review_aggregate_attempt": {
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4c0391055a39c6d21922a83095945a717a09748ad4059e420bf68e55c746adca",
+    "behavioral": {
+      "tests": 8668,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1275.253,
+      "workers": 32,
+      "distribution": "worksteal",
+      "junit_sha256": "f77b85b8ea910110eaf4029c84782e40d941e38b0a2240e40c35504d7c18f702",
+      "coverage_percent": 85.14235169085953
+    },
+    "code_quality": {
+      "tests": 567,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 329.958,
+      "workers": 32,
+      "distribution": "worksteal",
+      "junit_sha256": "dd54f45c21845eab1788591a9351b19d5c4df017790225adce728c485da5fcd1"
+    },
+    "failure": "GameState module grew from its frozen 7044-line budget to 7045 lines.",
+    "correction": "Moved validation context access into the existing persisting-effect helper, reducing GameState below its original size without raising the budget. Eleven focused restoration/size checks passed. Runtime artifacts, component evidence and both full suites were rerun."
+  },
+  "reviewed_head_validation": {
+    "order": 70,
+    "finding_ids": [
+      "C24-10"
+    ],
+    "validated_on": "2026-09-21",
+    "status": "passed",
+    "base_commit": "6ee55f30ad70cdf1766bb5c6f27fdf7fa82d3422",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:584cb851d2ec13d8371680059a244f83bec87039cd65a34edc89b979bc3b8d11",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.5",
+    "behavioral": {
+      "tests": 8662,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1256.389,
+      "workers": 32,
+      "distribution": "worksteal",
+      "junit_sha256": "682103017a255beb6ac7288f5b0b6bbdcfa22edbea27946179f9662b3ef1a912",
+      "coverage_percent": 85.14181225265784,
+      "coverage_minimum_percent": 85,
+      "warnings": 10,
+      "warning_types": [
+        "ResourceWarning: unclosed SQLite connections"
+      ]
+    },
+    "code_quality": {
+      "tests": 567,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 322.14,
+      "workers": 32,
+      "distribution": "worksteal",
+      "junit_sha256": "4a85668e8f25189fc733014bb8d4f50c22b944c1555f129511b585ab6e825f40",
+      "coverage": false
+    },
+    "gates_passed": [
+      "ruff check .",
+      "ruff format --check .",
+      "mypy src tests: 3174 source files",
+      "pyright: 0 errors, 0 warnings",
+      "lint-imports: 11 contracts",
+      "eight-shard inventory check",
+      "pre-commit run --all-files",
+      "Order 70 source generator and both canonical catalog generators",
+      "engine build identity and exact-base external contract compatibility (6ee55f30)",
+      "installed wheel: 2918 runtime resources, 27 schemas, six request families",
+      "TypeScript generated client and typecheck",
+      "TypeScript unit tests: 5",
+      "live HTTP conformance: 342 assertions",
+      "Order 70 matched component evidence",
+      "Orders 64, 65, 66 and 69 head evidence refreshed with unchanged baselines and budgets",
+      "Order 34 live work guards: all three scenarios, unchanged budgets",
+      "post-correction focused checks: 28 tests plus 3 source/performance guards"
+    ],
+    "first_aggregate_attempt": {
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:689fc14450192b3201b5002f403cbe4a850c7dd72a78ba0d2e2058cc95f11ddc",
+      "behavioral": {
+        "tests": 8662,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 1256.85,
+        "workers": 32,
+        "distribution": "worksteal",
+        "junit_sha256": "33d8ea780be85c61b30ac29daf156e1df08a29a32413938f9aa2b39d0e3038c8",
+        "coverage_percent": 85.141468953407
+      },
+      "code_quality": {
+        "tests": 567,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 333.978,
+        "workers": 32,
+        "distribution": "worksteal",
+        "junit_sha256": "062f7d70c869382d6827c49e0da5d45f9431d99a4637d3d5dd94be3238bb29ba"
+      },
+      "failures": [
+        {
+          "case": "Order 34 unrestricted",
+          "metric": "rules_unit_view_by_id",
+          "observed": 244,
+          "limit": 240
+        },
+        {
+          "case": "Order 34 unrestricted",
+          "metric": "applies_to_unit",
+          "observed": 8041,
+          "limit": 8000
+        },
+        {
+          "case": "Order 34 retained",
+          "metric": "applies_to_unit",
+          "observed": 6472,
+          "limit": 6300
+        }
+      ],
+      "correction": "After native-source integrity validation, an explicit empty Fights First inventory avoids unnecessary rules-unit membership and effect-target scans. One structural predicate serves inventory detection and per-model grants. All three focused existing work guards passed with unchanged budgets. Runtime artifacts, component measurements and both full suites were rerun after this production correction."
+    },
+    "diagnostic_history": [
+      "The initial every-model regression failed for both single-native-component attachment directions before implementation.",
+      "Focused iteration preserved descriptor-authorized Leader unit scope, added complete source-span fixture data, and rehydrated retained presence for conditional leading queries. The final focused source/Order 70 run passed 31 tests before the performance correction.",
+      "Pyright identified an untyped footprint list in the split test; an explicit list[set[str]] annotation resolved it. Source-package count assertions were updated from 46 to 47.",
+      "The archived base initially lacked pyproject.toml; the runtime correctly rejected its schema root. The complete trusted checkout metadata was restored before matched measurements.",
+      "The generated TypeScript check required a line-ending refresh; regeneration produced no semantic diff.",
+      "Both final suites use -n auto --dist=worksteal with PYTEST_XDIST_AUTO_NUM_WORKERS=32, retaining Order 69's allocation to avoid its observed host scheduling health-check failures. No tests or health checks were suppressed."
+    ],
+    "commands_not_run": {
+      "npm ci": "npm is unavailable on this host. Existing installed dependencies were exercised through the bundled Node runtime using each package script's direct command."
+    },
+    "performance_scope": "Matched Fights First query and inherited reconstruction, Firing Deck, Aircraft and roster components on provisional hardware. Complete gameplay slices, full-game targets and deferred Order 32 budgets remain uncertified.",
+    "scope": "Only Order 70 / C24-10. Orders 71-73 and final all-category certification remain separate. No production code changed after the final behavioral run began.",
+    "pr_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/490",
+    "merge_commit": null
+  }
+}

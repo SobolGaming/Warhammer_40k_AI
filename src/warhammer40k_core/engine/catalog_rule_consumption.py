@@ -19,9 +19,6 @@ from warhammer40k_core.engine.core_ability_materialization import (
     _feel_no_pain_source_for_model as _feel_no_pain_source_for_model,
 )
 from warhammer40k_core.engine.core_ability_materialization import (
-    _fights_first_effect_for_unit as _fights_first_effect_for_unit,
-)
-from warhammer40k_core.engine.core_ability_materialization import (
     _record_model_destruction_reaction_source as _record_model_destruction_reaction_source,
 )
 from warhammer40k_core.engine.core_ability_materialization import (

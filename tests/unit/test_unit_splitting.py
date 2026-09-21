@@ -651,6 +651,48 @@ def test_split_preserves_existing_effects_and_one_resource_account() -> None:
         conditional_not_leading_source_applies(state=state, source_unit_instance_id=original_id)
 
 
+def test_order70_native_fights_first_footprint_follows_split_models_and_restore() -> None:
+    from warhammer40k_core.engine.fights_first import fights_first_model_inventory
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    config = phase11c_config()
+    ability = DatasheetAbilityDescriptor(
+        ability_id="core-fights-first",
+        name="Fights First",
+        source_id="order70:split-native",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="Intrinsic component Fights First.",
+    )
+    catalog = replace(
+        config.army_catalog,
+        datasheets=tuple(
+            replace(row, abilities=(*row.abilities, ability))
+            if row.datasheet_id == "core-intercessor-like-infantry"
+            else row
+            for row in config.army_catalog.datasheets
+        ),
+    )
+    session = _session_at_split(replace(config, army_catalog=catalog))
+    _complete_split(session)
+    state = session.lifecycle.state
+    assert state is not None
+    registry = FightsFirstRegistry.from_state(state)
+    views = rules_unit_views_from_armies(armies=(state.army_definitions[0],))
+    assert len(views) == 2
+    footprints: list[set[str]] = []
+    for identity in views:
+        view = rules_unit_view_by_id(state=state, unit_instance_id=identity.unit_instance_id)
+        present, grants = fights_first_model_inventory(state=state, view=view)
+        assert registry.has_unit(view.unit_instance_id)
+        assert {m for _, ids in grants for m in ids} == set(present)
+        footprints.append(set(present))
+    assert footprints[0].isdisjoint(footprints[1])
+    restored = session.fork().lifecycle.state
+    assert restored is not None
+    assert FightsFirstRegistry.from_state(restored) == registry
+
+
 def test_core_splitting_rule_grants_no_permission_and_catalog_consumer_is_registered() -> None:
     assert unit_split_permissions(mustered_armies(phase11c_config())[0]) == ()
     army = mustered_armies(_split_config())[0]

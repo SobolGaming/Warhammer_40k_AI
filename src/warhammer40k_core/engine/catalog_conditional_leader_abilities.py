@@ -254,6 +254,7 @@ def _persisting_effect_for_source(
         phase=None,
         active_player_id=None,
         source_unit_instance_id=source.unit.unit_instance_id,
+        source_model_instance_id=_source_model_instance_id(source),
         source_keywords=tuple(sorted({*source.unit.keywords, *source.unit.faction_keywords})),
         state=state,
         record_persisting_effects=False,
@@ -301,6 +302,7 @@ def _fight_phase_not_leading_effect_for_source(
         active_player_id=event.active_player_id,
         timing_window_id=event.event_id,
         source_unit_instance_id=source.unit.unit_instance_id,
+        source_model_instance_id=_source_model_instance_id(source),
         source_keywords=tuple(sorted({*source.unit.keywords, *source.unit.faction_keywords})),
         state=context.state,
         event_log=context.decisions.event_log,
@@ -334,6 +336,14 @@ def _fight_phase_not_leading_effect_for_source(
         ),
         effect_payload=validate_json_value(payload),
     )
+
+
+def _source_model_instance_id(source: _ConditionalLeaderRuleSource) -> str | None:
+    if source.clause.target is None or source.clause.target.kind is not RuleTargetKind.THIS_MODEL:
+        return None
+    if len(source.unit.own_models) != 1:
+        raise GameLifecycleError("Conditional model grant requires one explicit source model.")
+    return source.unit.own_models[0].model_instance_id
 
 
 def _record_effect_once(*, state: GameState, effect: PersistingEffect) -> None:

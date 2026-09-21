@@ -61,6 +61,7 @@ from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
 from warhammer40k_core.engine.faction_resources import resolve_faction_resource_refund_roll
 from warhammer40k_core.engine.fight_order import FightsFirstRegistry
+from warhammer40k_core.engine.fights_first import fights_first_model_inventory
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
@@ -493,6 +494,31 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
         autarch_bodyguard_datasheet_id=HOWLING_BANSHEES_ID,
         autarch_wargear_id=None,
     )
+    grants = conditional_granted_ability_effects_for_rules_unit(
+        state=banshees.state,
+        rules_unit_instance_id=AUTARCH_ATTACHED_ID,
+        ability="fights_first",
+    )
+    assert len(grants) == 1
+    grant_payload = cast(dict[str, Any], grants[0].effect_payload)
+    assert grant_payload["target"]["kind"] == "this_model"
+    assert grant_payload["context"]["source_model_instance_id"] == (
+        banshees.autarch.own_models[0].model_instance_id
+    )
+    view = rules_unit_view_by_id(state=banshees.state, unit_instance_id=AUTARCH_ATTACHED_ID)
+    present, inventory = fights_first_model_inventory(state=banshees.state, view=view)
+    conditional_models = next(
+        ids for source, ids in inventory if source.effect_id == grants[0].effect_id
+    )
+    assert conditional_models == banshees.autarch.own_model_ids()
+    native_models = {
+        model_id
+        for source, model_ids in inventory
+        if source.effect_id != grants[0].effect_id
+        for model_id in model_ids
+    }
+    assert native_models == set(banshees.autarch_bodyguard.own_model_ids())
+    assert set(present) == native_models | set(conditional_models)
     assert FightsFirstRegistry.from_state(banshees.state).has_unit(AUTARCH_ATTACHED_ID)
     assert not conditional_granted_ability_effects_for_rules_unit(
         state=banshees.state,

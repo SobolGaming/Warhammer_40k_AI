@@ -30,7 +30,7 @@ def core_ability_inventory(
     from warhammer40k_core.engine.catalog_conditional_leader_queries import (
         conditional_granted_ability_effects_for_unit,
     )
-    from warhammer40k_core.engine.fights_first import FightsFirstRegistry
+    from warhammer40k_core.engine.fights_first import fights_first_model_inventory
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
     from warhammer40k_core.engine.stealth import stealth_source_inventory
 
@@ -45,9 +45,11 @@ def core_ability_inventory(
         if family is CoreAbilityFamily.FIGHTS_FIRST
         for source in sources
     }
-    for source in FightsFirstRegistry.from_state(state).sources:
+    _, fight_grants = fights_first_model_inventory(state=state, view=view)
+    for source, model_ids in fight_grants:
         if (
             source.unit_instance_id == view.unit_instance_id
+            and set(unit.own_model_ids()).intersection(model_ids)
             and source.effect_id not in native_fight_effect_ids
         ):
             _add(

@@ -118,9 +118,7 @@ def rules_unit_persisting_effects(
 def validate_persisting_effects(
     effects: object,
     *,
-    army_definitions: list[ArmyDefinition],
-    starting_strength_records: list[StartingStrengthRecord],
-    player_ids: tuple[str, ...],
+    state: GameState,
 ) -> list[PersistingEffect]:
     from warhammer40k_core.engine.activity_restrictions import activity_restriction_payload
     from warhammer40k_core.engine.firing_deck_restrictions import firing_deck_restriction_payload
@@ -128,8 +126,8 @@ def validate_persisting_effects(
     if not isinstance(effects, list):
         raise GameLifecycleError("GameState persisting_effects must be a list.")
     unit_ids = known_effect_target_unit_ids(
-        army_definitions=army_definitions,
-        starting_strength_records=starting_strength_records,
+        army_definitions=state.army_definitions,
+        starting_strength_records=state.starting_strength_records,
     )
     validated: list[PersistingEffect] = []
     seen: set[str] = set()
@@ -138,7 +136,7 @@ def validate_persisting_effects(
             raise GameLifecycleError(
                 "GameState persisting_effects must contain PersistingEffect values."
             )
-        if effect.owner_player_id not in player_ids:
+        if effect.owner_player_id not in state.player_ids:
             raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
         if not unit_ids:
             raise GameLifecycleError("PersistingEffect requires mustered army definitions.")
@@ -150,4 +148,9 @@ def validate_persisting_effects(
         firing_deck_restriction_payload(effect)
         seen.add(effect.effect_id)
         validated.append(effect)
+    from warhammer40k_core.engine.fights_first_native import validate_native_fights_first_effects
+
+    validate_native_fights_first_effects(
+        armies=tuple(state.army_definitions), effects=tuple(validated), stage=state.stage
+    )
     return sorted(validated, key=lambda effect: effect.effect_id)
