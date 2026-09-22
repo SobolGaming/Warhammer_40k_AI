@@ -221,7 +221,8 @@ Final validation and matched timings are recorded in
 preflight above remains evidence of the red state, not the final implementation
 status. PFINAL and full-game performance remain uncertified.
 
-The final behavioral run passes 8,873 cases with 85.19% coverage; the separate
+At the initial PR head (`e47170e4`), the behavioral run passes 8,873 cases
+with 85.19% coverage; the separate
 code-quality run passes 592 cases. Ruff, mypy, Pyright, import boundaries,
 pre-commit, the regenerated eight-shard inventory, source/build/contract checks,
 installed-wheel smoke, five TypeScript tests and 342 conformance assertions pass.
@@ -232,3 +233,48 @@ expecting the removed event. That assertion was corrected, with all 12 related
 cases passing. Its coverage reporter also failed to open the shared database;
 the successful final run used an isolated coverage database. Both attempts used
 coverage, and no production change followed the start of aggregate validation.
+
+
+## Review corrections R76-001 and R76-002
+
+Review of `e47170e4` reproduced two remaining violations of the typed ingress
+contract while confirming that authoritative state stayed unchanged. Emergency
+Disembark omitted `GeometryError` from its specific parser catches; pose
+validation could leak `OverflowError` when converting a JSON integer such as
+`10**400` to a float. Both attached and standalone Emergency Disembark placements
+now return their existing typed malformed-proposal diagnostic. The shared
+`geometry.pose.validate_finite_number` boundary converts only numeric overflow
+to `GeometryError`, preserving the original exception as its cause. It rejects
+rather than clamps or substitutes the unrepresentable value.
+
+The same-class search traced `PathWitness`, `UnitPlacement`, and attached
+rules-unit placements through `Pose.from_payload`, so this numeric repair
+applies to every coordinate and facing without separate adapter conversions.
+Ordinary movement/placement, Charge, Fight and Surge already normalize geometry
+errors. The search also reproduced missing geometry/type normalization at Rapid
+Ingress's separate placement prevalidator; that boundary now uses the shared
+proposal diagnostic builder before queue consumption. Non-coordinate numeric
+configuration validators and unrelated rule validation are outside this repair.
+
+Facade regressions cover malformed and overflowing Emergency Disembark
+coordinates, overflowing Surge witnesses, and Rapid Ingress nested geometry.
+They require unchanged lifecycle authority and pending requests, accepted valid
+retry, JSON persistence, and exact replay before and after retry. Direct pose
+regressions cover positive and negative overflow in x/y/z and facing. The static
+purity audit includes the Emergency Disembark parser and Rapid Ingress
+prevalidator. The existing adapter contract already specifies typed nested
+geometry rejection through the same invalid-status/proposal-validation envelope;
+no decision, proposal kind, schema, or gameplay semantics is added.
+
+The original validation record above applies to `e47170e4`. Fresh review-fix
+validation is recorded in `performance/order76/review-validation.json`.
+
+The review-fix final gates pass 8,893 behavioral tests
+with 85.19% coverage and all 592 code-quality tests.
+An earlier coverage attempt aborted during worker shutdown when the filesystem
+refused a coverage-database rename; it reported no test assertion failure.
+A focused 18-worker save probe passed in `/private/tmp`, followed by the clean
+complete coverage run there. Both aggregate attempts used coverage. No runtime
+change followed the first aggregate run. Contract compatibility, package smoke,
+TypeScript checks/conformance, lint, types, architecture, pre-commit, shard
+inventory and all matched component budgets pass for the final runtime.

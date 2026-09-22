@@ -128,7 +128,10 @@ def contact_planes_coincide(source_z: float, target_z: float) -> bool:
 def validate_finite_number(field_name: str, value: object) -> float:
     if not isinstance(value, int | float) or type(value) is bool:
         raise GeometryError(f"{field_name} must be a number.")
-    number = float(value)
+    try:
+        number = float(value)
+    except OverflowError as exc:
+        raise GeometryError(f"{field_name} must be finite.") from exc
     if not math.isfinite(number):
         raise GeometryError(f"{field_name} must be finite.")
     return number

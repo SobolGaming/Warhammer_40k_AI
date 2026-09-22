@@ -22,10 +22,10 @@ unchanged Fight control already appends zero events.
 
 | Revision / submissions | Mean seconds | Median seconds | p95 / maximum seconds | Completed |
 | --- | --- | --- | --- | --- |
-| Pinned main / valid | 0.015561 | 0.014565 | 0.029667 | 15/15 |
-| P03D / valid | 0.014856 | 0.011885 | 0.027615 | 15/15 |
-| Pinned main / malformed | 0.000996 | 0.000738 | 0.001737 | 15/15 |
-| P03D / malformed | 0.000953 | 0.000677 | 0.001686 | 15/15 |
+| Pinned main / valid | 0.014524 | 0.012867 | 0.026309 | 15/15 |
+| P03D / valid | 0.014334 | 0.011211 | 0.026928 | 15/15 |
+| Pinned main / malformed | 0.000935 | 0.000667 | 0.001679 | 15/15 |
+| P03D / malformed | 0.000962 | 0.000688 | 0.001743 | 15/15 |
 
 All head samples pass both declared ceilings. Malformed submissions append
 12 events on base and zero on head. These measurements establish bounded
@@ -49,4 +49,5 @@ Full games attempted/completed remain 0/0. The standing below-60-second mean
 and at-most-300-second observed maximum remain uncertified. PFINAL is Order 77
 and requires this prerequisite to merge before a fresh complete audit.
 `preflight.json` retains the original C03-04 failures; `validation.json` records
-the final correctness, package and client gates.
+the initial PR gates at `e47170e4`. `review-validation.json` records the current
+R76-001/R76-002 corrections and their fresh correctness, package and client gates.

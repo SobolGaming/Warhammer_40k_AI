@@ -1,6 +1,6 @@
 {
   "workload_id": "order73-emergency-geometry-facade-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:d05ab1c2a22d01e7950f804b448fd29de7cdc5ae31483fb7a8108a0a06df2ca7",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:7b7038f19d0028745694912fbb78724f23d51b69109bd76d3ff9ba08538cbb9a",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -14,126 +14,126 @@
       "rectangular": false,
       "attached": false,
       "repeat": 0,
-      "preparation_seconds": 1.6788734590008971,
+      "preparation_seconds": 1.6295575000040117,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.6722925840003882
+      "seconds": 0.6345979580000858
     },
     {
       "rectangular": false,
       "attached": false,
       "repeat": 1,
-      "preparation_seconds": 0.05430162500124425,
+      "preparation_seconds": 0.05296400000224821,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.33782079099910334
+      "seconds": 0.3218808329984313
     },
     {
       "rectangular": false,
       "attached": false,
       "repeat": 2,
-      "preparation_seconds": 0.05320375000155764,
+      "preparation_seconds": 0.05067137500009267,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.33560195800237125
+      "seconds": 0.32136404199991375
     },
     {
       "rectangular": false,
       "attached": true,
       "repeat": 0,
-      "preparation_seconds": 0.05535183300526114,
+      "preparation_seconds": 0.052733042000909336,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3607607090016245
+      "seconds": 0.34686574999795994
     },
     {
       "rectangular": false,
       "attached": true,
       "repeat": 1,
-      "preparation_seconds": 0.055573874997207895,
+      "preparation_seconds": 0.05306741700042039,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3754836250009248
+      "seconds": 0.35730475000309525
     },
     {
       "rectangular": false,
       "attached": true,
       "repeat": 2,
-      "preparation_seconds": 0.05473545800487045,
+      "preparation_seconds": 0.052879458002280444,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3429716250029742
+      "seconds": 0.32848041700344766
     },
     {
       "rectangular": true,
       "attached": false,
       "repeat": 0,
-      "preparation_seconds": 0.05632670799968764,
+      "preparation_seconds": 0.05352191600104561,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.358480499999132
+      "seconds": 0.3434469169951626
     },
     {
       "rectangular": true,
       "attached": false,
       "repeat": 1,
-      "preparation_seconds": 0.055564041998877656,
+      "preparation_seconds": 0.052863875003822614,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3736017909977818
+      "seconds": 0.3531656670020311
     },
     {
       "rectangular": true,
       "attached": false,
       "repeat": 2,
-      "preparation_seconds": 0.05667791699670488,
+      "preparation_seconds": 0.0529761670040898,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.339654708004673
+      "seconds": 0.3218519170040963
     },
     {
       "rectangular": true,
       "attached": true,
       "repeat": 0,
-      "preparation_seconds": 0.05785358299908694,
+      "preparation_seconds": 0.054823040998599026,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3714529589997255
+      "seconds": 0.3539052920023096
     },
     {
       "rectangular": true,
       "attached": true,
       "repeat": 1,
-      "preparation_seconds": 0.05789725000067847,
+      "preparation_seconds": 0.05468500000279164,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.34027654099918436
+      "seconds": 0.32409012500284007
     },
     {
       "rectangular": true,
       "attached": true,
       "repeat": 2,
-      "preparation_seconds": 0.056807665998348966,
+      "preparation_seconds": 0.054750916999182664,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.37407654200069373
+      "seconds": 0.35634858300181804
     }
   ],
   "completion_rate": 1.0,
-  "mean_attempt_seconds": 0.38187286108404805,
-  "maximum_attempt_seconds": 0.6722925840003882,
+  "mean_attempt_seconds": 0.36360852091759926,
+  "maximum_attempt_seconds": 0.6345979580000858,
   "full_game_certified": false,
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",

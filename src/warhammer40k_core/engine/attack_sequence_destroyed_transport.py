@@ -34,6 +34,7 @@ from warhammer40k_core.engine.rule_model_destruction_unplaced import (
     destroy_emergency_disembark_omitted_rules_unit_models,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_contains_component_lineage
+from warhammer40k_core.geometry.pose import GeometryError
 
 # fmt: off
 if TYPE_CHECKING:
@@ -875,7 +876,7 @@ def _parse_destroyed_transport_disembark_submission_or_invalid(
         submission = PlacementProposalPayload.from_payload(
             cast(PlacementProposalPayloadPayload, _payload_object(result.payload))
         )
-    except (GameLifecycleError, PlacementError, KeyError, TypeError) as exc:
+    except (GameLifecycleError, GeometryError, PlacementError, KeyError, TypeError) as exc:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
             result=result,
@@ -892,7 +893,7 @@ def _parse_destroyed_transport_disembark_submission_or_invalid(
 def _destroyed_transport_proposal_parse_failure(
     *,
     proposal_request: MovementProposalRequest,
-    error: GameLifecycleError | PlacementError | KeyError | TypeError,
+    error: GameLifecycleError | GeometryError | PlacementError | KeyError | TypeError,
 ) -> ProposalValidationResult:
     if type(error) is KeyError:
         missing = _key_error_field(error)

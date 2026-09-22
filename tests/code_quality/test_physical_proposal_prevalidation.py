@@ -19,12 +19,16 @@ def test_physical_prevalidation_owners_do_not_write_authoritative_history() -> N
             "physical_proposal_invalid_status",
             "parse_movement_proposal_payload",
         },
+        "stratagems_apply.py": {"invalid_stratagem_placement_proposal_status"},
         "physical_proposal_context.py": {"invalid_physical_proposal_spatial_context_status"},
         "triggered_movement.py": {
             "invalid_triggered_movement_proposal_status",
             "_reject_invalid_triggered_movement_proposal",
         },
-        "attack_sequence_destroyed_transport.py": {"_destroyed_transport_proposal_invalid_status"},
+        "attack_sequence_destroyed_transport.py": {
+            "_parse_destroyed_transport_disembark_submission_or_invalid",
+            "_destroyed_transport_proposal_invalid_status",
+        },
     }
     for filename, names in owners.items():
         tree = ast.parse((ENGINE / filename).read_text())

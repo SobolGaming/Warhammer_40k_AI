@@ -25,7 +25,7 @@ from warhammer40k_core.geometry.base import (
     base_shape_from_payload,
     bases_overlap,
 )
-from warhammer40k_core.geometry.pose import Facing, GeometryError, Point3, Pose
+from warhammer40k_core.geometry.pose import Facing, GeometryError, Point3, Pose, PosePayload
 from warhammer40k_core.geometry.spatial_index import SpatialIndex, SpatialIndexPayload
 from warhammer40k_core.geometry.terrain import (
     ObstacleVolume,
@@ -581,3 +581,15 @@ def test_setup_fit_absorbs_semantically_redundant_composite_regions(
         assert base_fits_regions(CircularBase(radius), cover) is fits
         assert base_fits_regions(CircularBase(radius), regions) is fits
     assert base_fits_regions(CircularBase(2), (redundant,)) is False
+
+
+@pytest.mark.parametrize("field", ["x", "y", "z", "degrees"])
+@pytest.mark.parametrize("sign", [-1, 1])
+def test_pose_numeric_overflow_is_a_typed_geometry_error(field: str, sign: int) -> None:
+    payload = Pose.at(1, 2, 3, 45).to_payload()
+    # JSON permits integers beyond the finite range used by engine geometry.
+    malformed = json.loads(json.dumps(payload))
+    malformed["facing" if field == "degrees" else "position"][field] = sign * 10**400
+    with pytest.raises(GeometryError, match="must be finite") as rejected:
+        Pose.from_payload(cast(PosePayload, malformed))
+    assert isinstance(rejected.value.__cause__, OverflowError)

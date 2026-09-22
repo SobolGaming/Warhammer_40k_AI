@@ -14,126 +14,126 @@
       "rectangular": false,
       "attached": false,
       "repeat": 0,
-      "preparation_seconds": 1.6878521249964251,
+      "preparation_seconds": 1.6370842500036815,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.6734486669956823
+      "seconds": 0.6407209169992711
     },
     {
       "rectangular": false,
       "attached": false,
       "repeat": 1,
-      "preparation_seconds": 0.05352379200485302,
+      "preparation_seconds": 0.05071083399525378,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.33113691699691117
+      "seconds": 0.321712375000061
     },
     {
       "rectangular": false,
       "attached": false,
       "repeat": 2,
-      "preparation_seconds": 0.052178749996528495,
+      "preparation_seconds": 0.050248542000190355,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3315151659990079
+      "seconds": 0.32001725000009174
     },
     {
       "rectangular": false,
       "attached": true,
       "repeat": 0,
-      "preparation_seconds": 0.055066000000806525,
+      "preparation_seconds": 0.05223270800343016,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.36068691699620103
+      "seconds": 0.3457498330026283
     },
     {
       "rectangular": false,
       "attached": true,
       "repeat": 1,
-      "preparation_seconds": 0.05476641700079199,
+      "preparation_seconds": 0.05213154100056272,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.37505429200246
+      "seconds": 0.35712183300347533
     },
     {
       "rectangular": false,
       "attached": true,
       "repeat": 2,
-      "preparation_seconds": 0.055077833007089794,
+      "preparation_seconds": 0.05309850000048755,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3399292090034578
+      "seconds": 0.3266648749995511
     },
     {
       "rectangular": true,
       "attached": false,
       "repeat": 0,
-      "preparation_seconds": 0.055678167002042755,
+      "preparation_seconds": 0.05286649999470683,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.35738416699314257
+      "seconds": 0.34293712500220863
     },
     {
       "rectangular": true,
       "attached": false,
       "repeat": 1,
-      "preparation_seconds": 0.056341458002862055,
+      "preparation_seconds": 0.05266300000221236,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3708288749985513
+      "seconds": 0.354269084004045
     },
     {
       "rectangular": true,
       "attached": false,
       "repeat": 2,
-      "preparation_seconds": 0.055626542001846246,
+      "preparation_seconds": 0.05518287500308361,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3339189160033129
+      "seconds": 0.3228224170015892
     },
     {
       "rectangular": true,
       "attached": true,
       "repeat": 0,
-      "preparation_seconds": 0.05730762500024866,
+      "preparation_seconds": 0.05441550000250572,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.36917666599765653
+      "seconds": 0.3533806659979746
     },
     {
       "rectangular": true,
       "attached": true,
       "repeat": 1,
-      "preparation_seconds": 0.057576250001147855,
+      "preparation_seconds": 0.05456770800083177,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.3399252079980215
+      "seconds": 0.3300415829944541
     },
     {
       "rectangular": true,
       "attached": true,
       "repeat": 2,
-      "preparation_seconds": 0.057896833000995684,
+      "preparation_seconds": 0.05577629199979128,
       "complete": true,
       "valid": true,
       "error": null,
-      "seconds": 0.37527220800257055
+      "seconds": 0.35876762500265613
     }
   ],
   "completion_rate": 1.0,
-  "mean_attempt_seconds": 0.3798564339989146,
-  "maximum_attempt_seconds": 0.6734486669956823,
+  "mean_attempt_seconds": 0.36451713191733387,
+  "maximum_attempt_seconds": 0.6407209169992711,
   "full_game_certified": false,
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
