@@ -279,7 +279,7 @@ the successful 8,758-test behavioral run and runtime identity.
 
 ## Required finding record
 
-- **Status:** P18I implemented; local validation passed, publication pending. PFINAL and CAUDIT-01 remain open.
+- **Status:** P18I implemented; local validation passed; PR #493 is open for review and unmerged. PFINAL and CAUDIT-01 remain open.
 - **Finding IDs:** C18-10.
 - **Dependencies and evidence gate:** P18B and P18H are merged in current main, `77e2e46340abd8a698465e0937df6363d356925a`. The owner authorized the prerequisite after the certification preflight found this execution gap. Retained source evidence is unchanged.
 - **Violated invariant:** omission may authorize a survivor casualty only after a complete negative placement proof over engine-supported geometry.
@@ -293,7 +293,7 @@ the successful 8,758-test behavioral run and runtime identity.
 - **Regression scenarios and same-bug-class search:** floor support/omission, nine passenger/Transport shape pairs, arbitrary orientation, rotated walls, overhang, objective/collision/range constraints, complete-group coherency, unengaged preference, closest placement, invalid submissions, unchanged rejected state, both viewers, restore and exact replay. The owner search found all geometry guards and all four proof consumers. The PDF-source audit also has a single owner; direct regressions distinguish documentation citations from forbidden runtime/source references.
 - **Generated artifacts/documentation:** runtime manifest and external contract examples; architecture, adapter contract, roadmap/comparison and this audit; matched Order 73 reports plus required current-runtime head refreshes for Orders 64, 65, 66, 69, 70, 71 and 72. Source package bytes and support-status identities are unchanged.
 - **Validation results:** 8,758 behavioral tests passed with 85.1739% coverage; 585 code-quality tests passed. Lint, formatting, mypy, pyright, import boundaries, shard inventory, source/contract generation, exact-base compatibility, installed-wheel smoke, TypeScript client checks, 342 HTTP conformance assertions and all declared matched component budgets passed. Final suites used 32 workers with work stealing.
-- **PR URL and merge commit:** Publication pending; unmerged.
+- **PR URL and merge commit:** [PR #493](https://github.com/SobolGaming/Warhammer_40k_AI/pull/493); open for review, unmerged.
 
 
 ## Final validation

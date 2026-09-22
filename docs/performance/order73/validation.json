@@ -119,5 +119,7 @@
     "A supplemental ellipse-in-disk regression exposed a general quantifier-elimination stall. The exact S-lemma certificate resolves it; exploratory-containment-stall.json preserves the incomplete result. The initial aggregate coverage run was superseded and rerun after this production correction.",
     "Final behavioral coverage and code-quality suites use xdist work stealing with PYTEST_XDIST_AUTO_NUM_WORKERS=32 and the required Node PATH. Focused iteration used serial execution as permitted by AGENTS.md.",
     "All qualified performance measurements ran sequentially without competing test/build workers. No old measurement was relabeled and no threshold was raised."
-  ]
+  ],
+  "pull_request_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/493",
+  "merge_status": "unmerged"
 }

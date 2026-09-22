@@ -5263,4 +5263,4 @@ conformance, installed-wheel and matched performance gates pass. See the
 [validation record](performance/order73/validation.json), including the retained
 initial failures and their corrections.
 
-PR URL and merge commit: Publication pending; unmerged.
+PR URL and merge commit: [PR #493](https://github.com/SobolGaming/Warhammer_40k_AI/pull/493); open for review, unmerged.
