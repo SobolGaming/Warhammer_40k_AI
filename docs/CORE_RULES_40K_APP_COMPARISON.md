@@ -41,7 +41,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 18 Transports | [18.00](https://www.40k.app/rules/18-transports) | authoritative_app_mirror | owned; see roadmap | P18C, P18D, P18E, P18G, P18A, P18B, P18H, P18F, P20, P18I |
 | 19 Attached Units | [19.00](https://www.40k.app/rules/19-attached-units) | authoritative_app_mirror | owned; see roadmap | P19 |
 | 20 Strategic Reserves | [20.00](https://www.40k.app/rules/20-strategic-reserves) | authoritative_app_mirror | owned; see roadmap | P20, P20B |
-| 21 Flying and Surging | [21.00](https://www.40k.app/rules/21-flying-and-surging) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P21A, P21B |
+| 21 Flying and Surging | [21.00](https://www.40k.app/rules/21-flying-and-surging) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P21A, P21B, P21C |
 | 22 Other Rules And Abilities | [22.00](https://www.40k.app/rules/22-other-rules-and-abilities) | authoritative_app_mirror | owned; see roadmap | P22, P22B |
 | 23 Aircraft | [23.00](https://www.40k.app/rules/23-aircraft) | authoritative_app_mirror | owned; see roadmap | P23 |
 | 24 Core Abilities | [24.00](https://www.40k.app/rules/24-core-abilities) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P24F, P24G, P24D, P24C1, P24I, P24A, P24H, P24E, P24C2, P24B, P24J |

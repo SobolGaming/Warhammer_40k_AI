@@ -1,12 +1,12 @@
 {
   "workload": "order70-fights-first-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
-  "platform": "Windows-11-10.0.26200-SP0",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
-  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-  "memory_bytes": 137327259648,
-  "cpu_allocation": 64,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
   "concurrency": 1,
   "host_role": "provisional",
   "timing_boundary": "100 live registry queries; canonical Firing Deck fixture preparation excluded; no RNG, geometry queries or decisions in timer",
@@ -22,16 +22,16 @@
       "model_count": 16,
       "source_count": 0,
       "samples_seconds": [
-        0.003728699986822903,
-        0.005384900025092065,
-        0.00404919998254627,
-        0.003856999974232167,
-        0.0037274000351317227,
-        0.004323899978771806,
-        0.0037688000011257827
+        0.000981875004072208,
+        0.000931125003262423,
+        0.000941875005082693,
+        0.0009243749955203384,
+        0.0009121670009335503,
+        0.0009929999941959977,
+        0.0009912500026985072
       ],
-      "mean_seconds": 0.004119985711960388,
-      "maximum_seconds": 0.005384900025092065,
+      "mean_seconds": 0.0009536667151093882,
+      "maximum_seconds": 0.0009929999941959977,
       "complete": true
     },
     {
@@ -40,16 +40,16 @@
       "model_count": 16,
       "source_count": 1,
       "samples_seconds": [
-        0.02977439999813214,
-        0.0306601999909617,
-        0.031732200004626065,
-        0.03158919996349141,
-        0.031019500049296767,
-        0.03089600004022941,
-        0.031751299975439906
+        0.007331374996283557,
+        0.007527374997152947,
+        0.00739400000020396,
+        0.007417959001031704,
+        0.007379959002719261,
+        0.007393667001451831,
+        0.007316541996260639
       ],
-      "mean_seconds": 0.0310604000031682,
-      "maximum_seconds": 0.031751299975439906,
+      "mean_seconds": 0.007394410999300557,
+      "maximum_seconds": 0.007527374997152947,
       "complete": true
     },
     {
@@ -58,16 +58,16 @@
       "model_count": 16,
       "source_count": 4,
       "samples_seconds": [
-        0.03557649999856949,
-        0.03635849995771423,
-        0.03590250003617257,
-        0.035584600002039224,
-        0.035900099959690124,
-        0.03619100002106279,
-        0.03614859998924658
+        0.00890754099964397,
+        0.008452750000287779,
+        0.008799916999123525,
+        0.008626874994661193,
+        0.008509459003107622,
+        0.0086005409975769,
+        0.008903917005227413
       ],
-      "mean_seconds": 0.035951685709213574,
-      "maximum_seconds": 0.03635849995771423,
+      "mean_seconds": 0.008685857142804057,
+      "maximum_seconds": 0.00890754099964397,
       "complete": true
     }
   ],

@@ -144,9 +144,9 @@ def surge_endpoint_evidence(
         return row, "surge_engagement_not_reached"
     if engagement.status is MovementReachabilityStatus.UNRESOLVED:
         return row, "surge_reachability_unresolved"
-    # A containing disk and the translation budget give a global lower bound,
-    # valid for every path, rotation, obstacle and coherency constraint. A legal
-    # submitted endpoint meeting that bound proves optimality directly.
+    # The shared fixed-target bound accounts for every moving orientation and
+    # translation budget. Meeting it with a fully validated endpoint proves
+    # optimality even after adding terrain, collision and coherency constraints.
     contact = MovementGoal(models=targets, range_inches=0.0)
     lower = max(0.0, contact.distance_lower_bound(source, ignores_vertical_distance=False) - budget)
     row["distance_lower_bound_inches"] = lower

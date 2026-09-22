@@ -1,0 +1,157 @@
+{
+  "schema": "order75-preflight-v1",
+  "reviewed_at": "2026-09-22T14:38:12.447886+00:00",
+  "revision": "9d8c5e2a1bb4db3c8a7f68b6da924c4ea9e23daa",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
+  "finding_id": "C21-03",
+  "proposed_owner": "P21C",
+  "certification_status": "blocked_before_complete_audit",
+  "caudit_01_closed": false,
+  "source_corroboration": {
+    "provider": "40k.app",
+    "url": "https://www.40k.app/rules/21-flying-and-surging",
+    "observed_at": "2026-09-22T14:36:35.448Z",
+    "app_version": null,
+    "stable_source_rule_id": "gw-11e-core-surge:surge-move",
+    "transcription": "Each model that cannot end its move engaged with the surge target must end its move as close as possible to the surge target.",
+    "transcription_scope": "One 21.02 maximum-approach clause; complete rule body reviewed in browser",
+    "transcription_sha256": "d61722c7a7d49a983b396c47f8ab1752cef2d0bc9cf7253e3cf07f64d3892e7d",
+    "non_affiliated": true,
+    "runtime_authority_registration": false,
+    "observation_sha256": "8babcb7fde2d5e7e400b3c130df86ebb26daaa8f0e0c7786dfc1e248fdbd1aa4"
+  },
+  "host": {
+    "role": "provisional",
+    "cpu": "Apple M5 Pro",
+    "logical_cpu_count": 18,
+    "memory_bytes": 68719476736,
+    "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+    "python": "3.14.5",
+    "hardware_observation_command": "sysctl -n machdep.cpu.brand_string hw.memsize hw.logicalcpu"
+  },
+  "full_game_performance": {
+    "certified": false,
+    "attempted_games": 0,
+    "completed_games": 0,
+    "completion_rate": null,
+    "samples": [],
+    "arithmetic_mean_seconds": null,
+    "maximum_seconds": null,
+    "targets": {
+      "mean_seconds_strictly_below": 60,
+      "maximum_seconds_at_most": 300
+    },
+    "missing_prerequisites": [
+      "No representative legal complete-game driver or complete-game decision recording found in repository",
+      "Versioned workload with rosters, terrain, seeds, legal decision policy, normal completion and replay output",
+      "Per-game end-to-end measurements on declared reference hardware"
+    ],
+    "note": "No game timeout or failed attempted game is hidden by the empty sample set. No games were started."
+  },
+  "validation": {
+    "focused_tests": 9,
+    "focused_seconds": 5.36,
+    "coverage_collected": false,
+    "facade_reproduction": "legal optimum rejected with surge_reachability_unresolved",
+    "checkpoint_round_trip": true,
+    "exact_rejection_replay": "reproduced",
+    "surge_source_generator_check": "passed",
+    "engine_build_identity_check": "passed",
+    "audit_probe_ruff": "passed",
+    "full_behavioral_gate_run": false,
+    "aggregate_quality_gate_run": false
+  },
+  "hashes": {
+    "reports/order75/probe_surge.py": "8b3713ffb25304c67da2e8e2745bc3ff4f6b7303f50346f9850403fb8cd19a16",
+    "reports/order75/surge-facade.json": "7db17d67fcaf319a2e811d3f55e9c991b02bef4764b08bd39e095ba3a61cec42",
+    "reports/order75/focused.xml": "0a6949327110a1e01b8a30ad2e3cc43776435fe6427498be9614e6d5dcd327fe",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "src/warhammer40k_core/engine/surge_movement.py": "17c8ad25d8aec6a62372b93f17186f95a6fe52d0782161adef758abaa5465e9a",
+    "src/warhammer40k_core/engine/surge_history.py": "4b006e9d778c2c4db9469d7e556ec01ef9d786dce6bb7e55ddf218836959528c",
+    "src/warhammer40k_core/geometry/movement_reachability.py": "65508160e9dbf7199b286d8b743a063d2a7fafe5a5bab015baa13245621205c4",
+    "data/source_audits/maintained_app_mirrors/surge_2026_09_16.audit.json": "973728611bbaac8da2af16ec1bd5855273e66aab39b149faa5e537756e8ba845"
+  },
+  "facade_result": {
+    "selected_option_ids": [
+      "decline_triggered_movement",
+      "surge:army-alpha:source:target:army-beta:enemy"
+    ],
+    "exact_minimum_distance_inches": 5.3700787401574805,
+    "facade_submission_seconds_warm_cache": 0.007451083998603281,
+    "battlefield_unchanged": true,
+    "movement_history_unchanged": true,
+    "checkpoint_round_trip": true,
+    "rejection_replay_status": "reproduced",
+    "pending_retry_request_id": "decision-request-000003",
+    "full_game_certified": false,
+    "restriction_violations": [
+      {
+        "violation_code": "surge_reachability_unresolved",
+        "message": "Surge mandatory endpoint requirement was not satisfied."
+      }
+    ],
+    "surge_model_endpoints": [
+      {
+        "source_rule_id": "gw-11e-core-surge:surge-move",
+        "model_instance_id": "army-alpha:source:core-intercessor-like:001",
+        "component_unit_instance_id": "army-alpha:source",
+        "target_unit_instance_id": "army-beta:enemy",
+        "distance_before_inches": 8.370078740157481,
+        "distance_after_inches": 5.370078740157481,
+        "engagement_status": "unreachable",
+        "approach_status": "unresolved",
+        "alternative_witness": null,
+        "distance_lower_bound_inches": 2.6315771031375546
+      },
+      {
+        "source_rule_id": "gw-11e-core-surge:surge-move",
+        "model_instance_id": "army-alpha:source:core-intercessor-like:002",
+        "component_unit_instance_id": "army-alpha:source",
+        "target_unit_instance_id": "army-beta:enemy",
+        "distance_before_inches": 8.370078740157481,
+        "distance_after_inches": 5.370078740157481,
+        "engagement_status": "unreachable",
+        "approach_status": "unresolved",
+        "alternative_witness": null,
+        "distance_lower_bound_inches": 2.344497563631289
+      },
+      {
+        "source_rule_id": "gw-11e-core-surge:surge-move",
+        "model_instance_id": "army-alpha:source:core-intercessor-like:003",
+        "component_unit_instance_id": "army-alpha:source",
+        "target_unit_instance_id": "army-beta:enemy",
+        "distance_before_inches": 8.370078740157481,
+        "distance_after_inches": 5.370078740157481,
+        "engagement_status": "unreachable",
+        "approach_status": "unresolved",
+        "alternative_witness": null,
+        "distance_lower_bound_inches": 2.246973114539819
+      },
+      {
+        "source_rule_id": "gw-11e-core-surge:surge-move",
+        "model_instance_id": "army-alpha:source:core-intercessor-like:004",
+        "component_unit_instance_id": "army-alpha:source",
+        "target_unit_instance_id": "army-beta:enemy",
+        "distance_before_inches": 8.370078740157481,
+        "distance_after_inches": 5.370078740157481,
+        "engagement_status": "unreachable",
+        "approach_status": "unresolved",
+        "alternative_witness": null,
+        "distance_lower_bound_inches": 2.344497563631289
+      },
+      {
+        "source_rule_id": "gw-11e-core-surge:surge-move",
+        "model_instance_id": "army-alpha:source:core-intercessor-like:005",
+        "component_unit_instance_id": "army-alpha:source",
+        "target_unit_instance_id": "army-beta:enemy",
+        "distance_before_inches": 8.370078740157481,
+        "distance_after_inches": 5.370078740157481,
+        "engagement_status": "unreachable",
+        "approach_status": "unresolved",
+        "alternative_witness": null,
+        "distance_lower_bound_inches": 2.6315771031375546
+      }
+    ]
+  },
+  "raw_evidence_note": "The reports/order75 hashes identify local preimplementation audit artifacts. The retained result fields and committed canonical regression fixtures reproduce the finding."
+}

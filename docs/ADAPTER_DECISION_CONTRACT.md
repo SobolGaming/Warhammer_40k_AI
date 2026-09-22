@@ -6581,3 +6581,23 @@ These evidence values live in existing JSON-valued event fields, so Contract 34'
 schemas and client envelopes remain valid. Both viewers use shared event redaction;
 clients must not infer permission from a proof token. Exact runtime identity binds
 new replay and persistence artifacts; no old-checkpoint conversion is introduced.
+
+
+## Order 75 — fixed-target Surge approach evidence
+
+P21C changes the shared numeric distance lower bound consumed by Surge execution
+and historical authentication. Fixed target footprint and facing remain in the
+bound; circular movers use the range owner's measured separation and other
+movers retain a conservative rotation envelope. An `optimal_bound` endpoint
+must still attain the authenticated bound and pass every ordinary path, terrain,
+coherency and engagement check. Finite target selection and parameterized
+`surge_move` submissions use the existing decision types, options, proposal
+schemas, source IDs, `surge_model_endpoints` fields and viewer-scoped events.
+No payload shape, visibility policy or contract version change is required.
+
+Malformed/stale submissions cannot mutate or consume a pending proposal. A
+well-formed shorter move follows the existing typed rejection/retry path; the
+accepted retry and its rejection history reproduce through exact replay. The
+new build identity binds authenticated checkpoints and replay to these numeric
+proof semantics. Superseded build artifacts require the existing explicit
+compatibility rules; no migration fallback is introduced.

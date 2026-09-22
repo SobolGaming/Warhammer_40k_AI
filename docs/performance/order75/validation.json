@@ -1,0 +1,111 @@
+{
+  "scope": "Order 75 / P21C / C21-03",
+  "baseline": "9d8c5e2a1bb4db3c8a7f68b6da924c4ea9e23daa",
+  "final_validation_status": "passed",
+  "focused_regressions": {
+    "passed": 34,
+    "seconds": 18.14,
+    "coverage": false
+  },
+  "p_final_certified": false,
+  "full_game_certified": false,
+  "additional_adapter_observations": "docs/ORDER_75_PREFLIGHT_AUDIT.md#additional-preflight-observation-requiring-separate-adapter-triage",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "gates_passed": [
+    "uv run ruff check .",
+    "uv run ruff format --check .",
+    "uv run mypy src tests: 3185 files",
+    "uv run pyright: 0 errors, 0 warnings",
+    "uv run lint-imports: 11 contracts",
+    "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+    "uv run pre-commit run --all-files",
+    "Surge source and Core Rules comparison generators: --check",
+    "Engine build identity: --check",
+    "External contract: --check --base-ref 9d8c5e2a1bb4db3c8a7f68b6da924c4ea9e23daa",
+    "Installed-wheel smoke: 2924 runtime resources, 27 schemas, six request families",
+    "TypeScript npm ci, generated-client check and typecheck",
+    "TypeScript unit tests: 5 passed",
+    "HTTP conformance: 342 assertions, cross-server replay equivalence",
+    "17 focused performance evidence guards; final fixture-hash guard rechecked after annotation-only cleanup",
+    "Roadmap regression tests: 5 passed"
+  ],
+  "local_runtime": {
+    "node": "24.19.0",
+    "npm": "11.18.0",
+    "python": "3.14.5"
+  },
+  "scope_audit": "One shared geometry bound and an engine explanatory comment; regression, source/contract documentation and required identity/contract/performance artifacts. No production change after final behavioral validation began.",
+  "resolved_validation_setup_issues": [
+    "Fetched exact historical R73-001 base commit when not present locally; resumed only unfinished measurement pairs.",
+    "Added the installed npm executable directory to PATH while retaining the prescribed Codex Node prefix.",
+    "TypeScript IPC tests reran outside the socket-restricted sandbox; all five tests and conformance passed.",
+    "Corrected fixture/test typing before final coverage; remeasured the final Order 75 fixture hash on both runtimes.",
+    "Final performance reports add percentile, throughput and dependency-version metadata; repeated only the affected base/head pair serially after coverage workers exited. No production code changed."
+  ],
+  "commands_not_run": [],
+  "behavioral": {
+    "passed": 8825,
+    "coverage_percent": 85.19,
+    "required_coverage_percent": 85,
+    "seconds": 679.31,
+    "workers": 18,
+    "distribution": "worksteal",
+    "warnings": 10,
+    "coverage_runs": 1,
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/order75/behavioral.xml",
+    "warnings_note": "Ten ResourceWarning diagnostics for unclosed SQLite connections; no failures or skipped tests."
+  },
+  "performance": {
+    "base_acceptance_rate": 0.0,
+    "head_acceptance_rate": 1.0,
+    "head_mean_seconds": 0.014733588001238078,
+    "head_maximum_seconds": 0.018605917000968475,
+    "head_p95_seconds": 0.018605917000968475,
+    "maximum_head_budget_seconds": 12,
+    "samples_per_revision": 9,
+    "complete_games_attempted": 0,
+    "complete_games_completed": 0,
+    "full_game_certified": false
+  },
+  "completed_at": "2026-09-22T15:20:18.074938+00:00",
+  "code_quality": {
+    "passed": 590,
+    "seconds": 128.6,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": false,
+    "aggregate_runs": 1,
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/order75/code-quality.xml"
+  },
+  "performance_report_sha256": {
+    "docs/performance/order64/base-reconstruction.json": "b02826c34895bb19bcda4500f32bc002f74e783c6b8233eeadccf474a2e53d02",
+    "docs/performance/order64/head-reconstruction.json": "191fa80fc46948f9c543b14527502632cdf1d47ebd1e5ad13f216e0e9a9aebd2",
+    "docs/performance/order65/base.json": "9154207814aa62d9352a9c856dd136fcc15e021e1f121fa124c20e185c538d79",
+    "docs/performance/order65/head.json": "7574e224e3fec21e47a8913f1bf6d6562b89a920f3c2cee0d0c19572d862b6ca",
+    "docs/performance/order66/base.json": "f2ddf6942699f7db2b6e0bb8e141bed576080552c98204a464a3c23ef16b896a",
+    "docs/performance/order66/head.json": "9becebea9fa42aa9fbe6e52b28bf8a993c37c28a125325acd07b7deab38f1b3f",
+    "docs/performance/order69/base.json": "420f75e9fe0ab3d2ba8a83ba67f4ec22a3354bde0827a433d1a171f21979d961",
+    "docs/performance/order69/head.json": "e474124d0207f1c9906c40e7d5d15fd2d110463943d4332bf938b254b7bcb325",
+    "docs/performance/order70/base.json": "316e31d167b7eddee6e6c48ba675ba38d4029920beb2dc16a05ba115c6c9dd2a",
+    "docs/performance/order70/head.json": "f1bf45bbe0401de4f83a9e9f05f918f16c82a8ce8bf39d0fd1b7dfb40100e413",
+    "docs/performance/order71/base.json": "e07d452848d036d6ffabd2de59f6299832fa4f650f07101c6fbc13c6ec716031",
+    "docs/performance/order71/head.json": "bcb657ec3002f2d9d8a6aa0efe8372b0bb7de4fc7ba37161186d66b94414520a",
+    "docs/performance/order72/base.json": "53813fdd8dc3c9b5efb59d570f9b0a01b1ff2b50edcbde88752f4b5c3df6be7e",
+    "docs/performance/order72/head.json": "d45fb6506eeb5085ab84e8927c08612adebbfe39d55f918ad122a99199422237",
+    "docs/performance/order73/r73_001/base.json": "a9bf49d712ebf6143902b98b9605336475852c2d984c5dfc6c02cf5dee91fa49",
+    "docs/performance/order73/r73_001/head.json": "760142d9cead70ef17123d1fcdac62bfcb87b96b439dcebc19e0f989b05a0b25",
+    "docs/performance/order73/r73_001/geometry-base.json": "ea1c3a8106462717dad826bc1c8b3c18056a5ec0705455ba367a14ebfca883b5",
+    "docs/performance/order73/r73_001/geometry-head.json": "d5e6e02c5fd6c94367ee3b9040f02d83b154d6812eda4668df54c123eff46553",
+    "docs/performance/order74/base.json": "7f80073cff10b248e95b1c45c3f208ab496fcb5c447580913d96436d4defe49c",
+    "docs/performance/order74/head.json": "09e5af8ae66378214b87b786cca61e40df685308945feb85bb74510f6dd88a7f",
+    "docs/performance/order75/base.json": "e42e8d14c9c2d80260693ada37b63915439bf844f68a3b5a0a9da42c35573667",
+    "docs/performance/order75/head.json": "abd214ed0ed4c5ac4036ea49f38c66ee74a508dd220701f09e6a69b8253d0e8b"
+  },
+  "local_evidence_sha256": {
+    "reports/order75/behavioral.xml": "4ce4f16fd033f4342b9bb12a6ad558771eccdbf3aac9caccc78eb5626372bfbf",
+    "reports/order75/code-quality.xml": "5d18ff6795acf24f412e4bb736729f80c379a6a41eea5800a85b34759be55c72",
+    "reports/order75/behavioral.log": "d3fe04abab49981f1466963cf4d053b5ef38b9c2f34c04339aa3a3937d4a5122",
+    "reports/order75/code-quality.log": "ed31994ecee54fbdcd30601455d372016e7979d32a6266860a5782d90c38130f"
+  },
+  "local_evidence_note": "Local JUnit/log hashes retain validation provenance; these raw artifacts are not packaged runtime data."
+}
