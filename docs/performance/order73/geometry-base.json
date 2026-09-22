@@ -1,0 +1,148 @@
+{
+  "workload_id": "order73-emergency-geometry-facade-v1",
+  "revision": "77e2e46340abd8a698465e0937df6363d356925a",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "cpu_allocation": 64,
+  "memory_bytes": 137327259648,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "one actual pending Emergency Disembark facade submission; five or six survivors; circular or rectangular Transport; one elevated floor; fixture/attack preparation excluded",
+  "samples": [
+    {
+      "rectangular": false,
+      "attached": false,
+      "repeat": 0,
+      "preparation_seconds": 5.825348899990786,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement proof is unresolved.",
+      "seconds": 1.7030668000224978
+    },
+    {
+      "rectangular": false,
+      "attached": false,
+      "repeat": 1,
+      "preparation_seconds": 0.16614360001403838,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement proof is unresolved.",
+      "seconds": 0.8483771000173874
+    },
+    {
+      "rectangular": false,
+      "attached": false,
+      "repeat": 2,
+      "preparation_seconds": 0.23733179998816922,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement proof is unresolved.",
+      "seconds": 0.8783991999807768
+    },
+    {
+      "rectangular": false,
+      "attached": true,
+      "repeat": 0,
+      "preparation_seconds": 0.17769849998876452,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement proof is unresolved.",
+      "seconds": 0.8506352999829687
+    },
+    {
+      "rectangular": false,
+      "attached": true,
+      "repeat": 1,
+      "preparation_seconds": 0.1787515000323765,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement proof is unresolved.",
+      "seconds": 0.841720299969893
+    },
+    {
+      "rectangular": false,
+      "attached": true,
+      "repeat": 2,
+      "preparation_seconds": 0.18969329999526963,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement proof is unresolved.",
+      "seconds": 0.8331154999905266
+    },
+    {
+      "rectangular": true,
+      "attached": false,
+      "repeat": 0,
+      "preparation_seconds": 0.18044719996396452,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement requires circular bases.",
+      "seconds": 0.8371101000229828
+    },
+    {
+      "rectangular": true,
+      "attached": false,
+      "repeat": 1,
+      "preparation_seconds": 0.18826399999670684,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement requires circular bases.",
+      "seconds": 0.8446914000087418
+    },
+    {
+      "rectangular": true,
+      "attached": false,
+      "repeat": 2,
+      "preparation_seconds": 0.17968420003307983,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement requires circular bases.",
+      "seconds": 0.8623204000177793
+    },
+    {
+      "rectangular": true,
+      "attached": true,
+      "repeat": 0,
+      "preparation_seconds": 0.1881693999748677,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement requires circular bases.",
+      "seconds": 0.8676756999921054
+    },
+    {
+      "rectangular": true,
+      "attached": true,
+      "repeat": 1,
+      "preparation_seconds": 0.2027964000008069,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement requires circular bases.",
+      "seconds": 0.8502467999933288
+    },
+    {
+      "rectangular": true,
+      "attached": true,
+      "repeat": 2,
+      "preparation_seconds": 0.2052619000314735,
+      "complete": false,
+      "valid": null,
+      "error": "Emergency Disembark placement requires circular bases.",
+      "seconds": 0.8737303999951109
+    }
+  ],
+  "completion_rate": 0.0,
+  "mean_attempt_seconds": 0.9242574166661749,
+  "maximum_attempt_seconds": 1.7030668000224978,
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order73.py": "9e25b76bcf0f8a119407277bee108e3cae2d19e2f95be3a1fae311c160cc1fbf",
+    "tests/emergency_geometry_helpers.py": "fb4c1714db92931293454a21eb35c2f2fa1386bdd2d4f6109927fccdbb0aa5eb"
+  },
+  "budget": {
+    "head_maximum_submission_seconds": 12,
+    "required_head_completion_rate": 1
+  },
+  "certification": "bounded facade workload only; base unresolved outcomes are failures, not rules answers; complete games unmeasured"
+}

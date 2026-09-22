@@ -43,6 +43,9 @@ def resolve_embark(
     persisting_effects: tuple[PersistingEffect, ...] = (),
 ) -> EmbarkResolution:
     from warhammer40k_core.core.validation import IdentifierValidator
+    from warhammer40k_core.engine.transport_disembark_geometry import (
+        geometry_models_for_unit_placement,
+    )
     from warhammer40k_core.engine.transports import (
         _CORE_TRANSPORT_RULE_ID,
         _EMBARK_DISTANCE_INCHES,
@@ -52,7 +55,6 @@ def resolve_embark(
         TransportOperationViolation,
         TransportOperationViolationCode,
         _append_transport_common_violations,
-        _geometry_models_for_unit_placement,
     )
 
     IdentifierValidator(GameLifecycleError)("Embark turn_player_id", turn_player_id)
@@ -175,7 +177,7 @@ def resolve_embark(
                 source_rule_id=active_cargo.capacity_profile.source_id,
             )
         )
-    transport_models = _geometry_models_for_unit_placement(
+    transport_models = geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=transport_placement,
     )

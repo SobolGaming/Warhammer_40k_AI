@@ -11,6 +11,7 @@ from tools.build_core_emergency_disembark_placement_source import (
     build_payloads,
 )
 
+from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_emergency_disembark_placement_2026_09 as source,
 )
@@ -49,22 +50,36 @@ def test_emergency_disembark_placement_has_one_proof_owner() -> None:
     geometry = (ENGINE / "transport_disembark_geometry.py").read_text(encoding="utf-8")
     transports = (ENGINE / "transports.py").read_text(encoding="utf-8")
     grouped = (ENGINE / "destroyed_transport_rules_unit_disembark.py").read_text(encoding="utf-8")
-    fit = (GEOMETRY / "emergency_disembark_fit.py").read_text(encoding="utf-8")
+    fit = (GEOMETRY / "emergency_setup_proof.py").read_text(encoding="utf-8")
     assert "PLACEMENT_POLICY" in owner
-    assert "circular_emergency_pose_exists(" in owner
+    assert "emergency_setup_pose_exists(" in owner
     assert "terrain_features" in owner
     assert "is_within_engagement_range(" in owner
     assert "append_emergency_disembark_placement_violations(" in transports
     assert "append_emergency_disembark_rules_unit_omission_violations(" in grouped
     assert "DisembarkModeKind.EMERGENCY_DISEMBARK" in geometry
-    assert 'decide(both(*constraints), ("x", "y"))' in fit
-    assert "AxisAlignedRectObstacle" in fit
-    assert "_circle_strictly_outside_rect(" in fit
-    # Every existence query must pass the floor/support guard before the planar
-    # SAT result can become a closest, unengaged, or omitted-casualty verdict.
-    assert "rect_obstacles=_terrain_proof_rects(" in owner
-    assert "for floor in feature.floors:" in owner
-    assert "floor collision and supported-elevation proof" in owner
+    assert "emergency_setup_pose_is_legal(" in owner
+    assert "_terrain_conditions(" in fit
+    assert "for floor in terrain.feature.floors" in fit
+    assert "rotation = (c * c + s * s).eq(1)" in fit
+    assert "formula, names = _plane_formula(query, z)" in fit
+    assert "if decide(formula, names):" in fit
+    assert "if contact_planes_coincide(float(z), oz):" in fit
+    measurement = ast.parse((GEOMETRY / "measurement.py").read_text(encoding="utf-8"))
+    (contact_method,) = (
+        node
+        for node in ast.walk(measurement)
+        if isinstance(node, ast.FunctionDef) and node.name == "contact_plane_footprints_overlap"
+    )
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "contact_planes_coincide"
+        for node in ast.walk(contact_method)
+    )
+    assert "_circular_radius" not in owner
+    assert "floor collision and supported-elevation proof" not in owner
+    assert not (GEOMETRY / "emergency_disembark_fit.py").exists()
     assert "except Exception" not in owner
     assert "except Exception" not in fit
     assert _emergency_owner_modules() == (
@@ -126,3 +141,50 @@ def _is_owner_call(node: ast.AST) -> bool:
     if isinstance(func, ast.Name):
         return func.id in names
     return isinstance(func, ast.Attribute) and func.attr in names
+
+
+@pytest.mark.parametrize("evidence_directory", ["", "r73_001"])
+def test_order73_geometry_performance_preserves_base_outcomes_and_complete_head(
+    evidence_directory: str,
+) -> None:
+    directory = ROOT / "docs/performance/order73" / evidence_directory
+    for prefix in ("", "geometry-"):
+        base, head = (
+            json.loads((directory / f"{prefix}{name}.json").read_text(encoding="utf-8"))
+            for name in ("base", "head")
+        )
+        for field in (
+            "workload_id",
+            "platform",
+            "python",
+            "cpu",
+            "cpu_allocation",
+            "memory_bytes",
+            "concurrency",
+            "timing_boundary",
+            "hashes",
+        ):
+            assert base[field] == head[field], field
+        assert head["completion_rate"] == 1
+        if evidence_directory:
+            assert head["revision"] == verified_engine_build_identity().build_id
+            assert base["completion_rate"] == 1
+            assert all(row["complete"] and row["valid"] for row in base["samples"])
+        assert head["full_game_certified"] is False
+        assert all(row["complete"] and row["valid"] for row in head["samples"])
+        if prefix:
+            if not evidence_directory:
+                assert base["completion_rate"] == 0
+                assert all(not row["complete"] and row["error"] for row in base["samples"])
+            assert len(head["samples"]) == 12
+            assert head["budget"] == base["budget"]
+            assert (
+                head["maximum_attempt_seconds"] <= head["budget"]["head_maximum_submission_seconds"]
+            )
+        else:
+            assert (
+                head["mean_seconds"]
+                <= base["mean_seconds"] * base["budgets"]["mean_ratio"]
+                + base["budgets"]["mean_additive_seconds"]
+            )
+            assert head["maximum_seconds"] <= base["budgets"]["maximum_seconds"]

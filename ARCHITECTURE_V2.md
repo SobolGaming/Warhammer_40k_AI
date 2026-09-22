@@ -44,6 +44,28 @@ policy ID only when their evidence identity, stable source ID, and observation
 hash match the registry's immutable inventory. Live mirror sites are not
 runtime inputs.
 
+## Core Rules certification status
+
+Completed implementation phases and loaded source packages do not establish
+all-category Core Rules compliance. PFINAL remains blocked by the
+[Order 73 preflight finding C18-10](docs/ORDER_73_PREFLIGHT_AUDIT.md) until
+its P18I prerequisite merges and the full audit is repeated. PFINAL moves to
+Order 74; `CAUDIT-01` remains open.
+
+Emergency Disembark now uses `geometry.emergency_setup_proof` and analytic
+`geometry.placement_predicates` for submitted poses and alternative-placement
+proofs. The engine supplies source-linked terrain permissions, complete proposed
+attached-unit model groups, blockers, objective disks and coherency/engagement
+policies. Objective disks constrain only coincident contact planes, using the
+same `geometry.pose.contact_planes_coincide` predicate and absolute `1e-9`
+tolerance as endpoint placement; model height does not determine marker contact.
+Ground and real floor planes retain continuous translation and all
+orientations for circular, elliptical and rectangular bases. Checked witnesses
+prove existence only; negative answers require exact unsatisfiability or an
+exact geometric bound. Unresolved computations remain typed domain errors.
+The obsolete circle/cardinal-only solver is removed. No new decision path,
+content-specific handler or architecture boundary is introduced.
+
 ## Roadmap status
 
 Everything through **Phase 14H** is treated as implemented at the time this file

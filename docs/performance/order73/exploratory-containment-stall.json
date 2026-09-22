@@ -1,0 +1,10 @@
+{
+  "scenario": "constant analytic ellipse with semiaxes 2 and 1, inside a disk of radius 2",
+  "result": "interrupted_unresolved",
+  "query_seconds": null,
+  "measurement_scope": "supplemental correctness probe; isolated timing was not recorded",
+  "resolution": "exact S-procedure certificate replaces general quantifier elimination for ellipse-in-disk containment",
+  "regression": "test_analytic_ellipse_containment_does_not_substitute_its_bounding_box",
+  "rules_answer_from_interruption": null,
+  "full_game_certified": false
+}

@@ -269,7 +269,7 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
         # Proposed Emergency Disembark endpoints, not current whole-unit authority.
         (
             "src/warhammer40k_core/engine/emergency_disembark_placement.py",
-            "_model_is_engaged",
+            "append_emergency_disembark_placement_violations",
         ): 1,
         (
             "src/warhammer40k_core/geometry/collision.py",

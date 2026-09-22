@@ -1,0 +1,125 @@
+{
+  "order": 73,
+  "prerequisite": "P18I",
+  "finding_ids": [
+    "C18-10"
+  ],
+  "validated_on": "2026-09-21T22:22:27.315740-04:00",
+  "status": "passed",
+  "base_commit": "77e2e46340abd8a698465e0937df6363d356925a",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc075ee49c3b002d659c40007f41c72069f49861fe77e93ab06a9dd5935ee9b8",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "behavioral": {
+    "tests": 8758,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1337.7,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "e81c68f364cce7709faaa2402881fdfa872da3ef89abeeed309322e6ac71fb54",
+    "coverage_percent": 85.17389455922434,
+    "coverage_minimum_percent": 85,
+    "coverage_report_sha256": "340c9ab7ac1078f6512ccea0a8a1a0e4eeaab638b9b120242ec72f14112f55d7",
+    "warning_types": [
+      "ResourceWarning: unclosed SQLite connections"
+    ]
+  },
+  "code_quality": {
+    "tests": 585,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 325.124,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "e5ef13112956c60bdd56ab2e3873f323b45474fc1a8c3610c7d76b97a916a7bc",
+    "coverage": false
+  },
+  "initial_behavioral_attempt": {
+    "tests": 8754,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 970.826,
+    "workers": 64,
+    "distribution": "worksteal",
+    "junit_sha256": "4fbaa0e3655a0eef54693f3584a784270e231b0f8f05afb06647d95e67e2be49",
+    "coverage_percent_rounded": 85.17,
+    "status": "superseded_after_production_correction"
+  },
+  "second_behavioral_attempt": {
+    "tests": 8758,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1026.182,
+    "workers": 64,
+    "distribution": "worksteal",
+    "junit_sha256": "3d28ee164c02a3840d97e0bfb60339203abe5b884c90ee44d25fde3a6767ce7f",
+    "coverage_percent": 85.17389455922434,
+    "failed_test": "tests/unit/test_polygon_geometry.py::test_overlap_preserves_exact_rectangle_area_and_winding",
+    "failure": "Hypothesis FailedHealthCheck: Input generation is slow; six valid integer inputs in 1.87 seconds under 64 workers and concurrent contract/client checks. No geometry assertion failed.",
+    "reproduction_seed": "275654064527675301587658295648444966813",
+    "focused_reproduction": "Exact failing seed passed unchanged: one test in 0.38 seconds without coverage.",
+    "correction": "No code or test changes. Final aggregate validation uses PYTEST_XDIST_AUTO_NUM_WORKERS=32 with -n auto --dist=worksteal, without competing build/client processes. No health check or threshold was disabled."
+  },
+  "initial_code_quality_attempt": {
+    "tests": 576,
+    "passed": 568,
+    "failures": 8,
+    "seconds": 326.26,
+    "workers": 64,
+    "distribution": "worksteal",
+    "coverage": false,
+    "log_sha256": "113b759e663e9f823efce67b1446e7af884249df3eb8a724456ae6047d9f1245",
+    "corrections": [
+      "Seven inherited component guards required fresh qualified head timings for the changed runtime. Orders 64, 65, 66, 69, 70, 71 and 72 were remeasured serially using unchanged scripts, inputs, baselines and budgets.",
+      "The engagement-boundary audit now names the same single proposed-model geometry call at its extracted owner. No current-state rules-unit consumer was added to the inventory."
+    ]
+  },
+  "second_code_quality_attempt": {
+    "tests": 576,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 317.381,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "1f6b06d7d5d3f270ae42c8333ac68a44e95a11492e444423c6d89413134444ef",
+    "failed_test": "tests/code_quality/test_phase17j_event_companion_boundary.py::test_phase17j_runtime_does_not_parse_event_companion_pdf_text_or_images",
+    "failure": "The generic .pdf token audit misclassified a mathematical reference in a function docstring as runtime Event Companion source ingestion.",
+    "correction": "The audit distinguishes bona fide docstrings from executable PDF strings. Explicit Event Companion tokens remain forbidden even in docstrings, and all PDF parser import prohibitions remain unchanged. Nine direct regressions cover allowed citations and forbidden runtime/source references; the ten-test focused file passes. No production code changed."
+  },
+  "commands_not_run": {},
+  "gates_passed": [
+    "uv run ruff check .",
+    "uv run ruff format --check .: 3359 files",
+    "uv run mypy src tests: 3182 source files",
+    "uv run pyright: 0 errors, 0 warnings",
+    "uv run lint-imports: 11 contracts",
+    "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+    "uv run pre-commit run --all-files",
+    "Emergency Disembark source generator and Core Rules comparison-report reproducibility",
+    "Engine build identity and exact-base external contract check against 77e2e46340abd8a698465e0937df6363d356925a",
+    "Installed wheel smoke: 2923 runtime resources, 27 schemas, six request families",
+    "Clean TypeScript npm ci, generated-client check, typecheck and five unit tests",
+    "Live HTTP conformance: 342 assertions and cross-server replay equivalence",
+    "Order 73 original component and expanded facade measurements: existing budgets, seven and twelve complete head samples respectively",
+    "Orders 64, 65, 66, 69, 70, 71 and 72 current-runtime head evidence: unchanged baselines, workloads and budgets"
+  ],
+  "scope": "P18I / C18-10 prerequisite authorized after the original Order 73 preflight found unsupported Emergency Disembark geometry. PFINAL moves to Order 74; CAUDIT-01 remains open until this prerequisite merges and the full category audit is repeated. No production code changed after the final behavioral run began.",
+  "source_evidence": "Retained Order 60 source package IDs, hashes and observations are unchanged. Source load support and consumer semantic-execution support remain distinct from all-category certification.",
+  "performance_scope": "Bounded component and actual facade-submission workloads on the provisional Windows host. Original base was measured before production changes; expanded base was measured afterward against the same unmodified pinned archive, recording 0/12 complete unsupported cases. Head completes 12/12. Whole-game 60-second mean / 300-second maximum targets and deferred Order 32 budgets remain uncertified.",
+  "diagnostic_history": [
+    "Existing floor/non-circular/cardinal-wall guards prevented complete negative placement proofs. The focused base regressions reproduced unsupported outcomes before the shared proof was replaced.",
+    "Same-bug-class tracing covered endpoint validation, omission, unengaged preference, closest placement and attached components. They now share the analytic query and full proposed group.",
+    "An unresolved thin rotated-floor exploration is retained in exploratory-floor-stall.json. An exactly checked positive floor witness resolves that regression without turning failed samples into negative answers.",
+    "A supplemental ellipse-in-disk regression exposed a general quantifier-elimination stall. The exact S-lemma certificate resolves it; exploratory-containment-stall.json preserves the incomplete result. The initial aggregate coverage run was superseded and rerun after this production correction.",
+    "Final behavioral coverage and code-quality suites use xdist work stealing with PYTEST_XDIST_AUTO_NUM_WORKERS=32 and the required Node PATH. Focused iteration used serial execution as permitted by AGENTS.md.",
+    "All qualified performance measurements ran sequentially without competing test/build workers. No old measurement was relabeled and no threshold was raised."
+  ],
+  "pull_request_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/493",
+  "merge_status": "unmerged"
+}

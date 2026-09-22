@@ -271,7 +271,8 @@ corroborate but is not required to begin that work.
 | 70 | P24J | C24-10 | Intrinsic component Fights First effects are promoted to the attached rules unit by FightsFirstRegistry.from_state without proving every model has the ability. | Require every rules-present model to have Fights First. Distinguish intrinsic model/component sources and conditional Leader model grants from source-authorized whole-unit grants, including Charge. Recompute after ordinary/retained casualties, cleanup, revival and splitting; certify fight order, Counteroffensive, restored source scope and replay. | [24.13 Fights First](https://www.40k.app/rules/24-core-abilities) and [01.02](https://www.40k.app/rules/01-core-concepts): every-model test and unit-wide grants. | P02D, P05B, P24A | APP-DRIFT |
 | 71 | P17 | C17-01 | The shared shooting candidate exempts every CLOSE-QUARTERS weapon from the engaged Monster/Vehicle penalty and records the legacy big_guns_never_tire ID. | Exempt a CLOSE-QUARTERS attack only when the attacker's rules unit is engaged with that target. Preserve the distinct 10.06 attacking-model and 17.03 target-unit scopes, cumulative modifiers and final hit cap. Audit targeting and attack modifiers together; use stable current source IDs, regenerate affected identities and test third-party shooting, attached units, both penalty causes, all shared attack hosts and replay. | [10.06](https://www.40k.app/rules/10-shooting-phase) and [17.03](https://www.40k.app/rules/17-monsters-and-vehicles): weapon AND target-engagement exception. | P10, P02D, P02B | APP-DRIFT |
 | 72 | P12B | C12-04 | P12 combined the unversioned Engaging body clause and v931 Ongoing erratum. | Resolved by the owner's official App v946 transcription: only Engaging forces enemy fights. Ongoing preserves prior engagements; Objective remains unengaged/in range. Shared source-mode authority governs queue creation and historical restore; superseded/orphan responses fail closed. See [scope, source resolution and validation](ORDER_72_SCOPE_PLAN.md). | [12.08](https://www.40k.app/rules/12-fight-phase), owner-confirmed official App v946 (2026-09-21), and preserved historical v931 erratum. | P12, S-MIRRORS | APP-AUTHORITY |
-| 73 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 71 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
+| 73 | P18I | C18-10 | PFINAL preflight found Emergency Disembark proofs restricted to circles, cardinal walls and unsupported terrain floors. | Complete analytic circle/ellipse/rectangle placement, all orientations and supported elevations; share terrain, distance, coherency and engagement predicates for endpoints and alternatives across physical and attached units. Preserve fail-closed unresolved proofs, source provenance, adapter/replay authority and matched performance evidence. See [Order 73 prerequisite](ORDER_73_PREFLIGHT_AUDIT.md). | Retained [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports) and existing terrain/coherency descriptors. | P18B, P18H | IMPLEMENTATION-GAP |
+| 74 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 72 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
 Categories 07 and 13 have no standalone remediation PR in this
 sequence. Category 13’s current Light/Dense Hidden wording is governed by the
@@ -3073,7 +3074,7 @@ The project may claim only:
 
 That claim requires:
 
-- all 71 implementation remediation PRs, S-MIRRORS, and PFINAL merged, plus every
+- all 72 implementation remediation PRs, S-MIRRORS, and PFINAL merged, plus every
   additional remediation PR inserted by the PFINAL fail-closed audit;
 - every governing operative statement, stable source ID, provider, URL,
   App-data version or observation timestamp, transcription SHA-256, and
@@ -3096,8 +3097,8 @@ and every other scope prohibited by `AGENTS.md`.
 
 ## Exception decisions to record only if encountered
 
-There are no routine source confirmations during the current 73-step
-one-PR-at-a-time sequence (71 implementation PRs, S-MIRRORS, and PFINAL).
+There are no routine source confirmations during the current 74-step
+one-PR-at-a-time sequence (72 implementation PRs, S-MIRRORS, and PFINAL).
 Record a user decision only when implementation encounters one of these
 concrete exceptions:
 
@@ -5227,3 +5228,48 @@ Final local validation: 8,720 behavioral tests, 85.14% coverage and 572 code-qua
   because npm is unavailable; direct Node client checks passed.
 - **PR URL and merge commit:** [PR #492](https://github.com/SobolGaming/Warhammer_40k_AI/pull/492);
   open for review, not merged.
+
+
+### P18I — C18-10 (Order 73, pre-certification prerequisite)
+
+The 2026-09-21 preflight reopened Emergency Disembark geometry completeness.
+The owner authorized fixing the findings. P18I is inserted before PFINAL,
+which moves to Order 74; Orders 1–72 retain their identities. The current
+inventory is 72 implementation PRs, S-MIRRORS and PFINAL (74 rows).
+The earlier 73-row inventory above remains the September 10 planning record.
+
+The shared Emergency Disembark proof now covers analytic circles, ellipses
+and rectangles, rotated walls, ground and actual terrain support planes.
+Endpoint legality, maximal placement, unengaged preference and closest-position
+proofs share one constraint builder. Attached-unit alternatives consider the
+complete proposed group, including reconnection of coherency components.
+Unresolved solver results remain explicit errors and never authorize casualties.
+
+The retained Order 60 source IDs, package hashes and observation fingerprints
+are unchanged. `loaded` and `executable_engine_runtime` describe source loading
+and this consumer, not all-category certification. The existing Disembark
+proposal/record/event contract remains authoritative; the additive
+`emergency_disembark_endpoint_illegal` diagnostic is documented in the adapter
+contract. See [scope, audit and validation](ORDER_73_PREFLIGHT_AUDIT.md).
+
+C18-10 requires this prerequisite to merge before a fresh all-category audit.
+`CAUDIT-01` remains open; this PR is not PFINAL and makes no snapshot-wide
+compliance claim.
+
+
+Initial PR validation before R73-001: 8,758 behavioral passes with 85.1739% coverage and 585
+code-quality passes; required lint/type/import/shard/source/contract, client,
+conformance, installed-wheel and matched performance gates pass. See the
+[validation record](performance/order73/validation.json), including the retained
+initial failures and their corrections.
+
+R73-001 corrects objective exclusions to use the endpoint authority's shared
+contact-plane predicate and absolute `1e-9` tolerance. A marker inside a model's
+height but outside its contact plane cannot exclude a legal placement or
+authorize omission. Eight regressions cover elevation, tolerance, alternative
+queries and both omission consumers. Correction validation passes 8,766 behavioral
+tests with 85.1743% coverage and 586 code-quality tests; the required
+contract, client, package and matched performance gates pass. See the
+[review-fix report](performance/order73/r73_001/validation.json).
+
+PR URL and merge commit: [PR #493](https://github.com/SobolGaming/Warhammer_40k_AI/pull/493); open for review, unmerged.

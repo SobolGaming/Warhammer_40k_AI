@@ -1,0 +1,85 @@
+{
+  "workload_id": "order60-emergency-disembark-placement-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc075ee49c3b002d659c40007f41c72069f49861fe77e93ab06a9dd5935ee9b8",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 137327259648,
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "resolve one five-model Emergency Disembark contact-ring placement on the canonical Transport fixture; fixture creation excluded; first sample cold",
+  "scenario": {
+    "models": "five Intercessors emergency-disembarking a 100mm circular Transport",
+    "units": 2,
+    "emergency_survivors": 5
+  },
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order60.py": "880d1aca3ff5fb712acf6fb6802da38d59ab6a891e22bf7c564c3013f87ac100",
+    "tests/order60_emergency_disembark_helpers.py": "316e0ae40bd1086787beee1b7406acb9aca932e335748ea807e77dc0203aa094"
+  },
+  "samples": [
+    {
+      "preparation_seconds": 7.40707710001152,
+      "matched_seconds": 0.0636804000241682,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9403776000253856,
+      "matched_seconds": 0.003687300020828843,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9308773000375368,
+      "matched_seconds": 0.0032965000136755407,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 1.0074301999993622,
+      "matched_seconds": 0.003328800026793033,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9469232000410557,
+      "matched_seconds": 0.003329999977722764,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9299100000062026,
+      "matched_seconds": 0.003466599970124662,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    },
+    {
+      "preparation_seconds": 0.9281487999833189,
+      "matched_seconds": 0.0034881000174209476,
+      "valid": true,
+      "violation_count": 0,
+      "complete": true
+    }
+  ],
+  "mean_seconds": 0.012039671435819141,
+  "median_seconds": 0.003466599970124662,
+  "maximum_seconds": 0.0636804000241682,
+  "p95_seconds": 0.003687300020828843,
+  "completion_rate": 1,
+  "full_game_certified": false,
+  "budgets": {
+    "mean_ratio": 3,
+    "mean_additive_seconds": 2.5,
+    "maximum_seconds": 12
+  },
+  "certification": "component diagnostic only; gameplay slice and complete games unmeasured"
+}

@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4fef0c52c5374e2b83fc1c4e881573ac584e2d3ff377cea5b55ef8379e1f7a41",
-  "fingerprint": "4fef0c52c5374e2b83fc1c4e881573ac584e2d3ff377cea5b55ef8379e1f7a41",
-  "resource_count": 2922,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2f6bea483c37e831c53781c91415537e8d3e8f33079b1c8f56d29292fd03de40",
+  "fingerprint": "2f6bea483c37e831c53781c91415537e8d3e8f33079b1c8f56d29292fd03de40",
+  "resource_count": 2923,
   "resources": [
     {
       "byte_length": 113,
@@ -2095,9 +2095,9 @@
       "sha256": "2614600a4f7ebbec8f310e749d35ed40b4c0ad56a46b28cb08f419758ca6c642"
     },
     {
-      "byte_length": 30501,
+      "byte_length": 15690,
       "path": "warhammer40k_core/engine/emergency_disembark_placement.py",
-      "sha256": "b901db3772d85c1c29deb366dd0f4a9979ab0293273f88976173be980703913d"
+      "sha256": "57982d232ada52cb27e23d9b05880869c91edf8d6a726d68366287c52128bb5d"
     },
     {
       "byte_length": 14880,
@@ -10905,9 +10905,9 @@
       "sha256": "24a8921556107b336ce407914c2edb593907f8b464467431a9ab25592bd77508"
     },
     {
-      "byte_length": 41026,
+      "byte_length": 41104,
       "path": "warhammer40k_core/engine/phases/movement_rules_unit_disembark.py",
-      "sha256": "a01db8950d07fb2f85d5b76128cc349d6ff11e7f7fffb9c2ad0e2647deb01fe9"
+      "sha256": "0edf1974b5e7f7c4fc5b33f01da9e119974fcad135d135c2f84cafaf27653c48"
     },
     {
       "byte_length": 19635,
@@ -12410,9 +12410,9 @@
       "sha256": "df1fc326c69933cdf7e88af48b92b3abc4d39f685a0c2b370041439865ff1aab"
     },
     {
-      "byte_length": 12933,
+      "byte_length": 13306,
       "path": "warhammer40k_core/engine/transport_disembark_geometry.py",
-      "sha256": "7e4ff1e292634b97e4147495dc93ac14adc3066e4baf81b981ece297561c50aa"
+      "sha256": "824312804c94ea0fe54b44a38b9b810e73e730d63c514ca20f3bbf816dd306fd"
     },
     {
       "byte_length": 6016,
@@ -12440,9 +12440,9 @@
       "sha256": "8c61d622a74cfb2410768f78143bf5ad97d535cc05b4930b40fe28ea226dbba2"
     },
     {
-      "byte_length": 10773,
+      "byte_length": 10849,
       "path": "warhammer40k_core/engine/transport_embark_validation.py",
-      "sha256": "ef0dcd8f862d1b781558079ecaa4bda934137a6e9dce32061dc00b1615ce477b"
+      "sha256": "959d107810515b7e140be063f4bcff4139d275716afbfe5bc5aa83bcac6fef3a"
     },
     {
       "byte_length": 13124,
@@ -12455,9 +12455,9 @@
       "sha256": "af8881a602d6ab04ab5e91447c57f41c7d8057da3b59e5e95d91270998777b31"
     },
     {
-      "byte_length": 105871,
+      "byte_length": 105670,
       "path": "warhammer40k_core/engine/transports.py",
-      "sha256": "b6b1b74b0baeb566f5d1ad0edf4755719e3ab1e4315a5950d980d449fc893262"
+      "sha256": "3075009a179675c01d551eeac9c14a1951902eac1aed54bdc54a696b79764fa4"
     },
     {
       "byte_length": 54387,
@@ -12690,14 +12690,14 @@
       "sha256": "a3f8598179e403968bdec8d35d55a8110c6f6fcc1e125e09861061b66542163d"
     },
     {
-      "byte_length": 5472,
-      "path": "warhammer40k_core/geometry/emergency_disembark_fit.py",
-      "sha256": "38f8bb0f7165e6fc7d3b25c2cbb230b77abf40b779af6ed42ebf9aa675f1f229"
+      "byte_length": 20700,
+      "path": "warhammer40k_core/geometry/emergency_setup_proof.py",
+      "sha256": "4a66edff90b50fa91c145b677958a9ff67cce6aed7c6db66cf2d1a6df697d460"
     },
     {
-      "byte_length": 19795,
+      "byte_length": 19784,
       "path": "warhammer40k_core/geometry/measurement.py",
-      "sha256": "2bd495f0b2434ac70b3246fdf295ec600b879fdfa73e4d78f52cd75edc5e91f2"
+      "sha256": "40991a3bf24bcd0c545785b3093ba2607537869257cc055b0476a131b3c4c484"
     },
     {
       "byte_length": 17287,
@@ -12730,14 +12730,19 @@
       "sha256": "6767ba8379471a41778c47b73a5ae15f1a4c244dbf022e18bd72148dd453063d"
     },
     {
+      "byte_length": 12129,
+      "path": "warhammer40k_core/geometry/placement_predicates.py",
+      "sha256": "7878894891d3182b1cd53bf3e928494e4d3c69b7730f5280dec3ddfd8b266d8a"
+    },
+    {
       "byte_length": 13833,
       "path": "warhammer40k_core/geometry/polygons.py",
       "sha256": "249ef8a5aafe546e5fc9becef1c4651d563f260e034f7dbdab454ccf5b4ffc41"
     },
     {
-      "byte_length": 4331,
+      "byte_length": 4562,
       "path": "warhammer40k_core/geometry/pose.py",
-      "sha256": "b10d878808822b4e492dadef9413dfdb348cedb4a52699f2a7dc7c291e479bbe"
+      "sha256": "f14ff23e3394ae31eed75a67b19baea357a0b56503f5079fb0e56878227838af"
     },
     {
       "byte_length": 7123,

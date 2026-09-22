@@ -6538,3 +6538,23 @@ permissions before queue pop. Ordinary, reaction, Snap/Overwatch, retained and
 Firing Deck attacks retain that same path. Source values change within existing
 string fields, so Contract 34's schemas remain valid; the exact runtime identity
 continues to reject old persistence and bind replay. See [Order 71](ORDER_71_SCOPE_PLAN.md).
+
+
+## Order 73 — Emergency Disembark geometry completeness
+
+The existing Disembark `PlacementProposalPayload`, grouped placement payload,
+finite choices, records, events, retry behavior and viewer scoping cover P18I.
+No new decision type, proposal kind, field or visibility rule is introduced.
+The existing string-valued transport violation inventory gains
+`emergency_disembark_endpoint_illegal`, identifying a submitted Emergency
+Disembark pose that fails the shared exact geometry predicate. Well-formed
+illegal proposals use the existing recorded rejection and fresh-request retry.
+Malformed, stale and wrong-context proposals still fail before queue pop.
+
+Floors, rotated walls and analytic non-circular bases use the same engine
+validation and mutation owner through local, HTTP, headless and replay routes.
+Omission cannot destroy a survivor while a legal supported placement exists;
+an unresolved computation raises a typed error without recording an invented
+placement or casualty. Exact runtime identity changes invalidate stale operator
+persistence and bind regenerated replay/contract examples. Contract 34's schemas
+remain valid because violation codes are already open strings.

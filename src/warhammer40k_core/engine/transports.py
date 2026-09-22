@@ -24,7 +24,6 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacementRecord,
     UnitPlacement,
     UnitPlacementPayload,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
@@ -107,7 +106,6 @@ from warhammer40k_core.engine.unit_coherency import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
-from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.damage_allocation import (
@@ -158,6 +156,7 @@ class TransportOperationViolationCode(StrEnum):
     FIRING_DECK_MELEE_WEAPON = "firing_deck_melee_weapon"
     FIRING_DECK_ONE_SHOT_WEAPON = "firing_deck_one_shot_weapon"
     EMERGENCY_DISEMBARK_NOT_CLOSEST = "emergency_disembark_not_closest"
+    EMERGENCY_DISEMBARK_ENDPOINT_ILLEGAL = "emergency_disembark_endpoint_illegal"
     EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE = "emergency_disembark_omitted_model_placeable"
 
 
@@ -2128,6 +2127,7 @@ def _resolve_disembark(
     battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     objective_markers: tuple[ObjectiveMarker, ...],
+    emergency_rules_unit_placement: RulesUnitPlacement | None = None,
 ) -> DisembarkResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_disembark requires a BattlefieldScenario.")
@@ -2224,18 +2224,19 @@ def _resolve_disembark(
         attempted_placement=selection.attempted_placement,
         allow_partial=allow_partial,
     )
-    models = _geometry_models_for_unit_placement(
+    from warhammer40k_core.engine.transport_disembark_geometry import (
+        append_disembark_endpoint_violations,
+        geometry_models_for_unit_placement,
+    )
+
+    models = geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=selection.attempted_placement,
     )
-    transport_models = _geometry_models_for_unit_placement(
+    transport_models = geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=transport_placement,
     )
-    from warhammer40k_core.engine.transport_disembark_geometry import (
-        append_disembark_endpoint_violations,
-    )
-
     append_disembark_endpoint_violations(
         violations=violations,
         scenario=scenario,
@@ -2268,6 +2269,7 @@ def _resolve_disembark(
             battlefield_depth_inches=depth,
             terrain_features=features,
             objective_markers=markers,
+            rules_unit_placement=emergency_rules_unit_placement,
         )
     coherency_result = unit_placement_coherency_result(
         scenario=scenario,
@@ -2410,20 +2412,6 @@ def _disembark_transition_batch(
             )
             for model_placement in attempted_placement.model_placements
         )
-    )
-
-
-def _geometry_models_for_unit_placement(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-) -> tuple[Model, ...]:
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(placement),
-            placement=placement,
-        )
-        for placement in unit_placement.model_placements
     )
 
 

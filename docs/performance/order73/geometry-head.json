@@ -1,0 +1,148 @@
+{
+  "workload_id": "order73-emergency-geometry-facade-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc075ee49c3b002d659c40007f41c72069f49861fe77e93ab06a9dd5935ee9b8",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "cpu_allocation": 64,
+  "memory_bytes": 137327259648,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "one actual pending Emergency Disembark facade submission; five or six survivors; circular or rectangular Transport; one elevated floor; fixture/attack preparation excluded",
+  "samples": [
+    {
+      "rectangular": false,
+      "attached": false,
+      "repeat": 0,
+      "preparation_seconds": 5.7095969000365585,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 2.1666794000193477
+    },
+    {
+      "rectangular": false,
+      "attached": false,
+      "repeat": 1,
+      "preparation_seconds": 0.1664137000334449,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.1427261999924667
+    },
+    {
+      "rectangular": false,
+      "attached": false,
+      "repeat": 2,
+      "preparation_seconds": 0.1639574999571778,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.100082199962344
+    },
+    {
+      "rectangular": false,
+      "attached": true,
+      "repeat": 0,
+      "preparation_seconds": 0.17257950000930578,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.2178292999742553
+    },
+    {
+      "rectangular": false,
+      "attached": true,
+      "repeat": 1,
+      "preparation_seconds": 0.17340899998089299,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.2019212000304833
+    },
+    {
+      "rectangular": false,
+      "attached": true,
+      "repeat": 2,
+      "preparation_seconds": 0.17274660000111908,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.1172504000132903
+    },
+    {
+      "rectangular": true,
+      "attached": false,
+      "repeat": 0,
+      "preparation_seconds": 0.18080319999717176,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.193115400034003
+    },
+    {
+      "rectangular": true,
+      "attached": false,
+      "repeat": 1,
+      "preparation_seconds": 0.18170710001140833,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.1876109999720939
+    },
+    {
+      "rectangular": true,
+      "attached": false,
+      "repeat": 2,
+      "preparation_seconds": 0.17422520002583042,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.1090279000345618
+    },
+    {
+      "rectangular": true,
+      "attached": true,
+      "repeat": 0,
+      "preparation_seconds": 0.18896840000525117,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.2373035000055097
+    },
+    {
+      "rectangular": true,
+      "attached": true,
+      "repeat": 1,
+      "preparation_seconds": 0.18365550000453368,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.1289341999799944
+    },
+    {
+      "rectangular": true,
+      "attached": true,
+      "repeat": 2,
+      "preparation_seconds": 0.18442440003855154,
+      "complete": true,
+      "valid": true,
+      "error": null,
+      "seconds": 1.1894849000382237
+    }
+  ],
+  "completion_rate": 1.0,
+  "mean_attempt_seconds": 1.2493304666713811,
+  "maximum_attempt_seconds": 2.1666794000193477,
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
+    "scripts/measure_order73.py": "9e25b76bcf0f8a119407277bee108e3cae2d19e2f95be3a1fae311c160cc1fbf",
+    "tests/emergency_geometry_helpers.py": "fb4c1714db92931293454a21eb35c2f2fa1386bdd2d4f6109927fccdbb0aa5eb"
+  },
+  "budget": {
+    "head_maximum_submission_seconds": 12,
+    "required_head_completion_rate": 1
+  },
+  "certification": "bounded facade workload only; base unresolved outcomes are failures, not rules answers; complete games unmeasured"
+}
