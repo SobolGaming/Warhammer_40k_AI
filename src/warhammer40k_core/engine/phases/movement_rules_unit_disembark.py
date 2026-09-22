@@ -333,6 +333,7 @@ def resolve_rules_unit_disembark(
                 ),
                 terrain_features=validation_scenario.battlefield_state.terrain_features,
                 objective_markers=objective_markers,
+                emergency_rules_unit_placement=selection.attempted_placement,
             )
         else:
             component_resolution = resolve_disembark(

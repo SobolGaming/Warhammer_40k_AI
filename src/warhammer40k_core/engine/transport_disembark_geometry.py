@@ -307,3 +307,17 @@ def _model_owner_unit_id(*, scenario: BattlefieldScenario, model_instance_id: st
                 if model_placement.model_instance_id == requested_model_id:
                     return unit_placement.unit_instance_id
     raise GameLifecycleError("model_instance_id is not placed.")
+
+
+def geometry_models_for_unit_placement(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+) -> tuple[Model, ...]:
+    return tuple(
+        geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(placement),
+            placement=placement,
+        )
+        for placement in unit_placement.model_placements
+    )

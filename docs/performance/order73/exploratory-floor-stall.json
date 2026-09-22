@@ -1,0 +1,10 @@
+{
+  "scenario": "thin rectangular passenger on 13-degree elevated floor, blocked ground",
+  "test": "tests/unit/test_order60_emergency_disembark.py::test_emergency_proof_finds_an_unsampled_orientation_on_a_rotated_floor",
+  "result": "interrupted_unresolved",
+  "observed_test_process_seconds": 177,
+  "measurement_scope": "whole focused process including earlier tests, not isolated query latency",
+  "resolution": "add exactly checked floor-center/floor-orientation positive witnesses; keep complete unsatisfiability path and the same terrain case",
+  "rules_answer_from_interruption": null,
+  "full_game_certified": false
+}

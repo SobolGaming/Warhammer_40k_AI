@@ -1,5 +1,10 @@
 # Order 72 consolidation response assessment
 
+Order 73 refreshes the head evidence for runtime `bc075ee4`
+with unchanged baselines, workloads and budgets. Earlier tables and validation
+records remain historical. Current qualification is recorded in
+[Order 73 validation](../order73/validation.json).
+
 The matched workload runs the existing full-Fight Engaging regression in a fresh
 serial pytest process, without coverage or profiling. Two single-model Character
 units use an empty battlefield and the fixed `p12-full-fight-continuation` game

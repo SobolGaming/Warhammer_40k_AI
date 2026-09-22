@@ -38,7 +38,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 15 Stratagems | [15.00](https://www.40k.app/rules/15-stratagems) | authoritative_app_internal_numbering_drift | owned; see roadmap | P15D, P15F, P15G, P15A, P15B, P15H, P15I, P15E, P15C |
 | 16 Actions | [16.00](https://www.40k.app/rules/16-actions) | authoritative_app_mirror | owned; see roadmap | P16 |
 | 17 Monsters And Vehicles | [17.00](https://www.40k.app/rules/17-monsters-and-vehicles) | authoritative_app_mirror | owned; see roadmap | P17 |
-| 18 Transports | [18.00](https://www.40k.app/rules/18-transports) | authoritative_app_mirror | owned; see roadmap | P18C, P18D, P18E, P18G, P18A, P18B, P18H, P18F, P20 |
+| 18 Transports | [18.00](https://www.40k.app/rules/18-transports) | authoritative_app_mirror | owned; see roadmap | P18C, P18D, P18E, P18G, P18A, P18B, P18H, P18F, P20, P18I |
 | 19 Attached Units | [19.00](https://www.40k.app/rules/19-attached-units) | authoritative_app_mirror | owned; see roadmap | P19 |
 | 20 Strategic Reserves | [20.00](https://www.40k.app/rules/20-strategic-reserves) | authoritative_app_mirror | owned; see roadmap | P20, P20B |
 | 21 Flying and Surging | [21.00](https://www.40k.app/rules/21-flying-and-surging) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P21A, P21B |

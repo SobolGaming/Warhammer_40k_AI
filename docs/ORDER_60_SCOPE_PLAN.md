@@ -1,5 +1,9 @@
 # Order 60 / P18B — Emergency Disembark maximal closest placement
 
+> Geometry execution limits recorded below are historical Order 60 scope.
+> [Order 73 / P18I](ORDER_73_PREFLIGHT_AUDIT.md) supersedes the circular-base,
+> cardinal-wall and floor guards while preserving this source history.
+
 ## Invariant and source
 
 Emergency Disembark is a Set Up. Each surviving model must be set up wholly

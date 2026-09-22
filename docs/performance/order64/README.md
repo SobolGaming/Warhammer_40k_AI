@@ -1,5 +1,10 @@
 # Order 64 authenticated reconstruction guard
 
+Order 73 refreshes the head evidence for runtime `bc075ee4`
+with unchanged baselines, workloads and budgets. Earlier tables and validation
+records remain historical. Current qualification is recorded in
+[Order 73 validation](../order73/validation.json).
+
 Order 72 refreshed the head JSON for runtime `4fef0c52` with unchanged
 workloads, baselines and budgets. The tables and prior validation below are
 historical; current gate results are recorded in

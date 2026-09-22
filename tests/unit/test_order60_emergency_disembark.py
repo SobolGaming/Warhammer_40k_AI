@@ -27,14 +27,17 @@ from warhammer40k_core.engine.emergency_disembark_placement import (
 )
 from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placement_violation
 from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
-from warhammer40k_core.engine.transports import TransportOperationViolationCode
-from warhammer40k_core.geometry.emergency_disembark_fit import (
-    AxisAlignedRectObstacle,
-    CircularEmergencyPoseQuery,
-    circular_emergency_pose_exists,
+from warhammer40k_core.engine.transports import (
+    TransportOperationViolation,
+    TransportOperationViolationCode,
+)
+from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
+from warhammer40k_core.geometry.emergency_setup_proof import (
+    EmergencySetupQuery,
+    SetupTerrain,
+    emergency_setup_pose_exists,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
@@ -42,52 +45,10 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_emergency_disembark_placement_2026_09 as placement_source,
 )
-
-
-def test_circular_emergency_pose_existence_excludes_axis_aligned_walls() -> None:
-    query = CircularEmergencyPoseQuery(
-        transport_x=Fraction(10),
-        transport_y=Fraction(10),
-        transport_radius=Fraction("197/100"),
-        passenger_radius=Fraction("63/100"),
-        containment_center_limit=Fraction("734/100"),
-        battlefield_width=Fraction(60),
-        battlefield_depth=Fraction(44),
-        overlap_obstacles=(),
-        unengaged_obstacles=(),
-        require_unengaged=False,
-        closer_than_center=Fraction("460/100"),
-        neighbor_obstacles=(),
-        span_obstacles=(),
-    )
-    assert circular_emergency_pose_exists(query) is True
-    blocked = CircularEmergencyPoseQuery(
-        transport_x=query.transport_x,
-        transport_y=query.transport_y,
-        transport_radius=query.transport_radius,
-        passenger_radius=query.passenger_radius,
-        containment_center_limit=query.containment_center_limit,
-        battlefield_width=query.battlefield_width,
-        battlefield_depth=query.battlefield_depth,
-        overlap_obstacles=(),
-        unengaged_obstacles=(),
-        require_unengaged=False,
-        closer_than_center=query.closer_than_center,
-        neighbor_obstacles=(),
-        span_obstacles=(),
-        rect_obstacles=(
-            AxisAlignedRectObstacle(
-                min_x=Fraction(0),
-                max_x=Fraction(14),
-                min_y=Fraction(0),
-                max_y=Fraction(44),
-            ),
-        ),
-    )
-    assert circular_emergency_pose_exists(blocked) is False
 
 
 def test_emergency_disembark_places_every_survivor_on_the_closest_ring() -> None:
@@ -119,7 +80,21 @@ def test_emergency_disembark_rejects_omitting_a_placeable_survivor() -> None:
 
 def test_emergency_disembark_rejects_a_pose_that_is_not_closest() -> None:
     session = order60_emergency_session()
-    result = order60_resolve_emergency(session, order60_passenger_placement(session, far=True))
+    placement = order60_passenger_placement(session)
+    placement = replace(
+        placement,
+        model_placements=tuple(
+            replace(
+                row,
+                pose=Pose.at(
+                    10 + 1.2 * (row.pose.position.x - 10),
+                    10 + 1.2 * (row.pose.position.y - 10),
+                ),
+            )
+            for row in placement.model_placements
+        ),
+    )
+    result = order60_resolve_emergency(session, placement)
     assert result.is_valid is False
     assert any(
         violation.violation_code is TransportOperationViolationCode.EMERGENCY_DISEMBARK_NOT_CLOSEST
@@ -266,8 +241,8 @@ def test_emergency_disembark_floor_interior_cannot_prove_a_closer_pose() -> None
     _assert_terrain_endpoints(session, placement, feature, legal=True)
     _assert_terrain_endpoints(session, order60_passenger_placement(session), feature, legal=False)
     before = session.lifecycle.to_payload()
-    with pytest.raises(GameLifecycleError, match="placement proof is unresolved"):
-        order60_resolve_emergency(session, placement, terrain_features=(feature,))
+    result = order60_resolve_emergency(session, placement, terrain_features=(feature,))
+    assert result.is_valid, result.violations
     assert session.lifecycle.to_payload() == before
 
 
@@ -294,28 +269,37 @@ def test_emergency_disembark_ground_failure_cannot_authorize_elevated_survivor_o
     before = session.lifecycle.to_payload()
     if grouped_omission:
         scenario = battlefield_scenario_for_state(state=state)
-        with pytest.raises(GameLifecycleError, match="placement proof is unresolved"):
-            append_emergency_disembark_rules_unit_omission_violations(
-                violations=[],
-                scenario=scenario,
-                ruleset_descriptor=state.runtime_ruleset_descriptor(),
-                rules_unit=rules_unit_view_from_armies(
-                    armies=scenario.armies, unit_instance_id=PASSENGER_ID
-                ),
-                attempted_placement=RulesUnitPlacement.single(partial),
-                transport_placement=scenario.battlefield_state.unit_placement_by_id(TRANSPORT_ID),
-                battlefield_width_inches=60,
-                battlefield_depth_inches=44,
-                terrain_features=(feature,),
-                objective_markers=(),
-            )
+        violations: list[TransportOperationViolation] = []
+        append_emergency_disembark_rules_unit_omission_violations(
+            violations=violations,
+            scenario=scenario,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            rules_unit=rules_unit_view_from_armies(
+                armies=scenario.armies, unit_instance_id=PASSENGER_ID
+            ),
+            attempted_placement=RulesUnitPlacement.single(partial),
+            transport_placement=scenario.battlefield_state.unit_placement_by_id(TRANSPORT_ID),
+            battlefield_width_inches=60,
+            battlefield_depth_inches=44,
+            terrain_features=(feature,),
+            objective_markers=(),
+        )
+        assert any(
+            row.violation_code
+            is TransportOperationViolationCode.EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE
+            for row in violations
+        )
     else:
-        with pytest.raises(GameLifecycleError, match="placement proof is unresolved"):
-            order60_resolve_emergency(session, partial, terrain_features=(feature,))
+        result = order60_resolve_emergency(session, partial, terrain_features=(feature,))
+        assert any(
+            row.violation_code
+            is TransportOperationViolationCode.EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE
+            for row in result.violations
+        )
     assert session.lifecycle.to_payload() == before
-    # Complete elevated proposals also need a support-aware closest/unengaged proof.
-    with pytest.raises(GameLifecycleError, match="placement proof is unresolved"):
-        order60_resolve_emergency(session, elevated, terrain_features=(feature,))
+    # Complete proposals use the same support-aware closest/unengaged proof.
+    result = order60_resolve_emergency(session, elevated, terrain_features=(feature,))
+    assert result.is_valid, result.violations
 
 
 @pytest.mark.parametrize("floor_z", [0.0, 1.0, 6.0])
@@ -387,6 +371,7 @@ def _elevated_support_feature() -> TerrainFeatureDefinition:
         width_inches=20.0,
         depth_inches=20.0,
     )
+
     return TerrainFeatureDefinition(
         feature_id="elevated-support",
         feature_kind=TerrainFeatureKind.HILLS,
@@ -419,3 +404,313 @@ def _elevated_support_feature() -> TerrainFeatureDefinition:
             ),
         ),
     )
+
+
+def _analytic_query(passenger: BaseShape, transport: BaseShape) -> EmergencySetupQuery:
+    return EmergencySetupQuery(
+        passenger=Model("passenger", Pose.at(0, 0), passenger, ModelVolume(2)),
+        transports=(
+            Model("transport", Pose.at(10, 10, facing_degrees=37), transport, ModelVolume(3)),
+        ),
+        blockers=(),
+        enemies=(),
+        partners=(),
+        terrain=(),
+        objective_disks=(),
+        width=Fraction(30),
+        depth=Fraction(30),
+        neighbor_limit=Fraction(2),
+        vertical_limit=Fraction(5),
+        span_limit=Fraction(8),
+        engagement=Fraction(1),
+        engagement_vertical=Fraction(5),
+        setup_distance=Fraction(6),
+        oversized_distance=Fraction(1),
+        ordinary_size_fit=True,
+        require_unengaged=True,
+        closer_than=None,
+        closest_tolerance=Fraction("0.04"),
+    )
+
+
+@pytest.mark.parametrize("passenger", [CircularBase(0.5), OvalBase(2, 1), RectangularBase(2, 1)])
+@pytest.mark.parametrize("transport", [CircularBase(2), OvalBase(4, 2), RectangularBase(4, 2)])
+def test_emergency_proof_covers_analytic_base_pairs(
+    passenger: BaseShape, transport: BaseShape
+) -> None:
+    query = _analytic_query(passenger, transport)
+    assert emergency_setup_pose_exists(query)
+    assert not emergency_setup_pose_exists(replace(query, width=Fraction("0.4")))
+
+
+@pytest.mark.parametrize("allowed", [False, True])
+def test_emergency_proof_respects_supported_elevation_permissions(allowed: bool) -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    terrain = SetupTerrain(_elevated_support_feature(), True, allowed, True, False)
+    assert emergency_setup_pose_exists(replace(query, terrain=(terrain,))) is allowed
+
+
+@pytest.mark.parametrize(("wall_width", "expected"), [(2.0, True), (30.0, False)])
+def test_emergency_proof_uses_rotated_wall_geometry(wall_width: float, expected: bool) -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    feature = _elevated_support_feature()
+    display = TerrainDisplayGeometry.axis_aligned_rectangle(
+        display_template_id="rotated-wall-footprint",
+        center_x_inches=10,
+        center_y_inches=10,
+        width_inches=50,
+        depth_inches=50,
+    )
+    feature = replace(
+        feature,
+        footprint_width_inches=50,
+        footprint_depth_inches=50,
+        rules_footprint_polygon=display.footprint_polygon,
+        display_geometry=display,
+        floors=(),
+        walls=(
+            replace(
+                feature.walls[0], width_inches=wall_width, depth_inches=30, rotation_degrees=37
+            ),
+        ),
+    )
+    terrain = SetupTerrain(feature, True, True, True, False)
+    assert emergency_setup_pose_exists(replace(query, terrain=(terrain,))) is expected
+
+
+def test_emergency_proof_excludes_overhang_and_out_of_range_elevations() -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    feature = _elevated_support_feature()
+    floor = feature.floors[0]
+    tiny = replace(feature, floors=(replace(floor, width_inches=0.8, depth_inches=0.8),))
+    high = replace(feature, floors=(replace(floor, bottom_z_inches=10),))
+    for blocked in (tiny, high):
+        assert not emergency_setup_pose_exists(
+            replace(query, terrain=(SetupTerrain(blocked, True, True, True, False),))
+        )
+    # Cached negative results cannot survive a support-policy or elevation change.
+    assert emergency_setup_pose_exists(
+        replace(query, terrain=(SetupTerrain(feature, True, True, True, False),))
+    )
+    assert emergency_setup_pose_exists(
+        replace(query, terrain=(SetupTerrain(tiny, True, True, False, False),))
+    )
+
+
+@pytest.mark.parametrize("passenger", [OvalBase(4, 1), RectangularBase(4, 1)])
+def test_emergency_proof_searches_orientations(passenger: BaseShape) -> None:
+    query = _analytic_query(passenger, CircularBase(0.25))
+    transport = replace(query.transports[0], pose=Pose.at(0.55, 6))
+    query = replace(query, transports=(transport,), width=Fraction("1.1"), depth=Fraction(12))
+    assert emergency_setup_pose_exists(query)
+
+
+def test_emergency_proof_keeps_vertical_coherency_and_unengaged_preference() -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    feature = _elevated_support_feature()
+    query = replace(query, terrain=(SetupTerrain(feature, True, True, True, False),))
+    partner = Model("partner", Pose.at(10, 10, 20), CircularBase(0.5), ModelVolume(2))
+    assert not emergency_setup_pose_exists(replace(query, partners=(partner,)))
+    enemy = Model("enemy", Pose.at(10, 10, 6), CircularBase(12), ModelVolume(1))
+    # All supported endpoints are engaged, but the explicit engaged alternative survives.
+    assert not emergency_setup_pose_exists(replace(query, enemies=(enemy,)))
+    assert emergency_setup_pose_exists(replace(query, enemies=(enemy,), require_unengaged=False))
+
+
+@pytest.mark.parametrize("attached", [False, True])
+@pytest.mark.parametrize("rectangular", [False, True])
+def test_emergency_geometry_facade_restore_and_replay(attached: bool, rectangular: bool) -> None:
+    from tests.emergency_geometry_helpers import emergency_geometry_session
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    session, proposal = emergency_geometry_session(attached=attached, rectangular=rectangular)
+    state = session.lifecycle.state
+    assert state is not None
+    request = session.lifecycle.pending_decision_request()
+    assert request is not None
+    for kind in ("malformed", "stale", "wrong_context"):
+        raw = validate_json_value(proposal.to_payload())
+        assert isinstance(raw, dict)
+        if kind == "malformed":
+            del raw["disembark_mode"]
+        elif kind == "stale":
+            raw["proposal_request_id"] = "stale-request"
+        else:
+            raw["transport_unit_instance_id"] = "other-transport"
+        before = state.to_payload()
+        records = tuple(session.lifecycle.decision_controller.records)
+        rejected = session.submit_parameterized_payload(
+            request_id=request.request_id, result_id=kind, payload=raw
+        )
+        assert rejected.status_kind is LifecycleStatusKind.INVALID
+        assert state.to_payload() == before
+        assert tuple(session.lifecycle.decision_controller.records) == records
+        assert session.lifecycle.pending_decision_request() == request
+    initial = session.lifecycle.to_payload()
+    components = (
+        proposal.attempted_rules_unit_placement.component_unit_placements
+        if proposal.attempted_rules_unit_placement is not None
+        else (proposal.require_unit_placement(),)
+    )
+    floating = tuple(
+        replace(
+            component,
+            model_placements=tuple(
+                replace(row, pose=Pose.at(row.pose.position.x, row.pose.position.y, 20))
+                for row in component.model_placements
+            ),
+        )
+        for component in components
+    )
+    invalid_proposal = replace(
+        proposal,
+        attempted_placement=None if attached else floating[0],
+        attempted_rules_unit_placement=RulesUnitPlacement(
+            rules_unit_instance_id=proposal.unit_instance_id,
+            component_unit_placements=floating,
+        )
+        if attached
+        else None,
+    )
+    battlefield_before = state.battlefield_state
+    cargo_before = tuple(state.transport_cargo_states)
+    invalid = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="floating-endpoint",
+        payload=validate_json_value(invalid_proposal.to_payload()),
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert state.battlefield_state == battlefield_before
+    assert tuple(state.transport_cargo_states) == cargo_before
+    request = session.lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.request_id != proposal.proposal_request_id
+    proposal = replace(proposal, proposal_request_id=request.request_id)
+    restored = LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload())
+    )
+    for target in (session, restored):
+        accepted = target.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="emergency-place",
+            payload=validate_json_value(proposal.to_payload()),
+        )
+        assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted
+    assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()
+    restored = LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload())
+    )
+    for viewer in state.player_ids:
+        assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)
+        assert session.events_since(
+            EventStreamCursor(), viewer_player_id=viewer
+        ) == restored.events_since(EventStreamCursor(), viewer_player_id=viewer)
+    replay = ReplayRunner(
+        ReplayArtifact.capture(
+            artifact_id="emergency-geometry",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+    ).run()
+    assert replay.reproduced_exactly, replay
+    assert state.battlefield_state is not None
+    placed = proposal.attempted_rules_unit_placement
+    model_ids = (
+        tuple(row.model_instance_id for row in placed.model_placements)
+        if placed is not None
+        else tuple(
+            row.model_instance_id for row in proposal.require_unit_placement().model_placements
+        )
+    )
+    assert set(model_ids).issubset(state.battlefield_state.placed_model_ids())
+    assert "object at 0x" not in json.dumps(session.lifecycle.to_payload(), sort_keys=True)
+
+
+def test_emergency_proof_must_reconnect_both_halves_of_an_attached_unit() -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    left = Model("left", Pose.at(2, 10), CircularBase(0.5), ModelVolume(2))
+    right = replace(left, model_id="right", pose=Pose.at(18, 10))
+    # Each half admits a nearby placement, but no placement can join both.
+    assert not emergency_setup_pose_exists(replace(query, partners=(left, right), span_limit=None))
+    assert emergency_setup_pose_exists(replace(query, partners=(left,), span_limit=None))
+
+
+def test_emergency_endpoint_rejects_floating_and_out_of_range_supported_poses() -> None:
+    from warhammer40k_core.geometry.emergency_setup_proof import emergency_setup_pose_is_legal
+
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    query = replace(query, passenger=replace(query.passenger, pose=Pose.at(10, 10, 6)))
+    assert not emergency_setup_pose_is_legal(query)
+    feature = _elevated_support_feature()
+    assert emergency_setup_pose_is_legal(
+        replace(query, terrain=(SetupTerrain(feature, True, True, True, False),))
+    )
+    feature = replace(feature, floors=(replace(feature.floors[0], bottom_z_inches=20),))
+    assert not emergency_setup_pose_is_legal(
+        replace(
+            query,
+            passenger=replace(query.passenger, pose=Pose.at(10, 10, 20)),
+            terrain=(SetupTerrain(feature, True, True, True, False),),
+        )
+    )
+
+
+def test_emergency_proof_fits_a_thin_base_on_a_rotated_floor() -> None:
+    query = _analytic_query(RectangularBase(4, 0.2), CircularBase(2))
+    feature = _elevated_support_feature()
+    feature = replace(
+        feature,
+        floors=(
+            replace(feature.floors[0], width_inches=4.2, depth_inches=0.4, rotation_degrees=13),
+        ),
+    )
+    # No 0/90/Transport-facing pose fits; the floor-oriented pose must be checked.
+    assert emergency_setup_pose_exists(
+        replace(query, terrain=(SetupTerrain(feature, True, True, True, False),))
+    )
+
+
+def test_emergency_proof_cache_tracks_objective_presence_and_restoration() -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    emergency_setup_pose_exists.cache_clear()
+    assert emergency_setup_pose_exists(query)
+    blocked = replace(query, objective_disks=((10, 10, 0, 100),))
+    assert not emergency_setup_pose_exists(blocked)
+    assert emergency_setup_pose_exists(query)
+    assert not emergency_setup_pose_exists.__wrapped__(blocked)
+    assert emergency_setup_pose_exists.__wrapped__(query)
+
+
+@pytest.mark.parametrize(("x", "expected"), [(0.0, True), (0.01, False)])
+def test_analytic_ellipse_containment_does_not_substitute_its_bounding_box(
+    x: float, expected: bool
+) -> None:
+    from warhammer40k_core.geometry.placement_predicates import Footprint, PlacementPredicates
+    from warhammer40k_core.geometry.visibility_algebra import decide, term
+
+    context = PlacementPredicates()
+    ellipse = Footprint.fixed(OvalBase(4, 2), Pose.at(x, 0))
+    circle = Footprint.fixed(CircularBase(1), Pose.at(0, 0))
+    formula = context.contained(ellipse, circle, term(1))
+    assert decide(formula, tuple(context.names)) is expected
+    enclosure = Footprint.fixed(RectangularBase(4, 2), Pose.at(x, 0))
+    formula = context.contained(enclosure, circle, term(1))
+    assert not decide(formula, tuple(context.names))
+
+
+@pytest.mark.parametrize(("x", "expected"), [(0.0, True), (20.0, False)])
+def test_analytic_mixed_curved_contact_uses_actual_base_membership(
+    x: float, expected: bool
+) -> None:
+    from warhammer40k_core.geometry.placement_predicates import Footprint, PlacementPredicates
+    from warhammer40k_core.geometry.visibility_algebra import decide, term
+
+    context = PlacementPredicates()
+    ellipse = Footprint.fixed(OvalBase(4, 2), Pose.at(x, 0))
+    rectangle = Footprint.fixed(RectangularBase(2, 1), Pose.at(0, 0, facing_degrees=37))
+    formula = context.near(ellipse, rectangle, term(0))
+    assert decide(formula, tuple(context.names)) is expected
