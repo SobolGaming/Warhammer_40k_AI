@@ -2,6 +2,11 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.physical_proposal_validation import (
+    physical_proposal_invalid_status as _reject_invalid_proposal,
+)
+
+
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battle_shock_resolution import (
@@ -109,10 +114,8 @@ def _apply_movement_proposal_decision(
     if not proposal_validation.is_valid:
         return _reject_invalid_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=proposal_validation,
-            event_type="movement_proposal_invalid",
             message="Movement proposal does not match the pending request.",
         )
 
@@ -880,35 +883,6 @@ def _action_result_from_proposal_request(
         actor_id=actor_id,
         selected_option_id=selected_option_id,
         payload=validate_json_value(payload),
-    )
-
-
-def _reject_invalid_proposal(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    result: DecisionResult,
-    proposal_validation: ProposalValidationResult,
-    event_type: str,
-    message: str,
-) -> LifecycleStatus:
-    payload = validate_json_value(
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": _active_player_id(state),
-            "phase": BattlePhase.MOVEMENT.value,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-            "phase_body_status": proposal_validation.status,
-            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
-        }
-    )
-    decisions.event_log.append(event_type, payload)
-    return LifecycleStatus.invalid(
-        stage=GameLifecycleStage.BATTLE,
-        message=message,
-        payload=payload,
     )
 
 

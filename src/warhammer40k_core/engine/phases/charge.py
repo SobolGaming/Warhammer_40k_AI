@@ -178,6 +178,9 @@ from warhammer40k_core.engine.phases.charge_proposal_flow import (
 from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
 )
+from warhammer40k_core.engine.physical_proposal_validation import (
+    physical_proposal_invalid_status as _reject_invalid_charge_proposal,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     placed_alive_rules_unit_views,
@@ -1439,7 +1442,6 @@ def _parse_charge_move_proposal_submission_or_invalid(
     except (GameLifecycleError, GeometryError, KeyError, TypeError) as exc:
         return _reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=_charge_proposal_payload_parse_failure(
                 proposal_request=proposal_request,
@@ -1482,34 +1484,6 @@ def _charge_proposal_payload_parse_failure(
         violation_code="proposal_payload_malformed",
         message=f"Charge Move proposal payload is malformed: {message}",
         field=field,
-    )
-
-
-def _reject_invalid_charge_proposal(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    result: DecisionResult,
-    proposal_validation: ProposalValidationResult,
-    message: str,
-) -> LifecycleStatus:
-    payload = validate_json_value(
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": _active_player_id(state),
-            "phase": BattlePhase.CHARGE.value,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-            "phase_body_status": proposal_validation.status,
-            "proposal_validation": proposal_validation.to_payload(),
-        }
-    )
-    decisions.event_log.append("charge_move_proposal_invalid", payload)
-    return LifecycleStatus.invalid(
-        stage=GameLifecycleStage.BATTLE,
-        message=message,
-        payload=payload,
     )
 
 

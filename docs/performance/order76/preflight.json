@@ -1,0 +1,2614 @@
+{
+  "audit_id": "order76-prefinal-prevalidation-audit-v1",
+  "reviewed_commit": "f96d235db3de236531a089fa2d95b8c20baaa418",
+  "observed_at": "2026-09-22T15:55:58.539788+00:00",
+  "prerequisite_pr": {
+    "number": 495,
+    "state": "MERGED",
+    "merged_at": "2026-09-22T15:47:33Z"
+  },
+  "remote_main_matches_reviewed_commit": true,
+  "open_prs_at_preflight": [],
+  "finding_id": "C03-04",
+  "audit_status": "blocked_before_complete_25_category_certification",
+  "caudit_01_closed": false,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "full_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "samples_seconds": [],
+    "arithmetic_mean_seconds": null,
+    "maximum_seconds": null,
+    "mean_target_seconds_exclusive": 60,
+    "maximum_target_seconds_inclusive": 300,
+    "certified": false,
+    "reason": "No representative legal complete-game driver or committed complete-game decision recording found; existing headless adapter submits one supplied decision and pairing certification seeds a Fight boundary.",
+    "missing_prerequisites": [
+      "Versioned complete-game workload with legal proposal generation or full recording",
+      "Declared rosters, terrain including the continuous terrain solver, seeds and decision policy",
+      "Initialization through normal completion and replay output measured on declared reference hardware"
+    ]
+  },
+  "files": [
+    {
+      "path": "reports/order76/probe_ingress.py",
+      "sha256": "99d6237044e1c6cd05cd686289ee34e1161e05b5a6652db986ee07a9e2d7049f"
+    },
+    {
+      "path": "reports/order76/ingress.json",
+      "sha256": "4ba04fd5f27fd5e54fd5f8b0bf5494c9bf30365dc46e66cabea89f1f1bdf0cad"
+    },
+    {
+      "path": "reports/order76/focused.xml",
+      "sha256": "3623474591005262efa3feea540137e3650fca04d1f3cc900758a1410e38c5d0"
+    },
+    {
+      "path": "tests/surge_fixed_target_helpers.py",
+      "sha256": "73fda088d8de0b792973e21fa011eff378f68d3ef962d68d65f217c14c13e79c"
+    },
+    {
+      "path": "tests/charge_endpoint_helpers.py",
+      "sha256": "817d51830e7ecaabfede5bf5d3f271db998b94cda0c4f73f6dcd4a2bbb2dc3de"
+    },
+    {
+      "path": "docs/ADAPTER_DECISION_CONTRACT.md",
+      "sha256": "f9893fd0606fb51a2ded0a4b592ef2d2fb3b1e453700d0b20a5d708df49c7d1c"
+    }
+  ],
+  "focused_tests": {
+    "passed": 9,
+    "deselected": 64,
+    "seconds": 18.59,
+    "coverage": false
+  },
+  "aggregate_gates_run": false,
+  "probe_results": [
+    {
+      "case": "valid_control",
+      "submission_status": {
+        "stage": "battle",
+        "status_kind": "waiting_for_decision",
+        "decision_request": {
+          "request_id": "decision-request-000003",
+          "decision_type": "select_shooting_unit",
+          "actor_id": "player-a",
+          "payload": {
+            "game_id": "order75-surge-rectangular-target",
+            "battle_round": 1,
+            "phase": "shooting",
+            "active_player_id": "player-a"
+          },
+          "options": [
+            {
+              "option_id": "army-alpha:source",
+              "label": "CORE Intercessor-like Infantry",
+              "payload": {
+                "unit_instance_id": "army-alpha:source"
+              }
+            },
+            {
+              "option_id": "complete_shooting_phase",
+              "label": "Complete Shooting Phase",
+              "payload": {
+                "submission_kind": "complete_shooting_phase",
+                "game_id": "order75-surge-rectangular-target",
+                "battle_round": 1,
+                "phase": "shooting",
+                "active_player_id": "player-a",
+                "phase_body_status": "shooting_phase_complete",
+                "skipped_unit_ids": [
+                  "army-alpha:source"
+                ]
+              }
+            }
+          ]
+        },
+        "message": null,
+        "payload": {
+          "phase": "shooting",
+          "battle_round": 1,
+          "active_player_id": "player-a",
+          "legal_unit_count": 1
+        }
+      },
+      "game_state_unchanged": false,
+      "pending_request_unchanged": false,
+      "decision_record_delta": 1,
+      "new_events": [
+        {
+          "event_id": "event-000028",
+          "event_type": "decision_recorded",
+          "payload": {
+            "record_id": "decision-record-000002",
+            "request": {
+              "request_id": "decision-request-000002",
+              "decision_type": "submit_movement_proposal",
+              "actor_id": "player-a",
+              "payload": {
+                "proposal_request": {
+                  "request_id": "decision-request-000002",
+                  "decision_type": "submit_movement_proposal",
+                  "actor_id": "player-a",
+                  "game_id": "order75-surge-rectangular-target",
+                  "battle_round": 1,
+                  "phase": "shooting",
+                  "unit_instance_id": "army-alpha:source",
+                  "proposal_kind": "surge_move",
+                  "source_decision_request_id": "decision-request-000001",
+                  "source_decision_result_id": "select-fixed-target-surge",
+                  "spatial_context_hash": "39805ee349ac59b5959d1f2df745117afa90f17697c1768d22373fb5c6da4e96",
+                  "movement_phase_action": "surge_move",
+                  "placement_kinds": [],
+                  "context": {
+                    "surge_target_unit_instance_id": "army-beta:enemy",
+                    "context_kind": "triggered_movement",
+                    "descriptor": {
+                      "movement_kind": "surge",
+                      "source_rule_id": "test:source-backed-surge",
+                      "trigger_timing": {
+                        "phase": "shooting",
+                        "window_kind": "rule_trigger",
+                        "source_step": "just_after_enemy_unit_has_shot",
+                        "source_event_id": "event-000022"
+                      },
+                      "max_distance_inches": 3.0,
+                      "movement_mode": "normal",
+                      "allow_battle_shocked": false,
+                      "allow_within_engagement_range": false,
+                      "one_per_phase": true,
+                      "optional": true
+                    },
+                    "selected_unit": {
+                      "unit_instance_id": "army-alpha:source",
+                      "hook_id": "test:hook",
+                      "source_id": "test:source-backed-surge",
+                      "replay_payload": null,
+                      "decision_effect_payload": null,
+                      "distance_roll_state": null,
+                      "distance_roll_bonus_inches": 0,
+                      "distance_reroll_permission": null
+                    },
+                    "selection_request_id": "decision-request-000001",
+                    "selection_result_id": "select-fixed-target-surge",
+                    "selection_option_id": "surge:army-alpha:source:target:army-beta:enemy",
+                    "take_to_the_skies": false
+                  }
+                }
+              },
+              "options": [
+                {
+                  "option_id": "submit_parameterized_payload",
+                  "label": "Submit Parameterized Payload",
+                  "payload": {
+                    "submission_kind": "parameterized"
+                  }
+                }
+              ]
+            },
+            "result": {
+              "result_id": "order76-valid_control",
+              "request_id": "decision-request-000002",
+              "decision_type": "submit_movement_proposal",
+              "actor_id": "player-a",
+              "selected_option_id": "submit_parameterized_payload",
+              "payload": {
+                "proposal_request_id": "decision-request-000002",
+                "proposal_kind": "surge_move",
+                "unit_instance_id": "army-alpha:source",
+                "movement_phase_action": "surge_move",
+                "witness": {
+                  "model_paths": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:001",
+                      "poses": [
+                        {
+                          "position": {
+                            "x": 27.2,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 27.2,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 27.2,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:002",
+                      "poses": [
+                        {
+                          "position": {
+                            "x": 28.6,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 28.6,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 28.6,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:003",
+                      "poses": [
+                        {
+                          "position": {
+                            "x": 30.0,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 30.0,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 30.0,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:004",
+                      "poses": [
+                        {
+                          "position": {
+                            "x": 31.4,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 31.4,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 31.4,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:005",
+                      "poses": [
+                        {
+                          "position": {
+                            "x": 32.8,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 32.8,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        {
+                          "position": {
+                            "x": 32.8,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "event_id": "event-000029",
+          "event_type": "triggered_movement_resolved",
+          "payload": {
+            "game_id": "order75-surge-rectangular-target",
+            "battle_round": 1,
+            "active_player_id": "player-a",
+            "phase": "shooting",
+            "unit_instance_id": "army-alpha:source",
+            "triggered_movement_kind": "surge",
+            "source_rule_id": "test:source-backed-surge",
+            "trigger_timing": {
+              "phase": "shooting",
+              "window_kind": "rule_trigger",
+              "source_step": "just_after_enemy_unit_has_shot",
+              "source_event_id": "event-000022"
+            },
+            "request_id": "decision-request-000002",
+            "result_id": "order76-valid_control",
+            "phase_body_status": "triggered_movement_resolved",
+            "transition_batch": {
+              "placements": [],
+              "removals": [],
+              "displacements": [
+                {
+                  "model_instance_id": "army-alpha:source:core-intercessor-like:001",
+                  "displacement_kind": "surge_move",
+                  "start_pose": {
+                    "position": {
+                      "x": 27.2,
+                      "y": 20.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "end_pose": {
+                    "position": {
+                      "x": 27.2,
+                      "y": 23.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "path_witness": {
+                    "model_paths": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:001",
+                        "poses": [
+                          {
+                            "position": {
+                              "x": 27.2,
+                              "y": 20.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 27.2,
+                              "y": 21.5,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 27.2,
+                              "y": 23.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "source_phase": "shooting",
+                  "source_step": "just_after_enemy_unit_has_shot",
+                  "source_rule_id": "test:source-backed-surge",
+                  "source_event_id": "event-000022"
+                },
+                {
+                  "model_instance_id": "army-alpha:source:core-intercessor-like:002",
+                  "displacement_kind": "surge_move",
+                  "start_pose": {
+                    "position": {
+                      "x": 28.6,
+                      "y": 20.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "end_pose": {
+                    "position": {
+                      "x": 28.6,
+                      "y": 23.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "path_witness": {
+                    "model_paths": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:002",
+                        "poses": [
+                          {
+                            "position": {
+                              "x": 28.6,
+                              "y": 20.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 28.6,
+                              "y": 21.5,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 28.6,
+                              "y": 23.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "source_phase": "shooting",
+                  "source_step": "just_after_enemy_unit_has_shot",
+                  "source_rule_id": "test:source-backed-surge",
+                  "source_event_id": "event-000022"
+                },
+                {
+                  "model_instance_id": "army-alpha:source:core-intercessor-like:003",
+                  "displacement_kind": "surge_move",
+                  "start_pose": {
+                    "position": {
+                      "x": 30.0,
+                      "y": 20.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "end_pose": {
+                    "position": {
+                      "x": 30.0,
+                      "y": 23.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "path_witness": {
+                    "model_paths": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:003",
+                        "poses": [
+                          {
+                            "position": {
+                              "x": 30.0,
+                              "y": 20.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 30.0,
+                              "y": 21.5,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 30.0,
+                              "y": 23.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "source_phase": "shooting",
+                  "source_step": "just_after_enemy_unit_has_shot",
+                  "source_rule_id": "test:source-backed-surge",
+                  "source_event_id": "event-000022"
+                },
+                {
+                  "model_instance_id": "army-alpha:source:core-intercessor-like:004",
+                  "displacement_kind": "surge_move",
+                  "start_pose": {
+                    "position": {
+                      "x": 31.4,
+                      "y": 20.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "end_pose": {
+                    "position": {
+                      "x": 31.4,
+                      "y": 23.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "path_witness": {
+                    "model_paths": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:004",
+                        "poses": [
+                          {
+                            "position": {
+                              "x": 31.4,
+                              "y": 20.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 31.4,
+                              "y": 21.5,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 31.4,
+                              "y": 23.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "source_phase": "shooting",
+                  "source_step": "just_after_enemy_unit_has_shot",
+                  "source_rule_id": "test:source-backed-surge",
+                  "source_event_id": "event-000022"
+                },
+                {
+                  "model_instance_id": "army-alpha:source:core-intercessor-like:005",
+                  "displacement_kind": "surge_move",
+                  "start_pose": {
+                    "position": {
+                      "x": 32.8,
+                      "y": 20.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "end_pose": {
+                    "position": {
+                      "x": 32.8,
+                      "y": 23.0,
+                      "z": 0.0
+                    },
+                    "facing": {
+                      "degrees": 0.0
+                    }
+                  },
+                  "path_witness": {
+                    "model_paths": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:005",
+                        "poses": [
+                          {
+                            "position": {
+                              "x": 32.8,
+                              "y": 20.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 32.8,
+                              "y": 21.5,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          },
+                          {
+                            "position": {
+                              "x": 32.8,
+                              "y": 23.0,
+                              "z": 0.0
+                            },
+                            "facing": {
+                              "degrees": 0.0
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "source_phase": "shooting",
+                  "source_step": "just_after_enemy_unit_has_shot",
+                  "source_rule_id": "test:source-backed-surge",
+                  "source_event_id": "event-000022"
+                }
+              ]
+            },
+            "take_to_the_skies": false,
+            "flying_model_instance_ids": [],
+            "flight_penalty_inches": 0.0,
+            "displacement_kind": "surge_move",
+            "movement_phase_action": null,
+            "movement_inches": 3.0,
+            "model_movements": [
+              {
+                "model_instance_id": "army-alpha:source:core-intercessor-like:001",
+                "movement_inches": 3.0,
+                "start_pose": {
+                  "position": {
+                    "x": 27.2,
+                    "y": 20.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "end_pose": {
+                  "position": {
+                    "x": 27.2,
+                    "y": 23.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:001",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:001",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:001",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                },
+                "path_validation_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "sampled_pose_count": 7,
+                  "model_collision_check_count": 30,
+                  "terrain_collision_check_count": 0,
+                  "engagement_check_count": 6,
+                  "movement_distance_witness": {
+                    "model_id": "army-alpha:source:core-intercessor-like:001",
+                    "segments": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:001",
+                        "segment_index": 0,
+                        "start_pose": {
+                          "position": {
+                            "x": 27.2,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 27.2,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      },
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:001",
+                        "segment_index": 1,
+                        "start_pose": {
+                          "position": {
+                            "x": 27.2,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 27.2,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      }
+                    ],
+                    "rotation_events": [],
+                    "budget": {
+                      "max_distance_inches": 3.0,
+                      "straight_line_distance_inches": 3.0,
+                      "total_distance_inches": 3.0,
+                      "remaining_distance_inches": 0.0,
+                      "exceeded_by_inches": 0.0
+                    }
+                  }
+                },
+                "terrain_path_legality_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "segments": [],
+                  "sampled_pose_count": 7
+                }
+              },
+              {
+                "model_instance_id": "army-alpha:source:core-intercessor-like:002",
+                "movement_inches": 3.0,
+                "start_pose": {
+                  "position": {
+                    "x": 28.6,
+                    "y": 20.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "end_pose": {
+                  "position": {
+                    "x": 28.6,
+                    "y": 23.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:002",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:002",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:002",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                },
+                "path_validation_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "sampled_pose_count": 7,
+                  "model_collision_check_count": 30,
+                  "terrain_collision_check_count": 0,
+                  "engagement_check_count": 6,
+                  "movement_distance_witness": {
+                    "model_id": "army-alpha:source:core-intercessor-like:002",
+                    "segments": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:002",
+                        "segment_index": 0,
+                        "start_pose": {
+                          "position": {
+                            "x": 28.6,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 28.6,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      },
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:002",
+                        "segment_index": 1,
+                        "start_pose": {
+                          "position": {
+                            "x": 28.6,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 28.6,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      }
+                    ],
+                    "rotation_events": [],
+                    "budget": {
+                      "max_distance_inches": 3.0,
+                      "straight_line_distance_inches": 3.0,
+                      "total_distance_inches": 3.0,
+                      "remaining_distance_inches": 0.0,
+                      "exceeded_by_inches": 0.0
+                    }
+                  }
+                },
+                "terrain_path_legality_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "segments": [],
+                  "sampled_pose_count": 7
+                }
+              },
+              {
+                "model_instance_id": "army-alpha:source:core-intercessor-like:003",
+                "movement_inches": 3.0,
+                "start_pose": {
+                  "position": {
+                    "x": 30.0,
+                    "y": 20.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "end_pose": {
+                  "position": {
+                    "x": 30.0,
+                    "y": 23.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:003",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:003",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:003",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                },
+                "path_validation_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "sampled_pose_count": 7,
+                  "model_collision_check_count": 30,
+                  "terrain_collision_check_count": 0,
+                  "engagement_check_count": 6,
+                  "movement_distance_witness": {
+                    "model_id": "army-alpha:source:core-intercessor-like:003",
+                    "segments": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:003",
+                        "segment_index": 0,
+                        "start_pose": {
+                          "position": {
+                            "x": 30.0,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 30.0,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      },
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:003",
+                        "segment_index": 1,
+                        "start_pose": {
+                          "position": {
+                            "x": 30.0,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 30.0,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      }
+                    ],
+                    "rotation_events": [],
+                    "budget": {
+                      "max_distance_inches": 3.0,
+                      "straight_line_distance_inches": 3.0,
+                      "total_distance_inches": 3.0,
+                      "remaining_distance_inches": 0.0,
+                      "exceeded_by_inches": 0.0
+                    }
+                  }
+                },
+                "terrain_path_legality_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "segments": [],
+                  "sampled_pose_count": 7
+                }
+              },
+              {
+                "model_instance_id": "army-alpha:source:core-intercessor-like:004",
+                "movement_inches": 3.0,
+                "start_pose": {
+                  "position": {
+                    "x": 31.4,
+                    "y": 20.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "end_pose": {
+                  "position": {
+                    "x": 31.4,
+                    "y": 23.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:004",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:004",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:004",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                },
+                "path_validation_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "sampled_pose_count": 7,
+                  "model_collision_check_count": 30,
+                  "terrain_collision_check_count": 0,
+                  "engagement_check_count": 6,
+                  "movement_distance_witness": {
+                    "model_id": "army-alpha:source:core-intercessor-like:004",
+                    "segments": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:004",
+                        "segment_index": 0,
+                        "start_pose": {
+                          "position": {
+                            "x": 31.4,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 31.4,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      },
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:004",
+                        "segment_index": 1,
+                        "start_pose": {
+                          "position": {
+                            "x": 31.4,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 31.4,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      }
+                    ],
+                    "rotation_events": [],
+                    "budget": {
+                      "max_distance_inches": 3.0,
+                      "straight_line_distance_inches": 3.0,
+                      "total_distance_inches": 3.0,
+                      "remaining_distance_inches": 0.0,
+                      "exceeded_by_inches": 0.0
+                    }
+                  }
+                },
+                "terrain_path_legality_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "segments": [],
+                  "sampled_pose_count": 7
+                }
+              },
+              {
+                "model_instance_id": "army-alpha:source:core-intercessor-like:005",
+                "movement_inches": 3.0,
+                "start_pose": {
+                  "position": {
+                    "x": 32.8,
+                    "y": 20.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "end_pose": {
+                  "position": {
+                    "x": 32.8,
+                    "y": 23.0,
+                    "z": 0.0
+                  },
+                  "facing": {
+                    "degrees": 0.0
+                  }
+                },
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:005",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:005",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:005",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                },
+                "path_validation_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "sampled_pose_count": 7,
+                  "model_collision_check_count": 30,
+                  "terrain_collision_check_count": 0,
+                  "engagement_check_count": 6,
+                  "movement_distance_witness": {
+                    "model_id": "army-alpha:source:core-intercessor-like:005",
+                    "segments": [
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:005",
+                        "segment_index": 0,
+                        "start_pose": {
+                          "position": {
+                            "x": 32.8,
+                            "y": 20.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 32.8,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      },
+                      {
+                        "model_id": "army-alpha:source:core-intercessor-like:005",
+                        "segment_index": 1,
+                        "start_pose": {
+                          "position": {
+                            "x": 32.8,
+                            "y": 21.5,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "end_pose": {
+                          "position": {
+                            "x": 32.8,
+                            "y": 23.0,
+                            "z": 0.0
+                          },
+                          "facing": {
+                            "degrees": 0.0
+                          }
+                        },
+                        "measurement_point": "pose_anchor",
+                        "distance_inches": 1.5
+                      }
+                    ],
+                    "rotation_events": [],
+                    "budget": {
+                      "max_distance_inches": 3.0,
+                      "straight_line_distance_inches": 3.0,
+                      "total_distance_inches": 3.0,
+                      "remaining_distance_inches": 0.0,
+                      "exceeded_by_inches": 0.0
+                    }
+                  }
+                },
+                "terrain_path_legality_result": {
+                  "is_valid": true,
+                  "violations": [],
+                  "segments": [],
+                  "sampled_pose_count": 7
+                }
+              }
+            ],
+            "path_validation_results": [
+              {
+                "is_valid": true,
+                "violations": [],
+                "sampled_pose_count": 7,
+                "model_collision_check_count": 30,
+                "terrain_collision_check_count": 0,
+                "engagement_check_count": 6,
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:001",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:001",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:001",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 27.2,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                }
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "sampled_pose_count": 7,
+                "model_collision_check_count": 30,
+                "terrain_collision_check_count": 0,
+                "engagement_check_count": 6,
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:002",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:002",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:002",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 28.6,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                }
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "sampled_pose_count": 7,
+                "model_collision_check_count": 30,
+                "terrain_collision_check_count": 0,
+                "engagement_check_count": 6,
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:003",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:003",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:003",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 30.0,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                }
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "sampled_pose_count": 7,
+                "model_collision_check_count": 30,
+                "terrain_collision_check_count": 0,
+                "engagement_check_count": 6,
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:004",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:004",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:004",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 31.4,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                }
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "sampled_pose_count": 7,
+                "model_collision_check_count": 30,
+                "terrain_collision_check_count": 0,
+                "engagement_check_count": 6,
+                "movement_distance_witness": {
+                  "model_id": "army-alpha:source:core-intercessor-like:005",
+                  "segments": [
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:005",
+                      "segment_index": 0,
+                      "start_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 20.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    },
+                    {
+                      "model_id": "army-alpha:source:core-intercessor-like:005",
+                      "segment_index": 1,
+                      "start_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 21.5,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "end_pose": {
+                        "position": {
+                          "x": 32.8,
+                          "y": 23.0,
+                          "z": 0.0
+                        },
+                        "facing": {
+                          "degrees": 0.0
+                        }
+                      },
+                      "measurement_point": "pose_anchor",
+                      "distance_inches": 1.5
+                    }
+                  ],
+                  "rotation_events": [],
+                  "budget": {
+                    "max_distance_inches": 3.0,
+                    "straight_line_distance_inches": 3.0,
+                    "total_distance_inches": 3.0,
+                    "remaining_distance_inches": 0.0,
+                    "exceeded_by_inches": 0.0
+                  }
+                }
+              }
+            ],
+            "terrain_path_legality_results": [
+              {
+                "is_valid": true,
+                "violations": [],
+                "segments": [],
+                "sampled_pose_count": 7
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "segments": [],
+                "sampled_pose_count": 7
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "segments": [],
+                "sampled_pose_count": 7
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "segments": [],
+                "sampled_pose_count": 7
+              },
+              {
+                "is_valid": true,
+                "violations": [],
+                "segments": [],
+                "sampled_pose_count": 7
+              }
+            ],
+            "coherency_result": {
+              "status": "coherent",
+              "ruleset_descriptor_hash": "92a0b43da535e86202170ce9a35ea116bd2a345e355342acb86be44123be2eeb",
+              "unit_instance_id": "army-alpha:source",
+              "coherency_policy": {
+                "policy_kind": "neighbor_count",
+                "required_neighbors_small_unit": 1,
+                "required_neighbors_large_unit": null,
+                "large_unit_model_count_threshold": null,
+                "max_horizontal_inches": 2.0,
+                "max_vertical_inches": 5.0,
+                "max_all_models_distance_inches": null,
+                "max_unit_span_inches": 9.0
+              },
+              "model_instance_ids": [
+                "army-alpha:source:core-intercessor-like:001",
+                "army-alpha:source:core-intercessor-like:002",
+                "army-alpha:source:core-intercessor-like:003",
+                "army-alpha:source:core-intercessor-like:004",
+                "army-alpha:source:core-intercessor-like:005"
+              ],
+              "offending_model_instance_ids": [],
+              "violations": []
+            },
+            "surge_target_unit_instance_id": "army-beta:enemy",
+            "surge_model_endpoints": [
+              {
+                "source_rule_id": "gw-11e-core-surge:surge-move",
+                "model_instance_id": "army-alpha:source:core-intercessor-like:001",
+                "component_unit_instance_id": "army-alpha:source",
+                "target_unit_instance_id": "army-beta:enemy",
+                "distance_before_inches": 8.370078740157481,
+                "distance_after_inches": 5.370078740157481,
+                "engagement_status": "unreachable",
+                "approach_status": "optimal_bound",
+                "alternative_witness": null,
+                "distance_lower_bound_inches": 5.370078740157481
+              },
+              {
+                "source_rule_id": "gw-11e-core-surge:surge-move",
+                "model_instance_id": "army-alpha:source:core-intercessor-like:002",
+                "component_unit_instance_id": "army-alpha:source",
+                "target_unit_instance_id": "army-beta:enemy",
+                "distance_before_inches": 8.370078740157481,
+                "distance_after_inches": 5.370078740157481,
+                "engagement_status": "unreachable",
+                "approach_status": "optimal_bound",
+                "alternative_witness": null,
+                "distance_lower_bound_inches": 5.370078740157481
+              },
+              {
+                "source_rule_id": "gw-11e-core-surge:surge-move",
+                "model_instance_id": "army-alpha:source:core-intercessor-like:003",
+                "component_unit_instance_id": "army-alpha:source",
+                "target_unit_instance_id": "army-beta:enemy",
+                "distance_before_inches": 8.370078740157481,
+                "distance_after_inches": 5.370078740157481,
+                "engagement_status": "unreachable",
+                "approach_status": "optimal_bound",
+                "alternative_witness": null,
+                "distance_lower_bound_inches": 5.370078740157481
+              },
+              {
+                "source_rule_id": "gw-11e-core-surge:surge-move",
+                "model_instance_id": "army-alpha:source:core-intercessor-like:004",
+                "component_unit_instance_id": "army-alpha:source",
+                "target_unit_instance_id": "army-beta:enemy",
+                "distance_before_inches": 8.370078740157481,
+                "distance_after_inches": 5.370078740157481,
+                "engagement_status": "unreachable",
+                "approach_status": "optimal_bound",
+                "alternative_witness": null,
+                "distance_lower_bound_inches": 5.370078740157481
+              },
+              {
+                "source_rule_id": "gw-11e-core-surge:surge-move",
+                "model_instance_id": "army-alpha:source:core-intercessor-like:005",
+                "component_unit_instance_id": "army-alpha:source",
+                "target_unit_instance_id": "army-beta:enemy",
+                "distance_before_inches": 8.370078740157481,
+                "distance_after_inches": 5.370078740157481,
+                "engagement_status": "unreachable",
+                "approach_status": "optimal_bound",
+                "alternative_witness": null,
+                "distance_lower_bound_inches": 5.370078740157481
+              }
+            ]
+          }
+        },
+        {
+          "event_id": "event-000030",
+          "event_type": "rule_trigger_observed",
+          "payload": {
+            "trigger_id": "rule-trigger:move_completion:5ccbd7f82a3284fe3f867faf53ed29bc1c132a589fe22c8a4e34cff55aeb5a35",
+            "kind": "move_completion",
+            "context": {
+              "game_id": "order75-surge-rectangular-target",
+              "battle_round": 1,
+              "phase": "shooting",
+              "trigger_event_id": "event-000029",
+              "event_type": "triggered_movement_resolved",
+              "triggering_unit_instance_id": "army-alpha:source",
+              "triggering_player_id": "player-a",
+              "turn_player_id": "player-a",
+              "movement_action": "normal_move"
+            },
+            "parent_batch_id": null,
+            "parent_participant_id": null
+          }
+        },
+        {
+          "event_id": "event-000031",
+          "event_type": "move_rule_candidates_observed",
+          "payload": {
+            "game_id": "order75-surge-rectangular-target",
+            "trigger_event_id": "event-000029",
+            "hook_ids": [
+              "core-move-ability:super-heavy-walker:completion",
+              "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker-removal",
+              "primary:surveil:move-marker-removal"
+            ],
+            "participants": []
+          }
+        },
+        {
+          "event_id": "event-000032",
+          "event_type": "active_player_scope_completed",
+          "payload": {
+            "scope": {
+              "kind": "reactive_move",
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:source",
+              "source_rule_id": "test:source-backed-surge",
+              "selection_request_id": "decision-request-000001",
+              "selection_result_id": "select-fixed-target-surge"
+            },
+            "result_id": "order76-valid_control"
+          }
+        },
+        {
+          "event_id": "event-000033",
+          "event_type": "rule_trigger_released",
+          "payload": {
+            "trigger_id": "rule-trigger:move_completion:5ccbd7f82a3284fe3f867faf53ed29bc1c132a589fe22c8a4e34cff55aeb5a35"
+          }
+        },
+        {
+          "event_id": "event-000034",
+          "event_type": "rule_trigger_completed",
+          "payload": {
+            "trigger_id": "rule-trigger:move_completion:5ccbd7f82a3284fe3f867faf53ed29bc1c132a589fe22c8a4e34cff55aeb5a35"
+          }
+        },
+        {
+          "event_id": "event-000035",
+          "event_type": "timing_window_opened",
+          "payload": {
+            "timing_window": {
+              "window_id": "timing-window:order75-surge-rectangular-target:round-01:turn:player-a:phase:shooting:start",
+              "descriptor": {
+                "descriptor_id": "timing-window:order75-surge-rectangular-target:round-01:turn:player-a:phase:shooting:start:descriptor",
+                "trigger_kind": "start_phase",
+                "source_rule_id": "core-rules-lifecycle-timing",
+                "phase": "shooting",
+                "source_step": "shooting",
+                "metadata": null
+              },
+              "game_id": "order75-surge-rectangular-target",
+              "battle_round": 1,
+              "active_player_id": "player-a",
+              "phase": "shooting",
+              "trigger_event_id": null
+            },
+            "resolution_order": []
+          }
+        },
+        {
+          "event_id": "event-000036",
+          "event_type": "timing_window_resolved",
+          "payload": {
+            "timing_window": {
+              "window_id": "timing-window:order75-surge-rectangular-target:round-01:turn:player-a:phase:shooting:start",
+              "descriptor": {
+                "descriptor_id": "timing-window:order75-surge-rectangular-target:round-01:turn:player-a:phase:shooting:start:descriptor",
+                "trigger_kind": "start_phase",
+                "source_rule_id": "core-rules-lifecycle-timing",
+                "phase": "shooting",
+                "source_step": "shooting",
+                "metadata": null
+              },
+              "game_id": "order75-surge-rectangular-target",
+              "battle_round": 1,
+              "active_player_id": "player-a",
+              "phase": "shooting",
+              "trigger_event_id": null
+            },
+            "resolution_order": []
+          }
+        },
+        {
+          "event_id": "event-000037",
+          "event_type": "decision_requested",
+          "payload": {
+            "request_id": "decision-request-000003",
+            "decision_type": "select_shooting_unit",
+            "actor_id": "player-a",
+            "payload": {
+              "game_id": "order75-surge-rectangular-target",
+              "battle_round": 1,
+              "phase": "shooting",
+              "active_player_id": "player-a"
+            },
+            "options": [
+              {
+                "option_id": "army-alpha:source",
+                "label": "CORE Intercessor-like Infantry",
+                "payload": {
+                  "unit_instance_id": "army-alpha:source"
+                }
+              },
+              {
+                "option_id": "complete_shooting_phase",
+                "label": "Complete Shooting Phase",
+                "payload": {
+                  "submission_kind": "complete_shooting_phase",
+                  "game_id": "order75-surge-rectangular-target",
+                  "battle_round": 1,
+                  "phase": "shooting",
+                  "active_player_id": "player-a",
+                  "phase_body_status": "shooting_phase_complete",
+                  "skipped_unit_ids": [
+                    "army-alpha:source"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "replay": {
+        "status": "reproduced",
+        "artifact_id": "order76-valid_control",
+        "reproduced_decision_count": 2,
+        "reproduced_event_count": 37,
+        "final_event_log_hash": "02d64e8931cc8ab4314931da22286fb9de9c4d018eadceb6b0cd0103c89a972a",
+        "diagnostics": []
+      },
+      "session_persistence": "restored"
+    },
+    {
+      "case": "invalid_kind",
+      "submission_status": {
+        "stage": "battle",
+        "status_kind": "invalid",
+        "decision_request": null,
+        "message": "Triggered movement proposal is malformed.",
+        "payload": {
+          "game_id": "order75-surge-rectangular-target",
+          "battle_round": 1,
+          "active_player_id": "player-a",
+          "phase": "shooting",
+          "request_id": "decision-request-000002",
+          "result_id": "order76-invalid_kind",
+          "phase_body_status": "triggered_movement_proposal_invalid",
+          "proposal_validation": {
+            "proposal_request_id": "decision-request-000002",
+            "proposal_kind": "surge_move",
+            "is_valid": false,
+            "status": "invalid",
+            "violations": [
+              {
+                "violation_code": "malformed_proposal_payload",
+                "message": "Unsupported ProposalKind token: not-a-proposal-kind.",
+                "field": null
+              }
+            ]
+          }
+        }
+      },
+      "game_state_unchanged": true,
+      "pending_request_unchanged": true,
+      "decision_record_delta": 0,
+      "new_events": [
+        {
+          "event_id": "event-000028",
+          "event_type": "triggered_movement_proposal_invalid",
+          "payload": {
+            "game_id": "order75-surge-rectangular-target",
+            "battle_round": 1,
+            "active_player_id": "player-a",
+            "phase": "shooting",
+            "request_id": "decision-request-000002",
+            "result_id": "order76-invalid_kind",
+            "phase_body_status": "triggered_movement_proposal_invalid",
+            "proposal_validation": {
+              "proposal_request_id": "decision-request-000002",
+              "proposal_kind": "surge_move",
+              "is_valid": false,
+              "status": "invalid",
+              "violations": [
+                {
+                  "violation_code": "malformed_proposal_payload",
+                  "message": "Unsupported ProposalKind token: not-a-proposal-kind.",
+                  "field": null
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "replay": {
+        "status": "drifted",
+        "artifact_id": "order76-invalid_kind",
+        "reproduced_decision_count": 1,
+        "reproduced_event_count": 27,
+        "final_event_log_hash": "5f046b71195f52aaef697282739d462d0608b3a326cbacb04a91d1a8389c268b",
+        "diagnostics": [
+          {
+            "diagnostic_code": "event_stream_drift",
+            "message": "Replay event stream drifted from artifact tail.",
+            "decision_record_index": 1,
+            "record_id": null,
+            "checkpoint_id": null,
+            "expected": {
+              "event_stream_hash": "d94d488906f5a7eabcb27a3d493e293c07e6eb2d4f0c848ce5d2349bf7e574d7"
+            },
+            "actual": {
+              "event_stream_hash": "93837536914ae0478103f651f09db3e2a2793c9ebce3c2a2b08e24a385c434a2"
+            }
+          }
+        ]
+      },
+      "session_persistence": {
+        "type": "LocalGameSessionPersistenceError",
+        "message": "LocalGameSession persistence replay lifecycle drifted."
+      }
+    },
+    {
+      "case": "invalid_kind_then_valid",
+      "submission_status": {
+        "stage": "battle",
+        "status_kind": "invalid",
+        "decision_request": null,
+        "message": "Triggered movement proposal is malformed.",
+        "payload": {
+          "game_id": "order75-surge-rectangular-target",
+          "battle_round": 1,
+          "active_player_id": "player-a",
+          "phase": "shooting",
+          "request_id": "decision-request-000002",
+          "result_id": "order76-invalid_kind_then_valid",
+          "phase_body_status": "triggered_movement_proposal_invalid",
+          "proposal_validation": {
+            "proposal_request_id": "decision-request-000002",
+            "proposal_kind": "surge_move",
+            "is_valid": false,
+            "status": "invalid",
+            "violations": [
+              {
+                "violation_code": "malformed_proposal_payload",
+                "message": "Unsupported ProposalKind token: not-a-proposal-kind.",
+                "field": null
+              }
+            ]
+          }
+        }
+      },
+      "game_state_unchanged": true,
+      "pending_request_unchanged": true,
+      "decision_record_delta": 0,
+      "new_events": [
+        {
+          "event_id": "event-000028",
+          "event_type": "triggered_movement_proposal_invalid",
+          "payload": {
+            "game_id": "order75-surge-rectangular-target",
+            "battle_round": 1,
+            "active_player_id": "player-a",
+            "phase": "shooting",
+            "request_id": "decision-request-000002",
+            "result_id": "order76-invalid_kind_then_valid",
+            "phase_body_status": "triggered_movement_proposal_invalid",
+            "proposal_validation": {
+              "proposal_request_id": "decision-request-000002",
+              "proposal_kind": "surge_move",
+              "is_valid": false,
+              "status": "invalid",
+              "violations": [
+                {
+                  "violation_code": "malformed_proposal_payload",
+                  "message": "Unsupported ProposalKind token: not-a-proposal-kind.",
+                  "field": null
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "retry_status": "waiting_for_decision",
+      "replay": {
+        "status": "drifted",
+        "artifact_id": "order76-invalid_kind_then_valid",
+        "reproduced_decision_count": 2,
+        "reproduced_event_count": 37,
+        "final_event_log_hash": "f496457860077315f64107bb53312408a503f6d4e44a7ee3cbaed96ec6481b14",
+        "diagnostics": [
+          {
+            "diagnostic_code": "event_stream_drift",
+            "message": "Replay event stream drifted from artifact tail.",
+            "decision_record_index": 2,
+            "record_id": null,
+            "checkpoint_id": null,
+            "expected": {
+              "event_stream_hash": "7e035d1d7f9aec6d1441f70af0caab4d7e781650db239f2c0b614277e98ea0de"
+            },
+            "actual": {
+              "event_stream_hash": "1bb955b037790c9d734a6503beac798eaca8ad4826655d967aa725e8fac81420"
+            }
+          }
+        ]
+      },
+      "session_persistence": {
+        "type": "LocalGameSessionPersistenceError",
+        "message": "LocalGameSession persistence replay lifecycle drifted."
+      }
+    },
+    {
+      "case": "missing_fields",
+      "escaped_exception": {
+        "type": "KeyError",
+        "message": "'proposal_request_id'"
+      },
+      "game_state_unchanged": true,
+      "pending_request_unchanged": true,
+      "decision_record_delta": 0,
+      "new_events": [],
+      "replay": {
+        "status": "reproduced",
+        "artifact_id": "order76-missing_fields",
+        "reproduced_decision_count": 1,
+        "reproduced_event_count": 27,
+        "final_event_log_hash": "5f046b71195f52aaef697282739d462d0608b3a326cbacb04a91d1a8389c268b",
+        "diagnostics": []
+      },
+      "session_persistence": "restored"
+    },
+    {
+      "case": "charge_invalid_kind",
+      "submission_status": {
+        "stage": "battle",
+        "status_kind": "invalid",
+        "decision_request": null,
+        "message": "Charge Move proposal payload is malformed.",
+        "payload": {
+          "game_id": "order47-attached",
+          "battle_round": 1,
+          "active_player_id": "player-a",
+          "phase": "charge",
+          "request_id": "decision-request-000004",
+          "result_id": "order76-charge_invalid_kind",
+          "phase_body_status": "invalid",
+          "proposal_validation": {
+            "proposal_request_id": "decision-request-000004",
+            "proposal_kind": "charge_move",
+            "is_valid": false,
+            "status": "invalid",
+            "violations": [
+              {
+                "violation_code": "proposal_payload_malformed",
+                "message": "Charge Move proposal payload is malformed: Unsupported ProposalKind token: not-a-proposal-kind.",
+                "field": "payload"
+              }
+            ]
+          }
+        }
+      },
+      "game_state_unchanged": true,
+      "pending_request_unchanged": true,
+      "decision_record_delta": 0,
+      "new_events": [
+        {
+          "event_id": "event-000041",
+          "event_type": "charge_move_proposal_invalid",
+          "payload": {
+            "game_id": "order47-attached",
+            "battle_round": 1,
+            "active_player_id": "player-a",
+            "phase": "charge",
+            "request_id": "decision-request-000004",
+            "result_id": "order76-charge_invalid_kind",
+            "phase_body_status": "invalid",
+            "proposal_validation": {
+              "proposal_request_id": "decision-request-000004",
+              "proposal_kind": "charge_move",
+              "is_valid": false,
+              "status": "invalid",
+              "violations": [
+                {
+                  "violation_code": "proposal_payload_malformed",
+                  "message": "Charge Move proposal payload is malformed: Unsupported ProposalKind token: not-a-proposal-kind.",
+                  "field": "payload"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "replay": {
+        "status": "drifted",
+        "artifact_id": "order76-charge_invalid_kind",
+        "reproduced_decision_count": 3,
+        "reproduced_event_count": 40,
+        "final_event_log_hash": "1860e84fd5c3f1514ac1b1bfae1b461adce9fdc457876484684f637852f1945e",
+        "diagnostics": [
+          {
+            "diagnostic_code": "event_stream_drift",
+            "message": "Replay event stream drifted from artifact tail.",
+            "decision_record_index": 3,
+            "record_id": null,
+            "checkpoint_id": null,
+            "expected": {
+              "event_stream_hash": "073fa11c896f7f9a6b48fbdc69ae47ee3c053bbfe5ddf9272b69ff6392dfc20f"
+            },
+            "actual": {
+              "event_stream_hash": "792d21fb336972f415a94925c43cc5d5a76797c4f6923f52cf00ef8f896cd81e"
+            }
+          }
+        ]
+      },
+      "session_persistence": {
+        "type": "LocalGameSessionPersistenceError",
+        "message": "LocalGameSession persistence replay lifecycle drifted."
+      }
+    },
+    {
+      "case": "charge_missing_fields",
+      "submission_status": {
+        "stage": "battle",
+        "status_kind": "invalid",
+        "decision_request": null,
+        "message": "Charge Move proposal payload is malformed.",
+        "payload": {
+          "game_id": "order47-attached",
+          "battle_round": 1,
+          "active_player_id": "player-a",
+          "phase": "charge",
+          "request_id": "decision-request-000004",
+          "result_id": "order76-charge_missing_fields",
+          "phase_body_status": "invalid",
+          "proposal_validation": {
+            "proposal_request_id": "decision-request-000004",
+            "proposal_kind": "charge_move",
+            "is_valid": false,
+            "status": "invalid",
+            "violations": [
+              {
+                "violation_code": "proposal_payload_missing_field",
+                "message": "Charge Move proposal payload missing required field: proposal_request_id.",
+                "field": "proposal_request_id"
+              }
+            ]
+          }
+        }
+      },
+      "game_state_unchanged": true,
+      "pending_request_unchanged": true,
+      "decision_record_delta": 0,
+      "new_events": [
+        {
+          "event_id": "event-000041",
+          "event_type": "charge_move_proposal_invalid",
+          "payload": {
+            "game_id": "order47-attached",
+            "battle_round": 1,
+            "active_player_id": "player-a",
+            "phase": "charge",
+            "request_id": "decision-request-000004",
+            "result_id": "order76-charge_missing_fields",
+            "phase_body_status": "invalid",
+            "proposal_validation": {
+              "proposal_request_id": "decision-request-000004",
+              "proposal_kind": "charge_move",
+              "is_valid": false,
+              "status": "invalid",
+              "violations": [
+                {
+                  "violation_code": "proposal_payload_missing_field",
+                  "message": "Charge Move proposal payload missing required field: proposal_request_id.",
+                  "field": "proposal_request_id"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "replay": {
+        "status": "drifted",
+        "artifact_id": "order76-charge_missing_fields",
+        "reproduced_decision_count": 3,
+        "reproduced_event_count": 40,
+        "final_event_log_hash": "1860e84fd5c3f1514ac1b1bfae1b461adce9fdc457876484684f637852f1945e",
+        "diagnostics": [
+          {
+            "diagnostic_code": "event_stream_drift",
+            "message": "Replay event stream drifted from artifact tail.",
+            "decision_record_index": 3,
+            "record_id": null,
+            "checkpoint_id": null,
+            "expected": {
+              "event_stream_hash": "057b9e22eadc74e7d811d8d1bc512e825682150891e0162b06df1fec58751eea"
+            },
+            "actual": {
+              "event_stream_hash": "792d21fb336972f415a94925c43cc5d5a76797c4f6923f52cf00ef8f896cd81e"
+            }
+          }
+        ]
+      },
+      "session_persistence": {
+        "type": "LocalGameSessionPersistenceError",
+        "message": "LocalGameSession persistence replay lifecycle drifted."
+      }
+    }
+  ]
+}

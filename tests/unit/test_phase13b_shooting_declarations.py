@@ -15612,7 +15612,7 @@ def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_pay
         expected_code="destroyed_transport_non_survivor_placement",
         expected_field="attempted_placement",
     )
-    assert len(invalid_events) == 10
+    assert invalid_events == ()
 
 
 def test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requirements() -> None:

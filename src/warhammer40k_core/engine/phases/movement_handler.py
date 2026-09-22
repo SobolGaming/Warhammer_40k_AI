@@ -475,10 +475,8 @@ class MovementPhaseHandler:
             if not proposal_validation.is_valid:
                 return _reject_invalid_proposal(
                     state=state,
-                    decisions=decisions,
                     result=result,
                     proposal_validation=proposal_validation,
-                    event_type="movement_proposal_invalid",
                     message="Movement proposal does not match the pending request.",
                 )
             if (
@@ -491,7 +489,6 @@ class MovementPhaseHandler:
             ):
                 return _reject_invalid_proposal(
                     state=state,
-                    decisions=decisions,
                     result=result,
                     proposal_validation=ProposalValidationResult.invalid(
                         proposal_request_id=proposal_request.request_id,
@@ -501,7 +498,6 @@ class MovementPhaseHandler:
                         field="unit_instance_id",
                         status="stale",
                     ),
-                    event_type="movement_proposal_invalid",
                     message="Unit has already made a Normal move this phase.",
                 )
             return None

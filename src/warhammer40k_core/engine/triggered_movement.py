@@ -34,13 +34,15 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.move_ability_choices import chosen_move_keywords
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
-    MovementProposalPayload,
-    MovementProposalPayloadPayload,
     MovementProposalRequest,
     ProposalKind,
     ProposalValidationResult,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.engine.physical_proposal_validation import (
+    parse_movement_proposal_payload,
+    physical_proposal_invalid_status,
+)
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowPayload
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.take_to_the_skies import flight_selection
@@ -754,25 +756,16 @@ def invalid_triggered_movement_proposal_status(
     )
     if authority is not None:
         return authority
-    try:
-        proposal_request = _triggered_movement_proposal_request_from_request(request)
-        submission = MovementProposalPayload.from_payload(
-            cast(MovementProposalPayloadPayload, result.payload)
-        )
-    except GameLifecycleError as exc:
-        proposal_request = _triggered_movement_proposal_request_from_request(request)
-        proposal_validation = ProposalValidationResult.invalid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-            violation_code="malformed_proposal_payload",
-            message=str(exc),
-            field=None,
-        )
+    proposal_request = _triggered_movement_proposal_request_from_request(request)
+    submission = parse_movement_proposal_payload(
+        proposal_request=proposal_request,
+        payload=result.payload,
+    )
+    if isinstance(submission, ProposalValidationResult):
         return _reject_invalid_triggered_movement_proposal(
             state=state,
-            decisions=decisions,
             result=result,
-            proposal_validation=proposal_validation,
+            proposal_validation=submission,
             message="Triggered movement proposal is malformed.",
         )
     proposal_validation = submission.validation_result_for_request(proposal_request)
@@ -780,7 +773,6 @@ def invalid_triggered_movement_proposal_status(
         return None
     return _reject_invalid_triggered_movement_proposal(
         state=state,
-        decisions=decisions,
         result=result,
         proposal_validation=proposal_validation,
         message="Triggered movement proposal does not match the pending request.",
@@ -876,42 +868,16 @@ def _triggered_movement_proposal_retry_request(  # pyright: ignore[reportUnusedF
 def _reject_invalid_triggered_movement_proposal(
     *,
     state: GameState,
-    decisions: DecisionController,
     result: DecisionResult,
     proposal_validation: ProposalValidationResult,
     message: str,
 ) -> LifecycleStatus:
-    invalid_payload = _triggered_movement_proposal_invalid_payload(
+    return physical_proposal_invalid_status(
         state=state,
         result=result,
         proposal_validation=proposal_validation,
-    )
-    decisions.event_log.append("triggered_movement_proposal_invalid", invalid_payload)
-    return LifecycleStatus.invalid(
-        stage=GameLifecycleStage.BATTLE,
         message=message,
-        payload=invalid_payload,
-    )
-
-
-def _triggered_movement_proposal_invalid_payload(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    proposal_validation: ProposalValidationResult,
-) -> dict[str, JsonValue]:
-    return _validate_json_object(
-        "triggered movement proposal invalid payload",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": _current_battle_phase_value(state),
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-            "phase_body_status": "triggered_movement_proposal_invalid",
-            "proposal_validation": proposal_validation.to_payload(),
-        },
+        phase_body_status="triggered_movement_proposal_invalid",
     )
 
 

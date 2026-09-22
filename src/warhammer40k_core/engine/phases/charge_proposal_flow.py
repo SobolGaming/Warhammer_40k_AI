@@ -65,7 +65,6 @@ def invalid_charge_move_proposal_status(
     if not proposal_validation.is_valid:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=proposal_validation,
             message="Charge Move proposal does not match the pending request.",
@@ -74,7 +73,6 @@ def invalid_charge_move_proposal_status(
     if charge_state is None:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=ProposalValidationResult.invalid(
                 proposal_request_id=proposal_request.request_id,
@@ -89,7 +87,6 @@ def invalid_charge_move_proposal_status(
     if pending_distance is None:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=ProposalValidationResult.invalid(
                 proposal_request_id=proposal_request.request_id,
@@ -103,7 +100,6 @@ def invalid_charge_move_proposal_status(
     if pending_distance.roll_result.request.unit_instance_id != proposal.unit_instance_id:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=ProposalValidationResult.invalid(
                 proposal_request_id=proposal_request.request_id,
@@ -145,7 +141,6 @@ def invalid_charge_move_proposal_status(
     if current_reachable != requested_reachable:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=ProposalValidationResult.invalid(
                 proposal_request_id=proposal_request.request_id,
@@ -169,7 +164,6 @@ def invalid_charge_move_proposal_status(
     if current_required != requested_required:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=ProposalValidationResult.invalid(
                 proposal_request_id=proposal_request.request_id,
@@ -188,7 +182,6 @@ def invalid_charge_move_proposal_status(
         if witness_validation is not None:
             return _charge._reject_invalid_charge_proposal(
                 state=state,
-                decisions=decisions,
                 result=result,
                 proposal_validation=witness_validation,
                 message="Charge Move witness does not match the current unit.",
@@ -358,7 +351,6 @@ def _apply_charge_move_proposal_decision(
     if not proposal_validation.is_valid:
         return _charge._reject_invalid_charge_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=proposal_validation,
             message="Charge Move proposal does not match the pending request.",

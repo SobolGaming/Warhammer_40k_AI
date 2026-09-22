@@ -1,0 +1,322 @@
+{
+  "workload_id": "order76-physical-proposal-prevalidation-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:d05ab1c2a22d01e7950f804b448fd29de7cdc5ae31483fb7a8108a0a06df2ca7",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d05ab1c2a22d01e7950f804b448fd29de7cdc5ae31483fb7a8108a0a06df2ca7",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "library_versions": {
+    "shapely": "2.1.2",
+    "z3-solver": "4.15.4.0",
+    "orjson": "3.11.9"
+  },
+  "timing_boundary": "one facade submission, preparation separate; first sample cold, subsequent process caches retained",
+  "workload": "Canonical five-model Movement/Fight, attached six-model Charge/Surge, loaded reserve Transport; fixed finite choices, typed proposal or invalid-kind token; fixture seeds and terrain retained by hash.",
+  "samples": [
+    {
+      "family": "surge",
+      "malformed": false,
+      "repeat": 0,
+      "preparation_seconds": 2.357120375003433,
+      "seconds": 0.013345250001293607,
+      "status": "waiting_for_decision",
+      "event_delta": 10
+    },
+    {
+      "family": "surge",
+      "malformed": false,
+      "repeat": 1,
+      "preparation_seconds": 0.4860181249969173,
+      "seconds": 0.011856292003358249,
+      "status": "waiting_for_decision",
+      "event_delta": 10
+    },
+    {
+      "family": "surge",
+      "malformed": false,
+      "repeat": 2,
+      "preparation_seconds": 0.45074395799747435,
+      "seconds": 0.011885416002769489,
+      "status": "waiting_for_decision",
+      "event_delta": 10
+    },
+    {
+      "family": "surge",
+      "malformed": true,
+      "repeat": 0,
+      "preparation_seconds": 0.4516774579969933,
+      "seconds": 0.001477833000535611,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "surge",
+      "malformed": true,
+      "repeat": 1,
+      "preparation_seconds": 0.44866595799976494,
+      "seconds": 0.0014222090030671097,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "surge",
+      "malformed": true,
+      "repeat": 2,
+      "preparation_seconds": 0.4488333330009482,
+      "seconds": 0.001424957998096943,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "charge",
+      "malformed": false,
+      "repeat": 0,
+      "preparation_seconds": 0.4662445419962751,
+      "seconds": 0.02761454100254923,
+      "status": "waiting_for_decision",
+      "event_delta": 17
+    },
+    {
+      "family": "charge",
+      "malformed": false,
+      "repeat": 1,
+      "preparation_seconds": 0.47301583400258096,
+      "seconds": 0.02593899999919813,
+      "status": "waiting_for_decision",
+      "event_delta": 17
+    },
+    {
+      "family": "charge",
+      "malformed": false,
+      "repeat": 2,
+      "preparation_seconds": 0.4671234160050517,
+      "seconds": 0.025677792000351474,
+      "status": "waiting_for_decision",
+      "event_delta": 17
+    },
+    {
+      "family": "charge",
+      "malformed": true,
+      "repeat": 0,
+      "preparation_seconds": 0.47039083400159143,
+      "seconds": 0.0016863330019987188,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "charge",
+      "malformed": true,
+      "repeat": 1,
+      "preparation_seconds": 0.49808029199630255,
+      "seconds": 0.0016734169985284097,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "charge",
+      "malformed": true,
+      "repeat": 2,
+      "preparation_seconds": 0.46245320799789624,
+      "seconds": 0.0016558749994146638,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "normal",
+      "malformed": false,
+      "repeat": 0,
+      "preparation_seconds": 0.25647708299948135,
+      "seconds": 0.01679149999836227,
+      "status": "waiting_for_decision",
+      "event_delta": 14
+    },
+    {
+      "family": "normal",
+      "malformed": false,
+      "repeat": 1,
+      "preparation_seconds": 0.25432904199988116,
+      "seconds": 0.015675624999857973,
+      "status": "waiting_for_decision",
+      "event_delta": 14
+    },
+    {
+      "family": "normal",
+      "malformed": false,
+      "repeat": 2,
+      "preparation_seconds": 0.25420141700305976,
+      "seconds": 0.01571233299910091,
+      "status": "waiting_for_decision",
+      "event_delta": 14
+    },
+    {
+      "family": "normal",
+      "malformed": true,
+      "repeat": 0,
+      "preparation_seconds": 0.2540677919969312,
+      "seconds": 0.0005220000020926818,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "normal",
+      "malformed": true,
+      "repeat": 1,
+      "preparation_seconds": 0.25793408299796283,
+      "seconds": 0.0005226669964031316,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "normal",
+      "malformed": true,
+      "repeat": 2,
+      "preparation_seconds": 0.2564007499968284,
+      "seconds": 0.000498707995575387,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "placement",
+      "malformed": false,
+      "repeat": 0,
+      "preparation_seconds": 0.27919195799768204,
+      "seconds": 0.011105875004432164,
+      "status": "waiting_for_decision",
+      "event_delta": 7
+    },
+    {
+      "family": "placement",
+      "malformed": false,
+      "repeat": 1,
+      "preparation_seconds": 0.2796490830005496,
+      "seconds": 0.010322374997485895,
+      "status": "waiting_for_decision",
+      "event_delta": 7
+    },
+    {
+      "family": "placement",
+      "malformed": false,
+      "repeat": 2,
+      "preparation_seconds": 0.2795153749975725,
+      "seconds": 0.010418749996460974,
+      "status": "waiting_for_decision",
+      "event_delta": 7
+    },
+    {
+      "family": "placement",
+      "malformed": true,
+      "repeat": 0,
+      "preparation_seconds": 0.2793522919964744,
+      "seconds": 0.0006771660046069883,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "placement",
+      "malformed": true,
+      "repeat": 1,
+      "preparation_seconds": 0.2790439580057864,
+      "seconds": 0.0007079170027282089,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "placement",
+      "malformed": true,
+      "repeat": 2,
+      "preparation_seconds": 0.278765666000254,
+      "seconds": 0.0006643750020884909,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "fight",
+      "malformed": false,
+      "repeat": 0,
+      "preparation_seconds": 0.25405387499631615,
+      "seconds": 0.009036916999320965,
+      "status": "waiting_for_decision",
+      "event_delta": 10
+    },
+    {
+      "family": "fight",
+      "malformed": false,
+      "repeat": 1,
+      "preparation_seconds": 0.25561145800020313,
+      "seconds": 0.008828291996906046,
+      "status": "waiting_for_decision",
+      "event_delta": 10
+    },
+    {
+      "family": "fight",
+      "malformed": false,
+      "repeat": 2,
+      "preparation_seconds": 0.2947222920047352,
+      "seconds": 0.008635915997729171,
+      "status": "waiting_for_decision",
+      "event_delta": 10
+    },
+    {
+      "family": "fight",
+      "malformed": true,
+      "repeat": 0,
+      "preparation_seconds": 0.2551341670041438,
+      "seconds": 0.0004604170026141219,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "fight",
+      "malformed": true,
+      "repeat": 1,
+      "preparation_seconds": 0.2543800839994219,
+      "seconds": 0.0004633330026990734,
+      "status": "invalid",
+      "event_delta": 0
+    },
+    {
+      "family": "fight",
+      "malformed": true,
+      "repeat": 2,
+      "preparation_seconds": 0.25495112499629613,
+      "seconds": 0.00044091699965065345,
+      "status": "invalid",
+      "event_delta": 0
+    }
+  ],
+  "summary": {
+    "valid": {
+      "count": 15,
+      "mean_seconds": 0.014856391599945102,
+      "median_seconds": 0.011885416002769489,
+      "p95_seconds": 0.02761454100254923,
+      "maximum_seconds": 0.02761454100254923,
+      "submissions_per_second": 67.31109591939507,
+      "completion_rate": 1
+    },
+    "malformed": {
+      "count": 15,
+      "mean_seconds": 0.0009532083340066795,
+      "median_seconds": 0.0006771660046069883,
+      "p95_seconds": 0.0016863330019987188,
+      "maximum_seconds": 0.0016863330019987188,
+      "submissions_per_second": 1049.0886035339602,
+      "completion_rate": 1
+    }
+  },
+  "completed_submissions": 30,
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order76.py": "d5d60f904c8c940ff2f9960bb4875cf7c43ebe8518fe69b4f0b3841782fae713",
+    "tests/physical_proposal_prevalidation_helpers.py": "bfd392c16943efae9f8cf26fcb8d6ac5be378c3cfe88062237679a3ff1550f66",
+    "tests/surge_fixed_target_helpers.py": "73fda088d8de0b792973e21fa011eff378f68d3ef962d68d65f217c14c13e79c",
+    "tests/charge_endpoint_helpers.py": "817d51830e7ecaabfede5bf5d3f271db998b94cda0c4f73f6dcd4a2bbb2dc3de",
+    "tests/order63_reserve_transport_helpers.py": "4712ff4f47cb9939f11d67298eec960a4373ecbcff3444c526c21209723da3f4",
+    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473"
+  }
+}

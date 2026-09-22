@@ -368,7 +368,6 @@ def apply_proposal_decision(
     if not proposal_validation.is_valid:
         return _reject_invalid_triggered_movement_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=proposal_validation,
             message="Triggered movement proposal does not match the pending request.",

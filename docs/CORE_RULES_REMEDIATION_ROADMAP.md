@@ -274,7 +274,8 @@ corroborate but is not required to begin that work.
 | 73 | P18I | C18-10 | PFINAL preflight found Emergency Disembark proofs restricted to circles, cardinal walls and unsupported terrain floors. | Complete analytic circle/ellipse/rectangle placement, all orientations and supported elevations; share terrain, distance, coherency and engagement predicates for endpoints and alternatives across physical and attached units. Preserve fail-closed unresolved proofs, source provenance, adapter/replay authority and matched performance evidence. See [Order 73 prerequisite](ORDER_73_PREFLIGHT_AUDIT.md). | Retained [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports) and existing terrain/coherency descriptors. | P18B, P18H | IMPLEMENTATION-GAP |
 | 74 | P03C | C03-03 | PFINAL preflight found a legal Charge rejected because finite navigation cannot prove terrain-excluded mandatory endpoints. | Add a shared continuous terrain-exclusion certificate for Charge, Consolidation and Surge, distinct from distance bounds and unresolved search. Preserve complete PathWitness validation, historical authentication, viewer/replay authority and independent Surge maximum approach. See [Order 74 prerequisite](ORDER_74_PREFLIGHT_AUDIT.md). | Retained 11.04 per-model Charge endpoints, shared movement/terrain descriptors and existing Consolidation/Surge source owners; no source wording change. | P11B, P12B, P21B, P03B, P18I | IMPLEMENTATION-GAP |
 | 75 | P21C | C21-03 | PFINAL preflight found legal optimal Surge approaches rejected against fixed noncircular targets. | Preserve the fixed target footprint and facing in the shared movement lower bound, with conservative moving-rotation allowance; authenticate the same proof in restore. Cover oval/rectangular targets, attached models, retry, viewer events and exact replay. See [Order 75 prerequisite](ORDER_75_PREFLIGHT_AUDIT.md). | Retained 21.02 Surge maximum-approach source and current maintained-mirror corroboration; no source wording change. | P21B, P03C | IMPLEMENTATION-GAP |
-| 76 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 74 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
+| 76 | P03D | C03-04 | PFINAL preflight reproduced unreplayable events from malformed physical proposals and an untyped Surge loader failure. | Return shared typed prevalidation diagnostics without mutating authoritative histories; preserve recorded rule-invalid retries, viewer scope and exact replay/recovery across movement, Charge, Surge and placement. See [Order 76 scope and evidence](ORDER_76_PREFLIGHT_AUDIT.md). | Existing Core physical proposal sources and the Phase 11D adapter contract; no rules wording change. | P21C, P03C, P18I | IMPLEMENTATION-GAP |
+| 77 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 75 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
 Categories 07 and 13 have no standalone remediation PR in this
 sequence. Category 13’s current Light/Dense Hidden wording is governed by the
@@ -3065,7 +3066,7 @@ audit and must commit the final audit artifact, generated report, validation
 results, snapshot identity, provider/version evidence, and the evidence
 supporting `CAUDIT-01` closure.
 
-Order 76 must also assess representative complete headless games using the
+Order 77 must also assess representative complete headless games using the
 existing legal driver or recorded workload, including the continuous terrain
 solver introduced by Order 74. Record completion, per-game timing, declared
 hardware and workload, and the standing below-60-second mean / at-most-300-second
@@ -5333,3 +5334,26 @@ invalid-kind prevalidation events can drift on exact replay, and a missing
 required field can raise an untyped loader error. These do not traverse the
 fixed-target bound. They need separate adapter triage and a scoped prerequisite
 if confirmed during the resumed audit; P21C does not certify those paths.
+
+
+## Order 76 / P03D — replay-safe physical proposal prevalidation
+
+The owner approved this prerequisite on 2026-09-22 after the PFINAL audit
+reproduced C03-04 through Surge and Charge facades. Malformed proposals appended
+unrecorded events, breaking exact replay and session recovery; an empty Surge
+payload escaped as KeyError. The same rejection mechanism affected ordinary
+movement, reserve/disembark placement, Emergency Disembark and spatial drift.
+Shared typed diagnostics now preserve authoritative state and history, while
+well-formed rule-invalid attempts retain their recorded retries.
+
+P03D is Order 76 and PFINAL moves to Order 77. The current inventory is 75
+implementation PRs, S-MIRRORS and PFINAL (77 rows); earlier counts record their
+historical review states. Source observations, rule semantics and payload
+schemas remain unchanged. The adapter contract now requires clients to consume
+prevalidation diagnostics from the returned status, without a corresponding
+authoritative event. Exact-build replay/persistence remains mandatory.
+
+See [scope, source trace and validation](ORDER_76_PREFLIGHT_AUDIT.md) and
+[matched component evidence](performance/order76/README.md). CAUDIT-01 remains
+open; merge this prerequisite before repeating the complete 25-category audit.
+Complete-game performance remains uncertified.
