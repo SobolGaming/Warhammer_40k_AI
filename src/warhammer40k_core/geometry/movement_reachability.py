@@ -15,6 +15,7 @@ from itertools import pairwise
 
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase, base_distance
+from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
@@ -208,6 +209,7 @@ class MovementReachabilityQuery:
 class MovementReachabilityStatus(StrEnum):
     REACHABLE = "reachable"
     UNREACHABLE = "unreachable"
+    ENDPOINT_UNREACHABLE = "endpoint_unreachable"
     UNRESOLVED = "unresolved"
 
 
@@ -261,6 +263,15 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
         witness = _validated_witness(query, poses)
         if witness is not None and _endpoint_satisfies(query, replace(source, pose=target)):
             return MovementReachabilityResult(witness, 1, MovementReachabilityStatus.REACHABLE)
+    if endpoint_excluded_by_terrain(
+        source=source,
+        goal=query.goal,
+        budget=budget,
+        ignores_vertical_distance=query.path_context.ignores_vertical_distance,
+        terrain=query.terrain_context.terrain,
+        terrain_features=query.terrain_context.terrain_features,
+    ):
+        return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
     nodes = _navigation_poses(query)
     start = source.pose
     queue: list[tuple[float, float, int, tuple[Pose, ...]]] = [(0.0, 0.0, -1, (start,))]

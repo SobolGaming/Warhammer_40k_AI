@@ -28,7 +28,13 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_charge_20
 )
 
 type EndpointReachabilityStatus = Literal[
-    "satisfied", "not_required", "not_evaluated", "reachable", "unreachable", "unresolved"
+    "satisfied",
+    "not_required",
+    "not_evaluated",
+    "reachable",
+    "unreachable",
+    "endpoint_unreachable",
+    "unresolved",
 ]
 
 
@@ -44,10 +50,11 @@ class EndpointReachabilityEvidence(msgspec.Struct, frozen=True, forbid_unknown_f
             "not_evaluated",
             "reachable",
             "unreachable",
+            "endpoint_unreachable",
             "unresolved",
         }:
             raise GameLifecycleError("Charge reachability status is invalid.")
-        searched = self.status in {"reachable", "unreachable", "unresolved"}
+        searched = self.status in {"reachable", "unreachable", "endpoint_unreachable", "unresolved"}
         if searched != (self.distance_lower_bound_inches is not None):
             raise GameLifecycleError("Charge reachability requires a bound exactly when searched.")
         if self.distance_lower_bound_inches is not None and (
@@ -260,7 +267,7 @@ def validate_charge_model_endpoint_inventory(
             elif not required:
                 valid = evidence.status == "not_required"
             else:
-                valid = (
+                valid = evidence.status == "endpoint_unreachable" or (
                     evidence.status == "unreachable"
                     and evidence.distance_lower_bound_inches is not None
                     and evidence.distance_lower_bound_inches > maximum_distance_inches + 1e-8

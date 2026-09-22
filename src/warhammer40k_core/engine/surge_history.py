@@ -20,6 +20,7 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptorPayload,
     is_triggered_movement_proposal_request,
 )
+from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 from warhammer40k_core.geometry.volume import Model
@@ -240,9 +241,28 @@ def validate_surge_history(*, state: GameState, decisions: DecisionController) -
                     MovementGoal(models=targets, range_inches=0.0).distance_lower_bound(start)
                     - budget,
                 )
+                engagement_proved = (
+                    row.get("engagement_status") == "unreachable"
+                    and goal.distance_lower_bound(start) > budget + 1e-8
+                )
+                if row.get("engagement_status") == "endpoint_unreachable":
+                    if state.battlefield_state is None:
+                        raise GameLifecycleError(
+                            "Surge endpoint proof requires battlefield terrain."
+                        )
+                    features = state.battlefield_state.terrain_features
+                    engagement_proved = endpoint_excluded_by_terrain(
+                        source=start,
+                        goal=goal,
+                        budget=budget,
+                        ignores_vertical_distance=False,
+                        terrain=tuple(
+                            volume for feature in features for volume in feature.terrain_volumes()
+                        ),
+                        terrain_features=features,
+                    )
                 if (
-                    row.get("engagement_status") != "unreachable"
-                    or goal.distance_lower_bound(start) <= budget + 1e-8
+                    not engagement_proved
                     or row.get("approach_status") != "optimal_bound"
                     or row.get("distance_lower_bound_inches") != lower
                     or distance > lower + 1e-8

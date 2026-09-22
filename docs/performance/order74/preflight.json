@@ -1,0 +1,43 @@
+{
+  "base_commit": "54284173293238ea417a1eb1cb0351843a442998",
+  "target_selected_through_facade": true,
+  "facade_status": "invalid",
+  "facade_payload": {
+    "phase": "charge",
+    "phase_body_status": "charge_move_invalid",
+    "battle_round": 1,
+    "active_player_id": "player-a",
+    "unit_instance_id": "army-alpha:source",
+    "movement_phase_action": "charge_move",
+    "violation_code": "charge_reachability_unresolved",
+    "next_request_id": "decision-request-000005",
+    "proposal_validation": {
+      "proposal_request_id": "decision-request-000004",
+      "proposal_kind": "charge_move",
+      "is_valid": false,
+      "status": "invalid",
+      "violations": [
+        {
+          "violation_code": "charge_reachability_unresolved",
+          "message": "Charge Move endpoint violates charge rules.",
+          "field": "charge_target_unit_instance_ids"
+        }
+      ]
+    }
+  },
+  "placement_unchanged": true,
+  "impossibility_proof": {
+    "trailing_base_radius": 0.6299212598425197,
+    "goal_center_distance": 2.2598425196850394,
+    "minimum_goal_y": 23.74015748031496,
+    "maximum_goal_x_offset_from_start": 0.27151799653808506,
+    "wall_near_y": 23.8,
+    "wall_half_width": 0.4,
+    "maximum_gap_from_wall_near_y": 0.059842519685041395,
+    "nearest_other_target_center_distance": 6.161168720299745,
+    "budget_plus_goal_radius": 6.009842519685039
+  },
+  "charge_move_budget_inches": 3.75,
+  "selected_target_distance_inches": 3.740157480314961,
+  "source_rule_id": "gw-11e-core-charge:model-endpoints"
+}

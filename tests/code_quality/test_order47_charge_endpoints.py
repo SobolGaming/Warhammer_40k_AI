@@ -74,6 +74,60 @@ def test_order47_endpoint_execution_has_reviewed_source_and_distinct_load_status
     assert mirror.provider_non_affiliation_recorded
 
 
+def test_order74_terrain_exclusion_has_one_shared_proof_owner() -> None:
+    for consumer in (
+        "charge_model_endpoints.py",
+        "consolidation_model_constraints.py",
+        "surge_movement.py",
+    ):
+        assert "movement_reachability" in _calls(consumer)
+        assert "decide" not in _calls(consumer)
+    for history in ("charge_endpoint_history.py", "surge_history.py"):
+        assert "endpoint_excluded_by_terrain" in _calls(history)
+    geometry = ROOT / "src/warhammer40k_core/geometry/movement_reachability.py"
+    tree = ast.parse(geometry.read_text())
+    resolver = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_cached_reachability"
+    )
+    assert isinstance(resolver.body[-1], ast.Return)
+    assert "UNRESOLVED" in ast.unparse(resolver.body[-1])
+    assert "endpoint_excluded_by_terrain" in ast.unparse(resolver)
+
+
+def test_order74_matched_facade_performance_retains_the_base_rejection() -> None:
+    import hashlib
+
+    from warhammer40k_core.build_identity import verified_engine_build_identity
+
+    directory = ROOT / "docs/performance/order74"
+    base = json.loads((directory / "base.json").read_text())
+    head = json.loads((directory / "head.json").read_text())
+    for key in (
+        "workload_id",
+        "platform",
+        "python",
+        "cpu",
+        "memory_bytes",
+        "concurrency",
+        "timing_boundary",
+        "hashes",
+        "budget",
+    ):
+        assert base[key] == head[key], key
+    assert head["revision"] == verified_engine_build_identity().build_id
+    assert len(base["samples"]) == len(head["samples"]) == 3
+    assert all(not sample["valid"] for sample in base["samples"])
+    assert all(sample["valid"] for sample in head["samples"])
+    assert head["maximum_seconds"] <= head["budget"]["maximum_head_seconds"]
+    assert not head["full_game_certified"]
+    for path, digest in head["hashes"].items():
+        assert (
+            hashlib.sha256((ROOT / path).read_bytes().replace(b"\r\n", b"\n")).hexdigest() == digest
+        )
+
+
 def test_historical_charge_movement_capabilities_use_the_event_bound_component() -> None:
     tree = ast.parse((ENGINE / "charge_endpoint_history.py").read_text())
     constructors = {
