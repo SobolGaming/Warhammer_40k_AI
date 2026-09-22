@@ -1,11 +1,11 @@
 {
   "workload_id": "order60-emergency-disembark-placement-v1",
   "revision": "516f75c31626aa883ed3e488eba5807148bc6faa",
-  "platform": "Windows-11-10.0.26200-SP0",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
-  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-  "memory_bytes": 137327259648,
-  "cpu_allocation": 64,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
   "concurrency": 1,
   "host_role": "provisional",
   "timing_boundary": "resolve one five-model Emergency Disembark contact-ring placement on the canonical Transport fixture; fixture creation excluded; first sample cold",
@@ -15,65 +15,65 @@
     "emergency_survivors": 5
   },
   "hashes": {
-    "uv.lock": "f7fac70482644eae6ca2ffa6ef9f14b566397b8173544929bcfaf346f64cfbba",
-    "scripts/measure_order60.py": "880d1aca3ff5fb712acf6fb6802da38d59ab6a891e22bf7c564c3013f87ac100",
-    "tests/order60_emergency_disembark_helpers.py": "316e0ae40bd1086787beee1b7406acb9aca932e335748ea807e77dc0203aa094"
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order60.py": "4bdf9c712108406d9d1e6d259584d8e5284f160395b5ff3a8c5e2d0f75c6e568",
+    "tests/order60_emergency_disembark_helpers.py": "dc1c3439d5fa7075b4719b8a6dcd01ae5698f44c7fa1f57faf442a13abe6e0e3"
   },
   "samples": [
     {
-      "preparation_seconds": 7.3106999000301585,
-      "matched_seconds": 0.0625004000030458,
+      "preparation_seconds": 2.274058207993221,
+      "matched_seconds": 0.026658833005058113,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9416675000102259,
-      "matched_seconds": 0.003548900014720857,
+      "preparation_seconds": 0.2796160419966327,
+      "matched_seconds": 0.0012322090042289346,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9653818999649957,
-      "matched_seconds": 0.003969900019001216,
+      "preparation_seconds": 0.27865125000244007,
+      "matched_seconds": 0.0011810830037575215,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.0014776999596506,
-      "matched_seconds": 0.0034455000422894955,
+      "preparation_seconds": 0.3154169589979574,
+      "matched_seconds": 0.0012714160038740374,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9309297000290826,
-      "matched_seconds": 0.0034285999718122184,
+      "preparation_seconds": 0.27807908300019335,
+      "matched_seconds": 0.0012439170022844337,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9288105000159703,
-      "matched_seconds": 0.0032950000022538006,
+      "preparation_seconds": 0.28380129199649673,
+      "matched_seconds": 0.0013071669964119792,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9341305999550968,
-      "matched_seconds": 0.0032683000317774713,
+      "preparation_seconds": 0.2778763330061338,
+      "matched_seconds": 0.001170625000668224,
       "valid": true,
       "violation_count": 0,
       "complete": true
     }
   ],
-  "mean_seconds": 0.011922371440700122,
-  "median_seconds": 0.0034455000422894955,
-  "maximum_seconds": 0.0625004000030458,
-  "p95_seconds": 0.003969900019001216,
+  "mean_seconds": 0.004866464288040463,
+  "median_seconds": 0.0012439170022844337,
+  "maximum_seconds": 0.026658833005058113,
+  "p95_seconds": 0.0013071669964119792,
   "completion_rate": 1,
   "full_game_certified": false,
   "budgets": {

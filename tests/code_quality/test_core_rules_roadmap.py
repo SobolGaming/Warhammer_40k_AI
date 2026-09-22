@@ -30,6 +30,7 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
             "C18-09": "P18H",
             "C18-10": "P18I",
             "C20-02": "P20B",
+            "C21-03": "P21C",
             "C24-10": "P24J",
         }.items()
     )

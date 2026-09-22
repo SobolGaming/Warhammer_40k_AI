@@ -1,0 +1,151 @@
+{
+  "workload_id": "order75-fixed-target-surge-facade-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "library_versions": {
+    "orjson": "3.11.9",
+    "msgspec": "0.21.1",
+    "pydantic": "2.13.4",
+    "shapely": "2.1.2",
+    "numpy": "2.4.6",
+    "jsonschema": "4.26.0",
+    "referencing": "0.37.0",
+    "z3-solver": "4.15.4.0"
+  },
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "cold-cache facade submission; preparation reported separately",
+  "workload": {
+    "moving_models": [
+      5,
+      6,
+      5
+    ],
+    "target_models": 1,
+    "target_size_inches": [
+      8,
+      2
+    ],
+    "terrain_count": 0,
+    "movement_budget_inches": 3,
+    "decision_policy": "fixed finite target followed by a complete three-pose path",
+    "rng": "no dice in measured slice"
+  },
+  "samples": [
+    {
+      "attached": false,
+      "oval": false,
+      "facing": 0,
+      "repeat": 0,
+      "preparation_seconds": 2.5893991669945535,
+      "seconds": 0.01438462499936577,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": false,
+      "oval": false,
+      "facing": 0,
+      "repeat": 1,
+      "preparation_seconds": 0.5424166669981787,
+      "seconds": 0.01227554099750705,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": false,
+      "oval": false,
+      "facing": 0,
+      "repeat": 2,
+      "preparation_seconds": 0.4946658330009086,
+      "seconds": 0.012819500007026363,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": true,
+      "oval": false,
+      "facing": 37,
+      "repeat": 0,
+      "preparation_seconds": 0.49868174999573966,
+      "seconds": 0.01587412500521168,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": true,
+      "oval": false,
+      "facing": 37,
+      "repeat": 1,
+      "preparation_seconds": 0.5007873750000726,
+      "seconds": 0.014360958004544955,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": true,
+      "oval": false,
+      "facing": 37,
+      "repeat": 2,
+      "preparation_seconds": 0.48209325000061654,
+      "seconds": 0.013344499995582737,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": false,
+      "oval": true,
+      "facing": 90,
+      "repeat": 0,
+      "preparation_seconds": 0.49799345799692674,
+      "seconds": 0.018605917000968475,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": false,
+      "oval": true,
+      "facing": 90,
+      "repeat": 1,
+      "preparation_seconds": 0.4839334579955903,
+      "seconds": 0.015505458999541588,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "attached": false,
+      "oval": true,
+      "facing": 90,
+      "repeat": 2,
+      "preparation_seconds": 0.47191675000067335,
+      "seconds": 0.01543166700139409,
+      "accepted": true,
+      "status": "waiting_for_decision"
+    }
+  ],
+  "mean_seconds": 0.014733588001238078,
+  "median_seconds": 0.01438462499936577,
+  "maximum_seconds": 0.018605917000968475,
+  "p95_seconds": 0.018605917000968475,
+  "percentile_method": "nearest rank",
+  "completed_submissions": 9,
+  "completion_rate": 1,
+  "acceptance_rate": 1.0,
+  "throughput_submissions_per_second": 67.87212998734381,
+  "full_game_certified": false,
+  "budget": {
+    "maximum_head_seconds": 12,
+    "required_head_acceptance_rate": 1
+  },
+  "comparison_note": "Base rejects optimal moves; accepted head work is not equivalent.",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order75.py": "bb1637371149c6a9dd260fd56825ae518c80149463d23238ccadcf6316d82eb2",
+    "tests/surge_fixed_target_helpers.py": "73fda088d8de0b792973e21fa011eff378f68d3ef962d68d65f217c14c13e79c"
+  }
+}

@@ -1594,6 +1594,110 @@ def test_mandatory_endpoint_horizontal_policy_does_not_charge_vertical_goal_dist
     assert result.status is not MovementReachabilityStatus.UNREACHABLE
 
 
+@pytest.mark.parametrize("target_base", [CircularBase(1), OvalBase(8, 2), RectangularBase(8, 2)])
+@pytest.mark.parametrize("facing", [0, 37, 90])
+@pytest.mark.parametrize("spatial", [False, True])
+def test_order75_fixed_target_bound_preserves_footprint_facing_and_vertical_policy(
+    target_base: BaseShape, facing: float, spatial: bool
+) -> None:
+    from warhammer40k_core.geometry.movement_reachability import MovementGoal
+
+    query = _mandatory_endpoint_query()
+    source = replace(query.path_context.moving_model, pose=Pose.at(10, 10))
+    target = replace(
+        query.goal.models[0], base=target_base, pose=Pose.at(10, 20, 8, facing_degrees=facing)
+    )
+    goal = (
+        MovementGoal(models=(target,), range_inches=1)
+        if spatial
+        else MovementGoal(models=(target,), horizontal_inches=2, vertical_inches=5)
+    )
+    horizontal = source.base_distance_to(target)
+    vertical = source.volume.vertical_gap_to(source.pose, target.volume, target.pose)
+    expected = (
+        max(0, math.hypot(horizontal, vertical) - 1)
+        if spatial
+        else math.hypot(max(0, horizontal - 2), max(0, vertical - 5))
+    )
+    assert math.isclose(goal.distance_lower_bound(source), expected, rel_tol=0, abs_tol=1e-10)
+    assert math.isclose(
+        goal.distance_lower_bound(source, ignores_vertical_distance=True),
+        max(0, horizontal - (1 if spatial else 2)),
+        rel_tol=0,
+        abs_tol=1e-10,
+    )
+
+
+@pytest.mark.parametrize("source_base", [OvalBase(4, 1), RectangularBase(4, 1)])
+@pytest.mark.parametrize("target_base", [CircularBase(1), OvalBase(6, 2), RectangularBase(6, 2)])
+def test_order75_moving_rotations_cannot_invalidate_fixed_target_lower_bound(
+    source_base: BaseShape, target_base: BaseShape
+) -> None:
+    from warhammer40k_core.geometry.movement_reachability import MovementGoal
+
+    query = _mandatory_endpoint_query()
+    source = replace(query.path_context.moving_model, base=source_base, pose=Pose.at(10, 10))
+    target = replace(
+        query.goal.models[0], base=target_base, pose=Pose.at(11, 20, facing_degrees=37)
+    )
+    goal = MovementGoal(models=(target,), range_inches=0)
+    lower = goal.distance_lower_bound(source)
+    for facing in range(0, 360, 15):
+        rotated = replace(source, pose=Pose.at(10, 10, facing_degrees=facing))
+        assert lower <= rotated.range_to(target) + 1e-10
+        moved = replace(rotated, pose=Pose.at(10, 13, facing_degrees=facing))
+        assert max(0, lower - 3) <= moved.range_to(target) + 1e-10
+
+
+def test_order75_fixed_target_union_uses_closest_actual_footprint() -> None:
+    from warhammer40k_core.geometry.movement_reachability import MovementGoal
+
+    query = _mandatory_endpoint_query()
+    source = replace(query.path_context.moving_model, pose=Pose.at(10, 10))
+    wide = replace(query.goal.models[0], base=RectangularBase(20, 1), pose=Pose.at(10, 22))
+    close = replace(wide, model_id="closer-target", base=OvalBase(4, 2), pose=Pose.at(10, 16))
+    # The wide model has the nearer enclosing disk, but its footprint is farther.
+    assert source.range_to(close) < source.range_to(wide)
+    for targets in ((wide, close), (close, wide)):
+        assert math.isclose(
+            MovementGoal(models=targets, range_inches=0).distance_lower_bound(source),
+            source.range_to(close),
+            rel_tol=0,
+            abs_tol=1e-10,
+        )
+
+
+def test_order75_fixed_target_bound_and_cache_recompute_after_target_rotation() -> None:
+    from warhammer40k_core.geometry.movement_reachability import (
+        MovementReachabilityStatus,
+        clear_movement_reachability_cache,
+        movement_reachability,
+    )
+
+    clear_movement_reachability_cache()
+    query = _mandatory_endpoint_query(target_x=10, budget=3)
+    target = replace(query.goal.models[0], base=RectangularBase(8, 2), pose=Pose.at(2, 10))
+    query = replace(
+        query,
+        goal=replace(query.goal, models=(target,)),
+        path_context=replace(query.path_context, enemy_models=(target,)),
+    )
+    blocked = movement_reachability(query)
+    assert blocked.status is MovementReachabilityStatus.UNREACHABLE
+    turned = replace(target, pose=Pose.at(2, 10, facing_degrees=90))
+    turned_query = replace(
+        query,
+        goal=replace(query.goal, models=(turned,)),
+        path_context=replace(query.path_context, enemy_models=(turned,)),
+    )
+    reached = movement_reachability(turned_query)
+    assert reached.status is MovementReachabilityStatus.REACHABLE
+    assert reached.witness is not None
+    assert replace(turned_query.path_context, witness=reached.witness).validate().is_valid
+    assert movement_reachability(query) is blocked
+    assert movement_reachability(turned_query) is reached
+
+
 def test_mandatory_endpoint_witness_also_satisfies_strict_closer_constraint() -> None:
     from warhammer40k_core.geometry.movement_reachability import movement_reachability
 

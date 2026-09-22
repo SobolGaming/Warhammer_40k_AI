@@ -1,12 +1,12 @@
 {
   "workload": "order71-engaged-shooting-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
-  "platform": "Windows-11-10.0.26200-SP0",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:212ad2bc426888efcbc200add04fb2df7b288c35ef418ead7e65b3bf3842c1c6",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
-  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-  "memory_bytes": 137327259648,
-  "cpu_allocation": 64,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
   "concurrency": 1,
   "host_role": "provisional",
   "timing_boundary": "10 uncached complete model-target candidates, including geometry and engagement; canonical scene preparation excluded; seven serial samples without coverage",
@@ -19,16 +19,16 @@
     {
       "case": "third-party-close",
       "samples_seconds": [
-        0.009426900011021644,
-        0.006976700038649142,
-        0.008330399985425174,
-        0.007071200001519173,
-        0.008475899987388402,
-        0.007091699982993305,
-        0.006801000039558858
+        0.0025358330021845177,
+        0.002031374999205582,
+        0.0020331670020823367,
+        0.0019941670034313574,
+        0.0021644169974024408,
+        0.0020333330030553043,
+        0.0020525420040939935
       ],
-      "mean_seconds": 0.0077391142923651,
-      "maximum_seconds": 0.009426900011021644,
+      "mean_seconds": 0.002120690573065076,
+      "maximum_seconds": 0.0025358330021845177,
       "complete": true,
       "legal": true,
       "hit_modifier": -1
@@ -36,16 +36,16 @@
     {
       "case": "both-causes",
       "samples_seconds": [
-        0.009115300024859607,
-        0.006904400011990219,
-        0.007874999952036887,
-        0.0070810000179335475,
-        0.00798719999147579,
-        0.007666299992706627,
-        0.006838000030256808
+        0.0024379580063396133,
+        0.001956708998477552,
+        0.002034082994214259,
+        0.001998084000661038,
+        0.0019726250029634684,
+        0.0021347500005504116,
+        0.0019901249979739077
       ],
-      "mean_seconds": 0.007638171431608498,
-      "maximum_seconds": 0.009115300024859607,
+      "mean_seconds": 0.0020749048573114643,
+      "maximum_seconds": 0.0024379580063396133,
       "complete": true,
       "legal": true,
       "hit_modifier": -2
@@ -53,16 +53,16 @@
     {
       "case": "mutual-close",
       "samples_seconds": [
-        0.008289299963507801,
-        0.007930200023110956,
-        0.0071066999807953835,
-        0.009633600013330579,
-        0.007194200006779283,
-        0.007957399997394532,
-        0.008340600004885346
+        0.002614375000121072,
+        0.002079292004054878,
+        0.0020743329951073974,
+        0.002257708001707215,
+        0.002067207999061793,
+        0.0020839170028921217,
+        0.002246082993224263
       ],
-      "mean_seconds": 0.00806457142711484,
-      "maximum_seconds": 0.009633600013330579,
+      "mean_seconds": 0.0022032737137383913,
+      "maximum_seconds": 0.002614375000121072,
       "complete": true,
       "legal": true,
       "hit_modifier": 0
@@ -70,16 +70,16 @@
     {
       "case": "attached-third-party",
       "samples_seconds": [
-        0.009312300011515617,
-        0.009906299994327128,
-        0.008396700024604797,
-        0.008729799999855459,
-        0.008452100038994104,
-        0.009813299984671175,
-        0.00834880000911653
+        0.002916749996074941,
+        0.0024462090004817583,
+        0.0026945829959004186,
+        0.002412707995972596,
+        0.00241733299480984,
+        0.0026689169972087257,
+        0.002406332998361904
       ],
-      "mean_seconds": 0.00899418572329783,
-      "maximum_seconds": 0.009906299994327128,
+      "mean_seconds": 0.002566118996972883,
+      "maximum_seconds": 0.002916749996074941,
       "complete": true,
       "legal": true,
       "hit_modifier": -1

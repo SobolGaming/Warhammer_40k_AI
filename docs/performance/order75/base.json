@@ -1,0 +1,151 @@
+{
+  "workload_id": "order75-fixed-target-surge-facade-v1",
+  "revision": "9d8c5e2a1bb4db3c8a7f68b6da924c4ea9e23daa",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "library_versions": {
+    "orjson": "3.11.9",
+    "msgspec": "0.21.1",
+    "pydantic": "2.13.4",
+    "shapely": "2.1.2",
+    "numpy": "2.4.6",
+    "jsonschema": "4.26.0",
+    "referencing": "0.37.0",
+    "z3-solver": "4.15.4.0"
+  },
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "cold-cache facade submission; preparation reported separately",
+  "workload": {
+    "moving_models": [
+      5,
+      6,
+      5
+    ],
+    "target_models": 1,
+    "target_size_inches": [
+      8,
+      2
+    ],
+    "terrain_count": 0,
+    "movement_budget_inches": 3,
+    "decision_policy": "fixed finite target followed by a complete three-pose path",
+    "rng": "no dice in measured slice"
+  },
+  "samples": [
+    {
+      "attached": false,
+      "oval": false,
+      "facing": 0,
+      "repeat": 0,
+      "preparation_seconds": 2.5751066250013537,
+      "seconds": 0.16363312500470784,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": false,
+      "oval": false,
+      "facing": 0,
+      "repeat": 1,
+      "preparation_seconds": 0.5344976670021424,
+      "seconds": 0.13415949999762233,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": false,
+      "oval": false,
+      "facing": 0,
+      "repeat": 2,
+      "preparation_seconds": 0.46917070799827343,
+      "seconds": 0.1357943749972037,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": true,
+      "oval": false,
+      "facing": 37,
+      "repeat": 0,
+      "preparation_seconds": 0.4750050420043408,
+      "seconds": 0.314011082999059,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": true,
+      "oval": false,
+      "facing": 37,
+      "repeat": 1,
+      "preparation_seconds": 0.49217804199724924,
+      "seconds": 0.29495233399939025,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": true,
+      "oval": false,
+      "facing": 37,
+      "repeat": 2,
+      "preparation_seconds": 0.4790268750002724,
+      "seconds": 0.29435591700166697,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": false,
+      "oval": true,
+      "facing": 90,
+      "repeat": 0,
+      "preparation_seconds": 0.48680462499760324,
+      "seconds": 1.4465324170014355,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": false,
+      "oval": true,
+      "facing": 90,
+      "repeat": 1,
+      "preparation_seconds": 0.4723958329996094,
+      "seconds": 1.5787916250046692,
+      "accepted": false,
+      "status": "invalid"
+    },
+    {
+      "attached": false,
+      "oval": true,
+      "facing": 90,
+      "repeat": 2,
+      "preparation_seconds": 0.5069139589977567,
+      "seconds": 1.5407477909975569,
+      "accepted": false,
+      "status": "invalid"
+    }
+  ],
+  "mean_seconds": 0.655886463000368,
+  "median_seconds": 0.29495233399939025,
+  "maximum_seconds": 1.5787916250046692,
+  "p95_seconds": 1.5787916250046692,
+  "percentile_method": "nearest rank",
+  "completed_submissions": 9,
+  "completion_rate": 1,
+  "acceptance_rate": 0.0,
+  "throughput_submissions_per_second": 1.5246541229490798,
+  "full_game_certified": false,
+  "budget": {
+    "maximum_head_seconds": 12,
+    "required_head_acceptance_rate": 1
+  },
+  "comparison_note": "Base rejects optimal moves; accepted head work is not equivalent.",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order75.py": "bb1637371149c6a9dd260fd56825ae518c80149463d23238ccadcf6316d82eb2",
+    "tests/surge_fixed_target_helpers.py": "73fda088d8de0b792973e21fa011eff378f68d3ef962d68d65f217c14c13e79c"
+  }
+}

@@ -2,11 +2,18 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 75 / P21C accepts provably optimal Surge approaches to fixed oval and
+rectangular targets through the shared geometry, facade, restore and replay
+path. The bound preserves the target footprint and facing, while retaining
+conservative rotation allowances for noncircular movers. See
+[scope and evidence](docs/ORDER_75_PREFLIGHT_AUDIT.md). PFINAL is Order 76 and
+requires this prerequisite to merge before a fresh complete audit.
+
 Order 74 / P03C repairs terrain-blocked mandatory movement endpoints using a
 shared continuous exclusion proof. Charge records and restores that proof;
 Consolidation and Surge consume the same reachability authority. Unresolved
 path or maximum-approach searches remain fail-closed. See
-[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 75
+[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 76
 and still requires a complete audit after the prerequisite merges.
 
 Order 72 resolves consolidation responses against owner-confirmed official App

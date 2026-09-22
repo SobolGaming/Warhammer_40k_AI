@@ -152,3 +152,58 @@ def test_surge_grant_validation_retains_matched_performance_evidence(prefix: str
         + base["budgets"]["mean_additive_seconds"]
     )
     assert head["maximum_seconds"] <= base["budgets"]["maximum_seconds"]
+
+
+def test_order75_live_and_restore_share_fixed_target_bound() -> None:
+    import ast
+
+    for module in ("surge_movement.py", "surge_history.py"):
+        tree = ast.parse((ENGINE / module).read_text())
+        assert any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "distance_lower_bound"
+            for node in ast.walk(tree)
+        )
+    geometry = ROOT / "src/warhammer40k_core/geometry/movement_reachability.py"
+    tree = ast.parse(geometry.read_text())
+    # A fixed target must never regain a rotating enclosing-disk relaxation.
+    assert "target.base.max_radius()" not in ast.unparse(tree)
+    assert "source.base_distance_to(target)" in ast.unparse(tree)
+    assert "target.base, target.pose" in ast.unparse(tree)
+
+
+def test_order75_fixed_target_surge_has_matched_current_runtime_evidence() -> None:
+    import hashlib
+
+    from warhammer40k_core.build_identity import verified_engine_build_identity
+
+    folder = ROOT / "docs/performance/order75"
+    base, head = (json.loads((folder / name).read_text()) for name in ("base.json", "head.json"))
+    assert head["runtime_id"] == verified_engine_build_identity().build_id
+    for key in (
+        "workload_id",
+        "platform",
+        "python",
+        "library_versions",
+        "cpu",
+        "memory_bytes",
+        "cpu_allocation",
+        "concurrency",
+        "timing_boundary",
+        "workload",
+        "hashes",
+        "budget",
+    ):
+        assert base[key] == head[key], key
+    for name, digest in head["hashes"].items():
+        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+    for report, accepted in ((base, False), (head, True)):
+        assert len(report["samples"]) == report["completed_submissions"] == 9
+        assert report["full_game_certified"] is False
+        assert report["completion_rate"] == 1
+        assert report["p95_seconds"] <= report["maximum_seconds"]
+        assert report["throughput_submissions_per_second"] > 0
+        assert all(row["accepted"] is accepted for row in report["samples"])
+    assert head["acceptance_rate"] == head["budget"]["required_head_acceptance_rate"] == 1
+    assert head["maximum_seconds"] <= head["budget"]["maximum_head_seconds"] == 12

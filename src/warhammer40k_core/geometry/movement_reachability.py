@@ -84,8 +84,10 @@ class MovementGoal:
     def distance_lower_bound(
         self, model: Model, *, ignores_vertical_distance: bool = False
     ) -> float:
-        # Every orientation fits inside this disk. Its distance to the target
-        # region cannot exceed the translation needed by any rotated footprint.
+        # Only the moving footprint can rotate. The target retains its measured
+        # footprint/facing. Circular movers are rotation invariant, so their
+        # actual separation is a translation lower bound. Other movers retain
+        # a containing-disk relaxation covering every possible orientation.
         radius = model.base.max_radius()
         if self.models:
             if self.range_inches is not None:
@@ -93,12 +95,7 @@ class MovementGoal:
                     max(
                         0.0,
                         math.hypot(
-                            max(
-                                0.0,
-                                model.pose.distance_2d_to(target.pose)
-                                - radius
-                                - target.base.max_radius(),
-                            ),
+                            _fixed_target_horizontal_lower_bound(model, target),
                             0.0
                             if ignores_vertical_distance
                             else model.volume.vertical_gap_to(
@@ -113,9 +110,7 @@ class MovementGoal:
                 math.hypot(
                     max(
                         0.0,
-                        model.pose.distance_2d_to(target.pose)
-                        - radius
-                        - target.base.max_radius()
+                        _fixed_target_horizontal_lower_bound(model, target)
                         - self.horizontal_inches,
                     ),
                     0.0
@@ -166,6 +161,26 @@ class MovementGoal:
                 self.z_inches - top - self.vertical_inches,
             ),
         )
+
+
+def _fixed_target_horizontal_lower_bound(source: Model, target: Model) -> float:
+    """Use the range owner's fixed footprint; relax only moving rotations.
+
+    Distance between sets is 1-Lipschitz under translation. A circle's measured
+    footprint is also independent of facing, including the existing polygonal
+    range representation when its target is not circular. For rotating movers,
+    distance from their center to the fixed target minus their enclosing radius
+    is a lower bound for every orientation. This does not certify a legal path.
+    """
+    if type(source.base) is CircularBase:
+        return source.base_distance_to(target)
+    if type(target.base) is CircularBase:
+        center_distance = source.pose.distance_2d_to(target.pose) - target.base.radius
+    else:
+        center_distance = shapely_backend.base_footprint_distance_to_point(
+            target.base, target.pose, x=source.pose.position.x, y=source.pose.position.y
+        )
+    return max(0.0, center_distance - source.base.max_radius())
 
 
 @dataclass(frozen=True, slots=True)

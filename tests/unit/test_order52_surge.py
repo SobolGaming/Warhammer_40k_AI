@@ -549,6 +549,158 @@ def test_surge_public_target_is_projected_consistently_to_both_players() -> None
         assert context["surge_target_unit_instance_id"] == TARGET
 
 
+@pytest.mark.parametrize(
+    ("attached", "oval", "facing"),
+    [
+        (False, False, 0),
+        (True, False, 0),
+        (False, False, 37),
+        (False, False, 90),
+        (False, True, 0),
+        (False, True, 90),
+    ],
+)
+def test_order75_fixed_target_optimal_surge_is_accepted_and_authenticated(
+    attached: bool, oval: bool, facing: float
+) -> None:
+    import json
+    from typing import cast
+
+    from tests.surge_fixed_target_helpers import (
+        fixed_target_surge_payload,
+        fixed_target_surge_request,
+        fixed_target_surge_session,
+    )
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.engine.lifecycle import GameLifecyclePayload
+    from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session = fixed_target_surge_session(attached=attached, oval=oval, facing=facing)
+    request = fixed_target_surge_request(session)
+    payload = fixed_target_surge_payload(session, request)
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id, payload=payload, result_id="optimal-fixed-target-surge"
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    state = session.lifecycle.state
+    assert state is not None
+    assert len(state.phase_movement_history) == 1
+    events = session.lifecycle.decision_controller.event_log.records
+    completed = next(event for event in events if event.event_type == "triggered_movement_resolved")
+    assert isinstance(completed.payload, dict)
+    rows = completed.payload["surge_model_endpoints"]
+    assert isinstance(rows, list)
+    assert len(rows) == (6 if attached else 5)
+    for row in rows:
+        assert isinstance(row, dict)
+        assert row["engagement_status"] == "unreachable"
+        assert row["approach_status"] == "optimal_bound"
+        assert row["alternative_witness"] is None
+    if attached:
+        assert any(
+            isinstance(row, dict) and row["component_unit_instance_id"] == "army-alpha:leader"
+            for row in rows
+        )
+    for viewer in ("player-a", "player-b"):
+        json.dumps(session.view(viewer_player_id=viewer), allow_nan=False)
+        delta = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        json.dumps(delta, allow_nan=False)
+        visible = next(
+            event for event in delta["events"] if event["event_type"] == completed.event_type
+        )
+        assert visible["payload"] == completed.payload
+    before = session.lifecycle.to_payload()
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        session.submit_parameterized_payload(
+            request_id=request.request_id, payload=payload, result_id="stale-fixed-target-surge"
+        )
+    assert session.lifecycle.to_payload() == before
+    checkpoint = cast(GameLifecyclePayload, json.loads(json.dumps(before)))
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order75-fixed-target"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+    forged = cast(GameLifecyclePayload, json.loads(json.dumps(checkpoint)))
+    for event in forged["decisions"]["event_log"]:
+        if event["event_type"] == "triggered_movement_resolved":
+            event_payload = event["payload"]
+            assert isinstance(event_payload, dict)
+            evidence = event_payload["surge_model_endpoints"]
+            assert isinstance(evidence, list)
+            assert isinstance(evidence[0], dict)
+            evidence[0]["distance_lower_bound_inches"] = 100.0
+    with pytest.raises(GameLifecycleError, match="Surge maximum-approach proof drifted"):
+        GameLifecycle.from_payload(forged)
+
+
+def test_order75_fixed_target_malformed_kind_preserves_pending_state() -> None:
+    from tests.surge_fixed_target_helpers import (
+        fixed_target_surge_payload,
+        fixed_target_surge_request,
+        fixed_target_surge_session,
+    )
+
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = fixed_target_surge_session()
+    request = fixed_target_surge_request(session)
+    before = session.lifecycle.to_payload()
+    malformed = fixed_target_surge_payload(session, request)
+    assert isinstance(malformed, dict)
+    malformed["proposal_kind"] = "not-a-proposal-kind"
+    invalid = session.submit_parameterized_payload(
+        request_id=request.request_id, payload=malformed, result_id="malformed-fixed-target"
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload()["state"] == before["state"]
+    assert session.lifecycle.pending_decision_request() == request
+
+
+def test_order75_fixed_target_shorter_approach_retries_without_mutation() -> None:
+    from tests.surge_fixed_target_helpers import (
+        fixed_target_surge_payload,
+        fixed_target_surge_request,
+        fixed_target_surge_session,
+    )
+
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session = fixed_target_surge_session()
+    request = fixed_target_surge_request(session)
+    state = session.lifecycle.state
+    assert state is not None
+    placement = state.battlefield_state
+    rejected = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=fixed_target_surge_payload(session, request, distance=2),
+        result_id="shorter-fixed-target",
+    )
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(rejected.payload, dict)
+    assert rejected.payload["violation_code"] == "surge_maximum_approach_not_reached"
+    assert state.battlefield_state == placement
+    assert not state.phase_movement_history
+    retry = session.lifecycle.pending_decision_request()
+    assert retry is not None
+    accepted = session.submit_parameterized_payload(
+        request_id=retry.request_id,
+        payload=fixed_target_surge_payload(session, retry),
+        result_id="retry-fixed-target",
+    )
+    assert accepted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert len(state.phase_movement_history) == 1
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order75-retry")).run().status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
 def test_surge_rejects_changed_target_commitment_on_restore() -> None:
     import json
     from typing import cast
