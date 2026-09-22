@@ -34,6 +34,7 @@ from warhammer40k_core.engine.rule_model_destruction_unplaced import (
     destroy_emergency_disembark_omitted_rules_unit_models,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_contains_component_lineage
+from warhammer40k_core.geometry.pose import GeometryError
 
 # fmt: off
 if TYPE_CHECKING:
@@ -109,7 +110,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
     if pending is None:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=MovementProposalRequest.from_decision_request_payload(request.payload),
             proposal_validation=ProposalValidationResult.invalid(
@@ -119,7 +119,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message="Destroyed Transport placement has no pending attack context.",
                 field=None,
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal has no pending context.",
         )
     parsed = _parse_destroyed_transport_disembark_submission_or_invalid(
@@ -143,7 +142,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
     ):
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -153,25 +151,21 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message=("Destroyed Transport placement lacks the completed survivor snapshot."),
                 field="context",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport survivor context drifted.",
         )
     proposal_validation = submission.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=proposal_validation,
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal does not match request.",
         )
     field = _missing_destroyed_transport_disembark_field(submission)
     if field is not None:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -181,14 +175,12 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message=f"Destroyed Transport disembark proposal missing {field}.",
                 field=field,
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal is incomplete.",
         )
     expected_unit_instance_id = _current_hazard_rules_unit_instance_id(pending=pending)
     if submission.unit_instance_id != expected_unit_instance_id:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -198,13 +190,11 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message="Destroyed Transport disembark unit does not match pending cargo.",
                 field="unit_instance_id",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal unit drifted.",
         )
     if submission.disembark_mode is not DisembarkModeKind.EMERGENCY_DISEMBARK:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -214,13 +204,11 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message="Destroyed Transport disembark must use Emergency Disembark mode.",
                 field="disembark_mode",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal mode drifted.",
         )
     if submission.transport_unit_instance_id != pending.transport_unit_instance_id:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -230,13 +218,11 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message="Destroyed Transport disembark transport does not match pending context.",
                 field="transport_unit_instance_id",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal transport drifted.",
         )
     if submission.transport_movement_status is not TransportMovementStatus.NOT_MOVED:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -246,7 +232,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message="Destroyed Transport disembark must use destroyed timing.",
                 field="transport_movement_status",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal timing drifted.",
         )
     attempted_rules_unit_placement = submission.resolved_rules_unit_placement()
@@ -256,7 +241,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
     if not attempted_model_ids <= set(survivor_ids):
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -266,7 +250,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message=("Destroyed Transport placement may contain only hazard survivors."),
                 field="attempted_placement",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport placement references a hazard casualty.",
         )
     if not set(attempted_rules_unit_placement.component_unit_instance_ids).issubset(
@@ -279,7 +262,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
     ):
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=ProposalValidationResult.invalid(
@@ -289,7 +271,6 @@ def invalid_destroyed_transport_disembark_proposal_status(
                 message=("Destroyed Transport placement component lineage drifted."),
                 field="attempted_rules_unit_placement",
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport placement component lineage drifted.",
         )
     return None
@@ -895,17 +876,15 @@ def _parse_destroyed_transport_disembark_submission_or_invalid(
         submission = PlacementProposalPayload.from_payload(
             cast(PlacementProposalPayloadPayload, _payload_object(result.payload))
         )
-    except (GameLifecycleError, PlacementError, KeyError, TypeError) as exc:
+    except (GameLifecycleError, GeometryError, PlacementError, KeyError, TypeError) as exc:
         return _destroyed_transport_proposal_invalid_status(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_request=proposal_request,
             proposal_validation=_destroyed_transport_proposal_parse_failure(
                 proposal_request=proposal_request,
                 error=exc,
             ),
-            event_type="destroyed_transport_disembark_proposal_invalid",
             message="Destroyed Transport disembark proposal payload is malformed.",
         )
     return proposal_request, submission
@@ -914,7 +893,7 @@ def _parse_destroyed_transport_disembark_submission_or_invalid(
 def _destroyed_transport_proposal_parse_failure(
     *,
     proposal_request: MovementProposalRequest,
-    error: GameLifecycleError | PlacementError | KeyError | TypeError,
+    error: GameLifecycleError | GeometryError | PlacementError | KeyError | TypeError,
 ) -> ProposalValidationResult:
     if type(error) is KeyError:
         missing = _key_error_field(error)
@@ -969,11 +948,9 @@ def _missing_destroyed_transport_disembark_field(
 def _destroyed_transport_proposal_invalid_status(
     *,
     state: GameState,
-    decisions: DecisionController,
     result: DecisionResult,
     proposal_request: MovementProposalRequest,
     proposal_validation: ProposalValidationResult,
-    event_type: str,
     message: str,
 ) -> LifecycleStatus:
     payload = validate_json_value(
@@ -990,7 +967,6 @@ def _destroyed_transport_proposal_invalid_status(
             "proposal_validation": validate_json_value(proposal_validation.to_payload()),
         }
     )
-    decisions.event_log.append(event_type, payload)
     return LifecycleStatus.invalid(
         stage=GameLifecycleStage.BATTLE,
         message=message,

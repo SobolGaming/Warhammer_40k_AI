@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.physical_proposal_validation import (
+    proposal_error_field as _key_error_field,
+    parse_movement_proposal_payload,
+    proposal_payload_parse_failure as _proposal_payload_parse_failure,
+)
+
 from warhammer40k_core.engine.physical_engagement import (
     current_physically_engaged_enemy_rules_unit_ids,
 )
@@ -70,21 +76,15 @@ def _parse_movement_proposal_submission_or_invalid(
     decisions: DecisionController,
 ) -> _MovementProposalParseResult:
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    try:
-        submission = MovementProposalPayload.from_payload(
-            cast(MovementProposalPayloadPayload, _decision_payload_object(result.payload))
-        )
-    except (GameLifecycleError, GeometryError, KeyError, TypeError) as exc:
+    submission = parse_movement_proposal_payload(
+        proposal_request=proposal_request,
+        payload=result.payload,
+    )
+    if isinstance(submission, ProposalValidationResult):
         return _reject_invalid_proposal(
             state=state,
-            decisions=decisions,
             result=result,
-            proposal_validation=_proposal_payload_parse_failure(
-                proposal_request=proposal_request,
-                error=exc,
-                default_field="witness",
-            ),
-            event_type="movement_proposal_invalid",
+            proposal_validation=submission,
             message="Movement proposal payload is malformed.",
         )
     return (proposal_request, submission)
@@ -105,66 +105,15 @@ def _parse_placement_proposal_submission_or_invalid(
     except (GameLifecycleError, GeometryError, PlacementError, KeyError, TypeError) as exc:
         return _reject_invalid_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=_proposal_payload_parse_failure(
                 proposal_request=proposal_request,
                 error=exc,
                 default_field="attempted_placement",
             ),
-            event_type="placement_proposal_invalid",
             message="Placement proposal payload is malformed.",
         )
     return (proposal_request, submission)
-
-
-def _proposal_payload_parse_failure(
-    *,
-    proposal_request: MovementProposalRequest,
-    error: GameLifecycleError | GeometryError | PlacementError | KeyError | TypeError,
-    default_field: str,
-) -> ProposalValidationResult:
-    violation_code = "proposal_payload_malformed"
-    field: str | None = default_field
-    if type(error) is KeyError:
-        missing = _key_error_field(error)
-        return ProposalValidationResult.invalid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-            violation_code="proposal_payload_missing_field",
-            message=f"Proposal payload missing required field: {missing}.",
-            field=missing,
-        )
-    message = str(error)
-    if "Unsupported ProposalKind token" in message:
-        violation_code = "unsupported_proposal_kind"
-        field = "proposal_kind"
-    elif "proposal_kind" in message:
-        field = "proposal_kind"
-    elif "movement_mode" in message or "MovementMode" in message:
-        field = "movement_mode"
-    elif "fall_back_mode" in message or "FallBackModeKind" in message:
-        field = "fall_back_mode"
-    elif "witness" in message or "PathWitness" in message:
-        field = "witness"
-    elif "attempted_placement" in message or "UnitPlacement" in message:
-        field = "attempted_placement"
-    return ProposalValidationResult.invalid(
-        proposal_request_id=proposal_request.request_id,
-        proposal_kind=proposal_request.proposal_kind,
-        violation_code=violation_code,
-        message=f"Proposal payload is malformed: {message}",
-        field=field,
-    )
-
-
-def _key_error_field(error: KeyError) -> str:
-    if len(error.args) != 1:
-        return "payload"
-    key = error.args[0]
-    if type(key) is str and key.strip():
-        return key.strip()
-    return "payload"
 
 
 def invalid_placement_proposal_submission_status(
@@ -189,7 +138,6 @@ def invalid_placement_proposal_submission_status(
         if missing is not None:
             return _reject_invalid_proposal(
                 state=state,
-                decisions=decisions,
                 result=result,
                 proposal_validation=ProposalValidationResult.invalid(
                     proposal_request_id=proposal_request.request_id,
@@ -198,7 +146,6 @@ def invalid_placement_proposal_submission_status(
                     message=f"Disembark placement proposal missing {missing}.",
                     field=missing,
                 ),
-                event_type="placement_proposal_invalid",
                 message="Disembark placement proposal is incomplete.",
             )
     spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
@@ -213,10 +160,8 @@ def invalid_placement_proposal_submission_status(
     if not proposal_validation.is_valid:
         return _reject_invalid_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=proposal_validation,
-            event_type="placement_proposal_invalid",
             message="Placement proposal does not match the pending request.",
         )
     if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
@@ -247,7 +192,6 @@ def invalid_placement_proposal_submission_status(
         ):
             return _reject_invalid_proposal(
                 state=state,
-                decisions=decisions,
                 result=result,
                 proposal_validation=ProposalValidationResult.invalid(
                     proposal_request_id=proposal_request.request_id,
@@ -257,7 +201,6 @@ def invalid_placement_proposal_submission_status(
                     field="disembark_mode",
                     status="stale",
                 ),
-                event_type="placement_proposal_invalid",
                 message="Disembark eligibility or permitting source changed.",
             )
     return None
@@ -291,7 +234,6 @@ def _apply_placement_proposal_decision(
         if missing is not None:
             return _reject_invalid_proposal(
                 state=state,
-                decisions=decisions,
                 result=result,
                 proposal_validation=ProposalValidationResult.invalid(
                     proposal_request_id=proposal_request.request_id,
@@ -300,17 +242,14 @@ def _apply_placement_proposal_decision(
                     message=f"Disembark placement proposal missing {missing}.",
                     field=missing,
                 ),
-                event_type="placement_proposal_invalid",
                 message="Disembark placement proposal is incomplete.",
             )
     proposal_validation = submission.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         return _reject_invalid_proposal(
             state=state,
-            decisions=decisions,
             result=result,
             proposal_validation=proposal_validation,
-            event_type="placement_proposal_invalid",
             message="Placement proposal does not match the pending request.",
         )
 

@@ -1766,7 +1766,8 @@ def test_phase15b_charge_target_without_witness_rejects_before_queue_pop() -> No
             witness=None,
         ),
     )
-    invalid = _last_event_payload(lifecycle, "charge_move_proposal_invalid")
+    assert _event_payloads(lifecycle, "charge_move_proposal_invalid") == ()
+    invalid = cast(dict[str, object], status.payload)
     proposal_validation = cast(dict[str, object], invalid["proposal_validation"])
     violations = cast(list[dict[str, object]], proposal_validation["violations"])
     after_state = _state(lifecycle)
@@ -2359,7 +2360,8 @@ def test_phase15b_malformed_charge_move_payload_rejects_before_queue_pop() -> No
             },
         ).to_result(proposal_request)
     )
-    invalid = _last_event_payload(lifecycle, "charge_move_proposal_invalid")
+    assert _event_payloads(lifecycle, "charge_move_proposal_invalid") == ()
+    invalid = cast(dict[str, object], status.payload)
     proposal_validation = cast(dict[str, object], invalid["proposal_validation"])
     violations = cast(list[dict[str, object]], proposal_validation["violations"])
 

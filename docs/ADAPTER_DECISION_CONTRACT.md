@@ -4028,7 +4028,24 @@ Before the queue is popped or a `DecisionRecord` is created, Phase 11D must vali
 - required proposal context drift;
 - JSON shape and required-field validity.
 
-Malformed, stale, schema-invalid, or context-drift submissions leave the pending request unresolved. They return typed invalid diagnostics and may append adapter-visible invalid-proposal events, but they must not create a `DecisionRecord`.
+Malformed, stale, schema-invalid, or context-drift physical proposals leave the
+pending request unresolved and return typed diagnostics in `LifecycleStatus`.
+Order 76 / P03D prohibits appending authoritative invalid-proposal events for
+these unrecorded attempts: decision-driven replay cannot reproduce them. They
+create no `DecisionRecord` and change no queue, event history, RNG or game state.
+Clients display the returned status; they must not wait for an event delta.
+The shared boundary covers ordinary movement, Charge, Surge, reserve/disembark
+placement (including Emergency Disembark), and stale spatial context. Existing
+Fight/pre-battle rejection remains pure. Emergency Disembark diagnostics retain
+the passenger controller and proposal context even during the opponent's turn.
+Surge uses the ordinary typed movement loader for missing fields, malformed
+JSON objects and nested witness errors, including the existing
+`proposal_payload_missing_field`, `proposal_payload_malformed` and
+`unsupported_proposal_kind` codes. Both viewers retain the same pre-rejection
+projection and event delta; returned statuses keep the shared viewer-redaction
+boundary. No new decision, proposal family or schema is introduced. Old replay
+and persistence artifacts retain their exact engine-build requirement; no
+historical invalid event is dropped or ignored during replay or recovery.
 
 Phase 11D chooses a different policy for rule-invalid but well-formed proposals. If the payload is well-formed and matches the pending request, but movement, pathing, terrain, placement, coherency, reserve, or transport validators reject it, the engine records the rejected attempt as a normal request/result pair, appends typed invalid diagnostics, and emits a fresh pending proposal request with the same authoritative validation context and a new request ID. This preserves replay of failed legal-shape attempts while still giving the actor a live request to answer.
 

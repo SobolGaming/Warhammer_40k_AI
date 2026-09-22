@@ -10,6 +10,12 @@ from warhammer40k_core.engine.charge_movement_source import (
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
 from warhammer40k_core.engine.rapid_ingress_authority import rapid_ingress_placement_error
+from warhammer40k_core.engine.battlefield_state import PlacementError
+from warhammer40k_core.engine.physical_proposal_validation import (
+    physical_proposal_invalid_status,
+    proposal_payload_parse_failure,
+)
+from warhammer40k_core.geometry.pose import GeometryError
 
 from typing import TYPE_CHECKING
 
@@ -483,7 +489,19 @@ def invalid_stratagem_placement_proposal_status(
     proposal_request = _movement_proposal_request_from_payload(request.payload)
     if proposal_request is None or not _proposal_request_is_rapid_ingress(proposal_request):
         return _invalid(state, "Malformed stratagem placement proposal request.", "malformed")
-    submitted = _placement_proposal_from_result_payload(result.payload)
+    try:
+        submitted = _placement_proposal_from_result_payload(result.payload)
+    except (GeometryError, PlacementError, TypeError) as exc:
+        return physical_proposal_invalid_status(
+            state=state,
+            result=result,
+            proposal_validation=proposal_payload_parse_failure(
+                proposal_request=proposal_request,
+                error=exc,
+                default_field="attempted_placement",
+            ),
+            message="Malformed stratagem placement proposal payload.",
+        )
     if submitted is None:
         return _invalid(state, "Malformed stratagem placement proposal payload.", "malformed")
     validation = submitted.validation_result_for_request(proposal_request)

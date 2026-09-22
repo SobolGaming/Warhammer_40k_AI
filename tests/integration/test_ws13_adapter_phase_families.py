@@ -573,8 +573,6 @@ def test_local_session_rejects_invalid_fight_movement_proposals_without_hidden_m
     delta = session.events_since(event_cursor, viewer_player_id="player-a")
     if records_attempt:
         _assert_event_types(delta, "decision_recorded", "fight_movement_invalid")
-    elif scenario == "spatial_context_drift":
-        _assert_event_types(delta, "movement_proposal_invalid")
     else:
         assert delta["events"] == []
 

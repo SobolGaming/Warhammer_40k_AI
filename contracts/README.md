@@ -2,6 +2,14 @@
 
 Contract version: `34.0.0`
 
+Order 76 / P03D makes physical-proposal prevalidation diagnostics response-only.
+Malformed and stale proposals leave decision/event history unchanged, so replay
+and persistence remain exact. Clients consume the invalid status; no event delta
+is promised for an unrecorded attempt. Recorded rule-invalid retries remain.
+The existing status/proposal schemas and Contract 34 envelopes cover this repair;
+exact engine-build matching rejects old saves rather than rewriting their events.
+See the Validation and Invalid Results section of the adapter contract.
+
 Order 72 narrows forced enemy Fight responses to Engaging Consolidation under
 owner-confirmed official App data v946. Ongoing and Objective moves grant no
 response. Existing decision and event envelopes remain compatible; old saves and

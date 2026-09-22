@@ -1,0 +1,9 @@
+{
+  "workload_id": "order76-physical-proposal-prevalidation-v1",
+  "maximum_submission_seconds": 12,
+  "maximum_ratio": 3,
+  "jitter_allowance_seconds": 0.05,
+  "required_completed_submissions": 30,
+  "full_game_certified": false,
+  "rationale": "Thirty matched accepted/rejected physical submissions. Preserve the standing 12-second focused movement ceiling and reject material added ingress work using 3x base plus 50 ms scheduling tolerance for millisecond proposals. This component guard does not certify complete games."
+}

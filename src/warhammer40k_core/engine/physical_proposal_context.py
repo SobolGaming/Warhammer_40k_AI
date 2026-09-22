@@ -184,11 +184,11 @@ def invalid_physical_proposal_spatial_context_status(
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.movement_proposals import (
-        MOVEMENT_PROPOSAL_DECISION_TYPE,
-        MovementProposalRequest,
-    )
+    from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
     from warhammer40k_core.engine.phase import LifecycleStatus
+    from warhammer40k_core.engine.physical_proposal_validation import (
+        physical_proposal_invalid_status,
+    )
 
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     from warhammer40k_core.engine.ingress_lifetimes import LOCK_REASON
@@ -217,26 +217,11 @@ def invalid_physical_proposal_spatial_context_status(
     )
     if spatial_validation.is_valid:
         return None
-    event_type = (
-        "movement_proposal_invalid"
-        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-        else "placement_proposal_invalid"
-    )
-    payload = validate_json_value(
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-            "phase_body_status": spatial_validation.status,
-            "proposal_validation": validate_json_value(spatial_validation.to_payload()),
-        }
-    )
-    decisions.event_log.append(event_type, payload)
-    return LifecycleStatus.invalid(
-        stage=state.stage,
+    return physical_proposal_invalid_status(
+        state=state,
+        result=result,
+        proposal_validation=spatial_validation,
         message="Physical proposal spatial context is stale.",
-        payload=payload,
     )
 
 
