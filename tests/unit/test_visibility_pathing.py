@@ -1422,6 +1422,96 @@ def test_mandatory_endpoint_search_never_treats_unresolved_search_as_impossible(
     assert result.status is MovementReachabilityStatus.UNRESOLVED
 
 
+@pytest.mark.parametrize(
+    "base", [CircularBase(16 / 25.4), OvalBase(1.2, 1.0), RectangularBase(1, 0.76)]
+)
+@pytest.mark.parametrize("goal_kind", ["model", "engagement", "disk", "polygon"])
+def test_order74_continuous_terrain_exclusion_covers_shapes_and_goal_families(
+    base: BaseShape, goal_kind: str
+) -> None:
+    from tests.mandatory_endpoint_helpers import wall_endpoint_query
+
+    from warhammer40k_core.geometry.movement_reachability import (
+        MovementReachabilityStatus,
+        movement_reachability,
+    )
+
+    query = wall_endpoint_query(base=base, goal_kind=goal_kind)
+    assert query.goal.distance_lower_bound(query.path_context.moving_model) < 3.75
+    result = movement_reachability(query)
+    assert result.status is MovementReachabilityStatus.ENDPOINT_UNREACHABLE
+    assert result.witness is None
+    assert result.explored_nodes == 0
+
+
+@pytest.mark.parametrize(
+    "change", ["absent", "raw", "distant", "short", "fly", "budget", "target", "support_alias"]
+)
+def test_order74_terrain_proof_does_not_reuse_a_changed_query_or_invent_impossibility(
+    change: str,
+) -> None:
+    from tests.mandatory_endpoint_helpers import wall_endpoint_query
+
+    from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
+    from warhammer40k_core.geometry.movement_reachability import movement_reachability
+
+    query = wall_endpoint_query(base=CircularBase(16 / 25.4))
+    assert movement_reachability(query).status.value == "endpoint_unreachable"
+    terrain = query.terrain_context
+    path = query.path_context
+    if change == "absent":
+        terrain = replace(terrain, terrain=())
+    elif change == "raw":
+        terrain = replace(terrain, terrain_features=())
+    elif change in {"distant", "short"}:
+        feature = terrain.terrain_features[0]
+        wall = feature.walls[0]
+        if change == "distant":
+            from tests.mandatory_endpoint_helpers import mandatory_endpoint_wall
+
+            feature = mandatory_endpoint_wall(x=40, width=1.2, depth=1.2)
+        else:
+            feature = replace(feature, walls=(replace(wall, height_inches=0.01),))
+        terrain = replace(terrain, terrain=feature.terrain_volumes(), terrain_features=(feature,))
+    elif change == "fly":
+        path = replace(path, ignores_vertical_distance=True)
+    elif change == "budget":
+        path = replace(path, movement_distance_budget_inches=10)
+    elif change == "support_alias":
+        from warhammer40k_core.geometry.terrain import TerrainFloorDefinition
+
+        feature = terrain.terrain_features[0]
+        feature = replace(
+            feature,
+            floors=(
+                TerrainFloorDefinition(
+                    floor_id=feature.walls[0].wall_id,
+                    center_x_inches=10,
+                    center_y_inches=24,
+                    bottom_z_inches=0,
+                    width_inches=1.8,
+                    depth_inches=1.8,
+                    thickness_inches=0.01,
+                ),
+            ),
+        )
+        terrain = replace(terrain, terrain_features=(feature,))
+    else:
+        query = replace(query, goal=replace(query.goal, range_inches=2))
+    query = replace(query, path_context=path, terrain_context=terrain)
+    assert path.movement_distance_budget_inches is not None
+    assert not endpoint_excluded_by_terrain(
+        source=path.moving_model,
+        goal=query.goal,
+        budget=path.movement_distance_budget_inches,
+        ignores_vertical_distance=path.ignores_vertical_distance,
+        terrain=terrain.terrain,
+        terrain_features=terrain.terrain_features,
+    )
+    if change in {"raw", "target", "support_alias"}:
+        assert movement_reachability(query).status.value == "reachable"
+
+
 @pytest.mark.parametrize("base", [CircularBase(0.5), OvalBase(2.0, 1.0), RectangularBase(2.0, 1.0)])
 @pytest.mark.parametrize("ignores_vertical", [False, True])
 @pytest.mark.parametrize("goal_kind", ["model", "disk", "polygon", "spatial_range"])

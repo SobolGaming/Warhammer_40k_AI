@@ -1,0 +1,90 @@
+{
+  "order": 74,
+  "prerequisite": "P03C",
+  "finding_ids": [
+    "C03-03"
+  ],
+  "validated_on": "2026-09-22T08:33:56.145843-04:00",
+  "status": "passed",
+  "pull_request_base_commit": "54284173293238ea417a1eb1cb0351843a442998",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "behavioral": {
+    "tests": 8790,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1033.704,
+    "workers": 64,
+    "distribution": "worksteal",
+    "junit_sha256": "851a5ee10baa46f5916e7d825ba8d6b2df314b6b2077c33a2861bf5c4b0a7f0d",
+    "log_sha256": "cc9dd7ca7cd82d4491921e8d4db03c82542968efa8e4a9e328a536d0cafda6f2",
+    "coverage_percent": 85.18202484103713,
+    "coverage_minimum_percent": 85,
+    "coverage_report_sha256": "634c4da77cfebaf6e69d1bac5b656faac81b7f746613f6da25865bb6481eb6e3",
+    "warning_count": 10,
+    "warning_types": [
+      "ResourceWarning: unclosed SQLite connections"
+    ]
+  },
+  "code_quality": {
+    "tests": 588,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 351.756,
+    "workers": 64,
+    "distribution": "worksteal",
+    "junit_sha256": "43c3d1a1ee1950a1d81aeff81cdb4dcfa39fb32d908dd381e14e01a884983cea",
+    "log_sha256": "3c8091d45c0cd6cb203fd1d984949948ad42335b3e2afe1530f47fba3579f8c7",
+    "coverage": false
+  },
+  "regression_evidence": {
+    "initial_charge_regression": "failed with charge_reachability_unresolved before production changes",
+    "support_identity_regression": "failed before relaxing support-aliased walls; then passed with a validated reachable witness",
+    "final_geometry_cases": 20,
+    "final_consumer_and_restore_cases": 8
+  },
+  "checks": {
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "mypy_src_tests": "passed",
+    "pyright": "passed",
+    "import_contracts": "11 passed",
+    "pre_commit_all_files": "passed",
+    "eight_shard_inventory": "passed; no collected test-file changes",
+    "core_charge_source_generator": "passed; retained source bytes unchanged",
+    "roadmap_comparison_generator": "passed",
+    "engine_build_identity": "passed",
+    "external_contract_exact_base": "passed",
+    "installed_wheel": "passed; 27 packaged schemas and six request families",
+    "typescript_generated_client_and_typecheck": "passed",
+    "typescript_unit_tests": "5 passed",
+    "live_http_conformance": "342 assertions passed",
+    "performance_evidence": "all ten focused guards passed; budgets unchanged"
+  },
+  "measurement_notes": [
+    "Qualified measurements ran serially without competing test/build jobs.",
+    "The baseline archive needed its own canonical schemas and pyproject.toml before runtime identity validation could succeed.",
+    "The Order 73 measurement script's local LF bytes were restored to match its retained raw-byte baseline hash, then the affected head was remeasured. No tracked script or baseline changed.",
+    "Draft measurements were superseded after the support-identity correctness fix; all current-runtime heads were freshly measured."
+  ],
+  "performance_report_hashes": {
+    "docs/performance/order74/base.json": "28365994ed36ef9362a0130bbece538d88373b9ab94b22068955b40257d52e63",
+    "docs/performance/order74/head.json": "03833e081550ec31599faa1eda9e994efb8f25a7907be7a121029ee51df18143",
+    "docs/performance/order64/head-reconstruction.json": "ea5e85ca624b3f1ee0ef7dd6168071d4f8c812b754dc38d85064c648dce1eab0",
+    "docs/performance/order65/head.json": "07d4b49349a4b951336a24a252dbfb8aefdbcc1d13d64d43cb3f19e50d5d37f0",
+    "docs/performance/order66/head.json": "3dfb38f9a189d30bad924118a9772f47b41ee206d5aab1cc052f8f5bd6d15b55",
+    "docs/performance/order69/head.json": "3f5aac3c1a2df22d0d40f22390543662d5e2d98bccda40240bdb9b6a316997c5",
+    "docs/performance/order70/head.json": "94e85fdd8dee6d026818d8883ed6c557130b8ad3dda277d2d825a92dc30963b5",
+    "docs/performance/order71/head.json": "c0eeb576c04dc38aa67b2cff4713d9ecf0db184e3da3ce1908a93afd583c6832",
+    "docs/performance/order72/head.json": "ca29059c327f96e7a596242ee6e2d506e474538c94870b85ae373421ca874fc3",
+    "docs/performance/order73/r73_001/head.json": "90c2787e230b245c91997f7c6add17e426244a1e3ca7460006197230014faabd",
+    "docs/performance/order73/r73_001/geometry-head.json": "c5fc1e20cf9b1b8b8ecfe9157b42199bd10d12d1f062aa06ff05f5e7cf0ea183"
+  },
+  "full_game_certified": false,
+  "core_rules_compliance_certified": false,
+  "next_gate": "Merge P03C, then repeat the complete PFINAL audit from main (Order 75).",
+  "pull_request_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/494"
+}

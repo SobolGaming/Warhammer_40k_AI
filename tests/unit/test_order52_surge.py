@@ -686,6 +686,58 @@ def test_surge_engages_each_model_when_a_legal_path_reaches_target(
         )
 
 
+def test_order74_surge_terrain_exclusion_does_not_invent_maximum_approach() -> None:
+    from dataclasses import replace
+
+    from tests.mandatory_endpoint_helpers import mandatory_endpoint_wall, wall_endpoint_query
+
+    from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+    from warhammer40k_core.engine.surge_movement import surge_endpoint_evidence
+    from warhammer40k_core.geometry.base import CircularBase
+    from warhammer40k_core.geometry.pathing import PathWitness
+    from warhammer40k_core.geometry.pose import Pose
+
+    query = wall_endpoint_query(base=CircularBase(16 / 25.4), goal_kind="engagement")
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+    target = query.goal.models[0]
+    target = replace(target, pose=Pose.at(10, target.pose.position.y + 1))
+    feature = mandatory_endpoint_wall()
+    query = replace(
+        query,
+        goal=replace(
+            query.goal,
+            models=(target,),
+            horizontal_inches=ruleset.engagement_policy.horizontal_inches,
+        ),
+        path_context=replace(query.path_context, enemy_models=(target,)),
+        terrain_context=replace(
+            query.terrain_context, terrain=feature.terrain_volumes(), terrain_features=(feature,)
+        ),
+    )
+    endpoint = replace(query.path_context.moving_model, pose=Pose.at(10, 23))
+    witness = PathWitness.for_paths(
+        (
+            (
+                endpoint.model_id,
+                (query.path_context.moving_model.pose, Pose.at(10, 21.5), endpoint.pose),
+            ),
+        )
+    )
+    assert replace(query.path_context, witness=witness).validate().is_valid
+    assert replace(query.terrain_context, witness=witness).validate().is_valid
+    row, violation = surge_endpoint_evidence(
+        query=query,
+        endpoint=endpoint,
+        target_id=TARGET,
+        component_unit_instance_id=SOURCE,
+        ruleset=ruleset,
+    )
+    assert row["engagement_status"] == "endpoint_unreachable"
+    assert row["approach_status"] == "reachable"
+    assert row["alternative_witness"] is not None
+    assert violation == "surge_maximum_approach_not_reached"
+
+
 def test_surge_cannot_end_engaged_with_another_enemy() -> None:
     from tests.phase15a_charge_declaration_helpers import charge_lifecycle, compact_test_unit_poses
 
@@ -779,7 +831,9 @@ def test_completed_surge_blocks_other_moves_and_second_surge() -> None:
     assert state.battlefield_state == battlefield
 
 
-@pytest.mark.parametrize("tamper", ["phase_history", "endpoint_proof", "completion_target"])
+@pytest.mark.parametrize(
+    "tamper", ["phase_history", "endpoint_proof", "completion_target", "terrain_proof"]
+)
 def test_completed_surge_restore_rejects_corrupt_authority(tamper: str) -> None:
     import copy
 
@@ -807,6 +861,11 @@ def test_completed_surge_restore_rejects_corrupt_authority(tamper: str) -> None:
         assert isinstance(event["payload"], dict)
         if tamper == "completion_target":
             event["payload"]["surge_target_unit_instance_id"] = "invented"
+        elif tamper == "terrain_proof":
+            rows = event["payload"]["surge_model_endpoints"]
+            assert isinstance(rows, list)
+            assert isinstance(rows[0], dict)
+            rows[0]["engagement_status"] = "endpoint_unreachable"
         else:
             event["payload"]["surge_model_endpoints"] = []
     with pytest.raises(GameLifecycleError):

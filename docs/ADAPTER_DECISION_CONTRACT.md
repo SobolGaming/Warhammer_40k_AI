@@ -6558,3 +6558,26 @@ an unresolved computation raises a typed error without recording an invented
 placement or casualty. Exact runtime identity changes invalidate stale operator
 persistence and bind regenerated replay/contract examples. Contract 34's schemas
 remain valid because violation codes are already open strings.
+
+## Order 74 — terrain exclusion for mandatory endpoints
+
+Charge's `preferred_reachability.status` and `engagement_reachability.status`,
+and Surge's `engagement_status`, can contain `endpoint_unreachable`. This means
+the engine proved that a continuous relaxation of every budget-reachable goal
+endpoint intersects feature-owned terrain walls. It does not mean that a finite
+path search exhausted its candidates. `unreachable` retains its distance-bound
+meaning, and `unresolved` never grants an exemption. Charge still records its
+actual distance lower bound and no alternative witness for either negative
+proof. The lower bound need not exceed the budget for `endpoint_unreachable`.
+
+Checkpoint loading recomputes the terrain certificate using event-time model
+geometry, the authenticated movement budget and metric, and immutable battlefield
+terrain. Forged proof statuses and bounds fail closed. Surge additionally requires
+its existing independently proved maximum approach; terrain exclusion alone does
+not satisfy that obligation. Consolidation uses the same proof during validation.
+
+No request, proposal, finite option, mutation route or visibility rule changes.
+These evidence values live in existing JSON-valued event fields, so Contract 34's
+schemas and client envelopes remain valid. Both viewers use shared event redaction;
+clients must not infer permission from a proof token. Exact runtime identity binds
+new replay and persistence artifacts; no old-checkpoint conversion is introduced.

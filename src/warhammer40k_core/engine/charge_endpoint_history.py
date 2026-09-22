@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battlefield_transition_history import (
 )
 from warhammer40k_core.engine.charge_model_endpoints import (
     ChargeModelEndpointWitness,
+    EndpointReachabilityEvidence,
     charge_model_endpoint_witness,
     validate_charge_model_endpoint_inventory,
 )
@@ -28,6 +29,7 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     physical_model_authority_before_event,
 )
 from warhammer40k_core.engine.take_to_the_skies import flight_selection
+from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -175,7 +177,7 @@ def validate_charge_endpoint_history(
             ):
                 raise GameLifecycleError("Charge historical per-model endpoint geometry drifted.")
             if not any(
-                evidence.status == "unreachable"
+                evidence.status in {"unreachable", "endpoint_unreachable"}
                 for evidence in (row.preferred_reachability, row.engagement_reachability)
             ):
                 continue
@@ -206,6 +208,23 @@ def validate_charge_endpoint_history(
                 ruleset=ruleset,
                 capabilities=capabilities,
             )
+            for evidence, goal in _endpoint_goals(row, targets, ruleset):
+                if evidence.status != "endpoint_unreachable":
+                    continue
+                if state.battlefield_state is None:
+                    raise GameLifecycleError("Charge endpoint proof requires battlefield terrain.")
+                features = state.battlefield_state.terrain_features
+                if not endpoint_excluded_by_terrain(
+                    source=start,
+                    goal=goal,
+                    budget=cast(float, budget),
+                    ignores_vertical_distance=capabilities.ignores_vertical_distance,
+                    terrain=tuple(
+                        volume for feature in features for volume in feature.terrain_volumes()
+                    ),
+                    terrain_features=features,
+                ):
+                    raise GameLifecycleError("Charge historical terrain endpoint proof drifted.")
 
 
 def charge_component_at_physical_boundary(
@@ -239,8 +258,23 @@ def validate_charge_model_reachability_bounds(
 ) -> None:
     # Recompute accepted impossibility proofs with the source-backed movement
     # metric. A flying model cannot claim a larger ground-movement bound.
+    for evidence, goal in _endpoint_goals(row, targets, ruleset):
+        if evidence.status in {
+            "unreachable",
+            "endpoint_unreachable",
+        } and evidence.distance_lower_bound_inches != goal.distance_lower_bound(
+            start, ignores_vertical_distance=capabilities.ignores_vertical_distance
+        ):
+            raise GameLifecycleError("Charge historical reachability bound drifted.")
+
+
+def _endpoint_goals(
+    row: ChargeModelEndpointWitness,
+    targets: dict[str, tuple[Model, ...]],
+    ruleset: RulesetDescriptor,
+) -> tuple[tuple[EndpointReachabilityEvidence, MovementGoal], ...]:
     target_models = tuple(model for group in targets.values() for model in group)
-    for evidence, goal in (
+    return (
         (
             row.preferred_reachability,
             MovementGoal(
@@ -256,12 +290,4 @@ def validate_charge_model_reachability_bounds(
                 vertical_inches=ruleset.engagement_policy.vertical_inches,
             ),
         ),
-    ):
-        if (
-            evidence.status == "unreachable"
-            and evidence.distance_lower_bound_inches
-            != goal.distance_lower_bound(
-                start, ignores_vertical_distance=capabilities.ignores_vertical_distance
-            )
-        ):
-            raise GameLifecycleError("Charge historical reachability bound drifted.")
+    )

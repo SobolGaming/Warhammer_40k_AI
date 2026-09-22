@@ -23,7 +23,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 |---|---|---|---|---|
 | 01 Core Concepts | [01.00](https://www.40k.app/rules/01-core-concepts) | authoritative_app_mirror | owned; see roadmap | P01, P01B, P01C, P01D |
 | 02 Datasheets | [02.00](https://www.40k.app/rules/02-datasheets) | authoritative_app_mirror | owned; see roadmap | P02A, P02B, P02C, P02D, P02E |
-| 03 Moving | [03.00](https://www.40k.app/rules/03-moving) | authoritative_app_mirror | owned; see roadmap | P03A, P03B |
+| 03 Moving | [03.00](https://www.40k.app/rules/03-moving) | authoritative_app_mirror | owned; see roadmap | P03A, P03B, P03C |
 | 04 Making Attacks | [04.00](https://www.40k.app/rules/04-making-attacks) | authoritative_app_mirror | owned; see roadmap | P04, P04B |
 | 05 Attack Sequence | [05.00](https://www.40k.app/rules/05-attack-sequence) | authoritative_app_mirror | owned; see roadmap | P05A, P05B, P05C, P05D |
 | 06 Other Concepts | [06.00](https://www.40k.app/rules/06-other-concepts) | authoritative_app_mirror | owned; see roadmap | P06A, P06B, P06C |

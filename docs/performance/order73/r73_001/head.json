@@ -1,6 +1,6 @@
 {
   "workload_id": "order60-emergency-disembark-placement-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:2f6bea483c37e831c53781c91415537e8d3e8f33079b1c8f56d29292fd03de40",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
@@ -21,59 +21,59 @@
   },
   "samples": [
     {
-      "preparation_seconds": 7.33385090000229,
-      "matched_seconds": 0.06194579997099936,
+      "preparation_seconds": 7.762550599989481,
+      "matched_seconds": 0.06697709998115897,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9382105999975465,
-      "matched_seconds": 0.005281299992930144,
+      "preparation_seconds": 0.9984368999721482,
+      "matched_seconds": 0.0035038000205531716,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9422861999482848,
-      "matched_seconds": 0.003453000041190535,
+      "preparation_seconds": 0.9886445000302047,
+      "matched_seconds": 0.003308999992441386,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 1.0032720999442972,
-      "matched_seconds": 0.003334200009703636,
+      "preparation_seconds": 1.0609296999755315,
+      "matched_seconds": 0.003364000003784895,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9267008000169881,
-      "matched_seconds": 0.003383199975360185,
+      "preparation_seconds": 0.989551400009077,
+      "matched_seconds": 0.00378689996432513,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9407753000268713,
-      "matched_seconds": 0.003485599998384714,
+      "preparation_seconds": 0.994850300019607,
+      "matched_seconds": 0.0033921999856829643,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.9345129000139423,
-      "matched_seconds": 0.0032988000311888754,
+      "preparation_seconds": 0.9879168000188656,
+      "matched_seconds": 0.0033960999571718276,
       "valid": true,
       "violation_count": 0,
       "complete": true
     }
   ],
-  "mean_seconds": 0.012025985717108207,
-  "median_seconds": 0.003453000041190535,
-  "maximum_seconds": 0.06194579997099936,
-  "p95_seconds": 0.005281299992930144,
+  "mean_seconds": 0.012532728557874049,
+  "median_seconds": 0.0033960999571718276,
+  "maximum_seconds": 0.06697709998115897,
+  "p95_seconds": 0.00378689996432513,
   "completion_rate": 1,
   "full_game_certified": false,
   "budgets": {

@@ -1,0 +1,43 @@
+{
+  "workload_id": "order74-mandatory-endpoint-facade-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "cold-cache Charge facade submission; five models; one wall; fixture excluded",
+  "samples": [
+    {
+      "repeat": 0,
+      "seconds": 0.6077561670026626,
+      "valid": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "repeat": 1,
+      "seconds": 0.5351412919990253,
+      "valid": true,
+      "status": "waiting_for_decision"
+    },
+    {
+      "repeat": 2,
+      "seconds": 0.538286707997031,
+      "valid": true,
+      "status": "waiting_for_decision"
+    }
+  ],
+  "mean_seconds": 0.5603947223329063,
+  "maximum_seconds": 0.6077561670026626,
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order74.py": "ccfb19e0a0f9aeb0e6f1298cd73aed178e357940cb532ce173dca12837f55a5f",
+    "tests/mandatory_endpoint_helpers.py": "45844490cc0f40928cf0c805872d610e7ddad32f7a7fdc2b64e7ed69a8990bab"
+  },
+  "budget": {
+    "maximum_head_seconds": 12,
+    "required_head_acceptance_rate": 1
+  }
+}

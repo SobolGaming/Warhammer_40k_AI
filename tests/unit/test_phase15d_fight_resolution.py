@@ -7290,6 +7290,78 @@ def test_p12_each_moved_model_must_reach_its_required_endpoint_when_possible(
     )
 
 
+def test_order74_consolidation_uses_shared_terrain_endpoint_exclusion() -> None:
+    from tests.mandatory_endpoint_helpers import SOURCE, TARGET, blocked_charge_session
+
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+
+    state = blocked_charge_session().lifecycle.state
+    assert state is not None
+    scenario = battlefield_scenario_for_state(state=state)
+    battlefield = scenario.battlefield_state
+    placement = battlefield.unit_placement_by_id(SOURCE)
+    placement = placement.with_model_placements(
+        (
+            placement.model_placements[0].with_pose(Pose.at(10, 20.75)),
+            *placement.model_placements[1:],
+        )
+    )
+    target = battlefield.unit_placement_by_id(TARGET)
+    target = target.with_model_placements(
+        tuple(
+            model.with_pose(Pose.at(model.pose.position.x, 27)) for model in target.model_placements
+        )
+    )
+    scenario = replace(
+        scenario,
+        battlefield_state=battlefield.with_unit_placement(placement).with_unit_placement(target),
+    )
+    attacker = scenario.unit_instance_for_placement(placement)
+    request = _fight_movement_request(proposal_kind=ProposalKind.CONSOLIDATE, attacker=attacker)
+    ends = (
+        Pose.at(10, 23),
+        *(Pose.at(model.pose.position.x, 24) for model in placement.model_placements[1:]),
+    )
+    witness = PathWitness.for_paths(
+        tuple(
+            (
+                model.model_instance_id,
+                (
+                    model.pose,
+                    Pose.at(model.pose.position.x, (model.pose.position.y + end.position.y) / 2),
+                    end,
+                ),
+            )
+            for model, end in zip(placement.model_placements, ends, strict=True)
+        )
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=SOURCE,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ENGAGING,
+        consolidate_target_unit_instance_ids=(TARGET,),
+        witness=witness,
+    )
+    ruleset = state.runtime_ruleset_descriptor()
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    assert resolution.is_valid
+    assert (
+        fight_movement_resolution_violation(
+            proposal_request=request,
+            proposal=proposal,
+            resolution=resolution,
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+        )
+        is None
+    )
+
+
 @pytest.mark.parametrize("path_kind", ["detour", "rotation", "stationary"])
 @pytest.mark.parametrize("base_contact", [False, True])
 def test_p12_fight_closed_loop_witnesses_cannot_disguise_movement(

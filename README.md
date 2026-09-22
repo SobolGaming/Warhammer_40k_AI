@@ -2,6 +2,13 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 74 / P03C repairs terrain-blocked mandatory movement endpoints using a
+shared continuous exclusion proof. Charge records and restores that proof;
+Consolidation and Surge consume the same reachability authority. Unresolved
+path or maximum-approach searches remain fail-closed. See
+[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 75
+and still requires a complete audit after the prerequisite merges.
+
 Order 72 resolves consolidation responses against owner-confirmed official App
 data v946: only Engaging Consolidation forces enemy Fight selections. Ongoing
 preserves prior engagements without a response queue. Shared source authority,
