@@ -3064,6 +3064,17 @@ audit and must commit the final audit artifact, generated report, validation
 results, snapshot identity, provider/version evidence, and the evidence
 supporting `CAUDIT-01` closure.
 
+Order 75 must also assess representative complete headless games using the
+existing legal driver or recorded workload, including the continuous terrain
+solver introduced by Order 74. Record completion, per-game timing, declared
+hardware and workload, and the standing below-60-second mean / at-most-300-second
+observed maximum targets. Keep incomplete games and unresolved calculations
+visible. Order 74's 12-second focused Charge budget is not full-game performance
+certification; its base rejects the move while its head completes the accepted
+mutation/advance path, so their timing ratio is not an equivalent-work regression.
+If complete games cannot yet be measured, record the missing prerequisites and
+leave full-game performance uncertified.
+
 ## Definition of full Core Rules compliance
 
 The project may claim only:

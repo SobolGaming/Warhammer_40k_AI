@@ -918,7 +918,10 @@ def test_order47_empty_target_set_is_a_typed_invalid_endpoint() -> None:
     assert result.endpoint_violation_code == "charge_target_required"
 
 
-def test_order74_obstacle_exemption_accepts_charge_through_facade_and_replays() -> None:
+@pytest.mark.parametrize("attached", [False, True], ids=["ordinary", "attached-leader"])
+def test_order74_obstacle_exemption_accepts_charge_through_facade_and_replays(
+    attached: bool,
+) -> None:
     import copy
     import json
 
@@ -933,7 +936,7 @@ def test_order74_obstacle_exemption_accepts_charge_through_facade_and_replays() 
     from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 
-    session = blocked_charge_session()
+    session = blocked_charge_session(attached=attached)
     session.advance_until_decision_or_terminal()
     initial = session.lifecycle.to_payload()
     request = blocked_charge_request(session)
@@ -954,15 +957,35 @@ def test_order74_obstacle_exemption_accepts_charge_through_facade_and_replays() 
     events = session.lifecycle.decision_controller.event_log.records
     event = next(row for row in events if row.event_type == "charge_move_completed")
     assert isinstance(event.payload, dict)
+    assert event.payload["unit_instance_id"] == (
+        "attached-unit:army-alpha:source" if attached else "army-alpha:source"
+    )
+    assert event.payload["maximum_distance_inches"] == 3.75
     endpoint = cast(dict[str, JsonValue], event.payload["endpoint_witness"])
     models = cast(list[dict[str, JsonValue]], endpoint["model_endpoints"])
-    proof = cast(dict[str, JsonValue], models[0]["preferred_reachability"])
+    component_id = "army-alpha:leader" if attached else "army-alpha:source"
+    exempt = next(row for row in models if row["component_unit_instance_id"] == component_id)
+    proof = cast(dict[str, JsonValue], exempt["preferred_reachability"])
     assert proof["status"] == "endpoint_unreachable"
+    assert 3.74 < cast(float, proof["distance_lower_bound_inches"]) < 3.75
+    assert proof["alternative_witness"] is None
+    assert len(models) == (6 if attached else 5)
+    assert all(
+        cast(dict[str, JsonValue], row["preferred_reachability"])["status"] == "satisfied"
+        for row in models
+        if row["model_instance_id"] != exempt["model_instance_id"]
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    placement = state.battlefield_state.unit_placement_by_id(component_id)
+    assert exempt["model_instance_id"] == placement.model_placements[0].model_instance_id
     for viewer in ("player-a", "player-b"):
         json.dumps(session.view(viewer_player_id=viewer), allow_nan=False)
         visible = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
         assert "endpoint_unreachable" in json.dumps(visible, allow_nan=False)
     final = session.lifecycle.to_payload()
+    assert json.loads(json.dumps(final, allow_nan=False)) == final
     assert GameLifecycle.from_payload(final).to_payload() == final
     artifact = ReplayArtifact.capture(
         artifact_id="order74-obstacle-charge",
@@ -970,9 +993,19 @@ def test_order74_obstacle_exemption_accepts_charge_through_facade_and_replays() 
         initial_lifecycle_payload=initial,
     )
     assert (
-        ReplayRunner.from_payload(artifact.to_payload()).run().status is ReplayRunStatus.REPRODUCED
+        ReplayRunner.from_payload(json.loads(json.dumps(artifact.to_payload(), allow_nan=False)))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
     )
-    for changed in ("unreachable", "unresolved"):
+    for field, changed, diagnostic in (
+        ("status", "unreachable", "endpoint"),
+        ("status", "unresolved", "endpoint"),
+        ("distance_lower_bound_inches", 3.5, "reachability bound drifted"),
+        ("component_unit_instance_id", "army-alpha:source", "per-model endpoint geometry drifted"),
+    ):
+        if field == "component_unit_instance_id" and not attached:
+            continue
         forged = copy.deepcopy(final)
         completion = next(
             e
@@ -982,8 +1015,12 @@ def test_order74_obstacle_exemption_accepts_charge_through_facade_and_replays() 
         data = cast(dict[str, JsonValue], completion["payload"])
         endpoint = cast(dict[str, JsonValue], data["endpoint_witness"])
         rows = cast(list[dict[str, JsonValue]], endpoint["model_endpoints"])
-        cast(dict[str, JsonValue], rows[0]["preferred_reachability"])["status"] = changed
-        with pytest.raises(GameLifecycleError, match="endpoint"):
+        row = next(row for row in rows if row["model_instance_id"] == exempt["model_instance_id"])
+        if field == "component_unit_instance_id":
+            row[field] = changed
+        else:
+            cast(dict[str, JsonValue], row["preferred_reachability"])[field] = changed
+        with pytest.raises(GameLifecycleError, match=diagnostic):
             GameLifecycle.from_payload(forged)
 
 

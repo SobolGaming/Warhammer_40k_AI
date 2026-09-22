@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 from tests.charge_distance_helpers import select_source, select_targets
+from tests.charge_endpoint_helpers import select_attached_source
 from tests.phase15a_charge_declaration_helpers import (
     charge_config,
     compact_test_unit_poses,
@@ -22,7 +23,9 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
+from warhammer40k_core.engine.charge_movement_source import charge_movement_placement
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import (
@@ -39,6 +42,7 @@ from warhammer40k_core.engine.movement_proposals import ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
 from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.geometry.base import BaseShape, CircularBase
 from warhammer40k_core.geometry.movement_reachability import MovementGoal, MovementReachabilityQuery
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -139,10 +143,11 @@ def mandatory_endpoint_wall(
     )
 
 
-def blocked_charge_session() -> LocalGameSession:
+def blocked_charge_session(*, attached: bool = False) -> LocalGameSession:
     config = charge_config(
         game_id="order74-charge-preflight",
-        alpha_unit_ids=("source",),
+        alpha_unit_ids=("source", "leader") if attached else ("source",),
+        alpha_attached_unit_ids=("source", "leader") if attached else None,
         enemy_unit_ids=("enemy",),
     )
     assert config.mission_setup is not None
@@ -166,10 +171,19 @@ def blocked_charge_session() -> LocalGameSession:
         for unit in army.units:
             poses = compact_test_unit_poses(
                 origin=Pose.at(10, 21 if army.player_id == "player-a" else 26),
-                model_count=5,
+                model_count=len(unit.own_models),
             )
             if army.player_id == "player-a":
-                poses = (Pose.at(10, 20), *poses[1:])
+                if not attached:
+                    poses = (Pose.at(10, 20), *poses[1:])
+                elif unit.unit_instance_id == SOURCE:
+                    poses = compact_test_unit_poses(
+                        origin=Pose.at(11.4, 21.25), model_count=len(unit.own_models)
+                    )
+                else:
+                    # The 40 mm Leader starts 4 mm behind the ordinary 32 mm
+                    # model, preserving its 3.740157-inch preferred-distance bound.
+                    poses = (Pose.at(10, 20 - 4 / 25.4),)
             battlefield = battlefield.with_unit_placement(
                 unit_placement_at(unit, army_id=army.army_id, player_id=army.player_id, poses=poses)
             )
@@ -215,14 +229,27 @@ def blocked_charge_session() -> LocalGameSession:
 
 
 def blocked_charge_request(session: LocalGameSession) -> DecisionRequest:
-    return select_targets(session, select_source(session), (TARGET,))
+    state = session.lifecycle.state
+    assert state is not None
+    view = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions), unit_instance_id=SOURCE
+    )
+    request = (
+        select_attached_source(session) if view.is_attached_rules_unit else select_source(session)
+    )
+    return select_targets(session, request, (TARGET,))
 
 
 def blocked_charge_payload(session: LocalGameSession, request: DecisionRequest) -> JsonValue:
     state = session.lifecycle.state
     assert state is not None
     assert state.battlefield_state is not None
-    placement = state.battlefield_state.unit_placement_by_id(SOURCE)
+    view = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions), unit_instance_id=SOURCE
+    )
+    placement = charge_movement_placement(
+        scenario=battlefield_scenario_for_state(state=state), unit_instance_id=view.unit_instance_id
+    )
     witness = PathWitness.for_paths(
         tuple(
             (
@@ -241,7 +268,7 @@ def blocked_charge_payload(session: LocalGameSession, request: DecisionRequest) 
         ChargeMoveProposal(
             proposal_request_id=request.request_id,
             proposal_kind=ProposalKind.CHARGE_MOVE,
-            unit_instance_id=SOURCE,
+            unit_instance_id=view.unit_instance_id,
             movement_phase_action="charge_move",
             movement_mode=MovementMode.CHARGE,
             charge_target_unit_instance_ids=(TARGET,),

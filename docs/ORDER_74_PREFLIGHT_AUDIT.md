@@ -253,7 +253,7 @@ base/head measurements and final gate results are retained under
 `docs/performance/order74/`; complete-game performance remains unmeasured.
 
 
-## Final validation
+## Original implementation validation
 
 The final runtime is `warhammer40k-core-v2:runtime-tree-sha256-v1:710cdbd8455ee52cf66f3be6f52c1ed1ea4722345a2dfba283c548c74a7ebaf9`. The complete behavioral
 suite passed **8,790 tests with 85.18% coverage**;
@@ -269,3 +269,44 @@ See [machine-readable validation](performance/order74/validation.json) and
 scoped prerequisite implementation for review, not CAUDIT-01 or PFINAL.
 
 Published for review as [PR #494](https://github.com/SobolGaming/Warhammer_40k_AI/pull/494). Merge remains pending; PFINAL/CAUDIT-01 is not certified.
+
+## R74-001 — attached-component terrain-proof acceptance
+
+The independent review of `9135086a9a081d4a495ea51c35f10df457f696c2`
+identified missing positive attached-unit coverage. The invariant is that a
+legitimate terrain endpoint exemption remains bound to its physical model and
+component through facade acceptance, serialized checkpoints and exact replay.
+The prior attached Charge test authenticated a distance exemption and rejected
+its relabelling as terrain exclusion; it did not exercise a genuine terrain proof.
+
+The existing wall regression now runs for both an ordinary unit and a canonical
+attached unit. The attached variant uses five 32 mm bodyguards and a 40 mm Leader.
+The Leader starts 4 mm farther back, retaining the ordinary case's approximately
+3.740157-inch preferred-distance lower bound within the 3.75-inch budget. All six
+models submit complete three-pose paths through `LocalGameSession`. The Leader
+legitimately records `endpoint_unreachable` under `army-alpha:leader`; every
+bodyguard satisfies its preferred endpoint. Both variants verify stale-request
+immutability, JSON-safe viewer events and checkpoints, restore equality and exact
+replay after a JSON round-trip. Forged statuses and bounds fail restoration, as
+does reassignment of the Leader's evidence to the bodyguard component.
+
+The bug-class search covered Charge's ordinary, attached and historical tests,
+Consolidation and Surge consumers, and their shared geometry proof. The existing
+static audits require shared proof ownership and event-bound component movement
+capabilities. No production change, source change, adapter contract change or
+new collected test file is needed. The shared fixture now uses canonical Charge
+placement for both ordinary and attached sources. Its hash-pinned five-model
+performance workload is remeasured against the same base and runtime on one host.
+
+Order 75's full-game performance follow-up is recorded in the remediation roadmap.
+The focused Charge timing budget does not certify the 60/300-second game targets.
+
+R74-001 validation passes: **8,791 behavioral tests with 85.18% coverage** and
+**588 code-quality tests** on macOS with 18 xdist workers and work stealing.
+The behavioral suite ran once with coverage, then code quality once without it.
+All 64 focused Charge tests, required lint/type/import/shard/pre-commit checks,
+source/build/contract checks against the unchanged PR base, installed-wheel smoke,
+five TypeScript unit tests and 342 HTTP conformance assertions pass. Refreshed
+ordinary Charge measurements accept all three head samples with a 0.608-second
+maximum against the unchanged 12-second budget. No production code changed.
+See [the R74-001 validation record](performance/order74/r74-001-validation.json).

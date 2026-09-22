@@ -5,8 +5,13 @@ The versioned workload is one five-model Charge facade submission with a
 clear the shared reachability cache before submission. Fixture construction and
 finite target selection are outside the timing boundary. The base is
 `54284173293238ea417a1eb1cb0351843a442998`; head records the verified runtime ID.
-Both use identical fixture/script/lock hashes and the same provisional Windows
+Both use identical fixture/script/lock hashes and the same provisional macOS
 host with one measurement process and no competing test/build jobs.
+R74-001 refreshed this pair on an Apple M5 Pro with 64 GiB memory and Python
+3.14.5 because the shared fixture gained the attached-unit regression variant.
+The timed workload remains the original five-model ordinary Charge; neither
+the runtime nor its budget changed. The original Windows measurements remain
+available at reviewed commit `9135086a9a081d4a495ea51c35f10df457f696c2`.
 
 The base rejects every sample with the reproduced endpoint-proof gap; the head
 accepts every sample and completes the ordinary mutation/advance path. The API
@@ -34,4 +39,8 @@ pair is also refreshed against unchanged baselines, workloads and budgets.
 Their old README tables remain historical; the JSON files identify this runtime.
 
 Final correctness, coverage, package, client and evidence-gate results are recorded
-in `validation.json`. PFINAL remains gated on merge and a fresh complete audit.
+in `validation.json` for the original review and `r74-001-validation.json` for
+the attached-unit follow-up. Historical report hashes in the original validation
+record refer to the reviewed commit above. PFINAL remains gated on merge and a
+fresh complete audit, including representative full-game/headless measurement;
+the focused 12-second threshold cannot substitute for the 60/300-second targets.

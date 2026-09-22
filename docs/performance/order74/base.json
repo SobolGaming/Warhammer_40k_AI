@@ -1,40 +1,40 @@
 {
   "workload_id": "order74-mandatory-endpoint-facade-v1",
   "revision": "54284173293238ea417a1eb1cb0351843a442998",
-  "platform": "Windows-11-10.0.26200-SP0",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
-  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-  "memory_bytes": 137327259648,
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
   "concurrency": 1,
   "host_role": "provisional",
   "timing_boundary": "cold-cache Charge facade submission; five models; one wall; fixture excluded",
   "samples": [
     {
       "repeat": 0,
-      "seconds": 0.05014149995986372,
+      "seconds": 0.013816833001328632,
       "valid": false,
       "status": "invalid"
     },
     {
       "repeat": 1,
-      "seconds": 0.044508199964184314,
+      "seconds": 0.012548082995635923,
       "valid": false,
       "status": "invalid"
     },
     {
       "repeat": 2,
-      "seconds": 0.0443004000117071,
+      "seconds": 0.012618334003491327,
       "valid": false,
       "status": "invalid"
     }
   ],
-  "mean_seconds": 0.04631669997858504,
-  "maximum_seconds": 0.05014149995986372,
+  "mean_seconds": 0.012994416666818628,
+  "maximum_seconds": 0.013816833001328632,
   "full_game_certified": false,
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
     "scripts/measure_order74.py": "ccfb19e0a0f9aeb0e6f1298cd73aed178e357940cb532ce173dca12837f55a5f",
-    "tests/mandatory_endpoint_helpers.py": "a836aa0e5415f52102c04d8f837f17608ff8b596a19ce15e0250d8383dce880c"
+    "tests/mandatory_endpoint_helpers.py": "45844490cc0f40928cf0c805872d610e7ddad32f7a7fdc2b64e7ed69a8990bab"
   },
   "budget": {
     "maximum_head_seconds": 12,
