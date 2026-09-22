@@ -15,7 +15,7 @@ from math import isqrt
 
 from warhammer40k_core.geometry.base import CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.placement_predicates import Footprint, PlacementPredicates, rational
-from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.pose import Pose, contact_planes_coincide
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainFloorDefinition
 from warhammer40k_core.geometry.visibility_algebra import (
     FALSE,
@@ -244,7 +244,7 @@ def _plane_formula(
         if _vertical_gap(z, height, other) == 0:
             constraints.append(context.clear(shape, Footprint.fixed(other.base, other.pose)))
     for ox, oy, oz, radius in query.objective_disks:
-        if z <= rational(oz) <= z + height:
+        if contact_planes_coincide(float(z), oz):
             constraints.append(
                 context.clear(shape, Footprint.fixed(CircularBase(radius), Pose.at(ox, oy)))
             )

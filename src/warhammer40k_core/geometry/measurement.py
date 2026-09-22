@@ -20,6 +20,7 @@ from warhammer40k_core.geometry.pose import (
     GeometryError,
     Pose,
     PosePayload,
+    contact_planes_coincide,
     validate_finite_number,
     validate_pose,
 )
@@ -208,11 +209,9 @@ class DistanceMeasurementContext:
         )
 
     def contact_plane_footprints_overlap(self) -> bool:
-        return self.footprints_overlap() and math.isclose(
+        return self.footprints_overlap() and contact_planes_coincide(
             self.target_pose.position.z,
             self.source_pose.position.z,
-            rel_tol=0.0,
-            abs_tol=1e-9,
         )
 
     def target_wholly_within_distance(

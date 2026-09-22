@@ -1,0 +1,113 @@
+{
+  "order": 73,
+  "prerequisite": "P18I",
+  "finding_ids": [
+    "C18-10",
+    "R73-001"
+  ],
+  "validated_on": "2026-09-21T23:38:59.697745-04:00",
+  "status": "passed",
+  "reviewed_pr_commit": "516f75c31626aa883ed3e488eba5807148bc6faa",
+  "pull_request_base_commit": "77e2e46340abd8a698465e0937df6363d356925a",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2f6bea483c37e831c53781c91415537e8d3e8f33079b1c8f56d29292fd03de40",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5",
+  "behavioral": {
+    "tests": 8766,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1333.573,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "eb3562b06b41c9bfec812dc0e4339684d056f2ee32e5f0e678b32970f110c867",
+    "coverage_percent": 85.1743218437019,
+    "coverage_minimum_percent": 85,
+    "coverage_report_sha256": "08885ca9e4a183d9d0b5861c7ede8c02e2174e6c317bf879784c513519dc69da",
+    "warning_count": 9,
+    "warning_types": [
+      "ResourceWarning: unclosed SQLite connections"
+    ]
+  },
+  "code_quality": {
+    "tests": 586,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 324.989,
+    "workers": 32,
+    "distribution": "worksteal",
+    "junit_sha256": "e7df188df7d419718f4f86c2caf54bb1c45277e2275ee2230bf90fa71387eb6f",
+    "coverage": false
+  },
+  "regression_evidence": {
+    "before_fix": {
+      "passed": 3,
+      "failed": 5,
+      "deselected": 43,
+      "seconds": 12.38,
+      "log_sha256": "a08b9f2983ef11182c7d3cee38c7cbcc749e78a07a26c709186b5b7e12f13c35"
+    },
+    "after_fix": {
+      "passed": 8,
+      "failed": 0,
+      "deselected": 43,
+      "seconds": 12.26,
+      "log_sha256": "4bb541dd8eb04644d54fcc704a3e9dc10bcb267cf526db027246544acda9d177"
+    },
+    "focused_related_tests": {
+      "passed": 101,
+      "failed": 0,
+      "deselected": 4,
+      "seconds": 95.49,
+      "log_sha256": "137e9a3ebe74c1f463e37f38e47eb98b935a51390178e8c7c01708e329099fab"
+    },
+    "scenarios": [
+      "Ground model with horizontally overlapping z=1 marker remains legal",
+      "Coincident contact planes block placement",
+      "Positive and negative z offsets within 1e-9 block placement, including the positive tolerance boundary",
+      "z offset beyond tolerance remains legal",
+      "Submitted pose, unengaged existence and closest alternative agree with endpoint authority",
+      "Both physical-unit and rules-unit omission consumers reject destroying a placeable survivor even when a non-contact-plane marker covers all candidate positions"
+    ],
+    "static_audit": "Both authoritative endpoint contact and analytic objective constraints delegate to geometry.pose.contact_planes_coincide.",
+    "fixture_diagnostic": "An initial empty UnitPlacement fixture was rejected by the existing domain invariant. The fixture was corrected to a real four-model partial placement before recording the qualified red run; no production invariant was weakened."
+  },
+  "commands_not_run": {},
+  "gates_passed": [
+    "uv run ruff check .",
+    "uv run ruff format --check .: 3359 files",
+    "uv run mypy src tests: 3182 source files",
+    "uv run pyright: 0 errors, 0 warnings",
+    "uv run lint-imports: 11 contracts",
+    "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+    "uv run pre-commit run --all-files",
+    "Emergency Disembark source generator and Core Rules comparison-report reproducibility",
+    "Engine build identity and exact-base external contract check against 77e2e46340abd8a698465e0937df6363d356925a",
+    "Installed wheel smoke: 2923 runtime resources, 27 schemas, six request families",
+    "Clean TypeScript npm ci, generated-client check, typecheck and five unit tests",
+    "Live HTTP conformance: 342 assertions and cross-server replay equivalence",
+    "Nine matched performance evidence guards: seven inherited current-runtime reports and both original/corrected Order 73 report pairs"
+  ],
+  "performance_report_sha256": {
+    "docs/performance/order64/head-reconstruction.json": "54011c892b3da1e419a7d70b40c40eb7154810a0cd14ec6e1478a170474c17b1",
+    "docs/performance/order65/head.json": "0ea0aca264df42dd99eadac98ca1ca8daa48c30f927f6eb4a2ebb209f8a7367b",
+    "docs/performance/order66/head.json": "7bff1c3a1a1c80ffb5121184b0857a6bb567d100f82de19a1e43182e804b5e53",
+    "docs/performance/order69/head.json": "54099b7833b4a361fc1b26f30852962a70bdc154f73c8096ead88dabe282b62e",
+    "docs/performance/order70/head.json": "87124517cf94500e380e9eb5940903212b99e59224e48679d6ba8054497c46f7",
+    "docs/performance/order71/head.json": "1e02ea99a8404cf7fced20552637380fd7a42de4373295c63b62a0cc287cab79",
+    "docs/performance/order72/head.json": "18d2ea5ba9b28b915497705b4b4bcaa1c4eface07ec94c557498030e36070210",
+    "docs/performance/order73/r73_001/base.json": "757823d9e0eb4ba5d0e7909bcb0a3e25dbd52d8ed2e05ae4399234e8c941aab2",
+    "docs/performance/order73/r73_001/head.json": "434cbfbb237e8bfc4eef3ba2514327eab90100f44115cf8fef2e066c68a29c35",
+    "docs/performance/order73/r73_001/geometry-base.json": "f7c27aca51b7b54bc03b6284a1ac354816a507b0eec6e254c1c2226a437d1f93",
+    "docs/performance/order73/r73_001/geometry-head.json": "4fd690c7a870f9d7d44d5c10026fd1d73c65f0cf647a80e674919bc517760fe4"
+  },
+  "scope": "Three production geometry files share the unchanged endpoint contact-plane definition. Existing test files, architecture/audit/roadmap notes and required runtime/contract/performance artifacts are updated. No production code changed after final behavioral validation began. P18I is Order 73; PFINAL remains Order 74; CAUDIT-01 remains open.",
+  "adapter_contract": "Existing proposal, diagnostic, record, event and viewer-scoping contracts cover the correction. No new player choice or adapter-visible shape is introduced.",
+  "source_evidence": "Source rule IDs, source package bytes, hashes and retained observations are unchanged.",
+  "performance_scope": "Matched reviewed-PR base measured before the production fix, corrected head measured afterward, same provisional Windows host and unchanged workloads, inputs and budgets. Qualified measurements ran serially without coverage or competing test/build processes. Retained workloads assess regression cost, not a new objective-marker-specific performance claim. All 7 component and 12 facade samples complete in both revisions. Full-game targets and deferred Order 32 budgets remain uncertified.",
+  "prior_validation": "../validation.json",
+  "pull_request_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/493",
+  "merge_status": "unmerged",
+  "performance_report_hash_algorithm": "sha256-normalized-text-lf"
+}

@@ -5257,10 +5257,19 @@ C18-10 requires this prerequisite to merge before a fresh all-category audit.
 compliance claim.
 
 
-Local validation: 8,758 behavioral passes with 85.1739% coverage and 585
+Initial PR validation before R73-001: 8,758 behavioral passes with 85.1739% coverage and 585
 code-quality passes; required lint/type/import/shard/source/contract, client,
 conformance, installed-wheel and matched performance gates pass. See the
 [validation record](performance/order73/validation.json), including the retained
 initial failures and their corrections.
+
+R73-001 corrects objective exclusions to use the endpoint authority's shared
+contact-plane predicate and absolute `1e-9` tolerance. A marker inside a model's
+height but outside its contact plane cannot exclude a legal placement or
+authorize omission. Eight regressions cover elevation, tolerance, alternative
+queries and both omission consumers. Correction validation passes 8,766 behavioral
+tests with 85.1743% coverage and 586 code-quality tests; the required
+contract, client, package and matched performance gates pass. See the
+[review-fix report](performance/order73/r73_001/validation.json).
 
 PR URL and merge commit: [PR #493](https://github.com/SobolGaming/Warhammer_40k_AI/pull/493); open for review, unmerged.

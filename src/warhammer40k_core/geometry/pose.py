@@ -120,6 +120,11 @@ class Pose:
         )
 
 
+def contact_planes_coincide(source_z: float, target_z: float) -> bool:
+    """Compare validated contact elevations using the endpoint-placement tolerance."""
+    return math.isclose(source_z, target_z, rel_tol=0.0, abs_tol=1e-9)
+
+
 def validate_finite_number(field_name: str, value: object) -> float:
     if not isinstance(value, int | float) or type(value) is bool:
         raise GeometryError(f"{field_name} must be a number.")

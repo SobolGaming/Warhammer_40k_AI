@@ -56,7 +56,10 @@ Emergency Disembark now uses `geometry.emergency_setup_proof` and analytic
 `geometry.placement_predicates` for submitted poses and alternative-placement
 proofs. The engine supplies source-linked terrain permissions, complete proposed
 attached-unit model groups, blockers, objective disks and coherency/engagement
-policies. Ground and real floor planes retain continuous translation and all
+policies. Objective disks constrain only coincident contact planes, using the
+same `geometry.pose.contact_planes_coincide` predicate and absolute `1e-9`
+tolerance as endpoint placement; model height does not determine marker contact.
+Ground and real floor planes retain continuous translation and all
 orientations for circular, elliptical and rectangular bases. Checked witnesses
 prove existence only; negative answers require exact unsatisfiability or an
 exact geometric bound. Unresolved computations remain typed domain errors.

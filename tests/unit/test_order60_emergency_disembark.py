@@ -17,18 +17,21 @@ from tests.order60_emergency_disembark_helpers import (
 )
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import UnitPlacement, geometry_model_for_placement
 from warhammer40k_core.engine.damage_allocation import unit_by_id
 from warhammer40k_core.engine.emergency_disembark_placement import (
+    append_emergency_disembark_placement_violations,
     append_emergency_disembark_rules_unit_omission_violations,
 )
 from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placement_violation
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.transport_disembark_geometry import geometry_models_for_unit_placement
 from warhammer40k_core.engine.transports import (
     TransportOperationViolation,
     TransportOperationViolationCode,
@@ -38,7 +41,9 @@ from warhammer40k_core.geometry.emergency_setup_proof import (
     EmergencySetupQuery,
     SetupTerrain,
     emergency_setup_pose_exists,
+    emergency_setup_pose_is_legal,
 )
+from warhammer40k_core.geometry.measurement import objective_marker_endpoint_is_clear
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -683,6 +688,110 @@ def test_emergency_proof_cache_tracks_objective_presence_and_restoration() -> No
     assert emergency_setup_pose_exists(query)
     assert not emergency_setup_pose_exists.__wrapped__(blocked)
     assert emergency_setup_pose_exists.__wrapped__(query)
+
+
+@pytest.mark.parametrize(
+    ("marker_z", "clear"),
+    [(1.0, True), (0.0, False), (5e-10, False), (1e-9, False), (2e-9, True), (-5e-10, False)],
+)
+def test_emergency_objective_proofs_match_endpoint_contact_planes(
+    marker_z: float, clear: bool
+) -> None:
+    query = _analytic_query(CircularBase(0.5), CircularBase(2))
+    passenger = replace(query.passenger, pose=Pose.at(13, 10))
+    # Cover the entire battlefield so an alternative cannot bypass the marker.
+    query = replace(query, passenger=passenger, objective_disks=((13, 10, marker_z, 100),))
+    assert (
+        objective_marker_endpoint_is_clear(
+            Pose.at(13, 10, marker_z), passenger, marker_diameter_inches=200
+        )
+        is clear
+    )
+    assert emergency_setup_pose_is_legal(query) is clear
+    assert emergency_setup_pose_exists(query) is clear
+    # The same contact-plane definition governs closer and unengaged alternatives.
+    assert (
+        emergency_setup_pose_exists(
+            replace(query, closer_than=replace(passenger, pose=Pose.at(14, 10)))
+        )
+        is clear
+    )
+
+
+@pytest.mark.parametrize("grouped_omission", [False, True])
+def test_noncontact_objective_cannot_authorize_emergency_survivor_omission(
+    grouped_omission: bool,
+) -> None:
+    session = order60_emergency_session()
+    state = session.lifecycle.state
+    assert state is not None
+    scenario = battlefield_scenario_for_state(state=state)
+    complete = order60_passenger_placement(session)
+    assert order60_resolve_emergency(session, complete).is_valid
+    partial = replace(complete, model_placements=complete.model_placements[:-1])
+    marker = ObjectiveMarker(
+        objective_marker_id="r73-noncontact-marker",
+        name="Non-contact marker",
+        x_inches=10,
+        y_inches=10,
+        z_inches=1,
+        marker_diameter_mm=200 * 25.4,
+        blocks_placement=True,
+    )
+    complete_models = geometry_models_for_unit_placement(scenario=scenario, unit_placement=complete)
+    assert all(
+        objective_marker_endpoint_is_clear(
+            Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
+            model,
+            marker_diameter_inches=marker.marker_diameter_inches,
+        )
+        for model in complete_models
+    )
+    before = session.lifecycle.to_payload()
+    transport = scenario.battlefield_state.unit_placement_by_id(TRANSPORT_ID)
+    violations: list[TransportOperationViolation] = []
+    if grouped_omission:
+        append_emergency_disembark_rules_unit_omission_violations(
+            violations=violations,
+            scenario=scenario,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            rules_unit=rules_unit_view_from_armies(
+                armies=scenario.armies, unit_instance_id=PASSENGER_ID
+            ),
+            attempted_placement=RulesUnitPlacement.single(partial),
+            transport_placement=transport,
+            battlefield_width_inches=60,
+            battlefield_depth_inches=44,
+            terrain_features=(),
+            objective_markers=(marker,),
+        )
+    else:
+        append_emergency_disembark_placement_violations(
+            violations=violations,
+            scenario=scenario,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            unit=unit_by_id(state=state, unit_instance_id=PASSENGER_ID),
+            attempted_placement=partial,
+            models=geometry_models_for_unit_placement(scenario=scenario, unit_placement=partial),
+            transport_models=geometry_models_for_unit_placement(
+                scenario=scenario, unit_placement=transport
+            ),
+            battlefield_width_inches=60,
+            battlefield_depth_inches=44,
+            terrain_features=(),
+            objective_markers=(marker,),
+        )
+    omitted = {row.model_instance_id for row in complete.model_placements} - {
+        row.model_instance_id for row in partial.model_placements
+    }
+    assert {row.model_instance_id for row in violations} == omitted
+    assert all(
+        row.violation_code
+        is TransportOperationViolationCode.EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE
+        and row.source_rule_id == placement_source.EMERGENCY_DISEMBARK_PLACEMENT_SOURCE_ID
+        for row in violations
+    )
+    assert session.lifecycle.to_payload() == before
 
 
 @pytest.mark.parametrize(("x", "expected"), [(0.0, True), (0.01, False)])

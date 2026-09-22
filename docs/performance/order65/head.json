@@ -1,7 +1,7 @@
 {
   "workload_id": "order65-firing-deck-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc075ee49c3b002d659c40007f41c72069f49861fe77e93ab06a9dd5935ee9b8",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc075ee49c3b002d659c40007f41c72069f49861fe77e93ab06a9dd5935ee9b8",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:2f6bea483c37e831c53781c91415537e8d3e8f33079b1c8f56d29292fd03de40",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2f6bea483c37e831c53781c91415537e8d3e8f33079b1c8f56d29292fd03de40",
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.5",
   "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
@@ -21,67 +21,67 @@
       "contribute": false,
       "samples": [
         {
-          "preparation_seconds": 7.368737299984787,
-          "declaration_seconds": 0.14003090001642704,
-          "hundred_queries_seconds": 0.0010504999663680792,
+          "preparation_seconds": 7.411421499971766,
+          "declaration_seconds": 0.12911800004076213,
+          "hundred_queries_seconds": 0.0006881000008434057,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0629791999817826,
-          "declaration_seconds": 0.12430700002005324,
-          "hundred_queries_seconds": 0.0006910999654792249,
+          "preparation_seconds": 1.0807377999881282,
+          "declaration_seconds": 0.12061220000032336,
+          "hundred_queries_seconds": 0.0006681000231765211,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9734862000332214,
-          "declaration_seconds": 0.13185870001325384,
-          "hundred_queries_seconds": 0.0006848000339232385,
-          "restricted_queries": 100,
-          "complete": true
-        },
-        {
-          "preparation_seconds": 1.0014953999780118,
-          "declaration_seconds": 0.12328930001240224,
+          "preparation_seconds": 0.9770248000277206,
+          "declaration_seconds": 0.12444339995272458,
           "hundred_queries_seconds": 0.0006738000083714724,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9740415000123903,
-          "declaration_seconds": 0.12093299999833107,
-          "hundred_queries_seconds": 0.0006638999911956489,
+          "preparation_seconds": 0.9703987999819219,
+          "declaration_seconds": 0.1250821000430733,
+          "hundred_queries_seconds": 0.0006877999985590577,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.967250999994576,
-          "declaration_seconds": 0.12188880000030622,
-          "hundred_queries_seconds": 0.0007264000014401972,
+          "preparation_seconds": 0.9762015000451356,
+          "declaration_seconds": 0.12137769995024428,
+          "hundred_queries_seconds": 0.000700299977324903,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9739219000330195,
-          "declaration_seconds": 0.12217649997910485,
-          "hundred_queries_seconds": 0.0008691999828442931,
+          "preparation_seconds": 0.9733794000349008,
+          "declaration_seconds": 0.1210107000079006,
+          "hundred_queries_seconds": 0.0006998000317253172,
+          "restricted_queries": 100,
+          "complete": true
+        },
+        {
+          "preparation_seconds": 0.9751039000111632,
+          "declaration_seconds": 0.1251056999899447,
+          "hundred_queries_seconds": 0.0006781999836675823,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.12635488571998263,
-          "median": 0.12328930001240224,
-          "p95": 0.14003090001642704,
-          "maximum": 0.14003090001642704
+          "mean": 0.12382139999785327,
+          "median": 0.12444339995272458,
+          "p95": 0.12911800004076213,
+          "maximum": 0.12911800004076213
         },
         "hundred_queries_seconds": {
-          "mean": 0.0007656714213745934,
-          "median": 0.0006910999654792249,
-          "p95": 0.0010504999663680792,
-          "maximum": 0.0010504999663680792
+          "mean": 0.0006851571462383228,
+          "median": 0.0006877999985590577,
+          "p95": 0.000700299977324903,
+          "maximum": 0.000700299977324903
         }
       }
     },
@@ -89,67 +89,67 @@
       "contribute": true,
       "samples": [
         {
-          "preparation_seconds": 0.9770662999944761,
-          "declaration_seconds": 0.08124420000240207,
-          "hundred_queries_seconds": 0.0006646999972872436,
+          "preparation_seconds": 0.993820899981074,
+          "declaration_seconds": 0.08201830001780763,
+          "hundred_queries_seconds": 0.0007072000298649073,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9745925000170246,
-          "declaration_seconds": 0.08248009998351336,
-          "hundred_queries_seconds": 0.0006539999740198255,
+          "preparation_seconds": 0.9730349999736063,
+          "declaration_seconds": 0.08255799999460578,
+          "hundred_queries_seconds": 0.0006858999840915203,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 1.0571706000482664,
-          "declaration_seconds": 0.08281210000859573,
-          "hundred_queries_seconds": 0.0007332999957725406,
+          "preparation_seconds": 1.0691578999976628,
+          "declaration_seconds": 0.08200350002152845,
+          "hundred_queries_seconds": 0.0006683999672532082,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9741066999849863,
-          "declaration_seconds": 0.08627750002779067,
-          "hundred_queries_seconds": 0.0007330999942496419,
+          "preparation_seconds": 0.9725333999958821,
+          "declaration_seconds": 0.08421800000360236,
+          "hundred_queries_seconds": 0.0006762999692000449,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9729842999950051,
-          "declaration_seconds": 0.08547420002287254,
-          "hundred_queries_seconds": 0.0006637999904341996,
+          "preparation_seconds": 0.9699922999716364,
+          "declaration_seconds": 0.0839453000226058,
+          "hundred_queries_seconds": 0.0006952999974600971,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9943381000193767,
-          "declaration_seconds": 0.08606279996456578,
-          "hundred_queries_seconds": 0.0006831999635323882,
+          "preparation_seconds": 0.9716352000250481,
+          "declaration_seconds": 0.08274639997398481,
+          "hundred_queries_seconds": 0.0006782999844290316,
           "restricted_queries": 100,
           "complete": true
         },
         {
-          "preparation_seconds": 0.9837504999595694,
-          "declaration_seconds": 0.08491750003304332,
-          "hundred_queries_seconds": 0.0006679000216536224,
+          "preparation_seconds": 0.9673583999974653,
+          "declaration_seconds": 0.08140750002348796,
+          "hundred_queries_seconds": 0.000699099968187511,
           "restricted_queries": 100,
           "complete": true
         }
       ],
       "summary": {
         "declaration_seconds": {
-          "mean": 0.08418120000611193,
-          "median": 0.08491750003304332,
-          "p95": 0.08627750002779067,
-          "maximum": 0.08627750002779067
+          "mean": 0.08269957143680326,
+          "median": 0.08255799999460578,
+          "p95": 0.08421800000360236,
+          "maximum": 0.08421800000360236
         },
         "hundred_queries_seconds": {
-          "mean": 0.0006857142767070659,
-          "median": 0.0006679000216536224,
-          "p95": 0.0007332999957725406,
-          "maximum": 0.0007332999957725406
+          "mean": 0.0006872142714980457,
+          "median": 0.0006858999840915203,
+          "p95": 0.0007072000298649073,
+          "maximum": 0.0007072000298649073
         }
       }
     }

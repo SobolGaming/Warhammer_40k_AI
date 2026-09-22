@@ -277,7 +277,7 @@ this token audit has one owner. Only code-quality tests changed, preserving
 the successful 8,758-test behavioral run and runtime identity.
 
 
-## Required finding record
+## Initial PR finding record (before R73-001)
 
 - **Status:** P18I implemented; local validation passed; PR #493 is open for review and unmerged. PFINAL and CAUDIT-01 remain open.
 - **Finding IDs:** C18-10.
@@ -296,7 +296,7 @@ the successful 8,758-test behavioral run and runtime identity.
 - **PR URL and merge commit:** [PR #493](https://github.com/SobolGaming/Warhammer_40k_AI/pull/493); open for review, unmerged.
 
 
-## Final validation
+## Initial PR validation (before R73-001)
 
 The final behavioral suite passes **8,758 tests** with **85.1739% coverage**;
 the final code-quality suite passes **585 tests** without coverage. Both use
@@ -316,3 +316,57 @@ also pass. All declared matched component budgets pass under unchanged limits.
 final results, runtime identity, report hashes and superseded attempts. These
 are local Windows results; remote CI supplies its own platform runs. They do
 not certify complete games or the remaining PFINAL category audit.
+
+
+## R73-001 — objective-marker contact-plane equivalence
+
+The review found a blocking mismatch in the analytic objective exclusion:
+it treated any marker elevation inside a model's vertical volume as contact.
+The authoritative endpoint validator instead compares the model and marker
+contact-plane elevations with absolute tolerance `1e-9`. Excluding a legal
+non-contact-plane position could produce an unsound negative omission proof
+and permit a placeable survivor to be destroyed. The same predicate also
+feeds submitted endpoints, unengaged alternatives and closest-position checks.
+
+The existing endpoint criterion is extracted, unchanged, into the pure
+`geometry.pose.contact_planes_coincide` helper. Both
+`DistanceMeasurementContext.contact_plane_footprints_overlap` and the analytic
+plane builder use it. Each solver pass already has a fixed elevation; converting
+that rationalized source elevation back to its original float lets the helper
+apply exactly the same floating-point tolerance as endpoint placement before
+adding the disk constraint. There is no model-height test for objective contact.
+The same-bug-class search found ordinary endpoint and spatial-index consumers,
+as well as the Cult Ambush contact consumers, already using the shared measurement
+context. The Emergency Disembark volume comparison was the divergent owner.
+A static audit now requires both definitions to delegate to the same helper.
+
+Eight new regressions were added before the production fix. The reviewed PR
+failed five and passed three; all eight pass after the fix. They cover marker
+z=1 above a ground model's base, exact contact, positive tolerance interior and
+boundary, a separation just beyond tolerance, and a marker just below the base
+within tolerance. Submitted legality, unengaged existence and closest-position
+queries are compared to the authoritative endpoint result. The two real-domain
+omission regressions cover physical and rules-unit consumers: a non-contact-plane
+marker covers the entire battlefield, so every possible placement overlaps its
+horizontal footprint. Both must report `EMERGENCY_DISEMBARK_OMITTED_MODEL_PLACEABLE`
+for the omitted survivor and leave authoritative state unchanged.
+
+This correction changes three production geometry files and their existing
+unit/code-quality tests. No behavioral test file was added or moved. The existing
+adapter contract covers the unchanged proposals, diagnostics, records, viewer
+scope and engine mutation path; no new adapter-visible shape or choice is added.
+Source IDs, source package bytes and retained observations are unchanged.
+Runtime identity, contract examples and required performance head evidence are
+refreshed for this revision. The scope and architecture audit found no new
+subsystem, dependency boundary, named handler or adjacent feature work.
+
+R73-001 validation: **8,766 behavioral tests pass with 85.1743% coverage**,
+and **586 code-quality tests pass** without coverage. Both final suites use
+32 workers with work stealing and no competing build/client jobs. Required
+lint, format, type, import, shard, source, exact-base contract, installed-wheel,
+TypeScript and 342-assertion live HTTP conformance checks pass. The nine
+performance evidence guards pass against unchanged inputs and budgets.
+See [review-fix validation](performance/order73/r73_001/validation.json) for
+runtime identity, report hashes and measured results.
+The initial PR results above remain historical. P18I is Order 73, PFINAL remains
+Order 74, and CAUDIT-01 remains open until merge and a fresh complete audit.
