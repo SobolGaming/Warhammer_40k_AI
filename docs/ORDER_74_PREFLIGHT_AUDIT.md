@@ -267,3 +267,5 @@ performance evidence guards pass against the unchanged declared budgets.
 See [machine-readable validation](performance/order74/validation.json) and
 [qualified performance evidence](performance/order74/README.md). This closes the
 scoped prerequisite implementation for review, not CAUDIT-01 or PFINAL.
+
+Published for review as [PR #494](https://github.com/SobolGaming/Warhammer_40k_AI/pull/494). Merge remains pending; PFINAL/CAUDIT-01 is not certified.

@@ -85,5 +85,6 @@
   },
   "full_game_certified": false,
   "core_rules_compliance_certified": false,
-  "next_gate": "Merge P03C, then repeat the complete PFINAL audit from main (Order 75)."
+  "next_gate": "Merge P03C, then repeat the complete PFINAL audit from main (Order 75).",
+  "pull_request_url": "https://github.com/SobolGaming/Warhammer_40k_AI/pull/494"
 }

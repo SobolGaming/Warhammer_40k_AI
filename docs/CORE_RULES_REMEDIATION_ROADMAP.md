@@ -5290,3 +5290,5 @@ retain their historical meaning. The implementation supplies a sufficient
 continuous terrain-exclusion proof, not a universal motion-planning certificate.
 Unknown path or maximum-approach computations remain fail-closed. CAUDIT-01
 remains open; merge this prerequisite before repeating the complete audit on main.
+
+P03C delivery: [PR #494](https://github.com/SobolGaming/Warhammer_40k_AI/pull/494), submitted for review with 8,790 behavioral tests, 85.18% coverage and 588 code-quality tests passing. Merge and the subsequent complete audit remain pending.
