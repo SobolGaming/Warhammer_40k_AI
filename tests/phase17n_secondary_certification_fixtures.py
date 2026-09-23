@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import cast
 
+from tests.mission_action_history_helpers import record_mission_action_terminal_for_fixture
 from tests.phase11c_command_phase_helpers import default_unit_selection, unit_selection
 from tests.phase17n_secondary_mission_helpers import resolved_secondary_mission_selection_for_card
 from tests.secondary_destruction_helpers import record_secondary_destruction_for_fixture
@@ -463,7 +464,12 @@ def _seed_cleanse(
         mission_action_id="cleanse-objective",
         target_id=marker.objective_marker_id,
     )
-    state.complete_mission_action(action_id=action.action_id, completion_phase=BattlePhase.FIGHT)
+    completed = state.complete_mission_action(
+        action_id=action.action_id, completion_phase=BattlePhase.FIGHT
+    )
+    record_mission_action_terminal_for_fixture(
+        state=state, decisions=decisions, action=completed, phase=BattlePhase.FIGHT
+    )
     return SecondaryPositiveExpectation(
         expected_amount=2,
         expected_rule_ids=frozenset({"cleanse-tactical-one-objective"}),

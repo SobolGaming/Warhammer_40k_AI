@@ -6639,3 +6639,9 @@ continues through shared viewer redaction. Restore rejects a persisted Action
 that continued after its recorded interrupting move, and authenticates the
 interruption's existing source reference. Engine identity regeneration binds
 replay and the external contract to the changed event ordering and semantics.
+
+R77-001 additionally authenticates every Action terminal against its persisted
+status, exact Action payload, battle/source context and start-event ordering
+before using that terminal to bound historical movement validation. A started
+Action cannot have a terminal event. Primary and secondary Actions share this
+check; the existing event fields and restore-error contract are sufficient.

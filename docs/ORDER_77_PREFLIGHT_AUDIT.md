@@ -243,3 +243,33 @@ full-game and PFINAL limitations still apply.
 Final gate and timing results are recorded in
 [Order 77 performance evidence](performance/order77/README.md) and its validation
 artifact. P16B must merge before the complete Order 78 PFINAL audit resumes.
+
+## R77-001 — authenticate terminal history before bounding movement
+
+Review reproduced a restore bypass in Cleanse: suppress its actual movement
+interruption, restore its status to `started`, and insert a forged terminal
+before the accepted return-path move. The movement validator bounded its scan
+at that terminal without authenticating it. Primary-only integrity checks did
+not protect secondary Actions. Completed, completion-failed and interrupted
+terminal event types all reproduced the bypass.
+
+The violated invariant is that only authenticated terminal history may end an
+Action's movement-validation interval. Terminal cardinality, type/status,
+persisted payload, battle/source context and ordering now live in one shared
+engine validator, extracted from the existing primary authority. Both primary
+integrity and the common movement scan consume it before accepting a terminal.
+Primary-specific source, decision, completion and interruption evidence checks
+remain in their existing owner. No payload schema or player choice changes.
+
+The bug-class search covered all three Action terminal types and both primary
+and secondary history consumers. Regressions exercise the original three
+forgeries plus altered terminal state/context, missing and duplicate terminals,
+and a terminal before its start. The untouched Cleanse history must round-trip
+before the tampering tests run. A static guard requires shared authentication
+before the movement evidence scan. PFINAL remains open as Order 78.
+
+The broader consumer run also exposed three lower-level fixtures that completed
+or interrupted Actions without recording their terminal events (11 failing
+parameterized cases). Those fixtures now append the missing terminal history;
+35 affected tests pass without weakening restore validation. Final aggregate
+results and refreshed performance evidence are recorded in the validation artifact.

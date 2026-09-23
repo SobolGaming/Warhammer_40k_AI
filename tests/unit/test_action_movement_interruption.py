@@ -252,3 +252,108 @@ def test_restore_rejects_forged_completed_move_interruption(
         GameLifecycleError, match=("continued after" if tamper == "suppressed" else None)
     ):
         GameLifecycle.from_payload(payload)
+
+
+@pytest.fixture(scope="module")
+def interrupted_secondary_return_session() -> LocalGameSession:
+    session, unit_id = action_movement_session(mission_action_id="cleanse-objective")
+    # Preserve event IDs when replacing this benign pre-move marker in forgery tests.
+    session.lifecycle.decision_controller.event_log.append("r77_001_before_move", {})
+    request = request_action_move(session, unit_id, "return")
+    option = next(o for o in request.options if o.option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID)
+    status = session.submit_option(
+        request_id=request.request_id, option_id=option.option_id, result_id="r77-001-move"
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    saved = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(saved).to_payload() == saved
+    return session
+
+
+@pytest.mark.parametrize(
+    "terminal_type",
+    ["mission_action_completion_failed", "mission_action_completed", "mission_action_interrupted"],
+)
+def test_secondary_terminal_cannot_hide_suppressed_move_interruption(
+    interrupted_secondary_return_session: LocalGameSession,
+    terminal_type: str,
+) -> None:
+    """R77-001: an unauthenticated terminal must never truncate the movement scan."""
+    payload = deepcopy(interrupted_secondary_return_session.lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    terminal = next(e for e in events if e["event_type"] == "mission_action_interrupted")
+    terminal["event_type"] = "forged_unrelated_event"
+    terminal["payload"] = {}
+    action = payload["state"]["mission_action_states"][-1]
+    action["status"] = "started"
+    action["interrupted_reason"] = None
+    forged = next(e for e in events if e["event_type"] == "r77_001_before_move")
+    forged["event_type"] = terminal_type
+    forged["payload"] = {"mission_action_state": cast(JsonValue, deepcopy(action))}
+
+    with pytest.raises(GameLifecycleError, match="Started Mission Action has a terminal event"):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("tamper", "diagnostic"),
+    [
+        ("failed_type", "terminal event authentication"),
+        ("completed_type", "terminal event authentication"),
+        ("state", "terminal event state"),
+        ("game", "event battle context"),
+        ("round", "event battle context"),
+        ("phase", "interruption precedes its start phase"),
+        ("player", "event player"),
+        ("source", "terminal source identity"),
+        ("missing", "terminal event authentication"),
+        ("duplicate", "terminal event authentication"),
+        ("before_start", "terminal event ordering"),
+    ],
+)
+def test_secondary_terminal_authenticates_persisted_state_and_context(
+    interrupted_secondary_return_session: LocalGameSession,
+    tamper: str,
+    diagnostic: str,
+) -> None:
+    payload = deepcopy(interrupted_secondary_return_session.lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    terminal = next(e for e in events if e["event_type"] == "mission_action_interrupted")
+    terminal_payload = cast(dict[str, JsonValue], terminal["payload"])
+    if tamper == "failed_type":
+        terminal["event_type"] = "mission_action_completion_failed"
+    elif tamper == "completed_type":
+        terminal["event_type"] = "mission_action_completed"
+    elif tamper == "state":
+        nested = cast(dict[str, JsonValue], terminal_payload["mission_action_state"])
+        nested["target_id"] = "forged-target"
+    elif tamper == "game":
+        terminal_payload["game_id"] = "forged-game"
+    elif tamper == "round":
+        terminal_payload["battle_round"] = 2
+    elif tamper == "phase":
+        terminal_payload["phase"] = "command"
+    elif tamper == "player":
+        terminal_payload["player_id"] = "player-a"
+    elif tamper == "source":
+        terminal_payload["mission_action_id"] = "forged-source"
+    elif tamper == "missing":
+        terminal["event_type"] = "forged_unrelated_event"
+    else:
+        replacement = next(
+            e
+            for e in events
+            if e["event_type"]
+            == (
+                "primary_mission_boundary_checkpoint_recorded"
+                if tamper == "before_start"
+                else "r77_001_before_move"
+            )
+        )
+        replacement["event_type"] = terminal["event_type"]
+        replacement["payload"] = deepcopy(terminal_payload)
+        if tamper == "before_start":
+            terminal["event_type"] = "forged_unrelated_event"
+
+    with pytest.raises(GameLifecycleError, match=diagnostic):
+        GameLifecycle.from_payload(payload)

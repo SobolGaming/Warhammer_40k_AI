@@ -15,11 +15,11 @@ versions and input hashes are recorded in the JSON.
 
 | Completed move | Base submit mean / max (s) | Head submit mean / max (s) | Head restore mean / max (s) |
 | --- | ---: | ---: | ---: |
-| translation | 1.3620 / 3.9599 | 1.3992 / 4.0710 | 0.4546 / 0.4557 |
-| return | 0.0714 / 0.0884 | 0.0714 / 0.0878 | 0.4543 / 0.4548 |
-| zero | 0.0626 / 0.0627 | 0.0719 / 0.0900 | 0.4706 / 0.4918 |
-| rotation | 0.0730 / 0.0895 | 0.0731 / 0.0897 | 0.4608 / 0.4614 |
-| rotation_return | 0.0639 / 0.0641 | 0.0664 / 0.0678 | 0.4655 / 0.4760 |
+| translation | 1.3568 / 3.9456 | 1.3607 / 3.9566 | 0.4539 / 0.4559 |
+| return | 0.0702 / 0.0862 | 0.0711 / 0.0879 | 0.4537 / 0.4561 |
+| zero | 0.0633 / 0.0653 | 0.0625 / 0.0628 | 0.4668 / 0.4918 |
+| rotation | 0.0725 / 0.0888 | 0.0730 / 0.0902 | 0.4612 / 0.4624 |
+| rotation_return | 0.0638 / 0.0639 | 0.0646 / 0.0651 | 0.4605 / 0.4612 |
 
 The declared limits remain 12 seconds per submission or restore and 3× the matching base
 sample plus 50 ms jitter allowance. The fast quality gate authenticates matching
@@ -35,6 +35,12 @@ uv run --no-sync python scripts/measure_order77.py --runtime-src src \
 
 The isolated baseline also requires its committed `contracts/schemas` and `pyproject.toml`.
 The measurement helpers and dependency lock come from the proposed checkout for both runs.
+
+R77-001 retains an additional pre-fix baseline in `r77_001/base.json`, measured
+from PR commit `10c62302b68252778725d5af6d85a95f7f9ec5c6` before changing runtime
+code. The current `head.json` must satisfy the same submission and authenticated
+restore limits against both that baseline and the original main baseline. The
+workload, fixture hashes, timing boundaries, host and numeric budgets are unchanged.
 
 ## Preserved phase-flow diagnostic
 

@@ -26,55 +26,55 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 3.171842124997056,
+      "preparation_seconds": 3.008201167001971,
       "payload_bytes": 388616,
       "decision_records": 3,
       "event_records": 41,
       "samples": [
         {
-          "seconds": 1.1065911250043428,
+          "seconds": 1.0527418340061558,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0659751249913825,
+          "seconds": 1.0173753330018371,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0605335000000196,
+          "seconds": 1.0131036669918103,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0564887910004472,
+          "seconds": 1.0300657500047237,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.089337167009944,
+          "seconds": 1.0495238339935895,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.058437583007617,
+          "seconds": 1.0161610829964047,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0549048329994548,
+          "seconds": 1.0200800410093507,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.0703240177161726,
-      "median_seconds": 1.0605335000000196,
-      "p95_seconds": 1.1065911250043428,
-      "maximum_seconds": 1.1065911250043428,
-      "operations_per_second": 0.9342965153054978,
+      "mean_seconds": 1.0284359345719818,
+      "median_seconds": 1.0200800410093507,
+      "p95_seconds": 1.0527418340061558,
+      "maximum_seconds": 1.0527418340061558,
+      "operations_per_second": 0.972350310198159,
       "completion_rate": 1,
       "profile": {
-        "seconds": 1.9663421659934102,
+        "seconds": 1.89248100000259,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7554506,
@@ -92,55 +92,55 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 3.171842124997056,
+      "preparation_seconds": 3.008201167001971,
       "payload_bytes": 388616,
       "decision_records": 3,
       "event_records": 41,
       "samples": [
         {
-          "seconds": 1.0612094170064665,
+          "seconds": 1.023947291992954,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.057516291999491,
+          "seconds": 1.026084750003065,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0591281249944586,
+          "seconds": 1.031582540992531,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1074203750031302,
+          "seconds": 1.0598444170027506,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0619254999910481,
+          "seconds": 1.0332027090043994,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0605420829961076,
+          "seconds": 1.035166207992006,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0618911250057863,
+          "seconds": 1.0221329999912996,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.067090416713784,
-      "median_seconds": 1.0612094170064665,
-      "p95_seconds": 1.1074203750031302,
-      "maximum_seconds": 1.1074203750031302,
-      "operations_per_second": 0.9371277113326574,
+      "mean_seconds": 1.0331372738541436,
+      "median_seconds": 1.031582540992531,
+      "p95_seconds": 1.0598444170027506,
+      "maximum_seconds": 1.0598444170027506,
+      "operations_per_second": 0.9679255848252148,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0278043750004144,
+        "seconds": 1.9448783749976428,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7678570,
@@ -158,55 +158,55 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.31390325000393204,
+      "preparation_seconds": 0.30073366599390283,
       "payload_bytes": 415271,
       "decision_records": 6,
       "event_records": 55,
       "samples": [
         {
-          "seconds": 1.0720040839951253,
+          "seconds": 1.033326709002722,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0690717499965103,
+          "seconds": 1.0383676249912241,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.121617917000549,
+          "seconds": 1.0720556249871152,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0736454169964418,
+          "seconds": 1.0349574580031913,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.072562041998026,
+          "seconds": 1.0461562080017757,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1154278340109158,
+          "seconds": 1.0890495000057854,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0704486659960821,
+          "seconds": 1.038490582999657,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.0849682442848072,
-      "median_seconds": 1.072562041998026,
-      "p95_seconds": 1.121617917000549,
-      "maximum_seconds": 1.121617917000549,
-      "operations_per_second": 0.9216859620247994,
+      "mean_seconds": 1.0503433868559244,
+      "median_seconds": 1.038490582999657,
+      "p95_seconds": 1.0890495000057854,
+      "maximum_seconds": 1.0890495000057854,
+      "operations_per_second": 0.9520695922058202,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0199067920038942,
+        "seconds": 1.9463551249937154,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7840688,
@@ -224,55 +224,55 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.31390325000393204,
+      "preparation_seconds": 0.30073366599390283,
       "payload_bytes": 415271,
       "decision_records": 6,
       "event_records": 55,
       "samples": [
         {
-          "seconds": 1.0829981669958215,
+          "seconds": 1.0416123750037514,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1267127079918282,
+          "seconds": 1.0722494999936316,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0773212500062073,
+          "seconds": 1.041264333005529,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0825468330003787,
+          "seconds": 1.0495854999899166,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1331440000067232,
+          "seconds": 1.074796790999244,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0834812499961117,
+          "seconds": 1.044179541990161,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0778842910076492,
+          "seconds": 1.0394823329988867,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.0948697855721028,
-      "median_seconds": 1.0829981669958215,
-      "p95_seconds": 1.1331440000067232,
-      "maximum_seconds": 1.1331440000067232,
-      "operations_per_second": 0.913350622309364,
+      "mean_seconds": 1.0518814819973028,
+      "median_seconds": 1.044179541990161,
+      "p95_seconds": 1.074796790999244,
+      "maximum_seconds": 1.074796790999244,
+      "operations_per_second": 0.9506774452395619,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0815617079933872,
+        "seconds": 2.0001707500050543,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7968676,
@@ -290,55 +290,55 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.3089951250003651,
+      "preparation_seconds": 0.298249332990963,
       "payload_bytes": 420274,
       "decision_records": 7,
       "event_records": 58,
       "samples": [
         {
-          "seconds": 1.0833205419912701,
+          "seconds": 1.036477792004007,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0794333340018056,
+          "seconds": 1.045397916008369,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1277666249952745,
+          "seconds": 1.0771141250006622,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0745597500063013,
+          "seconds": 1.0406750839902088,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.076666374996421,
+          "seconds": 1.0369572920026258,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1223448329983512,
+          "seconds": 1.0767695829999866,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0779555829940364,
+          "seconds": 1.0379870839969954,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.0917210059976372,
-      "median_seconds": 1.0794333340018056,
-      "p95_seconds": 1.1277666249952745,
-      "maximum_seconds": 1.1277666249952745,
-      "operations_per_second": 0.915984939839258,
+      "mean_seconds": 1.0501969822861221,
+      "median_seconds": 1.0406750839902088,
+      "p95_seconds": 1.0771141250006622,
+      "maximum_seconds": 1.0771141250006622,
+      "operations_per_second": 0.9522023171530632,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0260503750032512,
+        "seconds": 1.9557747920043766,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7887808,
@@ -356,55 +356,55 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.3089951250003651,
+      "preparation_seconds": 0.298249332990963,
       "payload_bytes": 420274,
       "decision_records": 7,
       "event_records": 58,
       "samples": [
         {
-          "seconds": 1.0873066670028493,
+          "seconds": 1.0447594170109369,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.12347225000849,
+          "seconds": 1.0777167090127477,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.08202312499634,
+          "seconds": 1.044483791993116,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1020304580015363,
+          "seconds": 1.0405218329979107,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1249622920004185,
+          "seconds": 1.0822099579963833,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0777440840029158,
+          "seconds": 1.048954165991745,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.080398417005199,
+          "seconds": 1.0484204159874935,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.0968481847168212,
-      "median_seconds": 1.0873066670028493,
-      "p95_seconds": 1.1249622920004185,
-      "maximum_seconds": 1.1249622920004185,
-      "operations_per_second": 0.9117032000724649,
+      "mean_seconds": 1.0552951844271905,
+      "median_seconds": 1.0484204159874935,
+      "p95_seconds": 1.0822099579963833,
+      "maximum_seconds": 1.0822099579963833,
+      "operations_per_second": 0.9476021636001263,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.095316582999658,
+        "seconds": 2.0122743749961955,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 8016491,

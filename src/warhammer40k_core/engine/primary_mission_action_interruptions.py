@@ -21,6 +21,10 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.mission_action_options import mission_action_for_state
+from warhammer40k_core.engine.mission_action_terminal_integrity import (
+    MISSION_ACTION_TERMINAL_EVENT_TYPES,
+    validate_mission_action_terminal_event,
+)
 from warhammer40k_core.engine.model_movement_history import distances_from_completion
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
@@ -187,6 +191,7 @@ def validate_mission_action_movement_history(
 ) -> None:
     """Authenticate movement outcomes for every recorded Action, including secondary Actions."""
     event_by_id = {event.event_id: event for event in event_records}
+    event_index_by_id = {event.event_id: index for index, event in enumerate(event_records)}
     for start in event_records:
         if start.event_type != "mission_action_started":
             continue
@@ -194,20 +199,21 @@ def validate_mission_action_movement_history(
         if action_id is None:
             raise GameLifecycleError("Action movement history start identity is missing.")
         action = state.mission_action_state_by_id(action_id)
+        _start_event_order(action=action, event_records=event_records)
         terminals = tuple(
-            (index, event)
-            for index, event in enumerate(event_records)
-            if event.event_type
-            in {
-                "mission_action_completed",
-                "mission_action_interrupted",
-                "mission_action_completion_failed",
-            }
+            event
+            for event in event_records
+            if event.event_type in MISSION_ACTION_TERMINAL_EVENT_TYPES
             and _nested_action_id(event) == action.action_id
         )
-        if len(terminals) > 1:
-            raise GameLifecycleError("Action movement history has duplicate terminal events.")
-        end = terminals[0][0] if terminals else len(event_records)
+        terminal = validate_mission_action_terminal_event(
+            state=state,
+            action=action,
+            start=start,
+            terminals=terminals,
+            event_index_by_id=event_index_by_id,
+        )
+        end = len(event_records) if terminal is None else event_index_by_id[terminal.event_id]
         evidence = _first_interruption_evidence(
             state=state,
             action=action,
@@ -221,9 +227,8 @@ def validate_mission_action_movement_history(
             if action.interrupted_reason == MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON:
                 raise GameLifecycleError("Action interruption lacks completed-move evidence.")
             continue
-        if action.status is not MissionActionStatus.INTERRUPTED or not terminals:
+        if action.status is not MissionActionStatus.INTERRUPTED or terminal is None:
             raise GameLifecycleError("Action continued after an interrupting completed move.")
-        terminal = terminals[0][1]
         payload = _event_payload(terminal)
         if (
             terminal.event_type != "mission_action_interrupted"

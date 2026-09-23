@@ -7,6 +7,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 from warhammer40k_core.build_identity import verified_engine_build_identity
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,11 +39,21 @@ def test_action_interruption_uses_one_completed_move_authority() -> None:
         "validate_mission_action_movement_history"
         in (ENGINE / "primary_mission_restore_integrity.py").read_text()
     )
+    history = ast.unparse(functions["validate_mission_action_movement_history"])
+    assert "terminals[0]" not in history
+    assert history.index("validate_mission_action_terminal_event(") < history.index(
+        "_first_interruption_evidence("
+    )
+    assert (
+        "validate_mission_action_terminal_event("
+        in (ENGINE / "primary_mission_action_integrity.py").read_text()
+    )
 
 
-def test_order77_matched_completed_move_cost_evidence() -> None:
+@pytest.mark.parametrize("baseline", ["base.json", "r77_001/base.json"])
+def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
     folder = ROOT / "docs/performance/order77"
-    base, head = (json.loads((folder / name).read_text()) for name in ("base.json", "head.json"))
+    base, head = (json.loads((folder / name).read_text()) for name in (baseline, "head.json"))
     budgets = json.loads((folder / "budgets.json").read_text())
     assert head["runtime_build_id"] == verified_engine_build_identity().build_id
     for key in (

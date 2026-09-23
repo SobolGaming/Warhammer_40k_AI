@@ -15,12 +15,17 @@ from warhammer40k_core.engine.mission_action_policies import (
     MissionActionPolicyDescriptor,
     mission_action_policy_descriptors,
 )
+from warhammer40k_core.engine.mission_action_terminal_integrity import (
+    MISSION_ACTION_TERMINAL_EVENT_TYPES,
+    validate_mission_action_event_context,
+    validate_mission_action_terminal_event,
+)
 from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_area_by_id,
 )
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
     validate_mission_action_opportunity_decline_integrity,
 )
@@ -74,13 +79,6 @@ if TYPE_CHECKING:
 _ACTION_EVENT_TYPES = frozenset(
     {
         "mission_action_started",
-        "mission_action_completed",
-        "mission_action_completion_failed",
-        "mission_action_interrupted",
-    }
-)
-_TERMINAL_EVENT_TYPES = frozenset(
-    {
         "mission_action_completed",
         "mission_action_completion_failed",
         "mission_action_interrupted",
@@ -220,10 +218,6 @@ def validate_primary_mission_action_integrity(
             event_records=event_records,
             event_index_by_id=event_index_by_id,
         )
-        if terminal_event is not None and (
-            event_index_by_id[start_event.event_id] >= event_index_by_id[terminal_event.event_id]
-        ):
-            raise GameLifecycleError("Primary Mission Action terminal event ordering drifted.")
 
     validate_primary_mission_action_use_limits(
         state=state,
@@ -712,7 +706,9 @@ def _validate_action_events(
         record for _index, record in records if record.event_type == "mission_action_started"
     )
     terminals = tuple(
-        record for _index, record in records if record.event_type in _TERMINAL_EVENT_TYPES
+        record
+        for _index, record in records
+        if record.event_type in MISSION_ACTION_TERMINAL_EVENT_TYPES
     )
     if len(starts) != 1:
         raise GameLifecycleError("Primary Mission Action requires one authenticated start event.")
@@ -727,7 +723,7 @@ def _validate_action_events(
     start = starts[0]
     if _nested_action_payload(start) != expected_started.to_payload():
         raise GameLifecycleError("Primary Mission Action start event state drifted.")
-    _validate_event_context(
+    validate_mission_action_event_context(
         state=state,
         action=action,
         event=start,
@@ -743,65 +739,17 @@ def _validate_action_events(
     ):
         raise GameLifecycleError("Primary Mission Action start event source drifted.")
 
-    expected_terminal_type: str | None
-    terminal_round: int | None
-    terminal_phase: str | None
-    if action.status is MissionActionStatus.STARTED:
-        expected_terminal_type = None
-        terminal_round = terminal_phase = None
-    elif action.status is MissionActionStatus.COMPLETED:
-        expected_terminal_type = "mission_action_completed"
-        terminal_round = action.completed_battle_round
-        terminal_phase = action.completed_phase
-    elif action.interrupted_reason == MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON:
-        expected_terminal_type = "mission_action_completion_failed"
-        terminal_round = action.battle_round_started
-        terminal_phase = state.battle_phase_sequence[-1].value
-    else:
-        expected_terminal_type = "mission_action_interrupted"
-        terminal_round = action.battle_round_started
-        terminal_phase = None
-    if expected_terminal_type is None:
-        if terminals:
-            raise GameLifecycleError("Started Primary Mission Action has a terminal event.")
-        return start, None
-    matching = tuple(record for record in terminals if record.event_type == expected_terminal_type)
-    if len(terminals) != 1 or len(matching) != 1:
-        raise GameLifecycleError("Primary Mission Action terminal event authentication drifted.")
-    terminal = matching[0]
-    if _nested_action_payload(terminal) != action.to_payload():
-        raise GameLifecycleError("Primary Mission Action terminal event state drifted.")
-    terminal_payload = _object(terminal.payload, label="Primary Mission Action terminal event")
-    if terminal_round is None:
-        raise GameLifecycleError("Primary Mission Action terminal battle round is missing.")
-    event_phase = terminal_payload.get("phase") if terminal_phase is None else terminal_phase
-    if type(event_phase) is not str or event_phase not in {phase.value for phase in BattlePhase}:
-        raise GameLifecycleError("Primary Mission Action terminal phase is invalid.")
-    if expected_terminal_type == "mission_action_interrupted":
-        phase_order = {
-            phase.value: index for index, phase in enumerate(state.battle_phase_sequence)
-        }
-        if phase_order[event_phase] < phase_order[action.phase_started]:
-            raise GameLifecycleError(
-                "Primary Mission Action interruption precedes its start phase."
-            )
-    _validate_event_context(
+    terminal = validate_mission_action_terminal_event(
         state=state,
         action=action,
-        event=terminal,
-        battle_round=terminal_round,
-        phase=event_phase,
+        start=start,
+        terminals=terminals,
+        event_index_by_id=event_index_by_id,
     )
-    terminal_mission_action_id = terminal_payload.get("mission_action_id")
-    if expected_terminal_type == "mission_action_interrupted":
-        if (
-            terminal_mission_action_id is not None
-            and terminal_mission_action_id != action.mission_action_id
-        ):
-            raise GameLifecycleError("Primary Mission Action terminal source identity drifted.")
-    elif terminal_mission_action_id != action.mission_action_id:
-        raise GameLifecycleError("Primary Mission Action terminal source identity drifted.")
-    if expected_terminal_type == "mission_action_interrupted":
+    if terminal is None:
+        return start, None
+    terminal_payload = _object(terminal.payload, label="Primary Mission Action terminal event")
+    if terminal.event_type == "mission_action_interrupted":
         _validate_interruption_evidence_reference(
             state=state,
             action=action,
@@ -812,7 +760,7 @@ def _validate_action_events(
             event_index_by_id=event_index_by_id,
         )
     if (
-        expected_terminal_type != "mission_action_interrupted"
+        terminal.event_type != "mission_action_interrupted"
         and policy.completion_timing == "turn_end"
         and terminal_payload.get("source_id") != policy.source_id
     ):
@@ -853,29 +801,6 @@ def _validate_interruption_evidence_reference(
         action=action,
         evidence_event=evidence,
     )
-
-
-def _validate_event_context(
-    *,
-    state: GameState,
-    action: MissionActionState,
-    event: EventRecord,
-    battle_round: int,
-    phase: str,
-) -> None:
-    payload = _object(event.payload, label="Primary Mission Action event")
-    if (
-        payload.get("game_id") != state.game_id
-        or payload.get("battle_round") != battle_round
-        or payload.get("phase") != phase
-    ):
-        raise GameLifecycleError("Primary Mission Action event battle context drifted.")
-    player_id = payload.get("player_id")
-    if player_id is not None and player_id != action.player_id:
-        raise GameLifecycleError("Primary Mission Action event player drifted.")
-    action_id = payload.get("action_id")
-    if action_id is not None and action_id != action.action_id:
-        raise GameLifecycleError("Primary Mission Action event action identity drifted.")
 
 
 def _validate_marker_effect(

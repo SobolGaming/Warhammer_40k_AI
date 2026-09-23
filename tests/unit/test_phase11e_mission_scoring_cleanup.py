@@ -7468,6 +7468,8 @@ def test_titanic_unit_can_start_action_while_engaged() -> None:
 def test_order34_action_restriction_survives_phase_and_action_status(
     phase: BattlePhase, titanic: bool, interrupted: bool
 ) -> None:
+    from tests.mission_action_history_helpers import record_mission_action_terminal_for_fixture
+
     from warhammer40k_core.engine.phases.shooting import shooting_unit_can_select_to_shoot
 
     config = _config()
@@ -7504,7 +7506,15 @@ def test_order34_action_restriction_survives_phase_and_action_status(
         lifecycle=lifecycle, target_suffix="center", result_id="order34-start"
     )
     if interrupted:
-        state.interrupt_mission_action(action_id=action.action_id, reason="unit_left_battlefield")
+        terminal = state.interrupt_mission_action(
+            action_id=action.action_id, reason="unit_left_battlefield"
+        )
+        record_mission_action_terminal_for_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            action=terminal,
+            phase=BattlePhase.SHOOTING,
+        )
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
     restored = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
     restored_state = restored.state
@@ -8627,6 +8637,8 @@ def test_shooting_lifecycle_exposes_held_tactical_plunder() -> None:
 
 
 def test_mission_action_can_complete_interrupt_and_score() -> None:
+    from tests.mission_action_history_helpers import record_mission_action_terminal_for_fixture
+
     lifecycle = _battle_lifecycle(
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
     )
@@ -8660,6 +8672,12 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     completed = state.complete_mission_action(
         action_id=completed_action.action_id,
         completion_phase=BattlePhase.FIGHT,
+    )
+    record_mission_action_terminal_for_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        action=completed,
+        phase=BattlePhase.FIGHT,
     )
     interrupted = interrupted_state.interrupt_mission_action(
         action_id=interrupted_action.action_id,
