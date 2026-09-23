@@ -1,0 +1,62 @@
+{
+  "workload": "order79-turn-end-control-v2",
+  "revision": "68c6bccb7d1f44e3b03409a86565a3d285c8449d",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "One facade advance from initialized unengaged Fight boundary to next decision; five serial samples, no coverage; fixture/restore preparation excluded",
+  "hashes": {
+    "scripts/measure_order79.py": "fa3ebc72faec8dae173bef70814b52c801a404ffb0d1f8a823ec822e0e6fce31",
+    "tests/order79_helpers.py": "a4680ca824470093d348312bddab1ec6decd5ebd30645ee8d72f626014dec23a",
+    "tests/aircraft_helpers.py": "b9d44fff415a72e211841e28f382671d6fda77041ef67ab20956e6e83cf877a4",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "player-b",
+      "samples_seconds": [
+        0.0572471659979783,
+        0.050954709004145116,
+        0.0499510840018047,
+        0.0542689169960795,
+        0.049468166995211504
+      ],
+      "mean_seconds": 0.052378008599043825,
+      "maximum_seconds": 0.0572471659979783,
+      "complete": true,
+      "controllers": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "case": "player-a",
+      "samples_seconds": [
+        0.03891137499886099,
+        0.03826058299455326,
+        0.038240291993133724,
+        0.038608874994679354,
+        0.0382795830082614
+      ],
+      "mean_seconds": 0.03846014159789775,
+      "maximum_seconds": 0.03891137499886099,
+      "complete": true,
+      "controllers": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "full_game_certified": false
+}

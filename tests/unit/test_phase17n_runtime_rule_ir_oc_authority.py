@@ -1045,3 +1045,73 @@ def _lifecycle_payload(
         _config=config,
         _runtime_content_bundle=bundle,
     ).to_payload()
+
+
+@pytest.mark.parametrize("endpoint", ["phase", "turn"])
+def test_order79_turn_snapshot_respects_phase_and_turn_effect_expiration(
+    authority_runtime: AuthorityRuntime, endpoint: str
+) -> None:
+    from tests.phase11c_command_phase_helpers import center_marker_definition
+
+    from warhammer40k_core.engine.turn_end_boundary import determine_turn_end_control
+
+    base, rule_ir, _bundle, _config = authority_runtime
+    state = deepcopy(base)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    assert state.battlefield_state is not None
+    marker = center_marker_definition(state)
+    unit = state.army_definitions[0].units[0]
+    placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(placement, marker, offsets=((0.0, 0.0),))
+    )
+    clause = rule_ir.clauses[0]
+    assert clause.duration is not None
+    rule_ir = replace(
+        rule_ir,
+        clauses=(
+            replace(
+                clause,
+                duration=replace(
+                    clause.duration, parameters=(RuleParameter(key="endpoint", value=endpoint),)
+                ),
+            ),
+        ),
+    )
+    _apply_generic_oc_rule_ir(state=state, decisions=DecisionController(), rule_ir=rule_ir)
+    registry = RuntimeModifierRegistry.empty()
+    phase = state.determine_current_phase_end_objective_control(runtime_modifier_registry=registry)
+    turn = determine_turn_end_control(
+        state=state, completed_phase=BattlePhase.FIGHT, runtime_modifier_registry=registry
+    )
+    model_id = placement.model_placements[0].model_instance_id
+    phase_contribution = next(
+        row
+        for row in phase.result_by_objective_id(marker.objective_marker_id).contributors
+        if row.model_instance_id == model_id
+    )
+    turn_contribution = next(
+        row
+        for row in turn.result_by_objective_id(marker.objective_marker_id).contributors
+        if row.model_instance_id == model_id
+    )
+    assert phase_contribution.effective_objective_control == 3
+    assert turn_contribution.effective_objective_control == (2 if endpoint == "phase" else 3)
+    assert bool(state.persisting_effects) is (endpoint == "turn")
+    assert not state.end_turn_cleanup_states
+    assert (
+        state.prepare_current_turn_end_boundary(
+            completed_phase=BattlePhase.FIGHT, runtime_modifier_registry=registry
+        )
+        == turn
+    )
+    assert not state.persisting_effects
+    final = state.to_payload()
+    assert (
+        state.prepare_current_turn_end_boundary(
+            completed_phase=BattlePhase.FIGHT, runtime_modifier_registry=registry
+        )
+        == turn
+    )
+    assert state.to_payload() == final
+    assert phase.record_id != turn.record_id

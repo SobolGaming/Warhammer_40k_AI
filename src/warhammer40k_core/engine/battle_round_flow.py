@@ -13,7 +13,9 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartResultContext,
 )
 from warhammer40k_core.engine.boundary_rule_flow import (
+    emit_objective_control_boundary,
     prepare_phase_end_boundary,
+    prepare_turn_end_control_boundary,
     request_end_rules,
 )
 from warhammer40k_core.engine.boundary_sequencing import boundary_context, start_turn_context
@@ -31,7 +33,6 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_turn_end_sequencing import request_mission_turn_end_rules
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
-    ObjectiveControlRecord,
     ObjectiveControlTiming,
     resolve_objective_control,
 )
@@ -299,6 +300,11 @@ class BattleRoundFlow:
             resolution_order=_END_WINDOW_RESOLUTION_ORDER,
         )
         if _is_end_of_player_turn(state):
+            prepare_turn_end_control_boundary(
+                state=state,
+                decisions=decisions,
+                runtime_modifier_registry=self._runtime_modifier_registry,
+            )
             turn_status = request_end_rules(
                 state=state,
                 decisions=decisions,
@@ -331,7 +337,7 @@ class BattleRoundFlow:
                 completed_phase=current_phase,
                 runtime_modifier_registry=self._runtime_modifier_registry,
             )
-            _emit_objective_control_boundary_event_if_missing(
+            emit_objective_control_boundary(
                 decisions=decisions,
                 record=turn_end_record,
             )
@@ -425,7 +431,7 @@ class BattleRoundFlow:
                 "Battle phase advance produced multiple turn-end objective-control records."
             )
         if turn_end_records:
-            _emit_objective_control_boundary_event_if_missing(
+            emit_objective_control_boundary(
                 decisions=decisions,
                 record=turn_end_records[0],
             )
@@ -533,32 +539,6 @@ def _is_start_of_battle_round(state: GameState) -> bool:
 def _is_end_of_player_turn(state: GameState) -> bool:
     return state.battle_phase_index is not None and state.battle_phase_index + 1 == len(
         state.battle_phase_sequence
-    )
-
-
-def _emit_objective_control_boundary_event_if_missing(
-    *,
-    decisions: DecisionController,
-    record: ObjectiveControlRecord,
-) -> None:
-    if any(
-        event.event_type == "end_boundary_objective_control_determined"
-        and isinstance(event.payload, dict)
-        and event.payload.get("record_ids") == [record.record_id]
-        for event in decisions.event_log.records
-    ):
-        return
-    decisions.event_log.append(
-        "end_boundary_objective_control_determined",
-        {
-            "game_id": record.game_id,
-            "battle_round": record.battle_round,
-            "phase": record.phase,
-            "record_ids": [record.record_id],
-            "source_rule_id": (
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
-            ),
-        },
     )
 
 

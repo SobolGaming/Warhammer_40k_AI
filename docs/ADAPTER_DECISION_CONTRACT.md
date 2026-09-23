@@ -3241,7 +3241,21 @@ Required Phase 17G Cult Ambush tests:
 
 Phase 17G adds opt-in turn-end decisions for faction runtime content and generic catalog IR consumers. These decisions are emitted only when the mustered army's runtime contribution or catalog IR index registers a turn-end hook and the completed phase matches the hook's timing. Current implemented support includes Aeldari Corsair Coterie Webway Pathstone, Chaos Daemons Shadow Legion Fade to Darkness, Genestealer Cults Cult Ambush marker ingress, Grey Knights Gate of Infinity, and catalog IR `catalog-ir:can-be-placed-in-reserves` abilities such as Chaos Daemons Flesh Hounds' Hunters from the Warp at the end of the opponent's turn.
 
-Phase-end objective-control hooks and phase-end cleanup resolve before turn-end faction-rule decisions are emitted. Adapters must therefore treat turn-end repositioning choices as occurring after engine-owned phase-end objective-control state has already been recorded for that phase.
+Phase-end objective-control hooks, phase-end rules and phase-expiring effects
+resolve before the engine determines the distinct turn-end control record.
+Order 79 / P14A records `end_boundary_objective_control_determined` for that
+turn boundary before discovering or executing any turn-end rule, including
+mandatory Aircraft departure and optional repositioning choices. Repeated
+advances and suspended or restored decisions reuse this frozen record. Later
+coherency cleanup and turn-expiring effects cannot recalculate it; control-based
+mission scoring consumes the same retained authority. Restore rejects a turn
+control event before final-phase resolution or after the turn window opens.
+Adapters consume this event through their existing viewer-scoped stream.
+
+This corrects timing under the existing decision, event and persistence shapes;
+no new submission, option family or visibility policy is introduced. Runtime
+identity changes invalidate incompatible old runtime histories under the existing
+build-identity contract; no permissive payload migration is provided.
 
 Phase 17G exposes the finite decision type `select_faction_rule_turn_end_option`. The pending request payload contains game ID, battle round, active player ID, completed phase, source rule ID, and hook ID. Single-target sources include a target unit ID; Grey Knights Gate of Infinity includes `max_units`, `selected_count`, `remaining_units`, selected rules-unit IDs, eligible rules-unit IDs, and eligible component unit IDs by rules unit. Other source-specific payload fields include Webway Pathstone's enhancement ID, Fade to Darkness' enhancement ID and destroyed enemy unit IDs, or catalog IR fields such as catalog record ID, ability ID, ability name, datasheet ID, source kind, and rule IR hash. Adapters answer by selecting one emitted option ID. Current Webway Pathstone options use:
 

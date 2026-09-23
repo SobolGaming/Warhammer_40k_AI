@@ -83,3 +83,10 @@ Order 70 review corrections refresh the head measurements and table for runtime 
 with unchanged baselines, workloads and budgets and no competing workers.
 Current validation is recorded in [Order 70 validation](../order70/validation.json);
 earlier validation records and runtime-specific notes remain historical.
+
+
+Order 79 corrects the shared Aircraft fixture to source-dash Movement and OC.
+Both this original base revision and the current head are remeasured with that
+same corrected fixture and unchanged numeric budgets. The pre-correction samples
+are retained in `../order79/withdrawn-oc4/`; numerical Aircraft control is not a
+supported 11th Edition scenario. See the Order 79 source correction.

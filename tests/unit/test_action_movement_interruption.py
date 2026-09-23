@@ -447,9 +447,9 @@ def completed_secondary_session() -> LocalGameSession:
     ("tamper", "diagnostic"),
     [
         ("missing", "completion boundary lacks one"),
-        ("unknown_record", "completion boundary lacks one"),
-        ("source", "objective boundary event ordering"),
-        ("phase", "objective boundary event ordering"),
+        ("unknown_record", "canonical boundary event does not identify exactly one stored record"),
+        ("source", "canonical boundary event does not identify exactly one stored record"),
+        ("phase", "canonical boundary event does not identify exactly one stored record"),
         ("after_terminal", "objective boundary event ordering"),
     ],
 )
@@ -458,10 +458,17 @@ def test_secondary_completion_requires_authentic_ordered_boundary(
 ) -> None:
     payload = deepcopy(completed_secondary_session.lifecycle.to_payload())
     events = payload["decisions"]["event_log"]
+    turn_record_ids = {
+        row["record_id"]
+        for row in payload["state"]["objective_control_records"]
+        if row["timing"] == "turn_end"
+    }
     boundary = next(
         event
         for event in events
         if event["event_type"] == "end_boundary_objective_control_determined"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("record_ids") == sorted(turn_record_ids)
     )
     boundary_payload = cast(dict[str, JsonValue], boundary["payload"])
     if tamper == "missing":

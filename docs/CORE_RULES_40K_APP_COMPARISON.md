@@ -34,7 +34,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 11 Charge Phase | [11.00](https://www.40k.app/rules/11-charge-phase) | authoritative_app_mirror | owned; see roadmap | P11A, P11B, P15E |
 | 12 Fight Phase | [12.00](https://www.40k.app/rules/12-fight-phase) | authoritative_app_mirror_controls_repository_conflict | owned; see roadmap | P12, P12B |
 | 13 Terrain | [13.00](https://www.40k.app/rules/13-terrain) | authoritative_app_mirror_supersedes_pdf | owned; see roadmap | P13A |
-| 14 Objectives | [14.00](https://www.40k.app/rules/14-objectives) | authoritative_app_mirror | owned; see roadmap | P14 |
+| 14 Objectives | [14.00](https://www.40k.app/rules/14-objectives) | authoritative_app_mirror | owned; see roadmap | P14, P14A |
 | 15 Stratagems | [15.00](https://www.40k.app/rules/15-stratagems) | authoritative_app_internal_numbering_drift | owned; see roadmap | P15D, P15F, P15G, P15A, P15B, P15H, P15I, P15E, P15C |
 | 16 Actions | [16.00](https://www.40k.app/rules/16-actions) | authoritative_app_mirror | owned; see roadmap | P16, P16B |
 | 17 Monsters And Vehicles | [17.00](https://www.40k.app/rules/17-monsters-and-vehicles) | authoritative_app_mirror | owned; see roadmap | P17 |

@@ -1199,7 +1199,9 @@ def test_attached_rules_unit_uses_one_canonical_required_test_and_clear_identity
 
 
 def test_off_battlefield_singleton_resolves_required_command_test_and_restores() -> None:
-    state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
+    state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision(
+        record_boundary=True
+    )
     decisions.queue.remove_by_id(request.request_id)
     prewound = continue_mortal_wound_application(
         state=state,
@@ -1264,6 +1266,10 @@ def test_off_battlefield_singleton_resolves_required_command_test_and_restores()
             result=result,
         )
     )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
+    state.fight_phase_state = None
     state.active_player_id = "player-a"
     state.battle_round = 2
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
@@ -8950,7 +8956,9 @@ def test_authenticated_reposition_preserves_prior_turn_advance_history() -> None
 def test_authenticated_reposition_rejects_cross_turn_disembark_history_and_preserves_effects() -> (
     None
 ):
-    state, decisions, registry, request, unit, transport = _gate_of_infinity_pending_decision()
+    state, decisions, registry, request, unit, transport = _gate_of_infinity_pending_decision(
+        record_boundary=True
+    )
     unit_id = unit.unit_instance_id
     assert "INFANTRY" in unit.keywords
     assert "TRANSPORT" in transport.keywords
@@ -8994,6 +9002,9 @@ def test_authenticated_reposition_rejects_cross_turn_disembark_history_and_prese
             result=result,
         )
     )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
 
     assert (
         state.disembarked_unit_state_for_unit(
@@ -10945,7 +10956,9 @@ def _advanced_unit_state(*, state: GameState, unit_instance_id: str) -> Advanced
     )
 
 
-def _gate_of_infinity_pending_decision() -> tuple[
+def _gate_of_infinity_pending_decision(
+    *, record_boundary: bool = False
+) -> tuple[
     GameState,
     DecisionController,
     TurnEndHookRegistry,
@@ -11032,6 +11045,10 @@ def _gate_of_infinity_pending_decision() -> tuple[
         decisions=decisions,
         config=config,
     )
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    if record_boundary:
+        prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
     registry = TurnEndHookRegistry.from_bindings(
         grey_knights_army_rule.runtime_contribution().turn_end_hook_bindings
     )

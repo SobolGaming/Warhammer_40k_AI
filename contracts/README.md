@@ -2,6 +2,11 @@
 
 Contract version: `34.0.0`
 
+Order 79 / P14A freezes turn-end objective control before turn-end rules and
+cleanup. Existing boundary events, finite choices and retained control records
+cover this correction without a schema change. Runtime identity remains exact;
+old histories are not migrated. See the turn-end section of the adapter contract.
+
 Order 76 / P03D makes physical-proposal prevalidation diagnostics response-only.
 Malformed and stale proposals leave decision/event history unchanged, so replay
 and persistence remain exact. Clients consume the invalid status; no event delta

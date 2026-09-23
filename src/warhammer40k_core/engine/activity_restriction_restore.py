@@ -25,6 +25,7 @@ from warhammer40k_core.engine.model_attack_history import (
 from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
 from warhammer40k_core.engine.objective_control_boundary_history_integrity import (
     completed_phase_objective_control_context,
+    objective_control_record_for_boundary_event,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_identity_ids
@@ -182,6 +183,21 @@ def activity_restrictions_from_history(
                 ),
             )
             _add(live, seen, effect)
+        elif event.event_type == "end_boundary_objective_control_determined":
+            record = objective_control_record_for_boundary_event(
+                event=event, records=tuple(state.objective_control_records)
+            )
+            if record.timing is ObjectiveControlTiming.TURN_END:
+                # The final phase has expired before turn control is captured,
+                # even when turn-end rules suspend before phase advancement.
+                boundary = EffectExpirationBoundary.phase_end(
+                    battle_round=record.battle_round,
+                    player_id=record.active_player_id,
+                    phase=BattlePhase(record.phase),
+                )
+                live = {
+                    key: effect for key, effect in live.items() if not effect.expires_at(boundary)
+                }
         elif event.event_type == "battle_phase_completed":
             round_number, player_id, phase = completed_phase_objective_control_context(
                 state=state, event=event
@@ -190,14 +206,13 @@ def activity_restrictions_from_history(
                 battle_round=round_number, player_id=player_id, phase=BattlePhase(phase)
             )
             live = {key: effect for key, effect in live.items() if not effect.expires_at(boundary)}
-    # Turn-end preparation is itself the engine-owned expiry boundary, before
-    # the next turn is entered. The existing OC authority validates these records.
-    for record in state.objective_control_records:
-        if record.timing is ObjectiveControlTiming.TURN_END:
-            boundary = EffectExpirationBoundary.turn_end(
-                battle_round=record.battle_round, player_id=record.active_player_id
-            )
-            live = {key: effect for key, effect in live.items() if not effect.expires_at(boundary)}
+    # Control determination precedes turn rules; only completed cleanup expires
+    # turn restrictions. Its typed records are also the live owner's once-only gate.
+    for cleanup in state.end_turn_cleanup_states:
+        boundary = EffectExpirationBoundary.turn_end(
+            battle_round=cleanup.battle_round, player_id=cleanup.active_player_id
+        )
+        live = {key: effect for key, effect in live.items() if not effect.expires_at(boundary)}
     return tuple(sorted(live.values(), key=lambda effect: effect.effect_id))
 
 

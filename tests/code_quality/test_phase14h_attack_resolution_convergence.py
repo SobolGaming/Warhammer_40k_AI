@@ -578,8 +578,8 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     assert "apply_reserve_destruction_to_battlefield(" in reserve_source
     assert "PrimaryUnattributedDestructionCause.RESERVE_DEADLINE" in reserve_owner_source
     assert "CoherencyCleanupRemoval(" in cleanup_source
-    assert "self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)" in (
-        reserve_owner_source
+    assert "state.resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)" in source_for(
+        SRC_ROOT / "engine" / "turn_end_boundary.py"
     )
     assert "record_primary_unit_destructions_for_end_turn_cleanup(state=self, cleanup=cleanup)" in (
         reserve_owner_source

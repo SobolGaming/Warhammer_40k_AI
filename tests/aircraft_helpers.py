@@ -5,6 +5,7 @@ from dataclasses import replace
 from tests.phase13b_shooting_declaration_helpers import shooting_lifecycle
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import BattlePhase
 
@@ -19,6 +20,19 @@ def aircraft_session(
         datasheets=tuple(
             replace(
                 sheet,
+                model_profiles=tuple(
+                    replace(
+                        profile,
+                        characteristics=tuple(
+                            CharacteristicValue.source_dash(value.characteristic)
+                            if value.characteristic
+                            in {Characteristic.MOVEMENT, Characteristic.OBJECTIVE_CONTROL}
+                            else value
+                            for value in profile.characteristics
+                        ),
+                    )
+                    for profile in sheet.model_profiles
+                ),
                 keywords=replace(
                     sheet.keywords,
                     keywords=(

@@ -263,24 +263,7 @@ def _validate_objective_control_boundary_event_inventory(
         if event.event_type == _OBJECTIVE_CONTROL_BOUNDARY_EVENT_TYPE
     )
     for event in canonical_events:
-        matching_records = tuple(
-            record
-            for record in records
-            if event.payload
-            == {
-                "game_id": record.game_id,
-                "battle_round": record.battle_round,
-                "phase": record.phase,
-                "record_ids": [record.record_id],
-                "source_rule_id": _OBJECTIVE_CONTROL_BOUNDARY_SOURCE_RULE_ID,
-            }
-        )
-        if len(matching_records) != 1:
-            raise GameLifecycleError(
-                "ObjectiveControlRecord canonical boundary event does not identify exactly "
-                "one stored record."
-            )
-        record = matching_records[0]
+        record = objective_control_record_for_boundary_event(event=event, records=records)
         matching_authorities = tuple(
             authority
             for authority in authorities
@@ -292,6 +275,31 @@ def _validate_objective_control_boundary_event_inventory(
                 "ObjectiveControlRecord canonical boundary event does not identify exactly "
                 "one hash-bound authority."
             )
+
+
+def objective_control_record_for_boundary_event(
+    *, event: EventRecord, records: tuple[ObjectiveControlRecord, ...]
+) -> ObjectiveControlRecord:
+    """Bind a canonical boundary event to its exact retained record and source."""
+    matches = tuple(
+        record
+        for record in records
+        if event.event_type == _OBJECTIVE_CONTROL_BOUNDARY_EVENT_TYPE
+        and event.payload
+        == {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": _OBJECTIVE_CONTROL_BOUNDARY_SOURCE_RULE_ID,
+        }
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "ObjectiveControlRecord canonical boundary event does not identify exactly "
+            "one stored record."
+        )
+    return matches[0]
 
 
 def _validate_phase_end_objective_control_history(
@@ -392,7 +400,7 @@ def _validate_completed_turn_end_objective_control_history(
 ) -> None:
     final_phase = state.battle_phase_sequence[-1].value
     timing_contexts: set[tuple[int, str, str]] = set()
-    for event in event_records:
+    for window_index, event in enumerate(event_records):
         if event.event_type != "timing_window_opened" or not isinstance(event.payload, dict):
             continue
         timing_window = event.payload.get("timing_window")
@@ -426,6 +434,37 @@ def _validate_completed_turn_end_objective_control_history(
                 "ObjectiveControlRecord turn-end timing history duplicates a turn context."
             )
         timing_contexts.add(context)
+        record = _require_objective_control_record_authority_and_event(
+            history_label="turn-end timing history",
+            game_id=state.game_id,
+            battle_round=battle_round,
+            active_player_id=active_player_id,
+            phase=final_phase,
+            timing=ObjectiveControlTiming.TURN_END,
+            event_records=event_records,
+            records=records,
+            authorities=authorities,
+        )
+        boundary_index = _objective_control_boundary_event_index(
+            event_records=event_records, record=record
+        )
+        if boundary_index >= window_index:
+            raise GameLifecycleError(
+                "ObjectiveControlRecord turn-end control must precede boundary rules in order."
+            )
+        phase_resolutions = _canonical_phase_timing_event_matches(
+            event_records=event_records,
+            event_type="timing_window_resolved",
+            trigger_kind="end_phase",
+            game_id=state.game_id,
+            battle_round=battle_round,
+            active_player_id=active_player_id,
+            phase=final_phase,
+        )
+        if len(phase_resolutions) != 1 or phase_resolutions[0] >= boundary_index:
+            raise GameLifecycleError(
+                "ObjectiveControlRecord turn-end control is out of order with final phase rules."
+            )
 
     for battle_round, active_player_id, phase in completed_turn_contexts:
         if (battle_round, active_player_id, phase) not in timing_contexts:

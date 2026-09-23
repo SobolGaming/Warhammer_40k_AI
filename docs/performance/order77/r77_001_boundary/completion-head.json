@@ -1,7 +1,7 @@
 {
   "workload_id": "order77-completed-secondary-restore-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -15,81 +15,81 @@
     "orjson": "3.11.9"
   },
   "timing_boundary": "Authenticated restore of a completed Cleanse at its engine turn-end boundary. Preparation and equality checking excluded; fixture preparation warms process caches. Fifteen repeated restores of the same serialized save in each fresh runtime process.",
-  "preparation_seconds": 2.9859462500025984,
+  "preparation_seconds": 2.930310791998636,
   "samples": [
     {
       "repeat": 0,
-      "seconds": 0.46004237499437295,
+      "seconds": 0.4609116249921499,
       "action_status": "completed"
     },
     {
       "repeat": 1,
-      "seconds": 0.4162904590048129,
+      "seconds": 0.42336654200335033,
       "action_status": "completed"
     },
     {
       "repeat": 2,
-      "seconds": 0.4153392089938279,
+      "seconds": 0.44300387499970384,
       "action_status": "completed"
     },
     {
       "repeat": 3,
-      "seconds": 0.42827716599276755,
+      "seconds": 0.4402171669935342,
       "action_status": "completed"
     },
     {
       "repeat": 4,
-      "seconds": 0.4109185839915881,
+      "seconds": 0.4242401250085095,
       "action_status": "completed"
     },
     {
       "repeat": 5,
-      "seconds": 0.4144306669913931,
+      "seconds": 0.4312762079935055,
       "action_status": "completed"
     },
     {
       "repeat": 6,
-      "seconds": 0.41399737499887124,
+      "seconds": 0.44410700000298675,
       "action_status": "completed"
     },
     {
       "repeat": 7,
-      "seconds": 0.4150706250075018,
+      "seconds": 0.42683620800380595,
       "action_status": "completed"
     },
     {
       "repeat": 8,
-      "seconds": 0.4104962080018595,
+      "seconds": 0.42516724999586586,
       "action_status": "completed"
     },
     {
       "repeat": 9,
-      "seconds": 0.4112745000020368,
+      "seconds": 0.43138249999901745,
       "action_status": "completed"
     },
     {
       "repeat": 10,
-      "seconds": 0.4096917080023559,
+      "seconds": 0.44849075000092853,
       "action_status": "completed"
     },
     {
       "repeat": 11,
-      "seconds": 0.41012583300471306,
+      "seconds": 0.4318231669894885,
       "action_status": "completed"
     },
     {
       "repeat": 12,
-      "seconds": 0.41141629200137686,
+      "seconds": 0.42555608300608583,
       "action_status": "completed"
     },
     {
       "repeat": 13,
-      "seconds": 0.4109726250026142,
+      "seconds": 0.4233302499924321,
       "action_status": "completed"
     },
     {
       "repeat": 14,
-      "seconds": 0.42263312501017936,
+      "seconds": 0.4257413750019623,
       "action_status": "completed"
     }
   ],
@@ -97,9 +97,9 @@
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
     "scripts/measure_order77_completion.py": "4e36af03f283a23d88b9d9f6e7aa140d85f06e22730b4c26631ebcd1ba3193f0",
-    "tests/mission_action_history_helpers.py": "01db7bf5fce93c4a1fbb402d06c7d1fbb3ce46bce4f2f1b2284f0d84473e2bc7",
+    "tests/mission_action_history_helpers.py": "9d2f9b9782bca23464c2f7facb88db06de2a8eb139cc9f38bf49a1b9a16205d6",
     "tests/phase17n_secondary_certification_fixtures.py": "8413b6d67c14b21b8946635f62210971215850a697104dd20047188c7ba7700b",
     "tests/phase17n_step6g_secondary_certification_helpers.py": "e00dd2859b60e08f8a87b37fb9ab3dbdddfa840cf34dfc79bc98d2f4953acaea",
-    "tests/phase17n_primary_mission_helpers.py": "2d6fe56dd059440e3f216a37d4f9930ff74ba32185adfa22a69a2c72855827b5"
+    "tests/phase17n_primary_mission_helpers.py": "59eea3980045729a833b08e6a9273b5129f7a3fef85e65df1b8074a67342bb1d"
   }
 }

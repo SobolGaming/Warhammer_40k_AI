@@ -25,7 +25,6 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.effects import EffectExpirationBoundary
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -50,12 +49,10 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
 )
 from warhammer40k_core.engine.objective_control import (
-    ObjectiveControlContext,
     ObjectiveControlContribution,
     ObjectiveControlRecord,
     ObjectiveControlResult,
     ObjectiveControlTiming,
-    resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
@@ -385,20 +382,9 @@ def phase17n_action_turn_end_record(
     assert state.battlefield_state is not None
     if controlled_target_id != action.target_id:
         raise AssertionError("Primary Action turn-end target drifted.")
-    state.expire_persisting_effects_at_boundary(
-        EffectExpirationBoundary.turn_end(
-            battle_round=state.battle_round, player_id=action.player_id
-        )
+    resolved = state.prepare_current_turn_end_boundary(
+        completed_phase=BattlePhase.FIGHT, runtime_modifier_registry=None
     )
-    resolved = resolve_objective_control(
-        ObjectiveControlContext.from_game_state(
-            state,
-            timing=ObjectiveControlTiming.TURN_END,
-            phase=BattlePhase.FIGHT,
-            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
-        )
-    )
-    state.record_objective_control_record(resolved)
     decisions.event_log.append(
         "end_boundary_objective_control_determined",
         {
@@ -1003,9 +989,8 @@ def phase17n_sensor_turn_end_fixture() -> tuple[GameState, DecisionController, M
 def phase17n_sensor_pending_fixture() -> tuple[GameState, DecisionController, DecisionRequest]:
     state, decisions, action = phase17n_sensor_turn_end_fixture()
     _enter_turn_end(state)
-    record = state.record_objective_control_boundary(
+    record = state.prepare_current_turn_end_boundary(
         completed_phase=BattlePhase.FIGHT,
-        timing=ObjectiveControlTiming.TURN_END,
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     _record_turn_end_objective_boundary(decisions=decisions, record=record)
@@ -1123,11 +1108,6 @@ def phase17n_state_with_setup(
 
 def _enter_turn_end(state: GameState) -> None:
     assert state.active_player_id is not None
-    state.expire_persisting_effects_at_boundary(
-        EffectExpirationBoundary.turn_end(
-            battle_round=state.battle_round, player_id=state.active_player_id
-        )
-    )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     state.replace_shooting_phase_state(None)
 
