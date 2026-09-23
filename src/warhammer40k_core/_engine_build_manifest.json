@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ec8838e24359f11dae55ce932f94c1af38a8c6f217613c782a49f67678a702ae",
-  "fingerprint": "ec8838e24359f11dae55ce932f94c1af38a8c6f217613c782a49f67678a702ae",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
+  "fingerprint": "0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
   "resource_count": 2929,
   "resources": [
     {
@@ -10010,9 +10010,9 @@
       "sha256": "546b87af37cf2ab8707ec2acdfc3e96f84b062fcc73ba046b28e44770c8d49df"
     },
     {
-      "byte_length": 303742,
+      "byte_length": 303699,
       "path": "warhammer40k_core/engine/game_state.py",
-      "sha256": "7d6f8ac2da8e9f92069835941c6b0aa134228413b86000207b9def04bab88d3c"
+      "sha256": "a1a41c5fc169fa8f4e150d325f0aa12b6794e5363c54176530bc248c9631e8a4"
     },
     {
       "byte_length": 11372,
@@ -10650,9 +10650,9 @@
       "sha256": "4054359ab73cecff53fda38771ab34b49ca784a6fe4eac0484d042a9bd579951"
     },
     {
-      "byte_length": 1600,
+      "byte_length": 8934,
       "path": "warhammer40k_core/engine/movement_decision_authority.py",
-      "sha256": "56f395ab000371e8222de7cd3387d0b8fa08f52099dbd12d66cffe5e8a557ca8"
+      "sha256": "fadf5dd610e1a73f05eda093ae858429ff663be1b04494ba9ff3a05d2681ad18"
     },
     {
       "byte_length": 14890,
@@ -10700,9 +10700,9 @@
       "sha256": "27252596ddf9090a4ca9dd5487932acd83de896bda6487f8c06c0b6d5a5602d1"
     },
     {
-      "byte_length": 16711,
+      "byte_length": 18350,
       "path": "warhammer40k_core/engine/normal_move_history.py",
-      "sha256": "cf52df52c335eb408523244e3b995fa6d2cd6f39fb7d85d539c78b16e7caa85c"
+      "sha256": "b0a075244d93ce53a63aec7601d011c6a3c56dd00ec8481a5ca15b6a10b3be97"
     },
     {
       "byte_length": 50207,
@@ -11245,9 +11245,9 @@
       "sha256": "950a13dfeea94e30f8ca1e63d41abde83655b61359adbd01b3ddcb2c549a59a0"
     },
     {
-      "byte_length": 16433,
+      "byte_length": 10471,
       "path": "warhammer40k_core/engine/primary_mission_event_decision_authority.py",
-      "sha256": "6f5fc0971824a47f3104037ed94944776bc7506572b67be8be4c38522b2e0b3d"
+      "sha256": "3ba1db4808588fd941631ea0ee5231cb19e76fbc5dd181ee75ec968e73705d6a"
     },
     {
       "byte_length": 268,

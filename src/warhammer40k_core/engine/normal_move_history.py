@@ -162,7 +162,30 @@ def validate_normal_move_state_consistency(
     expected: list[NormalMoveState] = []
     decisions = {row.result.result_id: row for row in decision_records}
     requests = {row.request.request_id: row.request for row in decision_records}
-    for event in event_records:
+    for event_index, event in enumerate(event_records):
+        if event.event_type == "movement_activation_completed":
+            from warhammer40k_core.engine.movement_decision_authority import (
+                validate_movement_completion_decision_authority,
+            )
+
+            if not isinstance(event.payload, dict) or event.payload.get("game_id") != state.game_id:
+                raise GameLifecycleError("Normal Move completion game authority drifted.")
+            source = decisions.get(_completion_text(event.payload, "result_id"))
+            accepted_action = (
+                source.result.payload.get("movement_phase_action")
+                if source is not None and isinstance(source.result.payload, dict)
+                else None
+            )
+            if (
+                event.payload.get("movement_phase_action") == "normal_move"
+                or accepted_action == "normal_move"
+            ):
+                validate_movement_completion_decision_authority(
+                    event_records=event_records,
+                    decision_records=decision_records,
+                    mutation_index=event_index,
+                    payload=event.payload,
+                )
         _validate_triggered_completion_classification(event, decisions)
         row = normal_move_from_completion(state, event)
         if row is None:
@@ -214,10 +237,7 @@ def validate_normal_move_state_consistency(
             ):
                 raise GameLifecycleError("Normal Move history source descriptor drifted.")
         expected.append(row)
-    if (
-        validate_normal_move_states(expected, player_ids=state.player_ids)
-        != state.normal_move_states
-    ):
+    if validate_normal_move_states(expected, state=state) != state.normal_move_states:
         raise GameLifecycleError("Normal Move history differs from accepted completion evidence.")
 
 
@@ -301,8 +321,10 @@ def record_normal_move_state(state: GameState, row: NormalMoveState) -> None:
         raise GameLifecycleError("NormalMoveState player_id is not in this game.")
     if any(stored.result_id == row.result_id for stored in state.normal_move_states):
         raise GameLifecycleError("NormalMoveState already exists for result_id.")
-    if any(stored.same_phase_key() == row.same_phase_key() for stored in state.normal_move_states):
-        raise GameLifecycleError("NormalMoveState already exists for unit in this phase.")
+    if any(_same_occurrence_lineage(state, stored, row) for stored in state.normal_move_states):
+        raise GameLifecycleError(
+            "Normal Move history already exists for unit in this phase (rules-unit lineage)."
+        )
     state.normal_move_states.append(row)
     state.normal_move_states.sort(key=lambda item: (*item.same_phase_key(), item.result_id))
 
@@ -361,27 +383,26 @@ def _battle_phase_from_token(value: object) -> BattlePhase:
 def validate_normal_move_states(
     values: object,
     *,
-    player_ids: tuple[str, ...],
+    state: GameState,
 ) -> list[NormalMoveState]:
     if not isinstance(values, list):
         raise GameLifecycleError("GameState normal_move_states must be a list.")
     validated: list[NormalMoveState] = []
     seen_result_ids: set[str] = set()
-    seen_same_phase_keys: set[tuple[int, str, BattlePhase, str, str]] = set()
     for value in cast(list[object], values):
         if type(value) is not NormalMoveState:
             raise GameLifecycleError(
                 "GameState normal_move_states must contain NormalMoveState values."
             )
-        if value.player_id not in player_ids or value.turn_player_id not in player_ids:
+        if value.player_id not in state.player_ids or value.turn_player_id not in state.player_ids:
             raise GameLifecycleError("NormalMoveState player_id is not in this game.")
         if value.result_id in seen_result_ids:
             raise GameLifecycleError("GameState normal_move_states must be unique by result.")
         seen_result_ids.add(value.result_id)
-        same_phase_key = value.same_phase_key()
-        if same_phase_key in seen_same_phase_keys:
-            raise GameLifecycleError("GameState normal_move_states must be unique by unit phase.")
-        seen_same_phase_keys.add(same_phase_key)
+        if any(_same_occurrence_lineage(state, previous, value) for previous in validated):
+            raise GameLifecycleError(
+                "Normal Move history must be unique by unit phase and rules-unit lineage."
+            )
         validated.append(value)
     return sorted(
         validated,
@@ -393,4 +414,19 @@ def validate_normal_move_states(
             state.unit_instance_id,
             state.result_id,
         ),
+    )
+
+
+def _same_occurrence_lineage(
+    state: GameState, first: NormalMoveState, second: NormalMoveState
+) -> bool:
+    from warhammer40k_core.engine.rules_units import rules_unit_identities_share_lineage
+
+    return first.same_phase_key()[:4] == second.same_phase_key()[:4] and (
+        first.unit_instance_id == second.unit_instance_id
+        or rules_unit_identities_share_lineage(
+            state=state,
+            first_unit_instance_id=first.unit_instance_id,
+            second_unit_instance_id=second.unit_instance_id,
+        )
     )

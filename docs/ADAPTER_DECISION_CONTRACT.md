@@ -6696,7 +6696,15 @@ Moves share completion recording, querying and restore validation. Triggered
 completion events expose the canonical descriptor `movement_mode` so history
 classification does not infer a Normal Move from a generic displacement kind.
 Accepted decision and completion evidence must agree with saved occurrence
-records; missing or drifted evidence fails restore.
+records; missing or drifted evidence fails restore. Ordinary completions must
+match the accepted action type, selected option payload, unit and turn owner.
+Their `proposal_request_id` identifies the exact accepted Normal Move proposal,
+including after a rejected attempt. Its source request/result IDs, selected source
+option, unit, action, kind and witness must agree; the source action must precede
+the proposal request and the accepted proposal must precede completion. Serialized
+history and live recording reject duplicate occurrences through lineage aliases.
+These checks use the existing Contract 35 fields and add no player choice or
+viewer-visible payload shape.
 
 Existing finite selections and typed movement proposals cover the player choices.
 Both adapters and replay continue through lifecycle submission, with unchanged

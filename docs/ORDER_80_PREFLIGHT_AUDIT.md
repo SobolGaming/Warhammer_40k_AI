@@ -188,3 +188,38 @@ import boundaries, the exact-base contract check, installed-wheel smoke and
 TypeScript generation/unit/conformance programs passed. Prior failed fixture and
 provenance attempts are retained in the validation record. PFINAL and complete-game
 performance certification remain open.
+
+## PR review — accepted ordinary movement authority
+
+Review of commit `41de85f335073870a60bc7b7fb0661324ee0ec18` identified that the
+Normal Move history owner authenticated ordinary occurrence fields without
+authenticating the accepted action and proposal chain. Existing lifecycle checks
+already rejected some coordinated action mutations; direct history validation
+did not. Correctly nested proposal regressions also reproduced full-restore gaps
+for proposal kind, selected source option and completion proposal references.
+
+The existing movement decision authority now owns the common accepted-action and
+proposal checks extracted from physical-history validation. Both Normal Move
+history and physical-history consumers call it. The completion's proposal ID
+selects the exact accepted proposal, whose source IDs, option, unit, action, kind,
+witness and event ordering must agree. Rejected proposal attempts remain valid
+history, and the completed retry restores and replays exactly. Classification is
+checked when either the accepted action or its completion claims a Normal Move,
+so removing the saved Normal Move row cannot hide a changed completion action.
+
+Recording and state restoration use the same occurrence-and-lineage uniqueness
+predicate. Regressions cover attached component aliases and historical split
+successors. The prior mission fixture now includes its existing accepted proposal
+reference and source option explicitly. No new schema or runtime rule is added.
+
+Review follow-up validation is recorded separately in
+[review-validation.json](performance/order80/review-validation.json); the initial
+PR validation above is retained as historical evidence.
+
+Final review-correction validation: **9,086 behavioral tests passed with 85.22%
+coverage; 610 code-quality tests passed**. The complete coverage run produced
+the refreshed eight-shard profile. Lint, formatting, both type checkers, import
+boundaries, exact-base contract validation, installed-wheel smoke and all 342
+TypeScript conformance assertions passed. The ordinary-restore matched pair,
+original occurrence pair and 16 inherited head reports pass unchanged numeric
+budgets. Complete-game performance and Order 81 / PFINAL remain uncertified.

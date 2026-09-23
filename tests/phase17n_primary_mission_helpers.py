@@ -482,7 +482,7 @@ def append_authenticated_normal_move(
         source_decision_result_id=action_result.result_id,
         spatial_context_hash="0" * 64,
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
-        context={"movement_mode": "normal"},
+        context={"movement_mode": "normal", "source_selected_option_id": "normal_move"},
     )
     proposal_decision_request = proposal_request.to_decision_request()
     decisions.request_decision(proposal_decision_request)
@@ -538,6 +538,7 @@ def append_authenticated_normal_move(
             "unit_instance_id": unit_instance_id,
             "request_id": action_request.request_id,
             "result_id": action_result.result_id,
+            "proposal_request_id": proposal_request.request_id,
             "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
             "movement_mode": "normal",
             "witness": validate_json_value(witness.to_payload()),

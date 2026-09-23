@@ -14,8 +14,8 @@ extended with explicit deployment history before this matched pair was measured.
 
 | Case | Base mean / maximum | Head mean / maximum |
 | --- | --- | --- |
-| Finite reaction | 2.090 / 2.100 s | 2.083 / 2.102 s |
-| Parameterized reaction | 2.006 / 2.021 s | 2.026 / 2.039 s |
+| Finite reaction | 2.100 / 2.117 s | 2.098 / 2.113 s |
+| Parameterized reaction | 2.017 / 2.025 s | 2.026 / 2.033 s |
 
 The versioned budget permits a head mean at most 1.25 times base plus 100 ms,
 and no head sample above 12 seconds. All samples completed and passed. The
@@ -48,3 +48,25 @@ Complete games attempted/completed: **0/0**. These are component and bounded
 gameplay measurements. The standing complete-game mean below 60 seconds and
 observed maximum at most 300 seconds remain uncertified. This prerequisite does
 not provide PFINAL's 25-category compliance certificate.
+
+
+## PR review: ordinary accepted-move restore authority
+
+The review workload compares published PR commit
+`41de85f335073870a60bc7b7fb0661324ee0ec18` with the repaired runtime using the
+same harness, fixture bytes, host and serial sampling. It times accepted ordinary
+Normal Move selection/proposal plus checkpoint export/restore after the prepared
+opponent reaction and turn boundary. Both runtimes accept the same legal move;
+the restore-tamper tests separately prove the authority repair.
+
+| Case | Published PR mean / maximum | Repaired mean / maximum |
+| --- | --- | --- |
+| Standalone | 1.971 / 1.989 s | 1.996 / 2.007 s |
+| Attached | 2.038 / 2.048 s | 2.038 / 2.042 s |
+
+`review-base.json` and `review-head.json` each retain three samples per case.
+They use the unchanged Order 80 mean ratio/additive and 12-second sample limits.
+The existing original-base occurrence pair and all 16 inherited current-runtime
+head reports are refreshed as well; no numeric budget is increased. Reproduce
+this additional pair with `scripts/measure_order80.py --ordinary-restore` and
+the corresponding `--runtime-src`, `--revision`, and `--output` values.

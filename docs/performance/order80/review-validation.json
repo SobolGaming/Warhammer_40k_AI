@@ -1,0 +1,411 @@
+{
+  "scope": "Order 80 / P09C PR #500 review: accepted ordinary movement provenance and occurrence lineage uniqueness",
+  "reviewed_base": "dc01911f57024ae69b565a0e965db65abf5fbdbe",
+  "reviewed_pr_commit": "41de85f335073870a60bc7b7fb0661324ee0ec18",
+  "approval": "User approved fixing identified gaps and supplied the PR #500 ordinary-move restore review.",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
+  "recorded_at": "2026-09-23T23:36:47.386585+00:00",
+  "scope_audit": {
+    "owner": "Existing movement_decision_authority shared by Normal Move history and physical mutation history",
+    "invariants": [
+      "Ordinary Normal Move completions authenticate the accepted finite action and exact accepted proposal chain.",
+      "Normal Move history is unique within a turn occurrence across exact and lineage-equivalent rules-unit identities."
+    ],
+    "new_named_handlers": 0,
+    "new_runtime_modules": 0,
+    "source_package_bytes_unchanged": true,
+    "external_contract_major": 35,
+    "schema_shape_changed_in_review_fix": false,
+    "adapter_contract_documented": true
+  },
+  "red_regression": {
+    "runtime_commit": "41de85f335073870a60bc7b7fb0661324ee0ec18",
+    "failed": 19,
+    "passed": 12,
+    "deselected": 25,
+    "log_path": "/tmp/order80-review-confirmed-red.log",
+    "log_sha256": "1f96c9007bbb503e73b376a58ba605571f0b4b0621f2cf8db1d64328041edcbc",
+    "interpretation": "Direct Normal Move history accepted action/proposal drift; full lifecycle restore accepted wrong proposal kind, selected source option and missing/wrong completion proposal references. Existing full lifecycle checks already rejected broken proposal source IDs. State restoration accepted duplicate split-lineage history.",
+    "discarded_exploratory_fixture": "An earlier test draft edited the outer proposal envelope. Regressions were corrected to edit the nested proposal_request and rerun against the isolated published runtime before reporting this evidence."
+  },
+  "focused_validation": [
+    {
+      "passed": 67,
+      "deselected": 2,
+      "scope": "65 Order 80 behavioral cases and two shared-owner static checks",
+      "log_sha256": "ce213b1baf89f24b3c6a987705e48e9956506727d1ad63a222aa2bd910eb22f1"
+    },
+    {
+      "passed": 413,
+      "scope": "Historical movement consumers, checkpoints, primary mission history/conditions, lifecycle and GSC consumers",
+      "log_sha256": "9ebc92720956eb3f1d3a936c187b91d3dede93d93ebb6fda46eb819204fcaacf"
+    },
+    {
+      "passed": 13,
+      "scope": "Order 80 authority/performance and inherited fixture guards",
+      "log_sha256": "94688d1e0bf7790672b51ca6b43871563880c58693db59e6b8bbd6bf83137812"
+    }
+  ],
+  "final_validation_status": "passed",
+  "behavioral_suite": {
+    "tests": 9086,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "distribution": "xdist worksteal, 18 workers",
+    "junit_sha256": "e4a34231d9779134132222421f378e68244b85eb3b3801f06596f86be21dc0a6",
+    "coverage_percent": 85.22,
+    "required_coverage_percent": 85,
+    "warnings": 8,
+    "warning_note": "SQLite unclosed-database ResourceWarnings were also present in the original published-runtime validation. The final suite exited successfully; warning output remains in the hashed log."
+  },
+  "code_quality_suite": {
+    "tests": 610,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "distribution": "xdist worksteal, 18 workers",
+    "junit_sha256": "67e67a7e5f2b4f320ee8a5ff9ca9cae536b3b7a3e3f84fb9b01373ab634b2d5c",
+    "coverage": false
+  },
+  "final_gates": [
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.11556387499149423,
+      "log_path": "/tmp/order80-review-final-ruff.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.04451337500358932,
+      "log_path": "/tmp/order80-review-final-format.log",
+      "log_sha256": "4c86b44257eedd506c4a80fd5c876482edadd97775eec252e06e41d4bb1ee6b4"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5248889159993269,
+      "log_path": "/tmp/order80-review-final-mypy.log",
+      "log_sha256": "fe013aa3913d2705a05e3a09b28e2d6f13b2b84bd1fd2ece619ad84af4f9b5fe"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "seconds": 35.11093587501091,
+      "log_path": "/tmp/order80-review-final-pyright.log",
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3265787919954164,
+      "log_path": "/tmp/order80-review-final-imports.log",
+      "log_sha256": "7a3ecc61239ac416cd0aa195cdbe724920d4490caf90125f674562e78a845b49"
+    },
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order80-review-behavior.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 676.252681041995,
+      "log_path": "/tmp/order80-review-final-behavior.log",
+      "log_sha256": "6d3b66317960285c022f5c35f8a3c78c2a06070bd8c71ef68882e2401dc07fe0"
+    },
+    {
+      "name": "shard_generation",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "/tmp/order80-review-behavior.xml",
+        "--profile-source",
+        "Order 80 PR 500 review correction final complete coverage suite; reviewed base dc01911f57024ae69b565a0e965db65abf5fbdbe; runtime 0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1; macOS 26.7 Apple M5 Pro 18 xdist workers",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11789275000046473,
+      "log_path": "/tmp/order80-review-final-shard_generation.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shard_check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.04599975000019185,
+      "log_path": "/tmp/order80-review-final-shard_check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order80-review-quality.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 105.89908354199724,
+      "log_path": "/tmp/order80-review-final-quality.log",
+      "log_sha256": "33ecd232777793ceda9c7fceabaf870835e18ea60720006c24b9538cd2cef16b"
+    }
+  ],
+  "publication_checks": [
+    {
+      "name": "identity",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+      "exit_code": 0,
+      "seconds": 0.3212682500015944,
+      "log_path": "/tmp/order80-review-extra-identity.log",
+      "log_sha256": "18b5c3dfeb211e7ef25427c4c0450aa143cbdc015654a4c1dbcd52d7e9847555"
+    },
+    {
+      "name": "contract",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "dc01911f57024ae69b565a0e965db65abf5fbdbe"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+      "exit_code": 0,
+      "seconds": 63.742893041009665,
+      "log_path": "/tmp/order80-review-extra-contract.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+      "exit_code": 0,
+      "seconds": 12.379471125008422,
+      "log_path": "/tmp/order80-review-extra-wheel.log",
+      "log_sha256": "fc045babb073959c2498d222f8751f9c515b313884bb7670e70344f3f5731e49"
+    },
+    {
+      "name": "typescript_generated",
+      "command": [
+        "node",
+        "scripts/check-generated.mjs"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.9855212919937912,
+      "log_path": "/tmp/order80-review-extra-typescript_generated.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typescript_typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.6426410830026725,
+      "log_path": "/tmp/order80-review-extra-typescript_typecheck.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typescript_unit",
+      "command": [
+        "node",
+        "node_modules/tsx/dist/cli.mjs",
+        "--test",
+        "src/battlefield-conformance.test.ts",
+        "src/canonical-json.test.ts",
+        "src/interaction-conformance.test.ts"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.8458858330122894,
+      "log_path": "/tmp/order80-review-extra-typescript_unit.log",
+      "log_sha256": "f815dcdee200d4b3e8681e6b99d9173d71d086a902c836e396ca3ad5cf474389"
+    },
+    {
+      "name": "typescript_conformance",
+      "command": [
+        "node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/main.ts"
+      ],
+      "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/conformance/typescript",
+      "exit_code": 0,
+      "seconds": 100.19346162499278,
+      "log_path": "/tmp/order80-review-extra-typescript_conformance.log",
+      "log_sha256": "fb480c78da51e10c87dc32c1960b65c0a31c0ab23d478057c8e1287e7d39627e"
+    },
+    {
+      "name": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/order80-review-precommit.log",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "name": "publication_shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/order80-review-publication-shards.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "publication_identity",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/order80-review-publication-identity.log",
+      "log_sha256": "18b5c3dfeb211e7ef25427c4c0450aa143cbdc015654a4c1dbcd52d7e9847555"
+    }
+  ],
+  "typescript_environment": "Bundled Node runtime and installed dependencies; npm executable unavailable, equivalent package-script programs executed directly.",
+  "performance": {
+    "ordinary_restore_base": "41de85f335073870a60bc7b7fb0661324ee0ec18",
+    "ordinary_restore_matched_samples": 12,
+    "ordinary_restore_cases": [
+      "standalone",
+      "attached"
+    ],
+    "occurrence_matched_samples": 12,
+    "inherited_head_reports_refreshed": 16,
+    "numeric_budgets_unchanged": true,
+    "sampling": "Serial, without coverage or competing build/test workers, before final aggregate gates"
+  },
+  "full_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "certified": false
+  },
+  "pfinal_order": 81,
+  "caudit_01_closed": false,
+  "historical_validation": "validation.json records the original published PR runtime; this file supersedes its final gate and performance hashes for the review correction.",
+  "evidence_sha256": {
+    "docs/performance/order80/base.json": "556741d70c8e9ba41337a0f722f29d429eeb14e5c33bcf090368d71b6f888d7d",
+    "docs/performance/order80/head.json": "798c48bc7a9ed273568a691b509dac9067490ed549fb1024141f3136b545a02c",
+    "docs/performance/order80/review-base.json": "9538f70b9ba0a60da6aa2c80359e43b107c89f0935dc6c50668e1b4c395a42e1",
+    "docs/performance/order80/review-head.json": "b9f828a78fd52224879d35d2fe4489b81b1856c754dfb7f73e13196b3952b713",
+    "docs/performance/order80/budgets.json": "03ea7df6f3b184194c7fdcff17723a1786e23d30d6447a130810c6741b4d87a0",
+    "docs/performance/order80/inherited-fixture-migration.json": "aef56347f5d87060411c1c8330eea40691ff55ac3dc01018c7a4f075adacb1ee",
+    "docs/performance/order64/head-reconstruction.json": "19b25772413abeb1068cd3e26cee3065c7b92914138c7cbd0285f2b1d9653f02",
+    "docs/performance/order65/head.json": "8c72c4a57de2a193a97930d3cbbbc282181ca5eb9b0d81d02e8f54139c66fc82",
+    "docs/performance/order66/head.json": "bd40baee2f3ed40408458e7f9509e7a73d436da01841e7c31d033f5d8247968d",
+    "docs/performance/order69/head.json": "79417e9b6725204439671281a2b5e62f944d8970be00fc8cd1191834b658c7c5",
+    "docs/performance/order70/head.json": "8dc1aefea15acaae3e5b9072bd6f21f5ced7a72e69239054e89710cf508a40ae",
+    "docs/performance/order71/head.json": "0247cff8b1084ea6dfa30bcc078c378096234655b6a0970c67d222b5bd78893f",
+    "docs/performance/order72/head.json": "fb1fcdb694cf00ff8e0bd6bebb8f9d92f00d87ec67e1a97373f757293b94f2c6",
+    "docs/performance/order73/r73_001/head.json": "1729114b0ed358f8f406f533e4a9a7f8aaa5e90189f98a6a9ce13b57f36d46d0",
+    "docs/performance/order73/r73_001/geometry-head.json": "c034127a044eb168cca4731b159554eedf43e6152b932884d3d6f7000112bb0b",
+    "docs/performance/order74/head.json": "20c925f3ecad8b773504a3088e28a785f5f160c76491556db3008188231d8c7b",
+    "docs/performance/order75/head.json": "63385cbbfa29e4607223fca29a0771ad2e46904d9803a47990a8692a568e3f43",
+    "docs/performance/order76/head.json": "056aec93eb7db91ba3b95f56b297c0cfee22555d420ecf9ee9025ebf9090802a",
+    "docs/performance/order77/head.json": "67dca6f85f60f2251e4d6935aceaa059aac520ea5b29fb0653847ff5dbd1e6d5",
+    "docs/performance/order77/r77_001_boundary/completion-head.json": "a938b9d2362d124fadd3e4cf1138667f4a4482df4e80e03496828f4827a7f756",
+    "docs/performance/order78/head.json": "a2460fbe99a18e6564a77d2feb5febab1e313c5d6f88f5be3c30b28b7ba2b1b4",
+    "docs/performance/order79/head.json": "b46f26ca19a045d65854c60252dad6b78f1d0121678603ab42d1cf03e1018cf9",
+    "ci/test_shards/durations.json": "c64ffa1a47d8d8be837d645a8b19cfb4a249f66be1e30704f21c61fff670ce8b"
+  }
+}

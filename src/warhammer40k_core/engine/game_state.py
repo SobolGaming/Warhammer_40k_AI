@@ -1475,7 +1475,7 @@ class GameState:
         validate_phase_movement_state(self)
         self.normal_move_states = _validate_normal_move_states(
             self.normal_move_states,
-            player_ids=self.player_ids,
+            state=self,
         )
         self.battle_shocked_unit_ids = list(
             _validate_identifier_tuple(
@@ -6264,12 +6264,10 @@ def _validate_fell_back_unit_states(
     )
 
 
-def _validate_normal_move_states(
-    values: object, *, player_ids: tuple[str, ...]
-) -> list[NormalMoveState]:
+def _validate_normal_move_states(values: object, *, state: GameState) -> list[NormalMoveState]:
     from warhammer40k_core.engine.normal_move_history import validate_normal_move_states
 
-    return validate_normal_move_states(values, player_ids=player_ids)
+    return validate_normal_move_states(values, state=state)
 
 
 def _validate_battle_shocked_unit_states(

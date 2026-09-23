@@ -19,6 +19,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--revision", required=True)
     parser.add_argument("--runtime-src", type=Path, default=Path("src"))
+    parser.add_argument("--ordinary-restore", action="store_true")
     args = parser.parse_args()
     _select_runtime_src(args.runtime_src)
     helper = importlib.import_module("tests.normal_move_occurrence_helpers")
@@ -30,10 +31,26 @@ def main() -> None:
         samples = []
         available = []
         for _ in range(3):
-            session, unit_id = helper.reaction_session(parameterized=parameterized)
-            started = time.perf_counter()
-            status = helper.accept_reaction(session, parameterized=parameterized)
-            request = helper.next_player_action(session, status, unit_id)
+            session, unit_id = helper.reaction_session(
+                parameterized=True if args.ordinary_restore else parameterized,
+                attached=parameterized if args.ordinary_restore else False,
+            )
+            if args.ordinary_restore:
+                status = helper.accept_reaction(session, parameterized=True)
+                request = helper.next_player_action(session, status, unit_id)
+                started = time.perf_counter()
+                proposal_status = session.submit_option(
+                    request_id=request.request_id,
+                    option_id="normal_move",
+                    result_id="measured-normal",
+                )
+                helper.submit_path(
+                    session, helper.request_from(proposal_status), result_id="measured-normal-path"
+                )
+            else:
+                started = time.perf_counter()
+                status = helper.accept_reaction(session, parameterized=parameterized)
+                request = helper.next_player_action(session, status, unit_id)
             checkpoint = session.to_persistence_payload()
             restored = session_type.from_persistence_payload(checkpoint)
             assert restored.to_persistence_payload() == checkpoint
@@ -41,7 +58,11 @@ def main() -> None:
             available.append("normal_move" in {o.option_id for o in request.options})
         rows.append(
             {
-                "case": "parameterized" if parameterized else "finite",
+                "case": (
+                    ("attached" if parameterized else "standalone")
+                    if args.ordinary_restore
+                    else ("parameterized" if parameterized else "finite")
+                ),
                 "samples_seconds": samples,
                 "mean_seconds": statistics.mean(samples),
                 "maximum_seconds": max(samples),
@@ -51,7 +72,11 @@ def main() -> None:
         )
     cpu, memory = _host_inventory()
     report = {
-        "workload": "order80-normal-move-occurrence-v1",
+        "workload": (
+            "order80-ordinary-move-authority-v1"
+            if args.ordinary_restore
+            else "order80-normal-move-occurrence-v1"
+        ),
         "revision": args.revision,
         "runtime_build_id": importlib.import_module(
             "warhammer40k_core.build_identity"
@@ -63,7 +88,11 @@ def main() -> None:
         "host_role": "provisional",
         "concurrency": 1,
         "timing_boundary": (
-            "Accepted reactive move through next player Movement action enumeration, session "
+            "Accepted ordinary Normal Move selection/proposal, checkpoint export and restore; "
+            "initial scene/reaction/turn preparation excluded; "
+            "three serial samples without coverage"
+            if args.ordinary_restore
+            else "Accepted reactive move through next player Movement action enumeration, session "
             "checkpoint export and restore; initial scene/permission preparation excluded; "
             "three serial samples without coverage"
         ),
@@ -79,7 +108,10 @@ def main() -> None:
         "rows": rows,
         "full_game_certified": False,
         "semantic_note": (
-            "Base wrongly omits Normal Move; timing compares the same submitted decisions "
+            "Base is published PR #500. Same accepted ordinary move and checkpoint work; "
+            "review regressions separately verify rejected forged histories."
+            if args.ordinary_restore
+            else "Base wrongly omits Normal Move; timing compares the same submitted decisions "
             "and checkpoint work, not semantic equivalence"
         ),
     }

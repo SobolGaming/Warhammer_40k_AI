@@ -78,3 +78,61 @@ def test_order80_matched_occurrence_performance() -> None:
         )
         assert after["maximum_seconds"] <= budget["maximum_seconds"]
     assert not head["full_game_certified"]
+
+
+def test_normal_move_restore_uses_shared_action_and_lineage_authorities() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    for filename in ("normal_move_history.py", "primary_mission_event_decision_authority.py"):
+        tree = ast.parse((engine / filename).read_text())
+        assert any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "validate_movement_completion_decision_authority"
+            for node in ast.walk(tree)
+        ), filename
+    tree = ast.parse((engine / "normal_move_history.py").read_text())
+    functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+    for name in ("record_normal_move_state", "validate_normal_move_states"):
+        assert any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_same_occurrence_lineage"
+            for node in ast.walk(functions[name])
+        ), name
+
+
+def test_order80_ordinary_restore_matched_performance() -> None:
+    folder = ROOT / "docs/performance/order80"
+    base, head = (
+        json.loads((folder / name).read_bytes())
+        for name in ("review-base.json", "review-head.json")
+    )
+    budgets = json.loads((folder / "budgets.json").read_bytes())
+    assert base["revision"] == "41de85f335073870a60bc7b7fb0661324ee0ec18"
+    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    for key in (
+        "workload",
+        "platform",
+        "python",
+        "cpu",
+        "memory_bytes",
+        "concurrency",
+        "hashes",
+        "timing_boundary",
+    ):
+        assert base[key] == head[key], key
+    assert head["workload"] == "order80-ordinary-move-authority-v1"
+    for path, digest in head["hashes"].items():
+        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
+    assert [row["case"] for row in head["rows"]] == ["standalone", "attached"]
+    for before, after in zip(base["rows"], head["rows"], strict=True):
+        assert before["complete"]
+        assert after["complete"]
+        assert len(before["samples_seconds"]) == len(after["samples_seconds"]) == 3
+        assert before["normal_move_available"] == after["normal_move_available"] == [True] * 3
+        assert (
+            after["mean_seconds"]
+            <= before["mean_seconds"] * budgets["mean_ratio"] + budgets["mean_additive_seconds"]
+        )
+        assert after["maximum_seconds"] <= budgets["maximum_seconds"]
+    assert not head["full_game_certified"]
