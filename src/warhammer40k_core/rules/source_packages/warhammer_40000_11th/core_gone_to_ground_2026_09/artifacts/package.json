@@ -1,0 +1,79 @@
+{
+  "artifact_schema": "core-v2-core-gone-to-ground-source-v1",
+  "source_package_id": "gw-11e-core-gone-to-ground",
+  "source_version": "maintained-app-mirrors-observed-2026-09-23",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-gone-to-ground:gone-to-ground",
+      "section_id": "13.11.01",
+      "source_text": "Hidden models that are concealed by dense terrain features gain an extra benefit while they have gone to ground. A model has gone to ground while all of the following apply: That model is hidden. That model is not fully visible to the attacking model due to one or more intervening dense terrain features. That model’s unit did not make one or more ranged attacks during this turn or during the previous turn. While a model has gone to ground, subtract 3\" from that model’s detection range. Designer’s Note: Units that made ranged attacks in the current or previous turn cannot go to ground, regardless of any abilities that allow them to shoot and remain hidden.",
+      "transcription_sha256": "97063c88c0146126f288170f1cd6fc4f6ecc291c8f4b33bb6075f209716a2c8c",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hidden_detection:hidden_detection_eligible_target_model_ids"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-gone-to-ground:gone-to-ground",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "97063c88c0146126f288170f1cd6fc4f6ecc291c8f4b33bb6075f209716a2c8c",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "26bbd97670a7ec3930c6887113789faf14bf09afe80fd110823e64a80d3e9f2f",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hidden_detection:hidden_detection_eligible_target_model_ids"
+      ],
+      "evidence_id": "core-gone-to-ground-review:gone-to-ground",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P13A 13.11.01 gone-to-ground",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-gone-to-ground:gone-to-ground",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "97063c88c0146126f288170f1cd6fc4f6ecc291c8f4b33bb6075f209716a2c8c",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "21f3880ee9573d9ce8fa25c715b0f60e13152b42bdfad5cae224a505b14b32f8",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.hidden_detection:hidden_detection_eligible_target_model_ids"
+      ],
+      "evidence_id": "core-gone-to-ground-mirror:gone-to-ground:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-gone-to-ground-maintained-app-mirrors-2026-09-23",
+      "review_audit_row_id": "gone-to-ground:40k-app",
+      "review_audit_source_observation_sha256": "f9e008887a8bb38842033b62d64ecc769553ac52370ae4c39384ccb9f3d21b0b",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 13.11.01 gone-to-ground",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/13-terrain",
+      "observed_at": "2026-09-23T14:19:29.200772+00:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "5356414cc3e9bc3fc84e516df272f08d51967503064e1d629992fab566ad6fcf"
+}

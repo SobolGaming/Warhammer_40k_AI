@@ -1,0 +1,177 @@
+{
+  "scope": "Order 78 / P13A / C13-01 Gone to Ground",
+  "approval": "Owner approved scoped prerequisite on 2026-09-23",
+  "baseline": "f14e288cf9be9830161aa4c71e5d24d64903197e",
+  "branch": "codex/order78-gone-to-ground",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f72d803c4b49b717763a6c9e8b7145bc1885b8f1a699869d0e5208fe41981922",
+  "final_validation_status": "passed",
+  "pfinal_order": 79,
+  "pfinal_certified": false,
+  "full_game_certified": false,
+  "scope_audit": "Two existing engine modules restore model-specific dense-feature concealment without occupancy; existing Hidden/history/visibility owners retained. Eager source package and registered exact observation. No geometry algorithm, named handler, new decision or schema changes.",
+  "red_regression": {
+    "report": "reports/order78/red.xml",
+    "failures": 3,
+    "passed": 4,
+    "sha256": "aa92cb54735e54f896c616a403c9d95ae5349c16692a9fbd99d21a572eed9913"
+  },
+  "focused_validation": {
+    "passed": 37,
+    "additional_cache_bonus_cases_passed": 4,
+    "source_and_roadmap_checks_passed": 8,
+    "registered_inventory_test_passed": 1
+  },
+  "performance": {
+    "own_matched_cases": 6,
+    "serial_samples_per_case": 7,
+    "query_pairs_per_sample": 10,
+    "inherited_head_reports_refreshed": 14,
+    "original_inherited_bases_and_budgets_retained": true,
+    "completed_games": 0,
+    "attempted_games": 0,
+    "final_measurements_without_competing_test_or_build_workers": true
+  },
+  "source_hashes": {
+    "docs/performance/order78/preflight.json": "35b48256f6fb383908fff7ceeb48f2d4cf6d2d5a7058018861fd3d78c2d686fa",
+    "data/source_audits/maintained_app_mirrors/gone_to_ground_2026_09_23.audit.json": "236503763385983f9eadf0535af841f6bb163ac501307551e711bd83063101c8",
+    "data/source_audits/order78-runtime-consumer-proof-v1.json": "c597641109e87ab27b5eda002babc382a2ea51fb19bcc9438542f7b9d625b178",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_gone_to_ground_2026_09/artifacts/package.json": "a13477e1e963431b97ffc50cae34a777a9b82401e10d8a37c3aaed793565a5cd"
+  },
+  "environment_adjustments": [
+    "UV_CACHE_DIR uses a task-local temporary cache.",
+    "Coverage data stored outside macOS Documents.",
+    "System TLS certificates enabled for the isolated wheel build after an UnknownIssuer dependency-download failure; verification remains enabled.",
+    "Bundled Node 24 with the existing pyright nodeenv npm executable runs exact client scripts. A pnpm attempt required dependency migration; npm ci restored package-lock dependencies and the generated pnpm files were removed."
+  ],
+  "production_changes_after_aggregate_validation_began": false,
+  "gates": {
+    "ruff": {
+      "command": "uv run ruff check .",
+      "status": "passed",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "format": {
+      "command": "uv run ruff format --check .",
+      "status": "passed",
+      "log_sha256": "10bc9f76a5b969cb532f065c5d34659885ed8e5a2653facd612c070aaefa01ea"
+    },
+    "mypy": {
+      "command": "uv run mypy src tests",
+      "status": "passed",
+      "log_sha256": "cf6d30f8f116676acc1889fefcf024a0952f459aa4d8256b2b57ccf9e652e652"
+    },
+    "pyright": {
+      "command": "uv run pyright",
+      "status": "passed",
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    "imports": {
+      "command": "uv run lint-imports",
+      "status": "passed",
+      "log_sha256": "2d57d105b1d17b8cd7569f1be2b8392f6430b71de9ba9d6044dd0159098fb891"
+    },
+    "engine_identity": {
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "status": "passed",
+      "log_sha256": "c853f277595c6ed343eb65dfe7fa1773ad7fb9010d0aa96c24912533f25332eb"
+    },
+    "contract_exact_base": {
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref f14e288cf9be9830161aa4c71e5d24d64903197e",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "installed_wheel": {
+      "command": "UV_SYSTEM_CERTS=true uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "status": "passed",
+      "log_sha256": "0c96edd85ffd36ff2a82a28fea51614da9c09be1d23ec52eb0f2dc0d61de70ea"
+    },
+    "typescript": {
+      "command": "npm ci; npm test (check:generated, typecheck, test:unit, conformance)",
+      "status": "passed",
+      "unit_tests_passed": 5,
+      "scenario": "phase18m-a-certified-setup",
+      "log_sha256": "087ed187a349ca95a7f9c2876275b98f80ebc15de800cad2fed31d14ee126d48"
+    },
+    "shards": {
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "status": "passed",
+      "profile": "complete local 8994-test successful coverage run; macOS; 18 worksteal workers"
+    },
+    "pre_commit": {
+      "command": "uv run pre-commit run --all-files",
+      "status": "passed",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    "generated_sources": {
+      "commands": [
+        "uv run --no-sync python tools/build_core_gone_to_ground_source.py --check",
+        "uv run --no-sync python tools/core_rules_40k_app_audit.py --check",
+        "uv run --no-sync python tools/core_rules_maintained_mirror_audit.py --check"
+      ],
+      "status": "passed"
+    },
+    "diff_check": {
+      "command": "git diff --check; git diff --cached --check",
+      "status": "passed"
+    }
+  },
+  "aggregate_attempts": [
+    {
+      "attempt": 1,
+      "passed": 8993,
+      "failed": 1,
+      "coverage_percent": 85.2,
+      "seconds": 731.89,
+      "failure": "test_source_authority_registry_is_pinned_typed_and_tamper_evident expected 48 packages after the reviewed source made 49",
+      "correction": "Updated both behavioral and static registered-package inventories to 49; hash, immutable legacy observations and tamper checks remain unchanged. The failing focused test passes. No runtime changes.",
+      "junit_sha256": "adebf6bc6e1353c1c9b4ba682875ca7423e72d888cda0f5f44aba32ce3fbf291",
+      "log_sha256": "4dec613584afefc6bae506d663be29aac976a847fbe823e4271cc031775dc267"
+    }
+  ],
+  "behavioral_suite": {
+    "passed": 8994,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 748.007,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage_percent": 85.2,
+    "coverage_threshold_percent": 85,
+    "aggregate_attempts": 2,
+    "successful_coverage_runs": 1,
+    "without_coverage_repeat": false,
+    "junit_sha256": "2c4453fcdf321f7e2346e6365005818950607f84fdccfb1aebed3340d654131d",
+    "log_sha256": "eb0a20bf1f0f3d40670b7d9a50732112e36436457b938fd8667d3ec3c4ce9bfa",
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/order78/behavioral.xml"
+  },
+  "code_quality_attempts": [
+    {
+      "attempt": 1,
+      "passed": 595,
+      "failed": 7,
+      "failures": [
+        "Six checks require refreshed Order 77 head runtime identities (two additional benchmark reports).",
+        "The new reviewed source package requires an entry in the explicit package classification inventory."
+      ],
+      "junit_sha256": "08796393b4c8bf67b09e5d82f793ea0997d633949b6060ef55bc80f68d011b6d",
+      "log_sha256": "6401f0f061726bb1c866666f8e803ffb3d260ce8d72421e415edd6177714272d"
+    }
+  ],
+  "code_quality_suite": {
+    "passed": 602,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 115.635,
+    "coverage": false,
+    "workers": 18,
+    "distribution": "worksteal",
+    "aggregate_attempts": 2,
+    "successful_runs": 1,
+    "junit_sha256": "bc5a8bb626f9818ac0e73ff78be5f7cae5eb53e509cba69b18df37a2d5157064",
+    "log_sha256": "2222177abf2991486a49f4ffadb3148d1e42a0c206d04efbc7b2ba469d841290",
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/order78/code-quality.xml"
+  },
+  "updated_at": "2026-09-23T15:24:10.075785+00:00"
+}

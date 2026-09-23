@@ -1,0 +1,60 @@
+{
+  "artifact_schema": "order78-runtime-consumer-proof-v1",
+  "source_id": "gw-11e-core-gone-to-ground:gone-to-ground",
+  "scope": "Core 13.11.01; source-granted Hidden fixture does not certify a faction ability; not PFINAL",
+  "runtime_consumer_ids": [
+    "warhammer40k_core.engine.hidden_detection:hidden_detection_eligible_target_model_ids",
+    "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target",
+    "warhammer40k_core.engine.shooting_targets:shooting_target_candidate_for_model"
+  ],
+  "clauses": [
+    {
+      "clause_id": "13.11.01:hidden",
+      "regression_ids": [
+        "tests/unit/test_order78_gone_to_ground.py:test_dense_feature_does_not_hide_an_unhidden_target",
+        "tests/unit/test_order78_gone_to_ground.py:test_light_area_can_grant_hidden_without_dense_occupancy"
+      ]
+    },
+    {
+      "clause_id": "13.11.01:intervening-dense-features",
+      "regression_ids": [
+        "tests/unit/test_order78_gone_to_ground.py:test_hidden_target_concealed_by_intervening_dense_feature",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_policy_only_dense_woods_preserve_gone_to_ground",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_woods_keep_feature_causality_and_round_trip",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_woods_preserve_feature_visibility_exceptions",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_area_obscuring_footprint_still_defers_to_area",
+        "tests/unit/test_order78_gone_to_ground.py:test_area_only_obstruction_is_not_a_dense_feature",
+        "tests/unit/test_order78_gone_to_ground.py:test_non_terrain_model_obstruction_does_not_reduce_detection",
+        "tests/unit/test_order78_gone_to_ground.py:test_light_feature_does_not_reduce_detection"
+      ]
+    },
+    {
+      "clause_id": "13.11.01:model-and-attacker-specific-concealment",
+      "regression_ids": [
+        "tests/unit/test_order78_gone_to_ground.py:test_full_visibility_and_cache_reuse_do_not_imply_dense_concealment",
+        "tests/unit/test_order78_gone_to_ground.py:test_attached_unit_only_qualifying_model_gains_reduction",
+        "tests/unit/test_order78_gone_to_ground.py:test_dense_concealment_cached_and_uncached_witnesses_agree"
+      ]
+    },
+    {
+      "clause_id": "13.11.01:current-and-previous-turn-shooting-designer-note",
+      "regression_ids": [
+        "tests/unit/test_order78_gone_to_ground.py:test_shooting_history_blocks_gone_to_ground_even_when_hidden_is_retained"
+      ]
+    },
+    {
+      "clause_id": "13.11.01:detection-reduction",
+      "regression_ids": [
+        "tests/unit/test_order78_gone_to_ground.py:test_detection_reduction_uses_model_base_distance",
+        "tests/unit/test_order78_gone_to_ground.py:test_gone_to_ground_composes_with_detection_floor_and_ceiling",
+        "tests/unit/test_order78_gone_to_ground.py:test_detection_bonus_composes_with_gone_to_ground"
+      ]
+    },
+    {
+      "clause_id": "13.11.01:shared-facade-consumers",
+      "regression_ids": [
+        "tests/unit/test_order78_gone_to_ground.py:test_facade_rejects_protected_target_then_accepts_retry_with_persistence_and_replay"
+      ]
+    }
+  ]
+}

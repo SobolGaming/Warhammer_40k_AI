@@ -9,14 +9,18 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.shooting_model_blockers import shooting_dynamic_model_blockers
 from warhammer40k_core.engine.shooting_terrain_visibility import (
-    blocker_record_is_solid,
+    blocker_record_is_dense_feature,
     model_visibility_keywords_for_rules_unit,
-    model_within_solid_terrain,
     terrain_visibility_areas_from_placements,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_gone_to_ground_2026_09,
+)
+
+GONE_TO_GROUND_SOURCE_ID = core_gone_to_ground_2026_09.GONE_TO_GROUND_SOURCE_ID
 
 
 def hidden_detection_eligible_target_model_ids(
@@ -97,13 +101,8 @@ def _target_model_has_gone_to_ground_against_attacker(
     terrain_areas: tuple[PlacedTerrainArea, ...],
     dynamic_model_blockers: tuple[Model, ...],
 ) -> bool:
-    if not model_within_solid_terrain(
-        ruleset_descriptor=ruleset_descriptor,
-        model=target_model,
-        terrain_features=terrain_features,
-        terrain_areas=terrain_areas,
-    ):
-        return False
+    # Core 13.11.01 requires intervening dense-feature concealment, not occupancy.
+    # Ordinary terrain-derived Hidden eligibility is owned separately by terrain_hidden.
     context = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=ruleset_descriptor,
         los_cache_key=visibility_cache_key,
@@ -128,7 +127,7 @@ def _target_model_has_gone_to_ground_against_attacker(
             record
             for record in witness.all_blocker_records()
             if record.blocks_full_visibility
-            and blocker_record_is_solid(
+            and blocker_record_is_dense_feature(
                 ruleset_descriptor=ruleset_descriptor,
                 record=record,
                 terrain_features=terrain_features,

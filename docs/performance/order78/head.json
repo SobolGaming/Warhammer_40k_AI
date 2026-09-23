@@ -1,0 +1,141 @@
+{
+  "workload": "order78-gone-to-ground-v2",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "Ten pairs of model-target candidate and shared LOS queries per sample; seven serial samples without coverage, normal immutable geometry caches enabled; no cached candidate wrapper; canonical scene preparation excluded",
+  "hashes": {
+    "scripts/measure_order78.py": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "tests/order78_helpers.py": "18b6a7a9220e1e111294473a1229981fb97cacab660382f4349df7e753ce0bf1",
+    "tests/order78_associated_terrain_helpers.py": "c5a58ca3af7284c11ea78fe2b1c65fbfd3d0bb7a4ae930d283b5ede9d99ef62f",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "dense-outside",
+      "samples_seconds": [
+        0.040316541999345645,
+        0.025817415997153148,
+        0.02607079199515283,
+        0.025786750004044734,
+        0.025353124990942888,
+        0.026039458010927774,
+        0.025688666995847598
+      ],
+      "mean_seconds": 0.027867535713344944,
+      "maximum_seconds": 0.040316541999345645,
+      "complete": true,
+      "legal": false,
+      "shared_los": false
+    },
+    {
+      "case": "dense-inside",
+      "samples_seconds": [
+        0.04252579199965112,
+        0.025860666995868087,
+        0.027762166995671578,
+        0.027262000003247522,
+        0.027907832991331816,
+        0.02710000000661239,
+        0.026014667004346848
+      ],
+      "mean_seconds": 0.029204732285247052,
+      "maximum_seconds": 0.04252579199965112,
+      "complete": true,
+      "legal": false,
+      "shared_los": false
+    },
+    {
+      "case": "attached-outside",
+      "samples_seconds": [
+        0.06696950001060031,
+        0.051381291006691754,
+        0.05087812499550637,
+        0.050502166006481275,
+        0.050420083993230946,
+        0.05014758299512323,
+        0.05053924999083392
+      ],
+      "mean_seconds": 0.052976856999781115,
+      "maximum_seconds": 0.06696950001060031,
+      "complete": true,
+      "legal": false,
+      "shared_los": false
+    },
+    {
+      "case": "light-outside",
+      "samples_seconds": [
+        0.018960040993988514,
+        0.017247374998987652,
+        0.016974124999251217,
+        0.016971332996035926,
+        0.01680420800403226,
+        0.01690299999609124,
+        0.016835542002809234
+      ],
+      "mean_seconds": 0.01724223199874229,
+      "maximum_seconds": 0.018960040993988514,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "not-hidden",
+      "samples_seconds": [
+        0.017032457995810546,
+        0.017892707997816615,
+        0.017019541992340237,
+        0.016849584004376084,
+        0.016659542001434602,
+        0.01697125000646338,
+        0.020716707993415184
+      ],
+      "mean_seconds": 0.017591684570236663,
+      "maximum_seconds": 0.020716707993415184,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "fully-visible",
+      "samples_seconds": [
+        0.0075489160080906,
+        0.007296333002159372,
+        0.009276249998947605,
+        0.008716208001715131,
+        0.007879708005930297,
+        0.006569416989805177,
+        0.006460292002884671
+      ],
+      "mean_seconds": 0.007678160572790408,
+      "maximum_seconds": 0.009276249998947605,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "associated-policy-only-woods",
+      "samples_seconds": [
+        0.03891304200806189,
+        0.02690450000227429,
+        0.02670412500447128,
+        0.0264902499911841,
+        0.02656520900200121,
+        0.026685916003771126,
+        0.02665533300023526
+      ],
+      "mean_seconds": 0.02841691071599988,
+      "maximum_seconds": 0.03891304200806189,
+      "complete": true,
+      "legal": false,
+      "shared_los": false
+    }
+  ],
+  "full_game_certified": false
+}
