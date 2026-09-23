@@ -1,0 +1,359 @@
+{
+  "scope": "Order 77 / P16B / C16-03 completed-move Action interruption",
+  "baseline": "a28e84025db258825af56769eb90652d69213350",
+  "branch": "codex/order77-action-interruption",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eaa687ec93a66e95af1b242dcd961adba01a6199b99f64b4c328228a2f9aa713",
+  "final_validation_status": "passed",
+  "p_final_order": 78,
+  "p_final_certified": false,
+  "full_game_certified": false,
+  "scope_audit": "The saved-source R77-001 repair moves the existing primary immutable start-snapshot comparison into the shared terminal validator, before status handling and source-based completion policy selection. Both primary and secondary history consumers bind saved Action fields to their authenticated start. Two production modules change; no fixture, geometry, schema, source wording, named handler, or gameplay driver changes.",
+  "focused_regressions": {
+    "untouched_start_source_substitution_reproduced_before_fix": 1,
+    "action_tests_passed": 65,
+    "immutable_field_and_status_cases_passed": 16,
+    "consumer_suite": {
+      "passed": 511,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 50.258,
+      "workers": 18,
+      "distribution": "worksteal",
+      "junit_sha256": "85cd646e5ebef456d0f988fc0bfa7ed6a079ae799ed310c6339ce3ca9681e3c0",
+      "log_sha256": "8cf63b9fb49ffe42327b3d6b25a58bcd3f201a91694674a06c2be0a543211f2b"
+    },
+    "static_shared_authority_audit": "passed in final code-quality suite"
+  },
+  "validation_attempts": [
+    "The saved-only Plunder substitution failed with DID NOT RAISE at 3eefd48a while the original Cleanse start event, accepted decisions, movement completion events and model movement history remained unchanged. The earlier control also rewrote the start and did not cover this variant.",
+    "The shared immutable start-snapshot comparison rejects the reproduced forgery. Sixteen additional cases check eight immutable fields in started and interrupted states before terminal status or completion policy can bypass authentication.",
+    "All 511 focused consumer tests passed, including 65 Action movement regressions. No canonical fixture changes were needed.",
+    "The final behavioral suite ran once with coverage, followed by the full code-quality suite without coverage. No production changes followed aggregate validation."
+  ],
+  "local_runtime": {
+    "python": "3.14.5",
+    "node": "24.19.0",
+    "npm": "11.18.0"
+  },
+  "performance": {
+    "completed_submissions_per_revision": 15,
+    "authenticated_restores_per_revision": 15,
+    "inherited_matched_pairs_refreshed": 12,
+    "complete_games_attempted": 0,
+    "complete_games_completed": 0,
+    "full_game_certified": false,
+    "additional_pre_fix_baseline": "docs/performance/order77/r77_001/base.json",
+    "additional_pre_fix_revision": "10c62302b68252778725d5af6d85a95f7f9ec5c6",
+    "coordinated_forgery_pre_fix_baseline": "docs/performance/order77/r77_001_boundary/base.json",
+    "coordinated_forgery_pre_fix_revision": "9039621f8a7c0af59740ec2728b1191419c50633",
+    "completed_secondary_restores_per_revision": 15,
+    "completed_secondary_restore_baseline": "9039621f8a7c0af59740ec2728b1191419c50633",
+    "saved_source_pre_fix_baseline": "docs/performance/order77/r77_001_start_binding/base.json",
+    "saved_source_pre_fix_revision": "3eefd48a95d39f29ec989fd4fb15dce311cee0cd",
+    "saved_source_completed_secondary_baseline": "docs/performance/order77/r77_001_start_binding/completion-base.json"
+  },
+  "updated_at": "2026-09-23T13:32:02.297956+00:00",
+  "behavioral_suite": {
+    "passed": 8958,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 721.391,
+    "workers": 18,
+    "distribution": "worksteal",
+    "junit_sha256": "b1bb9734f62260f12c8003775aed0739407b99b68d8f5db3add7d0774d62990c",
+    "log_sha256": "953a0a6dae112e4e3bea16f0bf843f23291102a7a815ef48ed45ae1fb87f5933",
+    "coverage_percent": 85.2,
+    "coverage_threshold_percent": 85,
+    "aggregate_attempts": 1,
+    "successful_coverage_runs": 1,
+    "without_coverage_repeat": false,
+    "execution": "Loopback-capable local execution; COVERAGE_FILE outside macOS Documents",
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/r77_001_start_binding/behavioral.xml"
+  },
+  "code_quality_suite": {
+    "passed": 599,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 109.469,
+    "workers": 18,
+    "distribution": "worksteal",
+    "junit_sha256": "c7a10ba4b19c5f71ab99013989b5232bfa3be0c2a1d2185d1b222c3b5c9d3955",
+    "log_sha256": "cf77698c5fd501f2d188b96e03f7e19e49ae64f2462ab857ea7239d981fc01a2",
+    "coverage": false,
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/r77_001_start_binding/code-quality.xml"
+  },
+  "production_changes_after_aggregate_validation_began": false,
+  "gates": {
+    "ruff": {
+      "command": "uv run ruff check .",
+      "status": "passed",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "format": {
+      "command": "uv run ruff format --check .",
+      "status": "passed",
+      "log_sha256": "fce1792dfb2ff99228841be22db161ef5e53f1806688b27312c14a50425f0a66"
+    },
+    "mypy": {
+      "command": "uv run mypy src tests",
+      "status": "passed",
+      "log_sha256": "9d41e4122344828710713a9db41a23e9f106c1cfcd00d4fc8a52b448bfa47c4b"
+    },
+    "pyright": {
+      "command": "uv run pyright",
+      "status": "passed",
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    "imports": {
+      "command": "uv run lint-imports",
+      "status": "passed",
+      "log_sha256": "7cac82f75608da940db790a2e71077c6ab35ed26bc43ce363b7353a9113c126e"
+    },
+    "identity-check": {
+      "command": "uv run python scripts/build_engine_build_identity.py --check",
+      "status": "passed",
+      "log_sha256": "3426f3b29c64d7522fd0adce68b542fa7dabebebf0a00fee81d83ae81b8d37b6"
+    },
+    "source-check": {
+      "command": "uv run python tools/build_core_actions_source.py --check",
+      "status": "passed",
+      "log_sha256": "57197041c73b6b472455346324327eccec08a4e75cbfc3486b356e19c0b7a9ab"
+    },
+    "comparison-check": {
+      "command": "uv run python tools/core_rules_40k_app_audit.py --check",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "contract-check": {
+      "command": "uv run python scripts/build_external_contract.py --check --base-ref a28e84025db258825af56769eb90652d69213350",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "wheel-smoke": {
+      "command": "uv run python scripts/smoke_installed_contract_wheel.py",
+      "status": "passed",
+      "log_sha256": "b307a79ffde4d5adaaa17b074e97e7b2d544acf6ec7310aa0354fadf91d7c030"
+    },
+    "npm-ci": {
+      "command": "npm ci (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "476397a6cb9b4d91f1c5bac7724f978d733067d149b8f21196e353b1ac62e36a"
+    },
+    "npm-check": {
+      "command": "npm run check (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    "npm-unit": {
+      "command": "npm run test:unit (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "8dea0ca6b55827f1344163474c6d5fa77001dd33cd6b2b1cfcc7b042f5786ca1"
+    },
+    "npm-conformance": {
+      "command": "npm run conformance (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "e3beca6da6736b94af59a4d066831d9b770df3d35c1a9504b616e2f19a679dd1"
+    },
+    "shard-check": {
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pre-commit": {
+      "command": "uv run pre-commit run --all-files",
+      "status": "passed",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  },
+  "external_contract": {
+    "version": "34.0.0",
+    "schemas": 27,
+    "wheel_engine_resources": 2926,
+    "wheel_request_families": 6,
+    "typescript_unit_tests_passed": 5,
+    "http_conformance_assertions_passed": 342,
+    "replay_sha256": "ecdd83ecfc1236b58fc8c734f7b82b64db46a4416c0d0fb3dba33bb671715b85"
+  },
+  "unchanged_action_source_package_sha256": "b9027d83c608961b9cde5baae546bbb97336235b8b9a6297b182cf0e93fad8aa",
+  "initial_failed_aggregate_evidence": {
+    "behavioral-initial.xml": "a7e16cccf03778ca34bd1a487221a6fcbca46fced1bf1841e4c8136feb42f782",
+    "behavioral-initial.log": "7b7b5dd3071c2ef5479b0c23036210c2b1e382f203ff54d7560f3291b395a9ab"
+  },
+  "evidence_sha256": {
+    "docs/performance/order64/head-reconstruction.json": "2611e71784a9eabd474de509be766e3d62063b103d749468b3225f72241b1076",
+    "docs/performance/order64/base-reconstruction.json": "dd0550796260c0cc83274ef088e6e8d4b08cebbef0256e3d4832d8714b0abea4",
+    "docs/performance/order65/base.json": "0ef8d385a8d3d47984f96f476f132a5bb16fab33fa4bc7b5291cc2b4c5c38c9f",
+    "docs/performance/order65/head.json": "f2dd2533e44e83a5dd4770821e9cfb9426945b75f6fa5594984b39a845fb8dc9",
+    "docs/performance/order66/base.json": "fec05f7ea385a0113f4c9cb6e4f5d2c65f3d379b950ada3434ad30e4f8eb65a1",
+    "docs/performance/order66/head.json": "a0f1bafe7b95352b79c952f640d1b368e318d9df462d7deaa8d49d242eac06fa",
+    "docs/performance/order69/base.json": "1bcefcd9ec37dbfb012a2ea76adaebde15685e15676755648306eaf7f68ea2a4",
+    "docs/performance/order69/head.json": "ce6727a1bcdeaeb0f9f62f820d4272dbedf3db88904fbbcc9d2b91712269aecd",
+    "docs/performance/order70/base.json": "8c4edffed04cc3213c265bd70633d5df1b4377b43e4dc5c556fba196861897e0",
+    "docs/performance/order70/head.json": "d4723f315f1433f6fe17775559cb6a3c38ab31134309b9c85e7f3beac8967743",
+    "docs/performance/order71/base.json": "fa4de005c9b7923535da5e2a5ffbccb4227bbb2d3c27aa04ea91f5374317d39a",
+    "docs/performance/order71/head.json": "e021ac1ec39c06de5eb8aaba456a45c75f33b52095e8ea788d67ea20e371f901",
+    "docs/performance/order72/base.json": "48b5e122dcebd92e24565dacb28cb15442b8a779028ab4229ca58b8c9c04a756",
+    "docs/performance/order72/head.json": "9b8b9f4f6d7f60dc111af523e562394cda907e6038fe4f40f5f9ed79dcf10dff",
+    "docs/performance/order74/base.json": "530a82942e90a8d918a09f7eda3da57f80f6ccece605e8f1d00905f865d447b8",
+    "docs/performance/order74/head.json": "ac29a725a5e6d3e88438cba10e947f122858c126634670a0a1c1cf365b82be0c",
+    "docs/performance/order75/base.json": "0a9dd71ebe3a1ccda82b354ce336b5026a5b33aff83dbcd2fb9c68aedec3b77e",
+    "docs/performance/order75/head.json": "7116baedf9cb78015088415fc4dc8f32ce8c617d65e98d9b164655edfa432298",
+    "docs/performance/order76/base.json": "c3905cb0fd1583a87c8d302d091c9c6cfb8cfb7f554942b7e2f96c73f3bf985c",
+    "docs/performance/order76/head.json": "9269982695c4b8a746ef3529234f311d9be0f011abd2d9de3dd82bacd2c1ad14",
+    "docs/performance/order73/r73_001/base.json": "ace2972115f1601daaa0ff1f2b198fd7a0f54a98d80c31fc8fe846ff68901df4",
+    "docs/performance/order73/r73_001/head.json": "622456ed9767f6a568298d6f5ce9b24b469a8c390e839bf21d19464a61acc901",
+    "docs/performance/order73/r73_001/geometry-base.json": "6dd2a0da83d7ef0eaf43ba05b804a8f14ce3e943eda707d21dcd8f285153082f",
+    "docs/performance/order73/r73_001/geometry-head.json": "48f84ce9da0d0a22ca3123b1afeb9dbbb7174869eb62d7894fb6789fa4e1444f",
+    "docs/performance/order77/base.json": "15cdaba74ea632f98d28a92853339522d084eea8b928d8cbcac83b639ea80433",
+    "docs/performance/order77/head.json": "7800474adac438280a3eb076c87e070b819601225f6f0abccf6f4a8a9e862b5c",
+    "docs/performance/order77/budgets.json": "ce6fca6f0a41072224b90d69c7e60fcec0c0790c65f1d32a2cb73c2500831b00",
+    "ci/test_shards/shard-1.txt": "6f87cb6f1601b84dd89d07534e6e8bb2d6675af42a611cc10b13c0df3f139c5e",
+    "ci/test_shards/shard-2.txt": "5805f50458da478a4ef117f940015e8f4c134ffd733dfece9d1073bb52b6626b",
+    "ci/test_shards/shard-3.txt": "f7ec8c85d61208af9eb4e2f1bd7418741214fc9b057b6cc57d9e21fdbe7d7bf4",
+    "ci/test_shards/shard-4.txt": "01b4df4ff9d8bf39221d36aa0689be48901152dde4142b85f9db8b24682768b8",
+    "ci/test_shards/shard-5.txt": "2d6e2a21577da426b4fbf6e382371f09db41c68ed2e79f5b0c783a41337e7149",
+    "ci/test_shards/shard-6.txt": "5d1cb704a5c551d3f5e3e51b677336d6ee9fbd6bf531e1ecb8b9f607b936defb",
+    "ci/test_shards/shard-7.txt": "5b54aa0ba016c4025dbb4db9f01ecb234534bbc09d45d8fa7d8a3e1649cd5b77",
+    "ci/test_shards/shard-8.txt": "44e937dbf01ccb4f5061c70fa11349e3e535ef3c75ec90a2e26e1bb3e4f7ee14",
+    "ci/test_shards/durations.json": "faf1c266b9e6fa39422e12881ebc5fd8fa9c8c4d7619ac43530024c30f4a2820",
+    "docs/performance/order77/r77_001/base.json": "30c14678991c4fa7ca4e7403f86c2654b375d5fe401ccede7f40eaf84e4e0fd1",
+    "docs/performance/order77/r77_001_boundary/base.json": "0a9818a22ee4088ebf468e6dc2a0d36ca5d9174378aac7d4f29b0afc3385e322",
+    "docs/performance/order77/r77_001_boundary/completion-base.json": "e4a96ce2bcd6e18e8c685799ce21f5b2ad05718dd124b6b8e8e25ff7b959f4d0",
+    "docs/performance/order77/r77_001_boundary/completion-head.json": "4650cb41d9303bc108c251860a5de37fd8db72a27950a345e726ee8c340cbf8a",
+    "docs/performance/order77/r77_001_start_binding/base.json": "fb8e9ef3f57de203c5173c097a1c55bc7b0315488554be2df34f07cc6e8d0617",
+    "docs/performance/order77/r77_001_start_binding/completion-base.json": "154658507adf2b6439591d7d98fd25990f2ed45a79e42b0f8259ef7bc1b93168"
+  },
+  "remote_ci_status_at_publication": "pending; local gates are not a claim of hosted CI completion",
+  "previous_revision_validation": {
+    "commit": "3eefd48a95d39f29ec989fd4fb15dce311cee0cd",
+    "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:253bd6e89ff3c3fa97a18920d7f4a7685039cfd232456ea9c9d3f18e80422330",
+    "behavioral_suite": {
+      "passed": 8941,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 738.632,
+      "workers": 18,
+      "distribution": "worksteal",
+      "junit_sha256": "01f1ea423f22fdedba763aefed43f7063d14b9f4293bc4dfaa38da62b2844458",
+      "log_sha256": "dbd655b5402d54cf849d11792f0e701710cc206da44dd3557584e797990f0ef3",
+      "coverage_percent": 85.2,
+      "coverage_threshold_percent": 85,
+      "aggregate_attempts": 1,
+      "successful_coverage_runs": 1,
+      "without_coverage_repeat": false,
+      "execution": "Loopback-capable local execution; COVERAGE_FILE outside macOS Documents",
+      "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/r77_001_boundary/behavioral.xml"
+    },
+    "code_quality_suite": {
+      "passed": 597,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 111.977,
+      "workers": 18,
+      "distribution": "worksteal",
+      "junit_sha256": "81fd3737fa97ba76e1eeffab9186c980d6c1a30211525acb6461b0abe09faa0a",
+      "log_sha256": "5db00020fa0fe2b790ea9f04784d7afeec51ebe559493208c311953662bc0f5f",
+      "coverage": false,
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/r77_001_boundary/code-quality.xml"
+    },
+    "validation_attempts": [
+      "Four coordinated state/terminal forgery regressions failed with DID NOT RAISE at 9039621f: Shooting completion, Fight completion, forged immediate timing, and completion failure. Accepted decisions and model movement history were preserved.",
+      "Focused iteration corrected lower-level Cleanse fixtures that lacked engine turn-end records, boundary events and scoring lifecycle authority. Secondary checkpoint capture ordering is preserved, and initial restore assertions compare the complete canonical payload.",
+      "The focused consumer run passed all 493 tests, including 47 Action movement tests. A subsequent source-substitution control was already rejected by accepted-decision authority; the corrected diagnostic expectation passes along with the four coordinated forgery cases.",
+      "The final behavioral suite ran once with coverage, followed by the full code-quality suite without coverage. No production changes followed aggregate validation."
+    ],
+    "previous_revision_validation": {
+      "commit": "9039621f8a7c0af59740ec2728b1191419c50633",
+      "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b252f2d1c5235e85626fbfcdf1ad394a980ee66ed7ac2703db39a8f8237d1f72",
+      "behavioral_suite": {
+        "passed": 8931,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 643.446,
+        "workers": 18,
+        "distribution": "worksteal",
+        "junit_sha256": "8b2d8b37fdcc6cc665dd6bea4ebe033b7c449dc4638c5df24325664132bf2ba5",
+        "log_sha256": "2ed1a6fcaca69e16aa9dc8ae501e20f6b1dadb6e438900853f5c3c3bf501e55a",
+        "coverage_percent": 85.2,
+        "coverage_threshold_percent": 85,
+        "aggregate_attempts": 1,
+        "successful_coverage_runs": 1,
+        "without_coverage_repeat": false,
+        "execution": "Loopback-capable local execution; COVERAGE_FILE outside macOS Documents",
+        "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/r77_001/behavioral.xml"
+      },
+      "code_quality_suite": {
+        "passed": 595,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 102.101,
+        "workers": 18,
+        "distribution": "worksteal",
+        "junit_sha256": "bf7e4ba37fd1f3397c79ec4dcfadaf11a924f02f4bee7fdb73460edd8439b506",
+        "log_sha256": "64a15cb879c8c05707f6aa55afcaa181862510ddeba9623f8efc692946f1b75f",
+        "coverage": false,
+        "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/r77_001/code-quality.xml"
+      },
+      "validation_attempts": [
+        "R77-001 reproduced all three forged terminal types accepting a started Cleanse after a return-path move; the final reproduction failed with DID NOT RAISE in all three cases before the repair.",
+        "A first probe replaced a required active-player scope event and was rejected independently; the final probe preserves those events and replaces a benign pre-move marker. Its untouched history round-trips before tampering.",
+        "The 653-case consumer run passed 642 and exposed 11 cases from three lower-level fixtures missing terminal events. Shared fixture history recording fixes those omissions; all 35 affected tests pass.",
+        "The first pre-fix performance command could not read CPU metadata in the sandbox. The retained baseline was rerun with hardware metadata access before runtime changes.",
+        "The final behavioral suite ran once with coverage, followed by the full code-quality suite without coverage. No production changes followed aggregate validation."
+      ],
+      "previous_revision_validation": {
+        "commit": "10c62302b68252778725d5af6d85a95f7f9ec5c6",
+        "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3c2bd09542015cbaad8b0143be7acdba0f1a6eb27234b834f022435a234ecae8",
+        "behavioral_suite": {
+          "passed": 8917,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 714.052,
+          "workers": 18,
+          "distribution": "worksteal",
+          "junit_sha256": "b585960c06c970a77f116c53d38a9bb711207538a84609b769b888ffe500a950",
+          "log_sha256": "5daa77f1b7ba0dea6d9840ca3807b23ccc2c2c630ec6dd11991b3c194e20f39e",
+          "coverage_percent": 85.19,
+          "coverage_threshold_percent": 85,
+          "aggregate_attempts": 2,
+          "successful_coverage_runs": 1,
+          "without_coverage_repeat": false,
+          "execution": "Loopback-capable local execution; COVERAGE_FILE outside macOS Documents",
+          "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/order77/behavioral.xml"
+        },
+        "code_quality_suite": {
+          "passed": 594,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": 112.66,
+          "workers": 18,
+          "distribution": "worksteal",
+          "junit_sha256": "6f3f5619d26ab9f84005968deab5890c154a36eab7de4f7165768646bd4a9711",
+          "log_sha256": "0ccd7f1a9e0e7793bf1eb2a97fbccbab0f45524fd2763e062cd78f77f1944c7b",
+          "coverage": false,
+          "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/order77/code-quality.xml"
+        },
+        "validation_attempts": [
+          "Pre-fix facade regressions reproduced return-path, zero-distance and rotate-and-return Action completion errors; translation, one-way rotation and decline controls passed.",
+          "Existing ordinary-movement and Charge restriction fixtures required their missing Action start events; the reactive regression now expects interruption at move completion.",
+          "The retained v1 phase-flow timing diagnostic failed its per-case relative limit: base pauses for erroneous Action completion while head advances further. V2 retains all five movement forms and unchanged numeric limits, using a spare friendly Shooting choice as the common stopping boundary; Action-containing restores are timed separately.",
+          "The installed-wheel smoke initially failed dependency retrieval because bundled TLS roots did not trust the local issuer. Retried with UV_SYSTEM_CERTS=true; the complete smoke passed without disabling certificate verification.",
+          "First full coverage run: 8912 passed, five failed, 85.18% coverage in 722.94 seconds. Three legacy fixtures omitted completed-move context or unintentionally triggered the new immediate interruption while constructing checkpoint forgeries; corrected the fixtures. Two HTTP tests failed because sandboxed loopback socket binding was denied. Retry retains the full coverage command and uses loopback-capable execution. No production changes after aggregate validation began."
+        ]
+      }
+    }
+  },
+  "r77_001_reproduction_log_sha256": "fea8c675b34d685efe840851d2422faf2d28a0bdf5ee982e697a74121f109585",
+  "r77_001_coordinated_reproduction_log_sha256": "15ef108569a3fc56f1b191d98c73254e3440900c91dd16cb6afe914ee6641f35",
+  "source_substitution_control_log_sha256": "8080eaff1706f3ade7e8e80d8549776fcae47b76e8bcb0df49a09e9cac923575",
+  "r77_001_saved_source_reproduction_log_sha256": "f453140e3b0f185e82bed41d41b2bb6865ba94458d1fa11d407f081151f33a3a"
+}

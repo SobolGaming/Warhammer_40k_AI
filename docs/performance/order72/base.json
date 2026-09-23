@@ -16,13 +16,13 @@
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
   "samples_seconds": [
-    5.589586000001873,
-    5.106418666000536,
-    5.1136924590027775
+    5.985230667007272,
+    5.499243041005684,
+    5.5417162499943515
   ],
-  "mean_seconds": 5.2698990416683955,
-  "median_seconds": 5.1136924590027775,
-  "maximum_seconds": 5.589586000001873,
+  "mean_seconds": 5.675396652669103,
+  "median_seconds": 5.5417162499943515,
+  "maximum_seconds": 5.985230667007272,
   "completion_rate": 1,
   "full_game_certified": false
 }

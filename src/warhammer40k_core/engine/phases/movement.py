@@ -154,7 +154,6 @@ __all__ = (
     "_grant_ranged_weapon_keywords",
     "_identifier_list_from_json_object",
     "_interpolate_pose",
-    "_interrupt_started_mission_actions_for_movement_activation",
     "_key_error_field",
     "_maximum_model_distance_inches_from_witness",
     "_missing_disembark_proposal_field",

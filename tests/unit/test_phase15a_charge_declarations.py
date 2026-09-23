@@ -3184,6 +3184,8 @@ def test_charge_phase_consumes_disembark_charge_eligibility_state() -> None:
 
 @pytest.mark.parametrize("action_status", ["started", "completed", "interrupted"])
 def test_unit_that_started_action_this_turn_cannot_declare_charge(action_status: str) -> None:
+    from warhammer40k_core.engine.event_log import validate_json_value
+
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         alpha_origins={
@@ -3224,6 +3226,14 @@ def test_unit_that_started_action_this_turn_cannot_declare_charge(action_status:
     elif action_status == "interrupted":
         action_state = action_state.interrupt(reason="unit_moved")
     state.record_mission_action_state(action_state)
+    if action_status == "started":
+        lifecycle.decision_controller.event_log.append(
+            "mission_action_started",
+            {
+                "game_id": state.game_id,
+                "mission_action_state": validate_json_value(action_state.to_payload()),
+            },
+        )
 
     request = _decision_request(lifecycle.advance_until_decision_or_terminal())
 

@@ -6618,3 +6618,47 @@ accepted retry and its rejection history reproduce through exact replay. The
 new build identity binds authenticated checkpoints and replay to these numeric
 proof semantics. Superseded build artifacts require the existing explicit
 compatibility rules; no migration fallback is introduced.
+
+
+## Order 77 — completed movement interrupts pending Actions
+
+The existing `mission_action_interrupted` event is emitted by the shared
+completed-move recorder after acceptance of a witnessed move. Its existing
+`source_evidence_event_id` and `source_evidence_event_type` fields identify the
+completion, including when `transition_batch.displacements` is empty because
+all endpoint poses equal their starting poses. Accepted zero-distance and
+rotation-only moves follow the same path. This applies to supported primary
+and secondary Actions and attached rules units. Remain Stationary, a declined
+move, pile-in and consolidation retain their existing distinctions.
+
+There is no new decision type, option family, proposal kind, viewer policy or
+payload field. Existing finite/parameterized submissions, per-model distance
+records and physical delta schemas cover this change. Interruption keeps the
+existing public Action event visibility; internal start/checkpoint evidence
+continues through shared viewer redaction. Restore rejects a persisted Action
+that continued after its recorded interrupting move, and authenticates the
+interruption's existing source reference. Engine identity regeneration binds
+replay and the external contract to the changed event ordering and semantics.
+
+R77-001 additionally authenticates every Action terminal against its persisted
+status, exact Action payload, battle/source context and start-event ordering
+before using that terminal to bound historical movement validation. A started
+Action cannot have a terminal event. Primary and secondary Actions share this
+check; the existing event fields and restore-error contract are sufficient.
+
+Matching terminal and Action fields alone do not authorize completion. Before
+bounding the scan, completion and completion-failure events must obey the
+source definition's completion timing. Turn-end completion requires the matching
+engine Objective Control turn-end record for the same game, player, round and
+final phase, plus its unique source-authenticated boundary event ordered after
+Action start and before the terminal. Existing Objective Control checkpoint and
+lifecycle restore authority continues to authenticate that record. This uses
+existing records and schemas; no new adapter payload or player choice is added.
+
+Before selecting completion timing or accepting any terminal cutoff, restore
+also binds every immutable saved Action field to its authenticated start snapshot.
+Primary and secondary Actions share the complete snapshot comparison, excluding
+only mutable outcome fields. A saved source substitution cannot select another
+Action's completion policy while retaining the original accepted start. Started
+Actions receive the same check before returning without a terminal. Existing
+start-event fields and restore errors cover this invariant.

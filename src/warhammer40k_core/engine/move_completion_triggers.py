@@ -86,6 +86,11 @@ def record_move_completion_event(
             decisions=decisions, kind=RuleTriggerKind.MOVE_COMPLETION, context=context
         )
         capture_move_rules(state=state, decisions=decisions, event=event, source_context=context)
+    from warhammer40k_core.engine.primary_mission_action_interruptions import (
+        reconcile_primary_mission_action_interruptions,
+    )
+
+    reconcile_primary_mission_action_interruptions(state=state, decisions=decisions)
     return event
 
 

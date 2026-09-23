@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine.actions import (
     MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON,
     MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON,
+    MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON,
     MissionActionState,
     MissionActionStatus,
     mission_action_interruption_reason_for_displacement,
@@ -14,13 +15,17 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
+    ModelDisplacementKind,
+    model_displacement_kind_from_token,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
-from warhammer40k_core.engine.mission_action_policies import (
-    mission_action_policy_descriptors,
-    mission_action_policy_for_id,
+from warhammer40k_core.engine.mission_action_options import mission_action_for_state
+from warhammer40k_core.engine.mission_action_terminal_integrity import (
+    MISSION_ACTION_TERMINAL_EVENT_TYPES,
+    validate_mission_action_terminal_event,
 )
+from warhammer40k_core.engine.model_movement_history import distances_from_completion
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -66,7 +71,7 @@ def reconcile_primary_mission_action_interruptions(
     state: GameState,
     decisions: DecisionController,
 ) -> tuple[MissionActionState, ...]:
-    """Interrupt source-backed Primary Actions from post-start authoritative evidence."""
+    """Interrupt supported mission Actions from post-start authoritative evidence."""
 
     from warhammer40k_core.engine.game_state import GameState
 
@@ -74,16 +79,12 @@ def reconcile_primary_mission_action_interruptions(
         raise GameLifecycleError(
             "Primary Mission Action interruption reconciliation requires engine state."
         )
-    policy_ids = {
-        descriptor.mission_action_id for descriptor in mission_action_policy_descriptors()
-    }
     candidates = tuple(
         sorted(
             (
                 action
                 for action in state.mission_action_states
                 if action.status is MissionActionStatus.STARTED
-                and action.mission_action_id in policy_ids
             ),
             key=lambda action: action.action_id,
         )
@@ -97,7 +98,7 @@ def reconcile_primary_mission_action_interruptions(
         )
         if evidence is None:
             continue
-        policy = mission_action_policy_for_id(action.mission_action_id)
+        policy = mission_action_for_state(state=state, mission_action_id=action.mission_action_id)
         interrupted = action.interrupt(reason=evidence.reason)
         event_payload: dict[str, JsonValue] = {
             "game_id": state.game_id,
@@ -141,49 +142,17 @@ def validate_primary_mission_action_interruption_evidence(
     }
     supported_reasons: set[str] = set()
     if evidence_event.event_type in _MOVE_COMPLETION_EVENTS:
-        raw_batch = payload.get("transition_batch")
-        if type(raw_batch) is not dict:
-            raise GameLifecycleError("Primary Action movement evidence requires transition_batch.")
-        batch = BattlefieldTransitionBatch.from_payload(
-            cast(BattlefieldTransitionBatchPayload, raw_batch)
-        )
         supported_reasons.update(
-            reason
-            for displacement in batch.displacements
-            if _model_matches_action(
+            row.reason
+            for row in _transition_evidence(
                 state=state,
                 action=action,
-                model_instance_id=displacement.model_instance_id,
-                component_by_model_id=component_by_model_id,
-            )
-            if (
-                reason := mission_action_interruption_reason_for_displacement(
-                    displacement.displacement_kind
-                )
-            )
-            is not None
-        )
-        relevant_removals = tuple(
-            removal
-            for removal in batch.removals
-            if _model_matches_action(
-                state=state,
-                action=action,
-                model_instance_id=removal.model_instance_id,
+                event=evidence_event,
+                event_order=0,
+                payload=payload,
                 component_by_model_id=component_by_model_id,
             )
         )
-        removal_kinds = {removal.removal_kind for removal in relevant_removals}
-        if relevant_removals:
-            reason = (
-                MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON
-                if removal_kinds == {BattlefieldRemovalKind.DESTROYED}
-                else MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON
-            )
-            if reason != MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON or {
-                removal.model_instance_id for removal in relevant_removals
-            } == _action_lineage_model_ids(state=state, action=action):
-                supported_reasons.add(reason)
     elif evidence_event.event_type == PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT:
         departure = PrimaryBattlefieldDepartureState.from_payload(
             payload.get("primary_battlefield_departure_state")
@@ -215,6 +184,66 @@ def validate_primary_mission_action_interruption_evidence(
         raise GameLifecycleError("Primary Action interruption evidence type is unsupported.")
     if action.interrupted_reason not in supported_reasons:
         raise GameLifecycleError("Primary Action interruption evidence reason drifted.")
+
+
+def validate_mission_action_movement_history(
+    *, state: GameState, event_records: tuple[EventRecord, ...]
+) -> None:
+    """Authenticate movement outcomes for every recorded Action, including secondary Actions."""
+    event_by_id = {event.event_id: event for event in event_records}
+    event_index_by_id = {event.event_id: index for index, event in enumerate(event_records)}
+    for start in event_records:
+        if start.event_type != "mission_action_started":
+            continue
+        action_id = _nested_action_id(start)
+        if action_id is None:
+            raise GameLifecycleError("Action movement history start identity is missing.")
+        action = state.mission_action_state_by_id(action_id)
+        _start_event_order(action=action, event_records=event_records)
+        terminals = tuple(
+            event
+            for event in event_records
+            if event.event_type in MISSION_ACTION_TERMINAL_EVENT_TYPES
+            and _nested_action_id(event) == action.action_id
+        )
+        terminal = validate_mission_action_terminal_event(
+            state=state,
+            action=action,
+            start=start,
+            terminals=terminals,
+            event_index_by_id=event_index_by_id,
+            event_records=event_records,
+        )
+        end = len(event_records) if terminal is None else event_index_by_id[terminal.event_id]
+        evidence = _first_interruption_evidence(
+            state=state,
+            action=action,
+            event_records=tuple(
+                event
+                for event in event_records[:end]
+                if event.event_type in {*_MOVE_COMPLETION_EVENTS, "mission_action_started"}
+            ),
+        )
+        if evidence is None or evidence.reason != MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON:
+            if action.interrupted_reason == MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON:
+                raise GameLifecycleError("Action interruption lacks completed-move evidence.")
+            continue
+        if action.status is not MissionActionStatus.INTERRUPTED or terminal is None:
+            raise GameLifecycleError("Action continued after an interrupting completed move.")
+        payload = _event_payload(terminal)
+        if (
+            terminal.event_type != "mission_action_interrupted"
+            or payload.get("source_evidence_event_id") != evidence.event.event_id
+            or payload.get("source_evidence_event_type") != evidence.event.event_type
+            or payload.get("interrupted_reason") != evidence.reason
+            or payload.get("mission_action_state") != action.to_payload()
+        ):
+            raise GameLifecycleError("Action completed-move interruption history drifted.")
+        validate_primary_mission_action_interruption_evidence(
+            state=state,
+            action=action,
+            evidence_event=event_by_id[evidence.event.event_id],
+        )
 
 
 def _first_interruption_evidence(
@@ -316,13 +345,22 @@ def _transition_evidence(
     payload: dict[str, JsonValue],
     component_by_model_id: dict[str, str],
 ) -> tuple[_InterruptionEvidence, ...]:
-    if (
-        event.event_type == "movement_activation_completed"
-        and payload.get("movement_phase_action") == "remain_stationary"
-    ):
+    phase_action = payload.get("movement_phase_action")
+    if event.event_type == "movement_activation_completed" and type(phase_action) is not str:
+        raise GameLifecycleError("Action movement evidence requires a movement action.")
+    if event.event_type == "movement_activation_completed" and phase_action == "remain_stationary":
         return ()
     raw_batch = payload.get("transition_batch")
-    if raw_batch is None:
+    if (
+        raw_batch is None
+        and type(phase_action) is str
+        and phase_action
+        in {
+            "ingress",
+            "disembark",
+            "combat_disembark",
+        }
+    ):
         return ()
     if type(raw_batch) is not dict:
         raise GameLifecycleError("Move completion transition_batch must be an object.")
@@ -331,33 +369,26 @@ def _transition_evidence(
     )
     phase = _event_phase(payload)
     evidence: list[_InterruptionEvidence] = []
-    displacement_reasons = {
-        reason
-        for displacement in batch.displacements
-        if _model_matches_action(
-            state=state,
-            action=action,
-            model_instance_id=displacement.model_instance_id,
-            component_by_model_id=component_by_model_id,
-        )
-        if (
-            reason := mission_action_interruption_reason_for_displacement(
-                displacement.displacement_kind
+    movement_kind = _completed_movement_kind(event=event, payload=payload)
+    if movement_kind is not None:
+        reason = mission_action_interruption_reason_for_displacement(movement_kind)
+        if reason is not None and any(
+            _model_matches_action(
+                state=state,
+                action=action,
+                model_instance_id=row.model_instance_id,
+                component_by_model_id=component_by_model_id,
             )
-        )
-        is not None
-    }
-    if len(displacement_reasons) > 1:
-        raise GameLifecycleError("Move completion has conflicting Action interruption reasons.")
-    if displacement_reasons:
-        evidence.append(
-            _InterruptionEvidence(
-                event_order=event_order,
-                event=event,
-                reason=next(iter(displacement_reasons)),
-                phase=phase,
+            for row in distances_from_completion(event, turn_player_id=action.player_id)
+        ):
+            evidence.append(
+                _InterruptionEvidence(
+                    event_order=event_order,
+                    event=event,
+                    reason=reason,
+                    phase=phase,
+                )
             )
-        )
     relevant_removals = tuple(
         removal
         for removal in batch.removals
@@ -387,6 +418,35 @@ def _transition_evidence(
                 )
             )
     return tuple(evidence)
+
+
+def _completed_movement_kind(
+    *, event: EventRecord, payload: dict[str, JsonValue]
+) -> ModelDisplacementKind | None:
+    """Classify the accepted move; physical deltas deliberately omit return paths."""
+    if event.event_type == "movement_activation_completed":
+        action = payload.get("movement_phase_action")
+        if type(action) is not str:
+            raise GameLifecycleError("Action movement evidence requires a movement action.")
+        if action in {"remain_stationary", "ingress", "disembark", "combat_disembark"}:
+            return None
+        return model_displacement_kind_from_token(action)
+    if event.event_type in {
+        "charge_move_completed",
+        "catalog_setup_reactive_charge_move_completed",
+    }:
+        return ModelDisplacementKind.CHARGE_MOVE
+    if event.event_type == "fight_movement_completed":
+        resolution = payload.get("resolution")
+        if type(resolution) is not dict:
+            raise GameLifecycleError("Action Fight movement evidence requires resolution.")
+        kind = model_displacement_kind_from_token(resolution.get("proposal_kind"))
+        if kind not in {ModelDisplacementKind.PILE_IN, ModelDisplacementKind.CONSOLIDATE}:
+            raise GameLifecycleError("Action Fight movement evidence kind drifted.")
+        return kind
+    if event.event_type == "triggered_movement_resolved":
+        return model_displacement_kind_from_token(payload.get("displacement_kind"))
+    raise GameLifecycleError("Action movement evidence type is unsupported.")
 
 
 def _start_event_order(

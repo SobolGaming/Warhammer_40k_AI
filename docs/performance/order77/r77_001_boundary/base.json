@@ -1,0 +1,227 @@
+{
+  "workload_id": "order77-action-completed-move-v2",
+  "revision": "9039621f8a7c0af59740ec2728b1191419c50633",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b252f2d1c5235e85626fbfcdf1ad394a980ee66ed7ac2703db39a8f8237d1f72",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "library_versions": {
+    "shapely": "2.1.2",
+    "z3-solver": "4.15.4.0",
+    "orjson": "3.11.9"
+  },
+  "timing_boundary": "one facade submission, preparation separate; first sample cold, subsequent process caches retained; authenticated restore timed separately, input serialization and equality check excluded from restore timer",
+  "workload": "Two five-model friendly and one five-model enemy unit, canonical purge-the-foe-vs-priority-assets-layout-1 terrain, fixed source seed; Maintain Control then reactive Normal Move of .25 inches, return to origin, zero distance, 45-degree rotation, or rotate-and-return. One facade submission with both versions stopping at the same spare friendly unit Shooting choice; no scoring/turn advancement in the timer. Base is cost evidence only.",
+  "samples": [
+    {
+      "case": "translation",
+      "repeat": 0,
+      "preparation_seconds": 2.798671500000637,
+      "seconds": 4.047973291992093,
+      "restore_seconds": 0.4502864169917302,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "translation",
+      "repeat": 1,
+      "preparation_seconds": 0.9183419579931069,
+      "seconds": 0.06433591700624675,
+      "restore_seconds": 0.4512152910028817,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "translation",
+      "repeat": 2,
+      "preparation_seconds": 0.9360840839945013,
+      "seconds": 0.06297658299445175,
+      "restore_seconds": 0.4912776249984745,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "return",
+      "repeat": 0,
+      "preparation_seconds": 0.9573935840016929,
+      "seconds": 0.08726395800476894,
+      "restore_seconds": 0.44951283300179057,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "return",
+      "repeat": 1,
+      "preparation_seconds": 0.9249382499983767,
+      "seconds": 0.06300191700574942,
+      "restore_seconds": 0.4502646249893587,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "return",
+      "repeat": 2,
+      "preparation_seconds": 0.9182277500076452,
+      "seconds": 0.06292120799480472,
+      "restore_seconds": 0.45174399999086745,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "zero",
+      "repeat": 0,
+      "preparation_seconds": 0.9617975000001024,
+      "seconds": 0.06332995800767094,
+      "restore_seconds": 0.45323562499834225,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "zero",
+      "repeat": 1,
+      "preparation_seconds": 0.9244870410038857,
+      "seconds": 0.06493716700060759,
+      "restore_seconds": 0.45962212499580346,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "zero",
+      "repeat": 2,
+      "preparation_seconds": 0.923900041001616,
+      "seconds": 0.06314945900521707,
+      "restore_seconds": 0.4901234580029268,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "rotation",
+      "repeat": 0,
+      "preparation_seconds": 0.9231193329906091,
+      "seconds": 0.08982012500928249,
+      "restore_seconds": 0.46299412500229664,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "rotation",
+      "repeat": 1,
+      "preparation_seconds": 0.9288847919960972,
+      "seconds": 0.06465654101339169,
+      "restore_seconds": 0.45866358299099375,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "rotation",
+      "repeat": 2,
+      "preparation_seconds": 0.9227184159972239,
+      "seconds": 0.06457295898871962,
+      "restore_seconds": 0.45795070799067616,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "rotation_return",
+      "repeat": 0,
+      "preparation_seconds": 0.9271420410077553,
+      "seconds": 0.06539083301322535,
+      "restore_seconds": 0.46517349999339785,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "rotation_return",
+      "repeat": 1,
+      "preparation_seconds": 0.9279012080078246,
+      "seconds": 0.0660525840066839,
+      "restore_seconds": 0.4585226670023985,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    },
+    {
+      "case": "rotation_return",
+      "repeat": 2,
+      "preparation_seconds": 0.9696437499951571,
+      "seconds": 0.06548737500270363,
+      "restore_seconds": 0.45914820799953304,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 12
+    }
+  ],
+  "summary": {
+    "translation": {
+      "count": 3,
+      "mean_seconds": 1.391761930664264,
+      "median_seconds": 0.06433591700624675,
+      "p95_seconds": 4.047973291992093,
+      "maximum_seconds": 4.047973291992093,
+      "submissions_per_second": 0.718513689710364,
+      "completion_rate": 1
+    },
+    "return": {
+      "count": 3,
+      "mean_seconds": 0.07106236100177436,
+      "median_seconds": 0.06300191700574942,
+      "p95_seconds": 0.08726395800476894,
+      "maximum_seconds": 0.08726395800476894,
+      "submissions_per_second": 14.072147138131688,
+      "completion_rate": 1
+    },
+    "zero": {
+      "count": 3,
+      "mean_seconds": 0.06380552800449853,
+      "median_seconds": 0.06332995800767094,
+      "p95_seconds": 0.06493716700060759,
+      "maximum_seconds": 0.06493716700060759,
+      "submissions_per_second": 15.672623223641317,
+      "completion_rate": 1
+    },
+    "rotation": {
+      "count": 3,
+      "mean_seconds": 0.0730165416704646,
+      "median_seconds": 0.06465654101339169,
+      "p95_seconds": 0.08982012500928249,
+      "maximum_seconds": 0.08982012500928249,
+      "submissions_per_second": 13.695526754925766,
+      "completion_rate": 1
+    },
+    "rotation_return": {
+      "count": 3,
+      "mean_seconds": 0.06564359734087095,
+      "median_seconds": 0.06548737500270363,
+      "p95_seconds": 0.0660525840066839,
+      "maximum_seconds": 0.0660525840066839,
+      "submissions_per_second": 15.233778167385427,
+      "completion_rate": 1
+    }
+  },
+  "completed_submissions": 15,
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order77.py": "96a1b125b588e02a86146a01c2281c85ba478fd4ac8b834cc13b0167ab7ce820",
+    "tests/action_movement_interruption_helpers.py": "6547f50aaaf3e03a377d40b0d3152ff3e9912a929eabd351901fde3602bbc102",
+    "tests/phase17n_primary_mission_helpers.py": "2d6fe56dd059440e3f216a37d4f9930ff74ba32185adfa22a69a2c72855827b5",
+    "tests/phase17n_step5g_pairing_certification_helpers.py": "8f0cb5be0cef51209ef8f56bafe9b7a96e0a7e7874647886b9d8c57e43380ce6"
+  }
+}

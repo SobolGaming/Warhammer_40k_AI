@@ -6092,15 +6092,14 @@ def test_phase17n_reconciliation_interrupts_post_start_triggered_move_once() -> 
         if event.event_type == "triggered_movement_resolved"
     )
 
-    interrupted = reconcile_primary_mission_action_interruptions(
-        state=state,
-        decisions=decisions,
+    interrupted = state.mission_action_state_by_id(action.action_id)
+    assert interrupted.status is MissionActionStatus.INTERRUPTED
+    assert interrupted.interrupted_reason == "unit_moved"
+    terminal = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "mission_action_interrupted"
     )
-
-    assert len(interrupted) == 1
-    assert interrupted[0].status is MissionActionStatus.INTERRUPTED
-    assert interrupted[0].interrupted_reason == "unit_moved"
-    terminal = decisions.event_log.records[-1]
     assert terminal.event_type == "mission_action_interrupted"
     terminal_payload = cast(dict[str, JsonValue], terminal.payload)
     assert terminal_payload["source_evidence_event_id"] == evidence.event_id
@@ -6128,7 +6127,10 @@ def test_phase17n_reconciliation_interrupts_post_start_triggered_move_once() -> 
     with pytest.raises(GameLifecycleError, match="interruption evidence is incomplete"):
         validate_primary_mission_action_integrity(
             state=state,
-            event_records=(*decisions.event_log.records[:-1], forged_terminal),
+            event_records=tuple(
+                forged_terminal if event.event_id == terminal.event_id else event
+                for event in decisions.event_log.records
+            ),
         )
 
 
@@ -6342,6 +6344,7 @@ def test_phase17n_reconciliation_ignores_remain_stationary_pile_in_and_consolida
         if movement_action is not None:
             payload["movement_phase_action"] = movement_action
         if displacement_kind is not None:
+            payload["resolution"] = {"proposal_kind": displacement_kind.value}
             assert state.battlefield_state is not None
             placement = state.battlefield_state.unit_placement_by_id(
                 action.unit_instance_id

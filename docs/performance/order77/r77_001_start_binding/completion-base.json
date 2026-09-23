@@ -1,0 +1,105 @@
+{
+  "workload_id": "order77-completed-secondary-restore-v1",
+  "revision": "3eefd48a95d39f29ec989fd4fb15dce311cee0cd",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:253bd6e89ff3c3fa97a18920d7f4a7685039cfd232456ea9c9d3f18e80422330",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "library_versions": {
+    "shapely": "2.1.2",
+    "z3-solver": "4.15.4.0",
+    "orjson": "3.11.9"
+  },
+  "timing_boundary": "Authenticated restore of a completed Cleanse at its engine turn-end boundary. Preparation and equality checking excluded; fixture preparation warms process caches. Fifteen repeated restores of the same serialized save in each fresh runtime process.",
+  "preparation_seconds": 2.918583207996562,
+  "samples": [
+    {
+      "repeat": 0,
+      "seconds": 0.4120837499940535,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 1,
+      "seconds": 0.40490391600178555,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 2,
+      "seconds": 0.41197108299820684,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 3,
+      "seconds": 0.4086065830051666,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 4,
+      "seconds": 0.41181195800891146,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 5,
+      "seconds": 0.40933141599816736,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 6,
+      "seconds": 0.4088907499972265,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 7,
+      "seconds": 0.4122009580023587,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 8,
+      "seconds": 0.40974925000045914,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 9,
+      "seconds": 0.4099992909905268,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 10,
+      "seconds": 0.41040758400049526,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 11,
+      "seconds": 0.4110182500007795,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 12,
+      "seconds": 0.4120064999879105,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 13,
+      "seconds": 0.41036854100821074,
+      "action_status": "completed"
+    },
+    {
+      "repeat": 14,
+      "seconds": 0.41347370800212957,
+      "action_status": "completed"
+    }
+  ],
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order77_completion.py": "4e36af03f283a23d88b9d9f6e7aa140d85f06e22730b4c26631ebcd1ba3193f0",
+    "tests/mission_action_history_helpers.py": "01db7bf5fce93c4a1fbb402d06c7d1fbb3ce46bce4f2f1b2284f0d84473e2bc7",
+    "tests/phase17n_secondary_certification_fixtures.py": "8413b6d67c14b21b8946635f62210971215850a697104dd20047188c7ba7700b",
+    "tests/phase17n_step6g_secondary_certification_helpers.py": "e00dd2859b60e08f8a87b37fb9ab3dbdddfa840cf34dfc79bc98d2f4953acaea",
+    "tests/phase17n_primary_mission_helpers.py": "2d6fe56dd059440e3f216a37d4f9930ff74ba32185adfa22a69a2c72855827b5"
+  }
+}

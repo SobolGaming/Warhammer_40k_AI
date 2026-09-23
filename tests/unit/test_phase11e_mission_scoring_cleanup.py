@@ -7468,6 +7468,8 @@ def test_titanic_unit_can_start_action_while_engaged() -> None:
 def test_order34_action_restriction_survives_phase_and_action_status(
     phase: BattlePhase, titanic: bool, interrupted: bool
 ) -> None:
+    from tests.mission_action_history_helpers import record_mission_action_terminal_for_fixture
+
     from warhammer40k_core.engine.phases.shooting import shooting_unit_can_select_to_shoot
 
     config = _config()
@@ -7504,7 +7506,15 @@ def test_order34_action_restriction_survives_phase_and_action_status(
         lifecycle=lifecycle, target_suffix="center", result_id="order34-start"
     )
     if interrupted:
-        state.interrupt_mission_action(action_id=action.action_id, reason="unit_left_battlefield")
+        terminal = state.interrupt_mission_action(
+            action_id=action.action_id, reason="unit_left_battlefield"
+        )
+        record_mission_action_terminal_for_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            action=terminal,
+            phase=BattlePhase.SHOOTING,
+        )
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
     restored = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
     restored_state = restored.state
@@ -8627,6 +8637,11 @@ def test_shooting_lifecycle_exposes_held_tactical_plunder() -> None:
 
 
 def test_mission_action_can_complete_interrupt_and_score() -> None:
+    from tests.mission_action_history_helpers import (
+        prepare_mission_action_turn_end_for_fixture,
+        record_mission_action_terminal_for_fixture,
+    )
+
     lifecycle = _battle_lifecycle(
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
     )
@@ -8657,9 +8672,21 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
         target_suffix="center",
     )
 
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.shooting_phase_state = None
     completed = state.complete_mission_action(
         action_id=completed_action.action_id,
         completion_phase=BattlePhase.FIGHT,
+    )
+    assert state.victory_point_total("player-a") == 0
+    prepare_mission_action_turn_end_for_fixture(
+        state=state, decisions=lifecycle.decision_controller
+    )
+    record_mission_action_terminal_for_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        action=completed,
+        phase=BattlePhase.FIGHT,
     )
     interrupted = interrupted_state.interrupt_mission_action(
         action_id=interrupted_action.action_id,
@@ -8672,7 +8699,6 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     assert interrupted.status is MissionActionStatus.INTERRUPTED
     assert _objective_marker_matches_suffix(interrupted.target_id, "northwest")
     assert interrupted.interrupted_reason == "unit_moved"
-    assert state.victory_point_total("player-a") == 0
     assert [
         cleanse.objective_marker_id for cleanse in state.secondary_objective_cleanse_states
     ] == [completed.target_id]
@@ -9118,6 +9144,8 @@ def test_mission_action_cancellation_maps_displacements_and_battlefield_departur
 
 
 def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
+    from warhammer40k_core.engine.event_log import validate_json_value
+
     lifecycle = _battle_lifecycle()
     state = lifecycle.state
     assert state is not None
@@ -9126,6 +9154,16 @@ def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
         interruption_conditions=("unit_moved", "unit_left_battlefield"),
     )
     state.record_mission_action_state(action)
+    lifecycle.decision_controller.event_log.append(
+        "mission_action_started",
+        {
+            "game_id": state.game_id,
+            "player_id": action.player_id,
+            "battle_round": action.battle_round_started,
+            "phase": action.phase_started,
+            "mission_action_state": validate_json_value(action.to_payload()),
+        },
+    )
     movement_status = lifecycle.advance_until_decision_or_terminal()
     movement_request = movement_status.decision_request
     assert movement_request is not None

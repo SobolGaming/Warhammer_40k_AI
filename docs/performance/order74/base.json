@@ -11,25 +11,25 @@
   "samples": [
     {
       "repeat": 0,
-      "seconds": 0.013294958996993955,
+      "seconds": 0.01425579200440552,
       "valid": false,
       "status": "invalid"
     },
     {
       "repeat": 1,
-      "seconds": 0.01210358299431391,
+      "seconds": 0.012986583009478636,
       "valid": false,
       "status": "invalid"
     },
     {
       "repeat": 2,
-      "seconds": 0.0122058749984717,
+      "seconds": 0.012644875008845702,
       "valid": false,
       "status": "invalid"
     }
   ],
-  "mean_seconds": 0.012534805663259855,
-  "maximum_seconds": 0.013294958996993955,
+  "mean_seconds": 0.01329575000757662,
+  "maximum_seconds": 0.01425579200440552,
   "full_game_certified": false,
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",

@@ -189,6 +189,10 @@ def test_action_checkpoint_rejects_coordinated_position_rewrite_after_move() -> 
         mission_action_id="maintain-control",
         current_phase=BattlePhase.FIGHT,
     )
+    # Build the move as prior history, then attach the deliberately stale Action graph.
+    # Its later physical-checkpoint validator must reject that coordinated forgery.
+    assert state.mission_action_states == [action]
+    state.mission_action_states = []
     prior_event_count = len(decisions.event_log.records)
     append_authenticated_normal_move(
         state=state,
@@ -202,6 +206,7 @@ def test_action_checkpoint_rejects_coordinated_position_rewrite_after_move() -> 
             facing_degrees=pose.facing.degrees,
         ),
     )
+    state.mission_action_states = [action]
     physical_events = decisions.event_log.records[prior_event_count:]
     action_events = decisions.event_log.records[:prior_event_count]
 
@@ -751,6 +756,10 @@ def test_vanguard_actor_cannot_be_placed_inside_only_in_terminal_checkpoint() ->
             facing_degrees=pose.facing.degrees,
         ),
     )
+    # Isolate the checkpoint forgery from the independent move-interruption guard.
+    # Full restore rejects suppressed interruptions in the Order 77 regression.
+    assert state.mission_action_states == [action]
+    state.mission_action_states = []
     append_authenticated_normal_move(
         state=state,
         decisions=decisions,
@@ -763,6 +772,7 @@ def test_vanguard_actor_cannot_be_placed_inside_only_in_terminal_checkpoint() ->
             facing_degrees=pose.facing.degrees,
         ),
     )
+    state.mission_action_states = [action]
     _resolve_vanguard_failure(
         state=state,
         decisions=decisions,
