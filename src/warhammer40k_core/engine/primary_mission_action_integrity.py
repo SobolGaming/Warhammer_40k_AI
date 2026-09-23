@@ -24,7 +24,6 @@ from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_area_by_id,
 )
-from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
     validate_mission_action_opportunity_decline_integrity,
@@ -376,17 +375,9 @@ def _validate_lifecycle_policy_evidence(
             faction_rule_execution_registry=faction_rule_execution_registry,
             runtime_content_activation=runtime_content_activation,
         )
-    if policy.completion_timing == "turn_end":
-        if objective_record is None:
-            raise GameLifecycleError(
-                "Turn-end Primary Mission Action lacks objective boundary evidence."
-            )
-        _validate_completion_boundary_event(
-            record=objective_record,
-            start_event=start_event,
-            terminal_event=terminal_event,
-            event_records=event_records,
-            event_index_by_id=event_index_by_id,
+    if policy.completion_timing == "turn_end" and objective_record is None:
+        raise GameLifecycleError(
+            "Turn-end Primary Mission Action lacks objective boundary evidence."
         )
     evaluated = validate_primary_mission_action_completion_evidence(
         state=state,
@@ -400,46 +391,6 @@ def _validate_lifecycle_policy_evidence(
     ):
         raise GameLifecycleError(
             "Primary Mission Action terminal status contradicts completion evidence."
-        )
-
-
-def _validate_completion_boundary_event(
-    *,
-    record: ObjectiveControlRecord,
-    start_event: EventRecord,
-    terminal_event: EventRecord,
-    event_records: tuple[EventRecord, ...],
-    event_index_by_id: dict[str, int],
-) -> None:
-    matches = tuple(
-        event
-        for event in event_records
-        if event.event_type == "end_boundary_objective_control_determined"
-        and isinstance(event.payload, dict)
-        and event.payload.get("record_ids") == [record.record_id]
-    )
-    if len(matches) != 1:
-        raise GameLifecycleError(
-            "Primary Mission Action completion lacks one objective boundary event."
-        )
-    boundary = matches[0]
-    payload = _object(boundary.payload, label="Objective-control boundary event")
-    expected_payload: dict[str, JsonValue] = {
-        "game_id": record.game_id,
-        "battle_round": record.battle_round,
-        "phase": record.phase,
-        "record_ids": [record.record_id],
-        "source_rule_id": (
-            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
-        ),
-    }
-    if payload != expected_payload or not (
-        event_index_by_id[start_event.event_id]
-        < event_index_by_id[boundary.event_id]
-        < event_index_by_id[terminal_event.event_id]
-    ):
-        raise GameLifecycleError(
-            "Primary Mission Action objective boundary event ordering drifted."
         )
 
 
@@ -745,6 +696,7 @@ def _validate_action_events(
         start=start,
         terminals=terminals,
         event_index_by_id=event_index_by_id,
+        event_records=event_records,
     )
     if terminal is None:
         return start, None

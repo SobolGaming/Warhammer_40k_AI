@@ -1,6 +1,6 @@
 {
   "workload_id": "order74-mandatory-endpoint-facade-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:b252f2d1c5235e85626fbfcdf1ad394a980ee66ed7ac2703db39a8f8237d1f72",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:253bd6e89ff3c3fa97a18920d7f4a7685039cfd232456ea9c9d3f18e80422330",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -11,25 +11,25 @@
   "samples": [
     {
       "repeat": 0,
-      "seconds": 0.5493220829957863,
+      "seconds": 0.5829654999979539,
       "valid": true,
       "status": "waiting_for_decision"
     },
     {
       "repeat": 1,
-      "seconds": 0.5170904170081485,
+      "seconds": 0.5335509589931462,
       "valid": true,
       "status": "waiting_for_decision"
     },
     {
       "repeat": 2,
-      "seconds": 0.5085016249940963,
+      "seconds": 0.5286126249993686,
       "valid": true,
       "status": "waiting_for_decision"
     }
   ],
-  "mean_seconds": 0.5249713749993438,
-  "maximum_seconds": 0.5493220829957863,
+  "mean_seconds": 0.5483763613301562,
+  "maximum_seconds": 0.5829654999979539,
   "full_game_certified": false,
   "hashes": {
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",

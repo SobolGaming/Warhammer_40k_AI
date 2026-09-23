@@ -212,6 +212,7 @@ def validate_mission_action_movement_history(
             start=start,
             terminals=terminals,
             event_index_by_id=event_index_by_id,
+            event_records=event_records,
         )
         end = len(event_records) if terminal is None else event_index_by_id[terminal.event_id]
         evidence = _first_interruption_evidence(

@@ -48,9 +48,20 @@ def test_action_interruption_uses_one_completed_move_authority() -> None:
         "validate_mission_action_terminal_event("
         in (ENGINE / "primary_mission_action_integrity.py").read_text()
     )
+    terminal = (ENGINE / "mission_action_terminal_integrity.py").read_text()
+    assert "_validate_completion_timing_and_boundary(" in terminal
+    assert "mission_action_for_state(" in terminal
+    assert "ObjectiveControlTiming.TURN_END" in terminal
+    assert "def _validate_completion_boundary_event(" in terminal
+    assert (
+        "def _validate_completion_boundary_event("
+        not in (ENGINE / "primary_mission_action_integrity.py").read_text()
+    )
 
 
-@pytest.mark.parametrize("baseline", ["base.json", "r77_001/base.json"])
+@pytest.mark.parametrize(
+    "baseline", ["base.json", "r77_001/base.json", "r77_001_boundary/base.json"]
+)
 def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
     folder = ROOT / "docs/performance/order77"
     base, head = (json.loads((folder / name).read_text()) for name in (baseline, "head.json"))
@@ -89,4 +100,39 @@ def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
             new["restore_seconds"]
             <= old["restore_seconds"] * budgets["maximum_ratio"]
             + budgets["jitter_allowance_seconds"]
+        )
+
+
+def test_order77_completed_secondary_restore_cost_evidence() -> None:
+    folder = ROOT / "docs/performance/order77"
+    base, head = (
+        json.loads((folder / "r77_001_boundary" / name).read_text())
+        for name in ("completion-base.json", "completion-head.json")
+    )
+    budgets = json.loads((folder / "budgets.json").read_text())
+    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    for key in (
+        "workload_id",
+        "platform",
+        "python",
+        "cpu",
+        "memory_bytes",
+        "cpu_allocation",
+        "concurrency",
+        "library_versions",
+        "timing_boundary",
+        "hashes",
+    ):
+        assert base[key] == head[key], key
+    for name, digest in head["hashes"].items():
+        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
+    assert head["full_game_certified"] is False
+    # Reuse the existing fifteen-sample requirement and unchanged restore budgets.
+    assert len(base["samples"]) == len(head["samples"]) == budgets["required_completed_submissions"]
+    for old, new in zip(base["samples"], head["samples"], strict=True):
+        assert old["repeat"] == new["repeat"]
+        assert old["action_status"] == new["action_status"] == "completed"
+        assert new["seconds"] <= budgets["maximum_restore_seconds"]
+        assert new["seconds"] <= (
+            old["seconds"] * budgets["maximum_ratio"] + budgets["jitter_allowance_seconds"]
         )

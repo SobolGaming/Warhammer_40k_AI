@@ -8637,7 +8637,10 @@ def test_shooting_lifecycle_exposes_held_tactical_plunder() -> None:
 
 
 def test_mission_action_can_complete_interrupt_and_score() -> None:
-    from tests.mission_action_history_helpers import record_mission_action_terminal_for_fixture
+    from tests.mission_action_history_helpers import (
+        prepare_mission_action_turn_end_for_fixture,
+        record_mission_action_terminal_for_fixture,
+    )
 
     lifecycle = _battle_lifecycle(
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
@@ -8669,9 +8672,15 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
         target_suffix="center",
     )
 
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.shooting_phase_state = None
     completed = state.complete_mission_action(
         action_id=completed_action.action_id,
         completion_phase=BattlePhase.FIGHT,
+    )
+    assert state.victory_point_total("player-a") == 0
+    prepare_mission_action_turn_end_for_fixture(
+        state=state, decisions=lifecycle.decision_controller
     )
     record_mission_action_terminal_for_fixture(
         state=state,
@@ -8690,7 +8699,6 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     assert interrupted.status is MissionActionStatus.INTERRUPTED
     assert _objective_marker_matches_suffix(interrupted.target_id, "northwest")
     assert interrupted.interrupted_reason == "unit_moved"
-    assert state.victory_point_total("player-a") == 0
     assert [
         cleanse.objective_marker_id for cleanse in state.secondary_objective_cleanse_states
     ] == [completed.target_id]

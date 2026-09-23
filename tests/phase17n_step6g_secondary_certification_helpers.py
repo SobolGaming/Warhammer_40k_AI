@@ -191,8 +191,7 @@ def assert_secondary_scores_through_lifecycle_restore_and_views(
     restored_initial = GameLifecycle.from_payload(initial_payload)
     restored_initial_state = restored_initial.state
     assert restored_initial_state is not None
-    assert restored_initial_state.primary_scoring_state_evidence_records == []
-    assert restored_initial_state.secondary_scoring_state_evidence_records == []
+    assert restored_initial.to_payload() == initial_payload
     restored = GameLifecycle.from_payload(deepcopy(session.lifecycle.to_payload()))
     assert restored.to_payload() == session.lifecycle.to_payload()
     restored_state = restored.state

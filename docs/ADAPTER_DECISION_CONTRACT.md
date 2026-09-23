@@ -6645,3 +6645,12 @@ status, exact Action payload, battle/source context and start-event ordering
 before using that terminal to bound historical movement validation. A started
 Action cannot have a terminal event. Primary and secondary Actions share this
 check; the existing event fields and restore-error contract are sufficient.
+
+Matching terminal and Action fields alone do not authorize completion. Before
+bounding the scan, completion and completion-failure events must obey the
+source definition's completion timing. Turn-end completion requires the matching
+engine Objective Control turn-end record for the same game, player, round and
+final phase, plus its unique source-authenticated boundary event ordered after
+Action start and before the terminal. Existing Objective Control checkpoint and
+lifecycle restore authority continues to authenticate that record. This uses
+existing records and schemas; no new adapter payload or player choice is added.

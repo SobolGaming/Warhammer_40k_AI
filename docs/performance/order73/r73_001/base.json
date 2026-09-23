@@ -21,59 +21,59 @@
   },
   "samples": [
     {
-      "preparation_seconds": 2.1327458339947043,
-      "matched_seconds": 0.018801250000251457,
+      "preparation_seconds": 2.209445540996967,
+      "matched_seconds": 0.020265415994799696,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.26984516700031236,
-      "matched_seconds": 0.0011256670113652945,
+      "preparation_seconds": 0.2771807499957504,
+      "matched_seconds": 0.0012307500001043081,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.267336000004434,
-      "matched_seconds": 0.001059875008650124,
+      "preparation_seconds": 0.27513191700563766,
+      "matched_seconds": 0.001188084002933465,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.2961657919950085,
-      "matched_seconds": 0.001029624996590428,
+      "preparation_seconds": 0.31379674999334384,
+      "matched_seconds": 0.0011549170012585819,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.2697526249976363,
-      "matched_seconds": 0.0010940829961327836,
+      "preparation_seconds": 0.27591695899900515,
+      "matched_seconds": 0.001192291994811967,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.2669172919995617,
-      "matched_seconds": 0.001085208001313731,
+      "preparation_seconds": 0.2783215410017874,
+      "matched_seconds": 0.001283833000343293,
       "valid": true,
       "violation_count": 0,
       "complete": true
     },
     {
-      "preparation_seconds": 0.26598016600473784,
-      "matched_seconds": 0.001044040996930562,
+      "preparation_seconds": 0.2769744580000406,
+      "matched_seconds": 0.001201042003231123,
       "valid": true,
       "violation_count": 0,
       "complete": true
     }
   ],
-  "mean_seconds": 0.00360567843017634,
-  "median_seconds": 0.001085208001313731,
-  "maximum_seconds": 0.018801250000251457,
-  "p95_seconds": 0.0011256670113652945,
+  "mean_seconds": 0.003930904856783205,
+  "median_seconds": 0.001201042003231123,
+  "maximum_seconds": 0.020265415994799696,
+  "p95_seconds": 0.001283833000343293,
   "completion_rate": 1,
   "full_game_certified": false,
   "budgets": {

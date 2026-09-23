@@ -273,3 +273,33 @@ or interrupted Actions without recording their terminal events (11 failing
 parameterized cases). Those fixtures now append the missing terminal history;
 35 affected tests pass without weakening restore validation. Final aggregate
 results and refreshed performance evidence are recorded in the validation artifact.
+
+### Coordinated completion forgery at `9039621f`
+
+The second review coordinated a completed saved Action with an early matching
+completion event while preserving accepted movement decisions and model history.
+Both Shooting and Fight claims bypassed the field-only terminal check. A forged
+`immediate` timing and a matching completion-failed terminal reproduced the same
+class of bypass in regression tests.
+
+The shared terminal validator now resolves completion timing from the mission
+source and requires same-turn completion. Turn-end terminals additionally require
+the engine's matching Objective Control turn-end record and its unique boundary
+event between Action start and terminal. The existing primary boundary-event
+validator was moved into this shared owner; primary completion-condition evidence
+and the Objective Control checkpoint/lifecycle authorities remain mandatory.
+The source and completion boundary must be validated before movement history can
+be bounded. No new scoring orchestration, schema or supported content is added.
+
+Regressions preserve accepted decisions and movement history while coordinating
+saved state and terminal fields. Positive secondary completion histories round-trip;
+missing, altered and reordered boundary events fail. Lower-level Cleanse fixtures
+now enter Fight, capture the real turn-end boundary and request the engine's
+mission-scoring sequence, preserving the existing secondary checkpoint ordering.
+The bug-class audit also covered immediate completion and completion failure, and
+kept primary and secondary consumers on the same timing/boundary authority.
+An additional coordinated source-substitution control changes the saved Action,
+start event and terminal to claim an immediate Action while preserving accepted
+decisions. Existing activity-restriction restore authority rejects the substituted
+source against the accepted start option; the regression retains that protection.
+PFINAL remains open as Order 78.

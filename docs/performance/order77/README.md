@@ -15,11 +15,11 @@ versions and input hashes are recorded in the JSON.
 
 | Completed move | Base submit mean / max (s) | Head submit mean / max (s) | Head restore mean / max (s) |
 | --- | ---: | ---: | ---: |
-| translation | 1.3568 / 3.9456 | 1.3607 / 3.9566 | 0.4539 / 0.4559 |
-| return | 0.0702 / 0.0862 | 0.0711 / 0.0879 | 0.4537 / 0.4561 |
-| zero | 0.0633 / 0.0653 | 0.0625 / 0.0628 | 0.4668 / 0.4918 |
-| rotation | 0.0725 / 0.0888 | 0.0730 / 0.0902 | 0.4612 / 0.4624 |
-| rotation_return | 0.0638 / 0.0639 | 0.0646 / 0.0651 | 0.4605 / 0.4612 |
+| translation | 1.4363 / 4.1747 | 1.4470 / 4.2062 | 0.4784 / 0.4798 |
+| return | 0.0748 / 0.0918 | 0.0765 / 0.0938 | 0.4774 / 0.4782 |
+| zero | 0.0663 / 0.0669 | 0.0675 / 0.0679 | 0.4945 / 0.5238 |
+| rotation | 0.0776 / 0.0941 | 0.0772 / 0.0949 | 0.4854 / 0.4876 |
+| rotation_return | 0.0680 / 0.0682 | 0.0683 / 0.0695 | 0.4855 / 0.4862 |
 
 The declared limits remain 12 seconds per submission or restore and 3× the matching base
 sample plus 50 ms jitter allowance. The fast quality gate authenticates matching
@@ -39,8 +39,32 @@ The measurement helpers and dependency lock come from the proposed checkout for 
 R77-001 retains an additional pre-fix baseline in `r77_001/base.json`, measured
 from PR commit `10c62302b68252778725d5af6d85a95f7f9ec5c6` before changing runtime
 code. The current `head.json` must satisfy the same submission and authenticated
-restore limits against both that baseline and the original main baseline. The
+restore limits against that baseline and the original main baseline. The
 workload, fixture hashes, timing boundaries, host and numeric budgets are unchanged.
+
+The coordinated-forgery repair also retains `r77_001_boundary/base.json`, measured
+from `9039621f8a7c0af59740ec2728b1191419c50633` before runtime changes. The current
+head must satisfy the same unchanged budgets against all three baselines.
+
+`r77_001_boundary/completion-base.json` and `completion-head.json` additionally
+measure the changed completion-boundary branch directly. Both runtimes restore
+the same canonical completed Cleanse fixture fifteen times, with its real turn-end
+Objective Control record, terminal event and pending scoring decision. Fixture
+preparation warms process caches and is excluded from the restore timer, as is
+the exact payload equality check. The same 12-second and 3× + 50 ms restore
+limits apply. Run each revision in a fresh process, serially without competing
+tests or builds:
+
+```sh
+PYTHONPATH=.:scripts uv run --no-sync python scripts/measure_order77_completion.py \
+  --runtime-src <revision-checkout>/src --revision <revision> \
+  --output docs/performance/order77/r77_001_boundary/completion-<base-or-head>.json
+```
+
+The completion baseline is `9039621f8a7c0af59740ec2728b1191419c50633`; both runs
+use the current canonical fixture helpers, whose hashes are retained in the reports.
+Baseline restore mean/max: 0.4083/0.4410 seconds. Head restore mean/max:
+0.4064/0.4219 seconds. All fifteen completed-Action restores round-trip exactly.
 
 ## Preserved phase-flow diagnostic
 

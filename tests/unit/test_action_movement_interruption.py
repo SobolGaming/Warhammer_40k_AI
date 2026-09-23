@@ -13,6 +13,10 @@ from tests.action_movement_interruption_helpers import (
     action_movement_session,
     request_action_move,
 )
+from tests.phase17n_step6g_secondary_certification_helpers import (
+    lifecycle_row,
+    secondary_certification_session,
+)
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -292,6 +296,124 @@ def test_secondary_terminal_cannot_hide_suppressed_move_interruption(
     forged["payload"] = {"mission_action_state": cast(JsonValue, deepcopy(action))}
 
     with pytest.raises(GameLifecycleError, match="Started Mission Action has a terminal event"):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("phase", "timing", "failed", "substitute_source", "diagnostic"),
+    [
+        ("shooting", "turn_end", False, False, "completion timing"),
+        ("fight", "turn_end", False, False, "completion boundary"),
+        ("shooting", "immediate", False, False, "source completion timing"),
+        ("fight", "turn_end", True, False, "completion boundary"),
+        (
+            "shooting",
+            "immediate",
+            False,
+            True,
+            "Activity restriction Action decision subject or timing",
+        ),
+    ],
+)
+def test_coordinated_secondary_completion_cannot_hide_move_interruption(
+    interrupted_secondary_return_session: LocalGameSession,
+    phase: str,
+    timing: str,
+    failed: bool,
+    substitute_source: bool,
+    diagnostic: str,
+) -> None:
+    """R77-001: matching saved state and terminal fields do not prove completion."""
+    original = interrupted_secondary_return_session.lifecycle.to_payload()
+    payload = deepcopy(original)
+    events = payload["decisions"]["event_log"]
+    terminal = next(e for e in events if e["event_type"] == "mission_action_interrupted")
+    terminal["event_type"] = "forged_unrelated_event"
+    terminal["payload"] = {}
+    action = payload["state"]["mission_action_states"][-1]
+    action["status"] = "interrupted" if failed else "completed"
+    action["interrupted_reason"] = "completion_condition_failed" if failed else None
+    action["completed_battle_round"] = None if failed else action["battle_round_started"]
+    action["completed_phase"] = None if failed else phase
+    action["completion_timing"] = timing
+    if substitute_source:
+        action["mission_action_id"] = "plunder-terrain"
+        action["mission_id"] = "plunder"
+        action["scoring_source_id"] = "plunder"
+        start = next(e for e in events if e["event_type"] == "mission_action_started")
+        start_payload = cast(dict[str, JsonValue], start["payload"])
+        start_payload["mission_action_id"] = action["mission_action_id"]
+        started = cast(dict[str, JsonValue], start_payload["mission_action_state"])
+        started["mission_action_id"] = action["mission_action_id"]
+        started["mission_id"] = action["mission_id"]
+        started["scoring_source_id"] = action["scoring_source_id"]
+        started["completion_timing"] = timing
+    forged = next(e for e in events if e["event_type"] == "r77_001_before_move")
+    forged["event_type"] = (
+        "mission_action_completion_failed" if failed else "mission_action_completed"
+    )
+    forged["payload"] = {
+        "game_id": payload["state"]["game_id"],
+        "player_id": action["player_id"],
+        "battle_round": action["battle_round_started"],
+        "phase": phase,
+        "mission_action_id": action["mission_action_id"],
+        "mission_action_state": cast(JsonValue, deepcopy(action)),
+    }
+    assert payload["decisions"]["records"] == original["decisions"]["records"]
+    assert payload["state"]["model_movement_history"] == original["state"]["model_movement_history"]
+    with pytest.raises(GameLifecycleError, match=diagnostic):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.fixture(scope="module")
+def completed_secondary_session() -> LocalGameSession:
+    session, saved, _expectation = secondary_certification_session(
+        lifecycle_row("cleanse", mode="tactical", scoring_player_id="player-a")
+    )
+    assert GameLifecycle.from_payload(saved).to_payload() == saved
+    assert session.lifecycle.state is not None
+    assert session.lifecycle.state.mission_action_states[-1].status is MissionActionStatus.COMPLETED
+    return session
+
+
+@pytest.mark.parametrize(
+    ("tamper", "diagnostic"),
+    [
+        ("missing", "completion boundary lacks one"),
+        ("unknown_record", "completion boundary lacks one"),
+        ("source", "objective boundary event ordering"),
+        ("phase", "objective boundary event ordering"),
+        ("after_terminal", "objective boundary event ordering"),
+    ],
+)
+def test_secondary_completion_requires_authentic_ordered_boundary(
+    completed_secondary_session: LocalGameSession, tamper: str, diagnostic: str
+) -> None:
+    payload = deepcopy(completed_secondary_session.lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    boundary = next(
+        event
+        for event in events
+        if event["event_type"] == "end_boundary_objective_control_determined"
+    )
+    boundary_payload = cast(dict[str, JsonValue], boundary["payload"])
+    if tamper == "missing":
+        boundary["event_type"] = "forged_unrelated_event"
+    elif tamper == "unknown_record":
+        boundary_payload["record_ids"] = ["record:unknown"]
+    elif tamper == "source":
+        boundary_payload["source_rule_id"] = "forged-source"
+    elif tamper == "phase":
+        boundary_payload["phase"] = "shooting"
+    else:
+        terminal = next(e for e in events if e["event_type"] == "mission_action_completed")
+        boundary["event_type"], terminal["event_type"] = (
+            terminal["event_type"],
+            boundary["event_type"],
+        )
+        boundary["payload"], terminal["payload"] = terminal["payload"], boundary["payload"]
+    with pytest.raises(GameLifecycleError, match=diagnostic):
         GameLifecycle.from_payload(payload)
 
 
