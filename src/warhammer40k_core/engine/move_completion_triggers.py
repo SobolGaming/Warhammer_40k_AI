@@ -80,6 +80,11 @@ def record_move_completion_event(
     )
     if phase_record is not None:
         state.phase_movement_history.append(phase_record)
+    from warhammer40k_core.engine.normal_move_history import normal_move_from_completion
+
+    normal_move = normal_move_from_completion(state, event)
+    if normal_move is not None:
+        state.record_normal_move_state(normal_move)
     context = move_trigger_source_context(state=state, decisions=decisions, event=event)
     if context["movement_action"] in _MOVE_ACTIONS:
         observe_rule_trigger(

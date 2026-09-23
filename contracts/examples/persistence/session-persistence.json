@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "85fffbf89816646f41843fbb5061400defa530110c68a27c75a078f8ff15d2b0",
+  "content_hash": "1ec22a5ad46634efdc38955969513bcf59adeb6c3539bd6d54da7f770b20f73b",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,21 +92,21 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ec8838e24359f11dae55ce932f94c1af38a8c6f217613c782a49f67678a702ae",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
-  "external_contract_version": "34.0.0",
+  "external_contract_version": "35.0.0",
   "game_session_index": [
     {
       "game_id": "phase18l-contract-persistence",
       "session_id": "session-phase18l-contract-persistence"
     }
   ],
-  "schema_version": "session-persistence-v26-construction",
+  "schema_version": "session-persistence-v27-normal-move-occurrence",
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "a1225c18ae9f0cde4f3fd469d0bc9ae76010f293485f0b9682a46705db35990e",
+        "content_hash": "3fd32b46bb25b5566ab902118a449b8a35eb668ca4bcd25ebf7326e081759b48",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "5f5a4635c85e2a5166395248bb3caafab146c60b187fe2980a3af507563f9f96",
         "initial_replay_lifecycle": {
@@ -14972,7 +14972,7 @@
             "seed": "phase18l-contract-persistence"
           },
           "projection_checkpoints": [],
-          "schema_version": "replay-artifact-v28-construction",
+          "schema_version": "replay-artifact-v29-normal-move-occurrence",
           "source_identity": {
             "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
             "catalog_id": "phase9a-canonical",
@@ -15072,11 +15072,11 @@
             },
             "operation": "start_session",
             "outcome_code": "command_committed",
-            "schema_version": "session-command-outcome-v34-contract",
+            "schema_version": "session-command-outcome-v35-contract",
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ec8838e24359f11dae55ce932f94c1af38a8c6f217613c782a49f67678a702ae",
               "engine_version": "0.1.0",
               "event_cursor": "-yshrpJoTx4oF7LdQ1XZSENBrkOi17H0DIfT9TGQFjbaHZLrT4nOfrkUqOSJIrrs",
               "game_id": "phase18l-contract-persistence",
@@ -15098,8 +15098,8 @@
                 "game": "warhammer_40000",
                 "version": "core-v2-setup-prebattle-ui-smoke"
               },
-              "schema_version": "session-metadata-v34-contract",
-              "server_contract_version": "34.0.0",
+              "schema_version": "session-metadata-v35-contract",
+              "server_contract_version": "35.0.0",
               "session_id": "session-phase18l-contract-persistence",
               "session_revision": 1,
               "session_state": "active",
@@ -15123,7 +15123,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "d352b4bce2e12a927676e56dd59a91287ebeec3381277d32f077430c9adbc94f",
+      "history_head": "3169e04fba3f366a88b238036cf035e6df4969e3c5991796fdadb49b8f61512a",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -15196,7 +15196,7 @@
         {
           "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
           "authoritative_state_hash": "ca357c8bb0803e75936a7fd13a27667c9323a181db01ae5a7104fd2bfb5ac586",
-          "checkpoint_hash": "3886d32fb3597d61bb0966af83ac4d05424fc4f2cf1d7d0aefae14a3f3f01108",
+          "checkpoint_hash": "daaf536c9941561c970ad8b5588012b444a10448943b7dbdf5c66001091903eb",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -15212,7 +15212,7 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "6d118a072e553c253c561906760be574e3ed73c1d68a2a58801530d008235866",
+          "revision_commitment": "2aacc588897dd4e99a1602bded5bf8ea261b62766865e51f470e57c8fb0ecf22",
           "rng_draw_count": 0,
           "rng_history_count": 1,
           "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
@@ -15226,7 +15226,7 @@
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
           "authoritative_state_hash": "1e6299de3c72ca9d939fcbf6901f2d057068093a560dd8e268642e309e89c25b",
-          "checkpoint_hash": "08aa0b594a74f2e37a019dd95e56ac6eb90ffb229e01dd63bc9d30333075adf6",
+          "checkpoint_hash": "ec24a32b04413b5ff5b701d3c309776f4c34e7cfcf997ad5c2b8e2d95bff542a",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -15245,7 +15245,7 @@
             },
             "token": "q_ERWUP-OzZpUYDVHTE4jsqADXO_dbNBWRUx8vWpWMIYHW6VjK6ad45ENcmnM0QJ"
           },
-          "journal_entry_hash": "2a298314028b8a3e39d1652df6a639b7a526f30cd66e900a30bac388727d00b8",
+          "journal_entry_hash": "01f57e7677c0089c321c4e0b99994fd139db7fac7e40173e5a2603e880b053ff",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -15262,9 +15262,9 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "6d118a072e553c253c561906760be574e3ed73c1d68a2a58801530d008235866",
-          "response_hash": "a48ac6b6d7c886c8f3a9f00003a21a9139da6ac8ecb18313043704298928aa0b",
-          "revision_commitment": "d352b4bce2e12a927676e56dd59a91287ebeec3381277d32f077430c9adbc94f",
+          "previous_revision_commitment": "2aacc588897dd4e99a1602bded5bf8ea261b62766865e51f470e57c8fb0ecf22",
+          "response_hash": "d49ffb4fbb7aabee13cb8bb7b959782f209a6f0964e6cb1821400a8cc4586950",
+          "revision_commitment": "3169e04fba3f366a88b238036cf035e6df4969e3c5991796fdadb49b8f61512a",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "0530ae04f41a90f3e8eeada7bd154e8e4fd9d10af2dbd42230ada45fe7bb37e4",
@@ -15292,7 +15292,7 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "d0dcf9e3089e0ff54911a21d682dcd1f50aaf915d25e24cf250753c036b17fb2",
+            "content_hash": "6543bc2f0d5d5eb95c94400d101df9a4d1dc15f73086e12b65de9c526950fb76",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5cdef2eabf7518e2abf3976239e13cbd51731553a1c5c4fd64dee7a18b529d54",
             "initial_replay_lifecycle": null,
@@ -20095,7 +20095,7 @@
                 "seed": "phase18l-contract-persistence"
               },
               "projection_checkpoints": [],
-              "schema_version": "replay-artifact-v28-construction",
+              "schema_version": "replay-artifact-v29-normal-move-occurrence",
               "source_identity": {
                 "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
                 "catalog_id": "phase9a-canonical",
@@ -20154,7 +20154,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "a1225c18ae9f0cde4f3fd469d0bc9ae76010f293485f0b9682a46705db35990e",
+            "content_hash": "3fd32b46bb25b5566ab902118a449b8a35eb668ca4bcd25ebf7326e081759b48",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5f5a4635c85e2a5166395248bb3caafab146c60b187fe2980a3af507563f9f96",
             "initial_replay_lifecycle": {
@@ -35020,7 +35020,7 @@
                 "seed": "phase18l-contract-persistence"
               },
               "projection_checkpoints": [],
-              "schema_version": "replay-artifact-v28-construction",
+              "schema_version": "replay-artifact-v29-normal-move-occurrence",
               "source_identity": {
                 "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
                 "catalog_id": "phase9a-canonical",

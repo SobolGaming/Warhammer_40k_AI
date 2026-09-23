@@ -148,7 +148,9 @@ def validate_payload_consistency(
     )
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
-    validate_normal_move_state_consistency(state=state)
+    validate_normal_move_state_consistency(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
     validate_config_state_payload_consistency(
         state=state,
         config=config,

@@ -3503,6 +3503,7 @@ def test_order38_candidate_grant_and_movement_matrix(
         state.record_normal_move_state(
             NormalMoveState(
                 player_id="player-a",
+                turn_player_id="player-a",
                 battle_round=1,
                 phase=BattlePhase.MOVEMENT,
                 unit_instance_id=transport.unit_instance_id,
@@ -3661,7 +3662,6 @@ def test_order38_other_movement_states_facade_replay(
     from tests.disembark_eligibility_helpers import PASSENGER_ID, TRANSPORT_ID, disembark_session
     from tests.psychic_modifier_helpers import pending_request
 
-    from warhammer40k_core.engine.normal_move_history import NormalMoveSourceKind, NormalMoveState
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 
     session = disembark_session(
@@ -3676,18 +3676,20 @@ def test_order38_other_movement_states_facade_replay(
             FellBackUnitState(player_id="player-a", battle_round=1, unit_instance_id=TRANSPORT_ID)
         )
     elif status is TransportMovementStatus.NORMAL_MOVE:
-        state.record_normal_move_state(
-            NormalMoveState(
-                player_id="player-a",
-                battle_round=1,
-                phase=BattlePhase.MOVEMENT,
-                unit_instance_id=TRANSPORT_ID,
-                source_rule_id="test:order38:normal",
-                source_kind=NormalMoveSourceKind.MOVEMENT_PHASE_ACTION,
-                request_id="order38:normal",
-                result_id="order38:normal-result",
-            )
+        from tests.normal_move_occurrence_helpers import request_from, submit_path
+
+        selection = pending_request(session)
+        action = session.submit_option(
+            request_id=selection.request_id,
+            option_id=TRANSPORT_ID,
+            result_id="order38:transport",
         )
+        proposal = session.submit_option(
+            request_id=request_from(action).request_id,
+            option_id="normal_move",
+            result_id="order38:normal",
+        )
+        submit_path(session, request_from(proposal), result_id="order38:normal-result", dx=0)
     if status is TransportMovementStatus.INGRESS_MOVE:
         from tests.order63_reserve_transport_helpers import submit_ingress
 

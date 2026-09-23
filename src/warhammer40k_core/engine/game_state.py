@@ -4617,26 +4617,9 @@ class GameState:
         return None
 
     def record_normal_move_state(self, state: NormalMoveState) -> None:
-        if type(state) is not NormalMoveState:
-            raise GameLifecycleError("Normal move state must be a NormalMoveState.")
-        if state.player_id not in self.player_ids:
-            raise GameLifecycleError("NormalMoveState player_id is not in this game.")
-        if any(stored.result_id == state.result_id for stored in self.normal_move_states):
-            raise GameLifecycleError("NormalMoveState already exists for result_id.")
-        if any(
-            stored.same_phase_key() == state.same_phase_key() for stored in self.normal_move_states
-        ):
-            raise GameLifecycleError("NormalMoveState already exists for unit in this phase.")
-        self.normal_move_states.append(state)
-        self.normal_move_states.sort(
-            key=lambda stored: (
-                stored.battle_round,
-                stored.phase,
-                stored.player_id,
-                stored.unit_instance_id,
-                stored.result_id,
-            )
-        )
+        from warhammer40k_core.engine.normal_move_history import record_normal_move_state
+
+        record_normal_move_state(self, state)
 
     def normal_move_states_for_unit_phase(
         self,
@@ -4646,18 +4629,14 @@ class GameState:
         phase: BattlePhase,
         unit_instance_id: str,
     ) -> tuple[NormalMoveState, ...]:
-        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
-        requested_round = _validate_positive_int("battle_round", battle_round)
-        if type(phase) is not BattlePhase:
-            raise GameLifecycleError("Normal move state query phase must be a BattlePhase.")
-        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        return tuple(
-            state
-            for state in self.normal_move_states
-            if state.player_id == requested_player_id
-            and state.battle_round == requested_round
-            and state.phase is phase
-            and state.unit_instance_id == requested_unit_id
+        from warhammer40k_core.engine.normal_move_history import normal_moves_for_unit_phase
+
+        return normal_moves_for_unit_phase(
+            self,
+            player_id=player_id,
+            battle_round=battle_round,
+            phase=phase,
+            unit_instance_id=unit_instance_id,
         )
 
     def to_payload(self) -> GameStatePayload:
@@ -6286,40 +6265,11 @@ def _validate_fell_back_unit_states(
 
 
 def _validate_normal_move_states(
-    values: object,
-    *,
-    player_ids: tuple[str, ...],
+    values: object, *, player_ids: tuple[str, ...]
 ) -> list[NormalMoveState]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState normal_move_states must be a list.")
-    validated: list[NormalMoveState] = []
-    seen_result_ids: set[str] = set()
-    seen_same_phase_keys: set[tuple[int, str, str, str]] = set()
-    for value in cast(list[object], values):
-        if type(value) is not NormalMoveState:
-            raise GameLifecycleError(
-                "GameState normal_move_states must contain NormalMoveState values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("NormalMoveState player_id is not in this game.")
-        if value.result_id in seen_result_ids:
-            raise GameLifecycleError("GameState normal_move_states must be unique by result.")
-        seen_result_ids.add(value.result_id)
-        same_phase_key = value.same_phase_key()
-        if same_phase_key in seen_same_phase_keys:
-            raise GameLifecycleError("GameState normal_move_states must be unique by unit phase.")
-        seen_same_phase_keys.add(same_phase_key)
-        validated.append(value)
-    return sorted(
-        validated,
-        key=lambda state: (
-            state.battle_round,
-            state.phase,
-            state.player_id,
-            state.unit_instance_id,
-            state.result_id,
-        ),
-    )
+    from warhammer40k_core.engine.normal_move_history import validate_normal_move_states
+
+    return validate_normal_move_states(values, player_ids=player_ids)
 
 
 def _validate_battle_shocked_unit_states(

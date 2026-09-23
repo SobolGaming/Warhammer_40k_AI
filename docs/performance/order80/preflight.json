@@ -1,0 +1,143 @@
+{
+  "audit_schema": "core-v2-prefinal-preflight-v1",
+  "audit_id": "order80-prefinal-normal-move-phase-occurrence-2026-09-23",
+  "reviewed_commit": "dc01911f57024ae69b565a0e965db65abf5fbdbe",
+  "reviewed_at": "2026-09-23T20:25:09.215927+00:00",
+  "remote_main_matched": true,
+  "open_pr_inventory": [],
+  "audit_status": "blocked_on_C09-03_before_complete_25_category_audit",
+  "finding_id": "C09-03",
+  "pr_id": "P09C",
+  "implementation_authorized": false,
+  "source_observations": [
+    {
+      "stable_source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+      "provider_name": "40k.app",
+      "provider_affiliation": "not_affiliated_with_or_endorsed_by_games_workshop",
+      "source_url": "https://www.40k.app/rules/09-movement-phase",
+      "clause": "09.05.01",
+      "app_data_version": null,
+      "observed_at": "2026-09-23T16:21:27-04:00",
+      "timestamp_basis": "Review record time for the browser observation made earlier in this same audit session; not an HTTP capture timestamp",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "transcription": "A unit cannot make more than one Normal Move in a phase.",
+      "transcription_sha256": "7a707d1210a36a856e11d70387c45fa60a8fcd7b6d607e6f2a3b13c5055b2aca",
+      "capture_bytes_retained": false,
+      "source_observation_sha256": "b20534091310c62471c61f37dcf40195393bc0b2d1dd50caaf13448f1a658826"
+    }
+  ],
+  "fingerprint_definition": "SHA-256 of sorted compact JSON of each observation excluding source_observation_sha256; detects retained-record drift, not website authenticity",
+  "retained_source_package": {
+    "path": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/july_rules_updates_2026_07/artifacts/package.json",
+    "sha256": "59ab29a5f0c8780418ba3a7fac29e16f228f235cedc3644c2bb75e84b68708fb",
+    "matching_rows": [
+      {
+        "evidence_id": "repository-app-core-rules-transcription:09-normal-move-one-per-phase",
+        "evidence_context_id": "repository-owner-transcription",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+        "source_url": null,
+        "review_audit_row_id": null,
+        "review_audit_source_observation_sha256": null,
+        "transcription_sha256": "cf34178e5aca13a70c5c3880cbfce78cff905bcf929fc8a0b72830cf4d7fde9f",
+        "verification_status": "unverified",
+        "observation_sha256": "b3f8d043677dc33fdb311f243dec50c2ae7f13480a9b019c9d4a42776f222c18",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "not_certified",
+        "runtime_consumer_ids": []
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:09-normal-move-one-per-phase",
+        "evidence_context_id": "40k-app-comparison-2026-08-25",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+        "source_url": "https://www.40k.app/rules/09-movement-phase",
+        "review_audit_row_id": "category:09",
+        "review_audit_source_observation_sha256": "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+        "transcription_sha256": "cf34178e5aca13a70c5c3880cbfce78cff905bcf929fc8a0b72830cf4d7fde9f",
+        "verification_status": "authoritative_app_mirror",
+        "observation_sha256": "d0475f0e2ea5f6a5cd7554ce2232fdd2d87067e60d5b22f0aaa64f322e6934ea",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "not_certified",
+        "runtime_consumer_ids": []
+      },
+      {
+        "behavior_descriptor": "normal_move_limited_to_once_per_unit_per_phase",
+        "evidence_ids": [
+          "repository-app-core-rules-transcription:09-normal-move-one-per-phase",
+          "40k-app-core-rules-2026-08-25:09-normal-move-one-per-phase"
+        ],
+        "rule_id": "09-normal-move-one-per-phase",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+        "source_text": "A unit cannot make more than one Normal move per phase."
+      }
+    ]
+  },
+  "additional_source_context": [
+    {
+      "url": "https://www.40k.app/rules/07-the-battle-round",
+      "clauses": [
+        "07.02",
+        "07.02.02"
+      ],
+      "observation_kind": "browser inspection and paraphrase only",
+      "summary": "Both players take separate turns, each with its own sequence of phases. Expanded definitions distinguish either player’s phase from a player-specific phase. No full-category certification."
+    },
+    {
+      "url": "https://game-datamissions.com/11th/rules/changelog",
+      "observation_kind": "web tool read",
+      "selected_version": "946",
+      "version_date": "2026-09-02",
+      "visible_change": "18.04.01 Rapid Disembark And Limitations",
+      "comparison": "No co-versioned observation of 09.05.01 available in this inspected page"
+    }
+  ],
+  "scope": {
+    "runtime_changed": false,
+    "registered_source_changed": false,
+    "behavioral_test_inventory_changed": false,
+    "caudit_01_closed": false,
+    "all_category_snapshot_selected": false,
+    "pr_opened": false
+  },
+  "probe": {
+    "path": "scripts/probe_order80_normal_move.py",
+    "results": "docs/performance/order80/probe-results.json",
+    "fixture": "Two canonical five-model infantry units, generic engine-created optional reactive Normal Move permission, 0.25-inch legal PathWitness; no faction permission or whole-game certification claimed",
+    "post_fixture_state_mutation": "Only engine-owned mutation through LocalGameSession submissions and lifecycle advancement",
+    "expected": "Player B can Normal Move in its own Movement phase after a reaction in Player A’s earlier Movement phase",
+    "actual": "Normal Move absent after accepted reaction; present after declined reaction",
+    "assertion_semantics": "Success reproduces the defect and controls on the reviewed base, not rule compliance"
+  },
+  "complete_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "samples_seconds": [],
+    "mean_seconds": null,
+    "maximum_seconds": null,
+    "target_mean_below_seconds": 60,
+    "target_observed_maximum_at_most_seconds": 300,
+    "certified": false,
+    "hardware": {
+      "cpu": "Apple M5 Pro",
+      "logical_cpus": 18,
+      "memory_bytes": 68719476736,
+      "os": "macOS 26.7",
+      "os_build": "25G229",
+      "reference_status": "provisional"
+    },
+    "missing_prerequisites": [
+      "Representative versioned legal complete-game driver or recording",
+      "Declared legal rosters, terrain, seeds and decision policy",
+      "Initialization-to-normal-completion and replay/log output evidence",
+      "Complete-game workload exercising Order 74 continuous terrain solver"
+    ],
+    "capability_search": [
+      "src/warhammer40k_core/adapters/headless.py",
+      "src/warhammer40k_core/ai",
+      "src/warhammer40k_core/profiling",
+      "scripts",
+      "tools",
+      "tests/benchmarks"
+    ],
+    "diagnostic_note": "No component budget or full-game performance pass inferred from this correctness probe"
+  }
+}

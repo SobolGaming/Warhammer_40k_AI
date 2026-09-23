@@ -77,9 +77,9 @@ def test_order76_matched_proposal_cost_and_pure_rejection_evidence() -> None:
         "library_versions",
         "timing_boundary",
         "workload",
-        "hashes",
     ):
         assert base[key] == head[key], key
+    _assert_fixture_migration(base["hashes"], head["hashes"])
     for name, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
     assert len(base["samples"]) == len(head["samples"]) == head["completed_submissions"] == 30
@@ -98,3 +98,46 @@ def test_order76_matched_proposal_cost_and_pure_rejection_evidence() -> None:
             new["seconds"]
             <= old["seconds"] * budgets["maximum_ratio"] + budgets["jitter_allowance_seconds"]
         )
+
+
+def _assert_fixture_migration(base: dict[str, str], head: dict[str, str]) -> None:
+    migration = json.loads(
+        (ROOT / "docs/performance/order80/order76-fixture-migration.json").read_text()
+    )
+    changed = "tests/phase15c_fight_order_helpers.py"
+    assert migration["changed_file"] == changed
+    assert base.keys() == head.keys()
+    assert base[changed] == migration["base_sha256"]
+    assert head[changed] == migration["head_sha256"]
+    assert {name: value for name, value in base.items() if name != changed} == {
+        name: value for name, value in head.items() if name != changed
+    }
+    tree = ast.parse((ROOT / changed).read_text())
+    function = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "fight_lifecycle"
+    )
+    assert function.args.kwonlyargs[-1].arg == "record_deployment"
+    default = function.args.kw_defaults[-1]
+    assert default is not None
+    assert ast.dump(default) == "Constant(value=False)"
+    function.args.kwonlyargs.pop()
+    function.args.kw_defaults.pop()
+    branch = next(
+        node
+        for node in function.body
+        if isinstance(node, ast.If) and ast.unparse(node.test) == "record_deployment"
+    )
+    expected = ast.parse(
+        "if record_deployment:\n"
+        "    from tests.setup_completion_helpers import "
+        "record_current_battlefield_placements_for_fixture\n"
+        "    record_current_battlefield_placements_for_fixture(state, decisions=decisions)\n"
+    ).body[0]
+    assert ast.dump(branch) == ast.dump(expected)
+    function.body.remove(branch)
+    assert (
+        hashlib.sha256(ast.dump(tree, include_attributes=False).encode()).hexdigest()
+        == migration["default_behavior_ast_sha256"]
+    )

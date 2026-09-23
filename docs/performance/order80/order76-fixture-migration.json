@@ -1,0 +1,7 @@
+{
+  "scope": "Order 80 adds opt-in deployment history for its complete movement/restore fixture. Order 76 leaves the flag disabled; its original base measurements and numeric budgets remain unchanged. The current-runtime head was remeasured with the opt-in helper bytes.",
+  "changed_file": "tests/phase15c_fight_order_helpers.py",
+  "base_sha256": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473",
+  "head_sha256": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
+  "default_behavior_ast_sha256": "8173cc34b5abc3c8373eb139eb30f1e65a62e27c947f0bf48d4e617909749b45"
+}

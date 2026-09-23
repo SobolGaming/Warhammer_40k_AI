@@ -767,6 +767,7 @@ def test_each_surge_model_must_make_maximum_approach(distances: tuple[float, ...
         descriptor=surge_descriptor(),
         path_witness=surge_path(lifecycle, distances),
         battle_round=1,
+        turn_player_id="player-a",
     )
     assert not resolution.is_valid
 
@@ -829,6 +830,7 @@ def test_surge_engages_each_model_when_a_legal_path_reaches_target(
         descriptor=surge_descriptor(),
         path_witness=surge_path(lifecycle, (distance,) * 5),
         battle_round=1,
+        turn_player_id="player-a",
     )
     assert resolution.is_valid is valid
     if not valid:
@@ -912,6 +914,7 @@ def test_surge_cannot_end_engaged_with_another_enemy() -> None:
         descriptor=surge_descriptor(),
         path_witness=surge_path(lifecycle, (3,) * 5),
         battle_round=1,
+        turn_player_id="player-a",
     )
     assert not resolution.is_valid
     assert "surge_non_target_engagement" in {
@@ -1073,5 +1076,6 @@ def test_surge_cannot_take_to_the_skies() -> None:
             descriptor=surge_descriptor(),
             path_witness=surge_path(lifecycle, (3,) * 5),
             battle_round=1,
+            turn_player_id="player-a",
             take_to_the_skies=True,
         )

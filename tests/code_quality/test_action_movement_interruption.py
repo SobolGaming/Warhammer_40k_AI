@@ -162,6 +162,10 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
         (ROOT / "docs/performance/order79/inherited-fixture-migration.json").read_text()
     )
     changes = migration["changed_files"]
+    occurrence_migration = json.loads(
+        (ROOT / "docs/performance/order80/inherited-fixture-migration.json").read_text()
+    )["changed_files"]
+    assert set(occurrence_migration) == {"tests/phase17n_primary_mission_helpers.py"}
     assert set(changes) == {
         "tests/mission_action_history_helpers.py",
         "tests/phase17n_primary_mission_helpers.py",
@@ -170,7 +174,11 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
     for name in base:
         if name in changes:
             assert base[name] == changes[name]["base_sha256"], name
-            assert head[name] == changes[name]["head_sha256"], name
+            expected_head = changes[name]["head_sha256"]
+            if name in occurrence_migration:
+                assert occurrence_migration[name]["base_sha256"] == expected_head
+                expected_head = occurrence_migration[name]["head_sha256"]
+            assert head[name] == expected_head, name
         else:
             assert base[name] == head[name], name
     # The movement workload uses these unchanged roster/mission initializers;

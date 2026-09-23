@@ -1,0 +1,7 @@
+{
+  "workload": "order80-normal-move-occurrence-v1",
+  "mean_ratio": 1.25,
+  "mean_additive_seconds": 0.1,
+  "maximum_seconds": 12.0,
+  "rationale": "Matched accepted reaction, boundary and checkpoint workload. Preserve the existing 12-second focused movement ceiling, with 25% plus 100ms mean variability allowance. Correctness is independently required; no full-game certification."
+}

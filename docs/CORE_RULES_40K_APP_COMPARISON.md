@@ -29,7 +29,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 06 Other Concepts | [06.00](https://www.40k.app/rules/06-other-concepts) | authoritative_app_mirror | owned; see roadmap | P06A, P06B, P06C |
 | 07 The Battle Round | [07.00](https://www.40k.app/rules/07-the-battle-round) | authoritative_app_mirror | REVALIDATE | PFINAL |
 | 08 Command Phase | [08.00](https://www.40k.app/rules/08-command-phase) | authoritative_app_mirror | owned; see roadmap | P08A, P08B |
-| 09 Movement Phase | [09.00](https://www.40k.app/rules/09-movement-phase) | authoritative_app_mirror | owned; see roadmap | P09A, P09B |
+| 09 Movement Phase | [09.00](https://www.40k.app/rules/09-movement-phase) | authoritative_app_mirror | owned; see roadmap | P09A, P09B, P09C |
 | 10 Shooting Phase | [10.00](https://www.40k.app/rules/10-shooting-phase) | authoritative_app_mirror | owned; see roadmap | P10 |
 | 11 Charge Phase | [11.00](https://www.40k.app/rules/11-charge-phase) | authoritative_app_mirror | owned; see roadmap | P11A, P11B, P15E |
 | 12 Fight Phase | [12.00](https://www.40k.app/rules/12-fight-phase) | authoritative_app_mirror_controls_repository_conflict | owned; see roadmap | P12, P12B |

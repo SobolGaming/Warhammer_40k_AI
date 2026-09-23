@@ -4457,10 +4457,16 @@ def _scored_command_boundary_after_mutation(*, kind: str) -> GameLifecycle:
     record = state.determine_current_phase_end_objective_control()
     _emit_oc_event(decisions=decisions, record=record)
     if kind == "move":
+        mover = next(
+            unit
+            for army in state.army_definitions
+            if army.player_id == state.active_player_id
+            for unit in army.units
+        )
         append_authenticated_normal_move(
             state=state,
             decisions=decisions,
-            unit_instance_id=enemy.unit_instance_id,
+            unit_instance_id=mover.unit_instance_id,
             suffix="post-oc",
             pose_transform=lambda pose: Pose.at(
                 pose.position.x,

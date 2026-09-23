@@ -69,6 +69,7 @@ def resolve_triggered_movement(
     descriptor: TriggeredMovementDescriptor,
     path_witness: PathWitness,
     battle_round: int,
+    turn_player_id: str,
     battle_shocked_unit_ids: tuple[str, ...] = (),
     normal_move_states: tuple[NormalMoveState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
@@ -114,6 +115,7 @@ def resolve_triggered_movement(
         unit_placement=unit_placement,
         descriptor=descriptor,
         battle_round=triggered_round,
+        turn_player_id=_validate_identifier("turn_player_id", turn_player_id),
         battle_shocked_unit_ids=battle_shocked_unit_ids,
         normal_move_states=normal_move_states,
     )
@@ -346,6 +348,7 @@ def resolve_triggered_movement(
             selected=take_to_the_skies,
         ),
         "triggered_movement_kind": descriptor.movement_kind.value,
+        "movement_mode": descriptor.movement_mode.value,
         "displacement_kind": descriptor.displacement_kind.value,
         "source_rule_id": descriptor.source_rule_id,
         "trigger_timing": validate_json_value(descriptor.trigger_timing.to_payload()),
@@ -404,6 +407,7 @@ def _triggered_movement_restriction_violations(
     unit_placement: ChargePlacement,
     descriptor: TriggeredMovementDescriptor,
     battle_round: int,
+    turn_player_id: str,
     battle_shocked_unit_ids: tuple[str, ...],
     normal_move_states: tuple[NormalMoveState, ...],
 ) -> tuple[TriggeredMovementViolation, ...]:
@@ -445,14 +449,26 @@ def _triggered_movement_restriction_violations(
                     message="Units within Engagement Range cannot make surge moves.",
                 )
             )
-    requested_key = (
+    requested_occurrence = (
         battle_round,
+        turn_player_id,
         descriptor.trigger_timing.phase,
         unit_placement.player_id,
-        charge_placement_id(unit_placement),
     )
+    from warhammer40k_core.engine.unit_split_views import historical_split_successor_ids
+
+    unit_ids = {view.unit_instance_id, *view.component_unit_instance_ids}
     matching_prior_moves = tuple(
-        state for state in prior_normal_moves if state.same_phase_key() == requested_key
+        state
+        for state in prior_normal_moves
+        if state.same_phase_key()[:4] == requested_occurrence
+        and (
+            state.unit_instance_id in unit_ids
+            or view.unit_instance_id
+            in historical_split_successor_ids(
+                armies=scenario.armies, identity=state.unit_instance_id
+            )
+        )
     )
     if (
         descriptor.movement_kind is not TriggeredMovementKind.SURGE

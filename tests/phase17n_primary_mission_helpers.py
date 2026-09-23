@@ -415,6 +415,7 @@ def append_authenticated_normal_move(
     assert battlefield is not None
     assert active_player_id is not None
     placement = battlefield.unit_placement_by_id(unit_instance_id)
+    moving_player_id = placement.player_id
     model_paths = tuple(
         (row.model_instance_id, (row.pose, pose_transform(row.pose)))
         for row in placement.model_placements
@@ -437,7 +438,7 @@ def append_authenticated_normal_move(
     action_request = DecisionRequest(
         request_id=f"phase17n-authority-move-action-{suffix}",
         decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
-        actor_id=active_player_id,
+        actor_id=moving_player_id,
         payload=validate_json_value(
             {
                 "game_id": state.game_id,
@@ -471,7 +472,7 @@ def append_authenticated_normal_move(
     proposal_request = MovementProposalRequest(
         request_id=f"phase17n-authority-move-proposal-{suffix}",
         decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
-        actor_id=active_player_id,
+        actor_id=moving_player_id,
         game_id=state.game_id,
         battle_round=state.battle_round,
         phase=BattlePhase.MOVEMENT.value,
@@ -489,7 +490,7 @@ def append_authenticated_normal_move(
         result_id=f"phase17n-authority-move-proposal-result-{suffix}",
         request_id=proposal_decision_request.request_id,
         decision_type=proposal_decision_request.decision_type,
-        actor_id=active_player_id,
+        actor_id=moving_player_id,
         selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
         payload=validate_json_value(
             MovementProposalPayload(

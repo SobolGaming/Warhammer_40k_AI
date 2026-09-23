@@ -17,8 +17,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayloadPayload,
 )
 from warhammer40k_core.engine.normal_move_history import (
-    NormalMoveSourceKind,
-    NormalMoveState,
+    normal_move_turn_player_id,
 )
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
@@ -147,6 +146,7 @@ def request_from_state(
             move_keyword_choice=cast(dict[str, JsonValue], keyword_option.payload).get(CHOICE_KEY),
             surge_target_unit_instance_id=target_id,
             battle_round=state.battle_round,
+            turn_player_id=normal_move_turn_player_id(state),
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             normal_move_states=tuple(state.normal_move_states),
         )
@@ -253,6 +253,7 @@ def apply_decision(
         move_keyword_choice=payload.get(CHOICE_KEY),
         surge_target_unit_instance_id=selected_surge_target(payload, descriptor),
         battle_round=state.battle_round,
+        turn_player_id=normal_move_turn_player_id(state),
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
     )
@@ -305,22 +306,6 @@ def apply_decision(
             resolution=resolution,
         )
     )
-    if (
-        descriptor.movement_mode is MovementMode.NORMAL
-        and descriptor.movement_kind is not TriggeredMovementKind.SURGE
-    ):
-        state.record_normal_move_state(
-            NormalMoveState(
-                player_id=unit_placement.player_id,
-                battle_round=state.battle_round,
-                phase=descriptor.trigger_timing.phase,
-                unit_instance_id=unit_instance_id,
-                source_rule_id=descriptor.source_rule_id,
-                source_kind=NormalMoveSourceKind.TRIGGERED,
-                request_id=result.request_id,
-                result_id=result.result_id,
-            )
-        )
     record_move_completion_event(
         state=state,
         decisions=decisions,
@@ -390,6 +375,7 @@ def apply_proposal_decision(
         move_keyword_choice=(proposal_request.context or {}).get(CHOICE_KEY),
         surge_target_unit_instance_id=selected_surge_target(proposal_request.context, descriptor),
         battle_round=state.battle_round,
+        turn_player_id=normal_move_turn_player_id(state),
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
     )
@@ -425,22 +411,6 @@ def apply_proposal_decision(
             resolution=resolution,
         )
     )
-    if (
-        descriptor.movement_mode is MovementMode.NORMAL
-        and descriptor.movement_kind is not TriggeredMovementKind.SURGE
-    ):
-        state.record_normal_move_state(
-            NormalMoveState(
-                player_id=unit_placement.player_id,
-                battle_round=state.battle_round,
-                phase=descriptor.trigger_timing.phase,
-                unit_instance_id=proposal_request.unit_instance_id,
-                source_rule_id=descriptor.source_rule_id,
-                source_kind=NormalMoveSourceKind.TRIGGERED,
-                request_id=result.request_id,
-                result_id=result.result_id,
-            )
-        )
     record_move_completion_event(
         state=state,
         decisions=decisions,

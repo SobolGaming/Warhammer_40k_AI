@@ -22,6 +22,7 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
         >= {
             "C01-04": "P01D",
             "C03-04": "P03D",
+            "C09-03": "P09C",
             "C02-05": "P02E",
             "C11-04": "P11B",
             "C12-04": "P12B",

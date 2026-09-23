@@ -1,0 +1,496 @@
+{
+  "cases": [
+    {
+      "case": "accepted_reaction",
+      "reacting_unit": "army-beta:enemy",
+      "reacting_unit_owner": "player-b",
+      "reaction_turn_owner": "player-a",
+      "reaction_distance_inches": 0.25,
+      "normal_move_history": [
+        {
+          "player_id": "player-b",
+          "battle_round": 1,
+          "phase": "movement",
+          "unit_instance_id": "army-beta:enemy",
+          "source_rule_id": "test:order80:reactive-normal-move",
+          "source_kind": "triggered",
+          "request_id": "decision-request-000001",
+          "result_id": "order80-reactive-normal"
+        }
+      ],
+      "same_phase_restriction_codes": [
+        "normal_move_already_used_this_phase"
+      ],
+      "different_phase_restriction_codes": [],
+      "next_turn_normal_move_offered": false,
+      "expected_next_turn_normal_move_offered": true,
+      "decision_trace": [
+        {
+          "turn_player_id": "player-a",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_unit",
+          "option_ids": [
+            "army-alpha:mover"
+          ]
+        },
+        {
+          "turn_player_id": "player-a",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_action",
+          "option_ids": [
+            "advance",
+            "normal_move",
+            "remain_stationary"
+          ]
+        },
+        {
+          "turn_player_id": "player-a",
+          "battle_round": 1,
+          "phase": "shooting",
+          "decision_type": "select_shooting_unit",
+          "option_ids": [
+            "army-alpha:mover",
+            "complete_shooting_phase"
+          ]
+        },
+        {
+          "turn_player_id": "player-b",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_unit",
+          "option_ids": [
+            "army-beta:enemy"
+          ]
+        },
+        {
+          "turn_player_id": "player-b",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_action",
+          "option_ids": [
+            "advance",
+            "remain_stationary"
+          ]
+        }
+      ],
+      "checkpoint_round_trip_exact": true,
+      "replay_status": "reproduced",
+      "viewer_pending_decisions": {
+        "player-a": {
+          "schema_version": "decision-request-view-v5-phase17n-step4",
+          "request_id": "decision-request-000006",
+          "decision_type": "select_movement_action",
+          "actor_id": "player-b",
+          "payload": {
+            "game_id": "order80-normal-turn-True",
+            "battle_round": 1,
+            "phase": "movement",
+            "active_player_id": "player-b",
+            "unit_instance_id": "army-beta:enemy",
+            "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
+          },
+          "options": [
+            {
+              "option_id": "advance",
+              "label": "Advance",
+              "payload": {
+                "movement_phase_action": "advance",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_mode": "advance"
+              }
+            },
+            {
+              "option_id": "remain_stationary",
+              "label": "Remain Stationary",
+              "payload": {
+                "movement_phase_action": "remain_stationary",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_inches": 0,
+                "model_movements": [],
+                "witness": null
+              }
+            }
+          ],
+          "is_parameterized": false,
+          "interaction": {
+            "schema_version": "interaction-descriptor-v2-variants",
+            "interaction_kind": "finite_option_list",
+            "submission_kind": "finite",
+            "proposal_kind": null,
+            "selected_entity_ids": [
+              "army-beta:enemy"
+            ],
+            "required_inputs": [
+              "selected_option"
+            ],
+            "submission_variants": [
+              {
+                "variant_id": "finite_option",
+                "interaction_kind": "finite_option_list",
+                "required_inputs": [
+                  "selected_option"
+                ],
+                "proposal_schema_ref": null,
+                "display_label": "Confirm Option"
+              }
+            ],
+            "constraints": {
+              "candidate_option_ids": [
+                "advance",
+                "remain_stationary"
+              ],
+              "entity_kinds": [],
+              "minimum_selections": 1,
+              "maximum_selections": 1,
+              "maximum_distance_in": null,
+              "minimum_enemy_distance_in": null,
+              "exact_model_count": null,
+              "must_preserve_coherency": null,
+              "may_enter_engagement_range": null,
+              "placement_kinds": [],
+              "submission_schema_ref": "finite-submission.schema.json",
+              "proposal_schema_ref": null
+            },
+            "display_hints": {
+              "confirm_label": "Confirm Option",
+              "decline_label": null
+            }
+          }
+        },
+        "player-b": {
+          "schema_version": "decision-request-view-v5-phase17n-step4",
+          "request_id": "decision-request-000006",
+          "decision_type": "select_movement_action",
+          "actor_id": "player-b",
+          "payload": {
+            "game_id": "order80-normal-turn-True",
+            "battle_round": 1,
+            "phase": "movement",
+            "active_player_id": "player-b",
+            "unit_instance_id": "army-beta:enemy",
+            "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
+          },
+          "options": [
+            {
+              "option_id": "advance",
+              "label": "Advance",
+              "payload": {
+                "movement_phase_action": "advance",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_mode": "advance"
+              }
+            },
+            {
+              "option_id": "remain_stationary",
+              "label": "Remain Stationary",
+              "payload": {
+                "movement_phase_action": "remain_stationary",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_inches": 0,
+                "model_movements": [],
+                "witness": null
+              }
+            }
+          ],
+          "is_parameterized": false,
+          "interaction": {
+            "schema_version": "interaction-descriptor-v2-variants",
+            "interaction_kind": "finite_option_list",
+            "submission_kind": "finite",
+            "proposal_kind": null,
+            "selected_entity_ids": [
+              "army-beta:enemy"
+            ],
+            "required_inputs": [
+              "selected_option"
+            ],
+            "submission_variants": [
+              {
+                "variant_id": "finite_option",
+                "interaction_kind": "finite_option_list",
+                "required_inputs": [
+                  "selected_option"
+                ],
+                "proposal_schema_ref": null,
+                "display_label": "Confirm Option"
+              }
+            ],
+            "constraints": {
+              "candidate_option_ids": [
+                "advance",
+                "remain_stationary"
+              ],
+              "entity_kinds": [],
+              "minimum_selections": 1,
+              "maximum_selections": 1,
+              "maximum_distance_in": null,
+              "minimum_enemy_distance_in": null,
+              "exact_model_count": null,
+              "must_preserve_coherency": null,
+              "may_enter_engagement_range": null,
+              "placement_kinds": [],
+              "submission_schema_ref": "finite-submission.schema.json",
+              "proposal_schema_ref": null
+            },
+            "display_hints": {
+              "confirm_label": "Confirm Option",
+              "decline_label": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "case": "declined_reaction_control",
+      "reacting_unit": "army-beta:enemy",
+      "reacting_unit_owner": "player-b",
+      "reaction_turn_owner": "player-a",
+      "reaction_distance_inches": 0,
+      "normal_move_history": [],
+      "same_phase_restriction_codes": [],
+      "different_phase_restriction_codes": [],
+      "next_turn_normal_move_offered": true,
+      "expected_next_turn_normal_move_offered": true,
+      "decision_trace": [
+        {
+          "turn_player_id": "player-a",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_unit",
+          "option_ids": [
+            "army-alpha:mover"
+          ]
+        },
+        {
+          "turn_player_id": "player-a",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_action",
+          "option_ids": [
+            "advance",
+            "normal_move",
+            "remain_stationary"
+          ]
+        },
+        {
+          "turn_player_id": "player-a",
+          "battle_round": 1,
+          "phase": "shooting",
+          "decision_type": "select_shooting_unit",
+          "option_ids": [
+            "army-alpha:mover",
+            "complete_shooting_phase"
+          ]
+        },
+        {
+          "turn_player_id": "player-b",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_unit",
+          "option_ids": [
+            "army-beta:enemy"
+          ]
+        },
+        {
+          "turn_player_id": "player-b",
+          "battle_round": 1,
+          "phase": "movement",
+          "decision_type": "select_movement_action",
+          "option_ids": [
+            "advance",
+            "normal_move",
+            "remain_stationary"
+          ]
+        }
+      ],
+      "checkpoint_round_trip_exact": true,
+      "replay_status": "reproduced",
+      "viewer_pending_decisions": {
+        "player-a": {
+          "schema_version": "decision-request-view-v5-phase17n-step4",
+          "request_id": "decision-request-000006",
+          "decision_type": "select_movement_action",
+          "actor_id": "player-b",
+          "payload": {
+            "game_id": "order80-normal-turn-False",
+            "battle_round": 1,
+            "phase": "movement",
+            "active_player_id": "player-b",
+            "unit_instance_id": "army-beta:enemy",
+            "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
+          },
+          "options": [
+            {
+              "option_id": "advance",
+              "label": "Advance",
+              "payload": {
+                "movement_phase_action": "advance",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_mode": "advance"
+              }
+            },
+            {
+              "option_id": "normal_move",
+              "label": "Normal Move",
+              "payload": {
+                "movement_phase_action": "normal_move",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_mode": "normal"
+              }
+            },
+            {
+              "option_id": "remain_stationary",
+              "label": "Remain Stationary",
+              "payload": {
+                "movement_phase_action": "remain_stationary",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_inches": 0,
+                "model_movements": [],
+                "witness": null
+              }
+            }
+          ],
+          "is_parameterized": false,
+          "interaction": {
+            "schema_version": "interaction-descriptor-v2-variants",
+            "interaction_kind": "finite_option_list",
+            "submission_kind": "finite",
+            "proposal_kind": null,
+            "selected_entity_ids": [
+              "army-beta:enemy"
+            ],
+            "required_inputs": [
+              "selected_option"
+            ],
+            "submission_variants": [
+              {
+                "variant_id": "finite_option",
+                "interaction_kind": "finite_option_list",
+                "required_inputs": [
+                  "selected_option"
+                ],
+                "proposal_schema_ref": null,
+                "display_label": "Confirm Option"
+              }
+            ],
+            "constraints": {
+              "candidate_option_ids": [
+                "advance",
+                "normal_move",
+                "remain_stationary"
+              ],
+              "entity_kinds": [],
+              "minimum_selections": 1,
+              "maximum_selections": 1,
+              "maximum_distance_in": null,
+              "minimum_enemy_distance_in": null,
+              "exact_model_count": null,
+              "must_preserve_coherency": null,
+              "may_enter_engagement_range": null,
+              "placement_kinds": [],
+              "submission_schema_ref": "finite-submission.schema.json",
+              "proposal_schema_ref": null
+            },
+            "display_hints": {
+              "confirm_label": "Confirm Option",
+              "decline_label": null
+            }
+          }
+        },
+        "player-b": {
+          "schema_version": "decision-request-view-v5-phase17n-step4",
+          "request_id": "decision-request-000006",
+          "decision_type": "select_movement_action",
+          "actor_id": "player-b",
+          "payload": {
+            "game_id": "order80-normal-turn-False",
+            "battle_round": 1,
+            "phase": "movement",
+            "active_player_id": "player-b",
+            "unit_instance_id": "army-beta:enemy",
+            "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
+          },
+          "options": [
+            {
+              "option_id": "advance",
+              "label": "Advance",
+              "payload": {
+                "movement_phase_action": "advance",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_mode": "advance"
+              }
+            },
+            {
+              "option_id": "normal_move",
+              "label": "Normal Move",
+              "payload": {
+                "movement_phase_action": "normal_move",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_mode": "normal"
+              }
+            },
+            {
+              "option_id": "remain_stationary",
+              "label": "Remain Stationary",
+              "payload": {
+                "movement_phase_action": "remain_stationary",
+                "unit_instance_id": "army-beta:enemy",
+                "movement_inches": 0,
+                "model_movements": [],
+                "witness": null
+              }
+            }
+          ],
+          "is_parameterized": false,
+          "interaction": {
+            "schema_version": "interaction-descriptor-v2-variants",
+            "interaction_kind": "finite_option_list",
+            "submission_kind": "finite",
+            "proposal_kind": null,
+            "selected_entity_ids": [
+              "army-beta:enemy"
+            ],
+            "required_inputs": [
+              "selected_option"
+            ],
+            "submission_variants": [
+              {
+                "variant_id": "finite_option",
+                "interaction_kind": "finite_option_list",
+                "required_inputs": [
+                  "selected_option"
+                ],
+                "proposal_schema_ref": null,
+                "display_label": "Confirm Option"
+              }
+            ],
+            "constraints": {
+              "candidate_option_ids": [
+                "advance",
+                "normal_move",
+                "remain_stationary"
+              ],
+              "entity_kinds": [],
+              "minimum_selections": 1,
+              "maximum_selections": 1,
+              "maximum_distance_in": null,
+              "minimum_enemy_distance_in": null,
+              "exact_model_count": null,
+              "must_preserve_coherency": null,
+              "may_enter_engagement_range": null,
+              "placement_kinds": [],
+              "submission_schema_ref": "finite-submission.schema.json",
+              "proposal_schema_ref": null
+            },
+            "display_hints": {
+              "confirm_label": "Confirm Option",
+              "decline_label": null
+            }
+          }
+        }
+      }
+    }
+  ]
+}

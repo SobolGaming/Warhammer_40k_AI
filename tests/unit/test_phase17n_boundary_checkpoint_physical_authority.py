@@ -674,7 +674,7 @@ def test_vanguard_failure_cannot_be_rewritten_by_moving_enemy_only_in_checkpoint
         player_id="player-b",
         mission_action_id="vanguard-operation",
         current_phase=BattlePhase.FIGHT,
-        vanguard_enemy_position="near_outside",
+        vanguard_enemy_position="inside",
     )
     target_area = _target_area(state=state, target_id=target_id)
     _, target_min_y, _, _ = target_area.bounds()
@@ -684,18 +684,7 @@ def test_vanguard_failure_cannot_be_rewritten_by_moving_enemy_only_in_checkpoint
         if army.player_id != action.player_id
         for unit in army.units
     )
-    append_authenticated_normal_move(
-        state=state,
-        decisions=decisions,
-        unit_instance_id=enemy_unit_id,
-        suffix="vanguard-enemy-inside",
-        pose_transform=lambda pose: Pose.at(
-            pose.position.x,
-            target_min_y + 1.0,
-            pose.position.z,
-            facing_degrees=pose.facing.degrees,
-        ),
-    )
+    # The accepted Action checkpoint anchors the enemy inside the target area.
     _resolve_vanguard_failure(
         state=state,
         decisions=decisions,
@@ -734,28 +723,11 @@ def test_vanguard_actor_cannot_be_placed_inside_only_in_terminal_checkpoint() ->
         player_id="player-b",
         mission_action_id="vanguard-operation",
         current_phase=BattlePhase.FIGHT,
-        vanguard_enemy_position="inside",
+        vanguard_enemy_position="near_outside",
     )
     target_area = _target_area(state=state, target_id=target_id)
     _, min_y, _, max_y = target_area.bounds()
-    enemy_unit_id = next(
-        unit.unit_instance_id
-        for army in state.army_definitions
-        if army.player_id != action.player_id
-        for unit in army.units
-    )
-    append_authenticated_normal_move(
-        state=state,
-        decisions=decisions,
-        unit_instance_id=enemy_unit_id,
-        suffix="vanguard-enemy-outside",
-        pose_transform=lambda pose: Pose.at(
-            pose.position.x,
-            min_y - 2.0,
-            pose.position.z,
-            facing_degrees=pose.facing.degrees,
-        ),
-    )
+    # Enemy models start outside; only the acting unit needs a recorded move.
     # Isolate the checkpoint forgery from the independent move-interruption guard.
     # Full restore rejects suppressed interruptions in the Order 77 regression.
     assert state.mission_action_states == [action]

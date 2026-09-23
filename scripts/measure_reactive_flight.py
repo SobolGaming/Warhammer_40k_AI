@@ -93,6 +93,7 @@ def main() -> None:
                 descriptor=descriptor,
                 path_witness=path,
                 battle_round=1,
+                turn_player_id="player-a",
                 take_to_the_skies=True,
             )
             for path in paths

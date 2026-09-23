@@ -6686,3 +6686,19 @@ only mutable outcome fields. A saved source substitution cannot select another
 Action's completion policy while retaining the original accepted start. Started
 Actions receive the same check before returning without a terminal. Existing
 start-event fields and restore errors cover this invariant.
+
+## Order 80 — Normal Move occurrence identity
+
+Normal Move history carries required `turn_player_id` separately from the unit's
+`player_id`. A phase occurrence is identified by round, turn player and phase;
+temporary effective-player scopes do not change it. Ordinary and reactive Normal
+Moves share completion recording, querying and restore validation. Triggered
+completion events expose the canonical descriptor `movement_mode` so history
+classification does not infer a Normal Move from a generic displacement kind.
+Accepted decision and completion evidence must agree with saved occurrence
+records; missing or drifted evidence fails restore.
+
+Existing finite selections and typed movement proposals cover the player choices.
+Both adapters and replay continue through lifecycle submission, with unchanged
+viewer visibility. Contract 35, persistence v27 and replay v29 require explicit
+occurrence evidence; see [the migration](../contracts/migrations/34-to-35.md).

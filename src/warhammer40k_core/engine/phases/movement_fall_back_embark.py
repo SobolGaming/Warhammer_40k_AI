@@ -1010,19 +1010,6 @@ def _complete_movement_activation_with_record_ids(
     if movement_state is None or movement_state.active_selection is None:
         raise GameLifecycleError("Movement activation completion requires active selection.")
     active_selection = movement_state.active_selection
-    if action is MovementPhaseActionKind.NORMAL_MOVE:
-        state.record_normal_move_state(
-            NormalMoveState(
-                player_id=active_selection.player_id,
-                battle_round=state.battle_round,
-                phase=BattlePhase.MOVEMENT,
-                unit_instance_id=active_selection.unit_instance_id,
-                source_rule_id=ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID,
-                source_kind=NormalMoveSourceKind.MOVEMENT_PHASE_ACTION,
-                request_id=request_id,
-                result_id=result_id,
-            )
-        )
     state.replace_movement_phase_state(
         movement_state.with_activation_complete(
             active_selection.unit_instance_id,
