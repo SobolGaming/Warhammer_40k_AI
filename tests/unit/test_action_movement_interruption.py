@@ -20,12 +20,19 @@ from tests.phase17n_step6g_secondary_certification_helpers import (
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.engine.actions import MissionActionStatus
+from warhammer40k_core.engine.actions import (
+    MissionActionState,
+    MissionActionStatePayload,
+    MissionActionStatus,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_prevents_rules_unit_from_shooting_this_phase,
     rules_unit_started_mission_action_this_turn,
+)
+from warhammer40k_core.engine.mission_action_terminal_integrity import (
+    validate_mission_action_terminal_event,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.primary_mission_action_interruptions import (
@@ -302,17 +309,18 @@ def test_secondary_terminal_cannot_hide_suppressed_move_interruption(
 @pytest.mark.parametrize(
     ("phase", "timing", "failed", "substitute_source", "diagnostic"),
     [
-        ("shooting", "turn_end", False, False, "completion timing"),
-        ("fight", "turn_end", False, False, "completion boundary"),
-        ("shooting", "immediate", False, False, "source completion timing"),
-        ("fight", "turn_end", True, False, "completion boundary"),
+        ("shooting", "turn_end", False, "none", "completion timing"),
+        ("fight", "turn_end", False, "none", "completion boundary"),
+        ("shooting", "immediate", False, "none", "Mission Action start event state"),
+        ("fight", "turn_end", True, "none", "completion boundary"),
         (
             "shooting",
             "immediate",
             False,
-            True,
+            "saved_and_start",
             "Activity restriction Action decision subject or timing",
         ),
+        ("shooting", "immediate", False, "saved_only", "Mission Action start event state"),
     ],
 )
 def test_coordinated_secondary_completion_cannot_hide_move_interruption(
@@ -320,7 +328,7 @@ def test_coordinated_secondary_completion_cannot_hide_move_interruption(
     phase: str,
     timing: str,
     failed: bool,
-    substitute_source: bool,
+    substitute_source: str,
     diagnostic: str,
 ) -> None:
     """R77-001: matching saved state and terminal fields do not prove completion."""
@@ -336,10 +344,11 @@ def test_coordinated_secondary_completion_cannot_hide_move_interruption(
     action["completed_battle_round"] = None if failed else action["battle_round_started"]
     action["completed_phase"] = None if failed else phase
     action["completion_timing"] = timing
-    if substitute_source:
+    if substitute_source != "none":
         action["mission_action_id"] = "plunder-terrain"
         action["mission_id"] = "plunder"
         action["scoring_source_id"] = "plunder"
+    if substitute_source == "saved_and_start":
         start = next(e for e in events if e["event_type"] == "mission_action_started")
         start_payload = cast(dict[str, JsonValue], start["payload"])
         start_payload["mission_action_id"] = action["mission_action_id"]
@@ -360,10 +369,67 @@ def test_coordinated_secondary_completion_cannot_hide_move_interruption(
         "mission_action_id": action["mission_action_id"],
         "mission_action_state": cast(JsonValue, deepcopy(action)),
     }
+    if substitute_source != "saved_and_start":
+        assert next(e for e in events if e["event_type"] == "mission_action_started") == next(
+            e
+            for e in original["decisions"]["event_log"]
+            if e["event_type"] == "mission_action_started"
+        )
+    assert [e for e in events if e["event_type"] == "triggered_movement_resolved"] == [
+        e
+        for e in original["decisions"]["event_log"]
+        if e["event_type"] == "triggered_movement_resolved"
+    ]
     assert payload["decisions"]["records"] == original["decisions"]["records"]
     assert payload["state"]["model_movement_history"] == original["state"]["model_movement_history"]
     with pytest.raises(GameLifecycleError, match=diagnostic):
         GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize("started", [False, True])
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("mission_id", "forged-mission"),
+        ("target_id", "forged-target"),
+        ("condition_target_id", "forged-condition"),
+        ("start_timing", "forged-window"),
+        ("completion_timing", "immediate"),
+        ("interruption_conditions", []),
+        ("scoring_source_id", "forged-source"),
+        ("victory_points", 10),
+    ],
+)
+def test_secondary_history_binds_immutable_start_fields_before_status_policy(
+    interrupted_secondary_return_session: LocalGameSession,
+    started: bool,
+    field: str,
+    value: JsonValue,
+) -> None:
+    lifecycle = interrupted_secondary_return_session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    action = state.mission_action_states[-1]
+    if started:
+        action = replace(action, status=MissionActionStatus.STARTED, interrupted_reason=None)
+    forged_payload = cast(dict[str, JsonValue], action.to_payload())
+    forged_payload[field] = value
+    forged = MissionActionState.from_payload(cast(MissionActionStatePayload, forged_payload))
+    events = lifecycle.decision_controller.event_log.records
+    start = next(e for e in events if e.event_type == "mission_action_started")
+    terminal = next(e for e in events if e.event_type == "mission_action_interrupted")
+    terminal_payload = deepcopy(cast(dict[str, JsonValue], terminal.payload))
+    terminal_payload["mission_action_state"] = cast(JsonValue, forged.to_payload())
+    terminal = replace(terminal, payload=terminal_payload)
+    with pytest.raises(GameLifecycleError, match="Mission Action start event state"):
+        validate_mission_action_terminal_event(
+            state=state,
+            action=forged,
+            start=start,
+            terminals=() if started else (terminal,),
+            event_index_by_id={e.event_id: i for i, e in enumerate(events)},
+            event_records=events,
+        )
 
 
 @pytest.fixture(scope="module")

@@ -15,11 +15,11 @@ versions and input hashes are recorded in the JSON.
 
 | Completed move | Base submit mean / max (s) | Head submit mean / max (s) | Head restore mean / max (s) |
 | --- | ---: | ---: | ---: |
-| translation | 1.4363 / 4.1747 | 1.4470 / 4.2062 | 0.4784 / 0.4798 |
-| return | 0.0748 / 0.0918 | 0.0765 / 0.0938 | 0.4774 / 0.4782 |
-| zero | 0.0663 / 0.0669 | 0.0675 / 0.0679 | 0.4945 / 0.5238 |
-| rotation | 0.0776 / 0.0941 | 0.0772 / 0.0949 | 0.4854 / 0.4876 |
-| rotation_return | 0.0680 / 0.0682 | 0.0683 / 0.0695 | 0.4855 / 0.4862 |
+| translation | 1.4022 / 4.0728 | 1.3941 / 4.0493 | 0.4663 / 0.4688 |
+| return | 0.0737 / 0.0921 | 0.0742 / 0.0892 | 0.4659 / 0.4683 |
+| zero | 0.0644 / 0.0661 | 0.0657 / 0.0677 | 0.4799 / 0.5032 |
+| rotation | 0.0744 / 0.0913 | 0.0757 / 0.0944 | 0.4744 / 0.4777 |
+| rotation_return | 0.0658 / 0.0661 | 0.0673 / 0.0684 | 0.4745 / 0.4789 |
 
 The declared limits remain 12 seconds per submission or restore and 3× the matching base
 sample plus 50 ms jitter allowance. The fast quality gate authenticates matching
@@ -46,6 +46,13 @@ The coordinated-forgery repair also retains `r77_001_boundary/base.json`, measur
 from `9039621f8a7c0af59740ec2728b1191419c50633` before runtime changes. The current
 head must satisfy the same unchanged budgets against all three baselines.
 
+The saved-source repair retains `r77_001_start_binding/base.json` and
+`r77_001_start_binding/completion-base.json`, measured from
+`3eefd48a95d39f29ec989fd4fb15dce311cee0cd` before changing runtime code. The current
+submission/interrupted-restore head must satisfy all four baselines; the current
+completed-Cleanse head must satisfy both completion baselines. Workloads, fixture
+hashes, timing boundaries and numeric limits remain unchanged.
+
 `r77_001_boundary/completion-base.json` and `completion-head.json` additionally
 measure the changed completion-boundary branch directly. Both runtimes restore
 the same canonical completed Cleanse fixture fifteen times, with its real turn-end
@@ -63,8 +70,9 @@ PYTHONPATH=.:scripts uv run --no-sync python scripts/measure_order77_completion.
 
 The completion baseline is `9039621f8a7c0af59740ec2728b1191419c50633`; both runs
 use the current canonical fixture helpers, whose hashes are retained in the reports.
-Baseline restore mean/max: 0.4083/0.4410 seconds. Head restore mean/max:
-0.4064/0.4219 seconds. All fifteen completed-Action restores round-trip exactly.
+Baseline restore mean/max: 0.4132/0.4159 seconds. Head restore mean/max:
+0.4146/0.4178 seconds, versus 0.4105/0.4135 seconds at `3eefd48a`.
+All fifteen completed-Action restores round-trip exactly.
 
 ## Preserved phase-flow diagnostic
 

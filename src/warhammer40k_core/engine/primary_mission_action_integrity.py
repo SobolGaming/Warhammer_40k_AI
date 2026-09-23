@@ -17,7 +17,6 @@ from warhammer40k_core.engine.mission_action_policies import (
 )
 from warhammer40k_core.engine.mission_action_terminal_integrity import (
     MISSION_ACTION_TERMINAL_EVENT_TYPES,
-    validate_mission_action_event_context,
     validate_mission_action_terminal_event,
 )
 from warhammer40k_core.engine.mission_terrain import (
@@ -663,24 +662,7 @@ def _validate_action_events(
     )
     if len(starts) != 1:
         raise GameLifecycleError("Primary Mission Action requires one authenticated start event.")
-    expected_started = replace(
-        action,
-        status=MissionActionStatus.STARTED,
-        completed_battle_round=None,
-        completed_phase=None,
-        interrupted_reason=None,
-        score_transaction_id=None,
-    )
     start = starts[0]
-    if _nested_action_payload(start) != expected_started.to_payload():
-        raise GameLifecycleError("Primary Mission Action start event state drifted.")
-    validate_mission_action_event_context(
-        state=state,
-        action=action,
-        event=start,
-        battle_round=action.battle_round_started,
-        phase=action.phase_started,
-    )
     start_payload = _object(start.payload, label="Primary Mission Action start event")
     if (
         start_payload.get("mission_action_id") != action.mission_action_id

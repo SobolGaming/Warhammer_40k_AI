@@ -6654,3 +6654,11 @@ final phase, plus its unique source-authenticated boundary event ordered after
 Action start and before the terminal. Existing Objective Control checkpoint and
 lifecycle restore authority continues to authenticate that record. This uses
 existing records and schemas; no new adapter payload or player choice is added.
+
+Before selecting completion timing or accepting any terminal cutoff, restore
+also binds every immutable saved Action field to its authenticated start snapshot.
+Primary and secondary Actions share the complete snapshot comparison, excluding
+only mutable outcome fields. A saved source substitution cannot select another
+Action's completion policy while retaining the original accepted start. Started
+Actions receive the same check before returning without a terminal. Existing
+start-event fields and restore errors cover this invariant.

@@ -53,6 +53,20 @@ def test_action_interruption_uses_one_completed_move_authority() -> None:
     assert "mission_action_for_state(" in terminal
     assert "ObjectiveControlTiming.TURN_END" in terminal
     assert "def _validate_completion_boundary_event(" in terminal
+    terminal_functions = {
+        node.name: node for node in ast.parse(terminal).body if isinstance(node, ast.FunctionDef)
+    }
+    terminal_validation = ast.unparse(terminal_functions["validate_mission_action_terminal_event"])
+    assert terminal_validation.index("_validate_mission_action_start_state(") < (
+        terminal_validation.index("if action.status")
+    )
+    assert terminal_validation.index("_validate_mission_action_start_state(") < (
+        terminal_validation.index("_validate_completion_timing_and_boundary(")
+    )
+    start_validation = ast.unparse(terminal_functions["_validate_mission_action_start_state"])
+    assert "expected_started.to_payload()" in start_validation
+    assert "validate_mission_action_event_context(" in start_validation
+    assert "expected_started" not in (ENGINE / "primary_mission_action_integrity.py").read_text()
     assert (
         "def _validate_completion_boundary_event("
         not in (ENGINE / "primary_mission_action_integrity.py").read_text()
@@ -60,7 +74,13 @@ def test_action_interruption_uses_one_completed_move_authority() -> None:
 
 
 @pytest.mark.parametrize(
-    "baseline", ["base.json", "r77_001/base.json", "r77_001_boundary/base.json"]
+    "baseline",
+    [
+        "base.json",
+        "r77_001/base.json",
+        "r77_001_boundary/base.json",
+        "r77_001_start_binding/base.json",
+    ],
 )
 def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
     folder = ROOT / "docs/performance/order77"
@@ -103,12 +123,11 @@ def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
         )
 
 
-def test_order77_completed_secondary_restore_cost_evidence() -> None:
+@pytest.mark.parametrize("baseline", ["r77_001_boundary", "r77_001_start_binding"])
+def test_order77_completed_secondary_restore_cost_evidence(baseline: str) -> None:
     folder = ROOT / "docs/performance/order77"
-    base, head = (
-        json.loads((folder / "r77_001_boundary" / name).read_text())
-        for name in ("completion-base.json", "completion-head.json")
-    )
+    base = json.loads((folder / baseline / "completion-base.json").read_text())
+    head = json.loads((folder / "r77_001_boundary/completion-head.json").read_text())
     budgets = json.loads((folder / "budgets.json").read_text())
     assert head["runtime_build_id"] == verified_engine_build_identity().build_id
     for key in (

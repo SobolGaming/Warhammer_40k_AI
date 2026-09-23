@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.actions import (
@@ -39,6 +40,7 @@ def validate_mission_action_terminal_event(
     event_index_by_id: dict[str, int],
     event_records: tuple[EventRecord, ...],
 ) -> EventRecord | None:
+    _validate_mission_action_start_state(state=state, action=action, start=start)
     if action.status is MissionActionStatus.STARTED:
         if terminals:
             raise GameLifecycleError("Started Mission Action has a terminal event.")
@@ -97,6 +99,29 @@ def validate_mission_action_terminal_event(
             event_index_by_id=event_index_by_id,
         )
     return terminal
+
+
+def _validate_mission_action_start_state(
+    *, state: GameState, action: MissionActionState, start: EventRecord
+) -> None:
+    """Bind every immutable saved field to the start authenticated by decision history."""
+    expected_started = replace(
+        action,
+        status=MissionActionStatus.STARTED,
+        completed_battle_round=None,
+        completed_phase=None,
+        interrupted_reason=None,
+        score_transaction_id=None,
+    )
+    if _event_payload(start).get("mission_action_state") != expected_started.to_payload():
+        raise GameLifecycleError("Mission Action start event state drifted.")
+    validate_mission_action_event_context(
+        state=state,
+        action=action,
+        event=start,
+        battle_round=action.battle_round_started,
+        phase=action.phase_started,
+    )
 
 
 def validate_mission_action_event_context(

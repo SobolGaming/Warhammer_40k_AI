@@ -303,3 +303,34 @@ start event and terminal to claim an immediate Action while preserving accepted
 decisions. Existing activity-restriction restore authority rejects the substituted
 source against the accepted start option; the regression retains that protection.
 PFINAL remains open as Order 78.
+
+### Saved-source substitution at `3eefd48a`
+
+The third review preserved the authenticated Cleanse start and accepted movement
+history, but changed the saved Action and early terminal to completed Plunder
+with immediate timing. This reproduced the bypass before the repair. The earlier
+source-substitution control also rewrote the start event, so its rejection did
+not cover this variant.
+
+The violated invariant is that every immutable saved Action field must agree
+with its authenticated start before that Action can select a completion policy
+or bound the movement scan. The existing primary start-snapshot comparison now
+lives in the shared terminal validator. It removes only mutable outcome fields
+from the saved Action and compares the complete remaining payload and start
+context, before even the started-status early return. Primary and secondary
+consumers use this single comparison; accepted-decision authentication remains
+with its existing owner.
+
+The new facade restore regression leaves the original start event, accepted
+decisions, movement completion events and per-model movement history unchanged.
+It failed with `DID NOT RAISE` at `3eefd48a` and now rejects the substituted
+source. Additional real-domain cases check immutable target, mission, timing,
+interruption, scoring-source and VP fields in both started and interrupted
+states. Existing completed, failed and immediate Action controls still pass.
+The static guard requires the shared start comparison before status handling
+and completion policy selection.
+
+The same-class search traced start-decision authentication, both terminal
+consumers and source selection. The production change is confined to two engine
+modules, sharing existing validation without a new schema, decision, handler or
+dependency boundary. PFINAL remains open as Order 78.
