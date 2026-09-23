@@ -1,0 +1,123 @@
+{
+  "workload": "order78-gone-to-ground-v1",
+  "revision": "f14e288cf9be9830161aa4c71e5d24d64903197e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:eaa687ec93a66e95af1b242dcd961adba01a6199b99f64b4c328228a2f9aa713",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "Ten pairs of model-target candidate and shared LOS queries per sample; seven serial samples without coverage, normal immutable geometry caches enabled; no cached candidate wrapper; canonical scene preparation excluded",
+  "hashes": {
+    "scripts/measure_order78.py": "7ab07b305c5daa6e7e1b5986cb267bb8c8cb19ccd84fd28be76484314dfc1713",
+    "tests/order78_helpers.py": "18b6a7a9220e1e111294473a1229981fb97cacab660382f4349df7e753ce0bf1",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "dense-outside",
+      "samples_seconds": [
+        0.03155370800232049,
+        0.017049250003765337,
+        0.01681391599413473,
+        0.01678179099690169,
+        0.016579374991124496,
+        0.016725417008274235,
+        0.016597583002294414
+      ],
+      "mean_seconds": 0.018871577142687914,
+      "maximum_seconds": 0.03155370800232049,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "dense-inside",
+      "samples_seconds": [
+        0.04927625000709668,
+        0.02682920799998101,
+        0.026916540999081917,
+        0.02639666700270027,
+        0.026781542008393444,
+        0.02725441599613987,
+        0.026676542009226978
+      ],
+      "mean_seconds": 0.030018738003231453,
+      "maximum_seconds": 0.04927625000709668,
+      "complete": true,
+      "legal": false,
+      "shared_los": false
+    },
+    {
+      "case": "attached-outside",
+      "samples_seconds": [
+        0.04412074999709148,
+        0.02999920900037978,
+        0.030190667006536387,
+        0.02977170899976045,
+        0.029823082993971184,
+        0.029670832998817787,
+        0.029888124990975484
+      ],
+      "mean_seconds": 0.03192348228393322,
+      "maximum_seconds": 0.04412074999709148,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "light-outside",
+      "samples_seconds": [
+        0.01817333399958443,
+        0.016920209003728814,
+        0.016791417001513764,
+        0.01773174999107141,
+        0.017050249996827915,
+        0.01741620800748933,
+        0.01724875000945758
+      ],
+      "mean_seconds": 0.017333131144239036,
+      "maximum_seconds": 0.01817333399958443,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "not-hidden",
+      "samples_seconds": [
+        0.016922082999371924,
+        0.017031209004926495,
+        0.01705900000524707,
+        0.016654166000080295,
+        0.016768125002272427,
+        0.016605000011622906,
+        0.016564750010729767
+      ],
+      "mean_seconds": 0.016800619004892985,
+      "maximum_seconds": 0.01705900000524707,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    },
+    {
+      "case": "fully-visible",
+      "samples_seconds": [
+        0.007001582998782396,
+        0.006006750001688488,
+        0.006034667007043026,
+        0.006122999999206513,
+        0.006045207992428914,
+        0.005986582997138612,
+        0.006030374992405996
+      ],
+      "mean_seconds": 0.006175452284099135,
+      "maximum_seconds": 0.007001582998782396,
+      "complete": true,
+      "legal": true,
+      "shared_los": true
+    }
+  ],
+  "full_game_certified": false
+}

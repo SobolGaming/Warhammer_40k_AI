@@ -276,15 +276,16 @@ corroborate but is not required to begin that work.
 | 75 | P21C | C21-03 | PFINAL preflight found legal optimal Surge approaches rejected against fixed noncircular targets. | Preserve the fixed target footprint and facing in the shared movement lower bound, with conservative moving-rotation allowance; authenticate the same proof in restore. Cover oval/rectangular targets, attached models, retry, viewer events and exact replay. See [Order 75 prerequisite](ORDER_75_PREFLIGHT_AUDIT.md). | Retained 21.02 Surge maximum-approach source and current maintained-mirror corroboration; no source wording change. | P21B, P03C | IMPLEMENTATION-GAP |
 | 76 | P03D | C03-04 | PFINAL preflight reproduced unreplayable events from malformed physical proposals and an untyped Surge loader failure. | Return shared typed prevalidation diagnostics without mutating authoritative histories; preserve recorded rule-invalid retries, viewer scope and exact replay/recovery across movement, Charge, Surge and placement. See [Order 76 scope and evidence](ORDER_76_PREFLIGHT_AUDIT.md). | Existing Core physical proposal sources and the Phase 11D adapter contract; no rules wording change. | P21C, P03C, P18I | IMPLEMENTATION-GAP |
 | 77 | P16B | C16-03 | PFINAL preflight reproduced an Action completing after a validated reactive Normal Move that returns to its initial pose. | Derive Action interruption from authoritative completed-move evidence rather than net displacement; share live/restore interpretation, audit ordinary and reactive callers and attached lineage, and preserve decline/Remain Stationary/pile-in/consolidation distinctions, facade/replay/viewer authority and restriction lifetimes. See [Order 77 prerequisite](ORDER_77_PREFLIGHT_AUDIT.md). | Retained 16.01 Action interruption and 03.01 cumulative movement; September 22 maintained-mirror corroboration, no source wording change. | P16, P03D | IMPLEMENTATION-GAP |
-| 78 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 76 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
+| 78 | P13A | C13-01 | PFINAL revalidation reproduced a Hidden target outside dense terrain remaining visible and shootable despite qualifying intervening dense concealment. | Apply source-backed Gone to Ground from Hidden state, causal dense-feature concealment and current/previous-turn ranged history without an extra occupancy condition. Audit both shared visibility consumers, per-model/attached scope, reaction shooting, facade/restore/replay, source identity and performance. See [Order 78 prerequisite](ORDER_78_PREFLIGHT_AUDIT.md). | [13.11.01 Gone to Ground](https://www.40k.app/rules/13-terrain), complete unversioned maintained-mirror observation on September 23; no official-App conflict observed. | P06C, S-MIRRORS | IMPLEMENTATION-GAP |
+| 79 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 77 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
-Categories 07 and 13 have no standalone remediation PR in this
-sequence. Category 13’s current Light/Dense Hidden wording is governed by the
-maintained App mirror and supersedes the older PDF’s Dense-only wording; it is
-immediately usable without separate confirmation. Category 17 is owned by C17-01/P17. PFINAL re-audits both as
-part of the complete 25-category gate. If that audit finds a gameplay gap, the
-gap receives a canonical finding ID and a new one-at-a-time remediation PR
-inserted before PFINAL.
+Category 07 has no standalone remediation PR and remains `REVALIDATE`.
+Category 13's Light/Dense Hidden wording is governed by the maintained mirror
+and supersedes the older PDF's Dense-only wording. The September 23 PFINAL
+preflight found C13-01 in Gone to Ground; P13A now owns that prerequisite.
+Category 17 is owned by C17-01/P17. PFINAL still re-audits every category.
+Any further gameplay gap receives a canonical finding ID and a scoped
+one-at-a-time remediation PR before PFINAL.
 
 ## September 10 independent-review disposition
 
@@ -3067,7 +3068,7 @@ audit and must commit the final audit artifact, generated report, validation
 results, snapshot identity, provider/version evidence, and the evidence
 supporting `CAUDIT-01` closure.
 
-PFINAL (now Order 78) must also assess representative complete headless games using the
+PFINAL (now Order 79) must also assess representative complete headless games using the
 existing legal driver or recorded workload, including the continuous terrain
 solver introduced by Order 74. Record completion, per-game timing, declared
 hardware and workload, and the standing below-60-second mean / at-most-300-second
@@ -5381,3 +5382,28 @@ authority, including return paths and attached/secondary Actions. This is not a
 PFINAL PR. CAUDIT-01 remains open; no complete
 25-category audit or source-snapshot compliance is claimed. After the prerequisite
 merges, repeat the complete audit from current main.
+
+
+## Order 78 preflight / P13A — Gone to Ground outside dense terrain
+
+The fresh PFINAL preflight of main `f14e288cf9be9830161aa4c71e5d24d64903197e`
+on 2026-09-23 reproduced C13-01 during category-13 revalidation. A Hidden model
+13.04015748031496 inches away, partially concealed by an intervening dense ruin,
+remains visible and shootable because the shared Gone to Ground query wrongly
+requires dense-terrain occupancy. The ordinary facade accepts the declaration;
+JSON persistence and exact replay preserve it. The dense-occupancy control
+correctly restricts detection to 12 inches.
+
+P13A is inserted as Order 78 and PFINAL moves to Order 79. The current inventory
+is 77 implementation PRs, S-MIRRORS and PFINAL (79 rows). Earlier count statements
+record their historical sequence. See [Order 78 preflight](ORDER_78_PREFLIGHT_AUDIT.md)
+for source observations, the shared-owner audit, executable evidence, proposed
+acceptance and complete-game limitations.
+
+The owner approved P13A on September 23. The repair removes dense occupancy
+from shared Gone to Ground qualification and requires causal dense-feature
+obstruction; a terrain-area record alone cannot qualify. Ordinary and Overwatch
+facades reject protected targets, accept legal retries and preserve exact replay.
+The source observation is registered and hash-pinned. No PFINAL PR is open, no complete 25-category audit or selected-snapshot certification is
+claimed, and CAUDIT-01 remains open. After P13A merges, repeat the complete audit
+from current main. Complete-game performance remains uncertified.

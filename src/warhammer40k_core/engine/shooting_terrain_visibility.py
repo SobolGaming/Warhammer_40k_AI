@@ -136,14 +136,13 @@ def model_within_solid_terrain(
     )
 
 
-def blocker_record_is_solid(
+def blocker_record_is_dense_feature(
     *,
     ruleset_descriptor: RulesetDescriptor,
     record: VisibilityBlockerRecord,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> bool:
-    if record.terrain_area_classification is not None:
-        return classification_is_solid(record.terrain_area_classification)
+    # An obscuring area alone is not evidence of an intervening dense feature.
     if record.terrain_feature_id is None:
         return False
     for feature in _validate_terrain_features(terrain_features):

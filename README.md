@@ -2,31 +2,39 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 78 / P13A applies Gone to Ground to Hidden models concealed by intervening
+Dense features, even outside those features. Shared shooting and LOS queries
+use per-model causal visibility and current/previous-turn ranged history.
+Ordinary Shooting and Fire Overwatch preserve validation, viewer scope, restore
+and exact replay. See [scope and evidence](docs/ORDER_78_PREFLIGHT_AUDIT.md).
+PFINAL is Order 79 and requires this prerequisite to merge before a fresh complete
+audit. Core Rules compliance and complete-game performance remain uncertified.
+
 Order 77 / P16B interrupts Actions from accepted completed moves, including
 return paths, rotation-only paths and zero-distance moves. Live play and restore
 share model-lineage evidence; physical transition deltas keep their existing
 meaning. See [scope and validation](docs/ORDER_77_PREFLIGHT_AUDIT.md). PFINAL is
-Order 78 and requires this prerequisite to merge before a fresh complete audit.
+Order 79; this prerequisite is merged and a fresh complete audit is still required.
 
 Order 76 / P03D preserves exact replay and recovery after malformed or stale
 physical proposals. Shared diagnostics leave authoritative histories unchanged;
 recorded rule-invalid attempts retain their retry path. See
-[scope and validation](docs/ORDER_76_PREFLIGHT_AUDIT.md). PFINAL is Order 78 and
-requires this prerequisite to merge before a fresh complete audit.
+[scope and validation](docs/ORDER_76_PREFLIGHT_AUDIT.md). PFINAL is Order 79;
+this prerequisite is merged and a fresh complete audit is still required.
 
 Order 75 / P21C accepts provably optimal Surge approaches to fixed oval and
 rectangular targets through the shared geometry, facade, restore and replay
 path. The bound preserves the target footprint and facing, while retaining
 conservative rotation allowances for noncircular movers. See
-[scope and evidence](docs/ORDER_75_PREFLIGHT_AUDIT.md). PFINAL is Order 78 and
-requires this prerequisite to merge before a fresh complete audit.
+[scope and evidence](docs/ORDER_75_PREFLIGHT_AUDIT.md). PFINAL is Order 79;
+this prerequisite is merged and a fresh complete audit is still required.
 
 Order 74 / P03C repairs terrain-blocked mandatory movement endpoints using a
 shared continuous exclusion proof. Charge records and restores that proof;
 Consolidation and Surge consume the same reachability authority. Unresolved
 path or maximum-approach searches remain fail-closed. See
-[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 78
-and still requires a complete audit after the prerequisite merges.
+[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 79
+and still requires a complete audit; this prerequisite is merged.
 
 Order 72 resolves consolidation responses against owner-confirmed official App
 data v946: only Engaging Consolidation forces enemy Fight selections. Ongoing
@@ -703,6 +711,12 @@ Current status:
   Neither provider is presented as Games Workshop-owned, and live provider
   sites are never runtime input. These audits exclude factions, faction
   detachments, and faction datasheet content.
+- Order 78 / P13A pins the complete reviewed 13.11.01 Gone to Ground source and
+  its September 23 unversioned 40k.app observation in
+  `core_gone_to_ground_2026_09/artifacts/package.json`. Regenerate offline with
+  `uv run python tools/build_core_gone_to_ground_source.py`; append `--check`
+  to verify committed bytes. The typed loader eagerly verifies the artifact and
+  registered provider identity; runtime queries use structured terrain policy.
 - P19's reviewed 19.01.01 Attached Units wording is pinned in
   `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_attached_units_source.py` and

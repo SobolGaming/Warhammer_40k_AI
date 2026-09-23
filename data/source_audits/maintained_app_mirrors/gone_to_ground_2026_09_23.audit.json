@@ -1,0 +1,23 @@
+{
+  "audit_id": "core-gone-to-ground-maintained-app-mirrors-2026-09-23",
+  "observed_at": "2026-09-23T14:19:29.200772+00:00",
+  "rows": [
+    {
+      "row_id": "gone-to-ground:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/13-terrain",
+      "observed_at": "2026-09-23T14:19:29.200772+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-gone-to-ground:gone-to-ground",
+      "transcription_sha256": "97063c88c0146126f288170f1cd6fc4f6ecc291c8f4b33bb6075f209716a2c8c",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "f9e008887a8bb38842033b62d64ecc769553ac52370ae4c39384ccb9f3d21b0b"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "Complete 13.11.01 expanded browser section observed through 40k.app. The provider exposes no App-data version. GDM v946 changelog does not provide a co-versioned 13.11.01 comparison. The official PDF is historical provenance; no official-App exception or mirror disagreement is asserted."
+}

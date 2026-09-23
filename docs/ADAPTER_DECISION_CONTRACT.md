@@ -2473,13 +2473,21 @@ penalty. Shooting target candidates and proposal validation consume
 engine-owned Hidden state, persisting Detection Range modifiers such as Path of
 the Outcast +6" effects, terrain/line-of-sight evidence, and
 `RangedAttackHistoryRecord` data from `GameState`. A Hidden model has Gone to
-Ground only when it is within Dense/Solid terrain, is not fully visible
-to the attacking model because of one or more intervening Dense/Solid terrain
-features, and its rules unit did not make ranged attacks in the current or
+Ground when it is not fully visible to the attacking model because of one or
+more intervening Dense terrain features, and its rules unit did not make ranged
+attacks in the current or
 previous player turn. Units that made ranged attacks in either turn cannot
 benefit even if another rule lets them shoot while remaining Hidden. Adapters
 must not locally add, remove, or reinterpret Hidden/detection state, terrain
-Solid status, or ranged-attack history.
+Dense-feature status, or ranged-attack history. Order 78 / P13A removes the
+incorrect dense-occupancy requirement: ordinary terrain-derived Hidden still
+requires its own eligible area occupancy, while Gone to Ground can also protect
+a model Hidden by an effect outside Dense terrain. A terrain-area blocker alone
+is not an intervening feature. The source is
+`gw-11e-core-gone-to-ground:gone-to-ground` (reviewed Core 13.11.01).
+The existing finite selections, shooting proposal kinds, target diagnostics and
+viewer redaction cover this repair; no payload shape or contract-version change
+is required. Both ordinary and out-of-phase shooting use this shared authority.
 
 Detection Range is a visibility gate, not an independent Indirect Fire
 targeting prohibition. An eligible `[INDIRECT FIRE]` weapon can therefore

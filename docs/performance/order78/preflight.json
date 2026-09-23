@@ -1,0 +1,649 @@
+{
+  "audit_id": "order78-prefinal-gone-to-ground-audit-v1",
+  "reviewed_commit": "f14e288cf9be9830161aa4c71e5d24d64903197e",
+  "recorded_at": "2026-09-23T14:19:29.200923+00:00",
+  "prerequisite_pr": {
+    "number": 497,
+    "state": "MERGED",
+    "merged_at": "2026-09-23T14:04:05Z"
+  },
+  "remote_main_matches_reviewed_commit": true,
+  "open_prs_at_preflight": [],
+  "finding_id": "C13-01",
+  "proposed_owner": "P13A",
+  "prerequisite_order": 78,
+  "pfinal_order": 79,
+  "implementation_status": "proposed_awaiting_owner_approval",
+  "audit_status": "blocked_before_complete_25_category_certification",
+  "caudit_01_closed": false,
+  "selected_all_category_snapshot": null,
+  "source": {
+    "preflight_source_id": "core-rules-preflight:13.11.01-gone-to-ground",
+    "provider_name": "40k.app",
+    "provider_affiliation": "non_affiliated",
+    "source_url": "https://www.40k.app/rules/13-terrain",
+    "section_id": "13.11.01",
+    "title": "Gone to Ground",
+    "observed_at": "2026-09-23T14:19:29.200772+00:00",
+    "app_version": null,
+    "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "observation_method": "Expanded browser-visible section read on 2026-09-23; whitespace-normalized transcription recorded after review.",
+    "operative_transcription": "Hidden models that are concealed by dense terrain features gain an extra benefit while they have gone to ground. A model has gone to ground while all of the following apply: That model is hidden. That model is not fully visible to the attacking model due to one or more intervening dense terrain features. That model\u2019s unit did not make one or more ranged attacks during this turn or during the previous turn. While a model has gone to ground, subtract 3\" from that model\u2019s detection range. Designer\u2019s Note: Units that made ranged attacks in the current or previous turn cannot go to ground, regardless of any abilities that allow them to shoot and remain hidden.",
+    "transcription_sha256": "97063c88c0146126f288170f1cd6fc4f6ecc291c8f4b33bb6075f209716a2c8c",
+    "source_observation_sha256": "aadcd49208029297db7f4469bbc8d4dade09d99c1fa58488000087f80b12f0dc"
+  },
+  "source_limits": {
+    "runtime_observation_registered": false,
+    "network_capture_retained": false,
+    "fingerprint_authenticates_external_website": false,
+    "co_version_comparison_performed": false,
+    "co_version_comparison_reason": "40k.app exposes no version; GDM v946 changelog has no co-versioned Gone to Ground statement.",
+    "other_browser_observations": [
+      "13.09 Hidden",
+      "13.09.01 Hidden and the First Turn",
+      "07.00-07.03 and expanded 07.02.01/07.02.02"
+    ],
+    "other_provider": {
+      "name": "Game Datamissions",
+      "url": "https://game-datamissions.com/11th/rules/changelog",
+      "app_version": "946",
+      "version_date": "2026-09-02",
+      "visible_change": "18.04.01 Rapid Disembark And Limitations"
+    }
+  },
+  "fixture_scope": "Real canonical one-model units and typed unit_hidden effect established before the replay root; custom dense ruin; ordinary Shooting facade. No faction rule grant is certified. Terrain-derived Hidden is source-traced only.",
+  "cases": [
+    {
+      "case": "dense_outside_hidden",
+      "hidden": true,
+      "recent_ranged_attacks": false,
+      "range_inches": 13.04015748031496,
+      "target_occupies_dense_terrain": false,
+      "shared_line_of_sight": true,
+      "candidate": {
+        "attacker_unit_instance_id": "army-alpha:shooter",
+        "weapon_profile_id": "core-bolt-rifle:standard",
+        "target_unit_instance_id": "army-beta:enemy",
+        "is_legal": true,
+        "violation_code": null,
+        "message": null,
+        "observer_model_id": "army-alpha:shooter:core-intercessor-like:001",
+        "target_visible_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "target_in_range_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "line_of_sight_witness": {
+          "context_fingerprint": "e00fe6ebca865fbd0ac3a495e96458a6e70f11411ad58eecf1e8319d083167bf",
+          "ruleset_descriptor_hash": "00ffdbd75bf0c3c018edc724d6f7e28501b4df6e429dc0babb044ba75abd6c88",
+          "los_cache_key": "los:64ece3434d206e07",
+          "observer_model_id": "army-alpha:shooter:core-intercessor-like:001",
+          "target_model_ids": [
+            "army-beta:enemy:core-intercessor-like:001"
+          ],
+          "visible_model_ids": [
+            "army-beta:enemy:core-intercessor-like:001"
+          ],
+          "fully_visible_model_ids": [],
+          "unit_visible": true,
+          "unit_fully_visible": false,
+          "model_records": [
+            {
+              "target_model_id": "army-beta:enemy:core-intercessor-like:001",
+              "model_visible": true,
+              "model_fully_visible": false,
+              "evidence": {
+                "algorithm_id": "continuous-analytic-prism-visibility:1",
+                "input_fingerprint": "e4eddc4fcb7e13fa6415bb3ec8b09027657624ae6af44f980eb762735bbacb96",
+                "model_visible": true,
+                "model_fully_visible": false,
+                "visibility_proof": "clear_corridor",
+                "full_visibility_proof": "hidden_target_part",
+                "checked_witness_count": 29,
+                "clear_corridor": [
+                  [
+                    "10/1",
+                    "35/1",
+                    "7943356823078669/4503599627370496"
+                  ],
+                  [
+                    "6839841934068941/281474976710656",
+                    "154789073806867835/4503599627370496",
+                    "7943356823078669/4503599627370496"
+                  ]
+                ],
+                "hidden_target_part": [
+                  "106600557794003531/4503599627370496",
+                  "35/1",
+                  "0/1"
+                ]
+              },
+              "blocker_records": [
+                {
+                  "blocker_kind": "terrain_feature",
+                  "blocker_id": "order78-intervening-dense",
+                  "terrain_feature_id": "order78-intervening-dense",
+                  "terrain_feature_kind": "ruins",
+                  "terrain_area_id": null,
+                  "terrain_area_classification": null,
+                  "line_of_sight_policy": "area_obscuring",
+                  "blocks_model_visibility": true,
+                  "blocks_full_visibility": true,
+                  "exception_applied": null
+                },
+                {
+                  "blocker_kind": "terrain_volume",
+                  "blocker_id": "order78-intervening-dense:order78-partial-wall",
+                  "terrain_feature_id": "order78-intervening-dense",
+                  "terrain_feature_kind": "ruins",
+                  "terrain_area_id": null,
+                  "terrain_area_classification": null,
+                  "line_of_sight_policy": "true_line_of_sight",
+                  "blocks_model_visibility": true,
+                  "blocks_full_visibility": true,
+                  "exception_applied": null
+                }
+              ]
+            }
+          ]
+        },
+        "visibility_cache_key": "los:64ece3434d206e07",
+        "shooting_types": [
+          "normal"
+        ],
+        "hit_roll_modifier": 0,
+        "targeting_rule_ids": [
+          "core-rules:benefit-of-cover"
+        ]
+      },
+      "facade_submission_status": "waiting_for_decision",
+      "accepted_event_count": 1,
+      "accepted_events": [
+        {
+          "event_id": "event-000014",
+          "event_type": "shooting_declaration_accepted",
+          "payload": {
+            "game_id": "order78-gone-to-ground",
+            "battle_round": 1,
+            "active_player_id": "player-a",
+            "phase": "shooting",
+            "unit_instance_id": "army-alpha:shooter",
+            "request_id": "decision-request-000003",
+            "result_id": "order78:declare",
+            "proposal_request_id": "decision-request-000003",
+            "visibility_cache_key": "los:64ece3434d206e07",
+            "attack_pools": [
+              {
+                "weapon_instance_id": "weapon-instance:7236025ce0e0aef1f76af2250a5eb0a299a5c025dcb2702b89f6ca070ae01a9e",
+                "attacker_model_instance_id": "army-alpha:shooter:core-intercessor-like:001",
+                "wargear_id": "core-bolt-rifle",
+                "weapon_profile_id": "core-bolt-rifle:standard",
+                "weapon_profile": {
+                  "profile_id": "core-bolt-rifle:standard",
+                  "name": "Core bolt rifle",
+                  "range_profile": {
+                    "kind": "distance",
+                    "distance_inches": 24
+                  },
+                  "attack_profile": {
+                    "fixed_attacks": 2,
+                    "dice_expression": null
+                  },
+                  "skill": {
+                    "characteristic": "ballistic_skill",
+                    "value_kind": "numeric",
+                    "raw": 3,
+                    "base": 3,
+                    "final": 3,
+                    "applied_modifier_ids": []
+                  },
+                  "strength": {
+                    "characteristic": "strength",
+                    "value_kind": "numeric",
+                    "raw": 4,
+                    "base": 4,
+                    "final": 4,
+                    "applied_modifier_ids": []
+                  },
+                  "armor_penetration": {
+                    "characteristic": "armor_penetration",
+                    "value_kind": "numeric",
+                    "raw": -1,
+                    "base": -1,
+                    "final": -1,
+                    "applied_modifier_ids": []
+                  },
+                  "damage_profile": {
+                    "fixed_damage": 1,
+                    "dice_expression": null
+                  },
+                  "keywords": [
+                    "Assault",
+                    "Rapid Fire"
+                  ],
+                  "abilities": [
+                    {
+                      "ability_id": "rapid-fire:1",
+                      "name": "Rapid Fire 1",
+                      "ability_kind": "rapid_fire",
+                      "parameters": [
+                        {
+                          "name": "value",
+                          "value": 1
+                        }
+                      ],
+                      "target_keywords": [],
+                      "timing": "attack_sequence",
+                      "condition": null
+                    }
+                  ],
+                  "source_ids": []
+                },
+                "target_unit_instance_id": "army-beta:enemy",
+                "shooting_type": "normal",
+                "attacks": 2,
+                "target_visible_model_ids": [
+                  "army-beta:enemy:core-intercessor-like:001"
+                ],
+                "target_in_range_model_ids": [
+                  "army-beta:enemy:core-intercessor-like:001"
+                ],
+                "hit_roll_modifier": 0,
+                "targeting_rule_ids": [
+                  "core-rules:benefit-of-cover"
+                ],
+                "selected_weapon_ability_ids": [],
+                "firing_deck_source_unit_instance_id": null,
+                "firing_deck_source_model_instance_id": null,
+                "weapon_selection_context": {
+                  "weapon_instance_id": "weapon-instance:7236025ce0e0aef1f76af2250a5eb0a299a5c025dcb2702b89f6ca070ae01a9e",
+                  "source_request_id": "decision-request-000003",
+                  "target_profiles": [
+                    {
+                      "target_unit_instance_id": "army-beta:enemy",
+                      "weapon_profile": {
+                        "profile_id": "core-bolt-rifle:standard",
+                        "name": "Core bolt rifle",
+                        "range_profile": {
+                          "kind": "distance",
+                          "distance_inches": 24
+                        },
+                        "attack_profile": {
+                          "fixed_attacks": 2,
+                          "dice_expression": null
+                        },
+                        "skill": {
+                          "characteristic": "ballistic_skill",
+                          "value_kind": "numeric",
+                          "raw": 3,
+                          "base": 3,
+                          "final": 3,
+                          "applied_modifier_ids": []
+                        },
+                        "strength": {
+                          "characteristic": "strength",
+                          "value_kind": "numeric",
+                          "raw": 4,
+                          "base": 4,
+                          "final": 4,
+                          "applied_modifier_ids": []
+                        },
+                        "armor_penetration": {
+                          "characteristic": "armor_penetration",
+                          "value_kind": "numeric",
+                          "raw": -1,
+                          "base": -1,
+                          "final": -1,
+                          "applied_modifier_ids": []
+                        },
+                        "damage_profile": {
+                          "fixed_damage": 1,
+                          "dice_expression": null
+                        },
+                        "keywords": [
+                          "Assault",
+                          "Rapid Fire"
+                        ],
+                        "abilities": [
+                          {
+                            "ability_id": "rapid-fire:1",
+                            "name": "Rapid Fire 1",
+                            "ability_kind": "rapid_fire",
+                            "parameters": [
+                              {
+                                "name": "value",
+                                "value": 1
+                              }
+                            ],
+                            "target_keywords": [],
+                            "timing": "attack_sequence",
+                            "condition": null
+                          }
+                        ],
+                        "source_ids": []
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "one_shot_weapon_use_records": [],
+            "ranged_attack_history_record": {
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:shooter",
+              "battle_round": 1,
+              "active_player_id": "player-a",
+              "phase": "shooting",
+              "request_id": "decision-request-000003",
+              "result_id": "order78:declare"
+            },
+            "ineligible_unit_instance_ids": [],
+            "phase_body_status": "declaration_accepted"
+          }
+        }
+      ],
+      "persistence_round_trip": true,
+      "replay_status": "reproduced",
+      "viewer_projection_round_trips": {
+        "player-a": true,
+        "player-b": true
+      }
+    },
+    {
+      "case": "dense_inside_hidden_control",
+      "hidden": true,
+      "recent_ranged_attacks": false,
+      "range_inches": 13.04015748031496,
+      "target_occupies_dense_terrain": true,
+      "shared_line_of_sight": false,
+      "candidate": {
+        "attacker_unit_instance_id": "army-alpha:shooter",
+        "weapon_profile_id": "core-bolt-rifle:standard",
+        "target_unit_instance_id": "army-beta:enemy",
+        "is_legal": false,
+        "violation_code": "outside_detection_range",
+        "message": "Hidden target models are outside the attacker's effective detection range.",
+        "observer_model_id": null,
+        "target_visible_model_ids": [],
+        "target_in_range_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "line_of_sight_witness": null,
+        "visibility_cache_key": "los:080579d7d0f423ee",
+        "shooting_types": [],
+        "hit_roll_modifier": 0,
+        "targeting_rule_ids": []
+      }
+    },
+    {
+      "case": "light_outside_hidden_control",
+      "hidden": true,
+      "recent_ranged_attacks": false,
+      "range_inches": 13.04015748031496,
+      "target_occupies_dense_terrain": false,
+      "shared_line_of_sight": true,
+      "candidate": {
+        "attacker_unit_instance_id": "army-alpha:shooter",
+        "weapon_profile_id": "core-bolt-rifle:standard",
+        "target_unit_instance_id": "army-beta:enemy",
+        "is_legal": true,
+        "violation_code": null,
+        "message": null,
+        "observer_model_id": "army-alpha:shooter:core-intercessor-like:001",
+        "target_visible_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "target_in_range_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "line_of_sight_witness": {
+          "context_fingerprint": "1f9b4ba00b1f97f34dd59a8681ef3867f2d420381d3dd84d96008ef15b666191",
+          "ruleset_descriptor_hash": "00ffdbd75bf0c3c018edc724d6f7e28501b4df6e429dc0babb044ba75abd6c88",
+          "los_cache_key": "los:250b1c3efd4b8471",
+          "observer_model_id": "army-alpha:shooter:core-intercessor-like:001",
+          "target_model_ids": [
+            "army-beta:enemy:core-intercessor-like:001"
+          ],
+          "visible_model_ids": [
+            "army-beta:enemy:core-intercessor-like:001"
+          ],
+          "fully_visible_model_ids": [],
+          "unit_visible": true,
+          "unit_fully_visible": false,
+          "model_records": [
+            {
+              "target_model_id": "army-beta:enemy:core-intercessor-like:001",
+              "model_visible": true,
+              "model_fully_visible": false,
+              "evidence": {
+                "algorithm_id": "continuous-analytic-prism-visibility:1",
+                "input_fingerprint": "e4eddc4fcb7e13fa6415bb3ec8b09027657624ae6af44f980eb762735bbacb96",
+                "model_visible": true,
+                "model_fully_visible": false,
+                "visibility_proof": "clear_corridor",
+                "full_visibility_proof": "hidden_target_part",
+                "checked_witness_count": 29,
+                "clear_corridor": [
+                  [
+                    "10/1",
+                    "35/1",
+                    "7943356823078669/4503599627370496"
+                  ],
+                  [
+                    "6839841934068941/281474976710656",
+                    "154789073806867835/4503599627370496",
+                    "7943356823078669/4503599627370496"
+                  ]
+                ],
+                "hidden_target_part": [
+                  "106600557794003531/4503599627370496",
+                  "35/1",
+                  "0/1"
+                ]
+              },
+              "blocker_records": [
+                {
+                  "blocker_kind": "terrain_feature",
+                  "blocker_id": "order78-intervening-dense",
+                  "terrain_feature_id": "order78-intervening-dense",
+                  "terrain_feature_kind": "ruins",
+                  "terrain_area_id": null,
+                  "terrain_area_classification": null,
+                  "line_of_sight_policy": "area_obscuring",
+                  "blocks_model_visibility": true,
+                  "blocks_full_visibility": true,
+                  "exception_applied": null
+                },
+                {
+                  "blocker_kind": "terrain_volume",
+                  "blocker_id": "order78-intervening-dense:order78-partial-wall",
+                  "terrain_feature_id": "order78-intervening-dense",
+                  "terrain_feature_kind": "ruins",
+                  "terrain_area_id": null,
+                  "terrain_area_classification": null,
+                  "line_of_sight_policy": "true_line_of_sight",
+                  "blocks_model_visibility": true,
+                  "blocks_full_visibility": true,
+                  "exception_applied": null
+                }
+              ]
+            }
+          ]
+        },
+        "visibility_cache_key": "los:250b1c3efd4b8471",
+        "shooting_types": [
+          "normal"
+        ],
+        "hit_roll_modifier": 0,
+        "targeting_rule_ids": [
+          "core-rules:benefit-of-cover"
+        ]
+      }
+    },
+    {
+      "case": "dense_outside_not_hidden_control",
+      "hidden": false,
+      "recent_ranged_attacks": false,
+      "range_inches": 13.04015748031496,
+      "target_occupies_dense_terrain": false,
+      "shared_line_of_sight": true,
+      "candidate": {
+        "attacker_unit_instance_id": "army-alpha:shooter",
+        "weapon_profile_id": "core-bolt-rifle:standard",
+        "target_unit_instance_id": "army-beta:enemy",
+        "is_legal": true,
+        "violation_code": null,
+        "message": null,
+        "observer_model_id": "army-alpha:shooter:core-intercessor-like:001",
+        "target_visible_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "target_in_range_model_ids": [
+          "army-beta:enemy:core-intercessor-like:001"
+        ],
+        "line_of_sight_witness": {
+          "context_fingerprint": "e00fe6ebca865fbd0ac3a495e96458a6e70f11411ad58eecf1e8319d083167bf",
+          "ruleset_descriptor_hash": "00ffdbd75bf0c3c018edc724d6f7e28501b4df6e429dc0babb044ba75abd6c88",
+          "los_cache_key": "los:64ece3434d206e07",
+          "observer_model_id": "army-alpha:shooter:core-intercessor-like:001",
+          "target_model_ids": [
+            "army-beta:enemy:core-intercessor-like:001"
+          ],
+          "visible_model_ids": [
+            "army-beta:enemy:core-intercessor-like:001"
+          ],
+          "fully_visible_model_ids": [],
+          "unit_visible": true,
+          "unit_fully_visible": false,
+          "model_records": [
+            {
+              "target_model_id": "army-beta:enemy:core-intercessor-like:001",
+              "model_visible": true,
+              "model_fully_visible": false,
+              "evidence": {
+                "algorithm_id": "continuous-analytic-prism-visibility:1",
+                "input_fingerprint": "e4eddc4fcb7e13fa6415bb3ec8b09027657624ae6af44f980eb762735bbacb96",
+                "model_visible": true,
+                "model_fully_visible": false,
+                "visibility_proof": "clear_corridor",
+                "full_visibility_proof": "hidden_target_part",
+                "checked_witness_count": 29,
+                "clear_corridor": [
+                  [
+                    "10/1",
+                    "35/1",
+                    "7943356823078669/4503599627370496"
+                  ],
+                  [
+                    "6839841934068941/281474976710656",
+                    "154789073806867835/4503599627370496",
+                    "7943356823078669/4503599627370496"
+                  ]
+                ],
+                "hidden_target_part": [
+                  "106600557794003531/4503599627370496",
+                  "35/1",
+                  "0/1"
+                ]
+              },
+              "blocker_records": [
+                {
+                  "blocker_kind": "terrain_feature",
+                  "blocker_id": "order78-intervening-dense",
+                  "terrain_feature_id": "order78-intervening-dense",
+                  "terrain_feature_kind": "ruins",
+                  "terrain_area_id": null,
+                  "terrain_area_classification": null,
+                  "line_of_sight_policy": "area_obscuring",
+                  "blocks_model_visibility": true,
+                  "blocks_full_visibility": true,
+                  "exception_applied": null
+                },
+                {
+                  "blocker_kind": "terrain_volume",
+                  "blocker_id": "order78-intervening-dense:order78-partial-wall",
+                  "terrain_feature_id": "order78-intervening-dense",
+                  "terrain_feature_kind": "ruins",
+                  "terrain_area_id": null,
+                  "terrain_area_classification": null,
+                  "line_of_sight_policy": "true_line_of_sight",
+                  "blocks_model_visibility": true,
+                  "blocks_full_visibility": true,
+                  "exception_applied": null
+                }
+              ]
+            }
+          ]
+        },
+        "visibility_cache_key": "los:64ece3434d206e07",
+        "shooting_types": [
+          "normal"
+        ],
+        "hit_roll_modifier": 0,
+        "targeting_rule_ids": [
+          "core-rules:benefit-of-cover"
+        ]
+      }
+    }
+  ],
+  "host": {
+    "role": "provisional",
+    "cpu": "Apple M5 Pro",
+    "logical_cpu_count": 18,
+    "memory_bytes": 68719476736,
+    "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+    "hardware_observation_command": "sysctl -n machdep.cpu.brand_string hw.memsize hw.logicalcpu"
+  },
+  "full_game_performance": {
+    "attempted_games": 0,
+    "completed_games": 0,
+    "samples_seconds": [],
+    "arithmetic_mean_seconds": null,
+    "maximum_seconds": null,
+    "mean_target_seconds_exclusive": 60,
+    "maximum_target_seconds_inclusive": 300,
+    "certified": false,
+    "missing_prerequisites": [
+      "Representative legal complete-game driver or committed complete-game recording",
+      "Versioned workload with rosters, terrain including Order 74 continuous terrain solver, seeds and decision policy",
+      "Initialization through normal completion and replay output measured on declared reference hardware"
+    ],
+    "note": "No games started. The single-decision headless adapter and seeded pairing certification do not supply the representative complete-game workload."
+  },
+  "validation": {
+    "existing_focused_behavioral_tests": {
+      "passed": 5,
+      "seconds": 3.02,
+      "coverage": false
+    },
+    "probe": "four diagnostic cases passed, ordinary facade accepts erroneous target, persistence/viewer round-trips and exact replay pass",
+    "aggregate_behavioral_coverage_run": false,
+    "aggregate_code_quality_run": false,
+    "publishing_gates_run": false,
+    "pr_opened": false,
+    "roadmap_tests": {
+      "passed": 5,
+      "seconds": 0.1,
+      "coverage": false
+    },
+    "roadmap_comparison_generator_check": "passed",
+    "maintained_mirror_generator_check": "passed",
+    "engine_build_identity_check": "passed_unchanged",
+    "eight_shard_inventory_check": "passed",
+    "probe_ruff_check_and_format": "passed",
+    "git_diff_check": "passed"
+  },
+  "hashes": {
+    "reports/order78/probe_gone_to_ground.py": "f215b60eab7ef4c828a8d6447753df8b19db3844531fe9dac848309779f0ad78",
+    "reports/order78/gone-to-ground.json": "d1669a3f4f62ae23683c3096cb04a191380927afb259919d0a433576d64a6203",
+    "reports/order78/focused.xml": "7e87b889f33c0b066a00da171b20641e1df76111548dbee5631339afe3183f76",
+    "src/warhammer40k_core/_engine_build_manifest.json": "2e1b94d01fbe7601a85e1ec16f96a339d83df381edf88584d2fdd0e51c1c1e4b",
+    "src/warhammer40k_core/engine/hidden_detection.py": "4b58a52ba7708aeb84b19717c65161d96ca96f12083d06c647b97c2fe80c09d1",
+    "src/warhammer40k_core/engine/shooting_terrain_visibility.py": "9434fc7eceaf982eaa76e59faa9b694b9e50fc6876c38f8526d21e43bb4a0e57",
+    "src/warhammer40k_core/engine/shooting_targets.py": "a3307db53454734da9d71987e47f139362d3cda6628c25c092e2e66ea16de6ce",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "reports/order78/roadmap.xml": "bb8c9f31addbfc13d71532779952fc6ef6858aacb5f5fb34a9e8632176ca2d9c"
+  }
+}

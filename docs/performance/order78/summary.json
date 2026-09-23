@@ -1,0 +1,66 @@
+{
+  "workload": "order78-gone-to-ground-v1",
+  "rows": [
+    {
+      "case": "dense-outside",
+      "base_mean_seconds": 0.018871577142687914,
+      "head_mean_seconds": 0.030318470574067242,
+      "base_maximum_seconds": 0.03155370800232049,
+      "head_maximum_seconds": 0.044028083997545764,
+      "base_legal": true,
+      "head_legal": false,
+      "within_diagnostic_envelope": true
+    },
+    {
+      "case": "dense-inside",
+      "base_mean_seconds": 0.030018738003231453,
+      "head_mean_seconds": 0.030580143142807565,
+      "base_maximum_seconds": 0.04927625000709668,
+      "head_maximum_seconds": 0.047220958993420936,
+      "base_legal": false,
+      "head_legal": false,
+      "within_diagnostic_envelope": true
+    },
+    {
+      "case": "attached-outside",
+      "base_mean_seconds": 0.03192348228393322,
+      "head_mean_seconds": 0.05541841671220027,
+      "base_maximum_seconds": 0.04412074999709148,
+      "head_maximum_seconds": 0.0708310410118429,
+      "base_legal": true,
+      "head_legal": false,
+      "within_diagnostic_envelope": true
+    },
+    {
+      "case": "light-outside",
+      "base_mean_seconds": 0.017333131144239036,
+      "head_mean_seconds": 0.017797428709205372,
+      "base_maximum_seconds": 0.01817333399958443,
+      "head_maximum_seconds": 0.018880500007071532,
+      "base_legal": true,
+      "head_legal": true,
+      "within_diagnostic_envelope": true
+    },
+    {
+      "case": "not-hidden",
+      "base_mean_seconds": 0.016800619004892985,
+      "head_mean_seconds": 0.016790827285149135,
+      "base_maximum_seconds": 0.01705900000524707,
+      "head_maximum_seconds": 0.01712745800614357,
+      "base_legal": true,
+      "head_legal": true,
+      "within_diagnostic_envelope": true
+    },
+    {
+      "case": "fully-visible",
+      "base_mean_seconds": 0.006175452284099135,
+      "head_mean_seconds": 0.006612845284897568,
+      "base_maximum_seconds": 0.007001582998782396,
+      "head_maximum_seconds": 0.0069769169931532815,
+      "base_legal": true,
+      "head_legal": true,
+      "within_diagnostic_envelope": true
+    }
+  ],
+  "full_game_certified": false
+}
