@@ -6618,3 +6618,24 @@ accepted retry and its rejection history reproduce through exact replay. The
 new build identity binds authenticated checkpoints and replay to these numeric
 proof semantics. Superseded build artifacts require the existing explicit
 compatibility rules; no migration fallback is introduced.
+
+
+## Order 77 — completed movement interrupts pending Actions
+
+The existing `mission_action_interrupted` event is emitted by the shared
+completed-move recorder after acceptance of a witnessed move. Its existing
+`source_evidence_event_id` and `source_evidence_event_type` fields identify the
+completion, including when `transition_batch.displacements` is empty because
+all endpoint poses equal their starting poses. Accepted zero-distance and
+rotation-only moves follow the same path. This applies to supported primary
+and secondary Actions and attached rules units. Remain Stationary, a declined
+move, pile-in and consolidation retain their existing distinctions.
+
+There is no new decision type, option family, proposal kind, viewer policy or
+payload field. Existing finite/parameterized submissions, per-model distance
+records and physical delta schemas cover this change. Interruption keeps the
+existing public Action event visibility; internal start/checkpoint evidence
+continues through shared viewer redaction. Restore rejects a persisted Action
+that continued after its recorded interrupting move, and authenticates the
+interruption's existing source reference. Engine identity regeneration binds
+replay and the external contract to the changed event ordering and semantics.

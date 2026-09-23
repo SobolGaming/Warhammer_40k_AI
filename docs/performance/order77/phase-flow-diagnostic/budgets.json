@@ -1,0 +1,9 @@
+{
+  "workload_id": "order77-action-completed-move-v1",
+  "maximum_submission_seconds": 12,
+  "maximum_ratio": 3,
+  "jitter_allowance_seconds": 0.05,
+  "required_completed_submissions": 15,
+  "full_game_certified": false,
+  "rationale": "Five accepted movement forms, three serial samples each. Preserve the existing 12-second focused movement ceiling and 3x base plus 50 ms jitter allowance. Equivalent facade inputs run automatic phase flow: the incorrect base can pause at Action completion while the repaired head advances past it. Cost comparison only; no full-game claim."
+}

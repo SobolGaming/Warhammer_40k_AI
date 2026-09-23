@@ -1,0 +1,10 @@
+{
+  "workload_id": "order77-action-completed-move-v2",
+  "maximum_submission_seconds": 12,
+  "maximum_ratio": 3,
+  "jitter_allowance_seconds": 0.05,
+  "required_completed_submissions": 15,
+  "full_game_certified": false,
+  "rationale": "Five accepted movement forms, three serial samples each. Preserve the 12-second focused movement ceiling and 3x base plus 50 ms jitter allowance. Both revisions stop at the same spare friendly unit Shooting decision. The preserved v1 phase-flow diagnostic compares different stopping boundaries and fails its per-case ratio; no sample or hard movement form is removed. This is component evidence, not full-game certification. Authenticated Action-containing restores use the same absolute and relative limits and must exactly reproduce the saved payload.",
+  "maximum_restore_seconds": 12
+}

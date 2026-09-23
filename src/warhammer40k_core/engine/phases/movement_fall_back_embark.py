@@ -68,7 +68,6 @@ __all__ = (
     "_complete_activation_then_request_post_normal_disembark_if_available",
     "_complete_movement_activation",
     "_complete_movement_activation_with_record_ids",
-    "_interrupt_started_mission_actions_for_movement_activation",
     "_maximum_model_distance_inches_from_witness",
     "_maximum_model_horizontal_distance_inches_from_witness",
     "_post_move_embark_options",
@@ -1011,15 +1010,6 @@ def _complete_movement_activation_with_record_ids(
     if movement_state is None or movement_state.active_selection is None:
         raise GameLifecycleError("Movement activation completion requires active selection.")
     active_selection = movement_state.active_selection
-    _interrupt_started_mission_actions_for_movement_activation(
-        state=state,
-        decisions=decisions,
-        active_selection=active_selection,
-        action=action,
-        request_id=request_id,
-        result_id=result_id,
-        displacement_kind=displacement_kind,
-    )
     if action is MovementPhaseActionKind.NORMAL_MOVE:
         state.record_normal_move_state(
             NormalMoveState(
@@ -1091,58 +1081,3 @@ def _maximum_model_horizontal_distance_inches_from_witness(
             model_distance += poses[index - 1].distance_2d_to(poses[index])
         maximum_distance = max(maximum_distance, model_distance)
     return maximum_distance
-
-
-def _interrupt_started_mission_actions_for_movement_activation(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    active_selection: MovementUnitSelection,
-    action: MovementPhaseActionKind,
-    request_id: str,
-    result_id: str,
-    displacement_kind: ModelDisplacementKind | None,
-) -> None:
-    if type(active_selection) is not MovementUnitSelection:
-        raise GameLifecycleError("Mission Action movement interruption requires active selection.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        return
-    active_unit_on_battlefield = reconcile_rules_unit_identity(
-        state=state,
-        unit_instance_id=active_selection.unit_instance_id,
-    ).placed_surviving_unit_instance_ids == (active_selection.unit_instance_id,)
-    for action_state in tuple(state.mission_action_states):
-        if not _mission_action_state_is_active_for_unit(
-            action_state=action_state,
-            unit_instance_id=active_selection.unit_instance_id,
-        ):
-            continue
-        if active_unit_on_battlefield:
-            if displacement_kind is None:
-                continue
-            interrupted = interrupt_mission_action_for_displacement(
-                action_state,
-                displacement_kind=displacement_kind,
-            )
-        else:
-            interrupted = interrupt_mission_action_for_battlefield_departure(action_state)
-        if interrupted is None:
-            continue
-        state.replace_mission_action_state(interrupted)
-        decisions.event_log.append(
-            "mission_action_interrupted",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": active_selection.player_id,
-                "phase": BattlePhase.MOVEMENT.value,
-                "unit_instance_id": active_selection.unit_instance_id,
-                "movement_phase_action": action.value,
-                "request_id": request_id,
-                "result_id": result_id,
-                "phase_body_status": "mission_action_interrupted",
-                "mission_action_state": validate_json_value(interrupted.to_payload()),
-                "interrupted_reason": interrupted.interrupted_reason,
-            },
-        )

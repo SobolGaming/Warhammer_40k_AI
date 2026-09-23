@@ -1,0 +1,212 @@
+{
+  "workload_id": "order77-action-completed-move-v1",
+  "revision": "3c2bd09542015cbaad8b0143be7acdba0f1a6eb27234b834f022435a234ecae8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3c2bd09542015cbaad8b0143be7acdba0f1a6eb27234b834f022435a234ecae8",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "library_versions": {
+    "shapely": "2.1.2",
+    "z3-solver": "4.15.4.0",
+    "orjson": "3.11.9"
+  },
+  "timing_boundary": "one facade submission, preparation separate; first sample cold, subsequent process caches retained",
+  "workload": "One five-model friendly and one five-model enemy unit, canonical purge-the-foe-vs-priority-assets-layout-1 terrain, fixed source seed; Maintain Control then reactive Normal Move of .25 inches, return to origin, zero distance, 45-degree rotation, or rotate-and-return. One facade submission including subsequent automatic phase flow; differing invalid-base Action completion availability changes the stopping boundary. Base is cost evidence only.",
+  "samples": [
+    {
+      "case": "translation",
+      "repeat": 0,
+      "preparation_seconds": 2.837944750004681,
+      "seconds": 1.1707551250001416,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "translation",
+      "repeat": 1,
+      "preparation_seconds": 0.8737748749990715,
+      "seconds": 1.1364270829944871,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "translation",
+      "repeat": 2,
+      "preparation_seconds": 0.8634297079988755,
+      "seconds": 1.1631096670025727,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "return",
+      "repeat": 0,
+      "preparation_seconds": 0.8632135829975596,
+      "seconds": 1.126229917004821,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "return",
+      "repeat": 1,
+      "preparation_seconds": 0.8678497499931837,
+      "seconds": 1.128553959002602,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "return",
+      "repeat": 2,
+      "preparation_seconds": 0.899379875001614,
+      "seconds": 1.1117071670014411,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "zero",
+      "repeat": 0,
+      "preparation_seconds": 0.8720021669869311,
+      "seconds": 1.1258799169881968,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "zero",
+      "repeat": 1,
+      "preparation_seconds": 0.8667878749984084,
+      "seconds": 1.1572314579971135,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "zero",
+      "repeat": 2,
+      "preparation_seconds": 0.8657103339937748,
+      "seconds": 1.1420031249872409,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "rotation",
+      "repeat": 0,
+      "preparation_seconds": 0.8676497499982361,
+      "seconds": 1.1769087909924565,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "rotation",
+      "repeat": 1,
+      "preparation_seconds": 0.8604327500070212,
+      "seconds": 1.1284723749995464,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "rotation",
+      "repeat": 2,
+      "preparation_seconds": 0.8662939999921946,
+      "seconds": 1.1294807499944,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "rotation_return",
+      "repeat": 0,
+      "preparation_seconds": 0.9067708749935264,
+      "seconds": 1.1354504580085631,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "rotation_return",
+      "repeat": 1,
+      "preparation_seconds": 0.8659067080006935,
+      "seconds": 1.1375806249998277,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    },
+    {
+      "case": "rotation_return",
+      "repeat": 2,
+      "preparation_seconds": 0.8734213339921553,
+      "seconds": 1.190466666012071,
+      "status": "waiting_for_decision",
+      "action_status": "interrupted",
+      "event_delta": 69
+    }
+  ],
+  "summary": {
+    "translation": {
+      "count": 3,
+      "mean_seconds": 1.1567639583324005,
+      "median_seconds": 1.1631096670025727,
+      "p95_seconds": 1.1707551250001416,
+      "maximum_seconds": 1.1707551250001416,
+      "submissions_per_second": 0.8644805993450966,
+      "completion_rate": 1
+    },
+    "return": {
+      "count": 3,
+      "mean_seconds": 1.1221636810029547,
+      "median_seconds": 1.126229917004821,
+      "p95_seconds": 1.128553959002602,
+      "maximum_seconds": 1.128553959002602,
+      "submissions_per_second": 0.8911355953939192,
+      "completion_rate": 1
+    },
+    "zero": {
+      "count": 3,
+      "mean_seconds": 1.1417048333241837,
+      "median_seconds": 1.1420031249872409,
+      "p95_seconds": 1.1572314579971135,
+      "maximum_seconds": 1.1572314579971135,
+      "submissions_per_second": 0.8758831274177964,
+      "completion_rate": 1
+    },
+    "rotation": {
+      "count": 3,
+      "mean_seconds": 1.1449539719954676,
+      "median_seconds": 1.1294807499944,
+      "p95_seconds": 1.1769087909924565,
+      "maximum_seconds": 1.1769087909924565,
+      "submissions_per_second": 0.8733975552372324,
+      "completion_rate": 1
+    },
+    "rotation_return": {
+      "count": 3,
+      "mean_seconds": 1.1544992496734874,
+      "median_seconds": 1.1375806249998277,
+      "p95_seconds": 1.190466666012071,
+      "maximum_seconds": 1.190466666012071,
+      "submissions_per_second": 0.8661763966350065,
+      "completion_rate": 1
+    }
+  },
+  "completed_submissions": 15,
+  "full_game_certified": false,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order77.py": "0105e324743dc47e9b7c320036b45aa0af3ee151aa5c8d132bb797602594d204",
+    "tests/action_movement_interruption_helpers.py": "6547f50aaaf3e03a377d40b0d3152ff3e9912a929eabd351901fde3602bbc102",
+    "tests/phase17n_primary_mission_helpers.py": "2d6fe56dd059440e3f216a37d4f9930ff74ba32185adfa22a69a2c72855827b5",
+    "tests/phase17n_step5g_pairing_certification_helpers.py": "8f0cb5be0cef51209ef8f56bafe9b7a96e0a7e7874647886b9d8c57e43380ce6"
+  }
+}

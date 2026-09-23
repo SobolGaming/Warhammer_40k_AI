@@ -9118,6 +9118,8 @@ def test_mission_action_cancellation_maps_displacements_and_battlefield_departur
 
 
 def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
+    from warhammer40k_core.engine.event_log import validate_json_value
+
     lifecycle = _battle_lifecycle()
     state = lifecycle.state
     assert state is not None
@@ -9126,6 +9128,16 @@ def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
         interruption_conditions=("unit_moved", "unit_left_battlefield"),
     )
     state.record_mission_action_state(action)
+    lifecycle.decision_controller.event_log.append(
+        "mission_action_started",
+        {
+            "game_id": state.game_id,
+            "player_id": action.player_id,
+            "battle_round": action.battle_round_started,
+            "phase": action.phase_started,
+            "mission_action_state": validate_json_value(action.to_payload()),
+        },
+    )
     movement_status = lifecycle.advance_until_decision_or_terminal()
     movement_request = movement_status.decision_request
     assert movement_request is not None

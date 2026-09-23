@@ -1,0 +1,210 @@
+{
+  "scope": "Order 77 / P16B / C16-03 completed-move Action interruption",
+  "baseline": "a28e84025db258825af56769eb90652d69213350",
+  "branch": "codex/order77-action-interruption",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3c2bd09542015cbaad8b0143be7acdba0f1a6eb27234b834f022435a234ecae8",
+  "final_validation_status": "passed",
+  "p_final_order": 78,
+  "p_final_certified": false,
+  "full_game_certified": false,
+  "scope_audit": "Four runtime owners change behavior: completed-move recorder, shared Action evidence, ordinary movement helper removal, and restore integration. Other movement-file edits remove imports/exports of the deleted helper. No source wording, geometry, schema, named handler or game driver change.",
+  "focused_regressions": {
+    "final_passed": 31,
+    "seconds": 33.18,
+    "workers": 4,
+    "coverage": false,
+    "consumer_run_passed_before_fixture_corrections": 363
+  },
+  "validation_attempts": [
+    "Pre-fix facade regressions reproduced return-path, zero-distance and rotate-and-return Action completion errors; translation, one-way rotation and decline controls passed.",
+    "Existing ordinary-movement and Charge restriction fixtures required their missing Action start events; the reactive regression now expects interruption at move completion.",
+    "The retained v1 phase-flow timing diagnostic failed its per-case relative limit: base pauses for erroneous Action completion while head advances further. V2 retains all five movement forms and unchanged numeric limits, using a spare friendly Shooting choice as the common stopping boundary; Action-containing restores are timed separately.",
+    "The installed-wheel smoke initially failed dependency retrieval because bundled TLS roots did not trust the local issuer. Retried with UV_SYSTEM_CERTS=true; the complete smoke passed without disabling certificate verification.",
+    "First full coverage run: 8912 passed, five failed, 85.18% coverage in 722.94 seconds. Three legacy fixtures omitted completed-move context or unintentionally triggered the new immediate interruption while constructing checkpoint forgeries; corrected the fixtures. Two HTTP tests failed because sandboxed loopback socket binding was denied. Retry retains the full coverage command and uses loopback-capable execution. No production changes after aggregate validation began."
+  ],
+  "local_runtime": {
+    "python": "3.14.5",
+    "node": "24.19.0",
+    "npm": "11.18.0"
+  },
+  "performance": {
+    "completed_submissions_per_revision": 15,
+    "authenticated_restores_per_revision": 15,
+    "inherited_matched_pairs_refreshed": 12,
+    "complete_games_attempted": 0,
+    "complete_games_completed": 0,
+    "full_game_certified": false
+  },
+  "updated_at": "2026-09-23T01:58:17.926167+00:00",
+  "behavioral_suite": {
+    "passed": 8917,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 714.052,
+    "workers": 18,
+    "distribution": "worksteal",
+    "junit_sha256": "b585960c06c970a77f116c53d38a9bb711207538a84609b769b888ffe500a950",
+    "log_sha256": "5daa77f1b7ba0dea6d9840ca3807b23ccc2c2c630ec6dd11991b3c194e20f39e",
+    "coverage_percent": 85.19,
+    "coverage_threshold_percent": 85,
+    "aggregate_attempts": 2,
+    "successful_coverage_runs": 1,
+    "without_coverage_repeat": false,
+    "execution": "Loopback-capable local execution; COVERAGE_FILE outside macOS Documents",
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=reports/order77/behavioral.xml"
+  },
+  "code_quality_suite": {
+    "passed": 594,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 112.66,
+    "workers": 18,
+    "distribution": "worksteal",
+    "junit_sha256": "6f3f5619d26ab9f84005968deab5890c154a36eab7de4f7165768646bd4a9711",
+    "log_sha256": "0ccd7f1a9e0e7793bf1eb2a97fbccbab0f45524fd2763e062cd78f77f1944c7b",
+    "coverage": false,
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=reports/order77/code-quality.xml"
+  },
+  "production_changes_after_aggregate_validation_began": false,
+  "fixture_correction_regressions": {
+    "passed": 14,
+    "seconds": 7.81
+  },
+  "gates": {
+    "ruff": {
+      "command": "uv run ruff check .",
+      "status": "passed",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "format": {
+      "command": "uv run ruff format --check .",
+      "status": "passed",
+      "log_sha256": "39b10d667f2afe706ef330e7fd4981606aa8258fd87d2c8f082c1995346a76d2"
+    },
+    "mypy": {
+      "command": "uv run mypy src tests",
+      "status": "passed",
+      "log_sha256": "81b51a4cdf904662f673ff527d1b52e6891149eb07560a631b0e239c3185b849"
+    },
+    "pyright": {
+      "command": "uv run pyright",
+      "status": "passed",
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    "imports": {
+      "command": "uv run lint-imports",
+      "status": "passed",
+      "log_sha256": "57b84ec01490801a44379ad472775c98fa2c3e26a4d74be067b89c48961bd395"
+    },
+    "identity-check": {
+      "command": "uv run python scripts/build_engine_build_identity.py --check",
+      "status": "passed",
+      "log_sha256": "bba4f0472cff67378b63da00b466a68493bd53a4a620ae989a869a2e18c5d059"
+    },
+    "source-check": {
+      "command": "uv run python tools/build_core_actions_source.py --check",
+      "status": "passed",
+      "log_sha256": "57197041c73b6b472455346324327eccec08a4e75cbfc3486b356e19c0b7a9ab"
+    },
+    "comparison-check": {
+      "command": "uv run python tools/core_rules_40k_app_audit.py --check",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "contract-check": {
+      "command": "uv run python scripts/build_external_contract.py --check --base-ref a28e84025db258825af56769eb90652d69213350",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "wheel-smoke": {
+      "command": "uv run python scripts/smoke_installed_contract_wheel.py",
+      "status": "passed",
+      "log_sha256": "a3be1dc05698c7e1bc74557a7c2f47f1ee66217105388a847bd3650fce256d5c"
+    },
+    "npm-ci": {
+      "command": "npm ci (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "18f5fa66278f81d92b2826cf9682485b1373b43392e377171531f895f2934f9c"
+    },
+    "npm-check": {
+      "command": "npm run check (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    "npm-unit": {
+      "command": "npm run test:unit (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "a9e2d14d4088a3e77ddf6d6dc32b4e7b50c5102761d259842fbdcd16f613db34"
+    },
+    "npm-conformance": {
+      "command": "npm run conformance (conformance/typescript)",
+      "status": "passed",
+      "log_sha256": "e3beca6da6736b94af59a4d066831d9b770df3d35c1a9504b616e2f19a679dd1"
+    },
+    "shard-check": {
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "status": "passed",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pre-commit": {
+      "command": "uv run pre-commit run --all-files",
+      "status": "passed",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  },
+  "external_contract": {
+    "version": "34.0.0",
+    "schemas": 27,
+    "wheel_engine_resources": 2925,
+    "wheel_request_families": 6,
+    "typescript_unit_tests_passed": 5,
+    "http_conformance_assertions_passed": 342,
+    "replay_sha256": "ecdd83ecfc1236b58fc8c734f7b82b64db46a4416c0d0fb3dba33bb671715b85"
+  },
+  "unchanged_action_source_package_sha256": "b9027d83c608961b9cde5baae546bbb97336235b8b9a6297b182cf0e93fad8aa",
+  "initial_failed_aggregate_evidence": {
+    "behavioral-initial.xml": "a7e16cccf03778ca34bd1a487221a6fcbca46fced1bf1841e4c8136feb42f782",
+    "behavioral-initial.log": "7b7b5dd3071c2ef5479b0c23036210c2b1e382f203ff54d7560f3291b395a9ab"
+  },
+  "evidence_sha256": {
+    "docs/performance/order64/head-reconstruction.json": "08b88dc77b6d2d7cffadc3fa49602112a4524bd2272982bffb2cc9d9aa9119ea",
+    "docs/performance/order64/base-reconstruction.json": "937c358026dd6b939d50b52933b8f9ccadc21780dc60dd75a789f81c03c171e8",
+    "docs/performance/order65/base.json": "b6fbca93c1b78a068645847ce1de2982135a5d5db8606684d5706b9f75871489",
+    "docs/performance/order65/head.json": "210fecfc63d5cd4b7840664e238d99d1d3f859210263b2f8303a6999a66b352e",
+    "docs/performance/order66/base.json": "940141a8c3b73190841f3c7b0ec05b72fd9d074e3b2db669bc12d957f740d3ce",
+    "docs/performance/order66/head.json": "e2fd9ce052de3ef1e29884f06c0f804c6ddad5de5b659c2bf57ac6e06a8ffe24",
+    "docs/performance/order69/base.json": "4e2e96a9a781fcfb683bd9a4bca52def2020de3ff39c75975613329e75f1cc1c",
+    "docs/performance/order69/head.json": "95e3225e2988fb9200b1226082dd2f955431b4c66a98d48e15ee753cd7868081",
+    "docs/performance/order70/base.json": "f596b33ae2fb319674cdc5ad075ad404245f7e9edc56988fb9cd3619e35dff2c",
+    "docs/performance/order70/head.json": "5858999dbb2d4c7c135e83043f8c7661b6e294dc61e8c87ca880497e00a2c6e4",
+    "docs/performance/order71/base.json": "1652941ba7f2bc395d0df7048875d1f51266a75b7b6d848910ac65a858425819",
+    "docs/performance/order71/head.json": "28cfcee1092773f46b88caf7695323f0db9fdf558d2c9837f43075526e817208",
+    "docs/performance/order72/base.json": "a194005e0879b6cb1c0fb0a18bcd2c6680b4812d9f4784f3f514c618ea7a7f1a",
+    "docs/performance/order72/head.json": "a015d16b665b68791cfe27f0743becfe5534634a5ebfd112904183b31282ba42",
+    "docs/performance/order74/base.json": "c023b95a25af274ea830d2b9f0fcb6c9baddb9fc5bb3c6aafd8777f79966d439",
+    "docs/performance/order74/head.json": "5dc4654bc989dcb4551ec19be0dce63285a90c533106b5f7d14378cfc001bd64",
+    "docs/performance/order75/base.json": "567d91d68b93fd0d2f786df529c06ba4b2caa9481cda8e6d0f874209e35e77cf",
+    "docs/performance/order75/head.json": "81e7f51bb032664cf18566ea96ca9a968b867dc0974ec1abaf053babdb42575c",
+    "docs/performance/order76/base.json": "3baecdc9893cba804156ae2cbc053fffe9058565e83f9967e868df8067c554c8",
+    "docs/performance/order76/head.json": "b125ebcae173205f808c65794ff9501f0fc4dc29513c58872392cce3ca41ffd6",
+    "docs/performance/order73/r73_001/base.json": "83f9f2acf1971a3a13b21a4ee989d51a0d665409e69f0bd252adaad1ad60a57c",
+    "docs/performance/order73/r73_001/head.json": "86cae31e12aee135eb8687e95fdf1d298f412b74164867d3612f29d7417f9278",
+    "docs/performance/order73/r73_001/geometry-base.json": "02a3038bc31ada7c96144bed0e8b7f00419ea9eb272dd5fdd175c0308b91aad3",
+    "docs/performance/order73/r73_001/geometry-head.json": "6526028c5ff90f0ee2572a9802982dc5f990a959f94edf404275a7511f063dc4",
+    "docs/performance/order77/base.json": "72bd83fa54aaa9c2a600a933cdcb2dc0809a56ffcad38b72719b3e16b80badda",
+    "docs/performance/order77/head.json": "cb8d89fb79932a6cf24336159424dd7346bcd6bfd9bb962d4f1ec0ac5c375cf0",
+    "docs/performance/order77/budgets.json": "ce6fca6f0a41072224b90d69c7e60fcec0c0790c65f1d32a2cb73c2500831b00",
+    "ci/test_shards/shard-1.txt": "d24a43360d0d8f545cf28ae26f4aaff73cde1b850df400d6ef3812e6ecdc1c15",
+    "ci/test_shards/shard-2.txt": "3933c0751c3a84d473a6d3b4b8e3b837e350f63c10a0b62bf56fd9312dd7fa2b",
+    "ci/test_shards/shard-3.txt": "a22cc2bc6ac83d244c99acc3ac0d65d073c087b1491268bb6e5ab09ea0196710",
+    "ci/test_shards/shard-4.txt": "0d52095dfb9450cb5ae689ede24f5dee6a14c854df27e679af123e17a7d8d5bd",
+    "ci/test_shards/shard-5.txt": "dfd7f7d6575c087221e041b13457f04ec597273af6dbaa32f2ab8b0655cd570c",
+    "ci/test_shards/shard-6.txt": "ac31b13d16ba1725588a50b35c7d5793147c5b9693fd9bf8e2ef843b83da1e9d",
+    "ci/test_shards/shard-7.txt": "145e60103be082bacc2e3ce415bbb241f8d4831504484fe5af2e7845b046ba7f",
+    "ci/test_shards/shard-8.txt": "ec6cb28ad25bc3deaf8ed39734afa85831f65dd3b774b09273e6534347dbb92e",
+    "ci/test_shards/durations.json": "ee6eedd139a9ff862ee51d7f41946037eb3f6a35244c6bb5815cd6116e2117a6"
+  },
+  "remote_ci_status_at_publication": "pending; local gates are not a claim of hosted CI completion"
+}

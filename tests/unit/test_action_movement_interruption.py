@@ -1,0 +1,254 @@
+"""Core 16.01: completed moves interrupt Actions even with equal endpoint poses."""
+
+from __future__ import annotations
+
+import json
+from copy import deepcopy
+from dataclasses import replace
+from typing import cast
+
+import pytest
+from tests.action_movement_interruption_helpers import (
+    MovementCase,
+    action_movement_session,
+    request_action_move,
+)
+
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.engine.actions import MissionActionStatus
+from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.mission_action_eligibility import (
+    mission_action_prevents_rules_unit_from_shooting_this_phase,
+    rules_unit_started_mission_action_this_turn,
+)
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.primary_mission_action_interruptions import (
+    reconcile_primary_mission_action_interruptions,
+    validate_primary_mission_action_interruption_evidence,
+)
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.triggered_movement import DECLINE_TRIGGERED_MOVEMENT_OPTION_ID
+
+
+@pytest.mark.parametrize(
+    ("case", "attached", "mission_action_id"),
+    [
+        ("translation", False, "maintain-control"),
+        ("return", False, "maintain-control"),
+        ("zero", False, "maintain-control"),
+        ("rotation", False, "maintain-control"),
+        ("rotation_return", False, "maintain-control"),
+        ("return", True, "maintain-control"),
+        ("return", False, "cleanse-objective"),
+        ("return", True, "cleanse-objective"),
+    ],
+)
+def test_completed_reactive_move_interrupts_action_through_facade(
+    case: MovementCase,
+    attached: bool,
+    mission_action_id: str,
+) -> None:
+    session, unit_id = action_movement_session(
+        attached=attached, mission_action_id=mission_action_id
+    )
+    request = request_action_move(session, unit_id, case)
+    lifecycle = session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    decisions = lifecycle.decision_controller
+    initial = lifecycle.to_payload()
+    cursor = EventStreamCursor(session.event_record_count())
+    option = next(o for o in request.options if o.option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID)
+
+    status = session.submit_option(
+        request_id=request.request_id, option_id=option.option_id, result_id="order77-move"
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    action = state.mission_action_states[-1]
+    assert action.status is MissionActionStatus.INTERRUPTED
+    assert action.interrupted_reason == "unit_moved"
+    assert rules_unit_started_mission_action_this_turn(
+        state=state, player_id=action.player_id, unit_instance_id=action.unit_instance_id
+    ) == (
+        state.active_player_id == action.player_id
+        and state.battle_round == action.battle_round_started
+    )
+    completion = next(
+        e for e in decisions.event_log.records if e.event_type == "triggered_movement_resolved"
+    )
+    assert isinstance(completion.payload, dict)
+    batch = completion.payload["transition_batch"]
+    assert isinstance(batch, dict)
+    displacements = batch["displacements"]
+    assert isinstance(displacements, list)
+    assert len(displacements) == (5 if case in {"translation", "rotation"} else 0)
+    history = [m for m in state.model_movement_history if m.event_id == completion.event_id]
+    assert len(history) == (6 if attached else 5)
+    assert {m.distance_inches for m in history} == (
+        {0.25} if case in {"translation", "return"} else {0.0}
+    )
+    assert reconcile_primary_mission_action_interruptions(state=state, decisions=decisions) == ()
+    assert not any(e.event_type == "mission_action_completed" for e in decisions.event_log.records)
+    pending = lifecycle.pending_decision_request()
+    assert pending is not None
+    assert not any(o.option_id.startswith("next:primary-action:") for o in pending.options)
+    for viewer in state.player_ids:
+        delta = session.events_since(cursor, viewer_player_id=viewer)
+        interruptions = [
+            e for e in delta["events"] if e["event_type"] == "mission_action_interrupted"
+        ]
+        assert len(interruptions) == 1
+        json.dumps(session.view(viewer_player_id=viewer), allow_nan=False)
+        json.dumps(delta, allow_nan=False)
+    restored = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    assert restored.lifecycle.to_payload() == lifecycle.to_payload()
+    artifact = ReplayArtifact.capture(
+        artifact_id=f"order77-{case}", initial_lifecycle_payload=initial, final_lifecycle=lifecycle
+    )
+    assert (
+        ReplayRunner.from_payload(artifact.to_payload()).run().status is ReplayRunStatus.REPRODUCED
+    )
+
+
+def test_declined_reactive_move_preserves_action_completion() -> None:
+    session, unit_id = action_movement_session()
+    request = request_action_move(session, unit_id, "return")
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+        result_id="order77-decline",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.mission_action_states[-1].status is MissionActionStatus.STARTED
+    pending = session.lifecycle.pending_decision_request()
+    assert pending is not None
+    request = pending
+    option = next(o for o in request.options if o.option_id.startswith("next:primary-action:"))
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id="order77-complete-unmoved-action",
+    )
+    assert (
+        state.mission_action_state_by_id("mission-action:order77-start-action").status
+        is MissionActionStatus.COMPLETED
+    )
+
+
+@pytest.fixture(scope="module")
+def interrupted_return_session() -> LocalGameSession:
+    session, unit_id = action_movement_session(pause_after_move=True)
+    request = request_action_move(session, unit_id, "return")
+    option = next(o for o in request.options if o.option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID)
+    status = session.submit_option(
+        request_id=request.request_id, option_id=option.option_id, result_id="order77-evidence-move"
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    return session
+
+
+def test_interruption_preserves_shooting_and_charge_locks(
+    interrupted_return_session: LocalGameSession,
+) -> None:
+    restored = GameLifecycle.from_payload(interrupted_return_session.lifecycle.to_payload())
+    state = restored.state
+    assert state is not None
+    action = state.mission_action_states[-1]
+    assert action.status is MissionActionStatus.INTERRUPTED
+    assert state.current_battle_phase is BattlePhase.SHOOTING
+    assert mission_action_prevents_rules_unit_from_shooting_this_phase(
+        state=state,
+        player_id=action.player_id,
+        unit_instance_id=action.unit_instance_id,
+    )
+    assert rules_unit_started_mission_action_this_turn(
+        state=state,
+        player_id=action.player_id,
+        unit_instance_id=action.unit_instance_id,
+    )
+
+
+@pytest.mark.parametrize(
+    ("event_type", "kind", "allowed"),
+    [
+        ("movement_activation_completed", "normal_move", False),
+        ("movement_activation_completed", "advance", False),
+        ("movement_activation_completed", "fall_back", False),
+        ("movement_activation_completed", "remain_stationary", True),
+        ("charge_move_completed", "charge_move", False),
+        ("catalog_setup_reactive_charge_move_completed", "charge_move", False),
+        ("triggered_movement_resolved", "surge_move", False),
+        ("fight_movement_completed", "pile_in", True),
+        ("fight_movement_completed", "consolidate", True),
+    ],
+)
+def test_action_evidence_classifies_completed_move_not_net_displacement(
+    interrupted_return_session: LocalGameSession,
+    event_type: str,
+    kind: str,
+    allowed: bool,
+) -> None:
+    """Exercise the shared evidence parser with real validated return-path model rows."""
+    lifecycle = interrupted_return_session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    event = next(
+        e
+        for e in lifecycle.decision_controller.event_log.records
+        if e.event_type == "triggered_movement_resolved"
+    )
+    payload = deepcopy(cast(dict[str, JsonValue], event.payload))
+    payload["movement_phase_action"] = kind
+    payload["displacement_kind"] = kind
+    if event_type == "fight_movement_completed":
+        payload["resolution"] = {"proposal_kind": kind}
+    classified = replace(event, event_type=event_type, payload=payload)
+    if allowed:
+        with pytest.raises(GameLifecycleError, match="evidence reason drifted"):
+            validate_primary_mission_action_interruption_evidence(
+                state=state,
+                action=state.mission_action_states[-1],
+                evidence_event=classified,
+            )
+    else:
+        validate_primary_mission_action_interruption_evidence(
+            state=state,
+            action=state.mission_action_states[-1],
+            evidence_event=classified,
+        )
+
+
+@pytest.mark.parametrize("tamper", ["reference", "type", "reason", "missing", "suppressed"])
+def test_restore_rejects_forged_completed_move_interruption(
+    interrupted_return_session: LocalGameSession,
+    tamper: str,
+) -> None:
+    payload = deepcopy(interrupted_return_session.lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    terminal = next(e for e in events if e["event_type"] == "mission_action_interrupted")
+    terminal_payload = cast(dict[str, JsonValue], terminal["payload"])
+    if tamper == "reference":
+        terminal_payload["source_evidence_event_id"] = "event:missing"
+    elif tamper == "type":
+        terminal_payload["source_evidence_event_type"] = "movement_activation_completed"
+    elif tamper == "reason":
+        terminal_payload["interrupted_reason"] = "unit_left_battlefield"
+    elif tamper == "missing":
+        del terminal_payload["source_evidence_event_id"]
+    else:
+        terminal["event_type"] = "forged_unrelated_event"
+        terminal["payload"] = {}
+        action = payload["state"]["mission_action_states"][-1]
+        action["status"] = "started"
+        action["interrupted_reason"] = None
+    with pytest.raises(
+        GameLifecycleError, match=("continued after" if tamper == "suppressed" else None)
+    ):
+        GameLifecycle.from_payload(payload)

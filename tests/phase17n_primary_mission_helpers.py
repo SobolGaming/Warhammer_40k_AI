@@ -29,7 +29,7 @@ from warhammer40k_core.engine.effects import EffectExpirationBoundary
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.list_validation import UnitMusterSelection
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration, UnitMusterSelection
 from warhammer40k_core.engine.mission_action_options import mission_action_for_state
 from warhammer40k_core.engine.mission_decisions import (
     DECLINE_MISSION_ACTION_START_OPTION_ID,
@@ -1081,11 +1081,13 @@ def phase17n_state_with_setup(
     battle_round: int,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
 ) -> GameState:
     state = battle_state(
         player_a_units=player_a_units,
         player_b_units=player_b_units,
+        player_b_attachment_declarations=player_b_attachment_declarations,
         player_a_secondary=player_a_secondary,
     )
     state.mission_setup = setup

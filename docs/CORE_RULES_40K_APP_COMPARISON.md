@@ -36,7 +36,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 13 Terrain | [13.00](https://www.40k.app/rules/13-terrain) | authoritative_app_mirror_supersedes_pdf | REVALIDATE | PFINAL |
 | 14 Objectives | [14.00](https://www.40k.app/rules/14-objectives) | authoritative_app_mirror | owned; see roadmap | P14 |
 | 15 Stratagems | [15.00](https://www.40k.app/rules/15-stratagems) | authoritative_app_internal_numbering_drift | owned; see roadmap | P15D, P15F, P15G, P15A, P15B, P15H, P15I, P15E, P15C |
-| 16 Actions | [16.00](https://www.40k.app/rules/16-actions) | authoritative_app_mirror | owned; see roadmap | P16 |
+| 16 Actions | [16.00](https://www.40k.app/rules/16-actions) | authoritative_app_mirror | owned; see roadmap | P16, P16B |
 | 17 Monsters And Vehicles | [17.00](https://www.40k.app/rules/17-monsters-and-vehicles) | authoritative_app_mirror | owned; see roadmap | P17 |
 | 18 Transports | [18.00](https://www.40k.app/rules/18-transports) | authoritative_app_mirror | owned; see roadmap | P18C, P18D, P18E, P18G, P18A, P18B, P18H, P18F, P20, P18I |
 | 19 Attached Units | [19.00](https://www.40k.app/rules/19-attached-units) | authoritative_app_mirror | owned; see roadmap | P19 |
