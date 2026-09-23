@@ -1,0 +1,449 @@
+{
+  "scope": "Order 79 / P14A / C14-03: turn-end objective control before boundary rules and cleanup",
+  "recorded_at": "2026-09-23T19:45:14.190753+00:00",
+  "approved_prerequisite": true,
+  "reviewed_base": "68c6bccb7d1f44e3b03409a86565a3d285c8449d",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "final_validation_status": "passed",
+  "scope_audit": "Six engine modules: extract shared turn preparation, invoke before rule discovery, share boundary emission, retain cleanup idempotence, validate historical ordering and reconstruct phase/turn activity expiry at their separate boundaries. No new choice/schema, named handler, source interpretation, faction support or architecture boundary.",
+  "source_authority": "Existing registered 14.02.01 control-first row exactly matches fresh September 23 observation; original source package and official provenance unchanged.",
+  "red_regression": {
+    "valid_coherency_regressions_failed_before_repair": 1,
+    "log_sha256": "8dc048e3e6eefdc415d29e2ee652d70a662c4e7843ebb037305b3ef8555f3add",
+    "initial_oc4_aircraft_numerical_claim": "withdrawn_rules_invalid_fixture",
+    "original_aircraft_log_sha256": "c7273cb8becb6662bd60c1e12706272f31e5f7f7003ea29e3169f09d2952b231"
+  },
+  "focused_validation": {
+    "hook_consumer_tests_passed": 831,
+    "hook_consumer_seconds": 102.01,
+    "hook_consumer_log_sha256": "c0cdbc4f63119791492cab91e679933095412c4d3224de40e92192dcb2062c46",
+    "history_scoring_replay_tests_passed": 237,
+    "history_log_sha256": "5110f2641dd7700e5dcd4da59eb94a23dedff7390a024198c35bb02362a1590b",
+    "expiry_consumer_tests_passed": 389,
+    "expiry_consumer_failures_before_final_cap_fixture_repair": 1,
+    "expiry_log_sha256": "fd64604453ce5a7442ca9498cb10643a0de6632277a8f8ff85173aebb9ed78ee",
+    "final_cap_tests_passed": 23,
+    "final_cap_log_sha256": "a30f86e2a9911b9afb10e135d1fd8ab5bb96d62bafabdda4d425f0558a0f9082",
+    "final_shared_fixture_tests_passed": 1073,
+    "final_shared_fixture_assertion_failures_before_narrowing": 3,
+    "final_shared_fixture_log_sha256": "7ba636480af520d04bda851f1336923deba508aef041871860d28194de339006",
+    "final_authority_tests_passed": 9,
+    "final_authority_log_sha256": "905819432a8773d1e9a325e9febbf6f48daaa77bbc5f6b977a6e8cb4477c9201",
+    "corrected_aircraft_expiry_and_scoring_passed": 422,
+    "corrected_aircraft_expiry_log_sha256": "6dd50c2f6f0d8fc9ad9cc2444800f6c6a178074487c01ceabe2ce349c7d4c5d6"
+  },
+  "behavioral_suite": {
+    "tests": 9021,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 728.325,
+    "junit_sha256": "a08cd9c7e3e3b478f344069f91d2b7a9db22b61d5bf033817f3476ba196c5d41",
+    "log_sha256": "3604f27211bdcf0890479db7b0d6faf574d65ca44f883b38e2e68a7b7cb918d6",
+    "coverage_percent": 85.21,
+    "coverage_threshold_percent": 85,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": true,
+    "coverage_file": "/private/tmp/order79-final.coverage",
+    "successful_complete_coverage_runs_on_final_runtime": 1,
+    "earlier_complete_coverage_passes_invalidated_by_production_change": 1,
+    "without_coverage_repeat": false
+  },
+  "code_quality_suite": {
+    "tests": 606,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 110.593,
+    "junit_sha256": "86a6818668a3d3da893417e7f421be9517ad812cf59d341dfcfc511a40fde8da",
+    "log_sha256": "6dc3e645fbc40e087fe6b3db383d36f221d82a3768c19245a350dada27cdb75e",
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": false
+  },
+  "attempts": [
+    {
+      "kind": "aborted_initial_aggregate",
+      "result": {
+        "tests": 2280,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 122.86,
+        "junit_sha256": "df05b1e1ce37451c8b10ba74c889d95720b4c920184343a093a6db7b7c54d9f6",
+        "log_sha256": "765c7be06758d66f646137d3998b91df13166f560afc95f86b9c66089c1d2609"
+      },
+      "reason": "Stopped after six reserve-hook fixture failures. Strict chronology exposed absent control/scoring history in fixtures that manually skip turns; repaired fixture preparation, scoring completion and one unrecorded casualty. Production validation was not relaxed."
+    },
+    {
+      "kind": "completed_aggregate_with_failures",
+      "result": {
+        "tests": 9020,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 765.977,
+        "junit_sha256": "741ec4daf229f136d025138813ed7ce72b9be1a74c8c9504472eb63ff9a45eb1",
+        "log_sha256": "80c2578f77d6a232c185dfe6225574a937f03ac6e19ac489ddb0587d3d241bf3"
+      },
+      "reason": "Seven failures: four exposed historical activity restriction expiry at the old boundary; three low-level scoring fixtures lacked phase/cleanup history. Repaired the shared restoration owner and canonical fixture sequencing, retaining strict validators."
+    },
+    {
+      "kind": "completed_aggregate_with_fixture_failures_and_coverage_io_error",
+      "result": {
+        "tests": 9021,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 697.092,
+        "junit_sha256": "8c9d36c672ea7a2bc246e817695ddb4307e7493d1910f5bc36fb1a555702b18b",
+        "log_sha256": "2e646cc61b726711d736a1d6752e4a5d68e51a575fa68b485af9da8dcdd7614c"
+      },
+      "reason": "Seven fixture/assertion failures: two manual expiry setups, four earlier typed tamper diagnostics, and one obsolete single-boundary authority count. Corrected shared fixtures and exact test targets. Coverage reporting could not open the shared .coverage database; final run uses a dedicated absolute COVERAGE_FILE without concurrent build gates."
+    },
+    {
+      "kind": "behavioral_pass_followed_by_work_budget_failure",
+      "behavioral": {
+        "tests": 9021,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 697.309,
+        "junit_sha256": "b63d530e781290fa23f5b117d7ca68bf6b62ceb3dd2f1c91148a4a09e35bc0d3",
+        "log_sha256": "af67f3340278bc2769a17ab4bb30a680f728a3c72cd852994064f575137aced4"
+      },
+      "code_quality": {
+        "tests": 606,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "seconds": 105.49,
+        "junit_sha256": "552cab852cfc4b98800418233e05a7f528a18d0e68303b2a3170e383dfc66bad",
+        "log_sha256": "010110c2197d842504bc908a300b56297988057db09ff1046b7303ed9f9ac5bd"
+      },
+      "reason": "9021 behavioral tests passed at 85.21% coverage, but one retained-attack work-count gate found 11 expiry calls against the fixed limit of 10. The shared final-phase expiry owner now skips an empty inventory without skipping later effects; focused count returned to 10. This production change invalidated the earlier aggregates. Owner review also corrected shared Aircraft Movement/OC to source dashes and withdrew the synthetic OC 4 numerical claim."
+    },
+    {
+      "kind": "publishing_checks_environment",
+      "reason": "Regenerated contract manifest after README update; used system TLS certificates for wheel dependencies and existing pyright nodeenv npm with the required bundled Node PATH prefix. All failed checks subsequently passed."
+    }
+  ],
+  "performance": {
+    "paired_case_count": 2,
+    "samples_per_case": 5,
+    "concurrency": 1,
+    "inherited_head_reports_refreshed": 15,
+    "inherited_fixture_migration": "docs/performance/order79/inherited-fixture-migration.json",
+    "numeric_budgets_unchanged": true,
+    "order79_workload_version": "v2_source_dash_aircraft",
+    "order66_base_remeasured_with_corrected_fixture": true,
+    "withdrawn_oc4_reports": "docs/performance/order79/withdrawn-oc4",
+    "measurements_without_competing_test_or_build_workers": true,
+    "base": "docs/performance/order79/base.json",
+    "head": "docs/performance/order79/head.json",
+    "budgets": "docs/performance/order79/budgets.json"
+  },
+  "full_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "mean_seconds": null,
+    "maximum_seconds": null,
+    "certified": false,
+    "reason": "No versioned representative legal complete-game driver/recording; existing complete-game targets remain uncertified."
+  },
+  "pfinal_order": 80,
+  "caudit_01_closed": false,
+  "gates": [
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.07620475000294391,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.0433844999934081,
+      "log_sha256": "3c9a0bde609d765af2944df8a67da27e7011fe0631e422fd284bfd5fa072aed5"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 12.061265750002349,
+      "log_sha256": "795e727517d1f43cc6a394a508b19a0d20da39538d6d43042d06c37bc717eb75"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "seconds": 71.51229112499277,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "lint-imports"
+      ],
+      "exit_code": 0,
+      "seconds": 0.49967849999666214,
+      "log_sha256": "2a6834536fd8f45adb300f1691557be7a9dad54fef4fe348317aa909e9b1d658"
+    },
+    {
+      "name": "identity-check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.42208287499670405,
+      "log_sha256": "78fb0f9415de85cf7c8747a28406f911450f79cff5f8d796acb58f7e02efb28b"
+    },
+    {
+      "name": "contract-base",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "68c6bccb7d1f44e3b03409a86565a3d285c8449d"
+      ],
+      "exit_code": 0,
+      "seconds": 71.50281554200046,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "exit_code": 0,
+      "seconds": 13.154980667008203,
+      "log_sha256": "d3ae504b5fd1115ae2d1a3b7fdd9bdc8269897b3fee5cc9b9723ff234b883a61"
+    },
+    {
+      "name": "app-audit",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "tools/core_rules_40k_app_audit.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.09910150000359863,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mirror-audit",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "tools/core_rules_maintained_mirror_audit.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08140262500091922,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typescript-check",
+      "command": [
+        "npm",
+        "--prefix",
+        "conformance/typescript",
+        "run",
+        "check"
+      ],
+      "exit_code": 0,
+      "seconds": 2.970065874993452,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "name": "typescript-unit",
+      "command": [
+        "npm",
+        "--prefix",
+        "conformance/typescript",
+        "run",
+        "test:unit"
+      ],
+      "exit_code": 0,
+      "seconds": 1.1289904169971123,
+      "log_sha256": "b98182377264a3957f1074aa593b59aaed94bf69ff19209804a086a76a4f4bce"
+    },
+    {
+      "name": "typescript-conformance",
+      "command": [
+        "npm",
+        "--prefix",
+        "conformance/typescript",
+        "run",
+        "conformance"
+      ],
+      "exit_code": 0,
+      "seconds": 103.5362553330051,
+      "log_sha256": "e3beca6da6736b94af59a4d066831d9b770df3d35c1a9504b616e2f19a679dd1"
+    },
+    {
+      "name": "behavioral",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=reports/order79/behavioral.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 730.5412037499918,
+      "log_sha256": "3604f27211bdcf0890479db7b0d6faf574d65ca44f883b38e2e68a7b7cb918d6"
+    },
+    {
+      "name": "shards-generate",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "reports/order79/behavioral.xml",
+        "--profile-source",
+        "Order 79 P14A; base 68c6bccb; runtime b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343; local macOS 26.7 Apple M5 Pro 18 CPUs 64 GiB; 18 worksteal workers with coverage",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.19150062499102205,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shards-check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.04948095799773,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "code-quality",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=reports/order79/code-quality.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 111.07146108300367,
+      "log_sha256": "6dc3e645fbc40e087fe6b3db383d36f221d82a3768c19245a350dada27cdb75e"
+    },
+    {
+      "name": "pre-commit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9630730829958338,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "name": "final-shards-check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07977612499962561,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "evidence_sha256": {
+    "docs/performance/order79/preflight.json": "8d1738455c3be4c63c0784509add2863d06b7660633037a6419dd6ca56026e5a",
+    "docs/performance/order79/base.json": "2f68339b56732bc7337fee730bf256031ac1fde00e3d80859dfa1984390d4d87",
+    "docs/performance/order79/head.json": "88fd41d1227d4472a24981c3374895e872f2d634cad7e3cd7817c381f60ebbbc",
+    "docs/performance/order79/budgets.json": "5641d2ab1000c345503003571e787c667124cd3dae0043d78ff9c7a15803b952",
+    "docs/performance/order79/inherited-fixture-migration.json": "b6c569264a0a62912d21ef6aafd9e390f3e1db270c4383cf4720b6d8c432bf10",
+    "reports/order79/performance-refresh.json": "d89583694a4dde03e19ca647ba1e862a0b9f7c6df2d6d5e7fab5841cdad7a2ca",
+    "ci/test_shards/durations.json": "f8a7f82a977039afc88e0ceb6f59c24c23b42f235d764029619297249edebcd4"
+  }
+}

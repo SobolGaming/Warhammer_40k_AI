@@ -1,0 +1,62 @@
+{
+  "workload": "order79-turn-end-control-v2",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "One facade advance from initialized unengaged Fight boundary to next decision; five serial samples, no coverage; fixture/restore preparation excluded",
+  "hashes": {
+    "scripts/measure_order79.py": "fa3ebc72faec8dae173bef70814b52c801a404ffb0d1f8a823ec822e0e6fce31",
+    "tests/order79_helpers.py": "a4680ca824470093d348312bddab1ec6decd5ebd30645ee8d72f626014dec23a",
+    "tests/aircraft_helpers.py": "b9d44fff415a72e211841e28f382671d6fda77041ef67ab20956e6e83cf877a4",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "player-b",
+      "samples_seconds": [
+        0.05524695799977053,
+        0.050041416005115025,
+        0.04990458300744649,
+        0.04967666600714438,
+        0.04974766699888278
+      ],
+      "mean_seconds": 0.05092345800367184,
+      "maximum_seconds": 0.05524695799977053,
+      "complete": true,
+      "controllers": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "case": "player-a",
+      "samples_seconds": [
+        0.038753333006752655,
+        0.038096167001640424,
+        0.037995417005731724,
+        0.03899529200862162,
+        0.038532208011019975
+      ],
+      "mean_seconds": 0.03847448340675328,
+      "maximum_seconds": 0.03899529200862162,
+      "complete": true,
+      "controllers": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "full_game_certified": false
+}

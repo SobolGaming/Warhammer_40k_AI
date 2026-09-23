@@ -4825,6 +4825,9 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
     seed_completed_fight_phase(state)
     evidence_before = tuple(state.primary_scoring_state_evidence_records)
 
+    from tests.mission_action_history_helpers import prepare_turn_end_control_for_fixture
+
+    prepare_turn_end_control_for_fixture(state=state, decisions=lifecycle.decision_controller)
     state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="bring-it-down",
@@ -7988,7 +7991,7 @@ def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() ->
 
     with pytest.raises(
         GameLifecycleError,
-        match="completed turn history lacks exactly one turn-end record",
+        match="turn-end timing history lacks exactly one turn-end record",
     ):
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
@@ -9547,7 +9550,7 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
         if row.model_instance_id == removed_model_id
     )
     assert (phase_end_row.presence, phase_end_row.wounds_remaining) == ("battlefield", 2)
-    assert (turn_end_row.presence, turn_end_row.wounds_remaining) == ("off_battlefield", 2)
+    assert (turn_end_row.presence, turn_end_row.wounds_remaining) == ("battlefield", 2)
     payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
@@ -9571,7 +9574,7 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
         GameLifecycle.from_payload(forged_payload)
 
 
-def test_turn_end_control_and_primary_scoring_use_post_cleanup_battlefield() -> None:
+def test_turn_end_control_and_primary_scoring_use_pre_cleanup_battlefield() -> None:
     state = _battle_state_for_primary("primary-immovable-object")
     assert state.battlefield_state is not None
     marker = _center_marker_definition(state)
@@ -9595,8 +9598,8 @@ def test_turn_end_control_and_primary_scoring_use_post_cleanup_battlefield() -> 
         if record.timing is ObjectiveControlTiming.TURN_END
     )
     central_result = turn_end_record.result_by_objective_id(marker.objective_marker_id)
-    assert central_result.controlled_by_player_id is None
-    assert not any(
+    assert central_result.controlled_by_player_id == "player-a"
+    assert any(
         _transaction_metadata(transaction)["scoring_rule_id"] == "immovable-object-central-turn-end"
         for transaction in state.victory_point_ledger_for_player("player-a").transactions
     )
@@ -11687,22 +11690,15 @@ def _battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
     from tests.destruction_occurrence_fixture_helpers import finish_core_destructions_for_fixture
 
     finish_core_destructions_for_fixture(state=state, decisions=lifecycle.decision_controller)
-    record = state.record_objective_control_boundary(
-        completed_phase=BattlePhase.FIGHT,
-        timing=ObjectiveControlTiming.TURN_END,
-        runtime_modifier_registry=None,
-    )
-    lifecycle.decision_controller.event_log.append(
-        "end_boundary_objective_control_determined",
-        {
-            "game_id": record.game_id,
-            "battle_round": record.battle_round,
-            "phase": record.phase,
-            "record_ids": [record.record_id],
-            "source_rule_id": (
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
-            ),
-        },
+    from tests.mission_action_history_helpers import prepare_turn_end_control_for_fixture
+
+    prepare_turn_end_control_for_fixture(state=state, decisions=lifecycle.decision_controller)
+    record = next(
+        record
+        for record in state.objective_control_records
+        if record.timing is ObjectiveControlTiming.TURN_END
+        and record.battle_round == state.battle_round
+        and record.active_player_id == state.active_player_id
     )
     score_primary_objective_control_boundary(
         state=state,

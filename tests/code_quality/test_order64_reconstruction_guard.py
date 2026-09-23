@@ -163,7 +163,7 @@ def test_reposition_and_ingress_cannot_reset_turn_history_or_effect_duration() -
         "persisting_effects",
     }
     reset_calls = {
-        "_clear_turn_action_states",
+        "clear_turn_action_states",
         "replace_battle_shock_state",
         "expire_persisting_effects_at_boundary",
     }

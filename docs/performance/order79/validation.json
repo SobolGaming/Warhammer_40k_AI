@@ -1,0 +1,80 @@
+{
+  "audit_id": "order79-prefinal-control-first-audit-v1",
+  "recorded_at": "2026-09-23T16:52:24.909373+00:00",
+  "reviewed_commit": "68c6bccb7d1f44e3b03409a86565a3d285c8449d",
+  "scope": "preflight evidence and remediation planning only",
+  "checks": [
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache PYTHONPATH=. uv run --no-sync python reports/order79/probe_control_first.py",
+      "status": "passed_diagnostic_assertions",
+      "cases": 3,
+      "exact_replay_cases": 3,
+      "note": "Confirms the existing defect and two controls, not rule compliance."
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run pytest tests/unit/test_phase10r_aircraft.py -k 'opponent_turn_end_returns_aircraft_and_restores or own_turn_end_keeps_aircraft' tests/unit/test_phase11b_objective_control.py -k 'opponent_turn_end_returns_aircraft_and_restores or own_turn_end_keeps_aircraft or end_boundary_control_is_fixed_before_later_end_of_phase_mutation' tests/unit/test_phase11e_mission_scoring_cleanup.py -k 'opponent_turn_end_returns_aircraft_and_restores or own_turn_end_keeps_aircraft or end_boundary_control_is_fixed_before_later_end_of_phase_mutation or turn_end_control_and_primary_scoring_use_post_cleanup_battlefield' -q --no-cov",
+      "status": "passed",
+      "passed": 4,
+      "deselected": 319,
+      "seconds": 6.36,
+      "note": "The last -k expression selects all four tests; one expects incorrect post-cleanup control."
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run pytest tests/code_quality/test_core_rules_roadmap.py -q --no-cov",
+      "status": "passed",
+      "passed": 5
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run --no-sync python tools/core_rules_40k_app_audit.py --check",
+      "status": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run --no-sync python tools/core_rules_maintained_mirror_audit.py --check",
+      "status": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "status": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run ruff check tests/code_quality/test_core_rules_roadmap.py",
+      "status": "passed"
+    },
+    {
+      "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache uv run ruff format --check tests/code_quality/test_core_rules_roadmap.py",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "evidence_sha256": {
+    "docs/performance/order79/preflight.json": "fa555e30fcd51f346d09a1ca812ce4ca9b80c719ec49457f0a7e6aee519062a3",
+    "reports/order79/probe_control_first.py": "99fdeadcd52cba9e7a138c33e6efa6365e2702881101cc59eeaf8cdfe1f77f8c",
+    "reports/order79/control-first-results.json": "a1191956aac1370acded3cf7d3b32bc000569e40464b7483fb5179affedf317b",
+    "reports/order79/focused.log": "458a027d0621a428da3dc6bbf031c087787f8160923cc863abd2f01ece104dd4",
+    "reports/order79/roadmap-check.log": "6b9ffd6b9a3baa1f0f65b43fd8e9939ac47909d796917593222ef0ccd5a23556"
+  },
+  "not_run": [
+    "Complete behavioral suite with coverage",
+    "Complete code-quality suite",
+    "Repository-wide Ruff lint and format",
+    "mypy",
+    "pyright",
+    "lint-imports",
+    "pre-commit",
+    "External contract base-ref generation",
+    "TypeScript client checks/unit tests/live conformance",
+    "Installed-wheel smoke",
+    "Full-game performance"
+  ],
+  "not_run_reason": "PFINAL preflight found a gameplay gap. Runtime repair requires a scope pause; no PR is being published. Aggregate and publication gates remain required for the later implementation PR.",
+  "runtime_changed": false,
+  "source_registry_changed": false,
+  "contract_changed": false,
+  "behavioral_test_inventory_changed": false,
+  "pr_opened": false,
+  "full_game_performance_certified": false,
+  "caudit_01_closed": false
+}

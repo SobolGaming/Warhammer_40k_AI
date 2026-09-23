@@ -336,8 +336,8 @@ def _complete_current_command_for_fixture(lifecycle: GameLifecycle) -> GameLifec
 
 
 def _advance_battle_phase_for_fixture(lifecycle: GameLifecycle) -> None:
-    from warhammer40k_core.engine.battle_round_flow import (
-        _emit_objective_control_boundary_event_if_missing,  # pyright: ignore[reportPrivateUsage]
+    from warhammer40k_core.engine.boundary_rule_flow import (
+        emit_objective_control_boundary,
     )
 
     state = _state(lifecycle)
@@ -348,16 +348,12 @@ def _advance_battle_phase_for_fixture(lifecycle: GameLifecycle) -> None:
         value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
     )
     record = state.determine_current_phase_end_objective_control()
-    _emit_objective_control_boundary_event_if_missing(
-        decisions=lifecycle.decision_controller, record=record
-    )
+    emit_objective_control_boundary(decisions=lifecycle.decision_controller, record=record)
     if state.current_battle_phase is BattlePhase.FIGHT:
         record = state.prepare_current_turn_end_boundary(
             completed_phase=BattlePhase.FIGHT, runtime_modifier_registry=None
         )
-        _emit_objective_control_boundary_event_if_missing(
-            decisions=lifecycle.decision_controller, record=record
-        )
+        emit_objective_control_boundary(decisions=lifecycle.decision_controller, record=record)
     state.advance_to_next_battle_phase(event_log=lifecycle.decision_controller.event_log)
     record_new_primary_turn_start_evidence_events(
         state=state,

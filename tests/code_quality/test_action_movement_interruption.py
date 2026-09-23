@@ -98,9 +98,9 @@ def test_order77_matched_completed_move_cost_evidence(baseline: str) -> None:
         "library_versions",
         "timing_boundary",
         "workload",
-        "hashes",
     ):
         assert base[key] == head[key], key
+    _assert_versioned_fixture_inputs(base["hashes"], head["hashes"])
     for name, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
     assert len(base["samples"]) == len(head["samples"]) == budgets["required_completed_submissions"]
@@ -140,9 +140,9 @@ def test_order77_completed_secondary_restore_cost_evidence(baseline: str) -> Non
         "concurrency",
         "library_versions",
         "timing_boundary",
-        "hashes",
     ):
         assert base[key] == head[key], key
+    _assert_versioned_fixture_inputs(base["hashes"], head["hashes"])
     for name, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
     assert head["full_game_certified"] is False
@@ -155,3 +155,32 @@ def test_order77_completed_secondary_restore_cost_evidence(baseline: str) -> Non
         assert new["seconds"] <= (
             old["seconds"] * budgets["maximum_ratio"] + budgets["jitter_allowance_seconds"]
         )
+
+
+def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str]) -> None:
+    migration = json.loads(
+        (ROOT / "docs/performance/order79/inherited-fixture-migration.json").read_text()
+    )
+    changes = migration["changed_files"]
+    assert set(changes) == {
+        "tests/mission_action_history_helpers.py",
+        "tests/phase17n_primary_mission_helpers.py",
+    }
+    assert base.keys() == head.keys()
+    for name in base:
+        if name in changes:
+            assert base[name] == changes[name]["base_sha256"], name
+            assert head[name] == changes[name]["head_sha256"], name
+        else:
+            assert base[name] == head[name], name
+    # The movement workload uses these unchanged roster/mission initializers;
+    # whole-file changes are confined to separate turn-end fixture functions.
+    expected = migration["unchanged_primary_fixture_entrypoints"]
+    assert set(expected) == {"phase17n_event_setup", "phase17n_state_with_setup"}
+    tree = ast.parse((ROOT / "tests/phase17n_primary_mission_helpers.py").read_text())
+    actual = {
+        node.name: hashlib.sha256(ast.dump(node, include_attributes=False).encode()).hexdigest()
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name in expected
+    }
+    assert actual == expected

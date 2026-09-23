@@ -470,6 +470,9 @@ def test_gate_of_infinity_can_be_used_after_attached_component_loss(
     )
     decisions = DecisionController()
 
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
     request = _request_for(state=state, decisions=decisions)
     assert f"grey-knights:gate-of-infinity:{attached_id}:use" in {
         option.option_id for option in request.options
@@ -481,6 +484,9 @@ def test_gate_of_infinity_can_be_used_after_attached_component_loss(
         option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
         result_id=f"result-gate-of-infinity-after-{destroyed_role}-loss",
     )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
 
     reserve_state = state.reserve_state_for_unit(attached_id)
     assert reserve_state is not None
@@ -648,6 +654,9 @@ def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None
     )
     _configure_mission_state(state)
     decisions = DecisionController()
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
     request = _request_for(state=state, decisions=decisions)
     _apply_result(
         state=state,
@@ -656,6 +665,9 @@ def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None
         option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
         result_id="result-gate-of-infinity-attached-retained",
     )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
     _arrive_rules_unit_from_strategic_reserves(
         state=state,
         decisions=decisions,
@@ -695,11 +707,21 @@ def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None
     )
     state.movement_phase_state = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    _destroy_test_unit_model(state=state, unit_instance_id=bodyguard.unit_instance_id)
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.with_removed_models(
-        (bodyguard.own_models[0].model_instance_id,)
+    from tests.destruction_occurrence_fixture_helpers import (
+        destroy_rule_model_for_fixture,
+        finish_core_destructions_for_fixture,
     )
+
+    enemy = state.army_definitions[1].units[0]
+    destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=bodyguard.own_models[0].model_instance_id,
+        destroying_player_id="player-opponent",
+        source_unit_id=enemy.unit_instance_id,
+        source_model_id=enemy.own_models[0].model_instance_id,
+    )
+    finish_core_destructions_for_fixture(state=state, decisions=decisions)
 
     validate_attached_rules_unit_identity_after_destruction(
         state=state,
@@ -1165,6 +1187,7 @@ def _arrive_rules_unit_from_strategic_reserves(
     result_id_prefix: str,
 ) -> None:
     state.battle_round = battle_round
+    state.fight_phase_state = None
     state.active_player_id = "player-grey"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     state.movement_phase_state = MovementPhaseState(

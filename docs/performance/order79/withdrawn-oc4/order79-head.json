@@ -1,0 +1,62 @@
+{
+  "workload": "order79-turn-end-control-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:0ef9931efe66bb40946f56d043fc4daa070d7364d401738c718e8f076b2fec6a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0ef9931efe66bb40946f56d043fc4daa070d7364d401738c718e8f076b2fec6a",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "One facade advance from initialized unengaged Fight boundary to next decision; five serial samples, no coverage; fixture/restore preparation excluded",
+  "hashes": {
+    "scripts/measure_order79.py": "f3dd5218e9abbb5c98904875aedc5d10b02d47a51d9598d7d3df3df380795387",
+    "tests/order79_helpers.py": "a4680ca824470093d348312bddab1ec6decd5ebd30645ee8d72f626014dec23a",
+    "tests/aircraft_helpers.py": "b21d4817ffd5ad698a439faa3c0d7f102b5c54ae0ca86344acc88ae7fe6f0baa",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "player-b",
+      "samples_seconds": [
+        0.05223212500277441,
+        0.051922208003816195,
+        0.05206295900279656,
+        0.048855916000320576,
+        0.049263082997640595
+      ],
+      "mean_seconds": 0.050867258201469666,
+      "maximum_seconds": 0.05223212500277441,
+      "complete": true,
+      "controllers": [
+        "player-a",
+        "player-a",
+        "player-a",
+        "player-a",
+        "player-a"
+      ]
+    },
+    {
+      "case": "player-a",
+      "samples_seconds": [
+        0.0380139579938259,
+        0.03793704199779313,
+        0.03811341599794105,
+        0.03812845800712239,
+        0.03863999999884982
+      ],
+      "mean_seconds": 0.038166574799106456,
+      "maximum_seconds": 0.03863999999884982,
+      "complete": true,
+      "controllers": [
+        "player-a",
+        "player-a",
+        "player-a",
+        "player-a",
+        "player-a"
+      ]
+    }
+  ],
+  "full_game_certified": false
+}

@@ -201,9 +201,9 @@ def test_cleanse_fabricated_completed_action_and_exact_projection_cannot_be_reha
 
     payload = deepcopy(state.to_payload())
     GameState.from_payload(deepcopy(payload))
-    assert len(payload["objective_control_record_authorities"]) == 1
-    genuine_checkpoint = deepcopy(
-        payload["objective_control_record_authorities"][0]["boundary_checkpoint"]
+    assert len(payload["objective_control_record_authorities"]) == 2
+    genuine_checkpoints = deepcopy(
+        [row["boundary_checkpoint"] for row in payload["objective_control_record_authorities"]]
     )
     action_matches = [
         action
@@ -256,10 +256,9 @@ def test_cleanse_fabricated_completed_action_and_exact_projection_cannot_be_reha
         secondary_mission_id="cleanse",
         mutate=rewrite_with_fabricated_completed_action,
     )
-    assert (
-        payload["objective_control_record_authorities"][0]["boundary_checkpoint"]
-        == genuine_checkpoint
-    )
+    assert [
+        row["boundary_checkpoint"] for row in payload["objective_control_record_authorities"]
+    ] == genuine_checkpoints
 
     with pytest.raises(GameLifecycleError, match=_AUTHORITY_DRIFT_ERROR):
         GameState.from_payload(payload)

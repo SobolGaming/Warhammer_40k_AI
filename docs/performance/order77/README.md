@@ -90,6 +90,14 @@ its exact hash is the v1 reports’ `scripts/measure_order77.py` hash.
 
 ## Validation scope
 
+Order 79 refreshes the head reports after repairing canonical boundary-history
+fixtures. The two changed helper hashes and unchanged initializer functions are
+pinned in `../order79/inherited-fixture-migration.json`. All other inputs, every
+historical baseline and all numeric budgets stay fixed. Completed-Cleanse head
+saves include the newly required phase history; those historical comparisons do
+not claim byte-identical saved inputs. See the Order 79 assessment for its matched
+base/head boundary workload.
+
 Final results and report hashes are recorded in `validation.json`. Runtime identity
 changes also require fresh inherited component evidence for Orders 64–66 and 69–76.
 Their original workload definitions, baseline revisions and budgets are retained.

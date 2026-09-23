@@ -432,6 +432,9 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
     assert state.to_payload() == state_before_unauthenticated_attempt
     assert decisions.to_payload() == decisions_before_unauthenticated_attempt
 
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
     request = registry.next_request_for(
         TurnEndRequestContext(
             state=state,
@@ -458,6 +461,9 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
         )
     )
 
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
     reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
     assert request.decision_type == SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
     assert request.actor_id == army.player_id
@@ -484,6 +490,7 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
     )
     assert restore(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
+    state.fight_phase_state = None
     state.active_player_id = army.player_id
     state.battle_round = 2
     state.battle_phase_index = tuple(state.battle_phase_sequence).index(BattlePhase.MOVEMENT)
@@ -610,6 +617,9 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
         model.model_instance_id for model in alive_after_second_casualty
     )
     assert len(alive_after_second_casualty) == len(unit.own_models) - 2
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
     second_request = registry.next_request_for(
         TurnEndRequestContext(
             state=state,
@@ -636,6 +646,9 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
             result=second_result,
         )
     )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
     repeated_reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
     assert repeated_reserve_state is not None
     assert repeated_reserve_state.entered_reserves_battle_round == 2
@@ -908,7 +921,7 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
     cloned_events.append(cloned_derived_event)
     with pytest.raises(
         GameLifecycleError,
-        match="Primary destroyed departure mutation source identity drift",
+        match="Primary scoring battlefield departure history is incomplete",
     ):
         restore(cloned_departure_payload)
 
@@ -2121,6 +2134,9 @@ def test_phase17n_real_destroy_restore_hunters_entry_orders_before_deadline_time
     assert state.battlefield_state is not None
     assert destroyed_model_id in state.battlefield_state.placed_model_ids()
 
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
     hunters_request = registry.next_request_for(
         TurnEndRequestContext(
             state=state,
@@ -2148,6 +2164,9 @@ def test_phase17n_real_destroy_restore_hunters_entry_orders_before_deadline_time
             result=hunters_result,
         )
     )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
     reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
     assert reserve_state is not None
     assert reserve_state.source_rule_ids == (hunters_record.definition.source_id,)

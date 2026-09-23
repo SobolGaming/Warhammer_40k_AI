@@ -4,6 +4,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
     PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
@@ -15,6 +16,7 @@ from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookRegistry,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.turn_end_boundary import determine_turn_end_control
 from warhammer40k_core.engine.turn_end_hooks import TurnEndHookRegistry, TurnEndRequestContext
 
 
@@ -112,22 +114,43 @@ def prepare_phase_end_boundary(
     phase_end_objective_control_record = state.determine_current_phase_end_objective_control(
         runtime_modifier_registry=runtime_modifier_registry,
     )
-    if not any(
+    emit_objective_control_boundary(decisions=decisions, record=phase_end_objective_control_record)
+
+
+def prepare_turn_end_control_boundary(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> None:
+    phase = state.current_battle_phase
+    if phase is None:
+        raise GameLifecycleError("Turn-end preparation requires a current phase.")
+    record = determine_turn_end_control(
+        state=state, completed_phase=phase, runtime_modifier_registry=runtime_modifier_registry
+    )
+    emit_objective_control_boundary(decisions=decisions, record=record)
+
+
+def emit_objective_control_boundary(
+    *, decisions: DecisionController, record: ObjectiveControlRecord
+) -> None:
+    if any(
         event.event_type == "end_boundary_objective_control_determined"
         and isinstance(event.payload, dict)
-        and event.payload.get("record_ids") == [phase_end_objective_control_record.record_id]
+        and event.payload.get("record_ids") == [record.record_id]
         for event in decisions.event_log.records
     ):
-        decisions.event_log.append(
-            "end_boundary_objective_control_determined",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": phase.value,
-                "record_ids": [phase_end_objective_control_record.record_id],
-                "source_rule_id": (
-                    "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
-                    "14.02.01-control-first"
-                ),
-            },
-        )
+        return
+    decisions.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
+    )

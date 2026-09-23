@@ -1,0 +1,62 @@
+{
+  "workload": "order79-turn-end-control-v1",
+  "revision": "68c6bccb7d1f44e3b03409a86565a3d285c8449d",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "cpu_allocation": 18,
+  "concurrency": 1,
+  "host_role": "provisional",
+  "timing_boundary": "One facade advance from initialized unengaged Fight boundary to next decision; five serial samples, no coverage; fixture/restore preparation excluded",
+  "hashes": {
+    "scripts/measure_order79.py": "f3dd5218e9abbb5c98904875aedc5d10b02d47a51d9598d7d3df3df380795387",
+    "tests/order79_helpers.py": "a4680ca824470093d348312bddab1ec6decd5ebd30645ee8d72f626014dec23a",
+    "tests/aircraft_helpers.py": "b21d4817ffd5ad698a439faa3c0d7f102b5c54ae0ca86344acc88ae7fe6f0baa",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "player-b",
+      "samples_seconds": [
+        0.061078708997229114,
+        0.05400220899900887,
+        0.055160959003842436,
+        0.05373733400483616,
+        0.05298983400280122
+      ],
+      "mean_seconds": 0.05539380900154356,
+      "maximum_seconds": 0.061078708997229114,
+      "complete": true,
+      "controllers": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "case": "player-a",
+      "samples_seconds": [
+        0.04125195799861103,
+        0.040755624999292195,
+        0.040870249998988584,
+        0.042072083000675775,
+        0.04121741600101814
+      ],
+      "mean_seconds": 0.041233466399717145,
+      "maximum_seconds": 0.042072083000675775,
+      "complete": true,
+      "controllers": [
+        "player-a",
+        "player-a",
+        "player-a",
+        "player-a",
+        "player-a"
+      ]
+    }
+  ],
+  "full_game_certified": false
+}

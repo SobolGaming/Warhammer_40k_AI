@@ -157,6 +157,8 @@ non-closable grouping label, not a finding ID or closure key.
   while `C24-07` owns alternating Scout resolution.
 - `C02-04` owns model keyword contribution under P05B’s retained-presence contract and the model-level schema
   needed to stop destroyed models contributing keywords to a surviving unit.
+- `C14-03` owns turn-end objective-control precedence over boundary rules and
+  cleanup, including scoring and historical consumers, under P14A.
 - `CAUDIT-01` owns the final all-category audit and certification gate. It is
   not an implementation finding and cannot close while any in-scope finding is
   open.
@@ -277,7 +279,8 @@ corroborate but is not required to begin that work.
 | 76 | P03D | C03-04 | PFINAL preflight reproduced unreplayable events from malformed physical proposals and an untyped Surge loader failure. | Return shared typed prevalidation diagnostics without mutating authoritative histories; preserve recorded rule-invalid retries, viewer scope and exact replay/recovery across movement, Charge, Surge and placement. See [Order 76 scope and evidence](ORDER_76_PREFLIGHT_AUDIT.md). | Existing Core physical proposal sources and the Phase 11D adapter contract; no rules wording change. | P21C, P03C, P18I | IMPLEMENTATION-GAP |
 | 77 | P16B | C16-03 | PFINAL preflight reproduced an Action completing after a validated reactive Normal Move that returns to its initial pose. | Derive Action interruption from authoritative completed-move evidence rather than net displacement; share live/restore interpretation, audit ordinary and reactive callers and attached lineage, and preserve decline/Remain Stationary/pile-in/consolidation distinctions, facade/replay/viewer authority and restriction lifetimes. See [Order 77 prerequisite](ORDER_77_PREFLIGHT_AUDIT.md). | Retained 16.01 Action interruption and 03.01 cumulative movement; September 22 maintained-mirror corroboration, no source wording change. | P16, P03D | IMPLEMENTATION-GAP |
 | 78 | P13A | C13-01 | PFINAL revalidation reproduced a Hidden target outside dense terrain remaining visible and shootable despite qualifying intervening dense concealment. | Apply source-backed Gone to Ground from Hidden state, causal dense-feature concealment and current/previous-turn ranged history without an extra occupancy condition. Audit both shared visibility consumers, per-model/attached scope, reaction shooting, facade/restore/replay, source identity and performance. See [Order 78 prerequisite](ORDER_78_PREFLIGHT_AUDIT.md). | [13.11.01 Gone to Ground](https://www.40k.app/rules/13-terrain), complete unversioned maintained-mirror observation on September 23; no official-App conflict observed. | P06C, S-MIRRORS | IMPLEMENTATION-GAP |
-| 79 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 77 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
+| 79 | P14A | C14-03 | The shared state owner captures turn-end objective control after coherency cleanup, which can remove controlling models and wrongly change scores. The initial numerical Aircraft example was withdrawn: Aircraft have source-dash OC; their departure tests event order only. | Determine and freeze turn-end control before all turn-end rules and cleanup, preserving distinct phase boundaries, sequenced choices, scoring, historical authority, adapters and exact replay. See [Order 79 preflight](ORDER_79_PREFLIGHT_AUDIT.md). Owner-approved implementation freezes the distinct turn boundary before rule discovery; retained authority validates event order. | [14.02.01](https://www.40k.app/rules/14-objectives), complete unversioned September 23 observation matching the retained stable source row; no source interpretation change. | P14, P01D, P23 | IMPLEMENTATION-GAP |
+| 80 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 78 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
 Category 07 has no standalone remediation PR and remains `REVALIDATE`.
 Category 13's Light/Dense Hidden wording is governed by the maintained mirror
@@ -3068,7 +3071,7 @@ audit and must commit the final audit artifact, generated report, validation
 results, snapshot identity, provider/version evidence, and the evidence
 supporting `CAUDIT-01` closure.
 
-PFINAL (now Order 79) must also assess representative complete headless games using the
+PFINAL (now Order 80) must also assess representative complete headless games using the
 existing legal driver or recorded workload, including the continuous terrain
 solver introduced by Order 74. Record completion, per-game timing, declared
 hardware and workload, and the standing below-60-second mean / at-most-300-second
@@ -5407,3 +5410,27 @@ facades reject protected targets, accept legal retries and preserve exact replay
 The source observation is registered and hash-pinned. No PFINAL PR is open, no complete 25-category audit or selected-snapshot certification is
 claimed, and CAUDIT-01 remains open. After P13A merges, repeat the complete audit
 from current main. Complete-game performance remains uncertified.
+
+
+## Order 79 preflight / P14A — turn-end objective control precedence
+
+The fresh PFINAL preflight of main `68c6bccb7d1f44e3b03409a86565a3d285c8449d`
+on 2026-09-23 reproduced C14-03 in the explicit September 10 control-first
+consumer check. The shared state owner captures control after coherency cleanup;
+an isolated infantry model can therefore lose its valid boundary control and
+control-based score before the snapshot is recorded. The existing regression's
+post-cleanup oracle has been corrected. The initial OC 4 Aircraft example was
+withdrawn after owner review: Aircraft have source-dash OC in 11th Edition, so
+their departure tests boundary event order without changing numerical control.
+
+P14A is inserted as Order 79 and PFINAL moves to Order 80. The current inventory
+is 78 implementation PRs, S-MIRRORS and PFINAL (80 rows); prior count statements
+are historical. See [Order 79 preflight](ORDER_79_PREFLIGHT_AUDIT.md) for the
+exact source tuple, executable evidence, owner trace, same-class audit, proposed
+acceptance and complete-game limitations. The owner approved P14A implementation.
+The shared turn-boundary owner now freezes control before all turn-end rules,
+keeps cleanup independently idempotent, and rejects reordered boundary history.
+
+No PFINAL PR is open, no complete 25-category snapshot is certified, and
+CAUDIT-01 remains open. After P14A merges, repeat the complete audit from
+current main. Complete-game performance remains uncertified.

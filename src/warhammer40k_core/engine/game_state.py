@@ -2062,12 +2062,10 @@ class GameState:
         phase_end_record = self.determine_current_phase_end_objective_control(
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        self.expire_persisting_effects_at_boundary(
-            EffectExpirationBoundary.phase_end(
-                battle_round=self.battle_round,
-                phase=completed_phase,
-                player_id=completed_player_id,
-            )
+        from warhammer40k_core.engine.turn_end_boundary import expire_completed_phase_effects
+
+        expire_completed_phase_effects(
+            state=self, completed_phase=completed_phase, player_id=completed_player_id
         )
         self._score_objective_control_boundary(phase_end_record, event_log=event_log)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
@@ -5375,44 +5373,13 @@ class GameState:
         completed_phase: BattlePhase,
         runtime_modifier_registry: RuntimeModifierRegistry | None,
     ) -> ObjectiveControlRecord:
-        if self.stage is not GameLifecycleStage.BATTLE:
-            raise GameLifecycleError("Turn-end preparation requires battle stage.")
-        if self.active_player_id is None or self.battle_phase_index is None:
-            raise GameLifecycleError("Turn-end preparation requires an active battle turn.")
-        if self.battle_phase_index + 1 != len(self.battle_phase_sequence):
-            raise GameLifecycleError("Turn-end preparation requires the final battle phase.")
-        if completed_phase is not self.current_battle_phase:
-            raise GameLifecycleError("Turn-end preparation phase drifted.")
-        existing = tuple(
-            record
-            for record in self.objective_control_records
-            if record.timing is ObjectiveControlTiming.TURN_END
-            and record.battle_round == self.battle_round
-            and record.active_player_id == self.active_player_id
-            and record.phase == completed_phase.value
-        )
-        if len(existing) > 1:
-            raise GameLifecycleError("Turn-end preparation found duplicate objective records.")
-        if existing:
-            return existing[0]
-        completed_player_id = self.active_player_id
-        self._clear_turn_action_states(
-            player_id=completed_player_id,
-            battle_round=self.battle_round,
-        )
-        self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
-        record = self.record_objective_control_boundary(
+        from warhammer40k_core.engine.turn_end_boundary import prepare_turn_end_boundary
+
+        return prepare_turn_end_boundary(
+            state=self,
             completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.TURN_END,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        self.expire_persisting_effects_at_boundary(
-            EffectExpirationBoundary.turn_end(
-                battle_round=self.battle_round,
-                player_id=completed_player_id,
-            )
-        )
-        return record
 
     def expire_sticky_objective_control_states(
         self,
@@ -5486,7 +5453,7 @@ class GameState:
             player_id=player_id,
         )
 
-    def _resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
+    def resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
         if self.battlefield_state is None:
             raise GameLifecycleError("End-turn cleanup requires battlefield_state.")
         if self.active_player_id is None:
@@ -5683,7 +5650,7 @@ class GameState:
                             "Battlefield placement cannot end on an objective marker."
                         )
 
-    def _clear_turn_action_states(self, *, player_id: str, battle_round: int) -> None:
+    def clear_turn_action_states(self, *, player_id: str, battle_round: int) -> None:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         requested_round = _validate_positive_int("battle_round", battle_round)
         self.advanced_unit_states = [

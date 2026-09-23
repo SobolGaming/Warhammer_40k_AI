@@ -1,0 +1,566 @@
+{
+  "audit_id": "order79-prefinal-control-first-audit-v1",
+  "aircraft_numerical_claim_correction": {
+    "status": "withdrawn_rules_invalid_fixture",
+    "reason": "Synthetic AIRCRAFT-tagged vehicle retained numerical OC 4; 11th Edition Aircraft have source-dash OC and cannot establish the claimed controller-loss example. Original observations below are historical, not valid gameplay certification. Coherency removal remains the valid numerical counterexample.",
+    "source_url": "https://www.warhammer-community.com/en-gb/articles/fchkklcq/new40k-download-new-xenos-faction-packs-today/",
+    "source_publication_date": "2026-06-09",
+    "source_observed_date": "2026-09-23",
+    "corrected_fixture": "tests/order79_helpers.py",
+    "operative_excerpt": "Aircraft, which all have their Movement and OC set to \u2018\u2013\u2019",
+    "excerpt_sha256": "02bd1a805cbaeb10def060bb50078c0adab05a0fc185e5c765d692c46cf80fda"
+  },
+  "reviewed_commit": "68c6bccb7d1f44e3b03409a86565a3d285c8449d",
+  "recorded_at": "2026-09-23T16:49:15.066499+00:00",
+  "prerequisite_pr": {
+    "number": 498,
+    "state": "MERGED",
+    "merged_at": "2026-09-23T16:40:32Z"
+  },
+  "remote_main_matches_reviewed_commit": true,
+  "open_prs_at_preflight": [],
+  "finding_id": "C14-03",
+  "proposed_owner": "P14A",
+  "prerequisite_order": 79,
+  "pfinal_order": 80,
+  "implementation_status": "proposed_awaiting_owner_approval",
+  "audit_status": "blocked_before_complete_25_category_certification",
+  "caudit_01_closed": false,
+  "selected_all_category_snapshot": null,
+  "source": {
+    "stable_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first",
+    "provider_name": "40k.app",
+    "provider_affiliation": "non_affiliated",
+    "source_url": "https://www.40k.app/rules/14-objectives",
+    "section_id": "14.02.01",
+    "title": "Controlling an Objective at the End of a Phase",
+    "observed_at": "2026-09-23T16:49:15.066056+00:00",
+    "app_version": null,
+    "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "observation_method": "Expanded browser-visible clause; whitespace-normalized transcription; timestamp records transcription retention after review.",
+    "operative_transcription": "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which objectives are controlled by which player.",
+    "transcription_sha256": "a267290551c3f73d1279486dc2e8e9f2d5e3d7d5c9ed517b695b5d8bc0ab0a33",
+    "source_observation_sha256": "6304d93ac618ec4a8c7c335cd9519ce1c245e04c7b8f9d1a08a611c6a8281448"
+  },
+  "source_limits": {
+    "runtime_observation_registered": false,
+    "network_capture_retained": false,
+    "fingerprint_authenticates_external_website": false,
+    "retained_runtime_package": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/july_rules_updates_2026_07/artifacts/package.json",
+    "retained_runtime_package_sha256": "59ab29a5f0c8780418ba3a7fac29e16f228f235cedc3644c2bb75e84b68708fb",
+    "operative_text_matches_retained_source_row": true,
+    "official_pdf_sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "co_version_comparison_performed": false,
+    "co_version_comparison_reason": "40k.app exposes no App-data version; GDM v946 exposes only the Rapid Disembark addition in the observed changelog section.",
+    "other_browser_observations": [
+      "07.00-07.03, including expanded 07.02.01 and 07.02.02",
+      "14.00-14.03; 14.01.01 not expanded"
+    ],
+    "other_provider": {
+      "name": "Game Datamissions",
+      "url": "https://game-datamissions.com/11th/rules/changelog",
+      "app_version": "946",
+      "version_date": "2026-09-02",
+      "visible_change": "18.04.01 Rapid Disembark And Limitations"
+    }
+  },
+  "fixture_scope": "Existing canonical Aircraft helper, OC 4 model with catalog AIRCRAFT/FLY/HOVER keywords, initialized at an unengaged Fight boundary. Objective placement configured before replay root, no move bypass during execution. No faction datasheet or complete deployment/game certification.",
+  "probe": {
+    "path": "reports/order79/probe_control_first.py",
+    "sha256": "99fdeadcd52cba9e7a138c33e6efa6365e2702881101cc59eeaf8cdfe1f77f8c",
+    "command": "UV_CACHE_DIR=/private/tmp/order79-uv-cache PYTHONPATH=. uv run --no-sync python reports/order79/probe_control_first.py",
+    "results_path": "reports/order79/control-first-results.json",
+    "results_sha256": "a1191956aac1370acded3cf7d3b32bc000569e40464b7483fb5179affedf317b",
+    "assertion_meaning": "Assertions confirm the pre-repair defect and control cases, not rules compliance.",
+    "initial_setup_attempt": "Public runtime relocation of an Aircraft was correctly rejected with aircraft_ingress_only. Final probe configures fixture geometry before the replay root and passes lifecycle reconstruction."
+  },
+  "cases": [
+    {
+      "turn_owner": "player-b",
+      "on_objective": true,
+      "status": "waiting_for_decision",
+      "phase_record": {
+        "record_id": "objective-control:round-01:player-b:fight:phase_end",
+        "game_id": "order66-aircraft",
+        "battle_round": 1,
+        "active_player_id": "player-b",
+        "timing": "phase_end",
+        "phase": "fight",
+        "battlefield_id": "phase13b-battlefield",
+        "results": [
+          {
+            "objective_id": "phase13b-remote-objective",
+            "status": "controlled",
+            "controlled_by_player_id": "player-a",
+            "scores": [
+              {
+                "player_id": "player-a",
+                "score": 4
+              }
+            ],
+            "contributors": [
+              {
+                "player_id": "player-a",
+                "unit_instance_id": "army-alpha:aircraft",
+                "model_instance_id": "army-alpha:aircraft:core-vehicle-monster:001",
+                "objective_control": 4,
+                "effective_objective_control": 4,
+                "battle_shocked": false,
+                "horizontal_distance_inches": 0.0,
+                "vertical_gap_inches": 0.0
+              }
+            ],
+            "unsupported_reason": null,
+            "retained_control_source_id": null
+          }
+        ]
+      },
+      "turn_record": {
+        "record_id": "objective-control:round-01:player-b:fight:turn_end",
+        "game_id": "order66-aircraft",
+        "battle_round": 1,
+        "active_player_id": "player-b",
+        "timing": "turn_end",
+        "phase": "fight",
+        "battlefield_id": "phase13b-battlefield",
+        "results": [
+          {
+            "objective_id": "phase13b-remote-objective",
+            "status": "uncontrolled",
+            "controlled_by_player_id": null,
+            "scores": [],
+            "contributors": [],
+            "unsupported_reason": null,
+            "retained_control_source_id": null
+          }
+        ]
+      },
+      "events": [
+        {
+          "index": 7,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "fight",
+            "record_ids": [
+              "objective-control:round-01:player-b:fight:phase_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        },
+        {
+          "index": 14,
+          "event_type": "aircraft_opponent_turn_end_departure",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "active_player_id": "player-b",
+            "player_id": "player-a",
+            "phase": "fight",
+            "source_rule_id": "gw-11e-core-aircraft:movement",
+            "unit_instance_id": "army-alpha:aircraft",
+            "component_unit_instance_ids": [
+              "army-alpha:aircraft"
+            ],
+            "model_instance_ids": [
+              "army-alpha:aircraft:core-vehicle-monster:001"
+            ],
+            "reserve_state": {
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:aircraft",
+              "reserve_origin": "during_battle_other",
+              "reserve_kind": "strategic_reserves",
+              "source_rule_ids": [
+                "gw-11e-core-aircraft:movement"
+              ],
+              "points_contribution": 0,
+              "declared_during_step": null,
+              "entered_reserves_battle_round": 1,
+              "entered_reserves_phase": "fight",
+              "required_arrival_battle_round": null,
+              "required_arrival_phase": null,
+              "required_arrival_source_rule_id": null,
+              "required_arrival_placement_kind": null,
+              "destruction_deadline_policy": {
+                "timing_kind": "end_of_battle_round_n",
+                "battle_round": 3,
+                "exclude_during_battle_strategic_reserves": true,
+                "only_declare_battle_formations": true,
+                "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:scoring:player-a:primary-meatgrinder:reserve-destruction"
+              },
+              "status": "in_reserves",
+              "embarked_unit_instance_ids": [],
+              "arrived_battle_round": null,
+              "arrived_phase": null,
+              "destroyed_battle_round": null,
+              "destroyed_at_end_of_battle": false,
+              "large_model_exception_used": false,
+              "post_arrival_restrictions": [],
+              "restriction_battle_round": null
+            }
+          }
+        },
+        {
+          "index": 18,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "fight",
+            "record_ids": [
+              "objective-control:round-01:player-b:fight:turn_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        },
+        {
+          "index": 44,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 2,
+            "phase": "command",
+            "record_ids": [
+              "objective-control:round-02:player-a:command:phase_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        }
+      ],
+      "persistence_roundtrip": true,
+      "viewer_projection_and_event_roundtrip": true,
+      "exact_replay": "reproduced"
+    },
+    {
+      "turn_owner": "player-a",
+      "on_objective": true,
+      "status": "waiting_for_decision",
+      "phase_record": {
+        "record_id": "objective-control:round-01:player-a:fight:phase_end",
+        "game_id": "order66-aircraft",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "timing": "phase_end",
+        "phase": "fight",
+        "battlefield_id": "phase13b-battlefield",
+        "results": [
+          {
+            "objective_id": "phase13b-remote-objective",
+            "status": "controlled",
+            "controlled_by_player_id": "player-a",
+            "scores": [
+              {
+                "player_id": "player-a",
+                "score": 4
+              }
+            ],
+            "contributors": [
+              {
+                "player_id": "player-a",
+                "unit_instance_id": "army-alpha:aircraft",
+                "model_instance_id": "army-alpha:aircraft:core-vehicle-monster:001",
+                "objective_control": 4,
+                "effective_objective_control": 4,
+                "battle_shocked": false,
+                "horizontal_distance_inches": 0.0,
+                "vertical_gap_inches": 0.0
+              }
+            ],
+            "unsupported_reason": null,
+            "retained_control_source_id": null
+          }
+        ]
+      },
+      "turn_record": {
+        "record_id": "objective-control:round-01:player-a:fight:turn_end",
+        "game_id": "order66-aircraft",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "timing": "turn_end",
+        "phase": "fight",
+        "battlefield_id": "phase13b-battlefield",
+        "results": [
+          {
+            "objective_id": "phase13b-remote-objective",
+            "status": "controlled",
+            "controlled_by_player_id": "player-a",
+            "scores": [
+              {
+                "player_id": "player-a",
+                "score": 4
+              }
+            ],
+            "contributors": [
+              {
+                "player_id": "player-a",
+                "unit_instance_id": "army-alpha:aircraft",
+                "model_instance_id": "army-alpha:aircraft:core-vehicle-monster:001",
+                "objective_control": 4,
+                "effective_objective_control": 4,
+                "battle_shocked": false,
+                "horizontal_distance_inches": 0.0,
+                "vertical_gap_inches": 0.0
+              }
+            ],
+            "unsupported_reason": null,
+            "retained_control_source_id": null
+          }
+        ]
+      },
+      "events": [
+        {
+          "index": 7,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "fight",
+            "record_ids": [
+              "objective-control:round-01:player-a:fight:phase_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        },
+        {
+          "index": 12,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "fight",
+            "record_ids": [
+              "objective-control:round-01:player-a:fight:turn_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        },
+        {
+          "index": 34,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "command",
+            "record_ids": [
+              "objective-control:round-01:player-b:command:phase_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        }
+      ],
+      "persistence_roundtrip": true,
+      "viewer_projection_and_event_roundtrip": true,
+      "exact_replay": "reproduced"
+    },
+    {
+      "turn_owner": "player-b",
+      "on_objective": false,
+      "status": "waiting_for_decision",
+      "phase_record": {
+        "record_id": "objective-control:round-01:player-b:fight:phase_end",
+        "game_id": "order66-aircraft",
+        "battle_round": 1,
+        "active_player_id": "player-b",
+        "timing": "phase_end",
+        "phase": "fight",
+        "battlefield_id": "phase13b-battlefield",
+        "results": [
+          {
+            "objective_id": "phase13b-remote-objective",
+            "status": "uncontrolled",
+            "controlled_by_player_id": null,
+            "scores": [],
+            "contributors": [],
+            "unsupported_reason": null,
+            "retained_control_source_id": null
+          }
+        ]
+      },
+      "turn_record": {
+        "record_id": "objective-control:round-01:player-b:fight:turn_end",
+        "game_id": "order66-aircraft",
+        "battle_round": 1,
+        "active_player_id": "player-b",
+        "timing": "turn_end",
+        "phase": "fight",
+        "battlefield_id": "phase13b-battlefield",
+        "results": [
+          {
+            "objective_id": "phase13b-remote-objective",
+            "status": "uncontrolled",
+            "controlled_by_player_id": null,
+            "scores": [],
+            "contributors": [],
+            "unsupported_reason": null,
+            "retained_control_source_id": null
+          }
+        ]
+      },
+      "events": [
+        {
+          "index": 7,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "fight",
+            "record_ids": [
+              "objective-control:round-01:player-b:fight:phase_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        },
+        {
+          "index": 14,
+          "event_type": "aircraft_opponent_turn_end_departure",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "active_player_id": "player-b",
+            "player_id": "player-a",
+            "phase": "fight",
+            "source_rule_id": "gw-11e-core-aircraft:movement",
+            "unit_instance_id": "army-alpha:aircraft",
+            "component_unit_instance_ids": [
+              "army-alpha:aircraft"
+            ],
+            "model_instance_ids": [
+              "army-alpha:aircraft:core-vehicle-monster:001"
+            ],
+            "reserve_state": {
+              "player_id": "player-a",
+              "unit_instance_id": "army-alpha:aircraft",
+              "reserve_origin": "during_battle_other",
+              "reserve_kind": "strategic_reserves",
+              "source_rule_ids": [
+                "gw-11e-core-aircraft:movement"
+              ],
+              "points_contribution": 0,
+              "declared_during_step": null,
+              "entered_reserves_battle_round": 1,
+              "entered_reserves_phase": "fight",
+              "required_arrival_battle_round": null,
+              "required_arrival_phase": null,
+              "required_arrival_source_rule_id": null,
+              "required_arrival_placement_kind": null,
+              "destruction_deadline_policy": {
+                "timing_kind": "end_of_battle_round_n",
+                "battle_round": 3,
+                "exclude_during_battle_strategic_reserves": true,
+                "only_declare_battle_formations": true,
+                "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:scoring:player-a:primary-meatgrinder:reserve-destruction"
+              },
+              "status": "in_reserves",
+              "embarked_unit_instance_ids": [],
+              "arrived_battle_round": null,
+              "arrived_phase": null,
+              "destroyed_battle_round": null,
+              "destroyed_at_end_of_battle": false,
+              "large_model_exception_used": false,
+              "post_arrival_restrictions": [],
+              "restriction_battle_round": null
+            }
+          }
+        },
+        {
+          "index": 18,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 1,
+            "phase": "fight",
+            "record_ids": [
+              "objective-control:round-01:player-b:fight:turn_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        },
+        {
+          "index": 44,
+          "event_type": "end_boundary_objective_control_determined",
+          "payload": {
+            "game_id": "order66-aircraft",
+            "battle_round": 2,
+            "phase": "command",
+            "record_ids": [
+              "objective-control:round-02:player-a:command:phase_end"
+            ],
+            "source_rule_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+          }
+        }
+      ],
+      "persistence_roundtrip": true,
+      "viewer_projection_and_event_roundtrip": true,
+      "exact_replay": "reproduced"
+    }
+  ],
+  "same_class_audit": [
+    {
+      "owner": "BattleRoundFlow.advance",
+      "status": "reproduced",
+      "finding": "END_TURN non-mission rule discovery/execution precedes turn-end control preparation."
+    },
+    {
+      "owner": "GameState.prepare_current_turn_end_boundary",
+      "status": "source_traced_and_existing_test_executed",
+      "finding": "Coherency cleanup precedes turn-end control capture; existing test requires post-cleanup uncontrolled result and no control-based score."
+    },
+    {
+      "owner": "prepare_phase_end_boundary",
+      "status": "existing_regression_executed",
+      "finding": "Distinct phase-end record is already fixed before later end-phase mutation; preserve this behavior."
+    },
+    {
+      "owner": "mission_turn_end_record / objective_control_record_authority",
+      "status": "source_traced",
+      "finding": "Scoring consumes the late turn-end record, and restore authenticates its checkpoint. A local Aircraft exception cannot repair the shared boundary invariant."
+    }
+  ],
+  "focused_tests": {
+    "status": "passed",
+    "count": 4,
+    "deselected": 319,
+    "duration_seconds": 6.36,
+    "log": "reports/order79/focused.log",
+    "meaning": "Includes an existing test asserting the incorrect post-cleanup result; passing does not certify Core compliance."
+  },
+  "full_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "samples_seconds": [],
+    "arithmetic_mean_seconds": null,
+    "observed_maximum_seconds": null,
+    "targets": {
+      "arithmetic_mean_seconds_less_than": 60,
+      "observed_maximum_seconds_at_most": 300
+    },
+    "certified": false,
+    "driver_or_recording_found": false,
+    "missing_prerequisites": [
+      "Versioned representative legal complete-game driver or recording",
+      "Pinned rosters, terrain, seeds and decision policy",
+      "Normal initialization-to-completion execution including replay output and Order 74 continuous terrain solver"
+    ],
+    "provisional_host": {
+      "cpu": "Apple M5 Pro",
+      "logical_cpus": 18,
+      "memory_bytes": 68719476736,
+      "os": "macOS 26.7",
+      "os_build": "25G229"
+    },
+    "capability_manifest_reason": "certified_full_game_evidence_missing",
+    "search_scope": [
+      "src/warhammer40k_core/adapters/headless.py",
+      "src/warhammer40k_core/ai",
+      "src/warhammer40k_core/adapters/capability_manifest.py",
+      "scripts",
+      "docs/performance/PERFORMANCE_POLICY.md"
+    ]
+  },
+  "delivery_status": {
+    "runtime_changed": false,
+    "pr_opened": false,
+    "final_aggregate_gates_run": false
+  }
+}

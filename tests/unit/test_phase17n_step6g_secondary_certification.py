@@ -463,18 +463,6 @@ def test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap(
         completed_phase=BattlePhase.FIGHT,
         runtime_modifier_registry=None,
     )
-    decisions.event_log.append(
-        "end_boundary_objective_control_determined",
-        {
-            "game_id": record.game_id,
-            "battle_round": record.battle_round,
-            "phase": record.phase,
-            "record_ids": [record.record_id],
-            "source_rule_id": (
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
-            ),
-        },
-    )
     score_turn_end_mission_scoring_boundary(
         state=state,
         record=record,
@@ -577,18 +565,6 @@ def test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolut
     record = state.prepare_current_turn_end_boundary(
         completed_phase=BattlePhase.FIGHT,
         runtime_modifier_registry=None,
-    )
-    decisions.event_log.append(
-        "end_boundary_objective_control_determined",
-        {
-            "game_id": record.game_id,
-            "battle_round": record.battle_round,
-            "phase": record.phase,
-            "record_ids": [record.record_id],
-            "source_rule_id": (
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
-            ),
-        },
     )
 
     score_turn_end_mission_scoring_boundary(
@@ -1211,11 +1187,9 @@ def _turn_cap_state() -> tuple[GameState, DecisionController]:
         )
     decisions = DecisionController()
     seed_sequential_tactical_turn_cap_conditions(state, decisions=decisions)
-    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+    from tests.mission_action_history_helpers import prepare_mission_action_turn_end_for_fixture
 
-    state.expire_persisting_effects_at_boundary(
-        EffectExpirationBoundary.turn_end(battle_round=state.battle_round, player_id="player-a")
-    )
+    prepare_mission_action_turn_end_for_fixture(state=state, decisions=decisions)
     return state, _decisions_for_seeded_secondary_state(state, decisions=decisions)
 
 

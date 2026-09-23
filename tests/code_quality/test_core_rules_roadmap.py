@@ -25,6 +25,7 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
             "C02-05": "P02E",
             "C11-04": "P11B",
             "C12-04": "P12B",
+            "C14-03": "P14A",
             "C17-01": "P17",
             "C18-07": "P18F",
             "C18-08": "P18G",
