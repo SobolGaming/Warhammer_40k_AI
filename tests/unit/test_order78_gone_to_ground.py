@@ -5,6 +5,7 @@ from dataclasses import replace
 
 import pytest
 from tests.fire_overwatch_helpers import choose_shooter, pending_overwatch
+from tests.order78_associated_terrain_helpers import associated_woods_scene
 from tests.order78_helpers import ALTERNATE, SHOOTER, TARGET, candidate_for_scene, scene, shared_los
 from tests.phase13b_shooting_declaration_helpers import (
     _decision_request,
@@ -35,6 +36,135 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )
+
+
+@pytest.mark.parametrize("consumer", ["candidate", "shared_los"])
+def test_associated_policy_only_dense_woods_preserve_gone_to_ground(consumer: str) -> None:
+    from warhammer40k_core.geometry.terrain_area_visibility import (
+        feature_ids_associated_with_terrain_areas,
+    )
+
+    lifecycle, units, context = associated_woods_scene()
+    (woods,) = context.terrain_features
+    assert not woods.terrain_volumes()
+    assert feature_ids_associated_with_terrain_areas(
+        context.terrain_features, context.terrain_areas
+    ) == frozenset({woods.feature_id})
+    assert lifecycle.state is not None
+    assert terrain_hidden_model_ids(
+        state=lifecycle.state,
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        unit_instance_id=TARGET,
+    ) == (units["enemy"].own_models[0].model_instance_id,)
+    if consumer == "candidate":
+        assert (
+            candidate_for_scene(lifecycle, units).violation_code
+            is ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
+        )
+    else:
+        assert not shared_los(lifecycle, units)
+
+
+@pytest.mark.parametrize(
+    "classification",
+    [
+        TerrainAreaClassification.DENSE,
+        TerrainAreaClassification.UNKNOWN,
+        TerrainAreaClassification.LIGHT,
+    ],
+)
+def test_associated_woods_keep_feature_causality_and_round_trip(
+    classification: TerrainAreaClassification,
+) -> None:
+    from warhammer40k_core.core.visibility import LineOfSightWitness, TerrainVisibilityContext
+    from warhammer40k_core.engine.shooting_terrain_visibility import blocker_record_is_dense_feature
+
+    lifecycle, units, context = associated_woods_scene(feature_classification=classification)
+    witness = context.resolve_line_of_sight_uncached()
+    assert witness == context.resolve_line_of_sight()
+    assert witness == LineOfSightWitness.from_payload(witness.to_payload())
+    restored = TerrainVisibilityContext.from_payload(context.to_payload())
+    assert restored.resolve_line_of_sight() == witness
+    assert witness.unit_visible
+    assert not witness.unit_fully_visible
+    sources = tuple(
+        record
+        for record in witness.all_blocker_records()
+        if record.terrain_feature_id == context.terrain_features[0].feature_id
+    )
+    assert len(sources) == 1
+    assert sources[0].blocks_full_visibility
+    assert not sources[0].blocks_model_visibility
+    assert restored.not_fully_visible_because_of(
+        witness, target_model_id=context.target_models[0].model_id, sources=sources
+    )
+    is_dense = classification is not TerrainAreaClassification.LIGHT
+    assert (
+        blocker_record_is_dense_feature(
+            ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+            record=sources[0],
+            terrain_features=context.terrain_features,
+        )
+        is is_dense
+    )
+    area_records = tuple(
+        record for record in witness.all_blocker_records() if record.terrain_area_id is not None
+    )
+    assert area_records
+    assert all(record.exception_applied == "target_intersects_area" for record in area_records)
+    assert not any(record.blocks_full_visibility for record in area_records)
+    assert candidate_for_scene(lifecycle, units).is_legal is not is_dense
+    assert shared_los(lifecycle, units) is not is_dense
+
+    # Association cannot turn the area into an alias for the removed feature.
+    assert replace(context, terrain_features=()).resolve_line_of_sight().unit_fully_visible
+    assert lifecycle.state is not None
+    assert lifecycle.state.mission_setup is not None
+    lifecycle.state.mission_setup = replace(lifecycle.state.mission_setup, terrain_features=())
+    assert candidate_for_scene(lifecycle, units).is_legal
+    assert shared_los(lifecycle, units)
+
+
+@pytest.mark.parametrize("keyword", ["AIRCRAFT", "TOWERING"])
+@pytest.mark.parametrize("on_observer", [False, True])
+def test_associated_woods_preserve_feature_visibility_exceptions(
+    keyword: str, on_observer: bool
+) -> None:
+    _, _, context = associated_woods_scene()
+    context = replace(
+        context,
+        observer_keywords=(keyword,) if on_observer else context.observer_keywords,
+        target_model_keywords=context.target_model_keywords
+        if on_observer
+        else ((context.target_models[0].model_id, (keyword,)),),
+    )
+    witness = context.resolve_line_of_sight()
+    assert witness.unit_fully_visible
+    assert any(
+        record.terrain_feature_id == context.terrain_features[0].feature_id
+        and record.exception_applied == keyword.lower()
+        and not record.blocks_full_visibility
+        for record in witness.all_blocker_records()
+    )
+
+
+def test_associated_area_obscuring_footprint_still_defers_to_area() -> None:
+    lifecycle, _ = scene()
+    assert lifecycle.state is not None
+    assert lifecycle.state.mission_setup is not None
+    _, _, context = associated_woods_scene()
+    context = replace(
+        context,
+        terrain_features=lifecycle.state.mission_setup.terrain_features,
+    )
+    witness = context.resolve_line_of_sight()
+    assert witness.unit_visible
+    records = witness.all_blocker_records()
+    assert any(record.blocker_kind is VisibilityBlockerKind.TERRAIN_VOLUME for record in records)
+    assert not any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_FEATURE for record in records
+    )
+    assert any(record.exception_applied == "target_intersects_area" for record in records)
 
 
 @pytest.mark.parametrize("inside", [False, True])

@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_gone_to_ground_2026_09 as source,
@@ -85,9 +87,10 @@ def test_order78_shared_authority_keeps_hidden_occupancy_separate_from_concealme
             )
 
 
-def test_order78_matched_query_evidence() -> None:
+@pytest.mark.parametrize("baseline", ["base.json", "review-base.json"])
+def test_order78_matched_query_evidence(baseline: str) -> None:
     folder = ROOT / "docs/performance/order78"
-    base = json.loads((folder / "base.json").read_bytes())
+    base = json.loads((folder / baseline).read_bytes())
     head = json.loads((folder / "head.json").read_bytes())
     budget = json.loads((folder / "budgets.json").read_bytes())
     assert head["runtime_build_id"] == verified_engine_build_identity().build_id
@@ -104,6 +107,8 @@ def test_order78_matched_query_evidence() -> None:
     ):
         assert base[key] == head[key], key
     assert head["workload"] == budget["workload"]
+    assert base["rows"][-1]["legal"]
+    assert base["rows"][-1]["shared_los"]
     for path, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
     assert [row["case"] for row in head["rows"]] == [
@@ -113,6 +118,7 @@ def test_order78_matched_query_evidence() -> None:
         "light-outside",
         "not-hidden",
         "fully-visible",
+        "associated-policy-only-woods",
     ]
     for before, after in zip(base["rows"], head["rows"], strict=True):
         assert before["complete"]

@@ -475,9 +475,14 @@ class TerrainVisibilityContext:
         )
         lower, upper = min(observer.lower, target.lower), max(observer.upper, target.upper)
         for feature in self.terrain_features:
-            if feature.feature_id in terrain_area_feature_ids:
-                continue
             policy = feature_visibility_policy(self.terrain_visibility_policy, feature.feature_kind)
+            # The associated area owns area obscuring and its intersection exceptions.
+            # Dense Cover is a separate feature policy, including without physical volumes.
+            if (
+                feature.feature_id in terrain_area_feature_ids
+                and policy.line_of_sight_policy is LineOfSightPolicy.AREA_OBSCURING
+            ):
+                continue
             if not (
                 policy.blocks_model_visibility_through_footprint
                 or policy.blocks_full_visibility_through_footprint

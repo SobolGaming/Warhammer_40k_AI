@@ -2483,7 +2483,9 @@ Dense-feature status, or ranged-attack history. Order 78 / P13A removes the
 incorrect dense-occupancy requirement: ordinary terrain-derived Hidden still
 requires its own eligible area occupancy, while Gone to Ground can also protect
 a model Hidden by an effect outside Dense terrain. A terrain-area blocker alone
-is not an intervening feature. The source is
+is not an intervening feature. Associated Dense Cover features retain their own
+footprint blocker identity and visibility exceptions even without wall/floor
+volumes; only area-obscuring footprints defer to the associated area. The source is
 `gw-11e-core-gone-to-ground:gone-to-ground` (reviewed Core 13.11.01).
 The existing finite selections, shooting proposal kinds, target diagnostics and
 viewer redaction cover this repair; no payload shape or contract-version change

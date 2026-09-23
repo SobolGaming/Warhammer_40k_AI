@@ -233,3 +233,29 @@ checks and publication gates have not run at this preflight pause. No PR was
 opened. AGENTS.md requires a pause before material scope expansion, and the
 roadmap explicitly says: "If the audit discovers any gap, do not open or certify
 PFINAL."
+
+## PR #498 review correction: associated Dense features
+
+Review of `60a863bcb1fdb16beacfddb80b6a3451bc12aa99` identified a remaining
+C13-01 instance: terrain-area association suppressed all feature footprints,
+including a policy-only Dense Woods feature with no wall/floor volumes. The
+area's blocker has no feature identity, so the corrected feature-only Gone to
+Ground predicate could not recover the missing causal evidence.
+
+Before changing production code, a real Woods/area regression reproduced both
+failures at a 12.01-inch model-base range: the shooting candidate was accepted
+and shared LOS returned true. The target derives Hidden from the area. The
+repair is confined to the shared visibility owner: associated area-obscuring
+footprints defer to the area, while Dense Cover footprints retain their own
+feature identity and policy exceptions. It neither reclassifies area records as
+features nor changes the exact causal solver, decision paths or payload schema.
+
+The bug-class search found the single suppression site in `_obstacle_entries`,
+shared by ordinary visibility and counterfactual causality. Regressions cover
+both consumers, cached/uncached and serialized witnesses, explicit Light versus
+Dense and unspecified feature classification, Aircraft/Towering exceptions,
+feature removal with the area retained, and unchanged area-obscuring behavior.
+The component workload adds the associated Woods case with the existing
+diagnostic limits. Review validation is recorded separately in
+`docs/performance/order78/review-validation.json`; the original preflight and
+publication validation remain historical records.

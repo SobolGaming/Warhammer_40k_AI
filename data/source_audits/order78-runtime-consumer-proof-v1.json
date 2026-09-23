@@ -19,6 +19,10 @@
       "clause_id": "13.11.01:intervening-dense-features",
       "regression_ids": [
         "tests/unit/test_order78_gone_to_ground.py:test_hidden_target_concealed_by_intervening_dense_feature",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_policy_only_dense_woods_preserve_gone_to_ground",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_woods_keep_feature_causality_and_round_trip",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_woods_preserve_feature_visibility_exceptions",
+        "tests/unit/test_order78_gone_to_ground.py:test_associated_area_obscuring_footprint_still_defers_to_area",
         "tests/unit/test_order78_gone_to_ground.py:test_area_only_obstruction_is_not_a_dense_feature",
         "tests/unit/test_order78_gone_to_ground.py:test_non_terrain_model_obstruction_does_not_reduce_detection",
         "tests/unit/test_order78_gone_to_ground.py:test_light_feature_does_not_reduce_detection"

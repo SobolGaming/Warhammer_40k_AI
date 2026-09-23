@@ -1,0 +1,287 @@
+{
+  "scope": "PR #498 review correction: associated policy-only Dense feature identity (C13-01)",
+  "reviewed_head": "60a863bcb1fdb16beacfddb80b6a3451bc12aa99",
+  "pr_base": "f14e288cf9be9830161aa4c71e5d24d64903197e",
+  "runtime_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b5d3885e0a8557cb1a520ccd5874aacf24105a298af639830239cf8308cd247",
+  "final_validation_status": "passed",
+  "scope_audit": "One shared core visibility condition preserves non-area-obscuring feature footprint evidence under area association. Exact causal geometry, dense-feature predicate, decision paths and payload shapes retained. No named handler, catalog expansion or solver change.",
+  "bug_class_search": "The only feature-association suppression site is TerrainVisibilityContext._obstacle_entries, shared by witness resolution and causal counterfactuals. Associated AREA_OBSCURING policies still defer to area semantics; DENSE_COVER keeps source feature identity and existing exceptions.",
+  "red_regression": {
+    "baseline": "60a863bcb1fdb16beacfddb80b6a3451bc12aa99",
+    "before_production_change": true,
+    "failed": 2,
+    "consumers": [
+      "shooting_target_candidate_for_model",
+      "unit_has_line_of_sight_to_target"
+    ],
+    "range_inches": 12.01,
+    "junit_sha256": "5367d0cda871afce5a75170a597551fcfb71a0a1e69221ccfd35d685d798620b"
+  },
+  "focused_validation": {
+    "associated_cases_passed": 10,
+    "source_and_performance_audits_passed": 4,
+    "junit_sha256": "19322fc9bd35f3ee3979e52c55274d4e03a7490d72382ed4a21562d984eb4198",
+    "iteration_notes": [
+      "Regenerated the runtime manifest and external contract after the intended runtime change; stale identity correctly rejected test collection before regeneration.",
+      "Initial broader focused run passed 85 cases with one invalid Ruins control fixture. Replaced the fixture with canonical Ruins including required walls/floors; all ten associated-feature cases then passed. No production relaxation."
+    ]
+  },
+  "performance": {
+    "workload": "order78-gone-to-ground-v2",
+    "cases": 7,
+    "base": "docs/performance/order78/base.json",
+    "reviewed_base": "docs/performance/order78/review-base.json",
+    "head": "docs/performance/order78/head.json",
+    "original_six_cases_retained": true,
+    "budgets_unchanged": true,
+    "serial_samples_per_case": 7,
+    "query_pairs_per_sample": 10,
+    "inherited_head_reports_refreshed": 14,
+    "measurements_without_competing_test_or_build_workers": true,
+    "completed_games": 0,
+    "attempted_games": 0
+  },
+  "behavioral_suite": {
+    "passed": 9004,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 752.443,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": true,
+    "junit_sha256": "d57612d70d1d1b419a5ce31415b09e559590ef49ee2e495a44423e34a1a4897e",
+    "log_sha256": "206950d8c5c14a6e11b1b82999db1d276c6f1eaf8f8acedb90c5cc80b99f0450",
+    "coverage_percent": 85.2,
+    "coverage_threshold_percent": 85,
+    "successful_coverage_runs": 1,
+    "without_coverage_repeat": false
+  },
+  "code_quality_suite": {
+    "passed": 603,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 111.256,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": false,
+    "junit_sha256": "124b9bca674a05dba28102254b7b15d7f7d1d3c235d874ce99698f7bf3c0a3d6",
+    "log_sha256": "69240d635dd225b5b70756e5c8bb3f01a940629c3edc9868f9d91fb0623ce5d3"
+  },
+  "gates": [
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 3.014205416999175,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.052135999998426996,
+      "log_sha256": "a644c2bf06fcd6540a8fd2c3541026f0d2e9346452f327b04c8419eaf42ece82"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3384440000081668,
+      "log_sha256": "132f60cf940b9d208f8d8a3e08669078932f3991ebdb0682ce22f860d7ad5431"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "seconds": 78.5564650830056,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "lint-imports"
+      ],
+      "exit_code": 0,
+      "seconds": 0.43312079200404696,
+      "log_sha256": "2d57d105b1d17b8cd7569f1be2b8392f6430b71de9ba9d6044dd0159098fb891"
+    },
+    {
+      "name": "engine-identity",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.425795458999346,
+      "log_sha256": "2a6942027c7a593fdaa574386cb0eef94c68a4ac3df45fc0fe6967033a273477"
+    },
+    {
+      "name": "contract-base",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "f14e288cf9be9830161aa4c71e5d24d64903197e"
+      ],
+      "exit_code": 0,
+      "seconds": 73.77420029199857,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "exit_code": 0,
+      "seconds": 13.723122875002446,
+      "log_sha256": "7a266d7d26822f9c0b1a277f103270c167314e1d27059c26c2d2820ad198cc83"
+    },
+    {
+      "name": "typescript-install",
+      "command": [
+        "npm",
+        "ci"
+      ],
+      "exit_code": 0,
+      "seconds": 3.345990499990876,
+      "log_sha256": "476397a6cb9b4d91f1c5bac7724f978d733067d149b8f21196e353b1ac62e36a"
+    },
+    {
+      "name": "typescript",
+      "command": [
+        "npm",
+        "test"
+      ],
+      "exit_code": 0,
+      "seconds": 113.26927720900858,
+      "log_sha256": "d6c5ca381ab9ab665794fd03e5c381fb3ac67af31c3e217422fc1a2aa846eafb"
+    },
+    {
+      "name": "source",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "tools/build_core_gone_to_ground_source.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.24497466700267978,
+      "log_sha256": "01b6ad0f1ca08b3e645023fc56d609e225d4052e84aafd233c2b054d541531d1"
+    },
+    {
+      "name": "app-audit",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "tools/core_rules_40k_app_audit.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.17030104200239293,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mirror-audit",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "tools/core_rules_maintained_mirror_audit.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.09855649998644367,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08466016600141302,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "pre-commit",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "exit_code": 0,
+      "seconds": 1.9052327910030726,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "production_changes_after_aggregate_validation_began": false,
+  "artifact_hashes": {
+    "data/source_audits/order78-runtime-consumer-proof-v1.json": "1ab8220817a4ef262f9285d0718d226a480c24669ed680fe3aae4b9f28e46f72",
+    "docs/performance/order78/base.json": "23d85e521f216718b3d9e6d7434b4c58514b07540cf40a19e73261085a7ac094",
+    "docs/performance/order78/review-base.json": "4f4f777cd626a2261b4b4897e5171bdb8bf0707023c680879483308f99f73473",
+    "docs/performance/order78/head.json": "382890cad71ff21fcf1330e6e7b6b5264a05845c8dd13597030087da66621a42",
+    "ci/test_shards/durations.json": "ea018c58c3be529d08c5768f8367cccb34f5a7151c75604dd1afc4c0a41362b5"
+  },
+  "pfinal_certified": false,
+  "full_game_certified": false,
+  "updated_at": "2026-09-23T16:15:18.937482+00:00"
+}

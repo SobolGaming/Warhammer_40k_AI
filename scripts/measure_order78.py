@@ -23,6 +23,7 @@ def main() -> None:
     args = parser.parse_args()
     _select_runtime_src(args.runtime_src)
     helpers = importlib.import_module("tests.order78_helpers")
+    associated = importlib.import_module("tests.order78_associated_terrain_helpers")
     areas = importlib.import_module("warhammer40k_core.core.terrain_areas")
     rows = []
     for name, settings in (
@@ -32,8 +33,12 @@ def main() -> None:
         ("light-outside", {"classification": areas.TerrainAreaClassification.LIGHT}),
         ("not-hidden", {"hidden": False}),
         ("fully-visible", {"wall_y": 40.0}),
+        ("associated-policy-only-woods", {}),
     ):
-        lifecycle, units = helpers.scene(**settings)
+        if name == "associated-policy-only-woods":
+            lifecycle, units, _ = associated.associated_woods_scene()
+        else:
+            lifecycle, units = helpers.scene(**settings)
         samples = []
         for _ in range(7):
             start = time.perf_counter()
@@ -54,7 +59,7 @@ def main() -> None:
         )
     cpu, memory = _host_inventory()
     report = {
-        "workload": "order78-gone-to-ground-v1",
+        "workload": "order78-gone-to-ground-v2",
         "revision": args.revision,
         "runtime_build_id": importlib.import_module(
             "warhammer40k_core.build_identity"
@@ -73,7 +78,12 @@ def main() -> None:
         ),
         "hashes": {
             name: hashlib.sha256(Path(name).read_bytes()).hexdigest()
-            for name in ("scripts/measure_order78.py", "tests/order78_helpers.py", "uv.lock")
+            for name in (
+                "scripts/measure_order78.py",
+                "tests/order78_helpers.py",
+                "tests/order78_associated_terrain_helpers.py",
+                "uv.lock",
+            )
         },
         "rows": rows,
         "full_game_certified": False,
