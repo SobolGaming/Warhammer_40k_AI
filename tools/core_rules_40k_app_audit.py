@@ -11,6 +11,7 @@ from typing import cast
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+PFINAL_PREREQUISITES = "All prior roadmap rows, including P15J and S-MIRRORS"
 AUDIT_PATH = ROOT / "data" / "source_audits" / "40k_app" / "core_rules_2026_08_25.audit.json"
 REPORT_PATH = ROOT / "docs" / "CORE_RULES_40K_APP_COMPARISON.md"
 EXPECTED_SCHEMA = "core-v2-40k-app-core-rules-audit-v3"
@@ -120,7 +121,12 @@ def roadmap_rows(document: str) -> tuple[RoadmapRow, ...]:
             ):
                 raise ValueError("Core roadmap finding closure keys must be valid and unique.")
             seen_findings.add(finding)
-        prerequisites = () if cells[6] == "—" or pr_id == "PFINAL" else tuple(cells[6].split(", "))
+        if pr_id == "PFINAL":
+            if cells[6] != PFINAL_PREREQUISITES:
+                raise ValueError("Core roadmap PFINAL must depend on all prior roadmap rows.")
+            prerequisites = tuple(row.pr_id for row in rows)
+        else:
+            prerequisites = () if cells[6] == "—" else tuple(cells[6].split(", "))
         rows.append(RoadmapRow(order, pr_id, findings, prerequisites, cells[7]))
         seen_prs.add(pr_id)
     if not rows or rows[-1].pr_id != "PFINAL":

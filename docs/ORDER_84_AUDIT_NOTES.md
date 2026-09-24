@@ -142,6 +142,21 @@ driver was added, and no timeout was converted into a rules answer.
 
 ## Scope and validation
 
+PR review identified two closure-integrity defects: historical evidence could be
+deleted or changed without failing validation, and the parser discarded PFINAL's
+aggregate prerequisites. Complete fingerprints now pin the 48 retained Core
+packages, 20 September 10 dispositions, six cross-category reviews and 19 prior
+obligations, including nested identities, hashes and support statuses. These pins
+authenticate the historical observation at `55780340`; they do not compare it to
+future runtime package contents or silently refresh the audit.
+
+PFINAL now declares all prior roadmap rows, including `P15J` and `S-MIRRORS`.
+The parser expands that declaration into ordered prerequisite IDs, and the
+prerequisite-order regression includes PFINAL. Omission, empty-list, duplicate,
+metadata/status mutation and narrowed-prerequisite regressions fail closed; an
+inserted source-governance row automatically becomes a PFINAL prerequisite.
+The committed audit JSON and its historical findings remain unchanged.
+
 Only audit tooling/data, code-quality regressions and documentation change. No
 runtime source package, engine identity, decision type, payload schema, handler,
 architecture boundary or gameplay path changes. The existing adapter contract
@@ -149,13 +164,14 @@ applies unchanged. Follow-up gameplay PRs must update it where their choices or
 payloads change. No behavioral test file was added, moved or deleted, so the
 eight-shard inventory remains unchanged and is checked before publication.
 
-Final local validation on the merged PR #504 baseline (`a050b8ab`) passed:
+Local validation on the merged PR #504 baseline (`a050b8ab`) passed, including
+fresh behavioral and code-quality runs after the integrity fixes:
 
 - Complete behavioral suite, once with coverage and the required Node `PATH`:
   **9,196 passed; 85.22% coverage**. It emitted 10 SQLite `ResourceWarning`s
   from unchanged persistence-tampering tests; there were no failures.
 - Complete code-quality suite, once afterward without coverage:
-  **633 passed**. Both suites used `-n auto --dist=worksteal` (18 workers).
+  **669 passed**. Both suites used `-n auto --dist=worksteal` (18 workers).
 - Ruff check/format, mypy (3,220 source files), Pyright, all 11 import contracts,
   pre-commit, and the exact eight-shard manifest check passed.
 - Engine build identity, external contract generation with `--base-ref origin/main`,
@@ -166,6 +182,13 @@ Final local validation on the merged PR #504 baseline (`a050b8ab`) passed:
 - Both audit report generators passed `--check`; the observed JS asset reproduced
   the pinned inventory; all eight probe results reproduced the retained JSON
   byte-for-byte. Local report/roadmap links resolve.
+- The 58 focused audit/roadmap checks pass, including 36 added integrity cases.
+  All 48 retained package paths, artifact hashes and package hashes were also
+  checked directly against the audited Git commit, without changing the JSON.
+
+The installed-wheel and TypeScript results are retained from initial PR
+validation. The integrity fixes change none of their runtime or contract inputs;
+the engine-identity and base-ref contract checks passed again.
 
 The host has bundled Node but no `npm` executable. The initial `npm run check`
 could not start. The same package scripts then passed through these direct

@@ -62,6 +62,64 @@ def test_order84_rejects_omissions_and_false_certification(mutation: str) -> Non
         validate_audit(audit)
 
 
+@pytest.mark.parametrize(
+    "inventory",
+    [
+        "retained_core_packages",
+        "september10_reviews",
+        "cross_category_reviews",
+        "obligation_reviews",
+    ],
+)
+@pytest.mark.parametrize("mutation", ["missing_field", "empty", "missing_row", "duplicate_row"])
+def test_order84_preserves_complete_historical_inventories(inventory: str, mutation: str) -> None:
+    audit = deepcopy(load_audit())
+    if mutation == "missing_field":
+        del audit[inventory]
+    elif mutation == "empty":
+        audit[inventory] = []
+    elif mutation == "missing_row":
+        audit[inventory].pop()
+    else:
+        audit[inventory][-1] = deepcopy(audit[inventory][0])
+    with pytest.raises(ValueError, match="Order 84"):
+        validate_audit(audit)
+
+
+@pytest.mark.parametrize(
+    ("inventory", "field", "replacement"),
+    [
+        ("retained_core_packages", "path", "unreviewed/package.json"),
+        ("retained_core_packages", "artifact_sha256", "0" * 64),
+        ("retained_core_packages", "package_hash", "0" * 64),
+        ("retained_core_packages", "rules", []),
+        ("september10_reviews", "reviewer_item", "unreviewed item"),
+        ("september10_reviews", "finding_id", "C01-07"),
+        ("september10_reviews", "status", "certified"),
+        ("cross_category_reviews", "topic", "unreviewed topic"),
+        ("cross_category_reviews", "evidence", []),
+        ("cross_category_reviews", "status", "certified"),
+        ("obligation_reviews", "obligation_id", "v931-unreviewed"),
+        ("obligation_reviews", "status", "certified"),
+    ],
+)
+def test_order84_rejects_changed_historical_evidence(
+    inventory: str, field: str, replacement: object
+) -> None:
+    audit = deepcopy(load_audit())
+    audit[inventory][0][field] = replacement
+    with pytest.raises(ValueError, match="Order 84"):
+        validate_audit(audit)
+
+
+@pytest.mark.parametrize("field", ["source_id", "load_support_status", "semantic_execution_status"])
+def test_order84_preserves_nested_package_rule_identity_and_support_status(field: str) -> None:
+    audit = deepcopy(load_audit())
+    audit["retained_core_packages"][0]["rules"][0][field] = "changed"
+    with pytest.raises(ValueError, match="Order 84"):
+        validate_audit(audit)
+
+
 def test_order84_rejects_missing_canonical_followup() -> None:
     roadmap = (ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text()
     roadmap = roadmap.replace("| C01-07 |", "| C01-99 |", 1)

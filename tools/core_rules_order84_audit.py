@@ -20,6 +20,26 @@ AUDIT = ROOT / "data/source_audits/order84/audit.json"
 REPORT = ROOT / "docs/ORDER_84_AUDIT_REPORT.md"
 INVENTORY_SHA256 = "9405274f48551a2431857c94d9004b779877f89345dc88955c9b72a74dd72921"
 ASSET_SHA256 = "6f4d27c5670489e9b6310bb8f43e837d8abaf2d5f7a8c8938f56690190edad0e"
+# Pin historical evidence to this audited commit, not to the evolving runtime tree.
+# Fingerprints cover complete records, including nested rule identities and statuses.
+HISTORICAL_INVENTORIES = {
+    "retained_core_packages": (
+        48,
+        "f3f43b67d4004e66f2a45dfc569897ba6a2e13c8c837c7e1a044b5a3751005a2",
+    ),
+    "september10_reviews": (
+        20,
+        "38b5636a8d37e719e5c192e0a06129a40b103ea85af6d53803bbe43ad97e74e5",
+    ),
+    "cross_category_reviews": (
+        6,
+        "8ff2fcb7d8614b6d10f61d24a6d2ebe7a7af1f2ad63a550c42ded20cda1fa7b5",
+    ),
+    "obligation_reviews": (
+        19,
+        "c73c61ef22a39cea8904c8b3950927a135e023b84682350df31fd267ec311c60",
+    ),
+}
 FINDING_OWNERS = {
     "C01-07": "P01G",
     "C01-08": "P01H",
@@ -95,6 +115,14 @@ def validate_audit(audit: dict[str, Any], *, roadmap: str | None = None) -> None
         expected = [f["finding_id"] for f in findings if row["row_id"] in f["source_rows"]]
         if row["finding_ids"] != expected:
             raise ValueError("Order 84 source/finding links disagree.")
+    for inventory_name, (count, expected_sha256) in HISTORICAL_INVENTORIES.items():
+        evidence = audit.get(inventory_name)
+        if (
+            type(evidence) is not list
+            or len(evidence) != count
+            or fingerprint(evidence) != expected_sha256
+        ):
+            raise ValueError(f"Order 84 historical inventory drifted: {inventory_name}.")
     obligations = audit["obligation_reviews"]
     if (
         len(obligations) != 19

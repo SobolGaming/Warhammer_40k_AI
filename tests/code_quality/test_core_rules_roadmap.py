@@ -41,7 +41,8 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
         }.items()
     )
     assert rows[-1].pr_id == "PFINAL"
-    assert f"All {len(rows) - 2} implementation PRs; S-MIRRORS" in document
+    assert rows[-1].prerequisites == tuple(row.pr_id for row in rows[:-1])
+    assert {"P15J", "S-MIRRORS"} <= set(rows[-1].prerequisites)
     by_pr = {row.pr_id: row for row in rows}
     assert by_pr["P18G"].gate == "APP-DRIFT"
     assert by_pr["P18F"].gate == "APP-AUTHORITY"
@@ -51,10 +52,43 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
     assert "owner-confirmed official App v946 (2026-09-21)" in document
     assert "[scope, source resolution and validation](ORDER_72_SCOPE_PLAN.md)" in document
     transport = ("P18A", "P18C", "P18D", "P18E", "P18F", "P18G", "P18H", "P18B")
-    for row in rows[:-1]:
+    for row in rows:
         for dependency in row.prerequisites:
             for prerequisite in transport if dependency == "T-TRANSPORT" else (dependency,):
                 assert by_pr[prerequisite].order < row.order, (row.pr_id, prerequisite)
+
+
+@pytest.mark.parametrize(
+    "prerequisites",
+    [
+        "—",
+        "All 93 implementation PRs; S-MIRRORS",
+        "All prior roadmap rows except P15J",
+        "P15J, S-MIRRORS",
+    ],
+)
+def test_pfinal_rejects_missing_or_narrowed_aggregate_prerequisites(prerequisites: str) -> None:
+    document = ROADMAP.read_text(encoding="utf-8")
+    final_line = next(line for line in document.splitlines() if "| PFINAL |" in line)
+    cells = final_line.split("|")
+    cells[-3] = f" {prerequisites} "
+    document = document.replace(final_line, "|".join(cells))
+    with pytest.raises(ValueError, match=r"Core roadmap.*PFINAL"):
+        roadmap_rows(document)
+
+
+def test_pfinal_includes_new_source_governance_rows_without_changing_aggregate() -> None:
+    document = ROADMAP.read_text(encoding="utf-8")
+    final_line = next(line for line in document.splitlines() if "| PFINAL |" in line)
+    order = int(final_line.split("|")[1])
+    inserted = (
+        f"| {order} | PEXTRA | C15-11 | New evidence | Retain evidence | Core 15 | "
+        "P15J | SOURCE-GOVERNANCE |"
+    )
+    moved_final = final_line.replace(f"| {order} |", f"| {order + 1} |", 1)
+    rows = roadmap_rows(document.replace(final_line, inserted + "\n" + moved_final))
+    assert rows[-1].prerequisites == tuple(row.pr_id for row in rows[:-1])
+    assert {"P15J", "S-MIRRORS", "PEXTRA"} <= set(rows[-1].prerequisites)
 
 
 def test_comparison_uses_current_roadmap_without_rewriting_historical_observations() -> None:
