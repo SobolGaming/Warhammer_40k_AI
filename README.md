@@ -2,6 +2,12 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Current Core status: the requested Order 84 audit surveyed all 25 categories and 59 FAQs
+and found 11 scoped follow-ups. Core Rules and full-game performance remain uncertified.
+See the [compact roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) for the current
+sequence (PFINAL is now Order 95), and the [audit](docs/ORDER_84_AUDIT_REPORT.md) for
+findings and evidence limits. Earlier implementation notes below retain historical numbering.
+
 Order 83 / P01F fixes phase-start revival coherency anchors. Shared producers
 and restore authenticate the phase-opening physical inventory, so models absent
 at phase start cannot become anchors through later returns. Contract 37

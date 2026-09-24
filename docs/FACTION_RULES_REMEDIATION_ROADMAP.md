@@ -4,7 +4,7 @@
 
 ## Where this stands
 
-Faction implementation has not started. Gate 0 is core `PFINAL` in the [Core Rules roadmap](CORE_RULES_REMEDIATION_ROADMAP.md). That audit is Order 84 and is open after Order 83 merged in [PR #503](https://github.com/SobolGaming/Warhammer_40k_AI/pull/503). P25A–C are already merged; they do not close Gate 0.
+Faction implementation has not started. Gate 0 is core `PFINAL` in the [Core Rules roadmap](CORE_RULES_REMEDIATION_ROADMAP.md). The [Order 84 audit](ORDER_84_AUDIT_REPORT.md) found 11 follow-ups after Order 83 merged in [PR #503](https://github.com/SobolGaming/Warhammer_40k_AI/pull/503); `PFINAL` is now Order 95 and remains open. P25A–C are already merged; they do not close Gate 0.
 
 F00 is complete: source policy, retained observations, and load support only. The three pilot observations stay `not_certified` for semantic execution. FM-pre design documents are delivered. FM0 and every later milestone are blocked on Gate 0.
 

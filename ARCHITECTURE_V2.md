@@ -4,7 +4,7 @@ This file is the build-order map for the Warhammer 40,000 CORE V2 engine. It rec
 
 Read it with the two remediation roadmaps:
 
-- [Core Rules remediation](docs/CORE_RULES_REMEDIATION_ROADMAP.md) owns categories 01–25. A landed phase here is not a compliance claim. Orders 1–83 are merged. `PFINAL` is Order 84 and is open. `CAUDIT-01` is open.
+- [Core Rules remediation](docs/CORE_RULES_REMEDIATION_ROADMAP.md) owns categories 01–25. A landed phase here is not a compliance claim. Orders 1–83 are merged. The [Order 84 audit](docs/ORDER_84_AUDIT_REPORT.md) found 11 follow-ups; `PFINAL` moves to Order 95. `CAUDIT-01` remains open.
 - [Faction rules remediation](docs/FACTION_RULES_REMEDIATION_ROADMAP.md) owns in-scope factions, detachments, Enhancements, Upgrades, Stratagems, and datasheets. Faction implementation waits on Gate 0, which is core `PFINAL`.
 
 CORE V2 is 11th Edition only. Do not add edition-diff switches or dual-edition behavior unless repository policy changes.
