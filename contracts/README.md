@@ -2,6 +2,15 @@
 
 Contract version: `35.0.0`
 
+Order 81 / P03E restores the existing pending-proposal contract for all 13
+parameterized families. Interaction conformance examples now preserve the four
+flat producer layouts (revival, return on death, model materialization and Cult
+Ambush marker placement). A typed engine registry owns layout extraction and
+identity validation for both proposal projection and interaction metadata.
+Existing schema, submission, visibility, persistence and replay families remain
+unchanged; the regenerated runtime identity pins the implementation repair.
+
+
 Contract 35 separates both players’ Normal Move phase occurrences. Persisted
 records require an explicit turn owner; replay authenticates that owner against
 accepted decisions. See [migration 34 to 35](migrations/34-to-35.md).

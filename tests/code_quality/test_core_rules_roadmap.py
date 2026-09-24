@@ -21,6 +21,8 @@ def test_core_roadmap_gives_review_findings_unique_owners_before_certification()
         owners.items()
         >= {
             "C01-04": "P01D",
+            "C01-05": "P01E",
+            "C03-05": "P03E",
             "C03-04": "P03D",
             "C09-03": "P09C",
             "C02-05": "P02E",

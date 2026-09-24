@@ -122,6 +122,21 @@ class InteractionSpec:
         return (self.interaction_kind, *self.alternative_interaction_kinds)
 
 
+class ParameterizedRequestLayout(StrEnum):
+    NESTED = "nested_proposal_request"
+    FLAT = "flat_request"
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ParameterizedInteractionSpec(InteractionSpec):
+    request_layout: ParameterizedRequestLayout
+
+    def __post_init__(self) -> None:
+        InteractionSpec.__post_init__(self)
+        if type(self.request_layout) is not ParameterizedRequestLayout:
+            raise GameLifecycleError("Parameterized interaction requires a typed request layout.")
+
+
 _FINITE_INTERACTION_SPECS = MappingProxyType(
     {
         "select_unit_split_membership": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
@@ -288,58 +303,71 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
 
 _PARAMETERIZED_INTERACTION_SPECS = MappingProxyType(
     {
-        "submit_cult_ambush_marker_placement": InteractionSpec(
+        "submit_cult_ambush_marker_placement": ParameterizedInteractionSpec(
             InteractionKind.BATTLEFIELD_POINT_PLACEMENT,
             ("marker",),
             (InteractionKind.CONFIRMATION,),
+            request_layout=ParameterizedRequestLayout.FLAT,
         ),
-        "submit_deployment_placement": InteractionSpec(
+        "submit_deployment_placement": ParameterizedInteractionSpec(
             InteractionKind.MULTI_MODEL_PLACEMENT,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_healing_revival_placement": InteractionSpec(
+        "submit_healing_revival_placement": ParameterizedInteractionSpec(
             InteractionKind.MODEL_POSE_PLACEMENT,
             ("model",),
+            request_layout=ParameterizedRequestLayout.FLAT,
         ),
-        "submit_catalog_model_materialization_placement": InteractionSpec(
+        "submit_catalog_model_materialization_placement": ParameterizedInteractionSpec(
             InteractionKind.MULTI_MODEL_PLACEMENT,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.FLAT,
         ),
-        "submit_melee_declaration": InteractionSpec(
+        "submit_melee_declaration": ParameterizedInteractionSpec(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
             ("attacking_model", "target_unit"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_movement_proposal": InteractionSpec(
+        "submit_movement_proposal": ParameterizedInteractionSpec(
             InteractionKind.PATH_EDITOR,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_placement_proposal": InteractionSpec(
+        "submit_placement_proposal": ParameterizedInteractionSpec(
             InteractionKind.MULTI_MODEL_PLACEMENT,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_redeploy_placement": InteractionSpec(
+        "submit_redeploy_placement": ParameterizedInteractionSpec(
             InteractionKind.MULTI_MODEL_PLACEMENT,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_return_on_death_placement": InteractionSpec(
+        "submit_return_on_death_placement": ParameterizedInteractionSpec(
             InteractionKind.MODEL_POSE_PLACEMENT,
             ("model",),
+            request_layout=ParameterizedRequestLayout.FLAT,
         ),
-        "submit_scout_move": InteractionSpec(
+        "submit_scout_move": ParameterizedInteractionSpec(
             InteractionKind.PATH_EDITOR,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_scout_reserve_setup": InteractionSpec(
+        "submit_scout_reserve_setup": ParameterizedInteractionSpec(
             InteractionKind.MULTI_MODEL_PLACEMENT,
             ("unit", "model"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_shooting_declaration": InteractionSpec(
+        "submit_shooting_declaration": ParameterizedInteractionSpec(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
             ("attacking_model", "weapon_instance", "target_unit"),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
-        "submit_stratagem_target_proposal": InteractionSpec(
+        "submit_stratagem_target_proposal": ParameterizedInteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("target",),
+            request_layout=ParameterizedRequestLayout.NESTED,
         ),
     }
 )
@@ -543,10 +571,53 @@ def _interaction_spec(*, decision_type: str, submission_kind: str) -> Interactio
     return spec
 
 
-def _request_context(request: DecisionRequest) -> dict[str, JsonValue]:
+def parameterized_request_layout(decision_type: str) -> ParameterizedRequestLayout:
+    spec = _PARAMETERIZED_INTERACTION_SPECS.get(decision_type)
+    if spec is None:
+        raise GameLifecycleError("Parameterized decision type has no registered request layout.")
+    return spec.request_layout
+
+
+def parameterized_proposal_request_payload(request: DecisionRequest) -> dict[str, JsonValue]:
+    """Read the declared request layout and bind its identity without altering source payloads.
+
+    This is the shared presentation context for interaction metadata and adapter proposals.
+    Family-specific submission validation remains with each engine decision owner.
+    """
+    if type(request) is not DecisionRequest or not request.is_parameterized_submission_request():
+        raise GameLifecycleError("Parameterized proposal context requires a parameterized request.")
+    layout = parameterized_request_layout(request.decision_type)
     if not isinstance(request.payload, dict):
-        if request.is_parameterized_submission_request():
-            raise GameLifecycleError("Parameterized interaction payload must be an object.")
+        raise GameLifecycleError("Parameterized DecisionRequest payload must be an object.")
+    if layout is ParameterizedRequestLayout.NESTED:
+        context = request.payload.get("proposal_request")
+        if not isinstance(context, dict):
+            raise GameLifecycleError(
+                "Parameterized DecisionRequest payload missing proposal_request."
+            )
+    else:
+        if "proposal_request" in request.payload:
+            raise GameLifecycleError(
+                "Flat parameterized request must not contain proposal_request."
+            )
+        context = request.payload
+    metadata: dict[str, JsonValue] = {
+        "request_id": request.request_id,
+        "decision_type": request.decision_type,
+        "actor_id": request.actor_id,
+    }
+    for key, value in metadata.items():
+        if key in context and context[key] != value:
+            raise GameLifecycleError(
+                "Parameterized proposal_request metadata must match DecisionRequest."
+            )
+    return {**context, **metadata}
+
+
+def _request_context(request: DecisionRequest) -> dict[str, JsonValue]:
+    if request.is_parameterized_submission_request():
+        return parameterized_proposal_request_payload(request)
+    if not isinstance(request.payload, dict):
         return {}
     proposal_request = request.payload.get("proposal_request")
     if proposal_request is None:

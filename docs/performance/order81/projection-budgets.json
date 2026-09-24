@@ -1,0 +1,7 @@
+{
+  "workload": "order81-shared-parameterized-projection-v1",
+  "mean_ratio": 1.25,
+  "mean_additive_seconds": 0.000005,
+  "maximum_seconds": 0.00015,
+  "rationale": "Serial request-view projection, 9 batches of 2000 calls. Permit 25% plus 5 microseconds variability for explicit layout and identity validation, with a 150 microsecond per-call batch ceiling. This is a component guard only; full-game calls and certification remain unmeasured. Correctness and non-mutation are independently gated."
+}

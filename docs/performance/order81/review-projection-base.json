@@ -1,0 +1,77 @@
+{
+  "workload": "order81-derived-projection-redaction-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+  "python": "3.14.5",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "cpu": "Apple M5 Pro",
+  "logical_cpus": 18,
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "workers": 1,
+  "coverage": false,
+  "scope": "Derived request projections only; setup excluded; no full-game timing claim.",
+  "fixture": "5-model recipient/enemy; one destroyed recipient; no terrain or random draws.",
+  "input_sha256": "de6dae104f3ed81a2133154283eccc9c02be4d27a2106de57972a1e1fba61bb1",
+  "script_sha256": "6ee017ad3ab93a3de3fd5edcd7f30340c9dc47fe24c25b264c07576d31314ea8",
+  "fixture_sha256": "d402d4a82e54961f07543d3d6804d42f52fa1f69c9fe368391186dedf5c48cea",
+  "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+  "rows": [
+    {
+      "case": "pending_decision",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        3.3872062500449827e-05,
+        3.358524999930523e-05,
+        3.367381249699974e-05,
+        3.377110449946485e-05,
+        3.389345850155223e-05,
+        3.396056249766843e-05,
+        3.41472289946978e-05,
+        3.400381249957718e-05,
+        3.354979200230446e-05
+      ],
+      "mean_seconds": 3.3828564888002194e-05,
+      "median_seconds": 3.3872062500449827e-05,
+      "maximum_seconds": 3.41472289946978e-05,
+      "protected_authority_exposed": false
+    },
+    {
+      "case": "pending_proposal",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        7.280249999894295e-06,
+        7.187271003203932e-06,
+        7.182291497883852e-06,
+        7.250833499711007e-06,
+        7.298145501408726e-06,
+        7.227645503007807e-06,
+        7.185312497313134e-06,
+        7.248541500302963e-06,
+        7.2315829966100866e-06
+      ],
+      "mean_seconds": 7.232430444370645e-06,
+      "median_seconds": 7.2315829966100866e-06,
+      "maximum_seconds": 7.298145501408726e-06,
+      "protected_authority_exposed": true
+    },
+    {
+      "case": "nested_interactions",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        1.2815583497285843e-05,
+        1.1944104000576773e-05,
+        1.2101687498216051e-05,
+        1.2094853998860343e-05,
+        1.2272291998669971e-05,
+        1.2051541503751651e-05,
+        1.2209229498694186e-05,
+        1.2046312498569024e-05,
+        1.213356249354547e-05
+      ],
+      "mean_seconds": 1.2185462998685479e-05,
+      "median_seconds": 1.2101687498216051e-05,
+      "maximum_seconds": 1.2815583497285843e-05,
+      "protected_authority_exposed": true
+    }
+  ]
+}

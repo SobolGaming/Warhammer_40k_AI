@@ -29,6 +29,7 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import (
     DecisionOptionPayload,
     DecisionRequest,
+    DecisionRequestPayload,
 )
 from warhammer40k_core.engine.dice_result_override_descriptors import (
     dice_result_override_descriptors_for_abilities,
@@ -41,6 +42,7 @@ from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
     interaction_descriptor_for_request,
     nested_interaction_request_payloads,
+    parameterized_proposal_request_payload,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
@@ -1215,7 +1217,9 @@ def public_decision_request_view(
         "payload": public_request["payload"],
         "options": cast(list[DecisionOptionPayload], raw_options),
         "is_parameterized": request.is_parameterized_submission_request(),
-        "interaction": interaction_descriptor_for_request(request),
+        "interaction": interaction_descriptor_for_request(
+            DecisionRequest.from_payload(cast(DecisionRequestPayload, public_request))
+        ),
     }
 
 
@@ -1228,12 +1232,10 @@ def _proposal_view(
         return None
     if not request.is_parameterized_submission_request():
         return None
-    if not isinstance(request.payload, dict):
-        raise GameLifecycleError("Parameterized DecisionRequest payload must be an object.")
-    proposal_request = request.payload.get("proposal_request")
-    if not isinstance(proposal_request, dict):
-        raise GameLifecycleError("Parameterized DecisionRequest payload missing proposal_request.")
-    return validate_json_value(_metadata_bearing_proposal_request(request, proposal_request))
+    request = DecisionRequest.from_payload(
+        cast(DecisionRequestPayload, public_decision_request_payload(request, viewer=viewer))
+    )
+    return validate_json_value(parameterized_proposal_request_payload(request))
 
 
 def _nested_interaction_request_views(
@@ -1243,26 +1245,10 @@ def _nested_interaction_request_views(
 ) -> list[InteractionAnnotatedDecisionRequestPayload]:
     if decision_request_hidden_from_context(request=request, viewer=viewer):
         return []
+    request = DecisionRequest.from_payload(
+        cast(DecisionRequestPayload, public_decision_request_payload(request, viewer=viewer))
+    )
     return nested_interaction_request_payloads(request)
-
-
-def _metadata_bearing_proposal_request(
-    request: DecisionRequest,
-    proposal_request: dict[str, JsonValue],
-) -> dict[str, JsonValue]:
-    metadata: dict[str, JsonValue] = {
-        "request_id": request.request_id,
-        "decision_type": request.decision_type,
-        "actor_id": request.actor_id,
-    }
-    for key, value in metadata.items():
-        if key not in proposal_request:
-            continue
-        if proposal_request[key] != value:
-            raise GameLifecycleError(
-                "Parameterized proposal_request metadata must match DecisionRequest."
-            )
-    return {**metadata, **proposal_request}
 
 
 def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:

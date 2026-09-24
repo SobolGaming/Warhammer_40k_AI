@@ -1,0 +1,591 @@
+{
+  "scope": "Order 81 / P03E / C03-05 shared parameterized request projection",
+  "approval": "User approved implementing and publishing the shared-projection prerequisite first.",
+  "base_commit": "45561d864c3634ce1d0e00d2b6599091ef43ed58",
+  "recorded_at": "2026-09-24T02:17:24.934452+00:00",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+  "final_validation_status": "passed",
+  "scope_audit": {
+    "runtime_modules": [
+      "adapters/projection.py",
+      "engine/interaction_metadata.py"
+    ],
+    "owner": "Typed parameterized interaction registry and shared context reader",
+    "registered_parameterized_families": 13,
+    "flat_families": 4,
+    "nested_families": 9,
+    "new_named_handlers": 0,
+    "new_runtime_modules": 0,
+    "source_packages_changed": false,
+    "external_contract": "35.0.0",
+    "schema_shapes_changed": false,
+    "adapter_contract_updated": true,
+    "open_prerequisites": [
+      "C01-05 / P01E / Order 82",
+      "CAUDIT-01 / PFINAL / Order 83"
+    ]
+  },
+  "red_regression": [
+    {
+      "scope": "Real return-on-death, Cult Ambush and materialization request producers",
+      "failed": 7,
+      "passed": 0,
+      "log_sha256": "a43dcb34b1e5dc3717d38daeff89a5b846a6b135a5a75488f82c6dfffb47bad7"
+    },
+    {
+      "scope": "Initial facade, published families and context validation regressions on base",
+      "failed": 24,
+      "passed": 23,
+      "log_sha256": "77fe38e0f2a18eb76d6463003694b3266c0946bf1b5a37a7102a66d3f29f4149"
+    }
+  ],
+  "focused_validation": [
+    {
+      "passed": 200,
+      "seconds": 49.19,
+      "scope": "New projection cases and complete sibling producer modules",
+      "log_sha256": "b7c10b6205bcc6eb2151f48e0e8fa66e2054db28a2bcfed58ae5e2363e220a2a"
+    },
+    {
+      "passed": 87,
+      "seconds": 41.3,
+      "scope": "Final facade/event deltas, CLI/shared session controls, metadata inventory and roadmap",
+      "log_sha256": "8091bfd86542d4ea9e45e0fd3f35790cd3177ab38c93b6bb07f4a18ab1acc141"
+    }
+  ],
+  "behavioral_suite": {
+    "tests": 9134,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "7eab378d37d86c911bd0552f20381eecd986bab99ddd5f98f6c3be739ced556b",
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage_percent": 85.21948539450784,
+    "required_coverage_percent": 85,
+    "coverage": true,
+    "warnings": 10,
+    "warning_note": "Unclosed SQLite database ResourceWarnings; this warning class also appears in the base Order 80 validation. Successful suite and coverage gate exited 0."
+  },
+  "sandbox_limited_attempt": {
+    "passed": 9132,
+    "failed": 2,
+    "exit_code": 3,
+    "cause": "Localhost socket binding denied in two HTTP tests; coverage SQLite aggregation could not open database.",
+    "log_sha256": "1360ed50a889ebee429c9407a3aae9b3b3990f5d20b3357f411456c754033cbc",
+    "junit_sha256": "9dc1bc12582e60a34afe1becb79b06d28a00cadf4fd43f817f45a8d97ddb98ba"
+  },
+  "code_quality_suite": {
+    "tests": 612,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "92442bfbb0574dde4d6587c4c5ad641250d2831f30cc69d4add3b290d99cde60",
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage": false
+  },
+  "initial_quality_attempt": {
+    "passed": 590,
+    "failed": 22,
+    "cause": "Inherited performance head reports referenced the previous runtime identity. Refreshed 18 actual serial workloads without changing baselines or budgets, then repeated the quality gate.",
+    "log_sha256": "da0899dcf628fcf4bc6fce0201597c82c0128bd45e64e5f82786af23629734c1"
+  },
+  "inherited_performance_refresh": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+    "concurrency": 1,
+    "coverage": false,
+    "competing_test_build_workers": false,
+    "baselines_and_budgets_unchanged": true,
+    "reason": "Inherited quality guards require actual fresh head measurements after every runtime identity change.",
+    "started_at": "2026-09-24T02:11:15.392651+00:00",
+    "measurements": [
+      {
+        "command": [
+          "python",
+          "scripts/measure_ingress_reconstruction.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order64/head-reconstruction.json"
+        ],
+        "output": "docs/performance/order64/head-reconstruction.json",
+        "seconds": 59.47174183400057,
+        "exit_code": 0,
+        "log_sha256": "084ea02e809deb4934cb56107f197d74cb843161e006f4c2f0cd504f10ca56f4",
+        "output_sha256": "4f56c8ae7b11cc8f62bc213a75be044f12c66e73a58412b20ab4ef54d4003163"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order65.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order65/head.json"
+        ],
+        "output": "docs/performance/order65/head.json",
+        "seconds": 7.3622304169985,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "c9f4b601ea77edac4cf9a903665463299fcd643ac8ebc413a9dfdbf03064514d"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order66.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order66/head.json"
+        ],
+        "output": "docs/performance/order66/head.json",
+        "seconds": 7.082944333989872,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "bd7c8bed2c8b63edbddf8bd8cb5093b8bf3ccdf7cdab0c2eb2be37dc9cdb8410"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order68.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order69/head.json"
+        ],
+        "output": "docs/performance/order69/head.json",
+        "seconds": 0.720847667005728,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "5234028c8abf3ca8665b1a58a211ebc87310546a15cdde8e441dbc1f491f3141"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order70.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order70/head.json"
+        ],
+        "output": "docs/performance/order70/head.json",
+        "seconds": 3.8981778750021476,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "60edb974ea9f6cb7678d33ee1127eb0dac525cecd4a5663eda7eff6a8008b166"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order71.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order71/head.json"
+        ],
+        "output": "docs/performance/order71/head.json",
+        "seconds": 3.9681455420068232,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "4f7ba0dbe322616ff7fdd2cf3f797d19f5b3995d34a8d8f6c99a3090f0e3b75d"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order72.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order72/head.json"
+        ],
+        "output": "docs/performance/order72/head.json",
+        "seconds": 15.456878625001991,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "349c4ccadfcdddaab6b546dfb720c52f1ea5dae4e794824f7939bc483ce27b85"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order60.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order73/r73_001/head.json"
+        ],
+        "output": "docs/performance/order73/r73_001/head.json",
+        "seconds": 4.877547790994868,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "af4c9bc659aa61c9f941a34a66a254bb80870805ba7384bf2dd194f4bed71193"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order73.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order73/r73_001/geometry-head.json"
+        ],
+        "output": "docs/performance/order73/r73_001/geometry-head.json",
+        "seconds": 7.652850667000166,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "59da6bb4d292a6d7cb7ea1728610477923ae63679089585fc806fd1bbe33dba9"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order74.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order74/head.json"
+        ],
+        "output": "docs/performance/order74/head.json",
+        "seconds": 5.820697041999665,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "98f26e19aa007078d71cada8f8c40d7f414291682c1904fabf4a305b5de54607"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order75.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order75/head.json"
+        ],
+        "output": "docs/performance/order75/head.json",
+        "seconds": 7.013217832994997,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "6b8d5841554ec6141eae4efc2ac1abc5548baccb9091305e384276896c08196b"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order76.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order76/head.json"
+        ],
+        "output": "docs/performance/order76/head.json",
+        "seconds": 13.26332349999575,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "1f367fe44d950e0d8b5aa48a23777aa23bcf249d083f9d6f5c979e9fc120abb3"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order77.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order77/head.json"
+        ],
+        "output": "docs/performance/order77/head.json",
+        "seconds": 28.95115833298769,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "a93538fadb2fbeabb70968637b4be7759c353196bfa70e5b2ca3bb0484386862"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order77_completion.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order77/r77_001_boundary/completion-head.json"
+        ],
+        "output": "docs/performance/order77/r77_001_boundary/completion-head.json",
+        "seconds": 10.859869791005622,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "9b84658e0b0052c6ab3a5ed4e6ed5e3083f769a8acc67befb1edde020b0d5532"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order78.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order78/head.json"
+        ],
+        "output": "docs/performance/order78/head.json",
+        "seconds": 3.939349249994848,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "5d0108ca004d93265bff11d8a3d6ae0e774518ef0297e26b9ffe37f55dd022dc"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order79.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order79/head.json"
+        ],
+        "output": "docs/performance/order79/head.json",
+        "seconds": 8.16256599999906,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "5e517bd5189fbb0f8f9e5a6288b3107451414b67d1ac7e259dba684207f3109a"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order80.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order80/head.json"
+        ],
+        "output": "docs/performance/order80/head.json",
+        "seconds": 16.493261833005818,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "f17a7230b4e96d9253963e8008ddb1c43be6715a7bc2c1be55235ead994d8a3c"
+      },
+      {
+        "command": [
+          "python",
+          "scripts/measure_order80.py",
+          "--runtime-src",
+          "src",
+          "--revision",
+          "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+          "--output",
+          "docs/performance/order80/review-head.json",
+          "--ordinary-restore"
+        ],
+        "output": "docs/performance/order80/review-head.json",
+        "seconds": 17.000662542006467,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output_sha256": "8edbed3c698c63e78603928c619fb1a25005484bc7b1cf2be9632155e7c39e5f"
+      }
+    ],
+    "completed_at": "2026-09-24T02:14:57.408452+00:00"
+  },
+  "final_gates": [
+    {
+      "name": "ruff",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-final-ruff.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-final-format.log",
+      "log_sha256": "a4db8104caa8884ee7e1888821ec7483335bf5303e691c64023cc6fac4da004e"
+    },
+    {
+      "name": "mypy",
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-mypy.log",
+      "log_sha256": "070323606d0dd3c08f5bdaf802b64ae08098e563d58762377cc7883258993534"
+    },
+    {
+      "name": "pyright",
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-final-pyright.log",
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    {
+      "name": "imports",
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-imports.log",
+      "log_sha256": "7a3ecc61239ac416cd0aa195cdbe724920d4490caf90125f674562e78a845b49"
+    },
+    {
+      "name": "behavior",
+      "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-behavior.log",
+      "log_sha256": "b3051c99a10fcc786faf118eea009f1d7296fbdbbdc16d7adda860c786a74095"
+    },
+    {
+      "name": "code_quality",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-quality.log",
+      "log_sha256": "cdd08d1cf376ecba04d8a4355588be7ccc3ed3331344dc11d7c28d737ece304f"
+    },
+    {
+      "name": "shards",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-shards.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "pre_commit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-precommit.log",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "name": "build_identity",
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-build-check.log",
+      "log_sha256": "588515a137124b22bb738d018c2d743d9b519af501ea48e7dd3b2e432ee02c0c"
+    },
+    {
+      "name": "contract",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref 45561d864c3634ce1d0e00d2b6599091ef43ed58",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-contract-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-wheel.log",
+      "log_sha256": "83103bfc1007393ed0b38f57ce64c332e59b9ff2304f48b4073491d347a23605"
+    },
+    {
+      "name": "client",
+      "command": "npm run check",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-client-check.log",
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "name": "client_unit",
+      "command": "npm run test:unit",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-client-unit.log",
+      "log_sha256": "68ae4c453189dc6e4f466ab60c6abbcff2f5e1cd85361208d6890a4088cd9387"
+    },
+    {
+      "name": "conformance",
+      "command": "npm run conformance",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-client-conformance.log",
+      "log_sha256": "48d8a5ce21117fd1debad5eaa0baa492412733346fbfbfb7fb156333f277a82e"
+    },
+    {
+      "name": "roadmap",
+      "command": "uv run --no-sync python tools/core_rules_40k_app_audit.py --check",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-roadmap-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "performance": {
+    "workload": "order81-shared-parameterized-projection-v1",
+    "measurement": "Serial, no coverage, no competing test workers; nine 2000-call batches per context layout; fixture construction excluded.",
+    "base_runtime": "Isolated git archive of exact base src, pyproject.toml and contracts, with identical current workload and canonical fixture helpers.",
+    "budget_status": "passed",
+    "summaries": {
+      "base": [
+        {
+          "case": "nested_request",
+          "sample_count": 9,
+          "mean_seconds": 2.047703466653022e-05,
+          "median_seconds": 2.035433299897704e-05,
+          "p95_seconds_nearest_rank": 2.0875353999144864e-05,
+          "maximum_seconds": 2.0875353999144864e-05,
+          "completed_calls": 18000,
+          "completion_rate": 1.0,
+          "calls_per_second": 48835.19592973602
+        },
+        {
+          "case": "flat_request",
+          "sample_count": 9,
+          "mean_seconds": 2.7909337889771755e-05,
+          "median_seconds": 2.7863166498718784e-05,
+          "p95_seconds_nearest_rank": 2.8089583502151072e-05,
+          "maximum_seconds": 2.8089583502151072e-05,
+          "completed_calls": 18000,
+          "completion_rate": 1.0,
+          "calls_per_second": 35830.30181330389
+        }
+      ],
+      "head": [
+        {
+          "case": "nested_request",
+          "sample_count": 9,
+          "mean_seconds": 2.2662226833441916e-05,
+          "median_seconds": 2.2646104000159538e-05,
+          "p95_seconds_nearest_rank": 2.2859562493977136e-05,
+          "maximum_seconds": 2.2859562493977136e-05,
+          "completed_calls": 18000,
+          "completion_rate": 1.0,
+          "calls_per_second": 44126.29029572382
+        },
+        {
+          "case": "flat_request",
+          "sample_count": 9,
+          "mean_seconds": 3.017123155506043e-05,
+          "median_seconds": 3.0130416496831457e-05,
+          "p95_seconds_nearest_rank": 3.035589600040112e-05,
+          "maximum_seconds": 3.035589600040112e-05,
+          "completed_calls": 18000,
+          "completion_rate": 1.0,
+          "calls_per_second": 33144.155821914945
+        }
+      ]
+    },
+    "full_games_attempted": 0,
+    "full_games_completed": 0,
+    "full_game_certification": "incomplete"
+  },
+  "environment_notes": [
+    "UV_CACHE_DIR=/private/tmp/order81-uv-cache was used because the default cache is outside the sandbox.",
+    "Wheel smoke required network access and UV_SYSTEM_CERTS=true for the host TLS certificate store; the final isolated install passed.",
+    "Node 24.19.0 used the required desktop runtime PATH. npm was located in the existing pyright nodeenv and added to PATH. Installed locked client dependencies were reused.",
+    "TypeScript unit/conformance harness required local socket access; final generated-client, unit and two-server conformance checks passed (5 tests; 342 assertions).",
+    "The first complete coverage attempt passed 9132 tests but failed two localhost HTTP tests due to sandbox socket restrictions; coverage combine also failed to open its database. Repeated the full coverage gate with socket access and COVERAGE_FILE=/private/tmp/order81-final.coverage, then ran code-quality without coverage. No production change or second no-coverage behavioral run occurred. The successful complete JUnit profile regenerated all eight shards."
+  ]
+}

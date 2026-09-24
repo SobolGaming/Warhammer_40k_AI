@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.parameterized_projection_helpers import assert_parameterized_projection
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
@@ -40,6 +41,7 @@ from warhammer40k_core.engine.direct_mortal_wound_application import (
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -181,6 +183,7 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement(
     decisions = DecisionController()
     request = build_return_on_death_placement_request(state=state, pending=pending)
     decisions.request_decision(request)
+    assert_parameterized_projection(GameLifecycle(state=state, decision_controller=decisions))
     result = _placement_result(
         request=request,
         placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
