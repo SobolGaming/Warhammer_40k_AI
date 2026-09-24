@@ -44,7 +44,6 @@ from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.healing_geometry import (
     healing_opposing_player_id,
-    healing_phase_start_enemy_engagement_model_ids,
     healing_phase_start_model_ids,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
@@ -288,12 +287,6 @@ class CatalogCommandRestorationRuntime:
             phase_start_model_ids=healing_phase_start_model_ids(
                 state=context.state,
                 rules_unit=target,
-            ),
-            phase_start_enemy_engagement_model_ids=(
-                healing_phase_start_enemy_engagement_model_ids(
-                    state=context.state,
-                    rules_unit=target,
-                )
             ),
         )
         resolved_effect, pending_request = resolve_healing_until_blocked(

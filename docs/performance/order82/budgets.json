@@ -1,0 +1,7 @@
+{
+  "workload": "order82-revival-engagement-v1",
+  "mean_ratio": 3.0,
+  "mean_additive_seconds": 0.25,
+  "maximum_seconds": 10.0,
+  "rationale": "Bound one public placement plus checkpoint/replay to 10 seconds on the provisional host; allow the newly legal cases to perform mutation and historical authentication absent in the rejecting base. This is a bounded slice regression gate, not an extrapolated complete-game certificate."
+}

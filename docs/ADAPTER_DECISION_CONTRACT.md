@@ -1930,9 +1930,9 @@ Phase 14H updates Transport Disembark decisions to expose the source-backed `dis
 
 Phase 14H Healing Wounds effects use the finite `select_healing_model` decision when the next one-wound healing step has multiple legal targets. The engine iterates each healing amount separately: wounded models are healed before any revival; if the unit is below Starting Strength and every alive model is at full wounds, one destroyed removed model becomes the next revival candidate; if the unit is at Starting Strength and full wounds, the step records no effect. Ambiguous wounded-model choices and ambiguous destroyed-model revival choices default to the opposing player, but source-backed effects may set `selection_actor_player_id` when the source rule gives the choice to another player; Necrons Reanimation Protocols uses the owning Necrons player. Option IDs are emitted by the engine, and model-option payloads include `submission_kind: "select_healing_model"`, `selection_kind` (`heal_wound` or `revive_model`), `effect_id`, `target_unit_instance_id`, `step_index`, the selected `model_instance_id`, `legal_model_ids`, and source rule/context. A source-backed optional revival may also set `allow_revival_finish: true`; the engine then emits `select_healing_model` even for one candidate and adds a deterministic `selection_kind: "finish"` option with `model_instance_id: null` before the first revival and after every completed revival while legal candidates remain. Selecting it records a replay-safe terminal healing step without returning another model. The request payload embeds the serialized `HealingEffect`, including `selection_actor_player_id` when present. Adapters select one pending option ID and do not invent model IDs, early-completion state, or wound mutations from local state.
 
-Every revival candidate, including a single unambiguous candidate, then emits the parameterized `submit_healing_revival_placement` decision with proposal kind `healing_revival_placement`. Its request binds the serialized `HealingEffect`, step, destroyed model ID, authoritative component-unit ID, and any preceding model-selection request/result IDs. The submission contains exactly one attempted `UnitPlacement` for that component and model. Before queue pop and mutation, the engine rejects stale or malformed context, wrong actor, army, player, rules-unit component, model, placement kind, or proposal kind; model overlap; returned-model overlap; impassable or occupied terrain; a returned base crossing the battlefield boundary; broken attached-rules-unit coherency; failure to cohere with phase-start models; or newly entering an enemy model's Engagement Range. Accepted placement restores the source-backed wound amount and records return-to-battlefield transition evidence. Adapters must not infer a default pose, component ownership, or placement legality locally.
+Every revival candidate, including a single unambiguous candidate, then emits the parameterized `submit_healing_revival_placement` decision with proposal kind `healing_revival_placement`. Its request binds the serialized `HealingEffect`, step, destroyed model ID, authoritative component-unit ID, and any preceding model-selection request/result IDs. The submission contains exactly one attempted `UnitPlacement` for that component and model. Before queue pop and mutation, the engine rejects stale or malformed context, wrong actor, army, player, rules-unit component, model, placement kind, or proposal kind; model overlap; returned-model overlap; impassable or occupied terrain; a returned base crossing the battlefield boundary; broken attached-rules-unit coherency; failure to cohere with phase-start models; or engaging an enemy rules unit that was not engaged with the receiving rules unit immediately before this placement. All rules-present models, including retained destroyed models and attached components, contribute through the shared physical engagement authority. Accepted placement restores the source-backed wound amount and records return-to-battlefield transition evidence. Adapters must not infer a default pose, component ownership, or placement legality locally.
 
-Healing and revival placement decisions expose public battlefield state in the current rules scope, so their request and result payloads do not require viewer-dependent redaction. Any future hidden healing source must define and test viewer-scoped request, record, event, and status projection before it is registered.
+Healing and revival placement decisions expose public battlefield facts in the current rules scope. Their requests, results and events still pass through centralized viewer redaction, including protected fields nested in source context. Any future hidden healing source must define and test viewer-scoped request, record, event, and status projection before it is registered.
 
 Source-backed healing effects may carry engine-authored `source_context` flags
 that restrict resolution to wounded models or destroyed removed models, lock a
@@ -6738,3 +6738,27 @@ Existing finite selections and typed movement proposals cover the player choices
 Both adapters and replay continue through lifecycle submission, with unchanged
 viewer visibility. Contract 35, persistence v27 and replay v29 require explicit
 occurrence evidence; see [the migration](../contracts/migrations/34-to-35.md).
+
+
+## Order 82 — rules-unit revival engagement
+
+Contract 36 removes `HealingEffect.phase_start_enemy_engagement_model_ids`.
+Phase-start model anchors still govern coherency; engagement is measured from
+engine state immediately before each individual model returns. Source-specific
+revival restrictions, wounds and selection ownership retain their existing
+shared Healing behavior. No adapter may construct or widen an engagement allowlist.
+
+Accepted `healing_step_resolved` battlefield-revival events require
+`revival_engagement`: the pinned `rule_source_id` and `source_package_hash`,
+canonical `target_unit_instance_id`, sorted `engaged_enemy_rules_unit_ids_before`
+and `returned_model_engaged_enemy_rules_unit_ids`. Recovery recomputes those
+sets from authenticated pre-return physical history, including retained presence.
+The returned model cannot establish its own permission. All recorded placements
+must have exactly one matching mutation. Missing or drifted evidence and legacy
+model-scoped HealingEffect payloads fail closed; no enemy unit is inferred from
+an old model allowlist. Existing request envelopes, proposal kinds, actor authority,
+retry atomicity and centralized viewer redaction are unchanged. Public engagement
+facts reach both viewers; protected nested source context remains redacted.
+
+Persistence uses `session-persistence-v28-revival-engagement`, replay uses
+`replay-artifact-v30-revival-engagement`, and server wrappers use v36.

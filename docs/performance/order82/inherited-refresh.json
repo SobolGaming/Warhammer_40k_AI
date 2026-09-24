@@ -1,0 +1,382 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+  "concurrency": 1,
+  "coverage": false,
+  "competing_test_build_workers": false,
+  "inherited_baselines_and_budgets_unchanged": true,
+  "started_at": "2026-09-24T13:48:07.184360+00:00",
+  "measurements": [
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order82.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order82/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order82/head.json",
+      "seconds": 53.41732516599586,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "b9fb2fee5f8f8fff8ebe980c462ffb2f0a64835e8bfe52ad641be33f54d3ca1a"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_ingress_reconstruction.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order64/head-reconstruction.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order64/head-reconstruction.json",
+      "seconds": 63.43253120800364,
+      "exit_code": 0,
+      "log_sha256": "89e2a18a0b732d3e0966fcd68fb2d878c94a7dbfe437c138261324e3a1fd39e0",
+      "output_sha256": "a8e7ee00ad41178756ba756b1089af2ab11e56e51c70d59f4d9e714576c1889b"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order65.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order65/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order65/head.json",
+      "seconds": 7.750203583011171,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "6a23e510db6ad27b3eeb58e70bce84721496dd16c5cf7cedf9c7083b299a80e7"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order66.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order66/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order66/head.json",
+      "seconds": 7.495020832982846,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "5713c24e97e38912085bbda4233bfa0ff0ed7d7ff45e352ce84c8b66613f8bbb"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order68.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order69/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order69/head.json",
+      "seconds": 0.7334902499860618,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "a584a587bed9418744051f0e6cb47d399c16863d3491b6e749aba18cdab328a0"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order70.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order70/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order70/head.json",
+      "seconds": 4.138351000001421,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "9e5d9ceeb7ca95f677e4ec78435756bad52bf2ec92da6da9c47026b7dbdbb5c6"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order71.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order71/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order71/head.json",
+      "seconds": 4.207003832998453,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "43ed3f28f2fbaaa0dc60a1b689b7e72164a48a2c14088281af102cabfd81bbd0"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order72.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order72/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order72/head.json",
+      "seconds": 17.04465400002664,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "b5f2b800906d8c066cf60e75e8e7b04f1c4ce6ae7fe9aaba742dcbcdcdbecaf2"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order60.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order73/r73_001/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order73/r73_001/head.json",
+      "seconds": 5.1788477080117445,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "dba979b666bd88988e1523240fdf3feb00d93ddcb31b39f05d0b17bb357a0963"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order73.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order73/r73_001/geometry-head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order73/r73_001/geometry-head.json",
+      "seconds": 8.075930666003842,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "521e916f6a2ddfa6284724bc50629f8cab92dd870294a2c78234a190521a0533"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order74.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order74/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order74/head.json",
+      "seconds": 6.097745915991254,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "f92a84ed6c3c0b17dfade273e1432004612b6c289ef69f652a0fa8aeef1cc8e2"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order75.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order75/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order75/head.json",
+      "seconds": 7.384634124988224,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "5585f4e9ac73a2c04ff15f0cbea8330a36ca556ea879f07e972a99f519014de1"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order76.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order76/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order76/head.json",
+      "seconds": 14.0238580419973,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "9629e92136878f408d9c328c800d4b1d2e07e4840a6e7a658b7f7444e0dd8646"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order77.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order77/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order77/head.json",
+      "seconds": 30.2222148340079,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "514bf40abe2b27bd050c31c3a0ce698a028de90d8019bc4ec0bd597228d3b7de"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order77_completion.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order77/r77_001_boundary/completion-head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order77/r77_001_boundary/completion-head.json",
+      "seconds": 11.173162000020966,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "00dd7a8137c5778d5bf87cb5c8bd74d0c57c0521ffa9737d08190c143589d093"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order78.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order78/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order78/head.json",
+      "seconds": 4.1407116659975145,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "43cb5ee75c7c18f57b4d04078e0d0b354ab929c4afa6016a8ea001082b0a1d9e"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order79.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order79/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order79/head.json",
+      "seconds": 8.590843707992462,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "1040b71dc7a771802587a5e79f8ebc80cddf527db6814ccbcd057f1d3818a995"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order80.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order80/head.json"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order80/head.json",
+      "seconds": 17.501834792026784,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "6e2ef082e6a1a793f617641f02a6fb304941f9fe5a04f5a7e7f88f885caba230"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/measure_order80.py",
+        "--runtime-src",
+        "src",
+        "--revision",
+        "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+        "--output",
+        "docs/performance/order80/review-head.json",
+        "--ordinary-restore"
+      ],
+      "pythonpath": ".:src",
+      "output": "docs/performance/order80/review-head.json",
+      "seconds": 17.782645041996147,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "f8a0a86a68880e98adecfa3346b8a92104b2437a64ef66d11c6190d85daadeda"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/benchmark_order81_projection.py",
+        "--output",
+        "docs/performance/order82/projection-base.json"
+      ],
+      "pythonpath": "/private/tmp/order82-projection-base/src:.",
+      "output": "docs/performance/order82/projection-base.json",
+      "seconds": 4.27762595898821,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "1df91674412dde9a388ff3b42e112a83aa3f83d67fc018e5809625ec7969092b"
+    },
+    {
+      "command": [
+        "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python",
+        "scripts/benchmark_order81_projection.py",
+        "--output",
+        "docs/performance/order82/projection-head.json"
+      ],
+      "pythonpath": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/src:.",
+      "output": "docs/performance/order82/projection-head.json",
+      "seconds": 4.473931333981454,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_sha256": "54f8472416b86e1927b581c7a3fc1105c0dc2c4d86e9d077aedea26c2d570aa8"
+    }
+  ],
+  "completed_at": "2026-09-24T13:53:04.355221+00:00"
+}

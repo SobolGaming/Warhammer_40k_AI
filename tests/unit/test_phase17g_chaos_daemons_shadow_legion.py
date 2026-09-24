@@ -38,7 +38,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
-from warhammer40k_core.engine import healing_geometry, healing_source_context
+from warhammer40k_core.engine import healing_source_context
 from warhammer40k_core.engine import (
     stratagems_generic_metadata as generic_metadata,
 )
@@ -157,6 +157,9 @@ from warhammer40k_core.engine.phases.shooting import (
     _apply_shooting_unit_selected_grant_decision,
     _request_shooting_unit_selected_grant_decision_if_available,
     request_out_of_phase_shooting_declaration,
+)
+from warhammer40k_core.engine.physical_engagement import (
+    current_physically_engaged_enemy_rules_unit_ids,
 )
 from warhammer40k_core.engine.prebattle import scout_ability_instances_for_rules_unit
 from warhammer40k_core.engine.primary_battlefield_departure_integrity import (
@@ -1673,9 +1676,9 @@ def test_shared_healing_phase_start_engagement_ignores_dead_enemy() -> None:
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit.unit_instance_id)
 
     assert (
-        healing_geometry.healing_phase_start_enemy_engagement_model_ids(
+        current_physically_engaged_enemy_rules_unit_ids(
             state=state,
-            rules_unit=rules_unit,
+            unit_instance_id=rules_unit.unit_instance_id,
         )
         == ()
     )

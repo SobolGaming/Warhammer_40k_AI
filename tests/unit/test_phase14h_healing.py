@@ -55,9 +55,6 @@ from warhammer40k_core.engine.healing import (
     invalid_healing_model_decision_status,
     resolve_healing_until_blocked,
 )
-from warhammer40k_core.engine.healing_geometry import (
-    healing_phase_start_enemy_engagement_model_ids,
-)
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
     apply_healing_revival_placement_decision,
@@ -74,8 +71,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.physical_engagement import (
+    current_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -1231,10 +1230,10 @@ def test_healing_phase_start_engagement_includes_retained_fight_on_death_enemy()
         source_phase=BattlePhaseKind.FIGHT,
     )
 
-    assert healing_phase_start_enemy_engagement_model_ids(
+    assert current_physically_engaged_enemy_rules_unit_ids(
         state=state,
-        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
-    ) == (retained_enemy_placement.model_instance_id,)
+        unit_instance_id=unit_id,
+    ) == (enemy_unit_id,)
 
 
 def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> None:
@@ -1265,7 +1264,6 @@ def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> No
         amount=1,
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
-        phase_start_enemy_engagement_model_ids=(),
     )
 
     blocked, request = resolve_healing_until_blocked(
@@ -1328,9 +1326,9 @@ def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> 
         source_phase=BattlePhaseKind.FIGHT,
     )
     records_before = decisions.records
-    phase_start_engagement_ids = healing_phase_start_enemy_engagement_model_ids(
+    phase_start_engagement_ids = current_physically_engaged_enemy_rules_unit_ids(
         state=state,
-        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
+        unit_instance_id=unit_id,
     )
     assert phase_start_engagement_ids == ()
     effect = HealingEffect(
@@ -1339,7 +1337,6 @@ def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> 
         amount=1,
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
-        phase_start_enemy_engagement_model_ids=phase_start_engagement_ids,
     )
 
     blocked, request = resolve_healing_until_blocked(
@@ -1349,7 +1346,7 @@ def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> 
         effect=effect,
     )
     assert request is not None
-    with pytest.raises(GameLifecycleError, match="engages a new enemy model"):
+    with pytest.raises(GameLifecycleError, match="engages a new enemy rules unit"):
         apply_healing_revival_placement_decision(
             state=state,
             decisions=decisions,

@@ -286,10 +286,13 @@ def test_parameterized_request_layouts_cover_dispatch_and_published_examples() -
 
 
 def test_order81_matched_projection_component_budget() -> None:
-    folder = ROOT / "docs/performance/order81"
+    # Order 82 removes the obsolete HealingEffect field from the shared fixture.
+    # Compare fresh measurements of both runtimes with that same fixture, while
+    # preserving the original Order 81 evidence and its unchanged budget.
+    folder = ROOT / "docs/performance/order82"
     base = json.loads((folder / "projection-base.json").read_text())
     head = json.loads((folder / "projection-head.json").read_text())
-    budgets = json.loads((folder / "projection-budgets.json").read_text())
+    budgets = json.loads((ROOT / "docs/performance/order81/projection-budgets.json").read_text())
     assert base["workload"] == head["workload"] == budgets["workload"]
     for key in (
         "python",

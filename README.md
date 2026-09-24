@@ -2,14 +2,15 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
-Order 81's fresh PFINAL preflight found two prerequisites: pending revival
-placements cannot be projected for either viewer (C03-05), and revival rejects
-engagement with an additional model of an already-engaged enemy unit (C01-05).
-The shared projection repair is Order 81 / P03E; the revival semantic repair is
-Order 82 / P01E. Owner-approved P03E now uses one explicit request-layout
-registry for shared proposal projection and interaction metadata. See
-[reproduction, source and acceptance plans](docs/ORDER_81_PREFLIGHT_AUDIT.md).
-PFINAL moves to Order 83 and remains blocked; no all-category certification is claimed.
+Order 82 / P01E implements revived-model engagement against already-engaged
+canonical enemy rules units, including attached components and retained destroyed
+models. The shared placement validator measures the pre-return battlefield;
+restore authenticates source-bound unit evidence against physical history.
+Contract 36 rejects obsolete model-scoped snapshots. See
+[scope, source and validation](docs/ORDER_82_SCOPE_PLAN.md).
+Order 81's shared parameterized projection prerequisite is merged in PR #501.
+PFINAL remains Order 83 and requires this PR to merge and a fresh complete audit;
+no all-category or complete-game performance certification is claimed.
 
 Order 80's PFINAL preflight found C09-03: a reactive Normal Move in the
 opponent's Movement phase blocks the unit's Normal Move in its own phase of

@@ -31,7 +31,6 @@ from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_unti
 from warhammer40k_core.engine.healing_geometry import (
     healing_battlefield_state,
     healing_opposing_player_id,
-    healing_phase_start_enemy_engagement_model_ids,
     healing_phase_start_model_ids,
     healing_rules_unit_placements,
 )
@@ -222,10 +221,6 @@ def _reanimation_healing_effect(
         source_rule_id=SOURCE_RULE_ID,
         source_context=source_context,
         phase_start_model_ids=healing_phase_start_model_ids(
-            state=state,
-            rules_unit=rules_unit,
-        ),
-        phase_start_enemy_engagement_model_ids=healing_phase_start_enemy_engagement_model_ids(
             state=state,
             rules_unit=rules_unit,
         ),

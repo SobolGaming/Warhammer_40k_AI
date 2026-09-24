@@ -1,0 +1,79 @@
+{
+  "artifact_schema": "core-v2-core-revival-source-v1",
+  "source_package_id": "gw-11e-core-revival",
+  "source_version": "maintained-app-mirrors-observed-2026-09-24",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-revival:revival",
+      "section_id": "01.02.03",
+      "source_text": "When a rule revives, resurrects, returns or adds models to a unit, the specified number of models are added to the unit. If a rule revives, resurrects or returns models to a unit, it does so through destroyed models from that unit. This cannot expand a unit beyond its starting strength. Unless otherwise stated, such models are added with all wargear and enhancements they started the battle with, and with their full W remaining. Models returned to a unit on the battlefield must be set up as follows: They must be set up in coherency with models in that unit that started that phase on the battlefield. They can be set up engaged with one or more enemy units, but only if those enemy units were already engaged with the unit that model is being returned to. If a leader or support model in an attached unit is destroyed and subsequently revived, they are still part of that attached unit and they must be returned to it if possible. When a model revives, resurrects, returns or is added to an embarked unit, if that TRANSPORT has sufficient remaining transport capacity for that model, that model is returned to that unit and is embarked. Otherwise, that model is destroyed, but it does not trigger rules that apply when a model is destroyed.",
+      "transcription_sha256": "cce4b8e3cd0c8a6efb2e36e5a2c72c569be3675493482bdf8a33570a95889b02",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.revival_engagement:revival_engagement_evidence"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-revival:revival",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cce4b8e3cd0c8a6efb2e36e5a2c72c569be3675493482bdf8a33570a95889b02",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "280f76fdea8a312879a9b045acf68eb7d50d550cf0eb11e9a6c2545f2f2dd1f5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.revival_engagement:revival_engagement_evidence"
+      ],
+      "evidence_id": "core-revival-review:revival",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01E 01.02.03 revival",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-revival:revival",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cce4b8e3cd0c8a6efb2e36e5a2c72c569be3675493482bdf8a33570a95889b02",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "3b7edf9a7e77f3189803cd77b97ab60a24a1063ea842c1ea1067ccb425713702",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.revival_engagement:revival_engagement_evidence"
+      ],
+      "evidence_id": "core-revival-mirror:revival:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-revival-maintained-app-mirrors-2026-09-24",
+      "review_audit_row_id": "revival:40k-app",
+      "review_audit_source_observation_sha256": "5214e698c41ef0abba31b49f415e6808c5c79b9718cfaf0b7246c5a796207e3c",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 01.02.03 revival",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/01-core-concepts",
+      "observed_at": "2026-09-24T13:16:10+00:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "276d3c5f22f0637362eb58d855eb21d2f01da66d11d12d9f47afa2ac3d83958d"
+}

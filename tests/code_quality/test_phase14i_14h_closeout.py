@@ -314,7 +314,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "resolve_healing_until_blocked" in healing_source
     assert "apply_healing_model_decision" in healing_source
     assert "with_returned_model_placement" in healing_revival_source
-    assert "phase_start_enemy_engagement_model_ids" in healing_source
+    assert "revival_engagement_evidence" in healing_revival_source
     assert "attachment_eligibilities" in datasheet_source
     assert "class AttachmentEligibility" in attachment_eligibility_source
     assert "class AttachmentDeclaration" in list_validation_source

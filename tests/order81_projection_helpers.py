@@ -12,7 +12,6 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.healing_geometry import (
-    healing_phase_start_enemy_engagement_model_ids,
     healing_phase_start_model_ids,
 )
 from warhammer40k_core.engine.phase import BattlePhase
@@ -51,14 +50,12 @@ def revival_projection_session(
         source_model_id=units["enemy"].own_models[0].model_instance_id,
     )
     unit = rules_unit_view_by_id(state=state, unit_instance_id=units["recipient"].unit_instance_id)
-    allowed = healing_phase_start_enemy_engagement_model_ids(state=state, rules_unit=unit)
     effect = HealingEffect(
         effect_id="order81-revival",
         target_unit_instance_id=unit.unit_instance_id,
         amount=1,
         opposing_player_id="player-b",
         phase_start_model_ids=healing_phase_start_model_ids(state=state, rules_unit=unit),
-        phase_start_enemy_engagement_model_ids=allowed,
         source_context={
             **({} if source_context is None else source_context),
             "revive_model_full_health": True,

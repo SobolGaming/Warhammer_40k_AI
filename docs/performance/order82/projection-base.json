@@ -1,0 +1,64 @@
+{
+  "workload": "order81-shared-parameterized-projection-v1",
+  "python": "3.14.5",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "cpu": "Apple M5 Pro",
+  "logical_cpus": 18,
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "workers": 1,
+  "coverage": false,
+  "scope": "Request projection only; setup excluded. No full-game timing claim.",
+  "fixture": "5-model recipient/enemy; one destroyed recipient; no terrain or random draws.",
+  "script_sha256": "e25149ab845d3ccffc79fa45dd57e50ddce8f4ac704d2c2dddcd86dbb6d96290",
+  "fixture_sha256": "1c1992ab51bfddc359a11c2e5a5f43ce902744b7a159b23d0243c498ca9ebe36",
+  "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+  "rows": [
+    {
+      "case": "nested_request",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        2.113216651196126e-05,
+        2.0926041499478742e-05,
+        2.0950104008079507e-05,
+        2.1075479497085325e-05,
+        2.1037103986600413e-05,
+        2.1005833506933415e-05,
+        2.104624999628868e-05,
+        2.094331249827519e-05,
+        2.104689599946141e-05
+      ],
+      "mean_seconds": 2.1018131944907106e-05,
+      "median_seconds": 2.1037103986600413e-05,
+      "maximum_seconds": 2.113216651196126e-05
+    },
+    {
+      "case": "flat_request",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        2.8419082998880186e-05,
+        2.847683349682484e-05,
+        2.8658729497692548e-05,
+        2.880241649108939e-05,
+        2.8707062505418435e-05,
+        2.841791699756868e-05,
+        2.8455250008846634e-05,
+        2.844416699372232e-05,
+        2.8641208496992477e-05
+      ],
+      "mean_seconds": 2.855807416522617e-05,
+      "median_seconds": 2.847683349682484e-05,
+      "maximum_seconds": 2.880241649108939e-05
+    }
+  ],
+  "proposal_projections": {
+    "nested_request": {
+      "status": "projected",
+      "payload_sha256": "991d5789b1fa9e8819372691eae4f9c3845c416a1bd540ccf0a107fc6e88ac1b"
+    },
+    "flat_request": {
+      "status": "projection_error",
+      "message": "Parameterized DecisionRequest payload missing proposal_request."
+    }
+  }
+}
