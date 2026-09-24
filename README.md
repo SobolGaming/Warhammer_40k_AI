@@ -2,53 +2,60 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 81's fresh PFINAL preflight found two prerequisites: pending revival
+placements cannot be projected for either viewer (C03-05), and revival rejects
+engagement with an additional model of an already-engaged enemy unit (C01-05).
+The shared projection repair is Order 81 / P03E; the revival semantic repair is
+Order 82 / P01E. Owner-approved P03E now uses one explicit request-layout
+registry for shared proposal projection and interaction metadata. See
+[reproduction, source and acceptance plans](docs/ORDER_81_PREFLIGHT_AUDIT.md).
+PFINAL moves to Order 83 and remains blocked; no all-category certification is claimed.
+
 Order 80's PFINAL preflight found C09-03: a reactive Normal Move in the
 opponent's Movement phase blocks the unit's Normal Move in its own phase of
 the same round. P09C now owns Order 80 and implements explicit turn ownership across Normal Move
 history, validation, direct consumers, persistence and replay.
 See [source, reproduction and approved implementation](docs/ORDER_80_PREFLIGHT_AUDIT.md).
-PFINAL moves to Order 81. No Core Rules or complete-game certificate is claimed.
+This prerequisite is merged in PR #500. No Core Rules or complete-game certificate is claimed.
 
 Order 79 / P14A freezes turn-end objective control before turn-end rules and
 cleanup. Control-based scoring retains models present before coherency removal.
 Optional reserve choices preserve that snapshot; source-dash Aircraft test event
 order without contributing OC. Phase-end effects expire at their separate boundary. See [scope and evidence](docs/ORDER_79_PREFLIGHT_AUDIT.md).
-This prerequisite is merged. PFINAL is Order 81 and requires P09C to merge
-and a fresh complete audit. Core Rules certification and complete-game performance remain uncertified.
+This prerequisite is merged. PFINAL is Order 83 and requires P03E and P01E plus a fresh complete audit. Core Rules certification and complete-game performance remain uncertified.
 
 Order 78 / P13A applies Gone to Ground to Hidden models concealed by intervening
 Dense features, even outside those features. Shared shooting and LOS queries
 use per-model causal visibility and current/previous-turn ranged history.
 Ordinary Shooting and Fire Overwatch preserve validation, viewer scope, restore
 and exact replay. See [scope and evidence](docs/ORDER_78_PREFLIGHT_AUDIT.md).
-This prerequisite is merged. PFINAL is Order 81 and requires the Order 80 prerequisite
-to merge and a fresh audit. Core Rules compliance and complete-game performance
+This prerequisite is merged. PFINAL is Order 83 and requires the new prerequisites and a fresh audit. Core Rules compliance and complete-game performance
 remain uncertified.
 
 Order 77 / P16B interrupts Actions from accepted completed moves, including
 return paths, rotation-only paths and zero-distance moves. Live play and restore
 share model-lineage evidence; physical transition deltas keep their existing
 meaning. See [scope and validation](docs/ORDER_77_PREFLIGHT_AUDIT.md). PFINAL is
-Order 81; this prerequisite is merged and a fresh complete audit is still required.
+Order 83; this prerequisite is merged and a fresh complete audit is still required.
 
 Order 76 / P03D preserves exact replay and recovery after malformed or stale
 physical proposals. Shared diagnostics leave authoritative histories unchanged;
 recorded rule-invalid attempts retain their retry path. See
-[scope and validation](docs/ORDER_76_PREFLIGHT_AUDIT.md). PFINAL is Order 81;
+[scope and validation](docs/ORDER_76_PREFLIGHT_AUDIT.md). PFINAL is Order 83;
 this prerequisite is merged and a fresh complete audit is still required.
 
 Order 75 / P21C accepts provably optimal Surge approaches to fixed oval and
 rectangular targets through the shared geometry, facade, restore and replay
 path. The bound preserves the target footprint and facing, while retaining
 conservative rotation allowances for noncircular movers. See
-[scope and evidence](docs/ORDER_75_PREFLIGHT_AUDIT.md). PFINAL is Order 81;
+[scope and evidence](docs/ORDER_75_PREFLIGHT_AUDIT.md). PFINAL is Order 83;
 this prerequisite is merged and a fresh complete audit is still required.
 
 Order 74 / P03C repairs terrain-blocked mandatory movement endpoints using a
 shared continuous exclusion proof. Charge records and restores that proof;
 Consolidation and Surge consume the same reachability authority. Unresolved
 path or maximum-approach searches remain fail-closed. See
-[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 81
+[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 83
 and still requires a complete audit; this prerequisite is merged.
 
 Order 72 resolves consolidation responses against owner-confirmed official App

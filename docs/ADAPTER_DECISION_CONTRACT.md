@@ -4504,6 +4504,29 @@ nested proposal payloads. Non-parameterized requests, hidden requests for a
 non-owning viewer, and views with no pending request expose
 `pending_proposal: null`.
 
+Order 81 / P03E enforces this existing contract through one engine-owned typed
+request-layout registry shared by interaction metadata and proposal projection.
+The four existing flat families are `submit_healing_revival_placement`,
+`submit_return_on_death_placement`, `submit_catalog_model_materialization_placement`
+and `submit_cult_ambush_marker_placement`; the other nine parameterized decision
+families use `payload.proposal_request`. Layout is declared per registered family,
+never guessed from a missing field. Unknown families, non-object contexts,
+missing nested contexts, nested fields in flat requests and conflicting
+`request_id`/`decision_type`/`actor_id` fail closed. Raw DecisionRequest payloads
+retain their producer-authored shape. The proposal view adds only the existing
+identity envelope; interaction metadata reads that same context. Family-specific
+submission validation and engine mutation remain with their existing owners.
+Shared viewer redaction executes before context extraction. Hidden non-owner
+requests still expose no proposal or interaction data.
+
+The existing open-JSON request/proposal schema and interaction descriptors already
+cover these families, including their distinct proposal schema references and
+Cult Ambush placement/decline variants. This repair restores the documented
+projection behavior and corrects renderer examples; it introduces no new
+choice, payload-family version, visibility rule, persistence or replay shape.
+Contract 35 remains current. Revival enemy-unit eligibility (C01-05) is a separate
+Order 82 prerequisite and is not changed by this adapter repair.
+
 Visibility examples:
 
 - local hot-seat UI: viewer-scoped player projection;

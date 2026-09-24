@@ -1,0 +1,157 @@
+{
+  "cases": [
+    {
+      "case": "new_model_same_enemy_unit",
+      "allowed_enemy_model_ids": [
+        "army-beta:enemy:core-intercessor-like:001"
+      ],
+      "engaged_enemy_model_ids_after": [
+        "army-beta:enemy:core-intercessor-like:001",
+        "army-beta:enemy:core-intercessor-like:002"
+      ],
+      "enemy_unit_id": "army-beta:enemy",
+      "placement": [
+        12,
+        12
+      ],
+      "expected_legal": true,
+      "status": "invalid",
+      "status_payload": {
+        "game_id": "order81-revival-new_model_same_enemy_unit",
+        "request_id": "order81-revival:healing-step-001:placement",
+        "result_id": "order81-revive-placement",
+        "invalid_reason": "malformed_or_invalid:GameLifecycleError"
+      },
+      "lifecycle_unchanged": true,
+      "checkpoint_exact": true,
+      "validator_diagnostic": {
+        "status": "rejected",
+        "error_type": "GameLifecycleError",
+        "message": "Revived model engages a new enemy model."
+      },
+      "pending_viewer_results": {
+        "player-a": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        },
+        "player-b": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        }
+      },
+      "final_viewer_results": {
+        "player-a": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        },
+        "player-b": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        }
+      },
+      "replay": "reproduced"
+    },
+    {
+      "case": "old_enemy_model_only",
+      "allowed_enemy_model_ids": [
+        "army-beta:enemy:core-intercessor-like:001"
+      ],
+      "engaged_enemy_model_ids_after": [
+        "army-beta:enemy:core-intercessor-like:001"
+      ],
+      "enemy_unit_id": "army-beta:enemy",
+      "placement": [
+        11.5,
+        12.5
+      ],
+      "expected_legal": true,
+      "status": "waiting_for_decision",
+      "status_payload": {
+        "phase": "movement",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "legal_unit_count": 1
+      },
+      "lifecycle_unchanged": false,
+      "checkpoint_exact": true,
+      "validator_diagnostic": {
+        "status": "accepted"
+      },
+      "pending_viewer_results": {
+        "player-a": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        },
+        "player-b": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        }
+      },
+      "final_viewer_results": {
+        "player-a": {
+          "status": "projected",
+          "projection_state_hash": "9ff6d929eca14f4cd013790b89cc48b9eb7e8a7aa6ff07fa6f8bc36717ffb7b4"
+        },
+        "player-b": {
+          "status": "projected",
+          "projection_state_hash": "1529a1fd8f3b8b10e3d6aeb8099ad58dc424c9ad74151563678f4f0e4dd421b4"
+        }
+      },
+      "replay": "reproduced"
+    },
+    {
+      "case": "unengaged",
+      "allowed_enemy_model_ids": [
+        "army-beta:enemy:core-intercessor-like:001"
+      ],
+      "engaged_enemy_model_ids_after": [],
+      "enemy_unit_id": "army-beta:enemy",
+      "placement": [
+        8.5,
+        15
+      ],
+      "expected_legal": true,
+      "status": "waiting_for_decision",
+      "status_payload": {
+        "phase": "movement",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "legal_unit_count": 1
+      },
+      "lifecycle_unchanged": false,
+      "checkpoint_exact": true,
+      "validator_diagnostic": {
+        "status": "accepted"
+      },
+      "pending_viewer_results": {
+        "player-a": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        },
+        "player-b": {
+          "status": "projection_error",
+          "error_type": "GameLifecycleError",
+          "message": "Parameterized DecisionRequest payload missing proposal_request."
+        }
+      },
+      "final_viewer_results": {
+        "player-a": {
+          "status": "projected",
+          "projection_state_hash": "89d8c6e70d4985afc1dca39426e55b1c3ae4ae857a325a98b2585d32439e6611"
+        },
+        "player-b": {
+          "status": "projected",
+          "projection_state_hash": "0756a74f3b10fd3683f55b30560110d459ba581aeb3a47827dcacf0170159b44"
+        }
+      },
+      "replay": "reproduced"
+    }
+  ]
+}

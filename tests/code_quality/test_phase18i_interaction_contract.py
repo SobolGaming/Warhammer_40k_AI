@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -11,7 +12,10 @@ from scripts.tacoma_2026_source_audit import audit_tacoma_2026_sources
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
+    ParameterizedRequestLayout,
     adapter_visible_interaction_decision_types,
+    decision_interaction_support_rows,
+    parameterized_request_layout,
     registered_interaction_decision_types,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -222,3 +226,96 @@ def _unique_string_set(value: JsonValue) -> set[str]:
     assert values
     assert len(values) == len(set(values))
     return set(values)
+
+
+def test_parameterized_request_layouts_cover_dispatch_and_published_examples() -> None:
+    registered = {
+        contract.decision_type
+        for contract in GameLifecycle().decision_dispatch_contracts
+        if contract.submission_kind.value == "parameterized"
+    }
+    assert registered == {
+        row["decision_type"]
+        for row in decision_interaction_support_rows()
+        if row["submission_kind"] == "parameterized"
+    }
+    flat = {
+        "submit_healing_revival_placement",
+        "submit_return_on_death_placement",
+        "submit_catalog_model_materialization_placement",
+        "submit_cult_ambush_marker_placement",
+    }
+    for decision_type in registered:
+        expected = (
+            ParameterizedRequestLayout.FLAT
+            if decision_type in flat
+            else ParameterizedRequestLayout.NESTED
+        )
+        assert parameterized_request_layout(decision_type) is expected
+    examples = json.loads(
+        (ROOT / "contracts/examples/decisions/interaction-conformance.json").read_text()
+    )
+    covered: set[str] = set()
+    for case in examples["cases"]:
+        request = case["request"]
+        if not request["is_parameterized"]:
+            continue
+        decision_type = request["decision_type"]
+        covered.add(decision_type)
+        assert ("proposal_request" in request["payload"]) == (decision_type not in flat)
+    assert covered == registered
+    projection = (ROOT / "src/warhammer40k_core/adapters/projection.py").read_text()
+    assert "parameterized_proposal_request_payload(request)" in projection
+    context_reader = (
+        INTERACTION_MODULE.read_text()
+        .split("def _request_context(", 1)[1]
+        .split("def _proposal_kind(", 1)[0]
+    )
+    assert "parameterized_proposal_request_payload(request)" in context_reader
+    assert "def _metadata_bearing_proposal_request" not in projection
+
+
+def test_order81_matched_projection_component_budget() -> None:
+    folder = ROOT / "docs/performance/order81"
+    base = json.loads((folder / "projection-base.json").read_text())
+    head = json.loads((folder / "projection-head.json").read_text())
+    budgets = json.loads((folder / "projection-budgets.json").read_text())
+    assert base["workload"] == head["workload"] == budgets["workload"]
+    for key in (
+        "python",
+        "platform",
+        "cpu",
+        "logical_cpus",
+        "memory_bytes",
+        "workers",
+        "lock_sha256",
+        "script_sha256",
+        "fixture_sha256",
+    ):
+        assert base[key] == head[key]
+    assert (
+        head["script_sha256"]
+        == hashlib.sha256(
+            (ROOT / "scripts/benchmark_order81_projection.py").read_bytes()
+        ).hexdigest()
+    )
+    assert (
+        head["fixture_sha256"]
+        == hashlib.sha256((ROOT / "tests/order81_projection_helpers.py").read_bytes()).hexdigest()
+    )
+    assert len(base["rows"]) == len(head["rows"]) == 2
+    for before, after in zip(base["rows"], head["rows"], strict=True):
+        assert before["case"] == after["case"]
+        assert len(before["samples_seconds"]) == len(after["samples_seconds"]) == 9
+        assert before["iterations_per_sample"] == after["iterations_per_sample"] == 2000
+        assert (
+            after["mean_seconds"]
+            <= before["mean_seconds"] * budgets["mean_ratio"] + budgets["mean_additive_seconds"]
+        )
+        assert after["maximum_seconds"] <= budgets["maximum_seconds"]
+    assert (
+        base["proposal_projections"]["nested_request"]
+        == head["proposal_projections"]["nested_request"]
+    )
+    assert base["proposal_projections"]["flat_request"]["status"] == "projection_error"
+    assert head["proposal_projections"]["flat_request"]["status"] == "projected"

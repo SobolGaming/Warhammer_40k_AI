@@ -161,6 +161,10 @@ non-closable grouping label, not a finding ID or closure key.
   direct consumers under P09C, including reactive moves across player turns.
 - `C14-03` owns turn-end objective-control precedence over boundary rules and
   cleanup, including scoring and historical consumers, under P14A.
+- `C03-05` owns the shared parameterized-request projection mismatch under P03E,
+  reproduced by the revival placement producer and audited across sibling builders.
+- `C01-05` owns canonical enemy rules-unit engagement for model revival under P01E;
+  individual enemy model identity must not impose a stricter Core restriction.
 - `CAUDIT-01` owns the final all-category audit and certification gate. It is
   not an implementation finding and cannot close while any in-scope finding is
   open.
@@ -282,8 +286,10 @@ corroborate but is not required to begin that work.
 | 77 | P16B | C16-03 | PFINAL preflight reproduced an Action completing after a validated reactive Normal Move that returns to its initial pose. | Derive Action interruption from authoritative completed-move evidence rather than net displacement; share live/restore interpretation, audit ordinary and reactive callers and attached lineage, and preserve decline/Remain Stationary/pile-in/consolidation distinctions, facade/replay/viewer authority and restriction lifetimes. See [Order 77 prerequisite](ORDER_77_PREFLIGHT_AUDIT.md). | Retained 16.01 Action interruption and 03.01 cumulative movement; September 22 maintained-mirror corroboration, no source wording change. | P16, P03D | IMPLEMENTATION-GAP |
 | 78 | P13A | C13-01 | PFINAL revalidation reproduced a Hidden target outside dense terrain remaining visible and shootable despite qualifying intervening dense concealment. | Apply source-backed Gone to Ground from Hidden state, causal dense-feature concealment and current/previous-turn ranged history without an extra occupancy condition. Audit both shared visibility consumers, per-model/attached scope, reaction shooting, facade/restore/replay, source identity and performance. See [Order 78 prerequisite](ORDER_78_PREFLIGHT_AUDIT.md). | [13.11.01 Gone to Ground](https://www.40k.app/rules/13-terrain), complete unversioned maintained-mirror observation on September 23; no official-App conflict observed. | P06C, S-MIRRORS | IMPLEMENTATION-GAP |
 | 79 | P14A | C14-03 | The shared state owner captures turn-end objective control after coherency cleanup, which can remove controlling models and wrongly change scores. The initial numerical Aircraft example was withdrawn: Aircraft have source-dash OC; their departure tests event order only. | Determine and freeze turn-end control before all turn-end rules and cleanup, preserving distinct phase boundaries, sequenced choices, scoring, historical authority, adapters and exact replay. See [Order 79 preflight](ORDER_79_PREFLIGHT_AUDIT.md). Owner-approved implementation freezes the distinct turn boundary before rule discovery; retained authority validates event order. | [14.02.01](https://www.40k.app/rules/14-objectives), complete unversioned September 23 observation matching the retained stable source row; no source interpretation change. | P14, P01D, P23 | IMPLEMENTATION-GAP |
-| 80 | P09C | C09-03 | Normal Move history keys the battle round, phase kind and unit owner, so a reactive move during the first player’s Movement phase incorrectly blocks the unit’s Normal Move in the second player’s Movement phase of that round. | Use an authenticated phase occurrence including the turn owner across ordinary/reactive validation, recording, restore and direct history consumers. Preserve same-phase limits, attached lineage, stationary and Transport classification, both viewers and exact replay. See [Order 80 preflight](ORDER_80_PREFLIGHT_AUDIT.md). Implemented in this PR after owner approval; merge and fresh PFINAL audit remain required. | [09.05.01](https://www.40k.app/rules/09-movement-phase) and [07.02](https://www.40k.app/rules/07-the-battle-round), unversioned September 23 browser observation; no source ambiguity observed. | P09A, P09B, P21B, P14A | IMPLEMENTATION-GAP |
-| 81 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 79 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
+| 80 | P09C | C09-03 | Normal Move history keys the battle round, phase kind and unit owner, so a reactive move during the first player’s Movement phase incorrectly blocks the unit’s Normal Move in the second player’s Movement phase of that round. | Use an authenticated phase occurrence including the turn owner across ordinary/reactive validation, recording, restore and direct history consumers. Preserve same-phase limits, attached lineage, stationary and Transport classification, both viewers and exact replay. See [Order 80 preflight](ORDER_80_PREFLIGHT_AUDIT.md). Merged in PR #500; fresh PFINAL audit remains required. | [09.05.01](https://www.40k.app/rules/09-movement-phase) and [07.02](https://www.40k.app/rules/07-the-battle-round), unversioned September 23 browser observation; no source ambiguity observed. | P09A, P09B, P21B, P14A | IMPLEMENTATION-GAP |
+| 81 | P03E | C03-05 | PFINAL preflight reproduces both viewers failing to project an engine-created revival placement request because the shared adapter assumes every parameterized request has a nested proposal_request. Other existing placement builders emit the same flat shape. | Reconcile all existing parameterized request families with one typed shared projection/interaction contract, preserving fail-closed validation, viewer redaction, headless/network authority and exact restore/replay. Add real producer-to-facade regressions and required generated contract checks; do not insert a permissive fallback. See [Order 81 preflight and implementation](ORDER_81_PREFLIGHT_AUDIT.md). Implemented after owner approval; merge and fresh audit remain required. | Existing Phase 11D adapter contract and Core 03.02 / 01.02.03 placement consumers; no rules wording change. | P03D, P09C | IMPLEMENTATION-GAP |
+| 82 | P01E | C01-05 | PFINAL preflight reproduces a legal revived-model placement rejected when it engages another model in an already-engaged enemy rules unit; the shared validator and HealingEffect evidence track individual enemy models. | Apply 01.02.03 engagement eligibility to canonical enemy rules units, including attached and retained presence; preserve phase-start coherency, source restrictions, invalid-submission atomicity, historical authentication, both viewers and exact replay. Audit every shared revival producer and consumer. See [Order 81 source and reproduction](ORDER_81_PREFLIGHT_AUDIT.md). Awaiting owner approval for implementation. | [01.02.03 Revived and Adding Models to a Unit](https://www.40k.app/rules/01-core-concepts#01.02.03), complete expanded unversioned browser observation on September 23. | P03E, P05B, P19 | IMPLEMENTATION-GAP |
+| 83 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01–25 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All 81 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
 Category 07 has no standalone remediation PR and remains `REVALIDATE`.
 Category 13's Light/Dense Hidden wording is governed by the maintained mirror
@@ -3074,7 +3080,7 @@ audit and must commit the final audit artifact, generated report, validation
 results, snapshot identity, provider/version evidence, and the evidence
 supporting `CAUDIT-01` closure.
 
-PFINAL (now Order 81) must also assess representative complete headless games using the
+PFINAL (now Order 83) must also assess representative complete headless games using the
 existing legal driver or recorded workload, including the continuous terrain
 solver introduced by Order 74. Record completion, per-game timing, declared
 hardware and workload, and the standing below-60-second mean / at-most-300-second
@@ -5459,3 +5465,27 @@ authentication, contract 35 migration and direct consumer regressions.
 No PFINAL PR is open, no complete 25-category snapshot is certified, and
 CAUDIT-01 remains open. After P09C merges, repeat the complete audit from
 current main. Complete-game performance remains uncertified.
+
+
+## Order 81 preflight — revival and parameterized placement findings
+
+Fresh PFINAL preflight of main `45561d864c3634ce1d0e00d2b6599091ef43ed58`
+(PR #500, merged 2026-09-24 UTC / September 23 America/New_York) reproduces
+C03-05 and C01-05. All three bounded revival cases round-trip checkpoints and
+reproduce replay exactly. Both viewers fail to project the pending revival
+request. A legal placement beside an additional model of the already-engaged
+enemy unit is rejected, while existing-model and unengaged controls succeed.
+See [the source, reproducible diagnostic, consumer audit and acceptance plan](ORDER_81_PREFLIGHT_AUDIT.md).
+
+The roadmap's mandatory insertion rule assigns P03E to Order 81, P01E to Order
+82 and PFINAL to Order 83. The current inventory is 81 implementation PRs,
+S-MIRRORS and PFINAL (83 rows). Earlier counts and order numbers remain
+historical. Implement and merge these prerequisites one at a time, then restart
+the complete audit from current main. The owner subsequently approved P03E;
+this PR implements the shared projection prerequisite. P01E gameplay work
+remains a separate prerequisite pending scope approval.
+
+This is a blocked bounded preflight, not a complete 25-category audit. No PFINAL
+PR is open, no complete snapshot has been selected or certified, and CAUDIT-01
+remains open. Complete-game performance also remains uncertified; no legal
+representative complete-game workload was found or measured.

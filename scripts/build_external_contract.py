@@ -74,7 +74,9 @@ from warhammer40k_core.engine.interaction_metadata import (
     INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION,
     INTERACTION_DESCRIPTOR_SCHEMA_VERSION,
     InteractionKind,
+    ParameterizedRequestLayout,
     interaction_annotated_decision_request_payload,
+    parameterized_request_layout,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.replay import REPLAY_ARTIFACT_SCHEMA_VERSION
@@ -830,7 +832,11 @@ def _write_interaction_conformance_examples() -> None:
             request_id=f"interaction-conformance:{payload_kind}",
             decision_type=decision_type,
             actor_id="player-a",
-            payload={"proposal_request": {"proposal_kind": proposal_kind}},
+            payload=(
+                {"proposal_kind": proposal_kind}
+                if parameterized_request_layout(decision_type) is ParameterizedRequestLayout.FLAT
+                else {"proposal_request": {"proposal_kind": proposal_kind}}
+            ),
             options=(parameterized_decision_option(),),
         )
         annotated = interaction_annotated_decision_request_payload(request)

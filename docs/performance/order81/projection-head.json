@@ -1,0 +1,64 @@
+{
+  "workload": "order81-shared-parameterized-projection-v1",
+  "python": "3.14.5",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "cpu": "Apple M5 Pro",
+  "logical_cpus": 18,
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "workers": 1,
+  "coverage": false,
+  "scope": "Request projection only; setup excluded. No full-game timing claim.",
+  "fixture": "5-model recipient/enemy; one destroyed recipient; no terrain or random draws.",
+  "script_sha256": "e25149ab845d3ccffc79fa45dd57e50ddce8f4ac704d2c2dddcd86dbb6d96290",
+  "fixture_sha256": "d36a55d1349116ab7e080a9ceb6a4740a2122eb4971c73cc51635bc6358c81cc",
+  "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+  "rows": [
+    {
+      "case": "nested_request",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        2.277025000512367e-05,
+        2.2670625003229362e-05,
+        2.2646104000159538e-05,
+        2.2859562493977136e-05,
+        2.2641791496425867e-05,
+        2.2752958502678667e-05,
+        2.2500874998513608e-05,
+        2.2538728997460566e-05,
+        2.2579146003408824e-05
+      ],
+      "mean_seconds": 2.2662226833441916e-05,
+      "median_seconds": 2.2646104000159538e-05,
+      "maximum_seconds": 2.2859562493977136e-05
+    },
+    {
+      "case": "flat_request",
+      "iterations_per_sample": 2000,
+      "samples_seconds": [
+        3.035589600040112e-05,
+        3.0137166504573543e-05,
+        3.0090937500062863e-05,
+        3.0110624997178094e-05,
+        3.0097333503363187e-05,
+        3.0130416496831457e-05,
+        3.0104229495918842e-05,
+        3.032095849630423e-05,
+        3.019352100091055e-05
+      ],
+      "mean_seconds": 3.017123155506043e-05,
+      "median_seconds": 3.0130416496831457e-05,
+      "maximum_seconds": 3.035589600040112e-05
+    }
+  ],
+  "proposal_projections": {
+    "nested_request": {
+      "status": "projected",
+      "payload_sha256": "991d5789b1fa9e8819372691eae4f9c3845c416a1bd540ccf0a107fc6e88ac1b"
+    },
+    "flat_request": {
+      "status": "projected",
+      "payload_sha256": "f9d036f0748de90368b802f0503c3bd1d99301d2aedce81e4a41f6ba954c21d1"
+    }
+  }
+}

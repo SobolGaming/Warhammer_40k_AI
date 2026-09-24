@@ -1,0 +1,129 @@
+{
+  "schema": "core-v2-pfinal-bounded-preflight-v1",
+  "reviewed_commit": "45561d864c3634ce1d0e00d2b6599091ef43ed58",
+  "review_date": "2026-09-23",
+  "timezone": "America/New_York",
+  "prerequisite_pr": {
+    "number": 500,
+    "merged_at": "2026-09-24T00:12:12Z",
+    "remote_main_matches": true,
+    "open_prs": []
+  },
+  "audit_status": "blocked_before_complete_25_category_audit",
+  "caudit_01": "open",
+  "complete_snapshot_selected": false,
+  "findings": [
+    {
+      "id": "C03-05",
+      "owner": "P03E",
+      "order": 81,
+      "status": "reproduced",
+      "summary": "Both viewer projections reject the engine-created flat parameterized revival placement request. Shared producer-shape audit identifies sibling consumers."
+    },
+    {
+      "id": "C01-05",
+      "owner": "P01E",
+      "order": 82,
+      "status": "reproduced",
+      "summary": "A legal revival beside another model in an already-engaged enemy rules unit is rejected by individual-model evidence."
+    }
+  ],
+  "pfinal_order": 83,
+  "source_observations": [
+    {
+      "observation_id": "order81-preflight:01.02.03:revival-engagement",
+      "provider": "40k.app",
+      "provider_url": "https://www.40k.app/rules/01-core-concepts#01.02.03",
+      "observed_at": "2026-09-23T20:22:26-04:00",
+      "app_data_version": null,
+      "clause_locator": "01.02.03 Revived and Adding Models to a Unit",
+      "non_affiliated_provider": true,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "retained_scope": "operative engagement subclause excerpt; expanded complete clause inspected",
+      "operative_excerpt": "but only if those enemy units were already engaged with the unit that model is being returned to.",
+      "runtime_source_registered": false,
+      "complete_category_transcription": false,
+      "transcription_sha256": "474cab7d6e9827d94d96ac29853f9eabc02d0464aaf747c8e5132f9aae5156b0",
+      "source_observation_sha256": "8455d2d3bc6d40645c0b4013274401f08b7e4ddbf5cd5e11893c089c8c9cf0dd"
+    }
+  ],
+  "mirror_comparison": {
+    "game_datamissions_url": "https://game-datamissions.com/11th/rules/changelog",
+    "observed_selected_version": 946,
+    "observed_version_date": "2026-09-02",
+    "observed_entry": "18.04.01 Rapid Disembark And Limitations",
+    "co_versioned_01_02_03_observation_available": false,
+    "official_app_comparison_performed": false,
+    "status": "no_co_versioned_comparison_claimed"
+  },
+  "probe": {
+    "script": "scripts/probe_order81_revival.py",
+    "script_sha256": "df57c4cc6240e3cf478fe53e1125be7c383b3dc53f56c7b19dd565de9ef5f238",
+    "command": "PYTHONPATH=.:src uv run --no-sync python scripts/probe_order81_revival.py",
+    "result": "docs/performance/order81/probe-results.json",
+    "result_sha256": "b3c72d2193e6f0e8b4d58b7fd1674a38b826d99b2d70cbd6ccf7237133b1d7b5",
+    "cases": 3,
+    "known_bad_semantics_expected": true,
+    "checkpoint_round_trips": 3,
+    "exact_replays": 3,
+    "pending_projection_failures": 6,
+    "accepted_control_cases": 2,
+    "initial_fixture_correction": "Replaced unrecorded casualty setup with the real rule-destruction owner and deployment evidence before retaining final results.",
+    "artifact_packaging_correction": "The original complete report was retained in reports/order81/probe-results.json, but the documentation copy was empty. Restored the preserved report and confirmed exact JSON equality by rerunning the committed diagnostic against isolated base runtime 45561d864c3634ce1d0e00d2b6599091ef43ed58."
+  },
+  "validation": {
+    "focused_behavior": {
+      "command": "uv run --no-sync pytest tests/unit/test_phase14h_healing.py -q --no-cov",
+      "passed": 29,
+      "seconds": 4.43,
+      "report": "docs/performance/order81/focused-healing.txt",
+      "report_sha256": "3517c8237b68511b1f9996a8456e6a94fdcc628b87a93a2807151c317385dfc7"
+    },
+    "focused_quality": {
+      "command": "uv run --no-sync pytest tests/code_quality/test_core_rules_roadmap.py -q --no-cov",
+      "passed": 5,
+      "seconds": 0.09,
+      "report": "docs/performance/order81/focused-roadmap.txt",
+      "report_sha256": "f805bf70b312b54eca19641a411d14f3254397f23fa0e6d5aa13f3a97682bf05"
+    },
+    "passed_commands": [
+      "uv run --no-sync ruff check scripts/probe_order81_revival.py tests/code_quality/test_core_rules_roadmap.py",
+      "uv run --no-sync ruff format --check scripts/probe_order81_revival.py tests/code_quality/test_core_rules_roadmap.py",
+      "uv run --no-sync python tools/core_rules_40k_app_audit.py --check",
+      "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "git diff --check"
+    ],
+    "environment": "UV_CACHE_DIR=/private/tmp/order81-uv-cache; default cache was sandbox-inaccessible",
+    "final_aggregate_gates": "not run: bounded preflight blocked, no production changes or PR publication",
+    "behavioral_test_inventory_changed": false
+  },
+  "complete_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "samples": [],
+    "mean_seconds": null,
+    "max_seconds": null,
+    "certified": false,
+    "target_mean_seconds_exclusive": 60,
+    "target_max_seconds_inclusive": 300,
+    "available_interface": "src/warhammer40k_core/adapters/headless.py:submit_headless_decision (single pending decision)",
+    "missing_prerequisites": [
+      "representative versioned legal complete-game driver or complete recording",
+      "declared legal rosters, terrain, seeds and decision policy",
+      "initialization through normal completion, including replay/log output",
+      "representative workload exercising Order 74 continuous terrain solver"
+    ],
+    "provisional_host": {
+      "cpu": "Apple M5 Pro",
+      "logical_cpus": 18,
+      "memory_bytes": 68719476736,
+      "os": "macOS 26.7",
+      "os_build": "25G229"
+    }
+  },
+  "publication": {
+    "pr_created": false,
+    "implementation_scope_approval": "pending",
+    "reason": "Roadmap prohibits opening PFINAL after discovery of a gap; AGENTS.md requires scope approval before broadening certification into gameplay/adapter remediation."
+  }
+}

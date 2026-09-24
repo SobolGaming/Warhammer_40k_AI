@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import pytest
 from tests.horror_destruction_helpers import resolve_horror_completion
+from tests.parameterized_projection_helpers import assert_parameterized_projection
 from tests.support.catalog_package_fixtures import horrors_package
 from tests.support.catalog_runtime_fixtures import (
     battle_state_with_armies,
@@ -206,6 +207,7 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
         == request.to_payload()
     )
 
+    assert_parameterized_projection(restored_pending_lifecycle)
     valid_payload = _placement_payload(
         request=request,
         army=scenario.source_army,

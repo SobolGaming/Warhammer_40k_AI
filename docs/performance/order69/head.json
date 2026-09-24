@@ -7,8 +7,8 @@
   "host_role": "provisional",
   "cpu_allocation": 18,
   "concurrency": 1,
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b8a7d30ebbd46a14759d7378ed9fc8b8073cf20a08b3a61a9f8df6e010ab7a94",
   "timing_boundary": "100 validate_roster_legality calls; catalog/request construction excluded; no gameplay, terrain, RNG or decisions",
   "hashes": {
     "scripts/measure_order68.py": "aa9ef50a607044c756347e11193a6ea1a2e56ffe406c3fdd8ec15aad9ff43890",
@@ -19,16 +19,16 @@
       "unit_count": 2,
       "model_count": 6,
       "samples_seconds": [
-        0.01160100000561215,
-        0.011500542008434422,
-        0.011394000001018867,
-        0.011417874993639998,
-        0.011424750002333894,
-        0.011331917005009018,
-        0.011362833000021055
+        0.011387334001483396,
+        0.010851290993741713,
+        0.010860333000891842,
+        0.010904082999331877,
+        0.010855708998860791,
+        0.010898666994762607,
+        0.010921749999397434
       ],
-      "mean_seconds": 0.011433273859438486,
-      "maximum_seconds": 0.01160100000561215,
+      "mean_seconds": 0.010954166712638522,
+      "maximum_seconds": 0.011387334001483396,
       "complete": true,
       "violation_codes": [
         "source_awaiting_unit_points"
@@ -38,16 +38,16 @@
       "unit_count": 4,
       "model_count": 16,
       "samples_seconds": [
-        0.013443541000015102,
-        0.013435540997306816,
-        0.013411167004960589,
-        0.013398958995821886,
-        0.01339637499768287,
-        0.013322832994163036,
-        0.013340334000531584
+        0.012863374999142252,
+        0.012779625001712702,
+        0.012847250007325783,
+        0.013052624999545515,
+        0.01294400000188034,
+        0.01280770800076425,
+        0.01285299999290146
       ],
-      "mean_seconds": 0.013392678570068841,
-      "maximum_seconds": 0.013443541000015102,
+      "mean_seconds": 0.012878226143324614,
+      "maximum_seconds": 0.013052624999545515,
       "complete": true,
       "violation_codes": [
         "source_awaiting_unit_points"
@@ -57,16 +57,16 @@
       "unit_count": 20,
       "model_count": 96,
       "samples_seconds": [
-        0.030685875011840835,
-        0.03055320899875369,
-        0.030625875006080605,
-        0.030564832995878533,
-        0.030677665999974124,
-        0.030463542003417388,
-        0.030557582998881117
+        0.029744750005193055,
+        0.02933758299332112,
+        0.029392208001809195,
+        0.029341540997847915,
+        0.029645000002346933,
+        0.029502541990950704,
+        0.030004542000824586
       ],
-      "mean_seconds": 0.03058979757354661,
-      "maximum_seconds": 0.030685875011840835,
+      "mean_seconds": 0.02956688085604193,
+      "maximum_seconds": 0.030004542000824586,
       "complete": true,
       "violation_codes": [
         "source_awaiting_unit_points",

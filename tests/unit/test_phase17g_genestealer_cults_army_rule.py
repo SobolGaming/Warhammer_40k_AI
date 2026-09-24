@@ -13,6 +13,7 @@ from tests.fight_movement_event_helpers import (
     standalone_fight_movement_event_evidence,
 )
 from tests.move_marker_fixture_helpers import resolve_cult_markers_for_fixture
+from tests.parameterized_projection_helpers import assert_parameterized_projection
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -799,6 +800,7 @@ def test_marker_placement_validates_enemy_distance_and_serializes() -> None:
         enemy_x=30.0,
         enemy_y=30.0,
     )
+    assert_parameterized_projection(GameLifecycle(state=state, decision_controller=decisions))
     _assert_cult_ambush_submission_variants(marker_request)
     invalid_result = _marker_placement_result(
         request=marker_request,

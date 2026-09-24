@@ -4944,9 +4944,7 @@
           }
         ],
         "payload": {
-          "proposal_request": {
-            "proposal_kind": "cult_ambush_marker_placement"
-          }
+          "proposal_kind": "cult_ambush_marker_placement"
         },
         "request_id": "interaction-conformance:cult_ambush_marker_placement",
         "schema_version": "annotated-decision-request-v2-primary-assignments"
@@ -5026,9 +5024,7 @@
           }
         ],
         "payload": {
-          "proposal_request": {
-            "proposal_kind": "cult_ambush_marker_placement"
-          }
+          "proposal_kind": "cult_ambush_marker_placement"
         },
         "request_id": "interaction-conformance:cult_ambush_no_marker",
         "schema_version": "annotated-decision-request-v2-primary-assignments"
@@ -5665,9 +5661,7 @@
           }
         ],
         "payload": {
-          "proposal_request": {
-            "proposal_kind": "healing_revival_placement"
-          }
+          "proposal_kind": "healing_revival_placement"
         },
         "request_id": "interaction-conformance:healing_revival_placement",
         "schema_version": "annotated-decision-request-v2-primary-assignments"
@@ -5872,9 +5866,7 @@
           }
         ],
         "payload": {
-          "proposal_request": {
-            "proposal_kind": "model_materialization_placement"
-          }
+          "proposal_kind": "model_materialization_placement"
         },
         "request_id": "interaction-conformance:model_materialization_placement",
         "schema_version": "annotated-decision-request-v2-primary-assignments"
@@ -6962,9 +6954,7 @@
           }
         ],
         "payload": {
-          "proposal_request": {
-            "proposal_kind": "return_on_death_placement"
-          }
+          "proposal_kind": "return_on_death_placement"
         },
         "request_id": "interaction-conformance:submit_return_on_death_placement",
         "schema_version": "annotated-decision-request-v2-primary-assignments"
