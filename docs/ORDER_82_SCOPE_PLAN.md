@@ -1,6 +1,6 @@
 # Order 82 / P01E — revived-model engagement
 
-Status: implemented and locally validated; PR publication pending. Finding C01-05.
+Status: implemented and locally validated in [PR #502](https://github.com/SobolGaming/Warhammer_40k_AI/pull/502); merge pending. Finding C01-05.
 Dependency: Order 81 / C03-05 merged as PR #501, main
 `c0d172f2f209f75144da1625b0f5b6f0721b9c34`. The owner's September 24 request
 approves this implementation. PFINAL remains Order 83 and requires a fresh
@@ -112,5 +112,5 @@ and projection budget remain unchanged. No complete game is measured or certifie
 
 Final validation: 9,177 behavioral tests passed with 85.22% coverage; 615 code-quality tests passed. All required local gates passed.
 Commands, hashes, counts and limitations are recorded in
-`docs/performance/order82/validation.json`. PR URL and merge commit: pending;
-merge is the owner's next step after review, not part of this implementation.
+`docs/performance/order82/validation.json`. PR URL: [#502](https://github.com/SobolGaming/Warhammer_40k_AI/pull/502).
+Merge commit: pending owner review and merge.

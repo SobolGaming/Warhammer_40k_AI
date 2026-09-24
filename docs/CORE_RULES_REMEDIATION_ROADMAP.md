@@ -5493,7 +5493,7 @@ representative complete-game workload was found or measured.
 
 ## Order 82 / P01E — revived-model engagement
 
-- Status: implemented and locally validated on the owner's September 24 request; publication pending.
+- Status: implemented and locally validated in [PR #502](https://github.com/SobolGaming/Warhammer_40k_AI/pull/502); merge pending.
 - Finding IDs: C01-05.
 - Dependencies and evidence gate: P03E merged in PR #501; based on main
   `c0d172f2f209f75144da1625b0f5b6f0721b9c34`. PFINAL remains open.
@@ -5521,4 +5521,4 @@ representative complete-game workload was found or measured.
   client; shard inventory; matched performance and final validation evidence.
 - Validation results: 9,177 behavioral tests passed with 85.22% coverage; 615 code-quality tests passed; all required local gates passed.
   See `docs/performance/order82/validation.json`. Complete-game performance and Core certification remain uncertified.
-- PR URL and merge commit: pending publication; merge remains the owner's action.
+- PR URL: [#502](https://github.com/SobolGaming/Warhammer_40k_AI/pull/502). Merge commit: pending owner review and merge.
