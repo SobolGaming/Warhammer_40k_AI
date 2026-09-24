@@ -954,6 +954,7 @@ def test_reactive_resolver_rejects_keyword_grants_outside_source_modes(
                 )
             ),
             battle_round=state.battle_round,
+            turn_player_id="player-a",
             move_keyword_choice=keyword_choice_context(
                 descriptor=source.movement_abilities()[0],
                 unit=rules_unit_view_by_id(

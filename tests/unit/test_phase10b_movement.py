@@ -898,6 +898,7 @@ def _record_prior_normal_move(
     state.record_normal_move_state(
         NormalMoveState(
             player_id="player-a",
+            turn_player_id="player-a",
             battle_round=state.battle_round,
             phase=BattlePhase.MOVEMENT,
             unit_instance_id=unit_instance_id,

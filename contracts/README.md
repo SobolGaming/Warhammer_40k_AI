@@ -1,6 +1,10 @@
 # CORE V2 external contract
 
-Contract version: `34.0.0`
+Contract version: `35.0.0`
+
+Contract 35 separates both players’ Normal Move phase occurrences. Persisted
+records require an explicit turn owner; replay authenticates that owner against
+accepted decisions. See [migration 34 to 35](migrations/34-to-35.md).
 
 Order 79 / P14A freezes turn-end objective control before turn-end rules and
 cleanup. Existing boundary events, finite choices and retained control records

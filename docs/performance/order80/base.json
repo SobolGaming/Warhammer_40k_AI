@@ -1,0 +1,54 @@
+{
+  "workload": "order80-normal-move-occurrence-v1",
+  "revision": "dc01911f57024ae69b565a0e965db65abf5fbdbe",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "host_role": "provisional",
+  "concurrency": 1,
+  "timing_boundary": "Accepted reactive move through next player Movement action enumeration, session checkpoint export and restore; initial scene/permission preparation excluded; three serial samples without coverage",
+  "hashes": {
+    "scripts/measure_order80.py": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "tests/normal_move_occurrence_helpers.py": "52169e54f13f5dc49774d1bec3a54f3ac44b303b5eb85e699a3f5dc041b0e837",
+    "tests/phase15c_fight_order_helpers.py": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "finite",
+      "samples_seconds": [
+        2.1170224999950733,
+        2.0715103749971604,
+        2.112109249996138
+      ],
+      "mean_seconds": 2.1002140416627904,
+      "maximum_seconds": 2.1170224999950733,
+      "complete": true,
+      "normal_move_available": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "case": "parameterized",
+      "samples_seconds": [
+        2.0143076250096783,
+        2.025394416996278,
+        2.0127440829965053
+      ],
+      "mean_seconds": 2.017482041667487,
+      "maximum_seconds": 2.025394416996278,
+      "complete": true,
+      "normal_move_available": [
+        false,
+        false,
+        false
+      ]
+    }
+  ],
+  "full_game_certified": false,
+  "semantic_note": "Base wrongly omits Normal Move; timing compares the same submitted decisions and checkpoint work, not semantic equivalence"
+}

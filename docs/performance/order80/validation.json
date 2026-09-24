@@ -1,0 +1,288 @@
+{
+  "scope": "Order 80 / P09C \u2014 Normal Move phase occurrence identity",
+  "reviewed_base": "dc01911f57024ae69b565a0e965db65abf5fbdbe",
+  "approval": "User: Approved to fix identified gaps",
+  "implementation_authorized": true,
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ec8838e24359f11dae55ce932f94c1af38a8c6f217613c782a49f67678a702ae",
+  "scope_audit": {
+    "owner": "engine.normal_move_history via shared move completion",
+    "frozen_game_state_extracted": true,
+    "new_named_handlers": 0,
+    "source_package_bytes_unchanged": true,
+    "external_contract_major": 35,
+    "remaining_scope": "Remote PR publication; implementation and local validation complete"
+  },
+  "red_regression": {
+    "reviewed_base_failures": 4,
+    "cases": "standalone/attached \u00d7 finite/parameterized opponent-turn reaction before own Normal Move",
+    "log_path": "/tmp/order80-red.log"
+  },
+  "focused_validation": {
+    "existing_triggered_and_transport_tests_passed": 275,
+    "normal_move_and_surge_tests_passed": 93,
+    "checkpoint_corrections_passed": 13,
+    "order80_behavioral_cases": 24
+  },
+  "final_validation_status": "passed",
+  "full_game_performance": {
+    "attempted": 0,
+    "completed": 0,
+    "certified": false
+  },
+  "pfinal_order": 81,
+  "caudit_01_closed": false,
+  "recorded_at": "2026-09-23T22:09:01.961165+00:00",
+  "behavioral_suite": {
+    "tests": 9045,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "coverage_percent": 85.21,
+    "required_coverage_percent": 85,
+    "distribution": "xdist worksteal, 18 workers",
+    "junit_sha256": "3d9ca94607a19837b8a0a0cc1f7e7b1880095febef213a6c769f4c55d5d51601"
+  },
+  "code_quality_suite": {
+    "tests": 608,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "coverage": false,
+    "distribution": "xdist worksteal, 18 workers",
+    "junit_sha256": "e02a976f8e914f4246ee36e184a5147ec7ab30d28cccca8871ef0753814a9aa9"
+  },
+  "final_gates": [
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.07927337499859277,
+      "log_path": "/tmp/order80-final-ruff.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.04101195799012203,
+      "log_path": "/tmp/order80-final-format.log",
+      "log_sha256": "4c86b44257eedd506c4a80fd5c876482edadd97775eec252e06e41d4bb1ee6b4"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 1.06705037500069,
+      "log_path": "/tmp/order80-final-mypy.log",
+      "log_sha256": "fe013aa3913d2705a05e3a09b28e2d6f13b2b84bd1fd2ece619ad84af4f9b5fe"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "seconds": 32.3804349580023,
+      "log_path": "/tmp/order80-final-pyright.log",
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "exit_code": 0,
+      "seconds": 0.380869625005289,
+      "log_path": "/tmp/order80-final-imports.log",
+      "log_sha256": "377d3b2e34276aa014cb5008edc4aa9b558d17d1f2de4fe2b9e776ab6b3629a8"
+    },
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order80-behavior.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 673.5970924580033,
+      "log_path": "/tmp/order80-final-behavior.log",
+      "log_sha256": "e13a0dc6a4fc02d27b5d3c9946d4b1165199f18759ff6669d68969fda0677444"
+    },
+    {
+      "name": "shard_generation",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "/tmp/order80-behavior.xml",
+        "--profile-source",
+        "Order 80 P09C final complete coverage suite; reviewed base dc01911f57024ae69b565a0e965db65abf5fbdbe; runtime ec8838e24359f11dae55ce932f94c1af38a8c6f217613c782a49f67678a702ae; macOS 26.7 Apple M5 Pro 18 xdist workers",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.12403175000508782,
+      "log_path": "/tmp/order80-final-shard_generation.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "shard_check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05019708300824277,
+      "log_path": "/tmp/order80-final-shard_check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order80-quality.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 110.98942254099529,
+      "log_path": "/tmp/order80-final-quality.log",
+      "log_sha256": "6b257db262ef5f990352a958a88761c05a9f57c714a001f08c6ec1a993b7bf1e"
+    }
+  ],
+  "failed_aggregate_attempts": [
+    {
+      "behavioral_tests": 9045,
+      "passed": 9043,
+      "failed": 2,
+      "coverage_percent": 85.21,
+      "log_sha256": "9c9335cdb145ffbf723dc2a19a8b6453c5228602ea460a596f26229d8b4bd9f8",
+      "reason": "Vanguard checkpoint fixtures injected ordinary enemy Normal Moves in the acting player turn. Initial authenticated checkpoint positions now express the intended physical setup; terminal-forgery assertions are unchanged. The complete coverage suite was rerun after correction."
+    }
+  ],
+  "failed_code_quality_attempts": [
+    {
+      "passed": 607,
+      "failed": 1,
+      "log_sha256": "255b41f4368b686b7fa2742b9a7262fa73994f412f9b14c91a4f90edce807f46",
+      "reason": "Order 76 provenance check required the old whole-file fixture hash. An explicit Order 80 migration now proves the default module AST unchanged after removing only the exact opt-in deployment branch and disabled parameter; all original base samples and numeric budgets remain."
+    }
+  ],
+  "post_quality_repair_checks": [
+    "uv run ruff check .",
+    "uv run ruff format --check .",
+    "uv run mypy src tests",
+    "uv run pyright"
+  ],
+  "publication_checks": [
+    {
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref dc01911f57024ae69b565a0e965db65abf5fbdbe",
+      "status": "passed"
+    },
+    {
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "status": "passed",
+      "packaged_schemas": 27,
+      "runtime_resources": 2929
+    },
+    {
+      "command": "node scripts/check-generated.mjs; node node_modules/typescript/bin/tsc --noEmit",
+      "cwd": "conformance/typescript",
+      "status": "passed"
+    },
+    {
+      "command": "node node_modules/tsx/dist/cli.mjs --test src/**/*.test.ts",
+      "cwd": "conformance/typescript",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "command": "node node_modules/tsx/dist/cli.mjs src/main.ts",
+      "cwd": "conformance/typescript",
+      "status": "passed",
+      "assertions": 342,
+      "contract_version": "35.0.0"
+    },
+    {
+      "command": "uv run pre-commit run --all-files",
+      "status": "passed",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "status": "passed"
+    },
+    {
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "status": "passed",
+      "note": "Repeated immediately before commit and PR publication."
+    }
+  ],
+  "typescript_environment": "Bundled Node runtime and installed locked dependencies; npm executable unavailable, equivalent package-script programs executed directly.",
+  "performance": {
+    "matched_order80_samples": 12,
+    "finite_and_parameterized_cases": 2,
+    "inherited_head_reports_refreshed": 16,
+    "numeric_budgets_unchanged": true,
+    "matched_report_paths": [
+      "docs/performance/order80/base.json",
+      "docs/performance/order80/head.json"
+    ]
+  },
+  "evidence_sha256": {
+    "docs/performance/order80/preflight.json": "8c023ae3788ac76440ab9be0d36017dca6a6d6bbc26b72a6f61935f549ff0f5c",
+    "docs/performance/order80/probe-results.json": "9bcb69d4eafb39682c7dd99ed114acfeebc5b18dfcc9a9368b2f62ca819cfa31",
+    "docs/performance/order80/base.json": "c09ec0282bb74f1deedef9c2815ad6e6a4dc5a97d35bb0f61294980baed2da4a",
+    "docs/performance/order80/head.json": "6c16f3ff68295199bc47973b143dd72d724bef426bfdebbb9ee673fb9a85a40c",
+    "docs/performance/order80/inherited-fixture-migration.json": "0f34b9086794dc3c29eab79b5443fdd6770a90b198a45efe4280335ace207eab",
+    "docs/performance/order80/order76-fixture-migration.json": "5038114fabd629f66462c121a186eadce60236728e094c3d388ab1a8eee799bc",
+    "ci/test_shards/durations.json": "1b8fd3babf5455e1f0dd8f06dcb66ce4c95eb4de7030454e349058876241a2dc"
+  }
+}

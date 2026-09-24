@@ -484,6 +484,7 @@ def test_retained_fod_base_blocks_triggered_movement_crossing_and_overlap(
         descriptor=_fight_end_triggered_descriptor(max_distance_inches=6.0),
         path_witness=witness,
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     source_model_ids = tuple(
@@ -706,6 +707,7 @@ def test_triggered_resolution_payloads_include_model_destinations_without_reprs(
         descriptor=_reactive_step_descriptor(max_distance_inches=3.0),
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     payload = resolution.to_payload()
@@ -825,6 +827,7 @@ def test_apply_triggered_movement_to_battlefield_uses_valid_resolution() -> None
         descriptor=_reactive_step_descriptor(max_distance_inches=3.0),
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     updated = apply_triggered_movement_to_battlefield(
@@ -859,6 +862,7 @@ def test_triggered_movement_full_unit_no_op_witness_emits_only_changed_displacem
         descriptor=_reactive_step_descriptor(max_distance_inches=3.0),
         path_witness=witness,
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     batch = resolution.transition_batch(before=unit_placement)
@@ -968,6 +972,7 @@ def test_invalid_triggered_resolution_cannot_mutate_or_emit_transitions() -> Non
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
     )
 
@@ -1209,6 +1214,7 @@ def test_surge_movement_cannot_occur_if_battle_shocked() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
     )
 
@@ -1231,6 +1237,7 @@ def test_surge_movement_cannot_occur_while_within_engagement_range() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     assert not resolution.is_valid
@@ -1258,6 +1265,7 @@ def test_surge_movement_cannot_leave_retained_only_enemy_engagement() -> None:
         descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     assert not resolution.is_valid
@@ -1292,6 +1300,7 @@ def test_prior_normal_move_blocks_another_triggered_normal_move() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
         normal_move_states=tuple(state.normal_move_states),
     )
 
@@ -1489,6 +1498,7 @@ def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement
         descriptor=descriptor,
         path_witness=transit_witness,
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
     endpoint_result = resolve_triggered_movement(
         scenario=scenario,
@@ -1497,6 +1507,7 @@ def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement
         descriptor=descriptor,
         path_witness=endpoint_witness,
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
 
     assert transit_result.is_valid
@@ -1549,6 +1560,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
     with pytest.raises(GameLifecycleError, match="Unsupported NormalMoveSourceKind token"):
         NormalMoveState(
             player_id="player-a",
+            turn_player_id="player-a",
             battle_round=1,
             phase=BattlePhase.SHOOTING,
             unit_instance_id="army-alpha:intercessor-unit-1",
@@ -1560,6 +1572,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
     with pytest.raises(GameLifecycleError, match="Unsupported NormalMoveState phase token"):
         NormalMoveState(
             player_id="player-a",
+            turn_player_id="player-a",
             battle_round=1,
             phase=cast(BattlePhase, "not-a-phase"),
             unit_instance_id="army-alpha:intercessor-unit-1",
@@ -1571,6 +1584,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
     with pytest.raises(GameLifecycleError, match="positive integer"):
         NormalMoveState(
             player_id="player-a",
+            turn_player_id="player-a",
             battle_round=0,
             phase=BattlePhase.SHOOTING,
             unit_instance_id="army-alpha:intercessor-unit-1",
@@ -1591,6 +1605,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
         descriptor=descriptor,
         path_witness=full_witness,
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
     assert state.battlefield_state is not None
 
@@ -1602,6 +1617,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=descriptor,
             path_witness=full_witness,
             battle_round=state.battle_round,
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
         resolve_triggered_movement(
@@ -1611,6 +1627,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=descriptor,
             path_witness=full_witness,
             battle_round=state.battle_round,
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires a UnitPlacement"):
         resolve_triggered_movement(
@@ -1620,6 +1637,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=descriptor,
             path_witness=full_witness,
             battle_round=state.battle_round,
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires a descriptor"):
         resolve_triggered_movement(
@@ -1629,6 +1647,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=cast(TriggeredMovementDescriptor, "not-a-descriptor"),
             path_witness=full_witness,
             battle_round=state.battle_round,
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires a PathWitness"):
         resolve_triggered_movement(
@@ -1638,6 +1657,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=descriptor,
             path_witness=cast(PathWitness, "not-a-witness"),
             battle_round=state.battle_round,
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="battle_round must be positive"):
         resolve_triggered_movement(
@@ -1647,6 +1667,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=descriptor,
             path_witness=full_witness,
             battle_round=0,
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="apply requires battlefield_state"):
         apply_triggered_movement_to_battlefield(
@@ -1672,6 +1693,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             descriptor=descriptor,
             path_witness=partial_witness,
             battle_round=state.battle_round,
+            turn_player_id="player-a",
         )
 
 
@@ -1734,6 +1756,7 @@ def test_triggered_movement_request_rejects_invalid_resolution_sets() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
     assert state.active_player_id is not None
     assert state.current_battle_phase is not None
@@ -1809,6 +1832,7 @@ def test_triggered_movement_request_rejects_invalid_resolution_sets() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=4.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
         battle_shocked_unit_ids=(unit_placement.unit_instance_id,),
     )
     with pytest.raises(GameLifecycleError, match="options must be valid choices"):
@@ -1836,6 +1860,7 @@ def test_triggered_movement_resolution_rejects_invalid_components() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
+        turn_player_id="player-a",
     )
     violation = TriggeredMovementViolation(
         violation_code=TriggeredMovementViolationCode.BATTLE_SHOCKED_SURGE_FORBIDDEN,
@@ -2135,6 +2160,7 @@ def _normal_move_state_from_descriptor(
 ) -> NormalMoveState:
     return NormalMoveState(
         player_id=player_id,
+        turn_player_id="player-a",
         battle_round=battle_round,
         phase=descriptor.trigger_timing.phase,
         unit_instance_id=unit_instance_id,
@@ -2670,6 +2696,7 @@ def test_order66_aircraft_reactive_movement_is_typed_invalid() -> None:
         descriptor=_reactive_step_descriptor(max_distance_inches=3),
         path_witness=_shift_witness(placement, dx=1),
         battle_round=1,
+        turn_player_id="player-a",
     )
     assert not result.is_valid
     assert TriggeredMovementViolationCode.AIRCRAFT_INGRESS_ONLY in {

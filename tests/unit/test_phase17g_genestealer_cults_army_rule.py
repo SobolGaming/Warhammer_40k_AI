@@ -3560,6 +3560,8 @@ def test_cult_marker_deferred_capture_preserves_source_move_endpoint(
     assert original.player_id == GSC_PLAYER_ID
     assert original.source_rule_id == SOURCE_RULE_ID
     # A later accepted movement cannot retroactively remove the earlier trigger.
+    # Use a distinct occurrence; a second Normal Move in the same phase is illegal.
+    state.battle_round += 1
     append_authenticated_normal_move(
         state=state,
         decisions=decisions,

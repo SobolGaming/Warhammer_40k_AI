@@ -1,0 +1,11 @@
+{
+  "scope": "Order 80 fixture ownership correction; all original Order 77 baselines and numeric budgets retained. The Normal Move fixture records the moving unit owner separately from the turn owner. Timed roster/mission initializers and measured operations are unchanged; the changed movement injection function is not used by either Order 77 timing harness. Current heads are remeasured with the corrected helper bytes.",
+  "parent": "docs/performance/order79/inherited-fixture-migration.json",
+  "changed_files": {
+    "tests/phase17n_primary_mission_helpers.py": {
+      "base_sha256": "59eea3980045729a833b08e6a9273b5129f7a3fef85e65df1b8074a67342bb1d",
+      "head_sha256": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f",
+      "reason": "Decision actors are the moving unit owner. The accepted source option and exact completed proposal reference are explicit. Timed initializers and measured operations are unchanged."
+    }
+  }
+}

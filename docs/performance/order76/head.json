@@ -1,7 +1,7 @@
 {
   "workload_id": "order76-physical-proposal-prevalidation-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b2c9b7108364bb138225320187e8bba5b38d74d08d7156c9d3efb6eae1b2c343",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0e5937e1a395fb4f0687a539b05b568f4a9e04b9c7afd402e0379076856e5de1",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -21,8 +21,8 @@
       "family": "surge",
       "malformed": false,
       "repeat": 0,
-      "preparation_seconds": 4.014536000002408,
-      "seconds": 0.02523099999234546,
+      "preparation_seconds": 2.310957833993598,
+      "seconds": 0.013274625001940876,
       "status": "waiting_for_decision",
       "event_delta": 10
     },
@@ -30,8 +30,8 @@
       "family": "surge",
       "malformed": false,
       "repeat": 1,
-      "preparation_seconds": 0.8856672090041684,
-      "seconds": 0.021725084006902762,
+      "preparation_seconds": 0.4790568749886006,
+      "seconds": 0.01138620798883494,
       "status": "waiting_for_decision",
       "event_delta": 10
     },
@@ -39,8 +39,8 @@
       "family": "surge",
       "malformed": false,
       "repeat": 2,
-      "preparation_seconds": 0.8425182079954538,
-      "seconds": 0.021048166003311053,
+      "preparation_seconds": 0.44124762499995995,
+      "seconds": 0.011132708008517511,
       "status": "waiting_for_decision",
       "event_delta": 10
     },
@@ -48,8 +48,8 @@
       "family": "surge",
       "malformed": true,
       "repeat": 0,
-      "preparation_seconds": 0.9749141670035897,
-      "seconds": 0.0031389579962706193,
+      "preparation_seconds": 0.4391536659968551,
+      "seconds": 0.0014342920039780438,
       "status": "invalid",
       "event_delta": 0
     },
@@ -57,8 +57,8 @@
       "family": "surge",
       "malformed": true,
       "repeat": 1,
-      "preparation_seconds": 0.9826374170079362,
-      "seconds": 0.0031700410036137328,
+      "preparation_seconds": 0.43779112500487827,
+      "seconds": 0.0014272089902078733,
       "status": "invalid",
       "event_delta": 0
     },
@@ -66,8 +66,8 @@
       "family": "surge",
       "malformed": true,
       "repeat": 2,
-      "preparation_seconds": 0.9760032909980509,
-      "seconds": 0.003053624997846782,
+      "preparation_seconds": 0.43828037500497885,
+      "seconds": 0.0014714999997522682,
       "status": "invalid",
       "event_delta": 0
     },
@@ -75,8 +75,8 @@
       "family": "charge",
       "malformed": false,
       "repeat": 0,
-      "preparation_seconds": 1.0880028340034187,
-      "seconds": 0.06981624999025371,
+      "preparation_seconds": 0.4533787500113249,
+      "seconds": 0.026165957999182865,
       "status": "waiting_for_decision",
       "event_delta": 17
     },
@@ -84,8 +84,8 @@
       "family": "charge",
       "malformed": false,
       "repeat": 1,
-      "preparation_seconds": 1.1629409159941133,
-      "seconds": 0.06402208299550693,
+      "preparation_seconds": 0.45267516700550914,
+      "seconds": 0.024322875004145317,
       "status": "waiting_for_decision",
       "event_delta": 17
     },
@@ -93,8 +93,8 @@
       "family": "charge",
       "malformed": false,
       "repeat": 2,
-      "preparation_seconds": 1.0371942079946166,
-      "seconds": 0.05490633400040679,
+      "preparation_seconds": 0.4541062909993343,
+      "seconds": 0.025122583989286795,
       "status": "waiting_for_decision",
       "event_delta": 17
     },
@@ -102,8 +102,8 @@
       "family": "charge",
       "malformed": true,
       "repeat": 0,
-      "preparation_seconds": 1.0156536669965135,
-      "seconds": 0.0036673750000772998,
+      "preparation_seconds": 0.4585876659984933,
+      "seconds": 0.0017070839967345819,
       "status": "invalid",
       "event_delta": 0
     },
@@ -111,8 +111,8 @@
       "family": "charge",
       "malformed": true,
       "repeat": 1,
-      "preparation_seconds": 1.0760348750045523,
-      "seconds": 0.00366533400665503,
+      "preparation_seconds": 0.4958970409934409,
+      "seconds": 0.0016686660092091188,
       "status": "invalid",
       "event_delta": 0
     },
@@ -120,8 +120,8 @@
       "family": "charge",
       "malformed": true,
       "repeat": 2,
-      "preparation_seconds": 1.0050019999907818,
-      "seconds": 0.0036413750058272853,
+      "preparation_seconds": 0.45427791599649936,
+      "seconds": 0.001690457997028716,
       "status": "invalid",
       "event_delta": 0
     },
@@ -129,8 +129,8 @@
       "family": "normal",
       "malformed": false,
       "repeat": 0,
-      "preparation_seconds": 0.5078275830019265,
-      "seconds": 0.031956542006810196,
+      "preparation_seconds": 0.2517682089965092,
+      "seconds": 0.016364791998057626,
       "status": "waiting_for_decision",
       "event_delta": 14
     },
@@ -138,8 +138,8 @@
       "family": "normal",
       "malformed": false,
       "repeat": 1,
-      "preparation_seconds": 0.4846377079957165,
-      "seconds": 0.030798125008004718,
+      "preparation_seconds": 0.24959045799914747,
+      "seconds": 0.0154605419957079,
       "status": "waiting_for_decision",
       "event_delta": 14
     },
@@ -147,8 +147,8 @@
       "family": "normal",
       "malformed": false,
       "repeat": 2,
-      "preparation_seconds": 0.49738337499729823,
-      "seconds": 0.03534649999346584,
+      "preparation_seconds": 0.24969941700692289,
+      "seconds": 0.014827082995907404,
       "status": "waiting_for_decision",
       "event_delta": 14
     },
@@ -156,8 +156,8 @@
       "family": "normal",
       "malformed": true,
       "repeat": 0,
-      "preparation_seconds": 0.5394955829979153,
-      "seconds": 0.0009433329978492111,
+      "preparation_seconds": 0.2498946249979781,
+      "seconds": 0.00047858299512881786,
       "status": "invalid",
       "event_delta": 0
     },
@@ -165,8 +165,8 @@
       "family": "normal",
       "malformed": true,
       "repeat": 1,
-      "preparation_seconds": 0.4829564579995349,
-      "seconds": 0.000947083011851646,
+      "preparation_seconds": 0.2492991670005722,
+      "seconds": 0.0004885829985141754,
       "status": "invalid",
       "event_delta": 0
     },
@@ -174,8 +174,8 @@
       "family": "normal",
       "malformed": true,
       "repeat": 2,
-      "preparation_seconds": 0.4761824580054963,
-      "seconds": 0.0009515840065432712,
+      "preparation_seconds": 0.2500213330058614,
+      "seconds": 0.00048479100223630667,
       "status": "invalid",
       "event_delta": 0
     },
@@ -183,8 +183,8 @@
       "family": "placement",
       "malformed": false,
       "repeat": 0,
-      "preparation_seconds": 0.5242370829946594,
-      "seconds": 0.020467249996727332,
+      "preparation_seconds": 0.2733520839974517,
+      "seconds": 0.010732875001849607,
       "status": "waiting_for_decision",
       "event_delta": 7
     },
@@ -192,8 +192,8 @@
       "family": "placement",
       "malformed": false,
       "repeat": 1,
-      "preparation_seconds": 0.5290033750061411,
-      "seconds": 0.019303832988953218,
+      "preparation_seconds": 0.2739811670035124,
+      "seconds": 0.010071124997921288,
       "status": "waiting_for_decision",
       "event_delta": 7
     },
@@ -201,8 +201,8 @@
       "family": "placement",
       "malformed": false,
       "repeat": 2,
-      "preparation_seconds": 0.5812955000001239,
-      "seconds": 0.02197225000418257,
+      "preparation_seconds": 0.2730672500038054,
+      "seconds": 0.009998334004194476,
       "status": "waiting_for_decision",
       "event_delta": 7
     },
@@ -210,8 +210,8 @@
       "family": "placement",
       "malformed": true,
       "repeat": 0,
-      "preparation_seconds": 0.5608671660011169,
-      "seconds": 0.0013041250058449805,
+      "preparation_seconds": 0.2759132080100244,
+      "seconds": 0.0006832499930169433,
       "status": "invalid",
       "event_delta": 0
     },
@@ -219,8 +219,8 @@
       "family": "placement",
       "malformed": true,
       "repeat": 1,
-      "preparation_seconds": 0.5463427920039976,
-      "seconds": 0.0013017909950576723,
+      "preparation_seconds": 0.27904629199474584,
+      "seconds": 0.0006683749961666763,
       "status": "invalid",
       "event_delta": 0
     },
@@ -228,8 +228,8 @@
       "family": "placement",
       "malformed": true,
       "repeat": 2,
-      "preparation_seconds": 0.5223315829935018,
-      "seconds": 0.0012855829991167411,
+      "preparation_seconds": 0.27720420800324064,
+      "seconds": 0.0006905840127728879,
       "status": "invalid",
       "event_delta": 0
     },
@@ -237,8 +237,8 @@
       "family": "fight",
       "malformed": false,
       "repeat": 0,
-      "preparation_seconds": 0.47645437499159016,
-      "seconds": 0.01799966699036304,
+      "preparation_seconds": 0.2517875830089906,
+      "seconds": 0.008775124995736405,
       "status": "waiting_for_decision",
       "event_delta": 10
     },
@@ -246,8 +246,8 @@
       "family": "fight",
       "malformed": false,
       "repeat": 1,
-      "preparation_seconds": 0.5298304580064723,
-      "seconds": 0.019152375010889955,
+      "preparation_seconds": 0.25071458400634583,
+      "seconds": 0.00845383299747482,
       "status": "waiting_for_decision",
       "event_delta": 10
     },
@@ -255,8 +255,8 @@
       "family": "fight",
       "malformed": false,
       "repeat": 2,
-      "preparation_seconds": 0.6262529170053313,
-      "seconds": 0.018551041997852735,
+      "preparation_seconds": 0.2866138749959646,
+      "seconds": 0.008262083007139154,
       "status": "waiting_for_decision",
       "event_delta": 10
     },
@@ -264,8 +264,8 @@
       "family": "fight",
       "malformed": true,
       "repeat": 0,
-      "preparation_seconds": 0.5533362080022926,
-      "seconds": 0.001016082998830825,
+      "preparation_seconds": 0.25248466699849814,
+      "seconds": 0.0004303330060793087,
       "status": "invalid",
       "event_delta": 0
     },
@@ -273,8 +273,8 @@
       "family": "fight",
       "malformed": true,
       "repeat": 1,
-      "preparation_seconds": 0.5528290410002228,
-      "seconds": 0.0010204169957432896,
+      "preparation_seconds": 0.2502206670033047,
+      "seconds": 0.00043395900866016746,
       "status": "invalid",
       "event_delta": 0
     },
@@ -282,8 +282,8 @@
       "family": "fight",
       "malformed": true,
       "repeat": 2,
-      "preparation_seconds": 0.5097340409993194,
-      "seconds": 0.0009377920068800449,
+      "preparation_seconds": 0.24948662500537466,
+      "seconds": 0.00043495799764059484,
       "status": "invalid",
       "event_delta": 0
     }
@@ -291,20 +291,20 @@
   "summary": {
     "valid": {
       "count": 15,
-      "mean_seconds": 0.03148643339906509,
-      "median_seconds": 0.02197225000418257,
-      "p95_seconds": 0.06981624999025371,
-      "maximum_seconds": 0.06981624999025371,
-      "submissions_per_second": 31.759710200447554,
+      "mean_seconds": 0.0142900499990598,
+      "median_seconds": 0.01138620798883494,
+      "p95_seconds": 0.026165957999182865,
+      "maximum_seconds": 0.026165957999182865,
+      "submissions_per_second": 69.97876145050536,
       "completion_rate": 1
     },
     "malformed": {
       "count": 15,
-      "mean_seconds": 0.002002966601867229,
-      "median_seconds": 0.0013017909950576723,
-      "p95_seconds": 0.0036673750000772998,
-      "maximum_seconds": 0.0036673750000772998,
-      "submissions_per_second": 499.2594479946737,
+      "mean_seconds": 0.0009461750004750986,
+      "median_seconds": 0.0006832499930169433,
+      "p95_seconds": 0.0017070839967345819,
+      "maximum_seconds": 0.0017070839967345819,
+      "submissions_per_second": 1056.8869389889549,
       "completion_rate": 1
     }
   },
@@ -317,6 +317,6 @@
     "tests/surge_fixed_target_helpers.py": "73fda088d8de0b792973e21fa011eff378f68d3ef962d68d65f217c14c13e79c",
     "tests/charge_endpoint_helpers.py": "817d51830e7ecaabfede5bf5d3f271db998b94cda0c4f73f6dcd4a2bbb2dc3de",
     "tests/order63_reserve_transport_helpers.py": "4712ff4f47cb9939f11d67298eec960a4373ecbcff3444c526c21209723da3f4",
-    "tests/phase15c_fight_order_helpers.py": "e6aaec9744d24926be352a3669b4d1731dc5c9303f7b54fe7d47b107e13ab473"
+    "tests/phase15c_fight_order_helpers.py": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf"
   }
 }

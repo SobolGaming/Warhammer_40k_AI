@@ -94,6 +94,7 @@ def fight_lifecycle(
     poses_by_unit_key: dict[str, tuple[Pose, ...]] | None = None,
     alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    record_deployment: bool = False,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_config = (
         fight_config(
@@ -167,6 +168,10 @@ def fight_lifecycle(
             )
         )
     decisions = DecisionController()
+    if record_deployment:
+        from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+
+        record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     for key in fights_first_unit_keys:
         record_fights_first_effect(
