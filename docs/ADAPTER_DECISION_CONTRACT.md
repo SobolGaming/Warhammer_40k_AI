@@ -4517,7 +4517,12 @@ retain their producer-authored shape. The proposal view adds only the existing
 identity envelope; interaction metadata reads that same context. Family-specific
 submission validation and engine mutation remain with their existing owners.
 Shared viewer redaction executes before context extraction. Hidden non-owner
-requests still expose no proposal or interaction data.
+requests still expose no proposal or interaction data. Visible requests also pass
+through the shared recursive authority-field filter before proposal extraction,
+interaction metadata derivation, or nested interaction projection. This includes
+protected fields inside arbitrary healing source context and nested arrays.
+Public siblings and the authenticated identity envelope survive; authoritative
+requests, checkpoints, and replay retain the original engine context.
 
 The existing open-JSON request/proposal schema and interaction descriptors already
 cover these families, including their distinct proposal schema references and

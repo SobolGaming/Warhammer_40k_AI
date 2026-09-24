@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import cast
 
@@ -17,6 +17,7 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.network import submit_network_parameterized_payload
 from warhammer40k_core.adapters.projection import (
     GameViewPayload,
+    _nested_interaction_request_views,
     _proposal_view,
     public_decision_request_view,
 )
@@ -34,6 +35,7 @@ from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
     ParameterizedInteractionSpec,
     ParameterizedRequestLayout,
+    interaction_annotated_decision_request_payload,
     interaction_descriptor_for_request,
     parameterized_proposal_request_payload,
 )
@@ -49,6 +51,69 @@ FLAT_FAMILIES = frozenset(
         "submit_cult_ambush_marker_placement",
     }
 )
+
+# Representatives of every recursively protected authority family. Public siblings
+# must survive at every depth; authority data must remain in engine state only.
+AUTHORITY_CONTEXT: dict[str, JsonValue] = {
+    "public_source": "source-rule-id",
+    "logical_death_cause_binding": {"private": "destruction-authority"},
+    "nested": [
+        {
+            "public_note": "keep-me",
+            "effect_snapshot_sha256": "psychic-authority",
+            "deeper": {
+                "ingress_placement_restrictions": {"private": "ingress-authority"},
+                "target_replacement_authority_sha256": "target-authority",
+                "public_count": 2,
+            },
+        }
+    ],
+}
+PUBLIC_CONTEXT: dict[str, JsonValue] = {
+    "public_source": "source-rule-id",
+    "nested": [{"public_note": "keep-me", "deeper": {"public_count": 2}}],
+}
+
+
+def test_real_flat_revival_redacts_recursive_authority_before_proposal_projection() -> None:
+    session, payload = revival_projection_session(source_context=AUTHORITY_CONTEXT)
+    before = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(before)))
+    assert restored.to_persistence_payload() == before
+    for candidate in (session, restored):
+        request = candidate.lifecycle.pending_decision_request()
+        assert request is not None
+        assert "destruction-authority" in json.dumps(request.payload)
+        for player in ("player-a", "player-b"):
+            view = candidate.view(viewer_player_id=player)
+            pending = view["pending_decision"]
+            proposal = view["pending_proposal"]
+            assert pending is not None
+            assert isinstance(pending["payload"], dict)
+            assert isinstance(proposal, dict)
+            for context in (pending["payload"], proposal):
+                effect = context["effect"]
+                assert isinstance(effect, dict)
+                assert effect["source_context"] == {
+                    **PUBLIC_CONTEXT,
+                    "revive_model_full_health": True,
+                    "revive_destroyed_models_only": True,
+                }
+            assert proposal["request_id"] == request.request_id
+            assert proposal["decision_type"] == request.decision_type
+            assert proposal["actor_id"] == request.actor_id
+            assert json.loads(json.dumps(view)) == view
+            delta = candidate.events_since(EventStreamCursor(), viewer_player_id=player)
+            assert "destruction-authority" not in json.dumps(delta)
+        assert candidate.to_persistence_payload() == before
+    request = restored.advance_until_decision_or_terminal().decision_request
+    assert request is not None
+    result = restored.submit_parameterized_payload(
+        request_id=request.request_id, result_id="redacted-revival", payload=payload
+    )
+    assert result.status_kind is not LifecycleStatusKind.INVALID
+    replay = ReplayRunner.from_payload(restored.replay_artifact(artifact_id="redacted-revival"))
+    assert replay.run().status is ReplayRunStatus.REPRODUCED
 
 
 @dataclass(frozen=True)
@@ -196,6 +261,48 @@ def test_every_parameterized_family_projects_exact_context(pending: DecisionRequ
     }
     assert _proposal_view(request, viewer=ViewerContext.for_player("player-a")) == expected
     assert interaction_descriptor_for_request(request)["proposal_kind"]
+
+
+@pytest.mark.parametrize("pending", _conformance_requests(), ids=lambda value: value.request_id)
+def test_all_layouts_and_nested_interactions_share_recursive_redaction(
+    pending: DecisionRequest,
+) -> None:
+    payload = cast(dict[str, JsonValue], pending.payload)
+    flat = pending.decision_type in FLAT_FAMILIES
+    context = payload if flat else cast(dict[str, JsonValue], payload["proposal_request"])
+    protected_context = {**context, "source_context": AUTHORITY_CONTEXT}
+    request = replace(
+        pending,
+        payload=protected_context if flat else {**payload, "proposal_request": protected_context},
+    )
+    nested = interaction_annotated_decision_request_payload(request)
+    outer = replace(
+        request,
+        payload={
+            **cast(dict[str, JsonValue], request.payload),
+            "nested_interaction_requests": [cast(JsonValue, nested)],
+        },
+    )
+    before = json.dumps(outer.to_payload(), sort_keys=True)
+    for player in ("player-a", "player-b"):
+        viewer = ViewerContext.for_player(player)
+        public = public_decision_request_view(request, viewer=viewer)
+        public_payload = cast(dict[str, JsonValue], public["payload"])
+        public_context = (
+            public_payload
+            if flat
+            else cast(dict[str, JsonValue], public_payload["proposal_request"])
+        )
+        assert public_context["source_context"] == PUBLIC_CONTEXT
+        proposal = _proposal_view(request, viewer=viewer)
+        assert isinstance(proposal, dict)
+        assert proposal["source_context"] == PUBLIC_CONTEXT
+        assert public["interaction"] == interaction_descriptor_for_request(pending)
+        children = _nested_interaction_request_views(outer, viewer=viewer)
+        assert len(children) == 1
+        assert children[0]["payload"] == public["payload"]
+        assert children[0]["interaction"] == public["interaction"]
+    assert json.dumps(outer.to_payload(), sort_keys=True) == before
 
 
 @pytest.mark.parametrize("family", ["submit_healing_revival_placement", "submit_movement_proposal"])

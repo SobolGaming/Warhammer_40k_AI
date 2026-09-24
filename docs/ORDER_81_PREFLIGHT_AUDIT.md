@@ -234,6 +234,44 @@ expects the old defects and must be run against the named base runtime.
 Final commands, counts, hashes and limitations are recorded separately in
 [implementation-validation.json](performance/order81/implementation-validation.json).
 
+## PR #501 field-redaction review correction
+
+Review of `c37ae4b17449106abee1f90a2039adfc0a6bc8be` found that the proposal
+projection enforced whole-request secrecy but extracted raw field values. A
+protected authority key inside arbitrary `HealingEffect.source_context` could
+therefore survive in `pending_proposal` after being removed from
+`pending_decision.payload`. This was a latent viewer-boundary defect; no current
+producer was observed inserting such a protected key into a flat request.
+
+The fix reconstructs a presentation-only typed request from
+`public_decision_request_payload` before the existing engine layout/identity
+reader extracts proposal context. The same-class audit found raw nested
+interaction projection; it now consumes the same scrubbed request path.
+Interaction metadata also derives from the already-redacted pending request.
+All protected-key policy remains in `adapters.redaction`; authoritative payloads,
+engine validators, layout registrations, and revival eligibility are unchanged.
+The correction changes only `adapters/projection.py` in runtime code.
+
+Regressions first reproduced the defect in an engine-produced revival request
+and all 24 parameterized conformance examples spanning the 13 registered
+families. They cover recursively protected destruction, psychic, ingress, and
+target-replacement fields, preserved public siblings and identity, both players,
+nested interactions, unchanged authoritative state, checkpoint restoration,
+event redaction, successful submission, and exact replay. A static audit guards
+shared redaction before every derived request projection.
+
+Matched diagnostics compare the reviewed runtime with the fix using
+`scripts/benchmark_order81_redaction.py`. The original request-view budget remains
+unchanged and is remeasured against the original main runtime with the same
+current fixture. Run the review diagnostic with `PYTHONPATH=.:src uv run --no-sync
+python scripts/benchmark_order81_redaction.py --output <path>`; for the reviewed
+base, substitute the archived commit's `src` path and retain its `pyproject.toml`
+and `contracts/` alongside it. Both runs use the current benchmark and fixture.
+Fresh inherited workload measurements, validation commands and
+results are recorded in [review-validation.json](performance/order81/review-validation.json).
+Original validation records remain historical evidence for the reviewed commit.
+No full-game performance or final Core Rules certification is claimed.
+
 
 The first quality aggregate detected 22 stale-evidence guards: Orders 64–80
 require fresh head measurements whenever the verified runtime identity changes.

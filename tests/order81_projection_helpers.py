@@ -20,7 +20,9 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.geometry.pose import Pose
 
 
-def revival_projection_session() -> tuple[LocalGameSession, dict[str, JsonValue]]:
+def revival_projection_session(
+    *, source_context: dict[str, JsonValue] | None = None
+) -> tuple[LocalGameSession, dict[str, JsonValue]]:
     x, y = 8.5, 15.0
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("recipient",),
@@ -57,7 +59,11 @@ def revival_projection_session() -> tuple[LocalGameSession, dict[str, JsonValue]
         opposing_player_id="player-b",
         phase_start_model_ids=healing_phase_start_model_ids(state=state, rules_unit=unit),
         phase_start_enemy_engagement_model_ids=allowed,
-        source_context={"revive_model_full_health": True, "revive_destroyed_models_only": True},
+        source_context={
+            **({} if source_context is None else source_context),
+            "revive_model_full_health": True,
+            "revive_destroyed_models_only": True,
+        },
     )
     _, request = resolve_healing_until_blocked(
         state=state,

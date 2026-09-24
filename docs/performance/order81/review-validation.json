@@ -1,0 +1,335 @@
+{
+  "scope": "PR #501 review correction: shared field redaction before derived request projection",
+  "reviewed_commit": "c37ae4b17449106abee1f90a2039adfc0a6bc8be",
+  "pr_base_commit": "45561d864c3634ce1d0e00d2b6599091ef43ed58",
+  "recorded_at": "2026-09-24T12:23:09.727377+00:00",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:049e3eff7cbeb4e1cb4a0c3d53448b1a79296583288723f053c11e47d30b4601",
+  "final_validation_status": "passed",
+  "scope_audit": {
+    "runtime_modules_changed_by_review_fix": [
+      "adapters/projection.py"
+    ],
+    "redaction_owner": "Existing adapters.redaction.public_decision_request_payload",
+    "context_owner": "Existing engine.interaction_metadata.parameterized_proposal_request_payload",
+    "same_bug_class": "Nested interaction projections also consumed raw authority fields; they now consume scrubbed typed requests, as does interaction metadata.",
+    "new_runtime_modules": 0,
+    "new_named_handlers": 0,
+    "schema_shapes_changed": false,
+    "external_contract": "35.0.0",
+    "adapter_contract_updated": true,
+    "open_prerequisites": [
+      "C01-05 / P01E / Order 82",
+      "CAUDIT-01 / PFINAL / Order 83"
+    ]
+  },
+  "red_regression": {
+    "failed": 25,
+    "scope": "Real engine-produced revival and all 24 parameterized conformance examples",
+    "log_sha256": "d55ae44bfbed74efdfd414acf0c9659bb0956420cf12b1b4efcb896a266f1737"
+  },
+  "focused_validation": {
+    "passed": 73,
+    "log_sha256": "0c74b0b00cecc05501ad211a90e2e1ab45547ea2896507d056d4c7dd7560b932"
+  },
+  "iteration_notes": [
+    "Initial focused collection detected expected runtime-manifest drift after production edit; regenerated build identity.",
+    "Contract regeneration initially hit a sandbox file-replacement restriction; reran successfully with filesystem access. A concurrent focused collection saw the temporarily absent generated example; final generation and tests were sequential.",
+    "The initial real revival submission omitted lifecycle advance before the pending decision, triggering the engine destruction-history guard. Corrected the test to use the established facade advance sequence; no production workaround."
+  ],
+  "behavioral_suite": {
+    "tests": 9159,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "c53408170b8056c5cd82f0ee587d1efae1a9fa1093e646caf0305336a2190cb1",
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage_percent": 85.21958264657212,
+    "required_coverage_percent": 85,
+    "coverage": true,
+    "warnings": 10,
+    "warning_note": "Unclosed SQLite ResourceWarnings; the same warning class was recorded for the reviewed commit. Suite and coverage gate exited 0."
+  },
+  "code_quality_suite": {
+    "tests": 612,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "75d926d40d1abda529e7e3f30c79c3bbf91af8caf164d892aded0f794c4db1fa",
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage": false
+  },
+  "inherited_performance_refresh": {
+    "path": "docs/performance/order81/review-inherited-refresh.json",
+    "sha256": "7d95dcca76b7a214e0b5222369d7ca4a67fb7c2ff52427d12fff487e1fe4911e",
+    "workloads_completed": 18,
+    "failed": 0,
+    "budgets_and_baselines_unchanged": true
+  },
+  "final_gates": [
+    {
+      "name": "ruff",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-ruff.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-format.log",
+      "log_sha256": "b210cdfd121384e1a51e249341de8d0424e24a46e2810e6dfe78ee462db31b10"
+    },
+    {
+      "name": "mypy",
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-mypy.log",
+      "log_sha256": "070323606d0dd3c08f5bdaf802b64ae08098e563d58762377cc7883258993534"
+    },
+    {
+      "name": "pyright",
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-pyright.log",
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    {
+      "name": "imports",
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-imports.log",
+      "log_sha256": "7a3ecc61239ac416cd0aa195cdbe724920d4490caf90125f674562e78a845b49"
+    },
+    {
+      "name": "behavior",
+      "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-behavior.log",
+      "log_sha256": "da6f97ab4322bccb1c8528aa31497ae3345b610394cd31b9d7ba9bb08e9f9bdd"
+    },
+    {
+      "name": "quality",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-quality.log",
+      "log_sha256": "68f8f461bf0a315e1468d12237c07433debc95320cd0b0b6f33627ba533c7beb"
+    },
+    {
+      "name": "shards",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-shards.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "precommit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-precommit.log",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "name": "build-check",
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-build-check.log",
+      "log_sha256": "d745e5f6aebc77252add3f44ab9ca1dfc0233efcfa3c36e6bb88841cddba7552"
+    },
+    {
+      "name": "contract-check",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref 45561d864c3634ce1d0e00d2b6599091ef43ed58",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-contract-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-wheel.log",
+      "log_sha256": "ffc5111f5a3ccd9d59097c9476ebbf24851b363eafb2fb5d5f34f6c4995d5c91"
+    },
+    {
+      "name": "client-check",
+      "command": "npm run check",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-client-check.log",
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "name": "client-unit",
+      "command": "npm run test:unit",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-client-unit.log",
+      "log_sha256": "b51a9cc00658bc5c4c00d5e932b9d4d40dbdd00a946c76b0f72631fed471149c"
+    },
+    {
+      "name": "client-conformance",
+      "command": "npm run conformance",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-client-conformance.log",
+      "log_sha256": "48d8a5ce21117fd1debad5eaa0baa492412733346fbfbfb7fb156333f277a82e"
+    },
+    {
+      "name": "roadmap",
+      "command": "uv run --no-sync python tools/core_rules_40k_app_audit.py --check",
+      "exit_code": 0,
+      "log_path": "/private/tmp/order81-review-roadmap.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "performance": {
+    "measurement": "Serial, no coverage or competing test/build workers; 9 samples of 2000 calls per case; fixture setup excluded.",
+    "budget_status": "Original request-view budget unchanged and passed.",
+    "matched_base": "Isolated git archives; identical current workload, fixture, host, dependencies and input.",
+    "evidence": {
+      "projection-base": {
+        "evidence_sha256": "d5ad59bde8c832ffbdb7d67e5363d6b560240b00fbb310260f37b73d6776f11c",
+        "rows": [
+          {
+            "case": "nested_request",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 2.088461338927219e-05,
+            "median_seconds": 2.0817103999434038e-05,
+            "maximum_seconds": 2.1191895997617393e-05,
+            "p95_seconds_nearest_rank": 2.1191895997617393e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 47882.14085464807
+          },
+          {
+            "case": "flat_request",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 2.885173366667004e-05,
+            "median_seconds": 2.8787707997253164e-05,
+            "maximum_seconds": 2.908616649801843e-05,
+            "p95_seconds_nearest_rank": 2.908616649801843e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 34659.962259225176
+          }
+        ]
+      },
+      "projection-head": {
+        "evidence_sha256": "c8331896c50d104bcac95ad51b180cf6e4c2b45e8c615541b5ec4d59bb84dbf1",
+        "rows": [
+          {
+            "case": "nested_request",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 2.7155650331729298e-05,
+            "median_seconds": 2.717029149789596e-05,
+            "maximum_seconds": 2.7263291500275954e-05,
+            "p95_seconds_nearest_rank": 2.7263291500275954e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 36824.748727581624
+          },
+          {
+            "case": "flat_request",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 3.740248383433532e-05,
+            "median_seconds": 3.7382854497991505e-05,
+            "maximum_seconds": 3.7643354000465475e-05,
+            "p95_seconds_nearest_rank": 3.7643354000465475e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 26736.192292181524
+          }
+        ]
+      },
+      "review-projection-base": {
+        "evidence_sha256": "5c4665bb9507895b00e3c3a7489c15845e0279d2b45b5128ecab418c3cf86c05",
+        "rows": [
+          {
+            "case": "pending_decision",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 3.3828564888002194e-05,
+            "median_seconds": 3.3872062500449827e-05,
+            "maximum_seconds": 3.41472289946978e-05,
+            "protected_authority_exposed": false,
+            "p95_seconds_nearest_rank": 3.41472289946978e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 29560.816526232982
+          },
+          {
+            "case": "pending_proposal",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 7.232430444370645e-06,
+            "median_seconds": 7.2315829966100866e-06,
+            "maximum_seconds": 7.298145501408726e-06,
+            "protected_authority_exposed": true,
+            "p95_seconds_nearest_rank": 7.298145501408726e-06,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 138266.10676613543
+          },
+          {
+            "case": "nested_interactions",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 1.2185462998685479e-05,
+            "median_seconds": 1.2101687498216051e-05,
+            "maximum_seconds": 1.2815583497285843e-05,
+            "protected_authority_exposed": true,
+            "p95_seconds_nearest_rank": 1.2815583497285843e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 82064.99827769172
+          }
+        ]
+      },
+      "review-projection-head": {
+        "evidence_sha256": "8a3a1ffb3c73701ff835ce5c10ed33084f2a779d807a9cf1ed763085b3d27979",
+        "rows": [
+          {
+            "case": "pending_decision",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 4.0174999942893114e-05,
+            "median_seconds": 4.022187500231666e-05,
+            "maximum_seconds": 4.087552049895748e-05,
+            "protected_authority_exposed": false,
+            "p95_seconds_nearest_rank": 4.087552049895748e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 24891.10146661987
+          },
+          {
+            "case": "pending_proposal",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 3.514293277759053e-05,
+            "median_seconds": 3.5165437504474536e-05,
+            "maximum_seconds": 3.528110399929574e-05,
+            "protected_authority_exposed": false,
+            "p95_seconds_nearest_rank": 3.528110399929574e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 28455.223311290243
+          },
+          {
+            "case": "nested_interactions",
+            "iterations_per_sample": 2000,
+            "mean_seconds": 9.252748610904544e-05,
+            "median_seconds": 9.245756249583793e-05,
+            "maximum_seconds": 9.351716649689478e-05,
+            "protected_authority_exposed": false,
+            "p95_seconds_nearest_rank": 9.351716649689478e-05,
+            "completed_calls": 18000,
+            "completion_rate": 1.0,
+            "calls_per_second": 10807.59936373372
+          }
+        ]
+      }
+    },
+    "full_games_attempted": 0,
+    "full_games_completed": 0,
+    "full_game_certification": "incomplete"
+  },
+  "environment_notes": [
+    "UV_CACHE_DIR=/private/tmp/order81-uv-cache and PRE_COMMIT_HOME=/private/tmp/order81-pre-commit-cache.",
+    "Coverage suite uses required Node PATH, socket permissions and COVERAGE_FILE=/private/tmp/order81-review.coverage; behavior ran once with coverage, followed by quality without coverage.",
+    "Node 24.19.0; npm from existing pyright nodeenv; locked client dependencies reused. TypeScript unit/conformance checks require local sockets.",
+    "Installed wheel smoke uses UV_SYSTEM_CERTS=true and network access for isolated dependencies.",
+    "No behavioral test file was added, deleted, renamed or moved by this review fix; the existing eight-shard inventory check passed."
+  ]
+}

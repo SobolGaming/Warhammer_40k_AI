@@ -29,6 +29,7 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import (
     DecisionOptionPayload,
     DecisionRequest,
+    DecisionRequestPayload,
 )
 from warhammer40k_core.engine.dice_result_override_descriptors import (
     dice_result_override_descriptors_for_abilities,
@@ -1216,7 +1217,9 @@ def public_decision_request_view(
         "payload": public_request["payload"],
         "options": cast(list[DecisionOptionPayload], raw_options),
         "is_parameterized": request.is_parameterized_submission_request(),
-        "interaction": interaction_descriptor_for_request(request),
+        "interaction": interaction_descriptor_for_request(
+            DecisionRequest.from_payload(cast(DecisionRequestPayload, public_request))
+        ),
     }
 
 
@@ -1229,6 +1232,9 @@ def _proposal_view(
         return None
     if not request.is_parameterized_submission_request():
         return None
+    request = DecisionRequest.from_payload(
+        cast(DecisionRequestPayload, public_decision_request_payload(request, viewer=viewer))
+    )
     return validate_json_value(parameterized_proposal_request_payload(request))
 
 
@@ -1239,6 +1245,9 @@ def _nested_interaction_request_views(
 ) -> list[InteractionAnnotatedDecisionRequestPayload]:
     if decision_request_hidden_from_context(request=request, viewer=viewer):
         return []
+    request = DecisionRequest.from_payload(
+        cast(DecisionRequestPayload, public_decision_request_payload(request, viewer=viewer))
+    )
     return nested_interaction_request_payloads(request)
 
 

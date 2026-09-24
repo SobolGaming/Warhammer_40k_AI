@@ -273,6 +273,16 @@ def test_parameterized_request_layouts_cover_dispatch_and_published_examples() -
     )
     assert "parameterized_proposal_request_payload(request)" in context_reader
     assert "def _metadata_bearing_proposal_request" not in projection
+    # Every derived request projection must consume the existing shared redaction
+    # result, including nested interaction payloads, before extracting context.
+    for function, reader in (
+        ("public_decision_request_view", "interaction_descriptor_for_request"),
+        ("_proposal_view", "parameterized_proposal_request_payload"),
+        ("_nested_interaction_request_views", "nested_interaction_request_payloads"),
+    ):
+        body = projection.split(f"def {function}(", 1)[1].split("\ndef ", 1)[0]
+        assert body.index("public_decision_request_payload(") < body.index(f"{reader}(")
+        assert "DecisionRequest.from_payload(" in body
 
 
 def test_order81_matched_projection_component_budget() -> None:
