@@ -1,0 +1,71 @@
+{
+  "dice_override": {
+    "6": {
+      "replacement": 6,
+      "status": "accepted"
+    },
+    "7": {
+      "diagnostic": "Dice result override replacement must be a D6 value.",
+      "status": "rejected"
+    }
+  },
+  "embarked_full_health_revival": {
+    "actual_wounds": 1,
+    "expected_wounds": 2,
+    "status": "resolved",
+    "step": "revive_model_embarked"
+  },
+  "multiple_wounded_healing": {
+    "diagnostic": "Multiple wounded models require an attached-unit healing decision.",
+    "status": "rejected"
+  },
+  "ordinary_character_healing": {
+    "character": true,
+    "decision_type": "submit_healing_revival_placement",
+    "status": "requested"
+  },
+  "random_melee_split": {
+    "is_valid": false,
+    "violations": [
+      "random_melee_split_unsupported"
+    ]
+  },
+  "shooting_selection": {
+    "near": {
+      "both_viewers_project": true,
+      "pending": [
+        {
+          "options": [
+            "army-alpha:audit-shooter",
+            "complete_shooting_phase"
+          ],
+          "type": "select_shooting_unit"
+        }
+      ],
+      "unit_id": "army-alpha:audit-shooter"
+    },
+    "out_of_range": {
+      "both_viewers_project": true,
+      "pending": [
+        {
+          "options": [
+            "army-beta:enemy"
+          ],
+          "type": "select_movement_unit"
+        }
+      ],
+      "unit_id": "army-alpha:audit-shooter"
+    }
+  },
+  "strength_dash": {
+    "diagnostic": "strength must be at least 1.",
+    "profile_accepted": true,
+    "status": "rejected"
+  },
+  "table_quarters": {
+    "edge_to_center_inches": 0.01,
+    "expected_quarter": null,
+    "half_divider_inches": 0.01968503937007874,
+    "observed_quarter": "table-quarter:south-west"
+  }
+}
