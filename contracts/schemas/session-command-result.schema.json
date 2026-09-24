@@ -18,7 +18,7 @@
       ],
       "type": "string"
     },
-    "schema_version": {"const": "session-command-result-v36-contract", "type": "string"},
+    "schema_version": {"const": "session-command-result-v37-contract", "type": "string"},
     "session": {"$ref": "https://warhammer40k-core.local/contracts/v18/session-metadata.schema.json"}
   },
   "required": [

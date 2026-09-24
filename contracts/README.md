@@ -1,12 +1,15 @@
 # CORE V2 external contract
 
+Contract 37 authenticates revival coherency against phase-start physical history.
+See [36 to 37 migration](migrations/36-to-37.md).
+
 Contract 36 implements Core 01.02.03 revival engagement against already-engaged
 canonical enemy rules units. It removes the serialized enemy-model snapshot
 from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `36.0.0`
+Contract version: `37.0.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

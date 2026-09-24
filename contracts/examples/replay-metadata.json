@@ -15935,7 +15935,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v30-revival-engagement",
+  "schema_version": "replay-artifact-v31-revival-phase-start",
   "source_identity": {
     "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
     "catalog_id": "phase9a-canonical",

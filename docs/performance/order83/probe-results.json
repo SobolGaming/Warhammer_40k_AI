@@ -1,0 +1,163 @@
+{
+  "reviewed_commit": "03fd10e6d859743205c0c26bb653bc0b77b4bd85",
+  "scope": "bounded generic revival diagnostic; separate per-grant replay roots",
+  "cases": [
+    {
+      "correct_phase_start_anchors": false,
+      "original_anchor_endpoint": false,
+      "phase_entry_event_id": "event-000060",
+      "phase_start_model_ids": [
+        "army-alpha:recipient:core-intercessor-like:001",
+        "army-alpha:recipient:core-intercessor-like:002",
+        "army-alpha:recipient:core-intercessor-like:003"
+      ],
+      "second_helper_model_ids": [
+        "army-alpha:recipient:core-intercessor-like:001",
+        "army-alpha:recipient:core-intercessor-like:002",
+        "army-alpha:recipient:core-intercessor-like:003",
+        "army-alpha:recipient:core-intercessor-like:004"
+      ],
+      "first_revival": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      },
+      "second_revival_pose": {
+        "position": {
+          "x": 10.0,
+          "y": 19.0,
+          "z": 0.0
+        },
+        "facing": {
+          "degrees": 0.0
+        }
+      },
+      "base_distances_inches": {
+        "army-alpha:recipient:core-intercessor-like:001": 7.74015748031496,
+        "army-alpha:recipient:core-intercessor-like:002": 6.240157480314961,
+        "army-alpha:recipient:core-intercessor-like:003": 4.740157480314961,
+        "army-alpha:recipient:core-intercessor-like:004": 1.7401574803149609
+      },
+      "expected_legal": false,
+      "observed_accepted": true,
+      "validator_diagnostic": "accepted",
+      "invalid_submission_atomic": false,
+      "second_revival": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      },
+      "viewer_healing_event_counts": {
+        "player-a": 2,
+        "player-b": 2
+      },
+      "legal_retry": null
+    },
+    {
+      "correct_phase_start_anchors": true,
+      "original_anchor_endpoint": false,
+      "phase_entry_event_id": "event-000060",
+      "phase_start_model_ids": [
+        "army-alpha:recipient:core-intercessor-like:001",
+        "army-alpha:recipient:core-intercessor-like:002",
+        "army-alpha:recipient:core-intercessor-like:003"
+      ],
+      "second_helper_model_ids": [
+        "army-alpha:recipient:core-intercessor-like:001",
+        "army-alpha:recipient:core-intercessor-like:002",
+        "army-alpha:recipient:core-intercessor-like:003",
+        "army-alpha:recipient:core-intercessor-like:004"
+      ],
+      "first_revival": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      },
+      "second_revival_pose": {
+        "position": {
+          "x": 10.0,
+          "y": 19.0,
+          "z": 0.0
+        },
+        "facing": {
+          "degrees": 0.0
+        }
+      },
+      "base_distances_inches": {
+        "army-alpha:recipient:core-intercessor-like:001": 7.74015748031496,
+        "army-alpha:recipient:core-intercessor-like:002": 6.240157480314961,
+        "army-alpha:recipient:core-intercessor-like:003": 4.740157480314961,
+        "army-alpha:recipient:core-intercessor-like:004": 1.7401574803149609
+      },
+      "expected_legal": false,
+      "observed_accepted": false,
+      "validator_diagnostic": "Revived model is not coherent with phase-start models.",
+      "invalid_submission_atomic": true,
+      "second_revival": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      },
+      "viewer_healing_event_counts": {
+        "player-a": 1,
+        "player-b": 1
+      },
+      "legal_retry": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      }
+    },
+    {
+      "correct_phase_start_anchors": false,
+      "original_anchor_endpoint": true,
+      "phase_entry_event_id": "event-000060",
+      "phase_start_model_ids": [
+        "army-alpha:recipient:core-intercessor-like:001",
+        "army-alpha:recipient:core-intercessor-like:002",
+        "army-alpha:recipient:core-intercessor-like:003"
+      ],
+      "second_helper_model_ids": [
+        "army-alpha:recipient:core-intercessor-like:001",
+        "army-alpha:recipient:core-intercessor-like:002",
+        "army-alpha:recipient:core-intercessor-like:003",
+        "army-alpha:recipient:core-intercessor-like:004"
+      ],
+      "first_revival": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      },
+      "second_revival_pose": {
+        "position": {
+          "x": 8.5,
+          "y": 14.0,
+          "z": 0.0
+        },
+        "facing": {
+          "degrees": 0.0
+        }
+      },
+      "base_distances_inches": {
+        "army-alpha:recipient:core-intercessor-like:001": 3.0121593529737263,
+        "army-alpha:recipient:core-intercessor-like:002": 1.6556334277376112,
+        "army-alpha:recipient:core-intercessor-like:003": 0.5429331180469552,
+        "army-alpha:recipient:core-intercessor-like:004": 1.2401574803149606
+      },
+      "expected_legal": true,
+      "observed_accepted": true,
+      "validator_diagnostic": "accepted",
+      "invalid_submission_atomic": false,
+      "second_revival": {
+        "checkpoint_exact": true,
+        "both_viewers_exact": true,
+        "replay": "reproduced"
+      },
+      "viewer_healing_event_counts": {
+        "player-a": 2,
+        "player-b": 2
+      },
+      "legal_retry": null
+    }
+  ]
+}

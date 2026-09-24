@@ -58,6 +58,11 @@ from warhammer40k_core.engine.mutation_decision_authority import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.revival_engagement import validated_revival_engagement_payload
+from warhammer40k_core.engine.revival_phase_start import (
+    RevivalPhaseStartPayload,
+    revival_phase_start_evidence,
+    validated_revival_phase_start_payload,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     current_rules_unit_views_for_identity,
@@ -455,7 +460,15 @@ def validate_july_daemonic_manifestation_pending_outcome(
                 "d3_result": d3_result.to_payload(),
             }
         ),
-        phase_start_model_ids=historical.placed_alive_model_ids(target.unit_instance_id),
+        phase_start_model_ids=tuple(
+            revival_phase_start_evidence(
+                state=context.state,
+                event_records=context.decisions.event_log.records,
+                decision_records=context.decisions.records,
+                target_unit_instance_id=target.unit_instance_id,
+                before_event_index=request_event_index,
+            )["model_ids"]
+        ),
     )
     initial_pending_index = _validate_initial_pending_event(
         context=context,
@@ -674,6 +687,13 @@ def _placement_producer_identifies_provider(
                 producer=producer,
                 model_id=model_id,
                 component_id=component_id,
+                phase_start=revival_phase_start_evidence(
+                    state=context.state,
+                    event_records=events,
+                    decision_records=context.decisions.records,
+                    target_unit_instance_id=root_effect.target_unit_instance_id,
+                    before_event_index=producer_index + 1,
+                ),
             )
             if child_request != expected_request:
                 raise GameLifecycleError(
@@ -706,6 +726,13 @@ def _placement_producer_identifies_provider(
             producer=producer,
             model_id=model_id,
             component_id=component_id,
+            phase_start=revival_phase_start_evidence(
+                state=context.state,
+                event_records=events,
+                decision_records=context.decisions.records,
+                target_unit_instance_id=root_effect.target_unit_instance_id,
+                before_event_index=producer_index + 1,
+            ),
         )
         if child_request != expected_request:
             raise GameLifecycleError("Daemonic Manifestation outcome provider identity drifted.")
@@ -756,6 +783,7 @@ def _expected_placement_request(
     producer: DecisionRecord,
     model_id: str,
     component_id: str,
+    phase_start: RevivalPhaseStartPayload,
 ) -> DecisionRequest:
     return DecisionRequest(
         request_id=(f"{effect.effect_id}:healing-step-{effect.next_step_index():03d}:placement"),
@@ -771,6 +799,7 @@ def _expected_placement_request(
                 "component_unit_instance_id": component_id,
                 "source_selection_request_id": producer.request.request_id,
                 "source_selection_result_id": producer.result.result_id,
+                "revival_phase_start": validate_json_value(phase_start),
             }
         ),
         options=(parameterized_decision_option(),),
@@ -860,6 +889,9 @@ def _healing_step_from_event(*, event: EventRecord, effect: HealingEffect) -> He
         "step": validate_json_value(step.to_payload()),
     }
     if step.step_kind is HealingStepKind.REVIVE_MODEL:
+        expected_payload["revival_phase_start"] = validate_json_value(
+            validated_revival_phase_start_payload(payload.get("revival_phase_start"))
+        )
         expected_payload["revival_engagement"] = validate_json_value(
             validated_revival_engagement_payload(
                 payload.get("revival_engagement"),
@@ -1111,6 +1143,7 @@ def _validate_exact_pending_request(
             "component_unit_instance_id",
             "source_selection_request_id",
             "source_selection_result_id",
+            "revival_phase_start",
         }
     ):
         raise GameLifecycleError("Daemonic Manifestation placement request shape drifted.")
@@ -1149,6 +1182,15 @@ def _validate_exact_pending_request(
                 "component_unit_instance_id": component_id,
                 "source_selection_request_id": selection_request_id,
                 "source_selection_result_id": selection_result_id,
+                "revival_phase_start": validate_json_value(
+                    revival_phase_start_evidence(
+                        state=context.state,
+                        event_records=context.decisions.event_log.records,
+                        decision_records=context.decisions.records,
+                        target_unit_instance_id=effect.target_unit_instance_id,
+                        before_event_index=request_event_index,
+                    )
+                ),
             }
         ),
         options=(parameterized_decision_option(),),

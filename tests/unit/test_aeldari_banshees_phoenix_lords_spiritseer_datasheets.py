@@ -735,8 +735,11 @@ def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
             model_instance_id=target_model.model_instance_id,
             wounds=1,
         )
+    from tests.healing_phase_start_helpers import record_healing_phase_start
+
     runtime = CatalogCommandRestorationRuntime(fixture.indexes, fixture.armies)
     decisions = DecisionController()
+    record_healing_phase_start(state=fixture.state, decisions=decisions)
     request = runtime.request(
         CommandPhaseStartRequestContext(
             state=fixture.state,
@@ -1223,8 +1226,11 @@ def _start_tears_revival(
         fixture.state,
         model_instance_id=target_model.model_instance_id,
     )
+    from tests.healing_phase_start_helpers import record_healing_phase_start
+
     runtime = CatalogCommandRestorationRuntime(fixture.indexes, fixture.armies)
     decisions = DecisionController()
+    record_healing_phase_start(state=fixture.state, decisions=decisions)
     selection_request = runtime.request(
         CommandPhaseStartRequestContext(
             state=fixture.state,

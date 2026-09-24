@@ -44,6 +44,7 @@ def healing_source_rule_id_for_request(request: DecisionRequest) -> str | None:
 def invalid_healing_decision_status(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
@@ -51,12 +52,14 @@ def invalid_healing_decision_status(
     if request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
         return invalid_healing_model_decision_status(
             state=state,
+            decisions=decisions,
             request=request,
             result=result,
         )
     if request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE:
         return invalid_healing_revival_placement_status(
             state=state,
+            decisions=decisions,
             request=request,
             result=result,
             ruleset_descriptor=ruleset_descriptor,

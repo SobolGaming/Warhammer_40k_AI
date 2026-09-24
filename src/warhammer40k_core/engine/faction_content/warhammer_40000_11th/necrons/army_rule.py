@@ -140,6 +140,7 @@ def apply_reanimation_protocols_result(context: CommandPhaseStartResultContext) 
     )
     effect = _reanimation_healing_effect(
         state=context.state,
+        decisions=context.decisions,
         army=army,
         rules_unit=rules_unit,
         result_id=result.result_id,
@@ -185,6 +186,7 @@ def apply_reanimation_protocols_result(context: CommandPhaseStartResultContext) 
 def _reanimation_healing_effect(
     *,
     state: GameState,
+    decisions: DecisionController,
     army: ArmyDefinition,
     rules_unit: RulesUnitView,
     request_id: str,
@@ -222,6 +224,7 @@ def _reanimation_healing_effect(
         source_context=source_context,
         phase_start_model_ids=healing_phase_start_model_ids(
             state=state,
+            decisions=decisions,
             rules_unit=rules_unit,
         ),
     )

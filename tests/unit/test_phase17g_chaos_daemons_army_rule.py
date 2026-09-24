@@ -1996,7 +1996,10 @@ def test_staged_july_daemonic_manifestation_uses_attached_rules_unit_models() ->
         )
     )
     assert tuple(modifier.operand for modifier in modifiers) == (1,)
+    from tests.healing_phase_start_helpers import record_healing_phase_start
+
     decisions = DecisionController()
+    record_healing_phase_start(state=state, decisions=decisions)
     dice_manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = dice_manager.roll_fixed(request.spec, (6, 6))
     result = BattleShockResult.from_roll_state(

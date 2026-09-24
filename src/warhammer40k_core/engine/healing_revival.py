@@ -44,12 +44,19 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.physical_engagement import physical_geometry_models_for_rules_unit
 from warhammer40k_core.engine.return_placement_legality import (
     validate_returned_model_endpoints,
 )
 from warhammer40k_core.engine.revival_engagement import (
     RevivalEngagementPayload,
     revival_engagement_evidence,
+)
+from warhammer40k_core.engine.revival_phase_start import (
+    RevivalPhaseStartPayload,
+    revival_phase_start_evidence,
+    validate_revival_anchor_coherency,
+    validated_revival_phase_start_payload,
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -69,6 +76,7 @@ class HealingRevivalRequestPayload(TypedDict):
     submission_kind: str
     proposal_kind: str
     effect: HealingEffectPayload
+    revival_phase_start: RevivalPhaseStartPayload
     step_index: int
     model_instance_id: str
     component_unit_instance_id: str
@@ -87,6 +95,7 @@ class ValidatedHealingRevival:
     hypothetical_battlefield: BattlefieldRuntimeState
     transition_batch: BattlefieldTransitionBatch
     revival_engagement: RevivalEngagementPayload
+    revival_phase_start: RevivalPhaseStartPayload
 
 
 def request_healing_revival_placement(
@@ -113,6 +122,14 @@ def request_healing_revival_placement(
         unit_instance_id=effect.target_unit_instance_id,
     )
     step_index = effect.next_step_index()
+    phase_start = revival_phase_start_evidence(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        target_unit_instance_id=effect.target_unit_instance_id,
+    )
+    if tuple(phase_start["model_ids"]) != effect.phase_start_model_ids:
+        raise GameLifecycleError("Healing effect phase-start anchors differ from physical history.")
     request = DecisionRequest(
         request_id=f"{effect.effect_id}:healing-step-{step_index:03d}:placement",
         decision_type=SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
@@ -122,6 +139,7 @@ def request_healing_revival_placement(
                 submission_kind=SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
                 proposal_kind=ProposalKind.HEALING_REVIVAL.value,
                 effect=effect.to_payload(),
+                revival_phase_start=phase_start,
                 step_index=step_index,
                 model_instance_id=model_instance_id,
                 component_unit_instance_id=component_id,
@@ -142,6 +160,7 @@ def healing_effect_from_revival_request(*, request: DecisionRequest) -> HealingE
 def invalid_healing_revival_placement_status(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
@@ -149,6 +168,7 @@ def invalid_healing_revival_placement_status(
     try:
         _validated_healing_revival_submission(
             state=state,
+            decisions=decisions,
             request=request,
             result=result,
             ruleset_descriptor=ruleset_descriptor,
@@ -186,6 +206,7 @@ def apply_healing_revival_placement_decision(
     request = decisions.queue.peek_next()
     validated = _validated_healing_revival_submission(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         ruleset_descriptor=ruleset_descriptor,
@@ -215,6 +236,7 @@ def apply_recorded_healing_revival_placement_decision(
     decisions.record_for_result(result)
     validated = _validated_healing_revival_submission(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         ruleset_descriptor=ruleset_descriptor,
@@ -245,6 +267,7 @@ def apply_recorded_healing_revival_placement_decision(
             "source_context": updated.source_context,
             "step": validate_json_value(step.to_payload()),
             "revival_engagement": validate_json_value(validated.revival_engagement),
+            "revival_phase_start": validate_json_value(validated.revival_phase_start),
         },
     )
     return resolve_healing_until_blocked(
@@ -258,6 +281,7 @@ def apply_recorded_healing_revival_placement_decision(
 def _validated_healing_revival_submission(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
@@ -266,6 +290,16 @@ def _validated_healing_revival_submission(
         raise GameLifecycleError("Healing revival requires a RulesetDescriptor.")
     payload = _healing_revival_request_payload(request)
     effect = HealingEffect.from_payload(payload["effect"])
+    phase_start = revival_phase_start_evidence(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        target_unit_instance_id=effect.target_unit_instance_id,
+    )
+    if payload["revival_phase_start"] != phase_start or effect.phase_start_model_ids != tuple(
+        phase_start["model_ids"]
+    ):
+        raise GameLifecycleError("Healing revival phase-start authority drifted.")
     expected_request_id = (
         f"{effect.effect_id}:healing-step-{effect.next_step_index():03d}:placement"
     )
@@ -324,6 +358,7 @@ def _validated_healing_revival_submission(
         effect=effect,
         rules_unit=rules_unit,
         placement=placement,
+        phase_start=phase_start,
     )
 
 
@@ -349,6 +384,7 @@ def _healing_revival_request_payload(request: DecisionRequest) -> HealingRevival
         submission_kind=SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
         proposal_kind=ProposalKind.HEALING_REVIVAL.value,
         effect=cast(HealingEffectPayload, effect_payload),
+        revival_phase_start=validated_revival_phase_start_payload(raw.get("revival_phase_start")),
         step_index=step_index,
         model_instance_id=_payload_string(raw, key="model_instance_id"),
         component_unit_instance_id=_payload_string(
@@ -383,6 +419,7 @@ def _validate_revival_placement(
     effect: HealingEffect,
     rules_unit: RulesUnitView,
     placement: ModelPlacement,
+    phase_start: RevivalPhaseStartPayload,
 ) -> ValidatedHealingRevival:
     model = model_by_id(state=state, model_instance_id=placement.model_instance_id)
     if model.is_alive:
@@ -463,6 +500,7 @@ def _validate_revival_placement(
         hypothetical_battlefield=hypothetical_battlefield,
         transition_batch=transition,
         revival_engagement=engagement,
+        revival_phase_start=phase_start,
     )
 
 
@@ -474,41 +512,16 @@ def _validate_phase_start_anchor_coherency(
     rules_unit: RulesUnitView,
     placement: ModelPlacement,
 ) -> None:
-    policy = ruleset_descriptor.coherency_policy
-    if policy.max_horizontal_inches is None or policy.max_vertical_inches is None:
-        raise GameLifecycleError("Revival coherency policy is incomplete.")
-    phase_start_ids = set(effect.phase_start_model_ids)
-    all_placements = _rules_unit_model_placements(scenario=scenario, rules_unit=rules_unit)
-    phase_start_placements = tuple(
-        candidate for candidate in all_placements if candidate.model_instance_id in phase_start_ids
-    )
-    if not phase_start_placements:
-        raise GameLifecycleError("Revival has no phase-start model anchors.")
-    revived_model = geometry_model_for_placement(
-        model=scenario.model_instance_for_placement(placement),
-        placement=placement,
-    )
-    neighbor_count = 0
-    for anchor in phase_start_placements:
-        anchor_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(anchor),
-            placement=anchor,
-        )
-        if (
-            revived_model.base_distance_to(anchor_model) <= policy.max_horizontal_inches
-            and revived_model.volume.vertical_gap_to(
-                revived_model.pose,
-                anchor_model.volume,
-                anchor_model.pose,
-            )
-            <= policy.max_vertical_inches
-        ):
-            neighbor_count += 1
-    if neighbor_count < _required_neighbor_count(
+    validate_revival_anchor_coherency(
+        returned=geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(placement), placement=placement
+        ),
+        present_models=physical_geometry_models_for_rules_unit(
+            scenario=scenario, unit_instance_id=rules_unit.unit_instance_id
+        ),
+        phase_start_model_ids=effect.phase_start_model_ids,
         ruleset_descriptor=ruleset_descriptor,
-        model_count=len(all_placements),
-    ):
-        raise GameLifecycleError("Revived model is not coherent with phase-start models.")
+    )
 
 
 def _battlefield_with_returned_revival_model(
@@ -591,24 +604,6 @@ def _battlefield_with_returned_model_new_component(
     )
 
 
-def _rules_unit_model_placements(
-    *,
-    scenario: BattlefieldScenario,
-    rules_unit: RulesUnitView,
-) -> tuple[ModelPlacement, ...]:
-    placements: list[ModelPlacement] = []
-    for component in rules_unit.components:
-        unit_placement = scenario.battlefield_state.unit_placement_or_none(
-            component.unit.unit_instance_id
-        )
-        if unit_placement is None:
-            if not any(model.is_alive for model in component.unit.own_models):
-                continue
-            raise GameLifecycleError("Living revival component is not on the battlefield.")
-        placements.extend(unit_placement.model_placements)
-    return tuple(sorted(placements, key=lambda candidate: candidate.model_instance_id))
-
-
 def _army_for_component(
     *,
     state: GameState,
@@ -618,22 +613,6 @@ def _army_for_component(
         if any(unit.unit_instance_id == component_unit_instance_id for unit in army.units):
             return army
     raise GameLifecycleError("Healing revival component is not in an army.")
-
-
-def _required_neighbor_count(
-    *,
-    ruleset_descriptor: RulesetDescriptor,
-    model_count: int,
-) -> int:
-    policy = ruleset_descriptor.coherency_policy
-    threshold = policy.large_unit_model_count_threshold
-    if threshold is not None and model_count >= threshold:
-        if policy.required_neighbors_large_unit is None:
-            raise GameLifecycleError("Revival large-unit coherency policy is incomplete.")
-        return policy.required_neighbors_large_unit
-    if policy.required_neighbors_small_unit is None:
-        raise GameLifecycleError("Revival small-unit coherency policy is incomplete.")
-    return policy.required_neighbors_small_unit
 
 
 def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:

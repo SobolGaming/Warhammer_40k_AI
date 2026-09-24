@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+from tests.healing_phase_start_helpers import record_healing_phase_start
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.battlefield_state import (
@@ -11,9 +12,6 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
-from warhammer40k_core.engine.healing_geometry import (
-    healing_phase_start_model_ids,
-)
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.geometry.pose import Pose
@@ -50,12 +48,19 @@ def revival_projection_session(
         source_model_id=units["enemy"].own_models[0].model_instance_id,
     )
     unit = rules_unit_view_by_id(state=state, unit_instance_id=units["recipient"].unit_instance_id)
+    record_healing_phase_start(state=state, decisions=lifecycle.decision_controller)
     effect = HealingEffect(
         effect_id="order81-revival",
         target_unit_instance_id=unit.unit_instance_id,
         amount=1,
         opposing_player_id="player-b",
-        phase_start_model_ids=healing_phase_start_model_ids(state=state, rules_unit=unit),
+        phase_start_model_ids=tuple(
+            sorted(
+                model.model_instance_id
+                for model in unit.own_models
+                if model.model_instance_id in state.battlefield_state.placed_model_ids()
+            )
+        ),
         source_context={
             **({} if source_context is None else source_context),
             "revive_model_full_health": True,

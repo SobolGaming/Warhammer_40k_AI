@@ -286,10 +286,9 @@ def test_parameterized_request_layouts_cover_dispatch_and_published_examples() -
 
 
 def test_order81_matched_projection_component_budget() -> None:
-    # Order 82 removes the obsolete HealingEffect field from the shared fixture.
-    # Compare fresh measurements of both runtimes with that same fixture, while
-    # preserving the original Order 81 evidence and its unchanged budget.
-    folder = ROOT / "docs/performance/order82"
+    # Order 83 makes phase openings explicit in both matched fixtures. Preserve
+    # the original Order 81/82 evidence and enforce the unchanged Order 81 budget.
+    folder = ROOT / "docs/performance/order83"
     base = json.loads((folder / "projection-base.json").read_text())
     head = json.loads((folder / "projection-head.json").read_text())
     budgets = json.loads((ROOT / "docs/performance/order81/projection-budgets.json").read_text())
@@ -304,6 +303,7 @@ def test_order81_matched_projection_component_budget() -> None:
         "lock_sha256",
         "script_sha256",
         "fixture_sha256",
+        "phase_fixture_sha256",
     ):
         assert base[key] == head[key]
     assert (
@@ -315,6 +315,10 @@ def test_order81_matched_projection_component_budget() -> None:
     assert (
         head["fixture_sha256"]
         == hashlib.sha256((ROOT / "tests/order81_projection_helpers.py").read_bytes()).hexdigest()
+    )
+    assert (
+        head["phase_fixture_sha256"]
+        == hashlib.sha256((ROOT / "tests/healing_phase_start_helpers.py").read_bytes()).hexdigest()
     )
     assert len(base["rows"]) == len(head["rows"]) == 2
     for before, after in zip(base["rows"], head["rows"], strict=True):
@@ -330,5 +334,7 @@ def test_order81_matched_projection_component_budget() -> None:
         base["proposal_projections"]["nested_request"]
         == head["proposal_projections"]["nested_request"]
     )
-    assert base["proposal_projections"]["flat_request"]["status"] == "projection_error"
+    original_base = json.loads((ROOT / "docs/performance/order81/projection-base.json").read_text())
+    assert original_base["proposal_projections"]["flat_request"]["status"] == "projection_error"
+    assert base["proposal_projections"]["flat_request"]["status"] == "projected"
     assert head["proposal_projections"]["flat_request"]["status"] == "projected"

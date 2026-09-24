@@ -1,0 +1,768 @@
+{
+  "scope": "Order 83 / P01F / C01-06: actual phase-start revival coherency",
+  "base_commit": "03fd10e6d859743205c0c26bb653bc0b77b4bd85",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c461fe83f419b78d2311b60ed93608835145a36e2b37be43f928b8e5718e807",
+  "recorded_at": "2026-09-24T17:27:49.234782+00:00",
+  "final_validation_status": "passed_with_coverage_report_recovery",
+  "full_game_certified": false,
+  "complete_games": 0,
+  "node_path_prefix": "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+  "scope_audit": {
+    "new_named_handlers": 0,
+    "architecture_boundaries_changed": false,
+    "shared_physical_history_owner": "physical_model_authority_before_event",
+    "external_contract": "37.0.0",
+    "remaining_certification": "Order 84 / PFINAL after merge"
+  },
+  "interrupted_attempts": [
+    {
+      "name": "behavior",
+      "reason": "Interrupted at 8% to complete the remaining direct generic Stratagem fixture with real damage and an explicit phase opening before final validation. Production unchanged.",
+      "log_sha256": "6d4dc183a75ab58af015a5001b8f33a8bcaa51a2326647d5c6e45130f3a60cc7"
+    }
+  ],
+  "focused_stratagem_consumer": {
+    "passed": 54,
+    "seconds": 9.04
+  },
+  "behavioral_suite": {
+    "tests": 9196,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage": true,
+    "coverage_percent": 85.21827711417446,
+    "required_coverage_percent": 85,
+    "junit_sha256": "0c3272c03c3a1f80a731448aa9b2118c55f6d6d5dc9acf3868aa0587c1835655",
+    "warnings": 10,
+    "warning_note": "Unclosed SQLite ResourceWarnings; the same class is documented by Orders 81 and 82. None suppressed."
+  },
+  "coverage_report_recovery": {
+    "pytest_exit_code": 1,
+    "reason": "All 9196 tests passed; pytest-cov could not open the collected SQLite .coverage file while rendering its report.",
+    "commands": [
+      [
+        "uv",
+        "run",
+        "coverage",
+        "json",
+        "-o",
+        "/tmp/order83-validation/coverage.json",
+        "--fail-under=85"
+      ],
+      [
+        "uv",
+        "run",
+        "coverage",
+        "report",
+        "--skip-covered",
+        "--precision=2",
+        "--fail-under=85"
+      ]
+    ],
+    "exit_code": 0,
+    "coverage_percent": 85.21827711417446,
+    "coverage_json_sha256": "6d1e37d078a7d4662c0e6bd77e70217a64555157e5d5027f41dd3d6a1883d008",
+    "collected_data_sha256": "77a95bc82ce51d53b7efb66ab083d181737774357654d077852f467b84b9b8bb",
+    "production_changed": false
+  },
+  "environment_note": "Required bundled Node PATH prefix plus npm from the existing pyright-python nodeenv; elevated local socket/cache permissions for tests and conformance.",
+  "completed_at": "2026-09-24T18:08:11.835573+00:00",
+  "gate_attempts": [
+    {
+      "name": "typescript-generate",
+      "command": [
+        "npm",
+        "run",
+        "generate"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.7551600410079118,
+      "log_sha256": "09da031fd69a3e01420eb93b650bdab8f9e5e1178897329b38587918057fc05d",
+      "log_path": "/tmp/order83-validation/typescript-generate.log"
+    },
+    {
+      "name": "engine-build",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.32902249999460764,
+      "log_sha256": "8c65a08c5ce2f4e23a437fdd511ace0b9346ba8421d36a7a436268d49e79ff5b",
+      "log_path": "/tmp/order83-validation/engine-build.log"
+    },
+    {
+      "name": "contract-base",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "03fd10e6d859743205c0c26bb653bc0b77b4bd85"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 37.74597466699197,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/order83-validation/contract-base.log"
+    },
+    {
+      "name": "installed-wheel",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 9.573370333004277,
+      "log_sha256": "92c999002a010a0bf26839976ac75650579f4b5913c96decfad3e33db4661884",
+      "log_path": "/tmp/order83-validation/installed-wheel.log"
+    },
+    {
+      "name": "typescript-check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 1.3317299580085091,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13",
+      "log_path": "/tmp/order83-validation/typescript-check.log"
+    },
+    {
+      "name": "typescript-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.6294402499916032,
+      "log_sha256": "e68b8d7f1fa6e6cb3499da0c27048e55203bb1e9a082715480a2103871e07683",
+      "log_path": "/tmp/order83-validation/typescript-unit.log"
+    },
+    {
+      "name": "typescript-conformance",
+      "command": [
+        "npm",
+        "run",
+        "conformance"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 64.10772187501425,
+      "log_sha256": "e847c735ef28863e0149392765f92fd108b433b137129ac9d86b48d5c41c1bdc",
+      "log_path": "/tmp/order83-validation/typescript-conformance.log"
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.18861095799366012,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_path": "/tmp/order83-validation/ruff.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 0.04455370898358524,
+      "log_sha256": "7b4a8cd292eef4a8c04eccebe435dbb13f1387f5fce089a9f890952717515a13",
+      "log_path": "/tmp/order83-validation/format.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.08519445799174719,
+      "log_sha256": "72150397b310d0b7c2fa35305e7cf8aa1c32802a2372b0f59d252f6cd395b43c",
+      "log_path": "/tmp/order83-validation/format.log"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 1.1454626249906141,
+      "log_sha256": "943686bcdf160234817dd200c2948ee481f88792008c5527e01476e6fb2bd403",
+      "log_path": "/tmp/order83-validation/mypy.log"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 37.14438683298067,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1",
+      "log_path": "/tmp/order83-validation/pyright.log"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.4374366250121966,
+      "log_sha256": "c3e0ad844de6e478a1d3ccd7d960fdaaadfa6d1dee3272a717f944524c5f9a47",
+      "log_path": "/tmp/order83-validation/imports.log"
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.09204533402225934,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_path": "/tmp/order83-validation/ruff.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.04481854199548252,
+      "log_sha256": "72150397b310d0b7c2fa35305e7cf8aa1c32802a2372b0f59d252f6cd395b43c",
+      "log_path": "/tmp/order83-validation/format.log"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.6867225420137402,
+      "log_sha256": "943686bcdf160234817dd200c2948ee481f88792008c5527e01476e6fb2bd403",
+      "log_path": "/tmp/order83-validation/mypy.log"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 37.146240292000584,
+      "log_sha256": "cd097385ea5812e4a18604721c3ce6cfeb2d62d51f9259122d1cabb6ba9e4add",
+      "log_path": "/tmp/order83-validation/pyright.log"
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.07975008399807848,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_path": "/tmp/order83-validation/ruff.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.04442195800947957,
+      "log_sha256": "72150397b310d0b7c2fa35305e7cf8aa1c32802a2372b0f59d252f6cd395b43c",
+      "log_path": "/tmp/order83-validation/format.log"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.6902447089960333,
+      "log_sha256": "943686bcdf160234817dd200c2948ee481f88792008c5527e01476e6fb2bd403",
+      "log_path": "/tmp/order83-validation/mypy.log"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 37.100007917004405,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1",
+      "log_path": "/tmp/order83-validation/pyright.log"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.28413937499863096,
+      "log_sha256": "c3e0ad844de6e478a1d3ccd7d960fdaaadfa6d1dee3272a717f944524c5f9a47",
+      "log_path": "/tmp/order83-validation/imports.log"
+    },
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order83-validation/behavior.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 750.7441985830083,
+      "log_sha256": "026c5ac252fb8a6568d4f0cd1cc4af5ca1ccf60ead2baf3fe4d54d0e0fe96689",
+      "log_path": "/tmp/order83-validation/behavior-failed.log",
+      "resolution": "Two test-only Contract 36 wrapper literals updated to Contract 37; no production change. Full coverage gate repeated after focused verification."
+    },
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order83-validation/behavior.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 704.5487136250013,
+      "log_sha256": "d24aa13095442785ccde3ec3d43269548117d26a043c81d911f3c8fb589a632b",
+      "log_path": "/tmp/order83-validation/behavior.log"
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order83-validation/quality.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 110.35117654199712,
+      "log_sha256": "96d32fa5224eb54a1f901f830fbbca4e4e62dea90f0f2d6a00734f7497805117",
+      "log_path": "/tmp/order83-validation/quality-failed.log",
+      "resolution": "Abbreviated commit hashes in documentation matched the retired-edition identity audit. Expanded to full digests; no production or test changes."
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order83-validation/quality.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 110.12172675001784,
+      "log_sha256": "c343d8ebcf2eb8f705add76bf75af8f55fed07e10dc843e8d2f2339edf49b584",
+      "log_path": "/tmp/order83-validation/quality.log"
+    },
+    {
+      "name": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.06472054202458821,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/order83-validation/shards.log"
+    },
+    {
+      "name": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.593162666016724,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67",
+      "log_path": "/tmp/order83-validation/precommit.log"
+    }
+  ],
+  "final_gates": [
+    {
+      "name": "typescript-generate",
+      "command": [
+        "npm",
+        "run",
+        "generate"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.7551600410079118,
+      "log_sha256": "09da031fd69a3e01420eb93b650bdab8f9e5e1178897329b38587918057fc05d",
+      "log_path": "/tmp/order83-validation/typescript-generate.log"
+    },
+    {
+      "name": "engine-build",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.32902249999460764,
+      "log_sha256": "8c65a08c5ce2f4e23a437fdd511ace0b9346ba8421d36a7a436268d49e79ff5b",
+      "log_path": "/tmp/order83-validation/engine-build.log"
+    },
+    {
+      "name": "contract-base",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "03fd10e6d859743205c0c26bb653bc0b77b4bd85"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 37.74597466699197,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/order83-validation/contract-base.log"
+    },
+    {
+      "name": "installed-wheel",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 9.573370333004277,
+      "log_sha256": "92c999002a010a0bf26839976ac75650579f4b5913c96decfad3e33db4661884",
+      "log_path": "/tmp/order83-validation/installed-wheel.log"
+    },
+    {
+      "name": "typescript-check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 1.3317299580085091,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13",
+      "log_path": "/tmp/order83-validation/typescript-check.log"
+    },
+    {
+      "name": "typescript-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.6294402499916032,
+      "log_sha256": "e68b8d7f1fa6e6cb3499da0c27048e55203bb1e9a082715480a2103871e07683",
+      "log_path": "/tmp/order83-validation/typescript-unit.log"
+    },
+    {
+      "name": "typescript-conformance",
+      "command": [
+        "npm",
+        "run",
+        "conformance"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 64.10772187501425,
+      "log_sha256": "e847c735ef28863e0149392765f92fd108b433b137129ac9d86b48d5c41c1bdc",
+      "log_path": "/tmp/order83-validation/typescript-conformance.log"
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.07975008399807848,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_path": "/tmp/order83-validation/ruff.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.04442195800947957,
+      "log_sha256": "72150397b310d0b7c2fa35305e7cf8aa1c32802a2372b0f59d252f6cd395b43c",
+      "log_path": "/tmp/order83-validation/format.log"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.6902447089960333,
+      "log_sha256": "943686bcdf160234817dd200c2948ee481f88792008c5527e01476e6fb2bd403",
+      "log_path": "/tmp/order83-validation/mypy.log"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 37.100007917004405,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1",
+      "log_path": "/tmp/order83-validation/pyright.log"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.28413937499863096,
+      "log_sha256": "c3e0ad844de6e478a1d3ccd7d960fdaaadfa6d1dee3272a717f944524c5f9a47",
+      "log_path": "/tmp/order83-validation/imports.log"
+    },
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order83-validation/behavior.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 704.5487136250013,
+      "log_sha256": "d24aa13095442785ccde3ec3d43269548117d26a043c81d911f3c8fb589a632b",
+      "log_path": "/tmp/order83-validation/behavior.log",
+      "status": "tests_passed_coverage_report_recovered",
+      "resolved_by": "coverage_report_recovery"
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order83-validation/quality.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 110.12172675001784,
+      "log_sha256": "c343d8ebcf2eb8f705add76bf75af8f55fed07e10dc843e8d2f2339edf49b584",
+      "log_path": "/tmp/order83-validation/quality.log"
+    },
+    {
+      "name": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.06472054202458821,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_path": "/tmp/order83-validation/shards.log"
+    },
+    {
+      "name": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.593162666016724,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67",
+      "log_path": "/tmp/order83-validation/precommit.log"
+    }
+  ],
+  "quality_suite": {
+    "tests": 616,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "332cedd39eea28bbe4b20c7e09f85e11b4a9da0cf579169f79e5289bf8378419",
+    "coverage": false,
+    "distribution": "xdist worksteal; 18 workers"
+  }
+}

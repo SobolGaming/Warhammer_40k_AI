@@ -35,6 +35,13 @@ from warhammer40k_core.engine.revival_engagement import (
     validate_revival_engagement_geometry,
     validated_revival_engagement_payload,
 )
+from warhammer40k_core.engine.revival_phase_start import (
+    revival_phase_start_evidence,
+    revival_phase_start_for_request,
+    validate_revival_anchor_coherency,
+    validate_revival_selection_phase_start,
+    validated_revival_phase_start_payload,
+)
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
@@ -52,9 +59,39 @@ def validate_revival_engagement_history(
     requests = (*pending_decision_requests, *(row.request for row in decision_records))
     for request in requests:
         if request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
-            healing_effect_from_request(request=request)
+            effect = healing_effect_from_request(request=request)
+            if request in pending_decision_requests:
+                validate_revival_selection_phase_start(
+                    state=state,
+                    event_records=event_records,
+                    decision_records=decision_records,
+                    request=request,
+                    target_unit_instance_id=effect.target_unit_instance_id,
+                    phase_start_model_ids=effect.phase_start_model_ids,
+                )
         elif request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE:
-            healing_effect_from_revival_request(request=request)
+            effect = healing_effect_from_revival_request(request=request)
+            expected = revival_phase_start_for_request(
+                state=state,
+                event_records=event_records,
+                decision_records=decision_records,
+                request=request,
+                target_unit_instance_id=effect.target_unit_instance_id,
+            )
+            if not isinstance(request.payload, dict):
+                raise GameLifecycleError("Revival request must be an object.")
+            if (
+                request.payload.get("revival_phase_start") != expected
+                or tuple(expected["model_ids"]) != effect.phase_start_model_ids
+            ):
+                raise GameLifecycleError("Revival phase-start request history drifted.")
+            if request in pending_decision_requests and expected != revival_phase_start_evidence(
+                state=state,
+                event_records=event_records,
+                decision_records=decision_records,
+                target_unit_instance_id=effect.target_unit_instance_id,
+            ):
+                raise GameLifecycleError("Pending revival phase-start occurrence is stale.")
     completions: set[str] = set()
     for index, event in enumerate(event_records):
         if event.event_type != "healing_step_resolved":
@@ -86,12 +123,12 @@ def validate_revival_engagement_history(
             payload=payload,
         )
         completions.add(result_id)
-    expected = {
+    expected_completions = {
         record.result.result_id
         for record in decision_records
         if record.request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
     }
-    if completions != expected:
+    if completions != expected_completions:
         raise GameLifecycleError("Revival placement decisions and mutations are not one-to-one.")
 
 
@@ -189,3 +226,26 @@ def _validate_completed_revival(
     )
     if actual != expected:
         raise GameLifecycleError("Revival engagement evidence differs from physical history.")
+    phase_start = revival_phase_start_for_request(
+        state=state,
+        event_records=events,
+        decision_records=records,
+        request=record.request,
+        target_unit_instance_id=target.unit_instance_id,
+    )
+    if validated_revival_phase_start_payload(payload.get("revival_phase_start")) != phase_start:
+        raise GameLifecycleError(
+            "Revival phase-start event evidence differs from physical history."
+        )
+    validate_revival_anchor_coherency(
+        returned=geometry_model_for_placement(
+            model=identities[placement.model_instance_id][2], placement=placement
+        ),
+        present_models=tuple(
+            geometry[model.model_instance_id]
+            for model in target.own_models
+            if model.model_instance_id in geometry
+        ),
+        phase_start_model_ids=tuple(phase_start["model_ids"]),
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )

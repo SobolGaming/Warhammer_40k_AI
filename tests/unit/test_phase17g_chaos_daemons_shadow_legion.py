@@ -592,20 +592,35 @@ def test_shadow_legion_death_denied_heals_and_revives_tzeentch_model_at_full_wou
     destroyed_model = unit.own_models[1]
     if wounded_model.starting_wounds < 2 or destroyed_model.starting_wounds < 2:
         raise AssertionError("Death Denied fixture requires multi-wound models.")
-    _set_model_wounds(
-        state,
-        model_instance_id=wounded_model.model_instance_id,
-        wounds_remaining=wounded_model.starting_wounds - 1,
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+    from tests.healing_phase_start_helpers import wound_model_for_healing_fixture
+    from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+
+    decisions = DecisionController()
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    wound_model_for_healing_fixture(
+        state=state,
+        decisions=decisions,
+        target_unit_id=unit.unit_instance_id,
+        model_id=wounded_model.model_instance_id,
     )
     if state.battlefield_state is None:
         raise AssertionError("Death Denied fixture requires battlefield state.")
     destroyed_placement = state.battlefield_state.model_placement_by_id(
         destroyed_model.model_instance_id
     )
-    _destroy_model(state, model_instance_id=destroyed_model.model_instance_id)
+    destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=destroyed_model.model_instance_id,
+        destroying_player_id="player-b",
+        source_unit_id=None,
+        source_model_id=None,
+    )
 
     decisions, _use_record = _use_shadow_legion_stratagem(
         state,
+        decisions=decisions,
         stratagem_id=shadow_legion_ir.DEATH_DENIED_STRATAGEM_ID,
         target_unit_id=unit.unit_instance_id,
         phase=BattlePhase.COMMAND,
@@ -3691,6 +3706,7 @@ def _use_shadow_legion_stratagem(
     trigger_kind: TimingTriggerKind | None = None,
     trigger_payload: JsonValue = None,
     effect_selection: JsonValue = None,
+    decisions: DecisionController | None = None,
 ) -> tuple[DecisionController, StratagemUseRecord]:
     record = _shadow_legion_stratagem_record(stratagem_id)
     definition = record.definition
@@ -3732,7 +3748,10 @@ def _use_shadow_legion_stratagem(
         effect_selection=effect_selection,
         effect_payload=definition.effect_payload,
     )
-    decisions = DecisionController()
+    from tests.healing_phase_start_helpers import record_healing_phase_start
+
+    decisions = DecisionController() if decisions is None else decisions
+    record_healing_phase_start(state=state, decisions=decisions)
     option = _stratagem_decision_option(
         context=context,
         record=record,
@@ -3998,13 +4017,6 @@ def _set_model_wounds(
     if not did_replace:
         raise AssertionError(f"Missing model {model_instance_id}.")
     state.army_definitions = updated_armies
-
-
-def _destroy_model(state: GameState, *, model_instance_id: str) -> None:
-    _set_model_wounds(state, model_instance_id=model_instance_id, wounds_remaining=0)
-    if state.battlefield_state is None:
-        raise AssertionError("Expected battlefield_state.")
-    state.battlefield_state = state.battlefield_state.with_removed_models((model_instance_id,))
 
 
 def _assign_malice_made_manifest(state: GameState, *, unit: UnitInstance) -> None:

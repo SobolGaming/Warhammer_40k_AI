@@ -6762,3 +6762,29 @@ facts reach both viewers; protected nested source context remains redacted.
 
 Persistence uses `session-persistence-v28-revival-engagement`, replay uses
 `replay-artifact-v30-revival-engagement`, and server wrappers use v36.
+
+
+## Order 83 / Contract 37: revival phase-start authority
+
+A battlefield revival placement request carries required `revival_phase_start`
+evidence: `rule_source_id`, `source_package_hash`, `game_id`, `battle_round`,
+`turn_owner_player_id`, `phase`, `phase_start_event_id`, `phase_start_window_id`,
+`target_unit_instance_id`, and sorted unique `model_ids`. The engine reconstructs
+this inventory from physical history before the actual phase-opening timing
+window, before its rules change presence. The effect's `phase_start_model_ids`
+must match. Distances use current poses of other physically present phase-start
+models. Models absent at phase opening cannot gain anchor eligibility through
+later revival or setup.
+
+The existing finite healing selection and parameterized placement submission
+paths remain authoritative. Stale phase occurrences, malformed evidence and
+invalid endpoints are rejected before queue pop or mutation. The accepted
+`healing_step_resolved` event repeats authenticated phase-start evidence; restore
+checks pending and completed placement records and historical coherency.
+Embarked revival remains governed by its separate cargo/capacity path.
+Pre-return enemy engagement remains a separate Order 82 predicate.
+
+Both viewers receive the existing public revival request/event projection; no
+hidden-information policy changes. Replay and persistence use Contract 37's
+strict schema boundary and exact runtime identity. See
+[the migration](../contracts/migrations/36-to-37.md).
