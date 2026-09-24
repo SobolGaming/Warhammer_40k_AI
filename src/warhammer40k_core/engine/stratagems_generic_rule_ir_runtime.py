@@ -28,7 +28,6 @@ from warhammer40k_core.engine.destruction_provenance import DestructionSourceKin
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.healing_geometry import (
-    healing_phase_start_enemy_engagement_model_ids,
     healing_phase_start_model_ids,
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
@@ -1032,10 +1031,6 @@ def _healing_effect(
         source_rule_id=_rule_effect_source_id(effect_payload),
         source_context=validate_json_value(source_context),
         phase_start_model_ids=healing_phase_start_model_ids(
-            state=state,
-            rules_unit=rules_unit,
-        ),
-        phase_start_enemy_engagement_model_ids=healing_phase_start_enemy_engagement_model_ids(
             state=state,
             rules_unit=rules_unit,
         ),

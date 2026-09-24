@@ -59,7 +59,6 @@ class HealingEffectPayload(TypedDict):
     source_rule_id: str
     source_context: JsonValue
     phase_start_model_ids: list[str]
-    phase_start_enemy_engagement_model_ids: list[str]
     resolved_steps: list[HealingStepPayload]
 
 
@@ -227,7 +226,6 @@ class HealingEffect:
     source_rule_id: str = CORE_HEALING_RULE_ID
     source_context: JsonValue = None
     phase_start_model_ids: tuple[str, ...] = ()
-    phase_start_enemy_engagement_model_ids: tuple[str, ...] = ()
     resolved_steps: tuple[HealingStep, ...] = ()
 
     def __post_init__(self) -> None:
@@ -263,15 +261,6 @@ class HealingEffect:
             _validate_identifier_tuple(
                 "phase_start_model_ids",
                 self.phase_start_model_ids,
-                min_length=0,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "phase_start_enemy_engagement_model_ids",
-            _validate_identifier_tuple(
-                "phase_start_enemy_engagement_model_ids",
-                self.phase_start_enemy_engagement_model_ids,
                 min_length=0,
             ),
         )
@@ -323,7 +312,6 @@ class HealingEffect:
             source_rule_id=self.source_rule_id,
             source_context=self.source_context,
             phase_start_model_ids=self.phase_start_model_ids,
-            phase_start_enemy_engagement_model_ids=self.phase_start_enemy_engagement_model_ids,
             resolved_steps=(*self.resolved_steps, step),
         )
 
@@ -337,14 +325,13 @@ class HealingEffect:
             "source_rule_id": self.source_rule_id,
             "source_context": self.source_context,
             "phase_start_model_ids": list(self.phase_start_model_ids),
-            "phase_start_enemy_engagement_model_ids": list(
-                self.phase_start_enemy_engagement_model_ids
-            ),
             "resolved_steps": [step.to_payload() for step in self.resolved_steps],
         }
 
     @classmethod
     def from_payload(cls, payload: HealingEffectPayload) -> Self:
+        if "phase_start_enemy_engagement_model_ids" in payload:
+            raise GameLifecycleError("Legacy model-scoped revival evidence is unsupported.")
         return cls(
             effect_id=payload["effect_id"],
             target_unit_instance_id=payload["target_unit_instance_id"],
@@ -354,9 +341,6 @@ class HealingEffect:
             source_rule_id=payload["source_rule_id"],
             source_context=payload["source_context"],
             phase_start_model_ids=tuple(payload["phase_start_model_ids"]),
-            phase_start_enemy_engagement_model_ids=tuple(
-                payload["phase_start_enemy_engagement_model_ids"]
-            ),
             resolved_steps=tuple(
                 HealingStep.from_payload(step) for step in payload["resolved_steps"]
             ),

@@ -1,0 +1,347 @@
+{
+  "scope": "Order 82 / P01E / C01-05: revived-model engagement by canonical enemy rules unit",
+  "base_commit": "c0d172f2f209f75144da1625b0f5b6f0721b9c34",
+  "recorded_at": "2026-09-24T15:01:47.584091+00:00",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+  "final_validation_status": "passed",
+  "source_observation": {
+    "row_id": "revival:40k-app",
+    "provider_name": "40k.app",
+    "source_url": "https://www.40k.app/rules/01-core-concepts",
+    "observed_at": "2026-09-24T13:16:10+00:00",
+    "app_version": null,
+    "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "rule_source_id": "gw-11e-core-revival:revival",
+    "transcription_sha256": "cce4b8e3cd0c8a6efb2e36e5a2c72c569be3675493482bdf8a33570a95889b02",
+    "provider_non_affiliation_recorded": true,
+    "source_observation_sha256": "5214e698c41ef0abba31b49f415e6808c5c79b9718cfaf0b7246c5a796207e3c"
+  },
+  "scope_audit": {
+    "runtime_owners": [
+      "healing_revival",
+      "revival_engagement",
+      "revival_engagement_history"
+    ],
+    "historical_physical_authority": "physical_model_authority_before_event",
+    "new_named_handlers": 0,
+    "architecture_boundaries_changed": false,
+    "adapter_contract_updated": true,
+    "external_contract": "36.0.0",
+    "persistence": "session-persistence-v28-revival-engagement",
+    "replay": "replay-artifact-v30-revival-engagement",
+    "remaining_prerequisite": "Order 83 / PFINAL after this PR merges"
+  },
+  "behavioral_suite": {
+    "tests": 9177,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "9a08543849da3c56380a795a51f32a5f265d1f1cebef9c4ac26cc51092362f14",
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage": true,
+    "coverage_percent": 85.21671088666858,
+    "required_coverage_percent": 85,
+    "warnings": 10,
+    "warning_note": "Unclosed SQLite ResourceWarnings; the same warning class is documented in the Order 81 review evidence. No warnings were suppressed."
+  },
+  "code_quality_suite": {
+    "tests": 615,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "2d03e5e839c37a365557cbb6d263874685769cd5a6722b319a4e1b270d1b7984",
+    "distribution": "xdist worksteal; 18 workers",
+    "coverage": false
+  },
+  "focused_validation": {
+    "initial_healing_and_projection": 184,
+    "consumer_integration": 64,
+    "producer_integration": 109,
+    "final_order82_regressions": 18,
+    "corrected_expectations": 3
+  },
+  "performance": {
+    "workload": "order82-revival-engagement-v1",
+    "cases": 5,
+    "samples_per_case": 3,
+    "maximum_sample_seconds": 3.093346042005578,
+    "host_role": "provisional",
+    "complete_game_samples": 0,
+    "full_game_certified": false,
+    "refresh_report": "docs/performance/order82/inherited-refresh.json",
+    "refresh_sha256": "f63dc676640507d604cbbcfe0fa8557942e65d323cadde0e38188269a72d7415",
+    "completed_measurements": 21,
+    "inherited_budgets_and_baselines_unchanged": true,
+    "projection_fixture_migration": "Original Order 81 runtime 45561d864c3634ce1d0e00d2b6599091ef43ed58 and current runtime remeasured with the same updated fixture into Order 82 reports; original reports and budget preserved."
+  },
+  "final_gates": [
+    {
+      "name": "build-check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.31498004199238494,
+      "log_path": "reports/order82/final-build-check.txt",
+      "log_sha256": "2d2bddcb95aadb709c13d8efd3f716f63740d834d27286fa2029f60a363d95ce"
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.12263033300405368,
+      "log_path": "reports/order82/final-ruff.txt",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.05791291600326076,
+      "log_path": "reports/order82/final-format.txt",
+      "log_sha256": "9a5257d3265530451c210b2a7f9bbb382a7f8d6f9af502f9e448fdd1546181b0"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 1.567683291999856,
+      "log_path": "reports/order82/final-mypy.txt",
+      "log_sha256": "13fbc6d89e4f712500ae5ac7bdff682c74e41c4f738c1d393f5a8d62ad6a7737"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 39.75104941602331,
+      "log_path": "reports/order82/final-pyright.txt",
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-report=json:reports/order82/coverage.json",
+        "--cov-fail-under=85",
+        "--junitxml=reports/order82/behavior.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 715.5008862919931,
+      "log_path": "reports/order82/final-behavior.txt",
+      "log_sha256": "103a7374291938ee23c0e2c151bc418e2beb526e6afefdce1ae0b5a632a17245"
+    },
+    {
+      "name": "shards-regenerate",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "reports/order82/behavior.xml",
+        "--profile-source",
+        "Local macOS 26.7; Apple M5 Pro; Order 82 final runtime 36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c; base c0d172f2; 18 xdist worksteal workers; complete behavioral coverage run",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.18926383400685154,
+      "log_path": "reports/order82/final-shards-regenerate.txt",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=reports/order82/quality.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 108.60151866698288,
+      "log_path": "reports/order82/final-quality.txt",
+      "log_sha256": "327d778f3eeaf81294bb17c8b54062fb91177a09fbe2408ab46384bf4fae5f8c"
+    },
+    {
+      "name": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.11202937498455867,
+      "log_path": "reports/order82/final-shards.txt",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.26171487499959767,
+      "log_path": "reports/order82/final-imports.txt",
+      "log_sha256": "762e67465041aefa0bd51ea4890b3d541b3fa91dbf58635d7f4e59f3442b1f7a"
+    },
+    {
+      "name": "contract-check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "c0d172f2f209f75144da1625b0f5b6f0721b9c34"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 38.87031375002698,
+      "log_path": "reports/order82/final-contract-check.txt",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 7.892060957994545,
+      "log_path": "reports/order82/final-wheel.txt",
+      "log_sha256": "f64d8dfcf6d674ed0b17d306d2a01eda961aefcb96118964c838cf56ae580ada"
+    },
+    {
+      "name": "client-check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 1.6262830829946324,
+      "log_path": "reports/order82/final-client-check.txt",
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "name": "client-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.643432999990182,
+      "log_path": "reports/order82/final-client-unit.txt",
+      "log_sha256": "e655ccbce4a7e6c14ac65423a30abb1e3be85bb093942c390d1538995e4f7815"
+    },
+    {
+      "name": "client-conformance",
+      "command": [
+        "npm",
+        "run",
+        "conformance"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 64.33761424999102,
+      "log_path": "reports/order82/final-client-conformance.txt",
+      "log_sha256": "63c9385a383e5f2683f39931524c694d1881d137b580376dabfb178738c89280"
+    },
+    {
+      "name": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.8005004159931559,
+      "log_path": "reports/order82/final-precommit.txt",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "iteration_notes": [
+    "Initial facade regression reproduced the reported legal-placement rejection on the base. Matched base/head reports also retain the rejected base and accepted repaired outcomes.",
+    "The first aggregate attempt was interrupted while correcting a stale TypeScript contract pin. It exposed an exact Daemonic Manifestation event reader needing the new typed evidence and a historical fixture lacking deployment anchors; both were corrected without weakening runtime validation.",
+    "A complete coverage attempt passed 9174 tests with 85.22% coverage but failed three stale assertions (two replay-v29 expectations and the old source-package count). The corrected expectations passed focused tests, followed by the successful complete final coverage run reported above.",
+    "No second no-coverage behavioral aggregate was run. Code-quality validation follows the successful complete coverage run.",
+    "The first code-quality run passed 614 checks and exposed one additional stale source-package count in the static inventory guard; it was corrected and the complete quality suite rerun. Production code and the successful behavioral coverage result remained unchanged.",
+    "An initial wheel build hit an unknown TLS issuer; UV_SYSTEM_CERTS=true used the trusted system certificate store for successful package verification.",
+    "The required Node PATH prefix and npm from the existing pyright nodeenv were used. Local socket and cache permissions were enabled for HTTP/conformance tests.",
+    "The successful complete local JUnit profile regenerated all eight shard manifests and durations, labelled with macOS host, runtime and worker count.",
+    "Historical Order 81 defect probes retain their original APIs and run only against their explicitly named base runtime; current Order 82 diagnostics use the shared facade fixture."
+  ]
+}

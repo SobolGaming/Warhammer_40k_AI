@@ -1,0 +1,110 @@
+{
+  "workload": "order82-revival-engagement-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:36c7f4dde72e3611e033b2f88a8240ee2972f6d5625bb7aca92f958430d7841c",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "host_role": "provisional",
+  "concurrency": 1,
+  "timing_boundary": "Two viewer projections, one facade submission, exact checkpoint recovery and replay; fixture setup excluded.",
+  "fixture": "Two canonical five-model units, optional attached Leaders or second enemy; flat empty terrain; no random draws.",
+  "hashes": {
+    "scripts/measure_order82.py": "f78e4cbf0997da8348c1086ed37f81b480536f854c79cc6644050e5e6ffb6c43",
+    "tests/order82_revival_helpers.py": "2bc24eda35896c28ab83cb7c2a2e00c333f314dbf35cfd004d58c596a6df1171",
+    "tests/phase15c_fight_order_helpers.py": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
+    "tests/fight_on_death_helpers.py": "aed9a5a1fd26feddc518f5207d6a36b7c28b5344218f9a218b23bc92aae01b63",
+    "tests/destruction_occurrence_fixture_helpers.py": "40238f25557d372c099153e5648e23c0f1142394abf0b79b2280fa820a2eba0d",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "unengaged-control",
+      "samples_seconds": [
+        3.0426287919981405,
+        3.0285959159955382,
+        3.0396705419989303
+      ],
+      "outcomes": [
+        "waiting_for_decision",
+        "waiting_for_decision",
+        "waiting_for_decision"
+      ],
+      "complete": true,
+      "mean_seconds": 3.0369650833308697,
+      "median_seconds": 3.0396705419989303,
+      "maximum_seconds": 3.0426287919981405
+    },
+    {
+      "case": "same-enemy-unit",
+      "samples_seconds": [
+        3.0068374169932213,
+        3.0498432079912163,
+        3.0630707909876946
+      ],
+      "outcomes": [
+        "waiting_for_decision",
+        "waiting_for_decision",
+        "waiting_for_decision"
+      ],
+      "complete": true,
+      "mean_seconds": 3.0399171386573776,
+      "median_seconds": 3.0498432079912163,
+      "maximum_seconds": 3.0630707909876946
+    },
+    {
+      "case": "attached",
+      "samples_seconds": [
+        3.093346042005578,
+        3.0550127500027884,
+        3.050959457992576
+      ],
+      "outcomes": [
+        "waiting_for_decision",
+        "waiting_for_decision",
+        "waiting_for_decision"
+      ],
+      "complete": true,
+      "mean_seconds": 3.066439416666981,
+      "median_seconds": 3.0550127500027884,
+      "maximum_seconds": 3.093346042005578
+    },
+    {
+      "case": "retained-enemy",
+      "samples_seconds": [
+        3.076364458014723,
+        3.085622666985728,
+        3.0907322079874575
+      ],
+      "outcomes": [
+        "waiting_for_decision",
+        "waiting_for_decision",
+        "waiting_for_decision"
+      ],
+      "complete": true,
+      "mean_seconds": 3.0842397776626362,
+      "median_seconds": 3.085622666985728,
+      "maximum_seconds": 3.0907322079874575
+    },
+    {
+      "case": "new-enemy-unit",
+      "samples_seconds": [
+        2.843294583988609,
+        2.8896715409937315,
+        2.8853727499954402
+      ],
+      "outcomes": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "complete": true,
+      "mean_seconds": 2.8727796249925937,
+      "median_seconds": 2.8853727499954402,
+      "maximum_seconds": 2.8896715409937315
+    }
+  ],
+  "coverage": false,
+  "full_game_certified": false
+}

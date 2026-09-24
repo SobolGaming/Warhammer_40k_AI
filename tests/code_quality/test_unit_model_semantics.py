@@ -227,14 +227,6 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "_model_engaged",
         ): 1,
         (
-            "src/warhammer40k_core/engine/healing_geometry.py",
-            "healing_phase_start_enemy_engagement_model_ids",
-        ): 1,
-        (
-            "src/warhammer40k_core/engine/healing_revival.py",
-            "_validate_revived_model_engagement",
-        ): 1,
-        (
             "src/warhammer40k_core/engine/charge_move_geometry.py",
             "_model_groups_are_engaged",
         ): 1,

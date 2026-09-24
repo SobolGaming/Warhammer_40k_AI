@@ -47,6 +47,10 @@ from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.return_placement_legality import (
     validate_returned_model_endpoints,
 )
+from warhammer40k_core.engine.revival_engagement import (
+    RevivalEngagementPayload,
+    revival_engagement_evidence,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
@@ -82,6 +86,7 @@ class ValidatedHealingRevival:
     hypothetical_armies: tuple[ArmyDefinition, ...]
     hypothetical_battlefield: BattlefieldRuntimeState
     transition_batch: BattlefieldTransitionBatch
+    revival_engagement: RevivalEngagementPayload
 
 
 def request_healing_revival_placement(
@@ -239,6 +244,7 @@ def apply_recorded_healing_revival_placement_decision(
             "source_rule_id": updated.source_rule_id,
             "source_context": updated.source_context,
             "step": validate_json_value(step.to_payload()),
+            "revival_engagement": validate_json_value(validated.revival_engagement),
         },
     )
     return resolve_healing_until_blocked(
@@ -428,10 +434,10 @@ def _validate_revival_placement(
         rules_unit=hypothetical_rules_unit,
         placement=placement,
     )
-    _validate_revived_model_engagement(
-        scenario=scenario,
+    engagement = revival_engagement_evidence(
+        scenario=battlefield_scenario_for_state(state=state),
         ruleset_descriptor=ruleset_descriptor,
-        effect=effect,
+        target_unit_instance_id=effect.target_unit_instance_id,
         placement=placement,
     )
     transition = BattlefieldTransitionBatch(
@@ -456,6 +462,7 @@ def _validate_revival_placement(
         hypothetical_armies=hypothetical_armies,
         hypothetical_battlefield=hypothetical_battlefield,
         transition_batch=transition,
+        revival_engagement=engagement,
     )
 
 
@@ -502,40 +509,6 @@ def _validate_phase_start_anchor_coherency(
         model_count=len(all_placements),
     ):
         raise GameLifecycleError("Revived model is not coherent with phase-start models.")
-
-
-def _validate_revived_model_engagement(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    effect: HealingEffect,
-    placement: ModelPlacement,
-) -> None:
-    revived_model = geometry_model_for_placement(
-        model=scenario.model_instance_for_placement(placement),
-        placement=placement,
-    )
-    allowed_enemy_ids = set(effect.phase_start_enemy_engagement_model_ids)
-    engaged_enemy_ids: set[str] = set()
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == placement.player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            for enemy_placement in unit_placement.model_placements:
-                if not scenario.model_is_present_at_placement(enemy_placement):
-                    continue
-                enemy_model = geometry_model_for_placement(
-                    model=scenario.model_instance_for_placement(enemy_placement),
-                    placement=enemy_placement,
-                )
-                if revived_model.is_within_engagement_range(
-                    enemy_model,
-                    horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                    vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-                ):
-                    engaged_enemy_ids.add(enemy_placement.model_instance_id)
-    if engaged_enemy_ids - allowed_enemy_ids:
-        raise GameLifecycleError("Revived model engages a new enemy model.")
 
 
 def _battlefield_with_returned_revival_model(

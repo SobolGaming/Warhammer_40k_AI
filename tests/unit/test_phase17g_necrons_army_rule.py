@@ -61,6 +61,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.physical_engagement import (
+    current_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
@@ -847,9 +850,9 @@ def test_reanimation_phase_start_engagement_ignores_destroyed_enemy_placements()
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=NECRON_UNIT_1_ID)
 
     assert (
-        healing_geometry.healing_phase_start_enemy_engagement_model_ids(
+        current_physically_engaged_enemy_rules_unit_ids(
             state=state,
-            rules_unit=rules_unit,
+            unit_instance_id=rules_unit.unit_instance_id,
         )
         == ()
     )

@@ -57,6 +57,7 @@ from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.revival_engagement import validated_revival_engagement_payload
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     current_rules_unit_views_for_identity,
@@ -850,16 +851,21 @@ def _healing_step_from_event(*, event: EventRecord, effect: HealingEffect) -> He
     payload = _object(event.payload, "healing step event")
     raw_step = _object(payload.get("step"), "healing step")
     step = HealingStep.from_payload(cast(HealingStepPayload, raw_step))
-    expected_payload = validate_json_value(
-        {
-            "effect_id": effect.effect_id,
-            "target_unit_instance_id": effect.target_unit_instance_id,
-            "amount": effect.amount,
-            "source_rule_id": effect.source_rule_id,
-            "source_context": effect.source_context,
-            "step": step.to_payload(),
-        }
-    )
+    expected_payload: dict[str, JsonValue] = {
+        "effect_id": effect.effect_id,
+        "target_unit_instance_id": effect.target_unit_instance_id,
+        "amount": effect.amount,
+        "source_rule_id": effect.source_rule_id,
+        "source_context": effect.source_context,
+        "step": validate_json_value(step.to_payload()),
+    }
+    if step.step_kind is HealingStepKind.REVIVE_MODEL:
+        expected_payload["revival_engagement"] = validate_json_value(
+            validated_revival_engagement_payload(
+                payload.get("revival_engagement"),
+                target_unit_instance_id=effect.target_unit_instance_id,
+            )
+        )
     if event.payload != expected_payload:
         raise GameLifecycleError("Daemonic Manifestation healing step drifted.")
     return step
@@ -1002,17 +1008,7 @@ def _validate_effect_prefix(
     if len(step_events) != len(effect.resolved_steps):
         raise GameLifecycleError("Daemonic Manifestation healing progress drifted.")
     for (event_index, event), step in zip(step_events, effect.resolved_steps, strict=True):
-        expected_payload = validate_json_value(
-            {
-                "effect_id": effect.effect_id,
-                "target_unit_instance_id": effect.target_unit_instance_id,
-                "amount": effect.amount,
-                "source_rule_id": effect.source_rule_id,
-                "source_context": effect.source_context,
-                "step": step.to_payload(),
-            }
-        )
-        if event.payload != expected_payload:
+        if _healing_step_from_event(event=event, effect=effect) != step:
             raise GameLifecycleError("Daemonic Manifestation healing step drifted.")
         if step.request_id is not None and step.result_id is not None:
             validate_mutation_decision_closure(
