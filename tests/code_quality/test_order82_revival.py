@@ -78,9 +78,9 @@ def test_revival_uses_one_shared_physical_predicate_and_no_producer_model_allowl
 
 
 def test_revival_matched_slice_performance() -> None:
-    folder = ROOT / "docs/performance/order82"
+    folder = ROOT / "docs/performance/order83"
     base, head = (json.loads((folder / name).read_bytes()) for name in ("base.json", "head.json"))
-    budget = json.loads((folder / "budgets.json").read_bytes())
+    budget = json.loads((ROOT / "docs/performance/order82/budgets.json").read_bytes())
     assert head["runtime_build_id"] == verified_engine_build_identity().build_id
     for key in (
         "workload",
@@ -118,3 +118,43 @@ def test_revival_matched_slice_performance() -> None:
         )
         assert after["maximum_seconds"] <= budget["maximum_seconds"]
     assert not head["full_game_certified"]
+
+
+def test_phase_start_revival_consumers_share_historical_membership_authority() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    helper = ast.parse((engine / "healing_geometry.py").read_text())
+    function = next(
+        node
+        for node in helper.body
+        if isinstance(node, ast.FunctionDef) and node.name == "healing_phase_start_model_ids"
+    )
+    calls = {
+        node.func.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "revival_phase_start_evidence" in calls
+    assert "healing_rules_unit_placements" not in calls
+    for filename in (
+        "catalog_command_restoration_runtime.py",
+        "stratagems_generic_rule_ir_runtime.py",
+        "faction_content/warhammer_40000_11th/necrons/army_rule.py",
+        "faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
+    ):
+        tree = ast.parse((engine / filename).read_text())
+        invocations = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "healing_phase_start_model_ids"
+        ]
+        assert invocations
+        assert all("decisions" in {kw.arg for kw in node.keywords} for node in invocations)
+    history = (engine / "revival_engagement_history.py").read_text()
+    assert "revival_phase_start_for_request(" in history
+    assert "validate_revival_anchor_coherency(" in history
+    assert "validate_revival_selection_phase_start(" in history
+    authority = (engine / "revival_phase_start.py").read_text()
+    assert "physical_model_authority_before_event(" in authority
+    assert "model.model_id != returned.model_id" in authority

@@ -5,8 +5,16 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
-from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.healing_phase_start_helpers import (
+    record_healing_phase_start,
+    wound_model_for_healing_fixture,
+)
+from tests.setup_completion_helpers import (
+    enter_battle_for_fixture,
+    record_current_battlefield_placements_for_fixture,
+)
 from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -91,8 +99,24 @@ def test_healing_iterates_wound_revival_revived_wound_and_no_effect() -> None:
     wounded = unit.own_models[0]
     removed = unit.own_models[1]
     assert wounded.starting_wounds == 2
-    _set_model_wounds(state, model_instance_id=wounded.model_instance_id, wounds_remaining=1)
-    revival_placement = _remove_model(state, model_instance_id=removed.model_instance_id)
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    wound_model_for_healing_fixture(
+        state=state,
+        decisions=decisions,
+        target_unit_id=unit_id,
+        model_id=wounded.model_instance_id,
+    )
+    assert state.battlefield_state is not None
+    revival_placement = state.battlefield_state.model_placement_by_id(removed.model_instance_id)
+    destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=removed.model_instance_id,
+        destroying_player_id="player-b",
+        source_unit_id=None,
+        source_model_id=None,
+    )
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-heal-sequence",
         target_unit_instance_id=unit_id,
@@ -149,6 +173,7 @@ def test_attached_unit_multiple_wounded_models_use_opposing_healing_decision() -
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     bodyguard_id = unit.own_models[0].model_instance_id
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-heal-attached-wounded",
         target_unit_instance_id=unit_id,
@@ -204,6 +229,7 @@ def test_healing_selection_drift_rejects_before_queue_pop() -> None:
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     bodyguard_id = unit.own_models[0].model_instance_id
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-heal-stale",
         target_unit_instance_id=unit_id,
@@ -259,13 +285,22 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
         unit_id=support.unit_instance_id,
         poses=(Pose.at(x=11.8, y=10.0),),
     )
-    _set_model_wounds(
-        state,
-        model_instance_id=leader_model.model_instance_id,
-        wounds_remaining=leader_model.starting_wounds - 1,
-    )
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     for model in bodyguard.own_models:
-        _remove_model(state, model_instance_id=model.model_instance_id)
+        destroy_rule_model_for_fixture(
+            state=state,
+            decisions=decisions,
+            model_id=model.model_instance_id,
+            destroying_player_id="player-b",
+            source_unit_id=None,
+            source_model_id=None,
+        )
+    wound_model_for_healing_fixture(
+        state=state,
+        decisions=decisions,
+        target_unit_id=attached_id,
+        model_id=leader_model.model_instance_id,
+    )
     assert state.battlefield_state is not None
     with pytest.raises(GameLifecycleError, match="StartingStrengthRecord"):
         state.starting_strength_record_for_unit(bodyguard.unit_instance_id)
@@ -286,6 +321,7 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
             leader_placement.pose.position.z,
         ),
     )
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-real-attached-heal-revive",
         target_unit_instance_id=attached_id,
@@ -379,6 +415,7 @@ def test_mustered_attached_unit_healing_stale_candidates_reject_before_queue_pop
         model_instance_id=support_model.model_instance_id,
         wounds_remaining=support_model.starting_wounds - 1,
     )
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-real-attached-heal-stale",
         target_unit_instance_id=formation.attached_unit_instance_id,
@@ -437,10 +474,12 @@ def test_lifecycle_submit_healing_model_decision_routes_through_submit_decision(
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
+    decisions = lifecycle.decision_controller
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     bodyguard_id = unit.own_models[0].model_instance_id
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-lifecycle-healing",
         target_unit_instance_id=unit_id,
@@ -495,10 +534,12 @@ def test_lifecycle_healing_selection_stale_rejects_before_queue_pop() -> None:
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
+    decisions = lifecycle.decision_controller
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     bodyguard_id = unit.own_models[0].model_instance_id
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-lifecycle-healing-stale",
         target_unit_instance_id=unit_id,
@@ -540,12 +581,14 @@ def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_cho
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
+    decisions = lifecycle.decision_controller
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _unit_by_id(state, unit_id)
     removed = tuple(
         _remove_model(state, model_instance_id=model.model_instance_id)
         for model in unit.own_models[:3]
     )
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-lifecycle-healing-follow-up",
         target_unit_instance_id=unit_id,
@@ -601,9 +644,11 @@ def test_lifecycle_healing_revival_rejects_stale_and_malformed_then_round_trips(
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
+    decisions = lifecycle.decision_controller
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _unit_by_id(state, unit_id)
     removed = _remove_model(state, model_instance_id=unit.own_models[0].model_instance_id)
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-lifecycle-revival-validation",
         target_unit_instance_id=unit_id,
@@ -673,6 +718,7 @@ def test_healing_lifecycle_validation_helpers_cover_invalid_finite_fields() -> N
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-healing-helper-validation",
         target_unit_instance_id=unit_id,
@@ -725,6 +771,7 @@ def test_healing_lifecycle_validation_helpers_cover_invalid_finite_fields() -> N
     def invalid_field(result: DecisionResult) -> object:
         status = invalid_healing_model_decision_status(
             state=state,
+            decisions=decisions,
             request=request,
             result=result,
         )
@@ -744,6 +791,7 @@ def test_healing_request_routing_rejects_malformed_request_contexts() -> None:
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-healing-malformed-routing",
         target_unit_instance_id=unit_id,
@@ -786,24 +834,28 @@ def test_healing_request_routing_rejects_malformed_request_contexts() -> None:
     with pytest.raises(GameLifecycleError, match="requires a DecisionRequest"):
         invalid_healing_model_decision_status(
             state=state,
+            decisions=decisions,
             request=cast(DecisionRequest, object()),
             result=result,
         )
     with pytest.raises(GameLifecycleError, match="requires a healing request"):
         invalid_healing_model_decision_status(
             state=state,
+            decisions=decisions,
             request=replace(request, decision_type="wrong_healing_request_type"),
             result=result,
         )
     with pytest.raises(GameLifecycleError, match="requires a DecisionResult"):
         invalid_healing_model_decision_status(
             state=state,
+            decisions=decisions,
             request=request,
             result=cast(DecisionResult, object()),
         )
 
     status = invalid_healing_model_decision_status(
         state=state,
+        decisions=decisions,
         request=request,
         result=wrong_decision_type,
     )
@@ -836,6 +888,7 @@ def test_healing_lifecycle_validation_reports_stale_selection_fields(
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-healing-stale-selection-fields",
         target_unit_instance_id=unit_id,
@@ -863,6 +916,7 @@ def test_healing_lifecycle_validation_reports_stale_selection_fields(
 
     status = invalid_healing_model_decision_status(
         state=state,
+        decisions=decisions,
         request=drifted_request,
         result=result,
     )
@@ -880,6 +934,7 @@ def test_recorded_healing_model_decision_rejects_effect_drift_without_mutation()
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-recorded-healing",
         target_unit_instance_id=unit_id,
@@ -926,6 +981,7 @@ def test_recorded_healing_model_decision_can_replay_from_request_effect() -> Non
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
     leader_id = unit.own_models[1].model_instance_id
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-recorded-healing-request-effect",
         target_unit_instance_id=unit_id,
@@ -975,6 +1031,7 @@ def test_multiple_wounded_non_attached_unit_rejects_without_choice() -> None:
         model_instance_id=unit.own_models[1].model_instance_id,
         wounds_remaining=1,
     )
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-heal-non-attached-multiple",
         target_unit_instance_id=unit_id,
@@ -1001,6 +1058,7 @@ def test_revival_requires_explicit_candidate_placement_without_mutation() -> Non
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _unit_by_id(state, unit_id)
     removed_placement = _remove_model(state, model_instance_id=unit.own_models[0].model_instance_id)
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-revive-missing-placement",
         target_unit_instance_id=unit_id,
@@ -1036,6 +1094,7 @@ def test_malformed_healing_selection_rejects_before_queue_pop() -> None:
     decisions = DecisionController()
     unit_id = "army-alpha:intercessor-unit-1"
     unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-heal-malformed",
         target_unit_instance_id=unit_id,
@@ -1090,6 +1149,7 @@ def test_multiple_missing_models_use_opposing_revival_decision() -> None:
     unit = _unit_by_id(state, unit_id)
     first_removed = _remove_model(state, model_instance_id=unit.own_models[0].model_instance_id)
     second_removed = _remove_model(state, model_instance_id=unit.own_models[1].model_instance_id)
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-revive-choice",
         target_unit_instance_id=unit_id,
@@ -1151,6 +1211,7 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
     invalid_placement = removed_placement.with_pose(
         Pose.at(x=70.0, y=70.0, z=0.0, facing_degrees=0.0)
     )
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-revive-invalid-placement",
         target_unit_instance_id=unit_id,
@@ -1258,6 +1319,7 @@ def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> No
         wounds_remaining=0,
     )
     removed_placement = _remove_model(state, model_instance_id=unit.own_models[0].model_instance_id)
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-revive-dead-enemy-engagement",
         target_unit_instance_id=unit_id,
@@ -1331,6 +1393,7 @@ def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> 
         unit_instance_id=unit_id,
     )
     assert phase_start_engagement_ids == ()
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-revive-retained-enemy-engagement",
         target_unit_instance_id=unit_id,
@@ -1583,6 +1646,7 @@ def test_healing_public_entrypoints_reject_wrong_contexts() -> None:
     state = _battle_state()
     decisions = DecisionController()
     unit_id = "army-alpha:intercessor-unit-1"
+    record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
         effect_id="phase14h-invalid-entrypoint",
         target_unit_instance_id=unit_id,

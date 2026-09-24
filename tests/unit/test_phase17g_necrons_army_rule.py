@@ -48,6 +48,7 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.healing import SELECT_HEALING_MODEL_DECISION_TYPE
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+    healing_effect_from_revival_request,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -57,6 +58,7 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
+    BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatusKind,
@@ -129,10 +131,26 @@ def test_reanimation_revive_choice_uses_necron_player_and_json_safe_records() ->
     lifecycle = _battle_ready_lifecycle(alpha_unit_ids=("necron-warriors-1",))
     state = _require_state(lifecycle)
     unit = _unit_by_id(state, NECRON_UNIT_1_ID)
+    from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
+    from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+
+    record_current_battlefield_placements_for_fixture(
+        state, decisions=lifecycle.decision_controller
+    )
+    assert state.battlefield_state is not None
     removed_placements = tuple(
-        _remove_model(state, model_instance_id=model.model_instance_id)
+        state.battlefield_state.model_placement_by_id(model.model_instance_id)
         for model in unit.own_models[:2]
     )
+    for removed in removed_placements:
+        destroy_rule_model_for_fixture(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            model_id=removed.model_instance_id,
+            destroying_player_id="player-b",
+            source_unit_id=None,
+            source_model_id=None,
+        )
     removed_model_ids = tuple(placement.model_instance_id for placement in removed_placements)
 
     status = lifecycle.advance_until_decision_or_terminal()
@@ -196,6 +214,24 @@ def test_reanimation_revive_choice_uses_necron_player_and_json_safe_records() ->
             ),
         )
     )
+
+    from warhammer40k_core.engine.healing_geometry import healing_phase_start_model_ids
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    phase_ids = healing_phase_start_model_ids(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=NECRON_UNIT_1_ID),
+    )
+    # This source grant completes Command; its returned model becomes an anchor
+    # only when the real lifecycle opens the following Movement phase.
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert selected_model_id in phase_ids
+    source_effect = healing_effect_from_revival_request(request=placement_request)
+    assert selected_model_id not in source_effect.phase_start_model_ids
+    assert set(source_effect.phase_start_model_ids) == {
+        model.model_instance_id for model in unit.own_models
+    } - set(removed_model_ids)
 
     assert resolved_status.status_kind is not LifecycleStatusKind.INVALID
     assert state.battlefield_state is not None

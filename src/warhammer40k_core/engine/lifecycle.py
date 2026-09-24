@@ -2313,6 +2313,7 @@ class GameLifecycle:
             self.reaction_queue.validate_result(result)
         return invalid_healing_decision_status(
             state=self._require_state(),
+            decisions=self.decision_controller,
             request=request,
             result=result,
             ruleset_descriptor=self._require_config().ruleset_descriptor,

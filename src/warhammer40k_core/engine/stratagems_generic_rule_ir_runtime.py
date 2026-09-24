@@ -368,6 +368,7 @@ def resolve_generic_rule_ir_restore_lost_wounds(
 
     healing_effect = _healing_effect(
         state=state,
+        decisions=decisions,
         use_record=use_record,
         effect_payload=effect_payload,
         effect_id=f"{use_record.use_id}:restore-lost-wounds:{target_unit_id}",
@@ -419,6 +420,7 @@ def resolve_generic_rule_ir_return_destroyed_target(
 
     healing_effect = _healing_effect(
         state=state,
+        decisions=decisions,
         use_record=use_record,
         effect_payload=effect_payload,
         effect_id=f"{use_record.use_id}:return-destroyed-target:{target_unit_id}",
@@ -1009,6 +1011,7 @@ def _generic_battle_shock_modifiers(
 def _healing_effect(
     *,
     state: GameState,
+    decisions: DecisionController,
     use_record: StratagemUseRecord,
     effect_payload: dict[str, JsonValue],
     effect_id: str,
@@ -1032,6 +1035,7 @@ def _healing_effect(
         source_context=validate_json_value(source_context),
         phase_start_model_ids=healing_phase_start_model_ids(
             state=state,
+            decisions=decisions,
             rules_unit=rules_unit,
         ),
     )

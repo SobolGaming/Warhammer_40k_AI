@@ -286,6 +286,7 @@ class CatalogCommandRestorationRuntime:
             source_context=source_context,
             phase_start_model_ids=healing_phase_start_model_ids(
                 state=context.state,
+                decisions=context.decisions,
                 rules_unit=target,
             ),
         )

@@ -1,0 +1,33 @@
+{
+  "schema": "order83-preflight-v1",
+  "base_revision": "03fd10e6d859743205c0c26bb653bc0b77b4bd85",
+  "finding": "C01-06",
+  "implementation": "P01F",
+  "owner_approved": true,
+  "full_category_audit_complete": false,
+  "complete_games_attempted": 0,
+  "complete_games_completed": 0,
+  "full_game_performance_certified": false,
+  "source_observation": {
+    "provider": "40k.app",
+    "url": "https://www.40k.app/rules/01-core-concepts#01.02.03",
+    "observed_date": "2026-09-24",
+    "method": "normal browser; complete expanded clause read; bounded excerpt retained",
+    "app_data_version": null,
+    "excerpt_sha256": "52c9697cfb778bd6c60148e3468a8414562e4415c7d579f84a16e487cca4f987",
+    "registered_full_observation": "data/source_audits/maintained_app_mirrors/revival_2026_09_24.audit.json",
+    "policy": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "scope": "corroboration; not a co-versioned all-category snapshot",
+    "excerpt_artifact": "docs/ORDER_83_PREFLIGHT_AUDIT.md"
+  },
+  "red_regression": {
+    "node": "tests/unit/test_order82_revival_engagement.py::test_separate_revivals_preserve_actual_phase_start_coherency_anchors",
+    "outcome": "failed before production repair: accepted waiting_overwatch_window instead of invalid",
+    "seconds": 3.39
+  },
+  "artifacts": {
+    "docs/performance/order83/probe-results.json": "3c66629490f2be7bdf11f120c92271644835cd40186d33b3af3d88fd14321eec",
+    "docs/performance/order83/focused-healing.txt": "bdf902d6f9d6788368a5516e47cb6c45014c81e565d2c8089c8c620c559765c3",
+    "scripts/probe_order83_revival_anchors.py": "18f06a1fd5e71c29bd71b85ac48f4a1a96feb7c4e34177df662b474e86bf7227"
+  }
+}

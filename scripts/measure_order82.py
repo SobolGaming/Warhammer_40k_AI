@@ -93,6 +93,7 @@ def main() -> None:
             for name in (
                 "scripts/measure_order82.py",
                 "tests/order82_revival_helpers.py",
+                "tests/healing_phase_start_helpers.py",
                 "tests/phase15c_fight_order_helpers.py",
                 "tests/fight_on_death_helpers.py",
                 "tests/destruction_occurrence_fixture_helpers.py",

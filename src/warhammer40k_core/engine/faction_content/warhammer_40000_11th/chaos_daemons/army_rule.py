@@ -48,6 +48,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
+from warhammer40k_core.engine.healing_geometry import healing_phase_start_model_ids
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -799,8 +800,9 @@ def _resolve_july_battleline_daemonic_manifestation(
                 "d3_result": d3_result.to_payload(),
             }
         ),
-        phase_start_model_ids=_placed_model_ids_for_unit(
+        phase_start_model_ids=healing_phase_start_model_ids(
             state=context.state,
+            decisions=context.decisions,
             rules_unit=target_rules_unit,
         ),
     )

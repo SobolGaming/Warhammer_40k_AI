@@ -2031,6 +2031,9 @@ def test_phase17n_real_destroy_restore_hunters_entry_orders_before_deadline_time
     from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
 
     record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    from tests.healing_phase_start_helpers import record_healing_phase_start
+
+    record_healing_phase_start(state=state, decisions=decisions)
     destroyed_model_id = unit.own_models[0].model_instance_id
     return_placement = state.battlefield_state.model_placement_by_id(destroyed_model_id)
     return_placement = return_placement.with_pose(Pose.at(x=10.0, y=12.0))

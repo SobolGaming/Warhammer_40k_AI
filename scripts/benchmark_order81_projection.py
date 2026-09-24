@@ -89,6 +89,9 @@ def measure() -> dict[str, object]:
         "fixture_sha256": hashlib.sha256(
             (ROOT / "tests/order81_projection_helpers.py").read_bytes()
         ).hexdigest(),
+        "phase_fixture_sha256": hashlib.sha256(
+            (ROOT / "tests/healing_phase_start_helpers.py").read_bytes()
+        ).hexdigest(),
         "lock_sha256": hashlib.sha256((ROOT / "uv.lock").read_bytes()).hexdigest(),
         "rows": rows,
         "proposal_projections": projections,

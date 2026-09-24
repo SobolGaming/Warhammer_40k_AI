@@ -20,6 +20,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.revival_phase_start import validate_revival_selection_phase_start
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
@@ -569,6 +570,7 @@ def apply_healing_model_decision(
         raise GameLifecycleError("Healing request effect drift.")
     _validated_healing_selection(
         state=state,
+        decisions=decisions,
         request=pending_request,
         result=result,
         effect=effect,
@@ -609,6 +611,7 @@ def apply_recorded_healing_model_decision(
     _validate_effect_for_state(state=state, effect=active_effect)
     selection, candidates = _validated_healing_selection(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         effect=active_effect,
@@ -707,6 +710,7 @@ def healing_revival_candidate_model_ids(
 def invalid_healing_model_decision_status(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
@@ -738,6 +742,21 @@ def invalid_healing_model_decision_status(
             stage=state.stage,
             message="Healing model selection no longer matches state.",
             payload={"invalid_reason": invalid_reason, "field": stale_field},
+        )
+    try:
+        validate_revival_selection_phase_start(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            request=request,
+            target_unit_instance_id=effect.target_unit_instance_id,
+            phase_start_model_ids=effect.phase_start_model_ids,
+        )
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message=str(exc),
+            payload={"invalid_reason": invalid_reason, "field": "revival_phase_start"},
         )
     return None
 
@@ -1100,6 +1119,7 @@ def _validate_selection_matches_effect(
 def _validated_healing_selection(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     effect: HealingEffect,
@@ -1123,6 +1143,14 @@ def _validated_healing_selection(
         and selection.selected_model_id not in candidates.model_ids
     ):
         raise GameLifecycleError("Healing model selection is no longer legal.")
+    validate_revival_selection_phase_start(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        request=request,
+        target_unit_instance_id=effect.target_unit_instance_id,
+        phase_start_model_ids=effect.phase_start_model_ids,
+    )
     return selection, candidates
 
 

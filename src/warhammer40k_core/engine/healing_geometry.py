@@ -7,7 +7,9 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.revival_phase_start import revival_phase_start_evidence
 from warhammer40k_core.engine.rules_units import RulesUnitView
 
 if TYPE_CHECKING:
@@ -17,17 +19,16 @@ if TYPE_CHECKING:
 def healing_phase_start_model_ids(
     *,
     state: GameState,
+    decisions: DecisionController,
     rules_unit: RulesUnitView,
 ) -> tuple[str, ...]:
-    return tuple(
-        sorted(
-            placement.model_instance_id
-            for placement in healing_rules_unit_placements(
-                state=state,
-                rules_unit=rules_unit,
-            )
-        )
+    evidence = revival_phase_start_evidence(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        target_unit_instance_id=rules_unit.unit_instance_id,
     )
+    return tuple(evidence["model_ids"])
 
 
 def healing_rules_unit_placements(
