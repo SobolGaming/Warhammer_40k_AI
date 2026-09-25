@@ -169,7 +169,7 @@ def test_r86_001_exact_rotated_contact_and_neighbors(shape: str, border: str) ->
     from warhammer40k_core.geometry.visibility_shapes import rational_rotation
 
     if shape == "rectangle":
-        facing = 34.0
+        facing = _exact_rectangle_contact_facing()
         cosine, sine = rational_rotation(facing)
         radius = float(cosine + sine)
         assert Fraction(radius) == cosine + sine
@@ -208,6 +208,21 @@ def test_r86_001_exact_rotated_contact_and_neighbors(shape: str, border: str) ->
             )
             == answer
         )
+
+
+def _exact_rectangle_contact_facing() -> float:
+    """Select a non-cardinal fixture from this runtime's exact rotation coefficients."""
+    from warhammer40k_core.geometry.visibility_shapes import rational_rotation
+
+    for degrees in range(1, 90):
+        cosine, sine = rational_rotation(float(degrees))
+        support = cosine + sine
+        # Prove every derived float, not just the radius: multiplying a
+        # representable support by three or adding the half-divider can round.
+        coordinates = (support, 3 * support, 4 * support + Fraction(1, 8))
+        if all(Fraction(float(value)) == value for value in coordinates):
+            return float(degrees)
+    raise AssertionError("No exactly representable non-cardinal rectangle contact fixture.")
 
 
 @pytest.mark.parametrize(("x", "y"), [(-10, 10), (70, 10), (30, 10), (10, -10), (10, 70)])

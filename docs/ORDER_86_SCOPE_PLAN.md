@@ -127,3 +127,37 @@ original publication results above.
 The independent reviewer approved the completed R86-001 update for publication
 with no outstanding findings after verifying the final aggregate results, artifact
 identities, shard inventory and transparent performance recovery.
+
+## R86-002: portable exact-contact fixture
+
+The review of `0a2bfed1021a19740e8c1dd4d45b8a35410e6d0b` identified a
+test-fixture invariant violation: a claimed exact contact must survive every
+conversion to the float-valued domain inputs without rounding. The fixed 34-degree
+rectangle satisfied that condition on macOS but failed on Linux. The completed
+[Ubuntu shard](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36168628342/job/108182438264)
+confirms both rectangle variants failed on the pinned Python 3.14.5 interpreter.
+
+The fixture now selects a non-cardinal angle from the runtime's rational rotation
+coefficients, proving exact round trips for the support `r`, contact position
+`3*r`, and quarter centre `4*r + 1/8` before using it. No candidate means an explicit
+assertion failure. Both rectangle and ellipse cases retain the exact-contact and
+neighboring-float assertions; there is no tolerance, skip or weakened containment
+expectation. The bug-class search found this one fixed-angle rectangle fixture;
+the ellipse's checked dyadic construction also passes the cross-platform run.
+
+The requested focused check passes all four cases on macOS arm64 and Linux x86-64
+with glibc 2.41, both using Python 3.14.5. The selected angles are 34 and 46 degrees,
+respectively. Production code, runtime identity, generated contracts, performance
+reports and test-case inventory remain unchanged. Current validation and final
+independent review are recorded in
+[R86-002 validation](performance/order86/r86_002/validation.json).
+
+Final validation passes all 9,382 behavioral tests with 85.20% branch-inclusive
+coverage and all 684 code-quality tests. Lint, formatting, both type checkers,
+all 11 import contracts, source/runtime and exact-base contract checks, installed
+wheel, generated TypeScript client, five TypeScript unit tests, 342 conformance
+assertions and the unchanged eight-shard inventory check pass.
+
+Independent final review approved R86-002 for publication with no outstanding
+findings after verifying the test diff, both platforms, aggregate results and
+validation hashes.
