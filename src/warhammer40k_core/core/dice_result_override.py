@@ -13,6 +13,7 @@ class DiceRollOverrideRecordPayload(TypedDict):
     source_rule_id: str
     previous_values: list[int]
     replacement_value: int
+    component_index: int | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,6 +23,7 @@ class DiceRollOverrideRecord:
     source_rule_id: str
     previous_values: tuple[int, ...]
     replacement_value: int
+    component_index: int | None = 0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -43,11 +45,27 @@ class DiceRollOverrideRecord:
             "DiceRollOverrideRecord previous_values",
             self.previous_values,
         )
-        if len(previous_values) != 1 or not 1 <= previous_values[0] <= 6:
-            raise DiceRollSpecError("Dice result override requires one prior D6 value.")
-        if type(self.replacement_value) is not int or not 1 <= self.replacement_value <= 6:
-            raise DiceRollSpecError("Dice result override replacement must be a D6 value.")
+        if not previous_values or any(value < 1 for value in previous_values):
+            raise DiceRollSpecError("Dice result override requires positive prior values.")
+        if type(self.replacement_value) is not int or self.replacement_value < 1:
+            raise DiceRollSpecError("Dice result override replacement must be a positive integer.")
+        if self.component_index is not None and (
+            type(self.component_index) is not int
+            or not 0 <= self.component_index < len(previous_values)
+        ):
+            raise DiceRollSpecError("Dice result override component index is outside the roll.")
         object.__setattr__(self, "previous_values", previous_values)
+
+    def assigned_values(self) -> tuple[int, ...]:
+        values = list(self.previous_values)
+        if self.component_index is not None:
+            values[self.component_index] = self.replacement_value
+        return tuple(values)
+
+    def assigned_unmodified_total(self) -> int:
+        if self.component_index is None:
+            return self.replacement_value
+        return sum(self.assigned_values())
 
     def to_payload(self) -> DiceRollOverrideRecordPayload:
         return {
@@ -56,6 +74,7 @@ class DiceRollOverrideRecord:
             "source_rule_id": self.source_rule_id,
             "previous_values": list(self.previous_values),
             "replacement_value": self.replacement_value,
+            "component_index": self.component_index,
         }
 
     @classmethod
@@ -66,4 +85,5 @@ class DiceRollOverrideRecord:
             source_rule_id=payload["source_rule_id"],
             previous_values=tuple(payload["previous_values"]),
             replacement_value=payload["replacement_value"],
+            component_index=payload["component_index"],
         )

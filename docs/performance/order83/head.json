@@ -1,7 +1,7 @@
 {
   "workload": "order82-revival-engagement-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c461fe83f419b78d2311b60ed93608835145a36e2b37be43f928b8e5718e807",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c461fe83f419b78d2311b60ed93608835145a36e2b37be43f928b8e5718e807",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:5107b205bc0303d48fd7ba15c9e00c4b0c9ea09a3f4ed4a28c3fb023078d11d0",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5107b205bc0303d48fd7ba15c9e00c4b0c9ea09a3f4ed4a28c3fb023078d11d0",
   "cpu": "Apple M5 Pro",
   "memory_bytes": 68719476736,
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
@@ -23,9 +23,9 @@
     {
       "case": "unengaged-control",
       "samples_seconds": [
-        3.109764249995351,
-        3.0233393750095274,
-        3.0375153749773744
+        3.160057875007624,
+        3.1324795830005314,
+        3.143605541001307
       ],
       "outcomes": [
         "waiting_for_decision",
@@ -33,16 +33,16 @@
         "waiting_for_decision"
       ],
       "complete": true,
-      "mean_seconds": 3.0568729999940842,
-      "median_seconds": 3.0375153749773744,
-      "maximum_seconds": 3.109764249995351
+      "mean_seconds": 3.1453809996698205,
+      "median_seconds": 3.143605541001307,
+      "maximum_seconds": 3.160057875007624
     },
     {
       "case": "same-enemy-unit",
       "samples_seconds": [
-        3.013745000003837,
-        3.0375958750082646,
-        3.029859333008062
+        3.096900167001877,
+        3.152355375001207,
+        3.151376000023447
       ],
       "outcomes": [
         "waiting_for_decision",
@@ -50,16 +50,16 @@
         "waiting_for_decision"
       ],
       "complete": true,
-      "mean_seconds": 3.0270667360067214,
-      "median_seconds": 3.029859333008062,
-      "maximum_seconds": 3.0375958750082646
+      "mean_seconds": 3.133543847342177,
+      "median_seconds": 3.151376000023447,
+      "maximum_seconds": 3.152355375001207
     },
     {
       "case": "attached",
       "samples_seconds": [
-        3.0712019170168787,
-        3.031035082996823,
-        3.0328867080097552
+        3.18719087500358,
+        3.185857708012918,
+        3.154825792007614
       ],
       "outcomes": [
         "waiting_for_decision",
@@ -67,16 +67,16 @@
         "waiting_for_decision"
       ],
       "complete": true,
-      "mean_seconds": 3.045041236007819,
-      "median_seconds": 3.0328867080097552,
-      "maximum_seconds": 3.0712019170168787
+      "mean_seconds": 3.1759581250080373,
+      "median_seconds": 3.185857708012918,
+      "maximum_seconds": 3.18719087500358
     },
     {
       "case": "retained-enemy",
       "samples_seconds": [
-        3.112772083026357,
-        3.0965197079931386,
-        3.089197791996412
+        3.16728854199755,
+        3.17920199999935,
+        3.1865247919922695
       ],
       "outcomes": [
         "waiting_for_decision",
@@ -84,16 +84,16 @@
         "waiting_for_decision"
       ],
       "complete": true,
-      "mean_seconds": 3.099496527671969,
-      "median_seconds": 3.0965197079931386,
-      "maximum_seconds": 3.112772083026357
+      "mean_seconds": 3.1776717779963897,
+      "median_seconds": 3.17920199999935,
+      "maximum_seconds": 3.1865247919922695
     },
     {
       "case": "new-enemy-unit",
       "samples_seconds": [
-        2.8249134579964448,
-        2.8574532080092467,
-        2.854829084011726
+        2.9223021670186426,
+        2.9654391660005786,
+        2.967538458004128
       ],
       "outcomes": [
         "invalid",
@@ -101,9 +101,9 @@
         "invalid"
       ],
       "complete": true,
-      "mean_seconds": 2.8457319166724724,
-      "median_seconds": 2.854829084011726,
-      "maximum_seconds": 2.8574532080092467
+      "mean_seconds": 2.9517599303411166,
+      "median_seconds": 2.9654391660005786,
+      "maximum_seconds": 2.967538458004128
     }
   ],
   "coverage": false,

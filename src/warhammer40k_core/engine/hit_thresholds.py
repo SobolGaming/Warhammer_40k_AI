@@ -19,6 +19,8 @@ class HitThresholds:
     minimum_success: int
     critical_threshold: int
     source_ids: tuple[str, ...]
+    critical_is_threshold: bool
+    success_requires_exact: bool
 
 
 def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> HitThresholds:
@@ -34,9 +36,11 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
         raise GameLifecycleError("Hit thresholds require HitRollMinimumUnmodifiedSuccessContext.")
     minimum = context.current_minimum_unmodified_success
     critical = 6
+    critical_is_threshold = False
     source_ids: set[str] = {sources.CRITICAL_SUCCESS_SOURCE_ID}
     snap_ids = {FIRE_OVERWATCH_RULE_ID, SNAP_SHOOTING_RULE_ID}
     is_snap = bool(snap_ids.intersection(context.targeting_rule_ids))
+    success_requires_exact = is_snap
     if is_snap:
         source_ids.add(sources.SNAP_CRITICAL_SOURCE_ID)
     for effect in _matching_generic_attack_effects(
@@ -72,7 +76,9 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
         if not 2 <= value <= 6:
             raise GameLifecycleError("Hit threshold must be between 2 and 6.")
         source_ids.add(generic_rule_modifier_source_id(effect))
+        success_requires_exact = False
         if status == "critical_hit_threshold":
+            critical_is_threshold = True
             critical = min(critical, value)
             if is_snap:
                 minimum = min(minimum, value)
@@ -80,7 +86,13 @@ def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> H
             minimum = min(minimum, value)
     # Indirect Shooting's stated failed faces remain failures. Critical hits
     # bypass the ordinary skill comparison, never that absolute failure floor.
-    return HitThresholds(minimum, max(minimum, critical), tuple(sorted(source_ids)))
+    return HitThresholds(
+        minimum,
+        max(minimum, critical),
+        tuple(sorted(source_ids)),
+        critical_is_threshold,
+        success_requires_exact,
+    )
 
 
 def _targeting_rule_gate_applies(

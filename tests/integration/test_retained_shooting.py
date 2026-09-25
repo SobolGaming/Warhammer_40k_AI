@@ -135,8 +135,8 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        # Preserve the own-Hazardous death with Order 43 hit-record RNG history.
-        game_id="order56-own-hazard-fnp-3-order64-1"
+        # Preserve own-Hazardous death with Order 84 retention evidence hashes.
+        game_id="order84-own-hazard-fnp-1"
         if with_feel_no_pain
         else "order56-own-hazard-0-order64-4",
         enemy_model_count=5,
@@ -548,8 +548,10 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
     profile = retained_sources.stratagem_profile()
     lifecycle, units = fight_lifecycle(
         catalog=unending_fidelity_catalog(),
-        # Preserve the first-pool casualty with Order 56 source-inventory RNG history.
-        game_id="order56-fidelity-1-order64-0",
+        # Preserve the first-pool casualty with Order 84 retention evidence hashes.
+        game_id="order84-fidelity-3"
+        if attached and action is RetainedAttackAction.FIGHT
+        else "order56-fidelity-1-order64-0",
         alpha_unit_ids=("alpha",),
         enemy_unit_ids=("enemy", "leader") if attached else ("enemy",),
         enemy_unit_specs={"enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1)}
@@ -1396,8 +1398,8 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
         )
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
-        # Preserve the nested casualty with Order 43 hit-record RNG history.
-        game_id="order56-nested-action-10-order64-1",
+        # Preserve the nested casualty with Order 84 retention evidence hashes.
+        game_id="order56-nested-action-10-order64-1" if titanic else "order84-nested-action-2",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

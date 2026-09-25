@@ -62,6 +62,8 @@ DICE_REROLL_DECISION_TYPE = "select_dice_reroll"
 
 _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
     {
+        "out_of_phase_shooting_started",
+        "fight_activation_completed",
         "secondary_missions_revealed",
         "setup_completion_gate_passed",
         "battle_started",
@@ -87,6 +89,8 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
 )
 _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS = frozenset(
     (
+        "critical_is_threshold",
+        "success_requires_exact",
         "destroyed_model_placements",
         "destruction_evidence",
         "logical_death_cause_binding",
@@ -127,15 +131,37 @@ def _rng_history_token(event: EventRecord, *, neutral_event_count: int) -> str:
 
 
 def _rng_payload_history_token(payload: JsonValue) -> str:
-    return canonical_json(_without_rng_history_neutral_metadata(payload))
+    normalized = _without_rng_history_neutral_metadata(payload)
+    if (
+        isinstance(normalized, dict)
+        and normalized.get("event_type") == "out_of_phase_shooting_declaration_accepted"
+        and isinstance(body := normalized.get("payload"), dict)
+    ):
+        normalized["payload"] = {
+            key: item for key, item in body.items() if key != "attack_sequence_id"
+        }
+    return canonical_json(normalized)
 
 
 def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
     if isinstance(value, dict):
+        # Added interpretation evidence must not perturb unchanged physical dice
+        # sequences. Assigned values and physical-component selections remain in
+        # authoritative history; only absent evidence is omitted from RNG input.
+        omit_absent_override = value.get("result_override") is None and any(
+            field in value for field in ("component_values", "components", "component_id")
+        )
+        omit_single_die_index = (
+            value.get("component_index") == 0
+            and isinstance(previous := value.get("previous_values"), list)
+            and len(previous) == 1
+        )
         return {
             key: _without_rng_history_neutral_metadata(item)
             for key, item in value.items()
             if key not in _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS
+            and not (key == "result_override" and omit_absent_override)
+            and not (key == "component_index" and omit_single_die_index)
         }
     if isinstance(value, list):
         return [_without_rng_history_neutral_metadata(item) for item in value]
@@ -392,13 +418,13 @@ class DiceRollManager:
         allowed_selections: Iterable[Iterable[int]] | None = None,
         permission: RerollPermission | None = None,
     ) -> DecisionRequest:
-        self._decision_request_counter += 1
         request = self.build_reroll_request(
             state,
-            request_id=f"decision-request-{self._decision_request_counter:06d}",
+            request_id=f"decision-request-{self._decision_request_counter + 1:06d}",
             allowed_selections=allowed_selections,
             permission=permission,
         )
+        self._decision_request_counter += 1
         event = self.event_log.append("decision_requested", request.to_payload())
         self.rng.append_history(_rng_payload_history_token(cast(JsonValue, request.to_payload())))
         self._append_event_history(event)
@@ -415,6 +441,7 @@ class DiceRollManager:
         extra_payload: dict[str, JsonValue] | None = None,
         ignored_reroll_forbidden_rule_ids: tuple[str, ...] = (),
     ) -> DecisionRequest:
+        _validate_unassigned_reroll_state(state)
         if state.original_result.spec.roll_type == "roll_off":
             raise DecisionError("Roll-off dice cannot be rerolled.")
         ignored_forbidden_ids = _validate_string_tuple(
@@ -635,6 +662,7 @@ class DiceRollManager:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> None:
+        _validate_unassigned_reroll_state(state)
         if request.decision_type != DICE_REROLL_DECISION_TYPE:
             raise DecisionError("Reroll request has the wrong decision_type.")
         result.validate_for_request(request)
@@ -1025,3 +1053,8 @@ def _validate_index_list(indices: tuple[object, ...], *, field_name: str) -> tup
         previous = index
         validated.append(index)
     return tuple(validated)
+
+
+def _validate_unassigned_reroll_state(state: DiceRollState) -> None:
+    if state.result_override is not None:
+        raise DecisionError("Cannot reroll an assigned dice result.")

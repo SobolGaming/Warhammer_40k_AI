@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.rules.rule_ir import RuleEffectKind
 
@@ -21,6 +22,7 @@ class WoundRollCriticalThresholdContext:
     target_unit_instance_id: str
     weapon_profile: WeaponProfile
     current_critical_threshold: int
+    current_critical_is_threshold: bool = False
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -54,7 +56,7 @@ class WoundRollCriticalThresholdContext:
 
 def generic_rule_critical_wound_threshold(
     context: WoundRollCriticalThresholdContext,
-) -> int:
+) -> CriticalRollThreshold:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         _matching_generic_attack_effects,  # pyright: ignore[reportPrivateUsage]
         _required_int_parameter,  # pyright: ignore[reportPrivateUsage]
@@ -67,6 +69,8 @@ def generic_rule_critical_wound_threshold(
             "Generic critical wound hooks require WoundRollCriticalThresholdContext."
         )
     current = context.current_critical_threshold
+    inclusive = context.current_critical_is_threshold
+    CriticalRollThreshold(current, inclusive)
     for effect in _matching_generic_attack_effects(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
@@ -84,13 +88,14 @@ def generic_rule_critical_wound_threshold(
             continue
         if not _roll_type_matches(effect.parameters, expected="wound"):
             continue
+        inclusive = True
         current = min(
             current,
             _validate_d6_target(
                 _required_int_parameter(effect.parameters, key="critical_threshold")
             ),
         )
-    return current
+    return CriticalRollThreshold(current, inclusive)
 
 
 def _battle_phase_from_token(value: object) -> BattlePhase:

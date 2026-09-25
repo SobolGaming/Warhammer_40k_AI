@@ -948,7 +948,11 @@ class GameLifecycle:
         from warhammer40k_core.engine.active_player_scope_history import (
             validate_active_player_history,
         )
+        from warhammer40k_core.engine.dice_extremum import validate_dice_extremum_history
 
+        validate_dice_extremum_history(
+            state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
         validate_active_player_history(
             state=lifecycle._require_state(),
             decisions=lifecycle.decision_controller,
@@ -1088,9 +1092,15 @@ class GameLifecycle:
         from warhammer40k_core.engine.core_ability_selection import (
             core_ability_selection_dispatch_handler,
         )
+        from warhammer40k_core.engine.dice_extremum import dice_extremum_dispatch_handler
 
         return build_decision_dispatch_registry(
             (
+                dice_extremum_dispatch_handler(
+                    state_provider=self._require_state,
+                    decisions=self.decision_controller,
+                    advance=self.advance_until_decision_or_terminal,
+                ),
                 core_ability_selection_dispatch_handler(
                     state_provider=self._require_state,
                     decisions=self.decision_controller,

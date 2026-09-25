@@ -4616,7 +4616,7 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         **save_entry,
         "value": save_roll_state.current_total + 1,
     }
-    with pytest.raises(GameLifecycleError, match="value must match roll_state"):
+    with pytest.raises(GameLifecycleError, match="value does not match its dice state"):
         PendingGroupedDamage(
             sorted_save_dice=(bad_value_entry,),
             ordered_allocation_group_payloads=tuple(
@@ -11482,7 +11482,9 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
         SavingThrow(
             save_kind=SaveKind.INVULNERABLE,
             target_number=4,
-            roll_state=save_roll,
+            roll_state=DiceRollManager("phase14e-armour-kind").roll_fixed(
+                save_roll.original_result.spec, [4]
+            ),
             unmodified_roll=4,
             final_roll=4,
             successful=True,
@@ -11522,18 +11524,17 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             resolution_rule=SaveResolutionRule.FAILED,
             option=valid_option,
         )
-    invalid_roll_state_throw = SavingThrow(
-        save_kind=SaveKind.ARMOUR,
-        target_number=3,
-        roll_state=cast(DiceRollState, "bad-roll-state"),
-        unmodified_roll=3,
-        final_roll=3,
-        successful=True,
-        resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
-        option=valid_option,
-    )
-    with pytest.raises(GameLifecycleError, match="roll_state"):
-        invalid_roll_state_throw.to_payload()
+    with pytest.raises(GameLifecycleError, match="requires a DiceRollState"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=cast(DiceRollState, "bad-roll-state"),
+            unmodified_roll=3,
+            final_roll=3,
+            successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
+            option=valid_option,
+        )
     with pytest.raises(GameLifecycleError, match="option or options"):
         resolve_saving_throw(
             option=valid_option,
@@ -19410,7 +19411,9 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             strength=4,
             toughness=4,
             target_number=4,
-            roll_state=wound_roll_state,
+            roll_state=DiceRollManager("phase13c-critical-flag").roll_fixed(
+                wound_roll_state.original_result.spec, [6]
+            ),
             unmodified_roll=6,
             modifier=0,
             capped_modifier=0,

@@ -55,6 +55,7 @@ from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.generic_rule_attack_hooks import (
     generic_rule_unit_characteristic_modifiers,
 )
+from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.lone_operative import lone_operative_target_allowed
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -608,7 +609,7 @@ def test_hit_wound_and_save_consumers_keep_natural_one_separate_from_negative_mo
         toughness=4,
         attacker_player_id="player-a",
         attack_context_id="limits-wound",
-        critical_threshold=6,
+        critical_threshold=CriticalRollThreshold(),
         wound_modifier=-10,
     )
     for result in (hit, wound):

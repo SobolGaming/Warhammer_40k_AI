@@ -2759,6 +2759,8 @@ def test_fight_activation_rejects_when_engagement_context_is_stale() -> None:
 
 
 def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() -> None:
+    from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
+
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
@@ -2769,6 +2771,7 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
         game_id="phase15c-interrupt",
         fight_interrupt_unit_keys=("enemy",),
     )
+    open_phase(lifecycle)
     first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
         lifecycle,
@@ -2781,15 +2784,15 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
         unit_instance_id=units["enemy"].unit_instance_id,
         fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
     )
-    completed_status = _resolve_phase15d_activation(
+    selected_status = _submit_option(
         lifecycle,
-        _submit_option(
-            lifecycle,
-            request=interrupt_request,
-            option_id=interrupt_option_id,
-            result_id="phase15c-resolve-interrupt",
-        ),
+        request=interrupt_request,
+        option_id=interrupt_option_id,
+        result_id="phase15c-resolve-interrupt",
     )
+    completed_status = _resolve_phase15d_activation(lifecycle, selected_status)
+    # The next unit-selected movement scope now belongs to player B.
+    assert_active_player_history(lifecycle, expected_player="player-b")
 
     assert interrupt_request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE
     assert interrupt_request.actor_id == "player-b"
@@ -2975,6 +2978,8 @@ def test_counteroffensive_epic_challenge_decline_continues_reaction_to_melee() -
 
 
 def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_sequence() -> None:
+    from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
+
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("parent", "interrupt-target"),
         enemy_unit_ids=("parent-target", "interrupter"),
@@ -2994,6 +2999,7 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
             ),
         },
     )
+    open_phase(lifecycle)
     first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
         lifecycle,
@@ -3011,6 +3017,7 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
         ),
         result_id="phase15d-accept-interrupt-melee-continuation",
     )
+    assert_active_player_history(lifecycle, expected_player="player-b")
     melee_request = _decision_request(melee_status)
 
     assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
@@ -3047,8 +3054,28 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
     completed_status = _resolve_phase15d_activation(lifecycle, next_attack_status)
 
     assert completed_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert_active_player_history(lifecycle, expected_player="player-a")
     assert lifecycle.reaction_queue.frames == ()
     assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == 1
+
+    from warhammer40k_core.engine.active_player_boundary_history import (
+        active_player_authority_before_event,
+    )
+
+    decisions = lifecycle.decision_controller
+    interrupt = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "fight_interrupt_activation_selected"
+    )
+    decisions.event_log.append("fight_activation_selected", interrupt.payload)
+    assert lifecycle.state is not None
+    with pytest.raises(GameLifecycleError, match="source scope boundary was reused"):
+        active_player_authority_before_event(
+            state=lifecycle.state,
+            decisions=decisions,
+            event_index=len(decisions.event_log.records),
+        )
 
 
 def test_phase15d_interrupt_overrun_pile_in_continues_reaction_to_melee_declaration() -> None:

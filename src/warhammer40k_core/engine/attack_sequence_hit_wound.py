@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
+
 from warhammer40k_core.core.modifiers import bound_modified_roll
 
 from typing import TYPE_CHECKING, cast
@@ -158,7 +160,14 @@ def _roll_hit(
         )
     )
     minimum_success = thresholds.minimum_success
-    critical = unmodified >= thresholds.critical_threshold
+    critical = CriticalRollThreshold(
+        thresholds.critical_threshold, thresholds.critical_is_threshold
+    ).matches(unmodified)
+    meets_minimum = (
+        unmodified == minimum_success
+        if thresholds.success_requires_exact
+        else unmodified >= minimum_success
+    )
     unmodified_success_threshold_active = minimum_success < base_minimum_success
     target_keywords = rules_unit_view_by_id(
         state=state,
@@ -196,11 +205,13 @@ def _roll_hit(
         final_roll=final_roll,
         successful=(
             critical
-            or (unmodified_success_threshold_active and unmodified >= minimum_success)
-            or (unmodified >= minimum_success and final_roll >= skill)
+            or (unmodified_success_threshold_active and meets_minimum)
+            or (meets_minimum and final_roll >= skill)
         ),
         critical=critical,
         critical_threshold=thresholds.critical_threshold,
+        critical_is_threshold=thresholds.critical_is_threshold,
+        success_requires_exact=thresholds.success_requires_exact,
         threshold_source_ids=thresholds.source_ids,
         minimum_unmodified_success=minimum_success,
         unmodified_success_threshold_active=unmodified_success_threshold_active,
@@ -228,7 +239,7 @@ def _roll_wound(
     toughness: int,
     attacker_player_id: str,
     attack_context_id: str,
-    critical_threshold: int,
+    critical_threshold: CriticalRollThreshold,
     wound_modifier: int = 0,
 ) -> WoundRoll:
     strength = pool.weapon_profile.strength.final
@@ -244,8 +255,7 @@ def _roll_wound(
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(wound_modifier)
     final_roll = bound_modified_roll(unmodified + capped_modifier)
-    critical_threshold = _validate_d6_target("critical_threshold", critical_threshold)
-    critical = unmodified >= critical_threshold
+    critical = critical_threshold.matches(unmodified)
     return WoundRoll(
         strength=strength,
         toughness=toughness,
@@ -257,7 +267,8 @@ def _roll_wound(
         final_roll=final_roll,
         successful=critical or (unmodified != 1 and final_roll >= target_number),
         critical=critical,
-        critical_threshold=critical_threshold,
+        critical_threshold=critical_threshold.value,
+        critical_is_threshold=critical_threshold.inclusive,
     )
 
 
@@ -298,7 +309,7 @@ def _critical_wound_threshold(
     pool: RangedAttackPool,
     source_phase: BattlePhase,
     target_keywords: tuple[str, ...],
-) -> int:
+) -> CriticalRollThreshold:
     threshold = anti_keyword_critical_threshold(
         profile=pool.weapon_profile,
         target_keywords=target_keywords,
@@ -315,6 +326,7 @@ def _critical_wound_threshold(
             target_unit_instance_id=pool.target_unit_instance_id,
             weapon_profile=pool.weapon_profile,
             current_critical_threshold=6 if threshold is None else threshold,
+            current_critical_is_threshold=threshold is not None,
         )
     )
 
@@ -335,6 +347,8 @@ def _reroll_wound_for_twin_linked_if_needed(
         return initial_wound_roll
     if initial_wound_roll.roll_state is None:
         raise GameLifecycleError("Twin-linked reroll requires a wound roll state.")
+    if initial_wound_roll.roll_state.result_override is not None:
+        return initial_wound_roll
     permission = RerollPermission(
         source_id=TWIN_LINKED_RULE_ID,
         timing_window="attack_sequence.wound",
@@ -372,8 +386,10 @@ def _reroll_wound_for_twin_linked_if_needed(
     unmodified = updated_state.current_total
     capped_modifier = _cap_roll_modifier(initial_wound_roll.modifier)
     final_roll = bound_modified_roll(unmodified + capped_modifier)
-    critical_threshold = initial_wound_roll.critical_threshold
-    critical = unmodified >= critical_threshold
+    critical_threshold = CriticalRollThreshold(
+        initial_wound_roll.critical_threshold, initial_wound_roll.critical_is_threshold
+    )
+    critical = critical_threshold.matches(unmodified)
     wound_roll = WoundRoll(
         strength=pool.weapon_profile.strength.final,
         toughness=toughness,
@@ -385,7 +401,8 @@ def _reroll_wound_for_twin_linked_if_needed(
         final_roll=final_roll,
         successful=critical or (unmodified != 1 and final_roll >= initial_wound_roll.target_number),
         critical=critical,
-        critical_threshold=critical_threshold,
+        critical_threshold=critical_threshold.value,
+        critical_is_threshold=critical_threshold.inclusive,
     )
     decisions.event_log.append(
         "weapon_ability_reroll_resolved",

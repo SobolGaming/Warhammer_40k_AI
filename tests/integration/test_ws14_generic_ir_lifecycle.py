@@ -529,9 +529,13 @@ def test_ws14_more_dakka_stratagem_ir_effects_drive_runtime_hooks() -> None:
 
 @pytest.mark.integration
 def test_ws14_more_dakka_call_dat_dakka_binds_destroyed_target_and_requests_shooting() -> None:
+    from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
+
     lifecycle = _more_dakka_battle_lifecycle()
     state = _state(lifecycle)
     _place_units_for_more_dakka_shooting(state)
+    _prepare_battle_phase(state, phase=BattlePhase.SHOOTING, active_player_id="player-b")
+    open_phase(lifecycle)
 
     use_record, submit_status = _use_more_dakka_stratagem_through_lifecycle(
         lifecycle,
@@ -565,6 +569,8 @@ def test_ws14_more_dakka_call_dat_dakka_binds_destroyed_target_and_requests_shoo
     assert request == submit_status.decision_request
     assert request.decision_type == "submit_shooting_declaration"
     assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+
+    assert_active_player_history(lifecycle, expected_player="player-a")
 
 
 @pytest.mark.integration

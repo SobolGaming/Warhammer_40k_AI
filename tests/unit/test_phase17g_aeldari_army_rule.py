@@ -436,8 +436,11 @@ def test_aspect_shrine_token_engine_decision_spends_and_records_override() -> No
     }
 
 
-def test_aspect_shrine_token_facade_use_resumes_failed_hit_as_six() -> None:
-    lifecycle, request = _aspect_shrine_lifecycle_override_request()
+@pytest.mark.parametrize("replacement_value", [1, 6, 7])
+def test_aspect_shrine_token_facade_use_resumes_assigned_hit(replacement_value: int) -> None:
+    lifecycle, request = _aspect_shrine_lifecycle_override_request(
+        replacement_value=replacement_value
+    )
 
     status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -458,8 +461,8 @@ def test_aspect_shrine_token_facade_use_resumes_failed_hit_as_six() -> None:
     )
     override_payload = _event_payload(lifecycle, DICE_RESULT_OVERRIDE_EVENT_TYPE)
     updated_state = cast(dict[str, JsonValue], override_payload["updated_roll_state"])
-    assert updated_state["current_values"] == [6]
-    assert updated_state["current_total"] == 6
+    assert updated_state["current_values"] == [replacement_value]
+    assert updated_state["current_total"] == replacement_value
 
 
 def test_aspect_shrine_token_facade_rejects_resource_drift_without_popping_request() -> None:
@@ -1721,7 +1724,7 @@ def _aspect_shrine_token_wargear_option() -> DatasheetWargearOption:
     )
 
 
-def _aspect_shrine_token_ability() -> DatasheetAbilityDescriptor:
+def _aspect_shrine_token_ability(*, replacement_value: int = 6) -> DatasheetAbilityDescriptor:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
             objective_scope=ObjectiveRuleScope.CORE_RULES,
@@ -1729,7 +1732,7 @@ def _aspect_shrine_token_ability() -> DatasheetAbilityDescriptor:
             raw_text=(
                 "Once per battle for each Aspect Shrine token this unit has, you can change "
                 "the result of one Hit roll or one Wound roll made for a model in this unit "
-                "(excluding CHARACTER models) to an unmodified 6."
+                f"(excluding CHARACTER models) to an unmodified {replacement_value}."
             ),
         ),
         source_keyword_sequence_parts=("CHARACTER",),
@@ -1899,10 +1902,31 @@ def _shooting_declaration_request_for_aeldari_vehicle(
     return _decision_request(declaration_status)
 
 
-def _aspect_shrine_lifecycle_override_request() -> tuple[GameLifecycle, DecisionRequest]:
-    lifecycle, _status = _advance_to_movement_unit_selection(
-        _aeldari_config(aspect_shrine_token_count=1)
-    )
+def _aspect_shrine_lifecycle_override_request(
+    *, replacement_value: int = 6
+) -> tuple[GameLifecycle, DecisionRequest]:
+    config = _aeldari_config(aspect_shrine_token_count=1)
+    # Exercise the generic descriptor with alternate source-fixture values;
+    # this does not change or claim the real Aspect Shrine rule's assigned six.
+    if replacement_value != 6:
+        ability = _aspect_shrine_token_ability(replacement_value=replacement_value)
+        catalog = replace(
+            config.army_catalog,
+            datasheets=tuple(
+                replace(
+                    row,
+                    abilities=tuple(
+                        ability if value.ability_id == ability.ability_id else value
+                        for value in row.abilities
+                    ),
+                )
+                if row.datasheet_id == _AELDARI_ASPECT_DATASHEET_ID
+                else row
+                for row in config.army_catalog.datasheets
+            ),
+        )
+        config = replace(config, army_catalog=catalog)
+    lifecycle, _status = _advance_to_movement_unit_selection(config)
     _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.SHOOTING)
     lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
 
@@ -1955,7 +1979,7 @@ def _aspect_shrine_lifecycle_override_request() -> tuple[GameLifecycle, Decision
             attack_context_id=attack_context_id,
             attacker_player_id="player-a",
         ),
-        [1],
+        [2] if replacement_value == 1 else [1],
     )
     manager.roll_fixed(
         attack_sequence_wound_roll_spec(

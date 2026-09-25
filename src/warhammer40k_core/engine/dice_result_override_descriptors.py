@@ -57,7 +57,7 @@ class DiceResultOverrideDescriptor:
         object.__setattr__(
             self,
             "replacement_value",
-            _validate_d6_value(
+            _validate_positive_int(
                 "DiceResultOverrideDescriptor replacement_value", self.replacement_value
             ),
         )
@@ -213,12 +213,6 @@ def _validate_keyword_tuple(field_name: str, values: tuple[str, ...]) -> tuple[s
     if len(validated) != len(set(validated)):
         raise GameLifecycleError(f"{field_name} must not contain duplicates.")
     return validated
-
-
-def _validate_d6_value(field_name: str, value: int) -> int:
-    if type(value) is not int or value < 1 or value > 6:
-        raise GameLifecycleError(f"{field_name} must be an integer from 1 through 6.")
-    return value
 
 
 def _validate_positive_int(field_name: str, value: int) -> int:

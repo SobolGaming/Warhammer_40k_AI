@@ -35,8 +35,10 @@ if TYPE_CHECKING:
 def hit_roll(
     *,
     raw: int,
+    assigned_value: int | None = None,
     mode: str = "normal",
     threshold: int = 4,
+    grant_threshold: bool = True,
     modifier: int = 0,
     status: str = "critical_hit_threshold",
     explicit_snap: bool = False,
@@ -70,16 +72,17 @@ def hit_roll(
         parameters["required_targeting_rule_id"] = (
             FIRE_OVERWATCH_RULE_ID if mode == "overwatch" else SNAP_SHOOTING_RULE_ID
         )
-    state.record_persisting_effect(
-        generic_effect(
-            effect_id="order43:threshold",
-            owner_player_id="player-a",
-            target_unit_instance_ids=(attacker.unit_instance_id,),
-            target_kind="this_unit",
-            effect_kind="set_contextual_status",
-            parameters=parameters,
+    if grant_threshold:
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id="order43:threshold",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                target_kind="this_unit",
+                effect_kind="set_contextual_status",
+                parameters=parameters,
+            )
         )
-    )
     profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 5),
@@ -116,6 +119,17 @@ def hit_roll(
         event_log=lifecycle.decision_controller.event_log,
         injected_results=(_fixed_roll_result(roll_id="order43:hit", spec=spec, value=raw),),
     )
+    if assigned_value is not None:
+        initial = manager.roll(spec)
+        assigned = initial.with_result_override(
+            decision_id="assigned-result",
+            request_id="assigned-request",
+            source_rule_id="gw-11e-core-dice-results:treated-as-set-to",
+            replacement_value=assigned_value,
+        )
+        manager.event_log.append(
+            "dice_result_overridden", {"updated_roll_state": assigned.to_payload()}
+        )
     return _roll_hit(
         state=state,
         manager=manager,

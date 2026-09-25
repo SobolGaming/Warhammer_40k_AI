@@ -92,6 +92,7 @@ def complete_active_fight_activation(
     # Cleanup decisions retain this activation until its destruction owners finish.
     # Later resumption finds the event above and cannot repeat attacks or completion.
     state.replace_fight_phase_state(require_fight_state(state).with_active_activation(None))
+    decisions.event_log.append("fight_activation_completed", activation.to_payload())
     validate_attached_rules_unit_after_fight_activation(state=state, rules_unit_instance_id=unit_id)
     if fight_state.forced_activation_context is not None:
         return None

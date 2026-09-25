@@ -475,7 +475,7 @@ def _request_source_backed_hit_reroll_if_available(
         return None
     if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
         return None
-    if roll_state.rerolls:
+    if roll_state.rerolls or roll_state.result_override is not None:
         return None
     if roll_state.original_result.spec.reroll_forbidden_rule_ids:
         return None
@@ -608,7 +608,7 @@ def _request_source_backed_save_reroll_if_available(
         return None
     if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
         return None
-    if roll_state.rerolls:
+    if roll_state.rerolls or roll_state.result_override is not None:
         return None
     if roll_state.original_result.spec.reroll_forbidden_rule_ids:
         return None
@@ -924,7 +924,7 @@ def _request_source_backed_wound_reroll_if_available(
         return None
     if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
         return None
-    if roll_state.rerolls:
+    if roll_state.rerolls or roll_state.result_override is not None:
         return None
     if roll_state.original_result.spec.reroll_forbidden_rule_ids:
         return None

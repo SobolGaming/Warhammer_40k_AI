@@ -1,0 +1,59 @@
+{
+  "audit_id": "core-dice-results-maintained-app-mirrors-2026-09-24",
+  "observed_at": "2026-09-24T20:42:09+00:00",
+  "rows": [
+    {
+      "row_id": "highest-lowest:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/01-core-concepts",
+      "observed_at": "2026-09-24T20:42:09+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-dice-results:highest-lowest",
+      "transcription_sha256": "14241e9bcaf4daa1e7026903f99e2518dda542cc47c689129a50b4e51e696113",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "e8fa68c6abc35a6f10e8ec08e99e21138a1ea2294eadaa03f48331b39a49cf27"
+    },
+    {
+      "row_id": "treated-as-set-to:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/01-core-concepts",
+      "observed_at": "2026-09-24T20:42:09+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-dice-results:treated-as-set-to",
+      "transcription_sha256": "5c562063cb3ab6245120e12cd9f6b7c6a2ab98fa84299929d6ae94b6ba99da37",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "1e916e148f2e31b3fec5baa7a7e3309678556cb6c7c34d5299ed3a8b34e275cd"
+    },
+    {
+      "row_id": "default-critical-hit:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "observed_at": "2026-09-24T20:42:09+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-dice-results:default-critical-hit",
+      "transcription_sha256": "d95c2d9aa08b4becce3179f82ed704c97776168f25e6a6c8340403be31826c1a",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "443a95fa4e5e221239442528f09cb4ccfd4dee445c7db39fd0fb73cad91a9347"
+    },
+    {
+      "row_id": "default-critical-wound:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "observed_at": "2026-09-24T20:42:09+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-dice-results:default-critical-wound",
+      "transcription_sha256": "4a40a91cccbe0ab80a0e1436d221125d30fe12e6a79246c7d2dd419ddbef1988",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "2ac24e8e86a9dded0f14f434127579d9e3f065afc09d09e91d2a13727e8a5c89"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "Complete 01.05.07 and 01.05.08 expanded browser sections and the 05.01/05.02 critical-result table rows observed through 40k.app on September 24. Neither this observation nor corroborating GDM Core page exposes an App-data version; no co-version equivalence is claimed. The official PDF remains historical provenance."
+}

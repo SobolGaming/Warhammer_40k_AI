@@ -122,6 +122,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
+from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -1187,20 +1188,17 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
     state.record_persisting_effect(
         replace(state.persisting_effects[0], effect_id="daemonic-patrons-effect-repeat")
     )
-    assert (
-        generic_rule_critical_wound_threshold(
-            WoundRollCriticalThresholdContext(
-                state=state,
-                source_phase=BattlePhase.FIGHT,
-                attacking_unit_instance_id=source.unit_instance_id,
-                attacker_model_instance_id=source.own_models[0].model_instance_id,
-                target_unit_instance_id=enemy.unit_instance_id,
-                weapon_profile=profile,
-                current_critical_threshold=6,
-            )
+    assert generic_rule_critical_wound_threshold(
+        WoundRollCriticalThresholdContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=source.unit_instance_id,
+            attacker_model_instance_id=source.own_models[0].model_instance_id,
+            target_unit_instance_id=enemy.unit_instance_id,
+            weapon_profile=profile,
+            current_critical_threshold=6,
         )
-        == 3
-    )
+    ) == CriticalRollThreshold(3, True)
 
     decisions = DecisionController()
     request = single_fight_end_request(

@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.interpreted_dice import validate_interpreted_d6
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -248,7 +250,8 @@ def _validate_save_die_entry_payload(value: object) -> SaveDieEntryPayload:
     if not isinstance(roll_state_payload, dict):
         raise GameLifecycleError("Save die entry roll_state must be an object.")
     roll_state = DiceRollState.from_payload(cast(DiceRollStatePayload, roll_state_payload))
-    die_value = _validate_d6_value("Save die entry value", payload["value"])
+    die_value = _validate_positive_int("Save die entry value", payload["value"])
+    validate_interpreted_d6(state=roll_state, value=die_value)
     if die_value != roll_state.current_total:
         raise GameLifecycleError("Save die entry value must match roll_state.")
     attack_context_payload = payload["attack_context"]

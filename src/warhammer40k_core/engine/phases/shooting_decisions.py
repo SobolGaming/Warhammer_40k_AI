@@ -313,6 +313,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
                 "result_id": result.result_id,
                 "proposal_request_id": proposal.proposal_request_id,
                 "visibility_cache_key": proposal.visibility_cache_key,
+                "attack_sequence_id": attack_sequence.sequence_id,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
                 "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
                 "ranged_attack_history_record": ranged_attack_history_record.to_payload(),

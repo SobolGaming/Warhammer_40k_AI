@@ -49,7 +49,7 @@ def request_command_reroll_if_available(
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
     trigger_context_extra: dict[str, JsonValue] | None = None,
 ) -> LifecycleStatus | None:
-    if roll_state is not None and roll_state.rerolls:
+    if roll_state is not None and (roll_state.rerolls or roll_state.result_override is not None):
         return None
     if roll_state is None or stratagem_index is None:
         return None

@@ -314,3 +314,71 @@ def test_interaction_metadata_is_engine_authored_and_fail_closed() -> None:
 
     with pytest.raises(GameLifecycleError, match="missing required engine-authored"):
         interaction_descriptor_for_request(_select_unit_request())
+
+
+def test_order84_interpretation_evidence_does_not_perturb_unchanged_rng_history() -> None:
+    from warhammer40k_core.core.dice import DiceExpression, DiceRollInstance, DiceRollSpec
+    from warhammer40k_core.core.modified_dice import UnmodifiedRollResult
+    from warhammer40k_core.engine.decision import (
+        _rng_payload_history_token,  # pyright: ignore[reportPrivateUsage]
+    )
+    from warhammer40k_core.engine.dice import DiceRollManager
+    from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+
+    physical = DiceRollManager("order84-metadata").roll_fixed(
+        DiceRollSpec(DiceExpression(1, 6), reason="Physical result", roll_type="hit"), (4,)
+    )
+    current = validate_json_value(
+        {
+            "instance": DiceRollInstance.from_state(physical).to_payload(),
+            "unmodified": UnmodifiedRollResult.from_state(physical).to_payload(),
+            "critical_is_threshold": False,
+            "success_requires_exact": False,
+        }
+    )
+    original = json.loads(json.dumps(current))
+    del original["critical_is_threshold"]
+    del original["success_requires_exact"]
+    del original["unmodified"]["result_override"]
+    del original["instance"]["result_override"]
+    del original["instance"]["components"][0]["result_override"]
+    assert _rng_payload_history_token(current) == _rng_payload_history_token(
+        cast(JsonValue, original)
+    )
+
+    assigned = physical.with_result_override(
+        decision_id="assignment",
+        request_id="source",
+        source_rule_id="core:test",
+        replacement_value=7,
+    )
+    assert _rng_payload_history_token(
+        validate_json_value(UnmodifiedRollResult.from_state(physical).to_payload())
+    ) != _rng_payload_history_token(
+        validate_json_value(UnmodifiedRollResult.from_state(assigned).to_payload())
+    )
+    assert assigned.result_override is not None
+    assignment_payload = validate_json_value(assigned.result_override.to_payload())
+    assert isinstance(assignment_payload, dict)
+    prior_single_die_assignment = {
+        key: value for key, value in assignment_payload.items() if key != "component_index"
+    }
+    assert _rng_payload_history_token(assignment_payload) == _rng_payload_history_token(
+        prior_single_die_assignment
+    )
+    accepted_event = {
+        "event_type": "out_of_phase_shooting_declaration_accepted",
+        "payload": {"attack_sequence_id": "sequence-a", "unit_instance_id": "unit-a"},
+    }
+    assert _rng_payload_history_token(validate_json_value(accepted_event)) == (
+        _rng_payload_history_token(
+            {
+                "event_type": "out_of_phase_shooting_declaration_accepted",
+                "payload": {"unit_instance_id": "unit-a"},
+            }
+        )
+    )
+    # A chosen tied physical component remains a real player choice in RNG history.
+    assert _rng_payload_history_token({"component_index": 0}) != _rng_payload_history_token(
+        {"component_index": 1}
+    )

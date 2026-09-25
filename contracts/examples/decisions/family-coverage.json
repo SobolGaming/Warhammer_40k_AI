@@ -300,6 +300,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "select_dice_extremum",
+      "example_path": null,
+      "interaction_kinds": [
+        "dice_selection"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "select_dice_reroll",
       "example_path": null,
       "interaction_kinds": [
@@ -841,9 +851,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 84,
+  "known_external_token_count": 85,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 82,
+  "registered_decision_type_count": 83,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",
