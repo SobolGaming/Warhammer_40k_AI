@@ -8,14 +8,17 @@ from typing import TYPE_CHECKING, cast
 import msgspec
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.geometry.base_contact import DeemedBaseContact, DeemedBaseContactPayload
 from warhammer40k_core.geometry.movement_envelope import (
     MovementDistanceWitness,
     MovementDistanceWitnessPayload,
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -25,6 +28,7 @@ class ModelMovementDistance(msgspec.Struct, frozen=True, forbid_unknown_fields=T
     turn_player_id: str
     model_instance_id: str
     distance_inches: float
+    base_contacts: tuple[DeemedBaseContactPayload, ...] = ()
 
     def __post_init__(self) -> None:
         for name in ("event_id", "turn_player_id", "model_instance_id"):
@@ -45,10 +49,13 @@ class ModelMovementDistance(msgspec.Struct, frozen=True, forbid_unknown_fields=T
             "turn_player_id": self.turn_player_id,
             "model_instance_id": self.model_instance_id,
             "distance_inches": self.distance_inches,
+            "base_contacts": cast(JsonValue, list(self.base_contacts)),
         }
 
     @classmethod
     def from_payload(cls, value: object) -> ModelMovementDistance:
+        if not isinstance(value, dict) or "base_contacts" not in value:
+            raise GameLifecycleError("Movement history requires explicit contact authority.")
         try:
             return msgspec.convert(value, type=cls, strict=True)
         except msgspec.ValidationError as exc:
@@ -93,6 +100,12 @@ def distances_from_completion(
                 turn_player_id=turn_player_id,
                 model_instance_id=witness.model_id,
                 distance_inches=witness.total_distance_inches,
+                base_contacts=tuple(
+                    DeemedBaseContact.from_payload(
+                        cast(DeemedBaseContactPayload, contact)
+                    ).to_payload()
+                    for contact in _contact_payloads(result)
+                ),
             )
         )
     if len({row.model_instance_id for row in rows}) != len(rows):
@@ -100,7 +113,13 @@ def distances_from_completion(
     return tuple(sorted(rows, key=lambda row: row.model_instance_id))
 
 
-def validate_model_movement_history(state: GameState, events: tuple[EventRecord, ...]) -> None:
+def validate_model_movement_history(
+    state: GameState,
+    events: tuple[EventRecord, ...],
+    *,
+    decision_records: tuple[DecisionRecord, ...] = (),
+    runtime_content_bundle: RuntimeContentBundle | None = None,
+) -> None:
     from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
     from warhammer40k_core.engine.move_completion_triggers import MOVE_COMPLETION_EVENT_TYPES
 
@@ -120,6 +139,14 @@ def validate_model_movement_history(state: GameState, events: tuple[EventRecord,
         expected.extend(distances_from_completion(event, turn_player_id=owner))
     if state.model_movement_history != expected:
         raise GameLifecycleError("Model movement history differs from accepted movement evidence.")
+    from warhammer40k_core.engine.base_contact_history import validate_base_contact_history
+
+    validate_base_contact_history(
+        state=state,
+        events=events,
+        decisions=decision_records,
+        runtime_content_bundle=runtime_content_bundle,
+    )
 
 
 def models_within_turn_distance(
@@ -146,3 +173,10 @@ def validate_history_state(state: GameState) -> None:
         for row in rows
     ):
         raise GameLifecycleError("Movement history identity or turn drift.")
+
+
+def _contact_payloads(result: dict[str, JsonValue]) -> list[JsonValue]:
+    values = result.get("deemed_base_contacts", [])
+    if not isinstance(values, list):
+        raise GameLifecycleError("Movement contact witnesses must be a list.")
+    return values

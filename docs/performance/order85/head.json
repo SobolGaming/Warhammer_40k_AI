@@ -1,0 +1,69 @@
+{
+  "workload": "order85-witnessed-contact-v1",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:6521ee7d3578ae30734edf50729862b19eafe5c284d81d3e5ad30b43c63762a6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6521ee7d3578ae30734edf50729862b19eafe5c284d81d3e5ad30b43c63762a6",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "host_role": "provisional",
+  "concurrency": 1,
+  "timing_boundary": "Separate session/config/restore/Charge-choice preparation and facade path submission through next pending decision",
+  "fixture": "Canonical one-model character and one-model vehicle, reviewed solid 8-inch cylinder on 120mm base; 100x100 empty board; fixed fixture seed and +10 Charge roll modifier; same body-touch and penetrating paths",
+  "hashes": {
+    "scripts/measure_order85.py": "9bc3ea520ce94fe6fd5000e41547d005c2b07c5a77bc12bf460ae067a1e8e66c",
+    "tests/order85_overhang_helpers.py": "75b571041cd7a9293eece454ec173b293eccc8d9b2db3575f8024533a230d587",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "body-touch",
+      "samples_seconds": [
+        0.07183841700316407,
+        0.015915124997263774,
+        0.01617962500313297
+      ],
+      "setup_seconds": [
+        2.3842817500117235,
+        0.4554688750067726,
+        0.4554437089827843
+      ],
+      "mean_seconds": 0.03464438900118694,
+      "maximum_seconds": 0.07183841700316407,
+      "median_seconds": 0.01617962500313297,
+      "p95_seconds_nearest_rank": 0.07183841700316407,
+      "submissions_per_second": 28.864703024946966,
+      "statuses": [
+        "waiting_for_decision",
+        "waiting_for_decision",
+        "waiting_for_decision"
+      ]
+    },
+    {
+      "case": "body-penetration",
+      "samples_seconds": [
+        0.0032560410036239773,
+        0.0029393330041784793,
+        0.003125957999145612
+      ],
+      "setup_seconds": [
+        0.45730554198962636,
+        0.45714187499834225,
+        0.4661354999989271
+      ],
+      "mean_seconds": 0.0031071106689826897,
+      "maximum_seconds": 0.0032560410036239773,
+      "median_seconds": 0.003125957999145612,
+      "p95_seconds_nearest_rank": 0.0032560410036239773,
+      "submissions_per_second": 321.84241455661237,
+      "statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ]
+    }
+  ],
+  "completion_rate": 1,
+  "coverage": false,
+  "full_game_certified": false
+}

@@ -1151,7 +1151,7 @@ def test_order47_checkpoint_authenticates_an_attached_models_distance_exemption(
     cast(dict[str, JsonValue], leader_row["preferred_reachability"])["status"] = (
         "endpoint_unreachable"
     )
-    with pytest.raises(GameLifecycleError, match="terrain endpoint proof drifted"):
+    with pytest.raises(GameLifecycleError, match="endpoint proof drifted"):
         GameLifecycle.from_payload(checkpoint)
 
 

@@ -1279,6 +1279,7 @@ def geometry_model_for_placement(
         pose=placement.pose,
         base=model.geometry.base_shape(),
         volume=ModelVolume(height=model.geometry.height_inches),
+        body_parts=model.geometry.body_parts,
     )
 
 

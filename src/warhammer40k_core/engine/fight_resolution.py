@@ -84,6 +84,7 @@ from warhammer40k_core.engine.fight_movement_target_authority import (
 from warhammer40k_core.engine.fight_movement_witness import (
     closed_loop_fight_model_id,
     fight_movement_path_violation,
+    validate_fight_witness_matches_unit,
     validate_fight_witness_shape,
 )
 from warhammer40k_core.engine.fight_on_death import model_has_fight_action_authority
@@ -941,7 +942,7 @@ def resolve_fight_movement(
     witness = proposal.witness
     if witness is None:
         raise GameLifecycleError("Fight movement requires a PathWitness.")
-    _validate_fight_witness_matches_unit(witness=witness, unit_placement=unit_placement)
+    validate_fight_witness_matches_unit(witness=witness, unit_placement=unit_placement)
     attempted_placement = _attempted_placement_from_witness(
         unit_placement=unit_placement,
         witness=witness,
@@ -955,6 +956,7 @@ def resolve_fight_movement(
         movement_mode=proposal.movement_mode,
         displacement_kind=_displacement_kind_for_proposal(proposal),
         distance_budget_inches=distance_budget_inches,
+        proposal=proposal,
     )
     _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
         scenario=scenario,
@@ -2455,21 +2457,6 @@ def _model_pose(unit_placement: UnitPlacement, model_instance_id: str) -> Pose:
         if placement.model_instance_id == requested_model_id:
             return placement.pose
     raise GameLifecycleError("Fight movement model pose was not found.")
-
-
-def _validate_fight_witness_matches_unit(
-    *,
-    witness: PathWitness,
-    unit_placement: UnitPlacement,
-) -> None:
-    expected_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
-    )
-    if tuple(sorted(witness.model_ids())) != expected_model_ids:
-        raise GameLifecycleError("Fight movement witness must match selected unit models.")
-    for placement in unit_placement.model_placements:
-        if witness.poses_for_model(placement.model_instance_id)[0] != placement.pose:
-            raise GameLifecycleError("Fight movement witness must start at current model poses.")
 
 
 def _proposal_context(request: MovementProposalRequest) -> dict[str, JsonValue]:

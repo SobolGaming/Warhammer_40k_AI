@@ -1351,7 +1351,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 51
+    assert len(scope.source_packages) == 52
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -1494,7 +1494,7 @@ def test_maintained_mirror_evidence_accepts_either_provider_with_complete_tuple(
     invalid_url = dict(payload)
     invalid_url["source_url"] = "https://game-datamissions.com/11th/rules/../factions"
     invalid_url["observation_sha256"] = _observation_sha256(cast(RuleEvidencePayload, invalid_url))
-    with pytest.raises(RuleEvidenceError, match="canonical HTTPS Core Rules changelog URL"):
+    with pytest.raises(RuleEvidenceError, match="canonical HTTPS Core Rules body or changelog URL"):
         RuleEvidenceRecord.from_payload(invalid_url)
 
 

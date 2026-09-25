@@ -1090,6 +1090,16 @@
           "audit_id": "core-dice-results-maintained-app-mirrors-2026-09-24",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-24T20:42:09+00:00"
+        },
+        {
+          "row_id": "deemed-base-contact:gdm",
+          "source_observation_sha256": "743f9409d7a6730f08a946f081e56e72f04d894094380a29f4a1e57ca77f3797",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-base-contact-maintained-app-mirrors-2026-09-24",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-25T02:17:22+00:00"
         }
       ],
       "legacy_observations": [
@@ -1789,6 +1799,15 @@
             "gw-11e-core-dice-results:treated-as-set-to",
             "gw-11e-core-dice-results:default-critical-hit",
             "gw-11e-core-dice-results:default-critical-wound"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-base-contact",
+          "version": "maintained-app-mirrors-observed-2026-09-24",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-base-contact:deemed-base-contact"
           ],
           "catalog_sha256": null
         }

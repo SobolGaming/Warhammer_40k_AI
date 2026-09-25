@@ -11,16 +11,19 @@ import math
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from functools import lru_cache
-from itertools import pairwise
+from itertools import pairwise, product
 
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase, base_distance
+from warhammer40k_core.geometry.base_contact_proof import endpoint_excluded_by_bodies
+from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
 from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
     TerrainPathLegalityContext,
 )
+from warhammer40k_core.geometry.physical_model import collision_geometry_is_rotation_invariant
 from warhammer40k_core.geometry.polygons import Point2D, triangulate_polygon
 from warhammer40k_core.geometry.pose import GeometryError, Pose, validate_finite_number
 from warhammer40k_core.geometry.volume import Model
@@ -198,6 +201,7 @@ class MovementReachabilityQuery:
     coherency_max_span_inches: float | None = None
     coherency_all_models_distance_inches: float | None = None
     closer_target_groups: tuple[tuple[Model, ...], ...] = ()
+    required_if_reachable_goals: tuple[MovementGoal, ...] = ()
 
     def __post_init__(self) -> None:
         if self.path_context.moving_model != self.terrain_context.moving_model:
@@ -256,6 +260,17 @@ def clear_movement_reachability_cache() -> None:
 
 @lru_cache(maxsize=512)
 def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabilityResult:
+    if query.required_if_reachable_goals:
+        obligations = query.required_if_reachable_goals
+        query = replace(query, required_if_reachable_goals=())
+        for goal in obligations:
+            result = movement_reachability(
+                replace(query, goal=goal, maximum_target_range_inches=None)
+            )
+            if result.status is MovementReachabilityStatus.UNRESOLVED:
+                return result
+            if result.reachable:
+                query = replace(query, required_goals=(*query.required_goals, goal))
     source = query.path_context.moving_model
     budget = query.path_context.movement_distance_budget_inches
     if budget is None:
@@ -274,10 +289,21 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
     # Direct paths are overwhelmingly the common headless case. Route construction is lazy.
     targets = _goal_poses(query, source.pose)
     for target in targets:
-        poses = _segment(source.pose, target)
-        witness = _validated_witness(query, poses)
-        if witness is not None and _endpoint_satisfies(query, replace(source, pose=target)):
-            return MovementReachabilityResult(witness, 1, MovementReachabilityStatus.REACHABLE)
+        paths: tuple[tuple[Pose, ...], ...] = (_segment(source.pose, target),)
+        if not collision_geometry_is_rotation_invariant(source):
+            rotated = Pose.at(
+                source.pose.position.x,
+                source.pose.position.y,
+                source.pose.position.z,
+                facing_degrees=target.facing.degrees,
+            )
+            # A supplied facing may require rotating before translation. Validate
+            # that complete path before resorting to the bounded navigation graph.
+            paths += ((*_segment(source.pose, rotated)[:-1], *_segment(rotated, target)),)
+        for poses in paths:
+            witness = _validated_witness(query, poses)
+            if witness is not None and _endpoint_satisfies(query, replace(source, pose=target)):
+                return MovementReachabilityResult(witness, 1, MovementReachabilityStatus.REACHABLE)
     if endpoint_excluded_by_terrain(
         source=source,
         goal=query.goal,
@@ -285,6 +311,16 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
         ignores_vertical_distance=query.path_context.ignores_vertical_distance,
         terrain=query.terrain_context.terrain,
         terrain_features=query.terrain_context.terrain_features,
+    ):
+        return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
+    if query.goal.range_inches is not None and endpoint_excluded_by_bodies(
+        source=source,
+        targets=query.goal.models,
+        range_inches=query.goal.range_inches,
+        budget=budget,
+        supported_elevations=endpoint_support_elevations(
+            terrain=query.terrain_context.terrain, features=query.terrain_context.terrain_features
+        ),
     ):
         return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
     nodes = _navigation_poses(query)
@@ -459,12 +495,15 @@ def _goal_poses(query: MovementReachabilityQuery, origin: Pose) -> tuple[Pose, .
             )
             targets.append((first[0] + t * dx, first[1] + t * dy, origin.position.z))
     candidates: set[Pose] = set()
-    for x, y, z in targets:
-        target = Pose.at(x, y, z, facing_degrees=origin.facing.degrees)
+    for (x, y, z), facing in product(targets, _search_facings(query, origin)):
+        oriented_origin = Pose.at(
+            origin.position.x, origin.position.y, origin.position.z, facing_degrees=facing
+        )
+        target = Pose.at(x, y, z, facing_degrees=facing)
         if not _goal_satisfied(query, replace(source, pose=target)):
             continue
-        if _goal_satisfied(query, replace(source, pose=origin)):
-            candidates.add(origin)
+        if _goal_satisfied(query, replace(source, pose=oriented_origin)):
+            candidates.add(oriented_origin)
             continue
         low, high = 0.0, 1.0
         for _ in range(48):
@@ -473,20 +512,24 @@ def _goal_poses(query: MovementReachabilityQuery, origin: Pose) -> tuple[Pose, .
                 origin.position.x + t * (x - origin.position.x),
                 origin.position.y + t * (y - origin.position.y),
                 z,
-                facing_degrees=origin.facing.degrees,
+                facing_degrees=facing,
             )
             if _goal_satisfied(query, replace(source, pose=candidate)):
                 high = t
             else:
                 low = t
         # Keep the endpoint on the legal side of the goal boundary.
-        t = min(1.0, high + _EPSILON)
+        t = (
+            high
+            if query.goal.range_inches is not None and query.goal.range_inches <= _EPSILON
+            else min(1.0, high + _EPSILON)
+        )
         candidates.add(
             Pose.at(
                 origin.position.x + t * (x - origin.position.x),
                 origin.position.y + t * (y - origin.position.y),
                 z,
-                facing_degrees=origin.facing.degrees,
+                facing_degrees=facing,
             )
         )
     return tuple(
@@ -503,6 +546,24 @@ def _goal_poses(query: MovementReachabilityQuery, origin: Pose) -> tuple[Pose, .
     )
 
 
+def _search_facings(query: MovementReachabilityQuery, origin: Pose) -> tuple[float, ...]:
+    source = query.path_context.moving_model
+    if collision_geometry_is_rotation_invariant(source):
+        return (origin.facing.degrees,)
+    return tuple(
+        sorted(
+            {
+                origin.facing.degrees,
+                *(
+                    pose.facing.degrees
+                    for pose in query.path_context.witness.poses_for_model(source.model_id)
+                ),
+                *(float(angle) for angle in range(0, 360, 15)),
+            }
+        )
+    )
+
+
 def _navigation_poses(query: MovementReachabilityQuery) -> tuple[Pose, ...]:
     source = query.path_context.moving_model
     budget = query.path_context.movement_distance_budget_inches
@@ -511,9 +572,7 @@ def _navigation_poses(query: MovementReachabilityQuery) -> tuple[Pose, ...]:
     radius = source.base.max_radius() + _EPSILON
     points: set[Point2D] = {(source.pose.position.x, source.pose.position.y)}
     heights = {source.pose.position.z, 0.0}
-    facings = {source.pose.facing.degrees}
-    if not isinstance(source.base, CircularBase):
-        facings.update(float(angle) for angle in range(0, 360, 15))
+    facings = _search_facings(query, source.pose)
     for model in (*query.path_context.friendly_models, *query.path_context.enemy_models):
         if source.pose.distance_2d_to(model.pose) > budget + radius + model.base.max_radius():
             continue

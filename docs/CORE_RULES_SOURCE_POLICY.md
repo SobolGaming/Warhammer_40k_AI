@@ -55,7 +55,9 @@ Missing, malformed, unregistered, or mismatched tuple data fails record
 construction and source-package loading. Provider names and URLs are
 allowlisted together: 40k.app records use canonical
 `https://www.40k.app/rules...` URLs, while Game Datamissions records use
-`https://game-datamissions.com/11th/rules/changelog`.
+`https://game-datamissions.com/11th/rules/changelog` or its canonical live body
+`https://game-datamissions.com/11th/rules/core-rules`. A live-body observation
+must retain its actual observation time and must not inherit a changelog version.
 
 The current policy is also bound to the typed
 `warhammer_40000_11th_core_rules` scope. A `RuleSourcePackage` must match a

@@ -29,6 +29,8 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     physical_model_authority_before_event,
 )
 from warhammer40k_core.engine.take_to_the_skies import flight_selection
+from warhammer40k_core.geometry.base_contact_proof import endpoint_excluded_by_bodies
+from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
 from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -223,8 +225,20 @@ def validate_charge_endpoint_history(
                         volume for feature in features for volume in feature.terrain_volumes()
                     ),
                     terrain_features=features,
+                ) and not (
+                    goal.range_inches is not None
+                    and endpoint_excluded_by_bodies(
+                        source=start,
+                        targets=goal.models,
+                        range_inches=goal.range_inches,
+                        budget=cast(float, budget),
+                        supported_elevations=endpoint_support_elevations(
+                            terrain=tuple(v for f in features for v in f.terrain_volumes()),
+                            features=features,
+                        ),
+                    )
                 ):
-                    raise GameLifecycleError("Charge historical terrain endpoint proof drifted.")
+                    raise GameLifecycleError("Charge historical endpoint proof drifted.")
 
 
 def charge_component_at_physical_boundary(

@@ -30,6 +30,7 @@ from warhammer40k_core.engine.large_model_setup import oversized_deployment_viol
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.physical_model import models_overlap_physically
 from warhammer40k_core.geometry.volume import Model
 
 _EPSILON = 1e-9
@@ -268,9 +269,7 @@ def _model_is_within_battlefield(
 
 
 def _models_overlap_with_volume(first: Model, second: Model) -> bool:
-    if not first.base_overlaps(second):
-        return False
-    return first.volume.vertical_gap_to(first.pose, second.volume, second.pose) <= _EPSILON
+    return models_overlap_physically(first, second)
 
 
 def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:

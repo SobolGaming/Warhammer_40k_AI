@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from warhammer40k_core.core.attributes import CharacteristicValue
 from warhammer40k_core.engine.aircraft import AircraftMovementViolationCode
+from warhammer40k_core.engine.base_contact_authority import (
+    contact_query_for_move,
+    contacts_for_validated_move,
+)
 from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
 
 from typing import TYPE_CHECKING
@@ -454,7 +458,7 @@ def _resolve_unit_move(
             owner_player_id=unit_placement.player_id,
             ignores_vertical_distance_override=ignores_vertical_distance,
         )
-        path_result = legality_context.to_path_validation_context(
+        path_context = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
             battlefield_width_inches=battlefield_width_inches,
@@ -496,7 +500,8 @@ def _resolve_unit_move(
                 if model_id != placement.model_instance_id
             ),
             movement_distance_budget_inches=movement_distance_budget_inches,
-        ).validate()
+        )
+        path_result = path_context.validate()
         if legality_context.capabilities.desperate_escape_tests_auto_passed:
             desperate_escape_auto_pass_model_ids.append(placement.model_instance_id)
         aircraft_violations: tuple[AircraftMovementViolation, ...] = ()
@@ -512,12 +517,27 @@ def _resolve_unit_move(
                 path_result=path_result,
                 aircraft_violations=aircraft_violations,
             )
-        terrain_result = legality_context.to_terrain_path_legality_context(
+        terrain_context = legality_context.to_terrain_path_legality_context(
             moving_model=moving_model,
             witness=model_witness,
             terrain=terrain,
             terrain_features=terrain_features,
-        ).validate()
+        )
+        terrain_result = terrain_context.validate()
+        if path_context.enemy_models:
+            path_result = contacts_for_validated_move(
+                path_context=path_context,
+                terrain_context=terrain_context,
+                path_result=path_result,
+                terrain_result=terrain_result,
+                query=contact_query_for_move(
+                    path_context=path_context,
+                    terrain_context=terrain_context,
+                    scenario=scenario,
+                    unit_instance_id=unit_placement.unit_instance_id,
+                    ruleset=ruleset_descriptor,
+                ),
+            )
         end_model = geometry_model_for_placement(
             model=model,
             placement=placement.with_pose(

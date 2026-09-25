@@ -214,8 +214,8 @@ def test_model_can_climb_tall_terrain_by_paying_vertical_distance() -> None:
         _normal_legality_context(),
         moving_model=mover,
         terrain=(tall_terrain,),
-        middle_pose=Pose.at(3.0, 1.0, 3.0),
-        end_pose=Pose.at(5.0, 1.0, 3.0),
+        middle_pose=Pose.at(2.5, 1.0, 3.0),
+        end_pose=Pose.at(3.0, 1.0, 3.0),
     ).validate()
 
     assert result.is_valid

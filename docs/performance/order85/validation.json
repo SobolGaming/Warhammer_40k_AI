@@ -1,0 +1,342 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6521ee7d3578ae30734edf50729862b19eafe5c284d81d3e5ad30b43c63762a6",
+  "started_at": "2026-09-25T14:43:34.796579+00:00",
+  "checks": [
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order85-behavior.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 748.959786167019,
+      "log_sha256": "28d9f151f9b77c7bcf3979bba603701b8003355191ba73df4ef1f60aeb1d01f2"
+    },
+    {
+      "name": "shard-generation",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "/tmp/order85-behavior.xml",
+        "--profile-source",
+        "Order 85 complete successful behavioral coverage profile; macOS Apple M5 Pro; xdist auto worksteal",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.10749295799178071,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order85-quality.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 116.77643066699966,
+      "log_sha256": "6f33d29c8ce1a1f4fbfc7669f441e492579a4ed5191846a3647f4de16b3595c2"
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.039669124991633,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.03603225000551902,
+      "log_sha256": "ac0ad2b83317af71cce2dcc8907622b513d8d5faa295284eb39b1b6da9c334f1"
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 1.175541250006063,
+      "log_sha256": "bce629377243d5cd40ebc9097b2b41fc7836d7087c351a6e3e410c4d8483f60c"
+    },
+    {
+      "name": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 37.59444875002373,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.13182516599772498,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "imports",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.32517483399715275,
+      "log_sha256": "cd61f4175f51c639e8a5b1ed1a9cecab776b43975fb86e660e7f7325c16b5297"
+    },
+    {
+      "name": "engine-identity",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.23261812498094514,
+      "log_sha256": "3141ac9b42c19e53ba647d84d172f5bcb3a472b6c0cd6aa4ba176ab1706434ee"
+    },
+    {
+      "name": "source-artifacts",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "tools/build_core_base_contact_source.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.03778720900299959,
+      "log_sha256": "aabb0b1256a04e867f542f736b051f6e1911c20d850214bf789de9e9352c1085"
+    },
+    {
+      "name": "contract-base",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "19a5b863e8bd3b15541facb73fd4c0f78a835ce1"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 39.60015166600351,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 8.181264832994202,
+      "log_sha256": "29590faf08412e1c9c7ca70dca7557d5b9f786fb087c21f770397571e987408c"
+    },
+    {
+      "name": "typescript-check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 1.7646164170000702,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "name": "typescript-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 0.6884862500010058,
+      "log_sha256": "84e1ce471aecc687146afb449abadf898303ef09a09180c6057afafd405a8c48"
+    },
+    {
+      "name": "typescript-conformance",
+      "command": [
+        "npm",
+        "run",
+        "conformance"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "seconds": 65.0408453749842,
+      "log_sha256": "02091363aaa1b8dfdd0b29438d65a10e72c7a475549ac315fb791d32feed692d"
+    },
+    {
+      "name": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.714106500003254,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "superseded_validation_attempts": [
+    {
+      "reason": "Stale static caller inventory still named the pre-extraction Leadership module; updated the expected owner to generic_effect_history.py. Production unchanged.",
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=/tmp/order85-quality.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 117.69977737500449,
+      "log_sha256": "0b54f3e0ddc4f31c3c2d30355ea61adf551be8533e96f9a8978c654dd5c11d9d"
+    }
+  ],
+  "completed_at": "2026-09-25T15:04:33.797865+00:00",
+  "scope": "Order 85 / P01H / C01-08, including R85-001 and R85-002",
+  "base_commit": "19a5b863e8bd3b15541facb73fd4c0f78a835ce1",
+  "full_game_certified": false,
+  "complete_games": 0,
+  "environment_note": "Python 3.14.5; isolated uv cache and system certificates; required bundled Node PATH and npm; local sockets and wheel installation permitted.",
+  "behavior_suite": {
+    "tests": 9293,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "0d993fb3de11da22a5561ac11bbd24a8bb8ecdab6767d5537c02d8801c55dbef",
+    "coverage": true,
+    "distribution": "xdist auto worksteal; 18 workers",
+    "coverage_percent": 85.2,
+    "required_coverage_percent": 85
+  },
+  "quality_suite": {
+    "tests": 678,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "60dbce0f687ae6575824aca8b64691c4452255e4c5424769cfd6a4a3800b3f53",
+    "coverage": false,
+    "distribution": "xdist auto worksteal; 18 workers"
+  },
+  "independent_review": {
+    "status": "approved",
+    "findings": [
+      "R85-001",
+      "R85-002"
+    ],
+    "all_findings_addressed": true,
+    "followup_findings_addressed": [
+      "Bind reactive roll to exact proposal and source choice",
+      "Evaluate Charge grant providers at effect creation boundary"
+    ],
+    "independent_targeted_tests_passed": 7,
+    "artifact_review": "approved; runtime identity, all contract hashes, matched inputs, unchanged budgets and inherited report hashes verified"
+  },
+  "incomplete_component_diagnostic": "docs/performance/order85/incomplete-diagnostics.json",
+  "focused_validation": {
+    "contact_pathing_and_static_tests_passed": 72,
+    "shared_effect_integration_tests_passed": 83
+  },
+  "previous_publication_validation": {
+    "commit": "4f3877be7797f2124c400f47efd5fc884ef70a2a",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:04db14ae5849986ba82f63ebaea65aa5f34c46b0e5ee347a9c7e38abb9a6d4db",
+    "validation_sha256": "b58e02d2abdcdafaaeb926447dfde13f7f0eb73b5c04f7e7291bd3bcd7793aae"
+  }
+}

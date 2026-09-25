@@ -12,12 +12,11 @@ from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placeme
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import model_is_within_battlefield_footprint
+from warhammer40k_core.geometry.physical_model import models_overlap_physically
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
-
-_OVERLAP_EPSILON = 1e-9
 
 
 def validate_returned_model_endpoints(
@@ -102,9 +101,7 @@ def validate_model_placement_endpoints(
 
 
 def _models_overlap(first: Model, second: Model) -> bool:
-    return first.base_overlaps(second) and (
-        first.volume.vertical_gap_to(first.pose, second.volume, second.pose) <= _OVERLAP_EPSILON
-    )
+    return models_overlap_physically(first, second)
 
 
 def _unit_for_model(*, scenario: BattlefieldScenario, model_instance_id: str) -> UnitInstance:

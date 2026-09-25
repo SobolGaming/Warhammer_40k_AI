@@ -1103,6 +1103,8 @@ def test_order66_end_turn_returns_every_aircraft_once() -> None:
 def test_order66_aircraft_cannot_pile_in_or_consolidate_in_direct_path_owner() -> None:
     from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
     from warhammer40k_core.engine.fight_movement_paths import validate_fight_paths
+    from warhammer40k_core.engine.fight_resolution import FightMovementProposal
+    from warhammer40k_core.engine.movement_proposals import ProposalKind
 
     scenario, aircraft, _enemy = _aircraft_scenario()
     placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
@@ -1120,6 +1122,16 @@ def test_order66_aircraft_cannot_pile_in_or_consolidate_in_direct_path_owner() -
             movement_mode=mode,
             displacement_kind=kind,
             distance_budget_inches=3,
+            proposal=FightMovementProposal(
+                proposal_request_id="aircraft-fight",
+                proposal_kind=ProposalKind.PILE_IN
+                if mode is MovementMode.PILE_IN
+                else ProposalKind.CONSOLIDATE,
+                unit_instance_id=aircraft.unit_instance_id,
+                movement_phase_action=mode.value,
+                movement_mode=mode,
+                witness=witness,
+            ),
         )
         assert not paths[0].is_valid
         assert paths[0].violations[0].violation_code == "aircraft_ingress_only"

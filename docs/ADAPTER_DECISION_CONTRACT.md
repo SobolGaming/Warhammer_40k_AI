@@ -6846,3 +6846,34 @@ shooting scope before early grant choices; `fight_activation_completed` records
 the exact scope close after retained-destruction cleanup. Attack declaration and
 completion IDs associate earlier scope closure with the owning attack sequence.
 These evidence events consume no RNG and use the existing event envelope.
+
+## Order 85: witnessed deemed base contact (contract 39)
+
+Core 01.04.04 contact is engine-derived from an accepted movement `PathWitness`.
+Charge, Fight, ordinary and triggered movement use the same shared geometry
+predicates. Finite choices and parameterized movement proposals retain their
+existing shapes and validation/retry rules; adapters cannot assert a contact.
+
+Catalog body parts (shape, offsets, bottom, height and evidence ID) survive runtime
+geometry serialization separately from the rules base. Contact authority binds
+physical model IDs, source ID, actual movement context and budget, counterfactual
+no-overhang witness, round and actual turn owner. The geometric contact predicate
+also accepts these symmetric pairs while the models are present, as close as
+possible, within one inch part-to-part, and before that turn's cleanup. Current
+battlefield geometry is used to recheck continuing conditions. Ordinary numeric
+base range, Engagement Range and attack-target range retain their source-defined
+measurements; deemed contact affects explicit base-contact predicates such as the
+pile-in and consolidation movement lock.
+
+Accepted path results with enemy body geometry retain a `base_contact_query` and
+zero or more `deemed_base_contacts`. Persistent per-model movement history requires
+`base_contacts`. Complete queries and counterfactual paths are operator/replay
+authority only: the shared adapter redactor removes them from projections, event
+deltas and status payloads for every viewer. Public contact entries expose only
+the source rule and enemy model identity, within the existing event visibility
+policy. No hidden off-battlefield model enters a feasibility query.
+
+Restore rejects source, movement, budget, geometry, turn, duplicate/missing query
+or pair inventory drift. An unresolved feasibility calculation produces a typed
+invalid movement result and cannot create contact authority. See
+[contract migration 38 to 39](../contracts/migrations/38-to-39.md).

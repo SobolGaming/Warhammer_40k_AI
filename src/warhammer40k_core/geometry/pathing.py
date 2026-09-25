@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
@@ -17,9 +17,9 @@ from warhammer40k_core.core.unit_group import UnitGroup, UnitGroupPayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.collision import CollisionSet, CollisionSetPayload
+from warhammer40k_core.geometry.endpoint_support import model_has_endpoint_support
 from warhammer40k_core.geometry.movement_envelope import (
     MovementDistanceWitness,
-    MovementDistanceWitnessPayload,
     MovementEnvelope,
     MovementEnvelopePayload,
 )
@@ -41,10 +41,29 @@ from warhammer40k_core.geometry.path_measurement import (
 from warhammer40k_core.geometry.path_measurement import (
     path_without_vertical_distance as _path_without_vertical_distance,
 )
+from warhammer40k_core.geometry.path_validation_result import (
+    PathConstraintViolation as PathConstraintViolation,
+)
+from warhammer40k_core.geometry.path_validation_result import (
+    PathConstraintViolationPayload as PathConstraintViolationPayload,
+)
+from warhammer40k_core.geometry.path_validation_result import (
+    PathValidationResult as PathValidationResult,
+)
+from warhammer40k_core.geometry.path_validation_result import (
+    PathValidationResultPayload as PathValidationResultPayload,
+)
 from warhammer40k_core.geometry.pathing_model_references import (
     validate_disjoint_path_validation_model_ids,
     validate_model_tuple_for_path_validation,
     validate_path_validation_model_reference_ids,
+)
+from warhammer40k_core.geometry.physical_model import (
+    base_crosses_physical_model,
+    body_intersects_terrain_endpoint,
+)
+from warhammer40k_core.geometry.physical_model import (
+    models_overlap_physically as _models_overlap_with_volume,
 )
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -132,23 +151,6 @@ class PathQueryPayload(TypedDict):
     collision_set: CollisionSetPayload
 
 
-class PathConstraintViolationPayload(TypedDict):
-    violation_code: str
-    message: str
-    model_id: str | None
-    blocker_id: str | None
-
-
-class PathValidationResultPayload(TypedDict):
-    is_valid: bool
-    violations: list[PathConstraintViolationPayload]
-    sampled_pose_count: int
-    model_collision_check_count: int
-    terrain_collision_check_count: int
-    engagement_check_count: int
-    movement_distance_witness: MovementDistanceWitnessPayload | None
-
-
 class PathValidationContextPayload(TypedDict):
     moving_model: ModelPayload
     witness: PathWitnessPayload
@@ -211,187 +213,6 @@ class TerrainPathLegalityContextPayload(TypedDict):
     horizontal_terrain_transit_height_inches: float | None
     has_fly: bool
     sample_interval_inches: float
-
-
-@dataclass(frozen=True, slots=True)
-class PathConstraintViolation:
-    violation_code: str
-    message: str
-    model_id: str | None = None
-    blocker_id: str | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "violation_code",
-            _validate_identifier("PathConstraintViolation violation_code", self.violation_code),
-        )
-        object.__setattr__(
-            self,
-            "message",
-            _validate_identifier("PathConstraintViolation message", self.message),
-        )
-        object.__setattr__(
-            self,
-            "model_id",
-            _validate_optional_identifier("PathConstraintViolation model_id", self.model_id),
-        )
-        object.__setattr__(
-            self,
-            "blocker_id",
-            _validate_optional_identifier("PathConstraintViolation blocker_id", self.blocker_id),
-        )
-
-    def to_payload(self) -> PathConstraintViolationPayload:
-        return {
-            "violation_code": self.violation_code,
-            "message": self.message,
-            "model_id": self.model_id,
-            "blocker_id": self.blocker_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: PathConstraintViolationPayload) -> Self:
-        return cls(
-            violation_code=payload["violation_code"],
-            message=payload["message"],
-            model_id=payload["model_id"],
-            blocker_id=payload["blocker_id"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class PathValidationResult:
-    violations: tuple[PathConstraintViolation, ...] = ()
-    sampled_pose_count: int = 0
-    model_collision_check_count: int = 0
-    terrain_collision_check_count: int = 0
-    engagement_check_count: int = 0
-    movement_distance_witness: MovementDistanceWitness | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "violations",
-            _validate_path_constraint_violations(self.violations),
-        )
-        object.__setattr__(
-            self,
-            "sampled_pose_count",
-            _validate_non_negative_int(
-                "PathValidationResult sampled_pose_count",
-                self.sampled_pose_count,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "model_collision_check_count",
-            _validate_non_negative_int(
-                "PathValidationResult model_collision_check_count",
-                self.model_collision_check_count,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "terrain_collision_check_count",
-            _validate_non_negative_int(
-                "PathValidationResult terrain_collision_check_count",
-                self.terrain_collision_check_count,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "engagement_check_count",
-            _validate_non_negative_int(
-                "PathValidationResult engagement_check_count",
-                self.engagement_check_count,
-            ),
-        )
-        if (
-            self.movement_distance_witness is not None
-            and type(self.movement_distance_witness) is not MovementDistanceWitness
-        ):
-            raise GeometryError(
-                "PathValidationResult movement_distance_witness must be a MovementDistanceWitness."
-            )
-
-    @classmethod
-    def valid(
-        cls,
-        *,
-        sampled_pose_count: int,
-        model_collision_check_count: int,
-        terrain_collision_check_count: int,
-        engagement_check_count: int,
-        movement_distance_witness: MovementDistanceWitness | None = None,
-    ) -> Self:
-        return cls(
-            sampled_pose_count=sampled_pose_count,
-            model_collision_check_count=model_collision_check_count,
-            terrain_collision_check_count=terrain_collision_check_count,
-            engagement_check_count=engagement_check_count,
-            movement_distance_witness=movement_distance_witness,
-        )
-
-    @classmethod
-    def invalid(
-        cls,
-        violation: PathConstraintViolation,
-        *,
-        sampled_pose_count: int,
-        model_collision_check_count: int,
-        terrain_collision_check_count: int,
-        engagement_check_count: int,
-        movement_distance_witness: MovementDistanceWitness | None = None,
-    ) -> Self:
-        return cls(
-            violations=(violation,),
-            sampled_pose_count=sampled_pose_count,
-            model_collision_check_count=model_collision_check_count,
-            terrain_collision_check_count=terrain_collision_check_count,
-            engagement_check_count=engagement_check_count,
-            movement_distance_witness=movement_distance_witness,
-        )
-
-    @property
-    def is_valid(self) -> bool:
-        return not self.violations
-
-    def to_payload(self) -> PathValidationResultPayload:
-        return {
-            "is_valid": self.is_valid,
-            "violations": [violation.to_payload() for violation in self.violations],
-            "sampled_pose_count": self.sampled_pose_count,
-            "model_collision_check_count": self.model_collision_check_count,
-            "terrain_collision_check_count": self.terrain_collision_check_count,
-            "engagement_check_count": self.engagement_check_count,
-            "movement_distance_witness": (
-                None
-                if self.movement_distance_witness is None
-                else self.movement_distance_witness.to_payload()
-            ),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: PathValidationResultPayload) -> Self:
-        result = cls(
-            violations=tuple(
-                PathConstraintViolation.from_payload(violation)
-                for violation in payload["violations"]
-            ),
-            sampled_pose_count=payload["sampled_pose_count"],
-            model_collision_check_count=payload["model_collision_check_count"],
-            terrain_collision_check_count=payload["terrain_collision_check_count"],
-            engagement_check_count=payload["engagement_check_count"],
-            movement_distance_witness=(
-                None
-                if payload["movement_distance_witness"] is None
-                else MovementDistanceWitness.from_payload(payload["movement_distance_witness"])
-            ),
-        )
-        if result.is_valid != payload["is_valid"]:
-            raise GeometryError("PathValidationResult payload validity does not match violations.")
-        return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -580,7 +401,7 @@ class PathValidationContext:
                 metrics.model_collision_check_count += 1
                 if enemy_model.model_id in self.aircraft_model_ids:
                     continue
-                if _models_overlap_with_volume(sampled_model, enemy_model):
+                if base_crosses_physical_model(sampled_model, enemy_model):
                     enemy_transit_blocker_ids = {
                         *self.enemy_vehicle_monster_model_ids,
                         *self.enemy_model_transit_blocker_ids,
@@ -631,7 +452,7 @@ class PathValidationContext:
                     and friendly_model.model_id not in self.friendly_model_transit_blocker_ids
                 ):
                     continue
-                if _models_overlap_with_volume(sampled_model, friendly_model):
+                if base_crosses_physical_model(sampled_model, friendly_model):
                     if friendly_model.model_id in self.friendly_model_transit_blocker_ids:
                         return _invalid_path_validation(
                             "friendly_model_transit_forbidden",
@@ -1182,6 +1003,27 @@ class TerrainPathLegalityContext:
                 sampled_pose_count=len(sampled_path),
             )
 
+        body_collision = body_intersects_terrain_endpoint(
+            _model_at_pose(self.moving_model, path[-1]),
+            (
+                *self.terrain,
+                *(
+                    volume
+                    for feature in self.terrain_features
+                    for volume in feature.terrain_volumes()
+                ),
+            ),
+        )
+        if body_collision is not None:
+            return TerrainPathLegalityResult.invalid(
+                TerrainTraversalViolation(
+                    violation_code=TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value,
+                    message="Model body cannot end within terrain.",
+                    terrain_id=body_collision,
+                ),
+                segments=(),
+                sampled_pose_count=len(sampled_path),
+            )
         segments: list[TerrainPathSegment] = []
         for terrain in self.terrain:
             violation = self._append_terrain_volume_segment(
@@ -1230,6 +1072,19 @@ class TerrainPathLegalityContext:
                     sampled_pose_count=len(sampled_path),
                 )
 
+        if not model_has_endpoint_support(
+            _model_at_pose(self.moving_model, path[-1]),
+            terrain=self.terrain,
+            features=self.terrain_features,
+        ):
+            return TerrainPathLegalityResult.invalid(
+                TerrainTraversalViolation(
+                    violation_code=TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value,
+                    message="Model endpoint has no physical support surface.",
+                ),
+                segments=tuple(segments),
+                sampled_pose_count=len(sampled_path),
+            )
         return TerrainPathLegalityResult.valid(
             segments=tuple(segments),
             sampled_pose_count=len(sampled_path),
@@ -1813,8 +1668,10 @@ class PathQuery:
 
             sampled_path = self.movement_envelope.sampled_path(path)
             metrics.sampled_pose_count += len(sampled_path)
-            for sampled_pose in sampled_path:
+            for sampled_index, sampled_pose in enumerate(sampled_path):
                 sampled_model = _model_at_pose(current_model, sampled_pose)
+                if sampled_index != len(sampled_path) - 1:
+                    sampled_model = replace(sampled_model, body_parts=())
                 model_collision = self.collision_set.model_collision_query(sampled_model)
                 metrics.model_collision_broadphase_check_count += (
                     model_collision.broadphase_check_count
@@ -2054,26 +1911,6 @@ def _validate_keyword_tuple(field_name: str, values: object) -> tuple[str, ...]:
     return tuple(sorted(keywords))
 
 
-def _validate_path_constraint_violations(
-    values: object,
-) -> tuple[PathConstraintViolation, ...]:
-    if type(values) is not tuple:
-        raise GeometryError("PathValidationResult violations must be a tuple.")
-    return tuple(
-        _validate_path_constraint_violation("PathValidationResult violation", value)
-        for value in cast(tuple[object, ...], values)
-    )
-
-
-def _validate_path_constraint_violation(
-    field_name: str,
-    value: object,
-) -> PathConstraintViolation:
-    if type(value) is not PathConstraintViolation:
-        raise GeometryError(f"{field_name} must be a PathConstraintViolation.")
-    return value
-
-
 def _validate_terrain_traversal_violation_tuple(
     values: object,
 ) -> tuple[TerrainTraversalViolation, ...]:
@@ -2152,12 +1989,7 @@ class _PathValidationMetricCounts:
 
 
 def _model_at_pose(model: Model, pose: Pose) -> Model:
-    return Model(
-        model_id=model.model_id,
-        pose=pose,
-        base=model.base,
-        volume=model.volume,
-    )
+    return replace(model, pose=pose)
 
 
 def _terrain_path_segment(
@@ -2312,14 +2144,6 @@ def model_is_within_battlefield_footprint(
     return min_x >= 0.0 and min_y >= 0.0 and max_x <= width and max_y <= depth
 
 
-def _models_overlap_with_volume(first: Model, second: Model) -> bool:
-    if first.volume.vertical_gap_to(first.pose, second.volume, second.pose) != 0.0:
-        return False
-    if not _model_pair_can_overlap_horizontally(first, second):
-        return False
-    return first.base_overlaps(second)
-
-
 def _models_are_in_enemy_engagement_range(
     first: Model,
     second: Model,
@@ -2384,12 +2208,6 @@ def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
             if _models_overlap_with_volume(first, second):
                 return (first.model_id, second.model_id)
     return None
-
-
-def _model_pair_can_overlap_horizontally(first: Model, second: Model) -> bool:
-    return first.pose.distance_2d_to(second.pose) <= (
-        first.base.max_radius() + second.base.max_radius()
-    )
 
 
 def _invalid(

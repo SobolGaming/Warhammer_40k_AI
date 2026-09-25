@@ -1,0 +1,24 @@
+{
+  "scope": "Exploratory full-contact stress trial, separate from the completed matched reachability diagnostic",
+  "status": "incomplete_interrupted",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ec66775d94962d3ff21c3afed7c2f24a8c397e3c0075c8e3f112ba0d5f71d14e",
+  "stage": "geometry.base_contact_proof.closer_body_endpoint_exists -> visibility_algebra.decide -> exact NRA solver",
+  "result": "VisibilityComputationError: Exact visibility calculation unresolved: interrupted from keyboard",
+  "exploratory_test_process_seconds": 201.65,
+  "isolated_performance_measurement": false,
+  "budget_verdict": "not assessed; interrupted exploratory run with other test processes",
+  "rules_answer_invented": false,
+  "log_sha256": "0f26cbde90fdcacb3e028428788ff7710da754cdaee78b2b9af788755aa0e889",
+  "reproduction": {
+    "fixture": "tests/unit/test_phase10h_pathing_smoke.py::test_circular_support_with_asymmetric_body_finds_rotated_contact_witness",
+    "bearing_degrees": 7.0,
+    "operation": "Use contacts_for_validated_move for the bearing-seven case as well as bearing zero; the committed bearing-seven regression isolates the counterfactual movement_reachability query.",
+    "shape_cases_in_order": [
+      "centered 4 x 0.99 rectangular body",
+      "radius 0.5 circular body offset 1 inch"
+    ],
+    "ordinary_path_and_terrain_valid": true,
+    "counterfactual_search": "Separately completed and validated in the committed regression and matched rotation diagnostic."
+  },
+  "limitation": "Complete-contact latency for this rotated layout is unresolved. Existing exact-solver efficiency work remains deferred under the Order 32 policy; no full-game certification is claimed."
+}

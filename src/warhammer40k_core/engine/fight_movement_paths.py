@@ -1,9 +1,18 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.fight_resolution import FightMovementProposal
+
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.aircraft import aircraft_model_ids_for_scenario
 from warhammer40k_core.engine.aircraft_rules import AIRCRAFT_INGRESS_ONLY, aircraft_rules_unit
+from warhammer40k_core.engine.base_contact_authority import (
+    contact_query_for_move,
+    contacts_for_validated_move,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
@@ -37,6 +46,7 @@ def validate_fight_paths(
     movement_mode: MovementMode,
     displacement_kind: ModelDisplacementKind,
     distance_budget_inches: float,
+    proposal: FightMovementProposal,
 ) -> tuple[tuple[PathValidationResult, ...], tuple[TerrainPathLegalityResult, ...]]:
     path_results: list[PathValidationResult] = []
     terrain_results: list[TerrainPathLegalityResult] = []
@@ -74,39 +84,53 @@ def validate_fight_paths(
             movement_phase_action=None,
             displacement_kind=displacement_kind,
         )
+        path_context = legality_context.to_path_validation_context(
+            moving_model=moving_model,
+            witness=model_witness,
+            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
+            friendly_models=_friendly_geometry_models_for_path(
+                scenario=scenario,
+                unit_placement=before,
+                attempted_placement=after,
+                moving_model_instance_id=placement.model_instance_id,
+            ),
+            enemy_models=_enemy_geometry_models_for_player(
+                scenario=scenario,
+                player_id=before.player_id,
+            ),
+            terrain=(),
+            aircraft_model_ids=tuple(
+                mid
+                for mid in aircraft_model_ids_for_scenario(scenario)
+                if mid != placement.model_instance_id
+            ),
+            movement_distance_budget_inches=distance_budget_inches,
+        )
+        terrain_context = legality_context.to_terrain_path_legality_context(
+            moving_model=moving_model,
+            witness=model_witness,
+            terrain=terrain_volumes,
+            terrain_features=terrain_features,
+        )
+        terrain_result = terrain_context.validate()
         path_results.append(
-            legality_context.to_path_validation_context(
-                moving_model=moving_model,
-                witness=model_witness,
-                battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
-                battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
-                friendly_models=_friendly_geometry_models_for_path(
+            contacts_for_validated_move(
+                path_context=path_context,
+                terrain_context=terrain_context,
+                path_result=path_context.validate(),
+                terrain_result=terrain_result,
+                query=contact_query_for_move(
+                    path_context=path_context,
+                    terrain_context=terrain_context,
                     scenario=scenario,
-                    unit_placement=before,
-                    attempted_placement=after,
-                    moving_model_instance_id=placement.model_instance_id,
+                    unit_instance_id=before.unit_instance_id,
+                    ruleset=ruleset_descriptor,
+                    fight_proposal=proposal,
                 ),
-                enemy_models=_enemy_geometry_models_for_player(
-                    scenario=scenario,
-                    player_id=before.player_id,
-                ),
-                terrain=(),
-                aircraft_model_ids=tuple(
-                    mid
-                    for mid in aircraft_model_ids_for_scenario(scenario)
-                    if mid != placement.model_instance_id
-                ),
-                movement_distance_budget_inches=distance_budget_inches,
-            ).validate()
+            )
         )
-        terrain_results.append(
-            legality_context.to_terrain_path_legality_context(
-                moving_model=moving_model,
-                witness=model_witness,
-                terrain=terrain_volumes,
-                terrain_features=terrain_features,
-            ).validate()
-        )
+        terrain_results.append(terrain_result)
     return (tuple(path_results), tuple(terrain_results))
 
 

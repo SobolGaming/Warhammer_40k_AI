@@ -1,0 +1,79 @@
+{
+  "artifact_schema": "core-v2-core-base-contact-source-v1",
+  "source_package_id": "gw-11e-core-base-contact",
+  "source_version": "maintained-app-mirrors-observed-2026-09-24",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-base-contact:deemed-base-contact",
+      "section_id": "01.04.04",
+      "source_text": "When two models’ bases are touching, they are in base contact – also known as base-to-base contact – and are as close as possible (01.04.03).\nWhen moving a model from your army into base contact with an enemy model during a move, if that enemy model overhangs its base such that it is not physically possible to be in base contact with that model, until the end of the turn, those models are considered to be in base contact with each other while all of the following are true:\nThe distance your model could move was sufficient to move it into base contact with the enemy model if there was no overhang.\nThe models are as close as possible together.\nAny part of one model is within 1\" of any part of the other model.",
+      "transcription_sha256": "322efc48b56d09690b4bb611b0e60dbc5f54a0ea863fa0304414a5775387bc7f",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.base_contact_authority:contacts_for_validated_move"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-base-contact:deemed-base-contact",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "322efc48b56d09690b4bb611b0e60dbc5f54a0ea863fa0304414a5775387bc7f",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "44752fcedcf3b598b0ab35f0a438ed8dbe3cf60c36bff5fcdb0b5d62029784f9",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.base_contact_authority:contacts_for_validated_move"
+      ],
+      "evidence_id": "core-base-contact-review:deemed-base-contact",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01H 01.04.04 deemed-base-contact",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-base-contact:deemed-base-contact",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "322efc48b56d09690b4bb611b0e60dbc5f54a0ea863fa0304414a5775387bc7f",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "93ae5dbd817ea40a29f448efe7ffa36102c712e2269656fad04bd5dc5a4d35e5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.base_contact_authority:contacts_for_validated_move"
+      ],
+      "evidence_id": "core-base-contact-mirror:deemed-base-contact:gdm",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-base-contact-maintained-app-mirrors-2026-09-24",
+      "review_audit_row_id": "deemed-base-contact:gdm",
+      "review_audit_source_observation_sha256": "743f9409d7a6730f08a946f081e56e72f04d894094380a29f4a1e57ca77f3797",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 01.04.04 deemed-base-contact",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "observed_at": "2026-09-25T02:17:22+00:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "44edca1a5f0f0768cedc90e6d40a0e9c621de50b9be10f362565314b2f01cf09"
+}

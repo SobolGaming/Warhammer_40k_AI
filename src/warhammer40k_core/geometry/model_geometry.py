@@ -2,16 +2,22 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, BaseSizeKind
 from warhammer40k_core.core.model_geometry_catalog import (
+    GeometryRulesFootprintPolicy,
     ModelFootprintKind,
     ModelGeometryCatalogError,
     ModelGeometryCatalogRecord,
 )
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
+from warhammer40k_core.geometry.model_body import (
+    ModelBodyPart,
+    ModelBodyPartPayload,
+    validate_body_parts,
+)
 from warhammer40k_core.geometry.pose import GeometryError, validate_finite_number
 
 
@@ -46,6 +52,7 @@ class FootprintPartPayload(TypedDict):
 
 
 class ModelGeometryPayload(TypedDict):
+    body_parts: NotRequired[list[ModelBodyPartPayload]]
     footprint_kind: str
     parts: list[FootprintPartPayload]
     height_inches: float
@@ -137,8 +144,10 @@ class ModelGeometry:
     geometry_source_id: str | None
     height_source_kind: HeightSourceKind
     height_source_id: str | None
+    body_parts: tuple[ModelBodyPart, ...] = ()
 
     def __post_init__(self) -> None:
+        validate_body_parts(self.body_parts)
         footprint_kind = base_footprint_kind_from_token(self.footprint_kind)
         object.__setattr__(self, "footprint_kind", footprint_kind)
         parts = _validate_footprint_parts(self.parts)
@@ -242,6 +251,26 @@ class ModelGeometry:
                 geometry_source_id=record.stable_identity(),
                 height_source_kind=HeightSourceKind.CATALOG_GEOMETRY_RECORD,
                 height_source_id=record.height.evidence_id,
+                body_parts=tuple(
+                    ModelBodyPart(
+                        part_id=part.part_id,
+                        base=_part_base_shape(
+                            _base_footprint_kind_from_catalog_kind(part.footprint_kind),
+                            part.radius_x_inches,
+                            part.radius_y_inches,
+                        ),
+                        offset_x_inches=part.offset_x_inches,
+                        offset_y_inches=part.offset_y_inches,
+                        bottom_inches=0.0
+                        if record.z_offset is None
+                        else record.z_offset.z_offset_inches,
+                        height_inches=record.height.height_inches,
+                        evidence_id=part.evidence_id,
+                    )
+                    for part in record.footprint.parts
+                )
+                if record.rules_footprint_policy is GeometryRulesFootprintPolicy.USE_SUPPORT_BASE
+                else (),
             )
         except ModelGeometryCatalogError as exc:
             raise GeometryError("catalog model geometry record is invalid.") from exc
@@ -260,7 +289,7 @@ class ModelGeometry:
         return RectangularBase(length=part.radius_x_inches * 2.0, width=part.radius_y_inches * 2.0)
 
     def to_payload(self) -> ModelGeometryPayload:
-        return {
+        payload: ModelGeometryPayload = {
             "footprint_kind": self.footprint_kind.value,
             "parts": [part.to_payload() for part in self.parts],
             "height_inches": self.height_inches,
@@ -269,6 +298,9 @@ class ModelGeometry:
             "height_source_kind": self.height_source_kind.value,
             "height_source_id": self.height_source_id,
         }
+        if self.body_parts:
+            payload["body_parts"] = [part.to_payload() for part in self.body_parts]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: ModelGeometryPayload) -> Self:
@@ -280,7 +312,18 @@ class ModelGeometry:
             geometry_source_id=payload["geometry_source_id"],
             height_source_kind=height_source_kind_from_token(payload["height_source_kind"]),
             height_source_id=payload["height_source_id"],
+            body_parts=tuple(ModelBodyPart.from_payload(part) for part in payload["body_parts"])
+            if "body_parts" in payload
+            else (),
         )
+
+
+def _part_base_shape(kind: BaseFootprintKind, radius_x: float, radius_y: float) -> BaseShape:
+    if kind is BaseFootprintKind.CIRCULAR:
+        return CircularBase(radius_x)
+    if kind is BaseFootprintKind.OVAL:
+        return OvalBase(length=2 * radius_x, width=2 * radius_y)
+    return RectangularBase(length=2 * radius_x, width=2 * radius_y)
 
 
 def base_footprint_kind_from_token(token: object) -> BaseFootprintKind:
