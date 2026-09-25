@@ -1645,6 +1645,8 @@ def test_phase17d_catalog_setup_reactive_decline_submits_through_lifecycle() -> 
 
 
 def test_phase17d_catalog_setup_reactive_shoot_submits_through_lifecycle() -> None:
+    from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
+
     state, catalog, player_b_index = _setup_reactive_single_model_state(
         target_pose=Pose.at(6.5, 10.0),
         source_pose=Pose.at(16.0, 10.0),
@@ -1652,6 +1654,7 @@ def test_phase17d_catalog_setup_reactive_shoot_submits_through_lifecycle() -> No
     lifecycle = _setup_reactive_lifecycle(state=state, catalog=catalog)
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
+    open_phase(lifecycle)
     action_request = _request_setup_reactive_lifecycle_action(
         lifecycle=lifecycle,
         state=lifecycle_state,
@@ -1684,6 +1687,8 @@ def test_phase17d_catalog_setup_reactive_shoot_submits_through_lifecycle() -> No
     )
     assert len(shoot_payloads) == 1
     assert shoot_payloads[0]["action"] == "shoot"
+
+    assert_active_player_history(lifecycle, expected_player="player-b")
 
 
 @pytest.mark.parametrize(

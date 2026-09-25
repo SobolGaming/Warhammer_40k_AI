@@ -215,9 +215,12 @@ def test_ws14_generic_contextual_status_lowers_critical_wound_threshold() -> Non
         weapon_profile=profile,
         current_critical_threshold=6,
     )
-    assert generic_rule_critical_wound_threshold(context) == 3
+    assert generic_rule_critical_wound_threshold(context).value == 3
     assert (
-        generic_rule_critical_wound_threshold(replace(context, current_critical_threshold=2)) == 2
+        generic_rule_critical_wound_threshold(
+            replace(context, current_critical_threshold=2, current_critical_is_threshold=True)
+        ).value
+        == 2
     )
     assert (
         generic_rule_critical_wound_threshold(
@@ -227,7 +230,7 @@ def test_ws14_generic_contextual_status_lowers_critical_wound_threshold() -> Non
                 attacker_model_instance_id=defender.own_models[0].model_instance_id,
                 target_unit_instance_id=attacker.unit_instance_id,
             )
-        )
+        ).value
         == 6
     )
 

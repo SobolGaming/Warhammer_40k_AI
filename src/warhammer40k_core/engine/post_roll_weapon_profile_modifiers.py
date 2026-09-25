@@ -32,7 +32,7 @@ class ResolvedAttackRollValues:
         object.__setattr__(
             self,
             "unmodified_roll",
-            _validate_optional_d6_value("unmodified_roll", self.unmodified_roll),
+            _validate_optional_result_value("unmodified_roll", self.unmodified_roll),
         )
         object.__setattr__(
             self,
@@ -133,12 +133,12 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         raise GameLifecycleError(f"Unsupported post-roll modifier BattlePhase: {token}.") from exc
 
 
-def _validate_optional_d6_value(field_name: str, value: object | None) -> int | None:
+def _validate_optional_result_value(field_name: str, value: object | None) -> int | None:
     if value is None:
         return None
     integer = _validate_int(field_name, value)
-    if not 1 <= integer <= 6:
-        raise GameLifecycleError(f"{field_name} must be between 1 and 6.")
+    if integer < 1:
+        raise GameLifecycleError(f"{field_name} must be a positive integer.")
     return integer
 
 

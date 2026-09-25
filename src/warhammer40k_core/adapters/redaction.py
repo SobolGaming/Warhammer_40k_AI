@@ -617,7 +617,11 @@ def _player_owned_secret_event_hidden_from_context(
         return False
     player_id = _required_string(payload, key="player_id")
     visibility_source = _required_string(payload, key="visibility_source")
-    if visibility_source not in {"declare_battle_formations", "core_ability_instance"}:
+    if visibility_source not in {
+        "declare_battle_formations",
+        "core_ability_instance",
+        "dice_extremum",
+    }:
         raise GameLifecycleError("Secret event visibility source is unsupported.")
     return not (viewer.policy.omniscient or viewer.owns_player(player_id))
 

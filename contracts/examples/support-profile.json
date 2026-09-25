@@ -260,6 +260,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_dice_extremum",
+        "interaction_kinds": [
+          "dice_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_dice_reroll",
         "interaction_kinds": [
           "dice_selection"
@@ -1099,13 +1106,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "37.0.0",
+        "contract_version": "38.0.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "36d82cc3d1671c2c1b203d74590d3804f00a32e5c3f9cd0c41e3f24b0ab2cf71",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7c461fe83f419b78d2311b60ed93608835145a36e2b37be43f928b8e5718e807"
+        "identity_hash": "7c15e52825d28327043b1e64992d410bb0d5c7a9179f9af6a6771cc60de4432d",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5107b205bc0303d48fd7ba15c9e00c4b0c9ea09a3f4ed4a28c3fb023078d11d0"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -3657,6 +3664,13 @@
       "decision_type": "select_destruction_reaction",
       "interaction_kinds": [
         "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_dice_extremum",
+      "interaction_kinds": [
+        "dice_selection"
       ],
       "submission_kind": "finite"
     },

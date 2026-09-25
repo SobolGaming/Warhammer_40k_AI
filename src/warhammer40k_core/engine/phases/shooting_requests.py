@@ -404,19 +404,19 @@ def request_out_of_phase_shooting_declaration(
         request_id=source_decision_request_id,
         result_id=source_decision_result_id,
     )
-    state.replace_out_of_phase_shooting_state(
-        OutOfPhaseShootingState(
-            battle_round=state.battle_round,
-            player_id=player_id,
-            parent_phase=parent_phase,
-            source_rule_id=source_rule_id,
-            source_decision_request_id=source_decision_request_id,
-            source_decision_result_id=source_decision_result_id,
-            source_context=source_context,
-            selected_unit_instance_id=selected_rules_unit_id,
-            target_unit_ids=target_unit_ids,
-        )
+    started = OutOfPhaseShootingState(
+        battle_round=state.battle_round,
+        player_id=player_id,
+        parent_phase=parent_phase,
+        source_rule_id=source_rule_id,
+        source_decision_request_id=source_decision_request_id,
+        source_decision_result_id=source_decision_result_id,
+        source_context=source_context,
+        selected_unit_instance_id=selected_rules_unit_id,
+        target_unit_ids=target_unit_ids,
     )
+    state.replace_out_of_phase_shooting_state(started)
+    decisions.event_log.append("out_of_phase_shooting_started", started.to_payload())
     grant_status = _request_shooting_unit_selected_grant_decision_if_available(
         state=state,
         decisions=decisions,

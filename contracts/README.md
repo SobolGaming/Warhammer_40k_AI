@@ -1,7 +1,7 @@
 # CORE V2 external contract
 
-Contract 37 authenticates revival coherency against phase-start physical history.
-See [36 to 37 migration](migrations/36-to-37.md).
+Contract 38 preserves physical dice identity alongside source-assigned results and
+active-player tied-die choices. See [37 to 38 migration](migrations/37-to-38.md).
 
 Contract 36 implements Core 01.02.03 revival engagement against already-engaged
 canonical enemy rules units. It removes the serialized enemy-model snapshot
@@ -9,7 +9,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `37.0.0`
+Contract version: `38.0.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four
@@ -522,3 +522,8 @@ Psychic finite choices retain all individual skill and hit sources, including
 cancelling contributions, and support per-source keep/ignore continuation choices.
 The existing finite submission envelope is unchanged. Hit events preserve the
 completed selection; engine build identity prevents aggregate-only runtime restores.
+
+Order 84 / Contract 38 separates physical dice from source-assigned results,
+including values above six and whole-roll assignments. Tied highest/lowest
+references expose physical component options to the effective active player.
+See [migration 37 to 38](migrations/37-to-38.md).

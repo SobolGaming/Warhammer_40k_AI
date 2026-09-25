@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold, validate_interpreted_d6
+
 from warhammer40k_core.engine.psychic_modifier_selection import PsychicAttackModifierIgnoreSelection
 
 from typing import TYPE_CHECKING
@@ -232,6 +234,7 @@ class HitRollPayload(TypedDict):
     roll_state: DiceRollStatePayload | None
     unmodified_roll: int | None
     minimum_unmodified_success: int
+    success_requires_exact: bool
     unmodified_success_threshold_active: bool
     modifier: int
     capped_modifier: int
@@ -239,6 +242,7 @@ class HitRollPayload(TypedDict):
     successful: bool
     critical: bool
     critical_threshold: int
+    critical_is_threshold: bool
     threshold_source_ids: list[str]
     skipped: bool
     generated_hits: int
@@ -251,6 +255,7 @@ class WoundRollPayload(TypedDict):
     roll_state: DiceRollStatePayload | None
     unmodified_roll: int | None
     critical_threshold: int
+    critical_is_threshold: bool
     modifier: int
     capped_modifier: int
     final_roll: int | None
@@ -450,8 +455,10 @@ class HitRoll:
     successful: bool
     critical: bool
     critical_threshold: int = 6
+    critical_is_threshold: bool = False
     threshold_source_ids: tuple[str, ...] = ()
     minimum_unmodified_success: int = 2
+    success_requires_exact: bool = False
     unmodified_success_threshold_active: bool = False
     skipped: bool = False
     generated_hits: int = 1
@@ -483,6 +490,8 @@ class HitRoll:
         _validate_bool("HitRoll critical", self.critical)
         _validate_bool("HitRoll unmodified_success_threshold_active", threshold_flag)
         _validate_bool("HitRoll skipped", self.skipped)
+        _validate_bool("HitRoll success_requires_exact", self.success_requires_exact)
+        critical_rule = CriticalRollThreshold(self.critical_threshold, self.critical_is_threshold)
         object.__setattr__(
             self,
             "generated_hits",
@@ -506,16 +515,21 @@ class HitRoll:
             raise GameLifecycleError("HitRoll requires a roll_state unless skipped.")
         if type(self.roll_state) is not DiceRollState:
             raise GameLifecycleError("HitRoll roll_state must be DiceRollState.")
-        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
-            raise GameLifecycleError("HitRoll unmodified_roll must be a D6 value.")
+        if type(self.unmodified_roll) is not int:
+            raise GameLifecycleError("HitRoll unmodified_roll must be an integer.")
+        validate_interpreted_d6(state=self.roll_state, value=self.unmodified_roll)
         if type(self.final_roll) is not int:
             raise GameLifecycleError("HitRoll final_roll must be an integer.")
         if self.unmodified_roll != self.roll_state.current_total:
             raise GameLifecycleError("HitRoll raw face does not match its dice state.")
         if self.final_roll != max(1, self.unmodified_roll + self.capped_modifier):
             raise GameLifecycleError("HitRoll final roll does not match its modifier trace.")
-        expected_critical = self.unmodified_roll >= self.critical_threshold
-        unmodified_meets_minimum = self.unmodified_roll >= self.minimum_unmodified_success
+        expected_critical = critical_rule.matches(self.unmodified_roll)
+        unmodified_meets_minimum = (
+            self.unmodified_roll == self.minimum_unmodified_success
+            if self.success_requires_exact
+            else self.unmodified_roll >= self.minimum_unmodified_success
+        )
         threshold_success = threshold_flag and unmodified_meets_minimum
         target_success = unmodified_meets_minimum and self.final_roll >= self.target_number
         expected_success = expected_critical or threshold_success or target_success
@@ -547,6 +561,7 @@ class HitRoll:
             "roll_state": None if self.roll_state is None else self.roll_state.to_payload(),
             "unmodified_roll": self.unmodified_roll,
             "minimum_unmodified_success": self.minimum_unmodified_success,
+            "success_requires_exact": self.success_requires_exact,
             "unmodified_success_threshold_active": self.unmodified_success_threshold_active,
             "modifier": self.modifier,
             "capped_modifier": self.capped_modifier,
@@ -554,6 +569,7 @@ class HitRoll:
             "successful": self.successful,
             "critical": self.critical,
             "critical_threshold": self.critical_threshold,
+            "critical_is_threshold": self.critical_is_threshold,
             "threshold_source_ids": list(self.threshold_source_ids),
             "skipped": self.skipped,
             "generated_hits": self.generated_hits,
@@ -573,6 +589,8 @@ class HitRoll:
             successful=payload["successful"],
             critical=payload["critical"],
             critical_threshold=payload["critical_threshold"],
+            critical_is_threshold=payload["critical_is_threshold"],
+            success_requires_exact=payload["success_requires_exact"],
             threshold_source_ids=tuple(payload["threshold_source_ids"]),
             minimum_unmodified_success=payload["minimum_unmodified_success"],
             unmodified_success_threshold_active=payload["unmodified_success_threshold_active"],
@@ -594,6 +612,7 @@ class WoundRoll:
     successful: bool
     critical: bool
     critical_threshold: int = 6
+    critical_is_threshold: bool = False
     skipped: bool = False
 
     def __post_init__(self) -> None:
@@ -622,6 +641,7 @@ class WoundRoll:
         _validate_bool("WoundRoll successful", self.successful)
         _validate_bool("WoundRoll critical", self.critical)
         _validate_bool("WoundRoll skipped", self.skipped)
+        critical_rule = CriticalRollThreshold(self.critical_threshold, self.critical_is_threshold)
         if self.skipped:
             if self.roll_state is not None or self.unmodified_roll is not None:
                 raise GameLifecycleError("Skipped WoundRoll must not include a roll.")
@@ -634,11 +654,12 @@ class WoundRoll:
             return
         if type(self.roll_state) is not DiceRollState:
             raise GameLifecycleError("WoundRoll roll_state must be DiceRollState.")
-        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
-            raise GameLifecycleError("WoundRoll unmodified_roll must be a D6 value.")
+        if type(self.unmodified_roll) is not int:
+            raise GameLifecycleError("WoundRoll unmodified_roll must be an integer.")
+        validate_interpreted_d6(state=self.roll_state, value=self.unmodified_roll)
         if type(self.final_roll) is not int:
             raise GameLifecycleError("WoundRoll final_roll must be an integer.")
-        expected_critical = self.unmodified_roll >= self.critical_threshold
+        expected_critical = critical_rule.matches(self.unmodified_roll)
         expected_success = expected_critical or (
             self.unmodified_roll != 1 and self.final_roll >= self.target_number
         )
@@ -678,6 +699,7 @@ class WoundRoll:
             "roll_state": None if self.roll_state is None else self.roll_state.to_payload(),
             "unmodified_roll": self.unmodified_roll,
             "critical_threshold": self.critical_threshold,
+            "critical_is_threshold": self.critical_is_threshold,
             "modifier": self.modifier,
             "capped_modifier": self.capped_modifier,
             "final_roll": self.final_roll,

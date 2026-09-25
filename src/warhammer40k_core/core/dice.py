@@ -60,9 +60,11 @@ class DiceRollComponentPayload(TypedDict):
     sides: int
     value: int
     rerolled: bool
+    result_override: DiceRollOverrideRecordPayload | None
 
 
 class DiceRollInstancePayload(TypedDict):
+    result_override: DiceRollOverrideRecordPayload | None
     roll_id: str
     spec: DiceRollSpecPayload
     components: list[DiceRollComponentPayload]
@@ -330,6 +332,7 @@ class DiceRollComponent:
     sides: int
     value: int
     rerolled: bool = False
+    result_override: DiceRollOverrideRecord | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -353,6 +356,20 @@ class DiceRollComponent:
             raise DiceRollSpecError("DiceRollComponent value is outside die bounds.")
         if type(self.rerolled) is not bool:
             raise DiceRollSpecError("DiceRollComponent rerolled must be a bool.")
+        if self.result_override is not None:
+            if type(self.result_override) is not DiceRollOverrideRecord:
+                raise DiceRollSpecError("DiceRollComponent result_override must be typed.")
+            if (
+                self.result_override.component_index != self.index
+                or self.result_override.previous_values[self.index] != self.value
+            ):
+                raise DiceRollSpecError("DiceRollComponent override physical identity drifted.")
+
+    @property
+    def effective_value(self) -> int:
+        return (
+            self.value if self.result_override is None else self.result_override.replacement_value
+        )
 
     def to_payload(self) -> DiceRollComponentPayload:
         return {
@@ -361,6 +378,9 @@ class DiceRollComponent:
             "sides": self.sides,
             "value": self.value,
             "rerolled": self.rerolled,
+            "result_override": (
+                None if self.result_override is None else self.result_override.to_payload()
+            ),
         }
 
     @classmethod
@@ -371,6 +391,11 @@ class DiceRollComponent:
             sides=payload["sides"],
             value=payload["value"],
             rerolled=payload["rerolled"],
+            result_override=(
+                None
+                if payload["result_override"] is None
+                else DiceRollOverrideRecord.from_payload(payload["result_override"])
+            ),
         )
 
 
@@ -381,6 +406,7 @@ class DiceRollInstance:
     components: tuple[DiceRollComponent, ...]
     total: int
     source: DiceRollSource
+    result_override: DiceRollOverrideRecord | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -406,7 +432,29 @@ class DiceRollInstance:
                 raise DiceRollSpecError("DiceRollInstance component sides must match expression.")
         if components != self.components:
             object.__setattr__(self, "components", components)
-        expected_total = self.spec.expression.total(component.value for component in components)
+        physical_values = tuple(component.value for component in components)
+        self.spec.expression.validate_values(physical_values)
+        for component in components:
+            if component.component_id != f"{self.roll_id}:component-{component.index}":
+                raise DiceRollSpecError("DiceRollInstance component identity drifted.")
+            if (
+                component.result_override is not None
+                and component.result_override.previous_values != physical_values
+            ):
+                raise DiceRollSpecError("DiceRollInstance override previous values drifted.")
+        expected_total = (
+            sum(component.effective_value for component in components)
+            + self.spec.expression.modifier
+        )
+        if self.result_override is not None:
+            if (
+                type(self.result_override) is not DiceRollOverrideRecord
+                or self.result_override.component_index is not None
+                or self.result_override.previous_values != physical_values
+                or any(component.result_override is not None for component in components)
+            ):
+                raise DiceRollSpecError("DiceRollInstance whole-roll override identity drifted.")
+            expected_total = self.result_override.replacement_value + self.spec.expression.modifier
         if self.total != expected_total:
             raise DiceRollSpecError("DiceRollInstance total does not match components.")
 
@@ -432,6 +480,7 @@ class DiceRollInstance:
     @classmethod
     def from_state(cls, state: DiceRollState) -> Self:
         rerolled_indices = set(state.rerolled_indices())
+        physical_values = _current_values_after_rerolls(state.original_result, state.rerolls)
         return cls(
             roll_id=state.original_result.roll_id,
             spec=state.original_result.spec,
@@ -442,8 +491,20 @@ class DiceRollInstance:
                     sides=state.original_result.spec.expression.sides,
                     value=value,
                     rerolled=index in rerolled_indices,
+                    result_override=(
+                        state.result_override
+                        if state.result_override is not None
+                        and state.result_override.component_index == index
+                        else None
+                    ),
                 )
-                for index, value in enumerate(state.current_values)
+                for index, value in enumerate(physical_values)
+            ),
+            result_override=(
+                state.result_override
+                if state.result_override is not None
+                and state.result_override.component_index is None
+                else None
             ),
             total=state.current_total,
             source=state.original_result.source,
@@ -456,6 +517,9 @@ class DiceRollInstance:
             "components": [component.to_payload() for component in self.components],
             "total": self.total,
             "source": self.source,
+            "result_override": None
+            if self.result_override is None
+            else self.result_override.to_payload(),
         }
 
     @classmethod
@@ -468,6 +532,11 @@ class DiceRollInstance:
             ),
             total=payload["total"],
             source=payload["source"],
+            result_override=(
+                None
+                if payload["result_override"] is None
+                else DiceRollOverrideRecord.from_payload(payload["result_override"])
+            ),
         )
 
 
@@ -831,6 +900,8 @@ class RerollPermission:
             raise DiceRollSpecError("RerollPermission state must be a DiceRollState.")
         if state.original_result.spec.roll_type != self.eligible_roll_type:
             raise DiceRollSpecError("RerollPermission eligible_roll_type does not match roll.")
+        if state.result_override is not None:
+            raise DiceRollSpecError("Assigned dice results cannot be rerolled.")
         already_rerolled = set(state.rerolled_indices())
         if self.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL:
             selection = tuple(range(len(state.current_values)))
@@ -980,7 +1051,9 @@ class DiceRollState:
                 )
         if rerolls != self.rerolls:
             object.__setattr__(self, "rerolls", rerolls)
-        value_tuple = self.original_result.spec.expression.validate_values(self.current_values)
+        value_tuple = _dice_validation.validate_int_tuple(
+            "DiceRollState current_values", self.current_values
+        )
         if value_tuple != self.current_values:
             object.__setattr__(self, "current_values", value_tuple)
         expected_values = _current_values_after_rerolls(
@@ -990,16 +1063,18 @@ class DiceRollState:
         if self.result_override is not None:
             if type(self.result_override) is not DiceRollOverrideRecord:
                 raise DiceRollSpecError("DiceRollState result_override must be typed.")
-            expression = self.original_result.spec.expression
-            if expression.quantity != 1 or expression.sides != 6 or expression.modifier != 0:
-                raise DiceRollSpecError("Dice result override requires one unmodified D6.")
             if self.result_override.previous_values != expected_values:
                 raise DiceRollSpecError("Dice result override previous values drifted.")
-            expected_values = (self.result_override.replacement_value,)
+            expected_values = self.result_override.assigned_values()
         if value_tuple != expected_values:
             raise DiceRollSpecError("DiceRollState current_values drifted from roll records.")
-        expected_total = self.original_result.spec.expression.total(value_tuple)
-        if self.current_total != expected_total:
+        unmodified_total = (
+            sum(value_tuple)
+            if self.result_override is None
+            else self.result_override.assigned_unmodified_total()
+        )
+        expected_total = unmodified_total + self.original_result.spec.expression.modifier
+        if type(self.current_total) is not int or self.current_total != expected_total:
             raise DiceRollSpecError("DiceRollState current_total does not match current_values.")
 
     @classmethod
@@ -1059,23 +1134,23 @@ class DiceRollState:
         request_id: str,
         source_rule_id: str,
         replacement_value: int,
+        component_index: int | None = 0,
     ) -> DiceRollState:
         if self.result_override is not None:
             raise DiceRollSpecError("A dice roll result can be overridden at most once.")
         expression = self.original_result.spec.expression
-        if expression.quantity != 1 or expression.sides != 6 or expression.modifier != 0:
-            raise DiceRollSpecError("Dice result override requires one unmodified D6.")
         record = DiceRollOverrideRecord(
             decision_id=decision_id,
             request_id=request_id,
             source_rule_id=source_rule_id,
             previous_values=self.current_values,
             replacement_value=replacement_value,
+            component_index=component_index,
         )
         return DiceRollState(
             original_result=self.original_result,
-            current_values=(record.replacement_value,),
-            current_total=record.replacement_value,
+            current_values=record.assigned_values(),
+            current_total=record.assigned_unmodified_total() + expression.modifier,
             rerolls=self.rerolls,
             result_override=record,
         )

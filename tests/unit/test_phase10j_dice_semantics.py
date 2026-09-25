@@ -856,3 +856,623 @@ def test_roll_off_rejects_an_intrinsic_offset() -> None:
             UnmodifiedRollResult("roll-off", "roll_off", 3, (3,)),
             intrinsic_offset=1,
         )
+
+
+@pytest.mark.parametrize("assigned", [1, 6, 7, 12])
+def test_order84_assigned_result_preserves_physical_die_and_replay(assigned: int) -> None:
+    original = DiceRollResult.from_values(
+        roll_id="order84-roll",
+        spec=_spec(quantity=2, reason="Core assigned die result", roll_type="charge_roll"),
+        values=(2, 5),
+        source="fixed",
+    )
+    state = DiceRollState.from_result(original).with_result_override(
+        decision_id="order84-result",
+        request_id="order84-request",
+        source_rule_id="gw-11e-core-dice-results:treated-as-set-to",
+        replacement_value=assigned,
+        component_index=1,
+    )
+    assert state.original_result == original
+    assert state.current_values == (2, assigned)
+    assert state.current_total == 2 + assigned
+    assert DiceRollState.from_payload(state.to_payload()) == state
+    instance = DiceRollInstance.from_state(state)
+    assert instance.components[1].component_id == "order84-roll:component-1"
+    assert instance.components[1].value == 5
+    assert instance.components[1].effective_value == assigned
+    assert instance.total == state.current_total
+    assert DiceRollInstance.from_payload(instance.to_payload()) == instance
+    modified = ModifiedRollResult.from_unmodified(UnmodifiedRollResult.from_state(state))
+    assert modified.unmodified.value == 2 + assigned
+    assert modified.final_value == min(12, 2 + assigned)
+
+
+def test_order84_raw_faces_and_unauthenticated_effective_values_remain_bounded() -> None:
+    from dataclasses import replace
+
+    original = DiceRollResult.from_values(
+        roll_id="order84-raw",
+        spec=_spec(quantity=1, reason="Core physical die bounds", roll_type="hit_roll"),
+        values=(3,),
+        source="fixed",
+    )
+    with pytest.raises(DiceRollSpecError):
+        replace(original, values=(7,), total=7)
+    with pytest.raises(DiceRollSpecError):
+        replace(DiceRollState.from_result(original), current_values=(7,), current_total=7)
+
+
+@pytest.mark.parametrize("kind", ["highest", "lowest"])
+@pytest.mark.parametrize("secret", [False, True])
+def test_order84_tied_physical_die_uses_active_player_facade_and_exact_replay(
+    kind: str,
+    secret: bool,
+) -> None:
+    from tests.dice_result_semantics_helpers import extremum_session
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.core.dice_extremum import DiceExtremum, DiceExtremumSelection
+    from warhammer40k_core.engine.dice_extremum import request_dice_extremum
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_dice_results_2026_09 as dice_sources,
+    )
+
+    extremum = DiceExtremum(kind)
+    session, roll, request = extremum_session(extremum=extremum, secret=secret)
+    assert request.actor_id == "player-a"
+    assert roll.original_result.spec.actor_id == ("player-a" if secret else "player-b")
+    assert [option.option_id for option in request.options] == [
+        f"{roll.original_result.roll_id}:component-0",
+        f"{roll.original_result.roll_id}:component-1",
+    ]
+    checkpoint = session.to_persistence_payload()
+    session = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    assert session.to_persistence_payload() == checkpoint
+    for viewer in ("player-a", "player-b"):
+        view_text = json.dumps(session.view(viewer_player_id=viewer))
+        delta_text = json.dumps(session.events_since(EventStreamCursor(), viewer_player_id=viewer))
+        if secret and viewer == "player-b":
+            assert "core_dice_reference" not in view_text + delta_text
+            assert request.options[0].option_id not in view_text + delta_text
+        else:
+            assert request.options[0].option_id in view_text
+    before_rolls = len(
+        [
+            event
+            for event in session.lifecycle.decision_controller.event_log.records
+            if event.event_type == "dice_rolled"
+        ]
+    )
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[1].option_id,
+        result_id="order84-selected-second-die",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    state = session.lifecycle.state
+    assert state is not None
+    # Read back the accepted physical identity, even though both choices have the same value.
+    chosen = request_dice_extremum(
+        state=state,
+        decisions=session.lifecycle.decision_controller,
+        roll_state=roll,
+        extremum=extremum,
+        referring_source_rule_id=dice_sources.HIGHEST_LOWEST_SOURCE_ID,
+        reference_id="order84:reference",
+    )
+    assert isinstance(chosen, DiceExtremumSelection)
+    assert chosen.component_index == 1
+    assert (
+        len(
+            [
+                event
+                for event in session.lifecycle.decision_controller.event_log.records
+                if event.event_type == "dice_rolled"
+            ]
+        )
+        == before_rolls
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order84")).run().status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+def test_order84_whole_roll_assignment_does_not_invent_physical_faces() -> None:
+    original = DiceRollResult.from_values(
+        roll_id="order84-total",
+        spec=_spec(quantity=2, reason="Core assigned roll result", roll_type="battle_shock_roll"),
+        values=(2, 3),
+        source="fixed",
+    )
+    state = DiceRollState.from_result(original).with_result_override(
+        decision_id="total-result",
+        request_id="total-request",
+        source_rule_id="gw-11e-core-dice-results:treated-as-set-to",
+        replacement_value=14,
+        component_index=None,
+    )
+    assert state.current_values == (2, 3)
+    assert state.current_total == 14
+    assert UnmodifiedRollResult.from_state(state).value == 14
+    assert DiceRollInstance.from_state(state).total == 14
+    assert DiceRollState.from_payload(state.to_payload()) == state
+    unmodified = UnmodifiedRollResult.from_state(state)
+    assert UnmodifiedRollResult.from_payload(unmodified.to_payload()) == unmodified
+
+
+@pytest.mark.parametrize("case", ["actor", "option", "payload", "request", "roll"])
+def test_order84_tied_die_rejects_invalid_submissions_atomically(case: str) -> None:
+    from dataclasses import replace
+
+    from tests.dice_result_semantics_helpers import extremum_session
+
+    from warhammer40k_core.core.dice_extremum import DiceExtremum
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session, roll, request = extremum_session(extremum=DiceExtremum.HIGHEST)
+    result = DecisionResult.for_request(
+        result_id="invalid-extremum",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    if case == "actor":
+        result = replace(result, actor_id="player-b")
+    elif case == "option":
+        result = replace(result, selected_option_id=f"{roll.original_result.roll_id}:component-2")
+    elif case == "payload":
+        result = replace(result, payload={"component_index": True})
+    elif case == "request":
+        result = replace(result, request_id="obsolete-request")
+    else:
+        updated = roll.with_result_override(
+            decision_id="intervening-result",
+            request_id="intervening-request",
+            source_rule_id="gw-11e-core-dice-results:treated-as-set-to",
+            replacement_value=7,
+            component_index=2,
+        )
+        session.lifecycle.decision_controller.event_log.append(
+            "dice_result_overridden",
+            {"updated_roll_state": updated.to_payload()},
+        )
+    before = session.lifecycle.to_payload()
+    status = session.lifecycle.submit_decision(result)
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == before
+
+
+@pytest.mark.parametrize("assigned", [1, 6, 7])
+def test_order84_wound_save_and_hazard_consume_assigned_results(assigned: int) -> None:
+    from warhammer40k_core.engine.attack_sequence import WoundRoll
+    from warhammer40k_core.engine.hazard import failed_hazard_roll_indices
+    from warhammer40k_core.engine.saves import SaveKind, SaveOption, resolve_saving_throw
+
+    state = DiceRollState.from_result(
+        DiceRollResult.from_values(
+            roll_id="order84-consumer",
+            spec=_spec(quantity=1, reason="Interpreted D6 consumer", roll_type="wound_roll"),
+            values=(2,),
+            source="fixed",
+        )
+    ).with_result_override(
+        decision_id="consumer-result",
+        request_id="consumer-request",
+        source_rule_id="gw-11e-core-dice-results:treated-as-set-to",
+        replacement_value=assigned,
+    )
+    wound = WoundRoll(
+        strength=4,
+        toughness=4,
+        target_number=4,
+        roll_state=state,
+        unmodified_roll=assigned,
+        modifier=-1,
+        capped_modifier=-1,
+        final_roll=max(1, assigned - 1),
+        successful=assigned >= 6,
+        critical=assigned == 6,
+    )
+    assert wound.unmodified_roll == assigned
+    save = resolve_saving_throw(
+        roll_state=state,
+        option=SaveOption(SaveKind.ARMOUR, 7, 3, -4),
+    )
+    assert save.successful is (assigned == 7)
+    assert failed_hazard_roll_indices(state) == ((0,) if assigned == 1 else ())
+
+
+@pytest.mark.parametrize("inclusive", [False, True])
+def test_order84_wound_threshold_predicate_distinguishes_six_from_six_plus(inclusive: bool) -> None:
+    from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
+
+    rule = CriticalRollThreshold(6, inclusive)
+    assert rule.matches(6)
+    assert rule.matches(7) is inclusive
+    assert not rule.matches(1)
+
+
+def test_order84_component_identity_survives_reroll_before_assignment() -> None:
+    original = DiceRollResult.from_values(
+        roll_id="order84-rerolled",
+        spec=_spec(quantity=2, reason="rerolled components", roll_type="test"),
+        values=(2, 3),
+        source="fixed",
+    )
+    replacement = DiceRollResult.from_values(
+        roll_id="order84-replacement",
+        spec=_spec(quantity=1, reason="replacement", roll_type="test"),
+        values=(5,),
+        source="fixed",
+    )
+    state = (
+        DiceRollState.from_result(original)
+        .with_reroll(
+            decision_id="reroll-result",
+            request_id="reroll-request",
+            selected_indices=(1,),
+            replacement_result=replacement,
+        )
+        .with_result_override(
+            decision_id="assign-result",
+            request_id="assign-request",
+            source_rule_id="core:test",
+            replacement_value=7,
+            component_index=1,
+        )
+    )
+    instance = DiceRollInstance.from_state(state)
+    assert instance.components[1].component_id == "order84-rerolled:component-1"
+    assert instance.components[1].value == 5
+    assert instance.components[1].effective_value == 7
+    assert DiceRollState.from_payload(state.to_payload()) == state
+    with pytest.raises(DiceRollSpecError):
+        state.with_reroll(
+            decision_id="late-reroll",
+            request_id="late-request",
+            selected_indices=(0,),
+            replacement_result=replacement,
+        )
+
+
+@pytest.mark.parametrize("kind", ["highest", "lowest"])
+def test_order84_reference_retry_is_idempotent_and_unique_extrema_need_no_choice(kind: str) -> None:
+    from tests.dice_result_semantics_helpers import extremum_session
+
+    from warhammer40k_core.core.dice_extremum import DiceExtremum, DiceExtremumSelection
+    from warhammer40k_core.engine.dice_extremum import request_dice_extremum
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_dice_results_2026_09 as sources,
+    )
+
+    session, roll, pending = extremum_session(extremum=DiceExtremum(kind))
+    state = session.lifecycle.state
+    assert state is not None
+    decisions = session.lifecycle.decision_controller
+    before = session.lifecycle.to_payload()
+    assert (
+        request_dice_extremum(
+            state=state,
+            decisions=decisions,
+            roll_state=roll,
+            extremum=DiceExtremum(kind),
+            referring_source_rule_id=sources.HIGHEST_LOWEST_SOURCE_ID,
+            reference_id="order84:reference",
+        )
+        == pending
+    )
+    assert session.lifecycle.to_payload() == before
+    unique = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_fixed(
+        _spec(quantity=3, reason="Unique extremum", roll_type="test"), (2, 5, 3)
+    )
+    before = session.lifecycle.to_payload()
+    selected = request_dice_extremum(
+        state=state,
+        decisions=decisions,
+        roll_state=unique,
+        extremum=DiceExtremum(kind),
+        referring_source_rule_id=sources.HIGHEST_LOWEST_SOURCE_ID,
+        reference_id="unique-reference",
+    )
+    assert isinstance(selected, DiceExtremumSelection)
+    assert selected.component_index == (1 if kind == "highest" else 0)
+    assert selected.value == (5 if kind == "highest" else 2)
+    assert session.lifecycle.to_payload() == before
+
+
+@pytest.mark.parametrize("target", ["reference", "selection", "visibility"])
+def test_order84_restore_rejects_dice_reference_history_drift(target: str) -> None:
+    from typing import cast
+
+    from tests.dice_result_semantics_helpers import extremum_session
+
+    from warhammer40k_core.core.dice_extremum import DiceExtremum
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session, _roll, request = extremum_session(extremum=DiceExtremum.HIGHEST, secret=True)
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[1].option_id,
+        result_id="order84-history-selection",
+    )
+    payload = session.lifecycle.to_payload()
+    events = payload["decisions"]["event_log"]
+    event = next(
+        row
+        for row in events
+        if row["event_type"]
+        == ("dice_extremum_selected" if target == "selection" else "dice_extremum_referenced")
+    )
+    data = cast(dict[str, JsonValue], event["payload"])
+    if target == "reference":
+        data["actor_id"] = "player-b"
+    elif target == "selection":
+        cast(dict[str, JsonValue], data["selection"])["component_index"] = 0
+    else:
+        data["secret"] = False
+    with pytest.raises(GameLifecycleError, match="Highest/lowest"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_order84_assigned_roll_cannot_reopen_reroll_or_mutate_manager() -> None:
+    manager = DiceRollManager("order84-reroll-preflight")
+    physical = manager.roll_fixed(
+        _spec(quantity=1, reason="Original", roll_type="test", actor_id="player-a"), (1,)
+    )
+    request = manager.build_reroll_request(
+        physical, request_id="before-assignment", allowed_selections=((0,),)
+    )
+    result = DecisionResult.for_request(
+        request=request, result_id="stale-reroll", selected_option_id=request.options[-1].option_id
+    )
+    assigned = physical.with_result_override(
+        decision_id="assigned",
+        request_id="assignment",
+        source_rule_id="core:test",
+        replacement_value=1,
+    )
+    before = (manager.rng.to_payload(), manager.event_log.to_payload())
+    with pytest.raises(DecisionError, match="assigned"):
+        manager.request_reroll(assigned, allowed_selections=((0,),))
+    with pytest.raises(DecisionError, match="assigned"):
+        manager.resolve_reroll(assigned, request=request, result=result)
+    assert (manager.rng.to_payload(), manager.event_log.to_payload()) == before
+
+
+def test_order84_assignment_does_not_reopen_twin_linked_or_conditional_source_rerolls() -> None:
+    from dataclasses import replace
+
+    from tests.generic_modifier_helpers import generic_effect
+    from tests.phase13b_shooting_declaration_helpers import (
+        _attack_pool_for_test,
+        _first_weapon_profile,
+        _shooting_lifecycle,
+        _state,
+    )
+
+    from warhammer40k_core.core.weapon_profiles import WeaponKeyword
+    from warhammer40k_core.engine.attack_sequence import WoundRoll
+    from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
+        _request_source_backed_hit_reroll_if_available,
+    )
+    from warhammer40k_core.engine.attack_sequence_hit_wound import (
+        _reroll_wound_for_twin_linked_if_needed,
+    )
+    from warhammer40k_core.engine.phase import BattlePhase
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker, defender = units["intercessor-1"], units["enemy"]
+    profile = replace(
+        _first_weapon_profile(lifecycle, attacker), keywords=(WeaponKeyword.TWIN_LINKED,)
+    )
+    pool = _attack_pool_for_test(
+        attacker=attacker, defender=defender, weapon_profile=profile, attacks=1
+    )
+    manager = DiceRollManager(state.game_id, event_log=lifecycle.decision_controller.event_log)
+    physical = manager.roll_fixed(
+        _spec(
+            quantity=1,
+            reason="Assignment before retry",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+        ),
+        (6,),
+    )
+    assigned = physical.with_result_override(
+        decision_id="assigned",
+        request_id="assignment",
+        source_rule_id="core:test",
+        replacement_value=1,
+    )
+    wound_physical = manager.roll_fixed(
+        _spec(quantity=1, reason="Assigned Wound", roll_type="attack_sequence.wound"), (6,)
+    )
+    assigned_wound = wound_physical.with_result_override(
+        decision_id="assigned-wound",
+        request_id="assignment-wound",
+        source_rule_id="core:test",
+        replacement_value=1,
+    )
+    state.record_persisting_effect(
+        generic_effect(
+            effect_id="order84:conditional-reroll",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="reroll_permission",
+            parameters={
+                "roll_type": "hit",
+                "attack_role": "attacker",
+                "reroll_unmodified_value": 1,
+            },
+        )
+    )
+    before = (manager.rng.to_payload(), lifecycle.to_payload())
+    assert (
+        _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            roll_state=assigned,
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=defender.unit_instance_id,
+            attack_context_id="order84:attack",
+            source_phase=BattlePhase.SHOOTING,
+            weapon_profile_id=profile.profile_id,
+        )
+        is None
+    )
+    wound = WoundRoll(
+        strength=4,
+        toughness=4,
+        target_number=4,
+        roll_state=assigned_wound,
+        unmodified_roll=1,
+        modifier=0,
+        capped_modifier=0,
+        final_roll=1,
+        successful=False,
+        critical=False,
+    )
+    assert (
+        _reroll_wound_for_twin_linked_if_needed(
+            manager=manager,
+            decisions=lifecycle.decision_controller,
+            pool=pool,
+            initial_wound_roll=wound,
+            toughness=4,
+            attacker_player_id="player-a",
+            attack_context_id="order84:attack",
+        )
+        is wound
+    )
+    assert (manager.rng.to_payload(), lifecycle.to_payload()) == before
+
+
+@pytest.mark.parametrize("field", ["player_id", "battle_round", "turn_player_id", "battle_phase"])
+def test_order84_correlated_tie_context_forgery_cannot_change_historical_authority(
+    field: str,
+) -> None:
+    from tests.dice_result_semantics_helpers import extremum_session
+
+    from warhammer40k_core.core.dice_extremum import DiceExtremum
+    from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    session, _roll, request = extremum_session(extremum=DiceExtremum.HIGHEST)
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[1].option_id,
+        result_id="review-choice",
+    )
+    payload = session.lifecycle.to_payload()
+    replacements: dict[str, JsonValue] = {
+        "player_id": "player-b",
+        "battle_round": 99,
+        "turn_player_id": "player-b",
+        "battle_phase": "made-up-phase",
+    }
+    replacement = replacements[field]
+
+    def tamper(value: JsonValue) -> None:
+        if isinstance(value, dict):
+            if value.get("visibility_source") == "dice_extremum" and field in value:
+                value[field] = replacement
+            if (
+                field == "player_id"
+                and value.get("request_id") == request.request_id
+                and "actor_id" in value
+            ):
+                value["actor_id"] = replacement
+            for child in value.values():
+                tamper(child)
+        elif isinstance(value, list):
+            for child in value:
+                tamper(child)
+
+    raw = cast(JsonValue, json.loads(json.dumps(payload)))
+    assert isinstance(raw, dict)
+    tamper(raw["decisions"])
+    with pytest.raises(GameLifecycleError, match="Highest/lowest historical active-player"):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, raw))
+
+
+@pytest.mark.parametrize("kind", ["shooting", "charge"])
+def test_order84_historical_chooser_tracks_real_out_of_turn_owner_and_completion(kind: str) -> None:
+    from tests.charge_reroll_helpers import heroic_session
+    from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
+    from tests.fire_overwatch_helpers import (
+        ENEMIES,
+        choose_enemy,
+        choose_shooter,
+        finish_overwatch,
+        overwatch_session,
+        pending_overwatch,
+    )
+    from tests.heroic_intervention_helpers import add_heroic_modifier, use_heroic
+
+    if kind == "shooting":
+        session = overwatch_session(attacks=2)
+        open_phase(session.lifecycle)
+        status = choose_shooter(session, pending_overwatch(session))
+        assert_active_player_history(session.lifecycle, expected_player="player-a")
+        request = status.decision_request
+        assert request is not None
+        status = choose_enemy(session, request, ENEMIES[0])
+        finish_overwatch(session, status)
+    else:
+        session, unit_id = heroic_session(natural=False)
+        open_phase(session.lifecycle)
+        add_heroic_modifier(session, unit_id, delta=20)
+        declaration = use_heroic(session, unit_id)
+        assert_active_player_history(session.lifecycle, expected_player="player-a")
+        status = session.submit_option(
+            request_id=declaration.request_id, option_id=unit_id, result_id="order84-declare"
+        )
+        request = status.decision_request
+        assert request is not None
+        assert request.decision_type == "select_charge_targets"
+        session.submit_option(
+            request_id=request.request_id,
+            option_id="decline_charge_targets",
+            result_id="order84-decline",
+        )
+    assert_active_player_history(session.lifecycle, expected_player="player-b")
+
+
+def test_order84_tie_cannot_borrow_a_future_decision_as_its_chooser_scope() -> None:
+    from tests.dice_result_semantics_helpers import forged_future_shooting_scope_payload
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    with pytest.raises(GameLifecycleError, match="accepted source selection"):
+        GameLifecycle.from_payload(
+            cast(GameLifecyclePayload, forged_future_shooting_scope_payload())
+        )
+
+
+@pytest.mark.parametrize("reuse", [False, True])
+def test_order84_chooser_scope_requires_an_unused_shooting_permission(reuse: bool) -> None:
+    from tests.dice_result_semantics_helpers import forged_shooting_source_lifecycle
+
+    from warhammer40k_core.engine.active_player_boundary_history import (
+        active_player_authority_before_event,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    lifecycle = forged_shooting_source_lifecycle(reuse=reuse)
+    assert lifecycle.state is not None
+    message = "boundary was reused" if reuse else "does not authorize out-of-phase shooting"
+    with pytest.raises(GameLifecycleError, match=message):
+        active_player_authority_before_event(
+            state=lifecycle.state,
+            decisions=lifecycle.decision_controller,
+            event_index=len(lifecycle.decision_controller.event_log.records),
+        )

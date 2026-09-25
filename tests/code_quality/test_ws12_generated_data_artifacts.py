@@ -56,6 +56,9 @@ _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "WE": "world-eaters",
 }
 _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
+    "core_dice_results_2026_09": (
+        "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
     "core_revival_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),
@@ -612,6 +615,10 @@ def test_edition_source_package_directories_are_explicitly_classified() -> None:
 
 
 def test_core_rules_app_mirror_sources_use_project_authority_not_official_capture() -> None:
+    assert (
+        _EDITION_SOURCE_PACKAGE_CLASSIFICATION["core_dice_results_2026_09"]
+        == "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    )
     assert (
         _EDITION_SOURCE_PACKAGE_CLASSIFICATION["app_core_rules_hidden_2026_08_09"]
         == "owner_transcription_with_project_authoritative_app_mirror_source"

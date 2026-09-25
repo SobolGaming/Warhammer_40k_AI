@@ -1,0 +1,122 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5107b205bc0303d48fd7ba15c9e00c4b0c9ea09a3f4ed4a28c3fb023078d11d0",
+  "base_revision": "c79e1c816cfc1bf0fca6676e6ecbf7c4bab407a0",
+  "status": "passed",
+  "behavior": {
+    "tests": 9252,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 759.01,
+    "coverage_percent": 85.21
+  },
+  "code_quality": {
+    "tests": 672,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 123.501
+  },
+  "environment_notes": [
+    "All uv commands used UV_CACHE_DIR=/private/tmp/codex-uv-cache.",
+    "The bundled Node runtime and temporary npm 11.6.2 were placed on PATH for Node commands.",
+    "HTTP and TypeScript conformance tests ran with local socket/IPC access; wheel smoke used system TLS certificates.",
+    "The final coverage database uses a dedicated temporary path after the preceding attempt failed opening the workspace database.",
+    "No production changes occurred after the independently approved runtime or during final aggregate validation.",
+    "No behavioral test files were added, removed or renamed; the existing eight-shard inventory remains complete."
+  ],
+  "commands": [
+    {
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "log_sha256": "ffabb34b1f2f7bdef60119a61a417fdb0351a00383a07385b6159437fc16396d"
+    },
+    {
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "log_sha256": "2923fab2c6ff8038486bf13a9796a8baf1c72304d276036b781bb39f13c670da"
+    },
+    {
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    {
+      "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" COVERAGE_FILE=/private/tmp/order84-final.coverage uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/private/tmp/order84-behavior-verified.xml",
+      "exit_code": 0,
+      "log_sha256": "3b2dfcd5e92d24f0d81ed3684eeb12238f6fd52de9e7a9308f24bc35193ca9dc"
+    },
+    {
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/private/tmp/order84-quality-final.xml",
+      "exit_code": 0,
+      "log_sha256": "0ea85ffcf9fd6ee982b3da9916cfe2ec1c5a2c074a7a5c212a1c3bed46aaaf76"
+    },
+    {
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "log_sha256": "31878812e7481719f7de8168a67057362aa2cd7adde50bd4ca8daeef61e7593a"
+    },
+    {
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "command": "uv run --no-sync python tools/build_core_dice_results_source.py --check",
+      "exit_code": 0,
+      "log_sha256": "b0d22add1c451599207ff4d25ee9089c718a794f9c869047eae23e70aa813649"
+    },
+    {
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "log_sha256": "0125e310ad59d8545de81db8eebe95089bf3a725fd8dcdaa2c9d9ee2a5c632be"
+    },
+    {
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref c79e1c816cfc1bf0fca6676e6ecbf7c4bab407a0",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm test (conformance/typescript; generated-client check, typecheck, five unit tests and 342 live conformance assertions)",
+      "exit_code": 0,
+      "log_sha256": "b594de2082a53315ba3afd92950b1c5e8ca99bb176cc84c297ece19cf9efe599"
+    },
+    {
+      "command": "UV_SYSTEM_CERTS=true uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "log_sha256": "588fe2ea7f9ce1d14d98e7290b795d64cb3be423ce2d33854c4db156aa4fd686"
+    }
+  ],
+  "earlier_unsuccessful_aggregate_attempts": [
+    {
+      "log_sha256": "365a544b40a324b656e9175843a7078378d3ce8f5b6fa454bffd139a3e65bb08",
+      "result": "24 failed, 9154 passed, 18 collection errors; coverage 85.16%",
+      "corrections": "New interpretation metadata affected seeded fixtures; stricter malformed fixtures and source count corrected. External contract generation was incorrectly concurrent with collection, and HTTP tests needed local socket access."
+    },
+    {
+      "log_sha256": "29cba2882b060137683397c3895843f854c7114b167ff36666762de6aa4a64e9",
+      "result": "2 failed, 9250 passed; coverage report could not open workspace SQLite database",
+      "corrections": "Two further canonical retention-hash seed fixtures updated without weakening assertions; all 37 retained-shooting tests passed. Final coverage uses a dedicated temporary database."
+    }
+  ],
+  "earlier_unsuccessful_code_quality_attempt": {
+    "log_sha256": "fb1cee2662a38724e20201cd9eb9ba71893c19f11e958f2fbe1915b7bb97c0d8",
+    "result": "2 failed, 670 passed",
+    "corrections": "Added explicit source-package classification and tied-die decision catalog row; corrected the generic assignment description. Runtime unchanged."
+  },
+  "independent_review": "APPROVED",
+  "performance": {
+    "component_and_inherited_reports": "inherited-refresh.json, base.json, head.json",
+    "full_game_certified": false
+  }
+}

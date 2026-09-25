@@ -15,6 +15,7 @@ from warhammer40k_core.core.modifiers import bound_modified_roll
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.visibility import BenefitOfCoverResult, BenefitOfCoverResultPayload
+from warhammer40k_core.engine.interpreted_dice import validate_interpreted_d6
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance
 
@@ -160,8 +161,7 @@ class SavingThrow:
             raise GameLifecycleError("SavingThrow save_kind must match option.")
         if self.target_number != self.option.characteristic_target_number:
             raise GameLifecycleError("SavingThrow target_number must match save characteristic.")
-        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
-            raise GameLifecycleError("SavingThrow unmodified_roll must be a D6 value.")
+        validate_interpreted_d6(state=self.roll_state, value=self.unmodified_roll)
         if type(self.final_roll) is not int:
             raise GameLifecycleError("SavingThrow final_roll must be an integer.")
         if type(self.successful) is not bool:
@@ -588,8 +588,8 @@ def _resolve_save_option_for_roll(
     options: tuple[SaveOption, ...],
     unmodified_roll: int,
 ) -> tuple[SaveOption, SaveResolutionRule]:
-    if type(unmodified_roll) is not int or not 1 <= unmodified_roll <= 6:
-        raise GameLifecycleError("Saving throw unmodified_roll must be a D6 value.")
+    if type(unmodified_roll) is not int or unmodified_roll < 1:
+        raise GameLifecycleError("Saving throw unmodified_roll must be a positive integer.")
     if unmodified_roll == 1:
         return (
             _last_checked_save_option(options),

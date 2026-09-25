@@ -238,6 +238,7 @@ def test_identity_requires_loaded_clause_and_canonicalizes_effect_target_set() -
 
 
 def test_both_players_accept_fidelity_in_fight_and_replay_through_completion() -> None:
+    from tests.dice_result_semantics_helpers import assert_active_player_history, open_phase
     from tests.phase13b_shooting_declaration_helpers import _proposal_from_request
     from tests.phase15c_fight_order_helpers import submit_minimal_melee_declaration
     from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
@@ -279,11 +280,13 @@ def test_both_players_accept_fidelity_in_fight_and_replay_through_completion() -
             source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
         )
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    open_phase(session.lifecycle)
     pending_request(session)
     initial = session.lifecycle.to_payload()
     accepted: set[str] = set()
     coexistence_checked = False
     for _ in range(60):
+        assert_active_player_history(session.lifecycle)
         checkpoint = session.lifecycle.to_payload()
         session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
         assert session.lifecycle.to_payload() == checkpoint

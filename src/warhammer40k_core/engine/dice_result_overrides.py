@@ -5,8 +5,6 @@ from hashlib import sha256
 from typing import TYPE_CHECKING, TypedDict, cast
 
 from warhammer40k_core.core.dice import (
-    DiceRollResult,
-    DiceRollResultPayload,
     DiceRollState,
     DiceRollStatePayload,
 )
@@ -18,6 +16,12 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice_result_override_descriptors import (
     DiceResultOverrideDescriptor,
     dice_result_override_descriptors_for_abilities,
+)
+from warhammer40k_core.engine.dice_roll_history import (
+    DICE_RESULT_OVERRIDE_EVENT_TYPE as DICE_RESULT_OVERRIDE_EVENT_TYPE,
+)
+from warhammer40k_core.engine.dice_roll_history import (
+    latest_roll_state,
 )
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
@@ -41,7 +45,6 @@ if TYPE_CHECKING:
 DICE_RESULT_OVERRIDE_DECISION_TYPE = "select_dice_result_override"
 DECLINE_DICE_RESULT_OVERRIDE_OPTION_ID = "decline"
 USE_DICE_RESULT_OVERRIDE_OPTION_ID = "use"
-DICE_RESULT_OVERRIDE_EVENT_TYPE = "dice_result_overridden"
 UNIT_RESOURCE_SPENT_EVENT_TYPE = "unit_resource_spent"
 CRITICAL_HIT_LETHAL_HITS_MARKER_ID = "core:critical-hit:lethal-hits"
 CRITICAL_HIT_SUSTAINED_HITS_MARKER_ID = "core:critical-hit:sustained-hits"
@@ -194,15 +197,11 @@ def request_dice_result_override_if_available(
 ) -> DecisionRequest | None:
     if roll_state is None or roll_state.result_override is not None:
         return None
-    if roll_state.current_total == 6 or roll_critical:
-        return None
     markers = critical_trigger_markers_for_attack(
         roll_type=roll_type,
         weapon_profile=weapon_profile,
         target_keywords=target_keywords,
     )
-    if roll_successful and not markers:
-        return None
     if _dice_result_override_already_answered(
         decisions=decisions,
         roll_id=roll_state.original_result.roll_id,
@@ -222,6 +221,8 @@ def request_dice_result_override_if_available(
             component.unit.datasheet_abilities
         ):
             if roll_type not in descriptor.roll_types:
+                continue
+            if roll_state.current_total == descriptor.replacement_value:
                 continue
             if any(
                 keyword in attacker_model.keywords for keyword in descriptor.excluded_model_keywords
@@ -336,7 +337,7 @@ def invalid_dice_result_override_status(
     )
     if expected_attack_identity != request_attack_identity:
         return _invalid_status(state, field="attack_context")
-    latest_state = _latest_roll_state(
+    latest_state = latest_roll_state(
         decisions=decisions,
         roll_id=payload["roll_id"],
     )
@@ -564,36 +565,6 @@ def _active_attack_sequence(*, state: GameState, sequence_id: str) -> AttackSequ
     if len(matching) > 1:
         raise GameLifecycleError("Active dice result override sequence identity is ambiguous.")
     return None if not matching else matching[0]
-
-
-def _latest_roll_state(*, decisions: DecisionController, roll_id: str) -> DiceRollState:
-    current: DiceRollState | None = None
-    for event in decisions.event_log.records:
-        if event.event_type == "dice_rolled":
-            if not isinstance(event.payload, dict):
-                raise GameLifecycleError("dice_rolled event payload must be an object.")
-            result = DiceRollResult.from_payload(cast(DiceRollResultPayload, event.payload))
-            if result.roll_id == roll_id:
-                current = DiceRollState.from_result(result)
-            continue
-        if event.event_type == "dice_reroll_resolved":
-            if not isinstance(event.payload, dict):
-                raise GameLifecycleError("dice_reroll_resolved payload must be an object.")
-            updated = DiceRollState.from_payload(cast(DiceRollStatePayload, event.payload))
-        elif event.event_type in {"command_reroll_resolved", DICE_RESULT_OVERRIDE_EVENT_TYPE}:
-            if not isinstance(event.payload, dict):
-                raise GameLifecycleError("Dice roll update event payload must be an object.")
-            updated_payload = event.payload.get("updated_roll_state")
-            if not isinstance(updated_payload, dict):
-                raise GameLifecycleError("Dice roll update event missing updated_roll_state.")
-            updated = DiceRollState.from_payload(cast(DiceRollStatePayload, updated_payload))
-        else:
-            continue
-        if updated.original_result.roll_id == roll_id:
-            current = updated
-    if current is None:
-        raise GameLifecycleError("Dice result override roll_id has no event-backed state.")
-    return current
 
 
 def _invalid_status(state: GameState, *, field: str) -> LifecycleStatus:

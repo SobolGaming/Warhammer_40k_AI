@@ -6788,3 +6788,61 @@ Both viewers receive the existing public revival request/event projection; no
 hidden-information policy changes. Replay and persistence use Contract 37's
 strict schema boundary and exact runtime identity. See
 [the migration](../contracts/migrations/36-to-37.md).
+
+## Order 84: interpreted dice and tied physical components
+
+Core 01.05.08 assigns rule results without changing the original RNG record.
+`DiceRollOverrideRecord` requires `component_index`: an integer identifies one
+physical die, while `null` assigns the aggregate unmodified roll. The record
+preserves prior component values, replacement, source and decision/request IDs.
+Assigned results are positive integers without a D6 ceiling. Physical original
+and replacement RNG faces retain their expression bounds; records authenticate
+all effective values during loading. Rerolls precede assignment; the existing
+source-specific attack request remains after all applicable reroll windows.
+
+`DiceRollInstance` retains physical component IDs and faces. Each component has
+nullable assignment evidence and an effective value; aggregate assignment has
+its own nullable instance record. `UnmodifiedRollResult` retains assignment
+provenance through ordered modifiers and source-defined terminal bounds. Hit,
+Wound, saving-throw and post-roll trigger consumers use assigned values. Being
+assigned seven does not mean having rolled an unmodified six: exact-value tests
+remain exact, while threshold tests compare against seven.
+
+Core 01.05.07 uses `select_dice_extremum` with `DICE_SELECTION` interaction metadata
+and finite component IDs of the form `<original-roll-id>:component-<index>`.
+Only matching highest/lowest components appear. The effective active player
+chooses, even when another player rolled the dice. A unique result resolves
+without a player choice. The source reference owner calls the shared
+`request_dice_extremum` service and suspends on its returned request; on resumption
+it consumes the recorded `DiceExtremumSelection`. This is a generic Core service;
+it does not add or certify unimplemented faction rules that might refer to dice.
+
+Requests bind source IDs, full current roll state, extremum kind, active player,
+turn owner, round and phase. Wrong actor, stale roll/phase, wrong component,
+malformed payload and changed source context reject before queue pop or event
+mutation. Repeated reads return the recorded component, without RNG consumption.
+Restore validates source-reference events, request/options, dice history and
+selected events. Public rolls are visible to both viewers; secret rolls and their
+reference/selection events use the shared adapters redaction module. A secret
+roll owned by a different player cannot be exposed to satisfy an active-player
+choice and raises an explicit domain error until a source authorizes disclosure.
+
+Contract 38 requires the new assignment fields. Old saves and replays require
+their exact original deployment; no six-clamping or missing-history compatibility
+path is provided. See [migration 37 to 38](../contracts/migrations/37-to-38.md).
+
+Order 84 Hit/Wound payloads require `critical_is_threshold`, preserving default
+exact-six versus source-defined inclusive critical thresholds. Hit payloads require
+`success_requires_exact` for ordinary Snap Shooting. `select_dice_extremum` context
+also requires a stable source `reference_id`; a later occurrence must use a new ID,
+while retries/resumption reuse the same ID and selected physical component.
+
+Tied-die context also requires `clock_event_id` and `scope_request_ids`. The engine
+rebuilds phase, turn, round and effective chooser from canonical clock events and
+accepted action scopes at the reference boundary. This rejects correlated edits
+to all copies of a request's chooser context. Live submissions also require the
+same scope and clock anchors. `out_of_phase_shooting_started` records the typed
+shooting scope before early grant choices; `fight_activation_completed` records
+the exact scope close after retained-destruction cleanup. Attack declaration and
+completion IDs associate earlier scope closure with the owning attack sequence.
+These evidence events consume no RNG and use the existing event envelope.

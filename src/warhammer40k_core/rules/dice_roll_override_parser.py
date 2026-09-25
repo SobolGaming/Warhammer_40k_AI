@@ -15,7 +15,7 @@ _RESOURCE_BACKED_DICE_ROLL_OVERRIDE_RE = re.compile(
     r"you\s+can\s+change\s+the\s+result\s+of\s+one\s+Hit\s+roll\s+or\s+one\s+"
     r"Wound\s+roll\s+made\s+for\s+a\s+model\s+in\s+this\s+unit\s+"
     r"\(excluding\s+(?P<excluded_keyword>CHARACTER)\s+models\)\s+to\s+an\s+"
-    r"unmodified\s+(?P<replacement_value>[1-6])\b",
+    r"unmodified\s+(?P<replacement_value>[1-9][0-9]*)\b",
     re.IGNORECASE,
 )
 

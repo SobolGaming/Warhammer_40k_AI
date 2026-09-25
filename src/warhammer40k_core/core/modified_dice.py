@@ -7,6 +7,10 @@ from typing import Self, TypedDict
 from warhammer40k_core.core import dice_validation as _dice_validation
 from warhammer40k_core.core.dice import DiceRollState
 from warhammer40k_core.core.dice_errors import DiceRollSpecError
+from warhammer40k_core.core.dice_result_override import (
+    DiceRollOverrideRecord,
+    DiceRollOverrideRecordPayload,
+)
 from warhammer40k_core.core.modifiers import (
     RollModifier,
     RollModifierPayload,
@@ -19,6 +23,7 @@ class UnmodifiedRollResultPayload(TypedDict):
     roll_type: str
     value: int
     component_values: list[int]
+    result_override: DiceRollOverrideRecordPayload | None
 
 
 class ModifiedRollResultPayload(TypedDict):
@@ -37,6 +42,7 @@ class UnmodifiedRollResult:
     roll_type: str
     value: int
     component_values: tuple[int, ...]
+    result_override: DiceRollOverrideRecord | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -57,7 +63,15 @@ class UnmodifiedRollResult:
         )
         if component_values != self.component_values:
             object.__setattr__(self, "component_values", component_values)
-        if not component_values or self.value != sum(component_values):
+        expected_value = sum(component_values)
+        if self.result_override is not None:
+            if (
+                type(self.result_override) is not DiceRollOverrideRecord
+                or self.result_override.assigned_values() != component_values
+            ):
+                raise DiceRollSpecError("Unmodified result override evidence drifted.")
+            expected_value = self.result_override.assigned_unmodified_total()
+        if not component_values or self.value != expected_value:
             raise DiceRollSpecError("Unmodified result must match its post-reroll components.")
 
     @classmethod
@@ -67,8 +81,9 @@ class UnmodifiedRollResult:
         return cls(
             roll_id=state.original_result.roll_id,
             roll_type=state.original_result.spec.roll_type,
-            value=sum(state.current_values),
+            value=state.current_total - state.original_result.spec.expression.modifier,
             component_values=state.current_values,
+            result_override=state.result_override,
         )
 
     def to_payload(self) -> UnmodifiedRollResultPayload:
@@ -77,6 +92,9 @@ class UnmodifiedRollResult:
             "roll_type": self.roll_type,
             "value": self.value,
             "component_values": list(self.component_values),
+            "result_override": None
+            if self.result_override is None
+            else self.result_override.to_payload(),
         }
 
     @classmethod
@@ -86,6 +104,11 @@ class UnmodifiedRollResult:
             roll_type=payload["roll_type"],
             value=payload["value"],
             component_values=tuple(payload["component_values"]),
+            result_override=(
+                None
+                if payload["result_override"] is None
+                else DiceRollOverrideRecord.from_payload(payload["result_override"])
+            ),
         )
 
 

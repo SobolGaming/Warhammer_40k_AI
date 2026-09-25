@@ -101,7 +101,7 @@ from warhammer40k_core.rules.wahapedia_schema import (
 DAEMON_PRINCE_ID = "000004086"
 TORMENTORS_ID = "000004079"
 ECSTATIC_DEATH_GAME_ID = "order56-ecstatic_death_game_id-01-order64-0"
-ECSTATIC_CHAIN_GAME_ID = "order56-ecstatic_chain_game_id-01-order64-0"
+ECSTATIC_CHAIN_GAME_ID = "order84-ecstatic-chain-0"
 EXPECTED_PACKAGE_HASH = "86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84"
 
 
@@ -1134,7 +1134,7 @@ def _ecstatic_death_chain_session() -> tuple[
             "retained": Pose.at(x=11.0, y=20.0),
             "child": Pose.at(x=12.0, y=20.0),
         },
-        # Preserve both casualty branches with Order 43 hit-record RNG history.
+        # Preserve both casualty branches with Order 84 retention evidence hashes.
         game_id=ECSTATIC_CHAIN_GAME_ID,
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",

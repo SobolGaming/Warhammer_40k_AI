@@ -1,0 +1,10 @@
+{
+  "workload": "order84-dice-results-v1",
+  "samples": 7,
+  "iterations_per_sample": 1000,
+  "mean_ratio": 1.75,
+  "mean_additive_seconds": 0.05,
+  "maximum_seconds": 1.0,
+  "rationale": "Bounded component construction/serialization work; permits explicit assignment provenance validation without per-roll event/geometry scans. An absolute one millisecond per interpretation is a diagnostic component ceiling, not an allocation or claim against the deferred full-game target.",
+  "full_game_certified": false
+}

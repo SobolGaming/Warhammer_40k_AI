@@ -1,0 +1,26 @@
+{
+  "reviewer": "independent subagent order84_review",
+  "verdict": "APPROVED",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5107b205bc0303d48fd7ba15c9e00c4b0c9ea09a3f4ed4a28c3fb023078d11d0",
+  "remaining_actionable_findings": [],
+  "resolved_findings": [
+    "Assigned results must not reopen conditional, Command Re-roll or Twin-linked rerolls or mutate RNG before rejection.",
+    "Accepted tied-die records require canonical historical phase, turn, round and chooser authority.",
+    "Fight interrupt history must preserve its typed interrupt identity.",
+    "Scope sources must be earlier accepted decisions and prove their actual shooting permission.",
+    "Consumed shooting and Fight selections cannot reopen, including cross-kind Fight event reuse.",
+    "Interpretation-only metadata preserves unchanged RNG history; canonical retention hashes and real dice assignments remain authoritative.",
+    "Decision submission catalog accurately describes generic source-assigned values above six, not a universal six."
+  ],
+  "independent_reproductions": [
+    "Future-source forged chooser rejected.",
+    "Completed Overwatch source reuse rejected; valid same checkpoint restores.",
+    "Heroic Intervention cannot authorize shooting.",
+    "Cross-kind Fight opening reuse rejected; valid interrupt history passes.",
+    "Final RNG normalization reviewed: actual assignments, physical component choices and authoritative dice evidence remain significant; seeded fixtures retain behavioral assertions.",
+    "Final two conditional retention fixture seed changes reviewed independently; all original behavioral assertions remain intact and runtime identity is unchanged.",
+    "Final performance evidence approved: matched inputs, hashes, statistics and budgets are consistent; all 20 inherited report hashes match and inherited baselines/budgets are unchanged.",
+    "Final source-package classification and both decision catalog rows approved; project-reviewed App-mirror provenance is distinguished from official capture."
+  ],
+  "scope": "Semantic and diff review before first push; final aggregate, generated, contract-client, wheel and performance checks are recorded separately."
+}

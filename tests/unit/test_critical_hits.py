@@ -102,6 +102,7 @@ def test_hit_restore_requires_owning_recorded_hit(phase: BattlePhase, forgery: s
     assert hit["successful"]
     if forgery == "critical":
         hit["critical_threshold"] = 5
+        hit["critical_is_threshold"] = True
         hit["critical"] = True
     elif forgery == "source":
         hit["threshold_source_ids"].append("invented:critical-source")
@@ -159,6 +160,7 @@ def test_pending_hit_drift_rejected_before_restore_and_submission(
     hit = cast(dict[str, JsonValue], context["hit_roll"])
     if forgery == "threshold":
         hit["critical_threshold"] = 5
+        hit["critical_is_threshold"] = True
         hit["critical"] = cast(int, hit["unmodified_roll"]) >= 5
     else:
         cast(list[JsonValue], hit["threshold_source_ids"]).append("invented:critical-source")
@@ -414,3 +416,44 @@ def test_hit_record_uses_the_current_rerolled_face(original: int, rerolled: int)
     assert current.roll_state.original_result.total == original
     assert current.unmodified_roll == rerolled
     assert HitRoll.from_payload(current.to_payload()) == current
+
+
+@pytest.mark.parametrize("phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+@pytest.mark.parametrize("assigned", [1, 6, 7])
+def test_order84_assigned_hit_reaches_shared_critical_and_trigger_consumers(
+    phase: BattlePhase,
+    assigned: int,
+) -> None:
+    from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import ResolvedAttackRollValues
+
+    hit = hit_roll(raw=2, assigned_value=assigned, threshold=6, modifier=-1, phase=phase)
+    assert hit.roll_state is not None
+    assert hit.roll_state.original_result.values == (2,)
+    assert hit.unmodified_roll == assigned
+    assert hit.critical is (assigned >= 6)
+    assert hit.successful is (assigned >= 6)
+    trigger = ResolvedAttackRollValues(
+        hit.unmodified_roll,
+        hit.final_roll,
+        hit.successful,
+        hit.critical,
+        hit.skipped,
+    )
+    assert trigger.unmodified_roll == assigned
+    assert HitRoll.from_payload(hit.to_payload()) == hit
+
+
+@pytest.mark.parametrize("mode", ["normal", "snap", "overwatch", "indirect"])
+@pytest.mark.parametrize("assigned", [6, 7])
+def test_order84_default_critical_and_snap_require_exact_six(mode: str, assigned: int) -> None:
+    hit = hit_roll(raw=2, assigned_value=assigned, mode=mode, grant_threshold=False)
+    assert hit.critical is (assigned == 6)
+    assert hit.successful is (assigned == 6 or mode in {"normal", "indirect"})
+    assert HitRoll.from_payload(hit.to_payload()) == hit
+
+
+@pytest.mark.parametrize("mode", ["snap", "overwatch"])
+def test_order84_explicit_snap_threshold_accepts_assigned_seven(mode: str) -> None:
+    hit = hit_roll(raw=2, assigned_value=7, mode=mode, threshold=6, explicit_snap=True)
+    assert hit.critical
+    assert hit.successful
