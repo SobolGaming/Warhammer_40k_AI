@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359",
-  "fingerprint": "dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
+  "fingerprint": "9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
   "resource_count": 2963,
   "resources": [
     {
@@ -12905,9 +12905,9 @@
       "sha256": "4b517985b9869fdff7a5460c568d550d0531376551fa8cf6759caf2cacf29776"
     },
     {
-      "byte_length": 3399,
+      "byte_length": 3921,
       "path": "warhammer40k_core/geometry/table_quarters.py",
-      "sha256": "6dd9b8c1a5c2bfa97ee6edcc4d728f6f439ce946a7b76a9983471897564d5818"
+      "sha256": "e81913815271b19c6202f46c672959b56ad18d7a33beaed7fa6dd8eac528dc63"
     },
     {
       "byte_length": 43196,

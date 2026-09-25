@@ -26,8 +26,8 @@ spatial evidence and secondary occupancy. Both now call `engine/table_quarters.p
 which binds the reviewed divider width to `geometry/table_quarters.py` and
 preserves these missions' independent six-inch centre exclusion. The geometry
 query knows only typed models, board dimensions and divider width. It evaluates
-analytic extrema of circles, rotated ellipses and rectangular hulls, avoiding
-polygonal under-approximation at the narrow borders. Quarter rectangles include
+exact rational half-plane predicates for circles, rotated ellipses and rectangular
+hulls, avoiding rounded extrema and polygonal under-approximation at the narrow borders. Quarter rectangles include
 their boundaries; any positive overlap with the divider is excluded. The
 battlefield's outer boundary remains inclusive. Empty groups do not qualify.
 
@@ -46,7 +46,7 @@ change; its Order 86 note records the corrected semantics. Runtime identity
 and generated contract examples are refreshed to prevent old runtime saves
 from being treated as current authority. No compatibility shim is added.
 
-## Validation and review
+## Original publication validation and review
 
 The pre-fix regression run reproduced eight incorrect border acceptances.
 Focused coverage includes both divider axes and sides, exact tangency, overlap,
@@ -89,3 +89,41 @@ Final independent review approved publication with no remaining findings. The
 reviewer verified all successful JUnit cases, the quality results and retained
 log hashes, same-database coverage recovery, all 23 refreshed inherited reports,
 source provenance, generated contracts and shard inventory.
+
+## R86-001: exact inclusive boundary repair
+
+The review of `79d76f8bd6c174b65f2ab17754beb39f07b6f918` found both a
+contained rotated rectangle rejected at the outer board and positive divider
+overlap accepted after rounding. The violated invariant is exact inclusive
+contact with zero positive overlap. The bug-class search covered model supports,
+quarter-edge arithmetic and both scoring consumers; all decisive arithmetic now
+retains the exact binary rational values used by `model_visibility_prism`.
+Source data, canonical unit ownership and the adapter contract remain unchanged.
+
+For a rectangle, the two axis supports are rational sums of absolute rotated
+half-axis components. For an ellipse, nonnegative clearance is compared by
+squaring it and the exact axis components, without a square root or tolerance.
+Negative clearance is rejected before squaring. A footprint contains its centre,
+so the first model's centre selects the only possible quarter; every model must
+still pass that quarter's complete containment test. Quarter edges are constructed
+with rational arithmetic too, including the half-divider width.
+
+Regression tests cover both reported models, their adjacent representable
+positions, all four outer and divider directions for rotated rectangles and
+ellipses, and proven exact non-cardinal contact with representable neighbors.
+An existing circular nominal-tangency fixture actually overlaps by about
+`9.23e-16` inches under the exact convention; its expected result is corrected.
+The static audit forbids reintroducing rounded extrema into the shared predicate.
+See the [R86-001 validation and matched performance evidence](performance/order86/r86_001/README.md).
+
+The corrected runtime passes 9,382 behavioral tests with 85.20% coverage and 684
+code-quality tests. The first quality run detected a 0.10% inherited projection
+timing-budget miss; its report is preserved alongside one fresh matched base/head
+measurement that passes the unchanged budget. No runtime or behavioral test change
+was needed for that evidence repair. The generated runtime/contract artifacts,
+full local gates and refreshed shard profile are recorded separately from the
+original publication results above.
+
+The independent reviewer approved the completed R86-001 update for publication
+with no outstanding findings after verifying the final aggregate results, artifact
+identities, shard inventory and transparent performance recovery.

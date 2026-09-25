@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from fractions import Fraction
+from math import hypot, inf, nextafter
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 import pytest
 
 from warhammer40k_core.engine.table_quarters import scoring_table_quarter_id_or_none
-from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
@@ -20,7 +22,13 @@ from warhammer40k_core.geometry.volume import Model, ModelVolume
 @pytest.mark.parametrize("axis", ["x", "y"])
 @pytest.mark.parametrize("side", [-1, 1])
 @pytest.mark.parametrize(
-    ("gap", "qualifies"), [(0.0, False), (0.01, False), (0.5 / 25.4, True), (0.02, True)]
+    ("gap", "qualifies"),
+    [
+        (0.0, False),
+        (0.01, False),
+        pytest.param(0.5 / 25.4, False, id="rounded-nominal-tangency-overlaps"),
+        (0.02, True),
+    ],
 )
 def test_quarter_divider_borders(axis: str, side: int, gap: float, qualifies: bool) -> None:
     coordinate = 30.0 + side * (0.5 + gap)
@@ -73,6 +81,174 @@ def test_rotated_analytic_base_and_hull_edges(shape: str, facing: float, gap: fl
     assert scoring_table_quarter_id_or_none(geometry_models=(model,), center_x=30, center_y=30) == (
         "table-quarter:south-west" if gap == 0.02 else None
     )
+
+
+@pytest.mark.parametrize(
+    ("x", "facing", "base", "expected"),
+    [
+        (1.7694605058044857, 101.0, RectangularBase(6.2, 2.4), (False, True, True)),
+        (27.775333743981115, 17.0, RectangularBase(4.0, 2.0), (True, False, False)),
+    ],
+)
+def test_r86_001_reported_hulls_and_adjacent_positions(
+    x: float, facing: float, base: RectangularBase, expected: tuple[bool, ...]
+) -> None:
+    for position, qualifies in zip(
+        (nextafter(x, -inf), x, nextafter(x, inf)), expected, strict=True
+    ):
+        model = Model(
+            "review-hull", Pose.at(position, 10, facing_degrees=facing), base, ModelVolume(1)
+        )
+        answer = "table-quarter:south-west" if qualifies else None
+        assert _analytic_quarter_oracle(model, 30, 30, 1 / 25.4) == answer
+        assert (
+            scoring_table_quarter_id_or_none(geometry_models=(model,), center_x=30, center_y=30)
+            == answer
+        )
+
+
+@pytest.mark.parametrize(
+    ("base", "facing"),
+    [
+        (RectangularBase(6.2, 2.4), 101.0),
+        (RectangularBase(4, 2), 17.0),
+        (OvalBase(6.2, 2.4), 101.0),
+        (OvalBase(4, 2), 17.0),
+    ],
+)
+@pytest.mark.parametrize("axis", [0, 1])
+@pytest.mark.parametrize("border", ["outer-low", "outer-high", "divider-low", "divider-high"])
+def test_r86_001_rotated_boundaries_match_exact_shapes_at_adjacent_floats(
+    base: BaseShape, facing: float, axis: int, border: str
+) -> None:
+    from warhammer40k_core.geometry.table_quarters import wholly_within_table_quarter
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+    from warhammer40k_core.geometry.visibility_shapes import model_visibility_prism
+
+    centered = Model("border", Pose.at(0, 0, facing_degrees=facing), base, ModelVolume(1))
+    footprint = model_visibility_prism(centered).footprint
+    if isinstance(footprint, RationalEllipse):
+        support = hypot(float(footprint.first_axis[axis]), float(footprint.second_axis[axis]))
+    else:
+        support = float(max(point[axis] for point in footprint))
+    half = Fraction(1 / 25.4) / 2
+    boundary = {
+        "outer-low": Fraction(0),
+        "outer-high": Fraction(60),
+        "divider-low": Fraction(30) - half,
+        "divider-high": Fraction(30) + half,
+    }[border]
+    upper = border in {"outer-high", "divider-low"}
+    anchor = float(boundary) + (-support if upper else support)
+    answers: list[str | None] = []
+    for coordinate in (nextafter(anchor, -inf), anchor, nextafter(anchor, inf)):
+        pose = (
+            Pose.at(coordinate, 10, facing_degrees=facing)
+            if axis == 0
+            else Pose.at(10, coordinate, facing_degrees=facing)
+        )
+        model = replace(centered, pose=pose)
+        expected = _analytic_quarter_oracle(model, 30, 30, 1 / 25.4)
+        answers.append(expected)
+        assert (
+            wholly_within_table_quarter(
+                models=(model,), center_x=30, center_y=30, divider_width_inches=1 / 25.4
+            )
+            == expected
+        )
+    assert None in answers
+    assert any(answer is not None for answer in answers)
+
+
+@pytest.mark.parametrize("shape", ["rectangle", "ellipse"])
+@pytest.mark.parametrize("border", ["outer", "divider"])
+def test_r86_001_exact_rotated_contact_and_neighbors(shape: str, border: str) -> None:
+    from math import degrees
+
+    from warhammer40k_core.geometry.table_quarters import wholly_within_table_quarter
+    from warhammer40k_core.geometry.visibility_shapes import rational_rotation
+
+    if shape == "rectangle":
+        facing = 34.0
+        cosine, sine = rational_rotation(facing)
+        radius = float(cosine + sine)
+        assert Fraction(radius) == cosine + sine
+        base: BaseShape = RectangularBase(2, 2)
+        center_x = 30.0 if border == "outer" else 4 * radius + 0.125
+        center_y = 30.0
+        coordinate = radius if border == "outer" else 3 * radius
+        assert Fraction(coordinate) == (1 if border == "outer" else 3) * (cosine + sine)
+        if border == "divider":
+            assert Fraction(center_x) - Fraction(0.125) == 4 * (cosine + sine)
+    else:
+        # A non-cardinal dyadic rotation with a 3:4:5 ellipse support. This
+        # establishes real contact, unlike nominally tangent rounded sqrt values.
+        sine = Fraction(1, 2**28)
+        facing = degrees(float(sine))
+        assert rational_rotation(facing) == (Fraction(1), sine)
+        base = OvalBase(6, float(8 * sine))
+        radius = float(5 * sine)
+        center_x = center_y = 30.0
+        coordinate = radius if border == "outer" else 29.875 - radius
+    expected = (False, True, True) if border == "outer" else (True, True, False)
+    for value, qualifies in zip(
+        (nextafter(coordinate, -inf), coordinate, nextafter(coordinate, inf)), expected, strict=True
+    ):
+        pose = (
+            Pose.at(value, 10, facing_degrees=facing)
+            if shape == "rectangle"
+            else Pose.at(10, value, facing_degrees=facing)
+        )
+        model = Model("exact-contact", pose, base, ModelVolume(1))
+        answer = "table-quarter:south-west" if qualifies else None
+        assert _analytic_quarter_oracle(model, center_x, center_y, 0.25) == answer
+        assert (
+            wholly_within_table_quarter(
+                models=(model,), center_x=center_x, center_y=center_y, divider_width_inches=0.25
+            )
+            == answer
+        )
+
+
+@pytest.mark.parametrize(("x", "y"), [(-10, 10), (70, 10), (30, 10), (10, -10), (10, 70)])
+def test_r86_001_ellipse_negative_clearance_is_rejected_before_squaring(x: float, y: float) -> None:
+    from warhammer40k_core.geometry.table_quarters import wholly_within_table_quarter
+
+    model = Model("outside", Pose.at(x, y, facing_degrees=17), OvalBase(4, 2), ModelVolume(1))
+    assert (
+        wholly_within_table_quarter(
+            models=(model,), center_x=30, center_y=30, divider_width_inches=1 / 25.4
+        )
+        is None
+    )
+
+
+def _analytic_quarter_oracle(
+    model: Model, center_x: float, center_y: float, width: float
+) -> str | None:
+    """Independent oracle using the existing exact polygon/ellipse construction."""
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+    from warhammer40k_core.geometry.visibility_shapes import model_visibility_prism
+
+    cx, cy, half = Fraction(center_x), Fraction(center_y), Fraction(width) / 2
+    footprint = model_visibility_prism(model).footprint
+    for name, left, bottom, right, top in (
+        ("north-west", Fraction(0), cy + half, cx - half, 2 * cy),
+        ("north-east", cx + half, cy + half, 2 * cx, 2 * cy),
+        ("south-west", Fraction(0), Fraction(0), cx - half, cy - half),
+        ("south-east", cx + half, Fraction(0), 2 * cx, cy - half),
+    ):
+        if isinstance(footprint, RationalEllipse):
+            contained = True
+            for axis, lower, upper in ((0, left, right), (1, bottom, top)):
+                support_square = footprint.first_axis[axis] ** 2 + footprint.second_axis[axis] ** 2
+                for margin in (footprint.center[axis] - lower, upper - footprint.center[axis]):
+                    contained = contained and margin >= 0 and support_square <= margin**2
+        else:
+            contained = all(left <= x <= right and bottom <= y <= top for x, y in footprint)
+        if contained:
+            return f"table-quarter:{name}"
+    return None
 
 
 def test_divider_and_centre_exclusion_are_distinct() -> None:

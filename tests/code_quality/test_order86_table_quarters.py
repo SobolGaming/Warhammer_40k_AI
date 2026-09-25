@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import statistics
@@ -47,6 +48,17 @@ def test_all_quarter_consumers_share_geometry_including_restore() -> None:
     assert "wholly_within_table_quarter(" in shared
 
 
+def test_quarter_containment_keeps_exact_values_until_the_final_predicate() -> None:
+    tree = ast.parse((ROOT / "src/warhammer40k_core/geometry/table_quarters.py").read_text())
+    calls = {
+        node.func.id if isinstance(node.func, ast.Name) else node.func.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name | ast.Attribute)
+    }
+    assert {"Fraction", "rational_rotation"} <= calls
+    assert not calls.intersection({"float", "sqrt", "hypot", "isclose", "_model_bounds"})
+
+
 def test_quarter_query_matched_cost_and_result_gate() -> None:
     from warhammer40k_core.build_identity import verified_engine_build_identity
 
@@ -74,13 +86,53 @@ def test_quarter_query_matched_cost_and_result_gate() -> None:
         assert len(before["samples_seconds"]) == len(after["samples_seconds"]) == budget["samples"]
         assert before["qualifying_counts"] == [100] * budget["samples"]
         assert (
-            after["qualifying_counts"] == [0 if after["gap"] == 0.01 else 100] * budget["samples"]
+            after["qualifying_counts"]
+            == [0 if after["gap"] in (0.01, 0.5 / 25.4) else 100] * budget["samples"]
         )
         assert after["mean_seconds"] == statistics.mean(after["samples_seconds"])
         assert (
             after["mean_seconds"]
             <= before["mean_seconds"] * budget["mean_ratio"] + budget["mean_additive_seconds"]
         )
+        assert max(after["samples_seconds"]) <= budget["maximum_query_seconds"]
+
+
+def test_r86_001_rotated_boundary_cost_and_result_gate() -> None:
+    from warhammer40k_core.build_identity import verified_engine_build_identity
+
+    folder = ROOT / "docs/performance/order86/r86_001"
+    base, head = (
+        json.loads((folder / name).read_text())
+        for name in ("boundary-base.json", "boundary-head.json")
+    )
+    budget = json.loads((folder / "boundary-budget.json").read_text())
+    assert base["revision"] == "79d76f8bd6c174b65f2ab17754beb39f07b6f918"
+    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    for key in (
+        "workload",
+        "cpu",
+        "memory_bytes",
+        "platform",
+        "python",
+        "concurrency",
+        "timing_boundary",
+        "hashes",
+    ):
+        assert base[key] == head[key], key
+    for name, digest in head["hashes"].items():
+        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+    assert head["workload"] == budget["workload"]
+    assert not head["full_game_certified"]
+    for before, after in zip(base["rows"], head["rows"], strict=True):
+        for key in ("case", "model", "expected_quarter", "iterations"):
+            assert before[key] == after[key], key
+        assert len(before["samples_seconds"]) == len(after["samples_seconds"]) == budget["samples"]
+        assert (
+            after["qualifying_counts"]
+            == [after["iterations"] if after["expected_quarter"] is not None else 0]
+            * budget["samples"]
+        )
+        assert after["mean_seconds"] == statistics.mean(after["samples_seconds"])
         assert max(after["samples_seconds"]) <= budget["maximum_query_seconds"]
 
 

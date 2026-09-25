@@ -1,0 +1,269 @@
+{
+  "workload": "r86-001-rotated-boundary-queries-v1",
+  "revision": "79d76f8bd6c174b65f2ab17754beb39f07b6f918",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "concurrency": 1,
+  "coverage": false,
+  "full_game_certified": false,
+  "timing_boundary": "one rotated geometry query; setup excluded; 9 batches of 100",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_order86_boundaries.py": "272bb483305bf93111d46a52544bf2b19be03a0a8e96a32237d6f6aa596df0a2"
+  },
+  "rows": [
+    {
+      "case": "reported-outer-contained",
+      "model": {
+        "model_id": "reported-outer-contained",
+        "pose": {
+          "position": {
+            "x": 1.7694605058044857,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "facing": {
+            "degrees": 101.0
+          }
+        },
+        "base": {
+          "kind": "rectangular",
+          "radius": null,
+          "length": 6.2,
+          "width": 2.4
+        },
+        "volume": {
+          "height": 1.0
+        }
+      },
+      "expected_quarter": "table-quarter:south-west",
+      "iterations": 100,
+      "samples_seconds": [
+        2.8758400003425777e-06,
+        2.580419823061675e-06,
+        2.6362499920651317e-06,
+        2.6283299666829406e-06,
+        2.7945899637416006e-06,
+        2.6754199643619357e-06,
+        2.667079970706254e-06,
+        2.6654099929146467e-06,
+        2.6733300182968378e-06
+      ],
+      "mean_seconds": 2.6885188546859554e-06,
+      "qualifying_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "reported-divider-overlap",
+      "model": {
+        "model_id": "reported-divider-overlap",
+        "pose": {
+          "position": {
+            "x": 27.775333743981115,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "facing": {
+            "degrees": 17.0
+          }
+        },
+        "base": {
+          "kind": "rectangular",
+          "radius": null,
+          "length": 4.0,
+          "width": 2.0
+        },
+        "volume": {
+          "height": 1.0
+        }
+      },
+      "expected_quarter": null,
+      "iterations": 100,
+      "samples_seconds": [
+        2.6679100119508804e-06,
+        2.678750024642795e-06,
+        2.6737499865703286e-06,
+        2.666669897735119e-06,
+        2.660830214153975e-06,
+        2.6570900809019803e-06,
+        2.6604198501445354e-06,
+        2.6699999580159783e-06,
+        2.799590001814067e-06
+      ],
+      "mean_seconds": 2.681667780658851e-06,
+      "qualifying_counts": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    {
+      "case": "ellipse-outer-contained",
+      "model": {
+        "model_id": "ellipse-outer-contained",
+        "pose": {
+          "position": {
+            "x": 1.9348272167903167,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "facing": {
+            "degrees": 17.0
+          }
+        },
+        "base": {
+          "kind": "oval",
+          "radius": null,
+          "length": 4.0,
+          "width": 2.0
+        },
+        "volume": {
+          "height": 1.0
+        }
+      },
+      "expected_quarter": "table-quarter:south-west",
+      "iterations": 100,
+      "samples_seconds": [
+        2.7270798454992473e-06,
+        2.5562502560205757e-06,
+        2.560409775469452e-06,
+        2.549579949118197e-06,
+        2.61707988101989e-06,
+        3.1162501545622943e-06,
+        2.6491598691791297e-06,
+        2.5237500085495412e-06,
+        2.7095797122456133e-06
+      ],
+      "mean_seconds": 2.6676821612959934e-06,
+      "qualifying_counts": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    {
+      "case": "ellipse-outer-overlap",
+      "model": {
+        "model_id": "ellipse-outer-overlap",
+        "pose": {
+          "position": {
+            "x": 1.9348272167903162,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "facing": {
+            "degrees": 17.0
+          }
+        },
+        "base": {
+          "kind": "oval",
+          "radius": null,
+          "length": 4.0,
+          "width": 2.0
+        },
+        "volume": {
+          "height": 1.0
+        }
+      },
+      "expected_quarter": null,
+      "iterations": 100,
+      "samples_seconds": [
+        2.5879201712086795e-06,
+        2.649999805726111e-06,
+        2.5891701807267966e-06,
+        2.495420048944652e-06,
+        2.5520898634567857e-06,
+        2.5883299531415104e-06,
+        2.547499898355454e-06,
+        2.554589882493019e-06,
+        2.611250092741102e-06
+      ],
+      "mean_seconds": 2.57514109964379e-06,
+      "qualifying_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "ellipse-exact-contact",
+      "model": {
+        "model_id": "ellipse-exact-contact",
+        "pose": {
+          "position": {
+            "x": 10.0,
+            "y": 1.862645149230957e-08,
+            "z": 0.0
+          },
+          "facing": {
+            "degrees": 2.1344341156289847e-07
+          }
+        },
+        "base": {
+          "kind": "oval",
+          "radius": null,
+          "length": 6.0,
+          "width": 2.9802322387695312e-08
+        },
+        "volume": {
+          "height": 1.0
+        }
+      },
+      "expected_quarter": "table-quarter:south-west",
+      "iterations": 100,
+      "samples_seconds": [
+        2.4466600734740497e-06,
+        2.424579870421439e-06,
+        2.433749905321747e-06,
+        2.4279201170429587e-06,
+        2.4312498862855137e-06,
+        2.415000053588301e-06,
+        2.4245900567620992e-06,
+        2.4258397752419114e-06,
+        2.425840066280216e-06
+      ],
+      "mean_seconds": 2.428381089379804e-06,
+      "qualifying_counts": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    }
+  ]
+}

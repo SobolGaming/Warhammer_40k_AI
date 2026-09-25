@@ -2,7 +2,7 @@
 
 The workload measures one primary quarter witness for a real five-model squad,
 including geometry materialization and the mission's six-inch centre exclusion.
-Ten batches of 100 calls cover overlapping, tangent, clear and distant bases.
+Ten batches of 100 calls cover overlapping, nominally tangent, clear and distant bases.
 Fixture setup is outside the timing boundary. Each sample is a per-query mean.
 Base and head run serially without coverage on the same provisional Apple M5 Pro
 host and locked dependencies. The base is `c727a6ad08ff9204d5338dabc736bbf767812a1e`.
@@ -19,13 +19,18 @@ The retained run measured the following per-query means on that host:
 
 | Base edge distance from centre line | Base | Head | Head qualifying queries per batch |
 | --- | ---: | ---: | ---: |
-| 0.01 inches, inside divider | 56.78 µs | 9.56 µs | 0/100 |
-| Half a millimetre, tangent | 56.14 µs | 35.27 µs | 100/100 |
-| 0.02 inches, clear | 56.08 µs | 35.04 µs | 100/100 |
-| 4 inches, distant | 56.19 µs | 34.64 µs | 100/100 |
+| 0.01 inches, inside divider | 56.78 µs | 14.14 µs | 0/100 |
+| Half a millimetre, nominal tangency with positive overlap | 56.14 µs | 14.22 µs | 0/100 |
+| 0.02 inches, clear | 56.08 µs | 53.16 µs | 100/100 |
+| 4 inches, distant | 56.19 µs | 52.99 µs | 100/100 |
 
-The maximum head batch mean was 37.35 µs, below the fixed one-millisecond
+The maximum head batch mean was 55.54 µs, below the fixed one-millisecond
 component ceiling. These finite measurements establish only this workload's cost.
+The [R86-001 review repair](r86_001/README.md) replaces rounded supports and
+quarter edges with exact rational predicates. Its additional comparison against
+the reviewed PR revision and rotated-boundary diagnostic preserve the original
+budgets. The nominal tangency pose actually overlaps the exact divider by about
+`9.23e-16` inches and is correctly rejected.
 
 Inherited current-runtime diagnostics are rerun rather than relabelled with a
 new identity. Their historical baselines and budgets remain unchanged.

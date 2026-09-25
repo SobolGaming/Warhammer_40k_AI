@@ -1,0 +1,6 @@
+{
+  "workload": "r86-001-rotated-boundary-queries-v1",
+  "samples": 9,
+  "maximum_query_seconds": 0.001,
+  "rationale": "Retain the existing Order 86 maximum batch-mean query ceiling for the added rotated boundary workload. This is component evidence, not gameplay or full-game certification."
+}
