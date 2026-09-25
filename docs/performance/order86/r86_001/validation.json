@@ -1,0 +1,371 @@
+{
+  "finding": "R86-001",
+  "reviewed_revision": "79d76f8bd6c174b65f2ab17754beb39f07b6f918",
+  "pr_base_revision": "c727a6ad08ff9204d5338dabc736bbf767812a1e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
+  "production_sha256": "e81913815271b19c6202f46c672959b56ad18d7a33beaed7fa6dd8eac528dc63",
+  "regression_red_run": {
+    "failed": 26,
+    "passed": 28,
+    "deselected": 30,
+    "log_sha256": "ca8c0263027608f030b77f91c0260645427f18138b1c383b86bfd2a50b77cab9"
+  },
+  "focused_regressions_passed": 89,
+  "behavioral_passed": 9382,
+  "code_quality_passed": 684,
+  "coverage_percent": 85.2031379968359,
+  "coverage_totals": {
+    "covered_lines": 196824,
+    "num_statements": 220637,
+    "percent_covered": 85.2031379968359,
+    "percent_covered_display": "85",
+    "missing_lines": 23813,
+    "excluded_lines": 2719,
+    "percent_statements_covered": 89.20715927065723,
+    "percent_statements_covered_display": "89",
+    "num_branches": 85928,
+    "num_partial_branches": 19449,
+    "covered_branches": 64379,
+    "missing_branches": 21549,
+    "percent_branches_covered": 74.9220277441579,
+    "percent_branches_covered_display": "75"
+  },
+  "checks": [
+    {
+      "name": "behavioral-final",
+      "command": "COVERAGE_FILE=/tmp/r86_001-validation/.coverage PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/tmp/r86_001-validation/behavioral-final.xml",
+      "exit_code": 0,
+      "elapsed_seconds": 743.9459614579973,
+      "log_sha256": "e5d01cc4aceb708a154dd03486ad554be64a585ce535f90c9334a8af124f6013"
+    },
+    {
+      "name": "boundary-base",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order86_boundaries.py --runtime-src /tmp/r86_001-base/src --revision 79d76f8bd6c174b65f2ab17754beb39f07b6f918 --output docs/performance/order86/r86_001/boundary-base.json",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5168735000188462,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "boundary-head",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order86_boundaries.py --runtime-src src --revision r86-001-exact-half-planes --output docs/performance/order86/r86_001/boundary-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 0.432419166987529,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "code-quality-final",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/tmp/r86_001-validation/code-quality-final.xml",
+      "exit_code": 0,
+      "elapsed_seconds": 118.94770179098123,
+      "log_sha256": "9bd27e7d1eff5a5e2fa03089ca08b37ebb62b0432723e255f7131974d92a2535"
+    },
+    {
+      "name": "code-quality-initial",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/tmp/r86_001-validation/code-quality-final.xml",
+      "exit_code": 1,
+      "elapsed_seconds": 119.2849521249882,
+      "log_sha256": "cbff0c597191f20dc476b2a13115ccf9a0ee84b0af1f64df1a075e91294697fa"
+    },
+    {
+      "name": "contract-base",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref c727a6ad08ff9204d5338dabc736bbf767812a1e",
+      "exit_code": 0,
+      "elapsed_seconds": 39.87924254202517,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "coverage-json",
+      "command": "COVERAGE_FILE=/tmp/r86_001-validation/.coverage uv run coverage json -o /tmp/r86_001-validation/coverage.json --fail-under=85",
+      "exit_code": 0,
+      "elapsed_seconds": 15.818484208983136,
+      "log_sha256": "d1d04a4aaf3826bce433b704cb7e576bec48a43815a43adc8f202ca6ab721c6e"
+    },
+    {
+      "name": "external-contract-generation",
+      "command": "uv run python scripts/build_external_contract.py",
+      "exit_code": 0,
+      "elapsed_seconds": 31.172987917001592,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "import-shards",
+      "command": "uv run lint-imports && uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "elapsed_seconds": 0.4390359590179287,
+      "log_sha256": "6ba621892c1fabaa4ba8e85c03e0641d4cbe43223f49fc4213f9ae3e8af90414"
+    },
+    {
+      "name": "performance-completion-head",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order77_completion.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order77/r77_001_boundary/completion-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 11.48168224998517,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-ingress",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_ingress_reconstruction.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order64/head-reconstruction.json",
+      "exit_code": 0,
+      "elapsed_seconds": 63.98496487500961,
+      "log_sha256": "f895466f5973a99b3b91ef6e6f4106583b0e53edb9661777b57f9790a07eb42b"
+    },
+    {
+      "name": "performance-order65",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order65.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order65/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 8.026734459010186,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order66",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order66.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order66/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 7.657432542007882,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order69",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order68.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order69/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9514211659843568,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order70",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order70.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order70/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.316195292019984,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order71",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order71.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order71/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.391359416011255,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order72",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order72.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order72/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 17.197395166003844,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order73-control",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order60.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b  --output docs/performance/order73/r73_001/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 5.410142792010447,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order73-geometry",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order73.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b  --output docs/performance/order73/r73_001/geometry-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 8.357346750010038,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order74",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order74.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b  --output docs/performance/order74/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 6.415552541002398,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order75",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order75.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b  --output docs/performance/order75/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 7.602993290987797,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order76",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order76.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order76/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 13.965783207997447,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order77",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order77.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order77/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 30.690188791020773,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order78",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order78.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order78/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.353730167000322,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order79",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order79.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order79/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 8.827017874980811,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order80-review",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order80.py --runtime-src src --revision r86-001-exact-half-planes --ordinary-restore --output docs/performance/order80/review-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 18.071060624992242,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order80",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order80.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order80/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 17.659699083014857,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order83-projection-initial",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/benchmark_order81_projection.py   --output docs/performance/order83/projection-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 5.071517791977385,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order83-projection",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/benchmark_order81_projection.py   --output docs/performance/order83/projection-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 5.071517791977385,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order83-revival",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order82.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order83/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 53.405101250013104,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order84",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order84.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order84/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 0.6675501670106314,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order85-rotation",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order85_rotation.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order85/rotation-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 1.3618014169915114,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order85",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order85.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order85/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 6.204520416999003,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order86-head",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order86.py --runtime-src src --revision r86-001-exact-half-planes  --output docs/performance/order86/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 2.9739322910027113,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "pre-commit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "elapsed_seconds": 0.734276332979789,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "name": "projection-matched-base",
+      "command": "PYTHONPATH=.:src:scripts uv run python /tmp/r86_001_projection_pair.py /tmp/r86_001-base/src docs/performance/order86/r86_001/projection-base.json",
+      "exit_code": 0,
+      "elapsed_seconds": 6.508314208011143,
+      "log_sha256": "85418976d8490e1963cfbc73827e640cf8d5d82ba04bf0262812fa3bf0f72752"
+    },
+    {
+      "name": "projection-matched-head",
+      "command": "PYTHONPATH=.:src:scripts uv run python /tmp/r86_001_projection_pair.py src docs/performance/order83/projection-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.843083042011131,
+      "log_sha256": "9e7a44b5df0f5bc5c1d7ab864dfd2613b7f11a443c1a337602dbde0f74bb6d21"
+    },
+    {
+      "name": "publication-checks",
+      "command": "uv run ruff check . && uv run ruff format --check . && uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8 && uv run pre-commit run --all-files && git diff --cached --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.8722666669928003,
+      "log_sha256": "812e8fc8218d05bbebb2f504001dbe9c37098f4d89d037219bea215ec3afa01e"
+    },
+    {
+      "name": "ruff",
+      "command": "uv run ruff check . && uv run ruff format --check .",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1724091670184862,
+      "log_sha256": "2a0fc5e45c624b44948cb09b761f8718aa011c7765d71b18d4587994389d4764"
+    },
+    {
+      "name": "shard-profile",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --junit /tmp/r86_001-validation/behavioral-final.xml --profile-source \"R86-001 runtime 9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b; reviewed revision 79d76f8 plus exact-half-plane working tree; macOS-26.7 Apple M5 Pro; 18 xdist worksteal workers; coverage\" --shard-count 8 && uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "elapsed_seconds": 0.2225008330133278,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "source-runtime",
+      "command": "uv run python tools/build_core_table_quarters_source.py --check && uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.4051687910105102,
+      "log_sha256": "3eb391bc5091cb3ef0189bbdd6cc735a3dd5b7308feccf21df47db9f55035587"
+    },
+    {
+      "name": "typechecks",
+      "command": "uv run mypy src tests && uv run pyright",
+      "exit_code": 0,
+      "elapsed_seconds": 45.63296445898595,
+      "log_sha256": "ace70f4008b5a2350665f725754c8203e0a27b37394dd7d252ae6d826c98e950"
+    },
+    {
+      "name": "typescript",
+      "command": "cd conformance/typescript && export PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" && node scripts/check-generated.mjs && node node_modules/typescript/bin/tsc --noEmit && node node_modules/tsx/dist/cli.mjs --test src/**/*.test.ts && node node_modules/tsx/dist/cli.mjs src/main.ts",
+      "exit_code": 0,
+      "elapsed_seconds": 65.575556374999,
+      "log_sha256": "66967b3c1f1058496fad88b5d1ac9f7d0f4342994a2c6afe5e620923d887d4f6"
+    },
+    {
+      "name": "wheel",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "elapsed_seconds": 8.239326292008627,
+      "log_sha256": "1f3af3623b8891944de1c6fea02249a147198d9f252e3897beb4074e9093c5c2"
+    }
+  ],
+  "junit_sha256": {
+    "behavioral-final.xml": "04d1f6bfbcc8fe38cb18f72b05d16f78465a02ffe8af70c2b9f833b4619459be",
+    "code-quality-final.xml": "115451f51c582aa5654137cf1f5ddfde3002494bbe4e45ca3e2d6d2ce442f52f"
+  },
+  "typescript_execution": "npm is unavailable; equivalent installed Node entry points ran generated-client, type, unit and conformance checks.",
+  "projection_measurement_recovery": {
+    "initial_quality_result": "1 failed, 683 passed; retained as code-quality-initial",
+    "initial_flat_mean_seconds": 5.131302772497293e-05,
+    "unchanged_limit_seconds": 5.1260483122750885e-05,
+    "matched_base_mean_seconds": 5.006577783529388e-05,
+    "matched_head_mean_seconds": 5.058579855540302e-05,
+    "rerun_policy": "One fresh serial matched base/head run; all nine 2000-call samples retained; workload, historical baselines and budgets unchanged.",
+    "wrapper_source": "import json,runpy,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()))\nfrom scripts.measure_order65 import _select_runtime_src\nruntime,output=sys.argv[1:]\n_select_runtime_src(Path(runtime))\nfrom warhammer40k_core.build_identity import current_engine_build_id\nprint(json.dumps({'runtime_build_id':current_engine_build_id(),'runtime_src':runtime}),flush=True)\nsys.argv=['scripts/benchmark_order81_projection.py','--output',output]\nrunpy.run_path(sys.argv[0],run_name='__main__')\n"
+  },
+  "performance_scope": "Matched component diagnostics only; no full-game certification. Historical baselines and budgets unchanged.",
+  "independent_review": {
+    "agent": "r86_001_review",
+    "implementation": "approved with no actionable findings",
+    "publication": "approved with no outstanding findings after reviewing full validation, retained initial performance failure and matched recovery",
+    "verified": [
+      "unchanged exact containment implementation",
+      "9382 passing behavioral cases and 85.2031% coverage",
+      "684 passing code-quality cases",
+      "generated runtime/contract artifacts",
+      "refreshed shard inventory",
+      "raw validation hashes and unchanged performance budgets"
+    ]
+  }
+}

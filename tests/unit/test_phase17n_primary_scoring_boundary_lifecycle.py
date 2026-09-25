@@ -124,7 +124,6 @@ from warhammer40k_core.engine.primary_scoring_position_witness import (
 )
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION,
-    TABLE_QUARTER_NORTH_WEST,
     PrimaryTerritoryUnitWitness,
     build_primary_scoring_spatial_evidence,
 )
@@ -233,6 +232,9 @@ from warhammer40k_core.engine.turn_end_hooks import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.table_quarters import (
+    TABLE_QUARTER_NORTH_WEST,
+)
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (

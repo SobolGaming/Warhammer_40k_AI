@@ -1,7 +1,7 @@
 {
   "workload_id": "loaded-ingress-reconstruction-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:6521ee7d3578ae30734edf50729862b19eafe5c284d81d3e5ad30b43c63762a6",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6521ee7d3578ae30734edf50729862b19eafe5c284d81d3e5ad30b43c63762a6",
+  "revision": "r86-001-exact-half-planes",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -26,63 +26,63 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 3.069167165987892,
+      "preparation_seconds": 3.0971826660097577,
       "payload_bytes": 389149,
       "decision_records": 3,
       "event_records": 41,
       "samples": [
         {
-          "seconds": 1.1234648329846095,
+          "seconds": 1.1162895419984125,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.080695625016233,
+          "seconds": 1.0935881250188686,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0732710000011139,
+          "seconds": 1.0757047079969198,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0669398329919204,
+          "seconds": 1.082116584002506,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.06849304199568,
+          "seconds": 1.0799351249879692,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.065139166021254,
+          "seconds": 1.0775696669879835,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.072454832989024,
+          "seconds": 1.0754249159945175,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.078636904571405,
-      "median_seconds": 1.072454832989024,
-      "p95_seconds": 1.1234648329846095,
-      "maximum_seconds": 1.1234648329846095,
-      "operations_per_second": 0.9270960373800197,
+      "mean_seconds": 1.0858040952838823,
+      "median_seconds": 1.0799351249879692,
+      "p95_seconds": 1.1162895419984125,
+      "maximum_seconds": 1.1162895419984125,
+      "operations_per_second": 0.9209764490145445,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0104804579750635,
+        "seconds": 2.0258876250009052,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7562784,
-          "lifecycle.py:submit_decision": 1,
-          "replay.py:run": 1,
-          "lifecycle.py:from_payload": 4,
           "ingress_placement_history.py:validate_ingress_history_origin": 4,
-          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1
+          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+          "lifecycle.py:from_payload": 4,
+          "lifecycle.py:submit_decision": 1,
+          "replay.py:run": 1
         }
       }
     },
@@ -92,63 +92,63 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 3.069167165987892,
+      "preparation_seconds": 3.0971826660097577,
       "payload_bytes": 389149,
       "decision_records": 3,
       "event_records": 41,
       "samples": [
         {
-          "seconds": 1.0803962920035701,
+          "seconds": 1.2488749169860967,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0727575829951093,
+          "seconds": 1.0896985419967677,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0707669999974314,
+          "seconds": 1.0861278329975903,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1234961669833865,
+          "seconds": 1.1369587079971097,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.082430459005991,
+          "seconds": 1.085772583988728,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0705644999979995,
+          "seconds": 1.0844129160104785,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.07668475000537,
+          "seconds": 1.082825707999291,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.0824423929984082,
-      "median_seconds": 1.07668475000537,
-      "p95_seconds": 1.1234961669833865,
-      "maximum_seconds": 1.1234961669833865,
-      "operations_per_second": 0.9238366923434701,
+      "mean_seconds": 1.1163816011394374,
+      "median_seconds": 1.0861278329975903,
+      "p95_seconds": 1.2488749169860967,
+      "maximum_seconds": 1.2488749169860967,
+      "operations_per_second": 0.8957510576843507,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0872287079982925,
+        "seconds": 2.0710772080055904,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7686895,
-          "lifecycle.py:submit_decision": 1,
-          "replay.py:run": 1,
-          "lifecycle.py:from_payload": 4,
           "ingress_placement_history.py:validate_ingress_history_origin": 4,
-          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1
+          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+          "lifecycle.py:from_payload": 4,
+          "lifecycle.py:submit_decision": 1,
+          "replay.py:run": 1
         }
       }
     },
@@ -158,63 +158,63 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.31567441701190546,
+      "preparation_seconds": 0.3165910840034485,
       "payload_bytes": 415825,
       "decision_records": 6,
       "event_records": 55,
       "samples": [
         {
-          "seconds": 1.0909039999824017,
+          "seconds": 1.0907712079933845,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0868331670062616,
+          "seconds": 1.091860083019128,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1360312500037253,
+          "seconds": 1.1266929999983404,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0880136670020875,
+          "seconds": 1.0937487499904819,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0872230000095442,
+          "seconds": 1.0915769169805571,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1354203750088345,
+          "seconds": 1.1355960829823744,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1033846659993287,
+          "seconds": 1.093813458981458,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.1039728750017406,
-      "median_seconds": 1.0909039999824017,
-      "p95_seconds": 1.1360312500037253,
-      "maximum_seconds": 1.1360312500037253,
-      "operations_per_second": 0.9058193571997168,
+      "mean_seconds": 1.1034370714208177,
+      "median_seconds": 1.0937487499904819,
+      "p95_seconds": 1.1355960829823744,
+      "maximum_seconds": 1.1355960829823744,
+      "operations_per_second": 0.9062592021784902,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0552634579944424,
+        "seconds": 2.089605917019071,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7851302,
-          "lifecycle.py:submit_decision": 4,
-          "replay.py:run": 1,
-          "lifecycle.py:from_payload": 4,
           "ingress_placement_history.py:validate_ingress_history_origin": 4,
-          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1
+          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+          "lifecycle.py:from_payload": 4,
+          "lifecycle.py:submit_decision": 4,
+          "replay.py:run": 1
         }
       }
     },
@@ -224,63 +224,63 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.31567441701190546,
+      "preparation_seconds": 0.3165910840034485,
       "payload_bytes": 415825,
       "decision_records": 6,
       "event_records": 55,
       "samples": [
         {
-          "seconds": 1.0973224579938687,
+          "seconds": 1.1045039579912554,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1335412909975275,
+          "seconds": 1.1429103749978822,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0915219169983175,
+          "seconds": 1.094466292008292,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0921560409769882,
+          "seconds": 1.094285333994776,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1422330829955172,
+          "seconds": 1.1365435830084607,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0978332909871824,
+          "seconds": 1.109019333991455,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0883203750126995,
+          "seconds": 1.1040116250223946,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.1061326365660145,
-      "median_seconds": 1.0973224579938687,
-      "p95_seconds": 1.1422330829955172,
-      "maximum_seconds": 1.1422330829955172,
-      "operations_per_second": 0.9040507141209548,
+      "mean_seconds": 1.1122486430020737,
+      "median_seconds": 1.1045039579912554,
+      "p95_seconds": 1.1429103749978822,
+      "maximum_seconds": 1.1429103749978822,
+      "operations_per_second": 0.8990795415141141,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.1147864160011522,
+        "seconds": 2.160867500002496,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7979339,
-          "lifecycle.py:submit_decision": 4,
-          "replay.py:run": 1,
-          "lifecycle.py:from_payload": 4,
           "ingress_placement_history.py:validate_ingress_history_origin": 4,
-          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1
+          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+          "lifecycle.py:from_payload": 4,
+          "lifecycle.py:submit_decision": 4,
+          "replay.py:run": 1
         }
       }
     },
@@ -290,63 +290,63 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.3125742919801269,
+      "preparation_seconds": 0.31580545799806714,
       "payload_bytes": 420828,
       "decision_records": 7,
       "event_records": 58,
       "samples": [
         {
-          "seconds": 1.090493208001135,
+          "seconds": 1.1096836659999099,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.084189624991268,
+          "seconds": 1.1161192079889588,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1451009580050595,
+          "seconds": 1.1603198750235606,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.092037165974034,
+          "seconds": 1.0958148750069086,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0850753340055235,
+          "seconds": 1.0983433749934193,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1368278749869205,
+          "seconds": 1.1425672089972068,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.093249375000596,
+          "seconds": 1.1004260829940904,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.1038533629949339,
-      "median_seconds": 1.092037165974034,
-      "p95_seconds": 1.1451009580050595,
-      "maximum_seconds": 1.1451009580050595,
-      "operations_per_second": 0.9059174284588283,
+      "mean_seconds": 1.1176106130005792,
+      "median_seconds": 1.1096836659999099,
+      "p95_seconds": 1.1603198750235606,
+      "maximum_seconds": 1.1603198750235606,
+      "operations_per_second": 0.8947660199066862,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.0670481660054065,
+        "seconds": 2.086448875023052,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 7898948,
-          "lifecycle.py:submit_decision": 5,
-          "replay.py:run": 1,
-          "lifecycle.py:from_payload": 4,
           "ingress_placement_history.py:validate_ingress_history_origin": 4,
-          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1
+          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+          "lifecycle.py:from_payload": 4,
+          "lifecycle.py:submit_decision": 5,
+          "replay.py:run": 1
         }
       }
     },
@@ -356,63 +356,63 @@
       "game_id": "phase12c-game",
       "unit_count": 4,
       "model_count": 16,
-      "preparation_seconds": 0.3125742919801269,
+      "preparation_seconds": 0.31580545799806714,
       "payload_bytes": 420828,
       "decision_records": 7,
       "event_records": 58,
       "samples": [
         {
-          "seconds": 1.1101346249924973,
+          "seconds": 1.1030979579954874,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1366107500216458,
+          "seconds": 1.138715625012992,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.095940208004322,
+          "seconds": 1.0975180410023313,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1227339580073021,
+          "seconds": 1.1017332920164336,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.1473772090103012,
+          "seconds": 1.140695665992098,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0973185420152731,
+          "seconds": 1.099419374979334,
           "complete": true,
           "work_counts": {}
         },
         {
-          "seconds": 1.0988647080084775,
+          "seconds": 1.1161114170099609,
           "complete": true,
           "work_counts": {}
         }
       ],
-      "mean_seconds": 1.115568571437117,
-      "median_seconds": 1.1101346249924973,
-      "p95_seconds": 1.1473772090103012,
-      "maximum_seconds": 1.1473772090103012,
-      "operations_per_second": 0.8964038837269883,
+      "mean_seconds": 1.1138987677155197,
+      "median_seconds": 1.1030979579954874,
+      "p95_seconds": 1.140695665992098,
+      "maximum_seconds": 1.140695665992098,
+      "operations_per_second": 0.8977476490533218,
       "completion_rate": 1,
       "profile": {
-        "seconds": 2.1364283750008326,
+        "seconds": 2.149799124978017,
         "complete": true,
         "work_counts": {
           "total_profiled_calls": 8027680,
-          "lifecycle.py:submit_decision": 5,
-          "replay.py:run": 1,
-          "lifecycle.py:from_payload": 4,
           "ingress_placement_history.py:validate_ingress_history_origin": 4,
-          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1
+          "reserve_arrival_resolution.py:resolve_reserve_arrival": 1,
+          "lifecycle.py:from_payload": 4,
+          "lifecycle.py:submit_decision": 5,
+          "replay.py:run": 1
         }
       }
     }

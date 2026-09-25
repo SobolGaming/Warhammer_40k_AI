@@ -21,7 +21,9 @@ from warhammer40k_core.engine.objective_control import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
+from warhammer40k_core.engine.table_quarters import scoring_table_quarter_id_or_none
 from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.table_quarters import TABLE_QUARTER_IDS
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -30,18 +32,6 @@ if TYPE_CHECKING:
 class _Footprint(Protocol):
     def covers(self, other: object) -> bool: ...
 
-
-TABLE_QUARTER_NORTH_WEST = "table-quarter:north-west"
-TABLE_QUARTER_NORTH_EAST = "table-quarter:north-east"
-TABLE_QUARTER_SOUTH_WEST = "table-quarter:south-west"
-TABLE_QUARTER_SOUTH_EAST = "table-quarter:south-east"
-TABLE_QUARTER_IDS = (
-    TABLE_QUARTER_NORTH_WEST,
-    TABLE_QUARTER_NORTH_EAST,
-    TABLE_QUARTER_SOUTH_WEST,
-    TABLE_QUARTER_SOUTH_EAST,
-)
-_CENTER_EXCLUSION_INCHES = 6.0
 
 PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION = (
     "each_controlled_objective_in_opponent_territory"
@@ -666,43 +656,16 @@ def _table_quarter_witness_or_none(
         )
         for placement in placements
     )
-    if any(
-        shapely_backend.base_footprint_distance_to_point(
-            model.base,
-            model.pose,
-            x=center_x,
-            y=center_y,
-        )
-        <= _CENTER_EXCLUSION_INCHES
-        for model in geometry_models
-    ):
-        return None
-    quarter_bounds = (
-        (TABLE_QUARTER_NORTH_WEST, (0.0, center_y, center_x, 2.0 * center_y)),
-        (
-            TABLE_QUARTER_NORTH_EAST,
-            (center_x, center_y, 2.0 * center_x, 2.0 * center_y),
-        ),
-        (TABLE_QUARTER_SOUTH_WEST, (0.0, 0.0, center_x, center_y)),
-        (TABLE_QUARTER_SOUTH_EAST, (center_x, 0.0, 2.0 * center_x, center_y)),
+    quarter_id = scoring_table_quarter_id_or_none(
+        geometry_models=geometry_models,
+        center_x=center_x,
+        center_y=center_y,
     )
-    matching_quarters = tuple(
-        quarter_id
-        for quarter_id, bounds in quarter_bounds
-        if all(
-            shapely_backend.base_footprint_within_bounds(model.base, model.pose, bounds)
-            for model in geometry_models
-        )
-    )
-    if not matching_quarters:
+    if quarter_id is None:
         return None
-    if len(matching_quarters) != 1:
-        raise GameLifecycleError(
-            "Primary spatial scoring rules unit belongs to multiple table quarters."
-        )
     return PrimaryTableQuarterUnitWitness(
         rules_unit_instance_id=view.unit_instance_id,
-        quarter_id=matching_quarters[0],
+        quarter_id=quarter_id,
         model_instance_ids=tuple(sorted(placement.model_instance_id for placement in placements)),
     )
 

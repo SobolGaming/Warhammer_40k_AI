@@ -1,0 +1,408 @@
+{
+  "order": "86 / P01I",
+  "base_revision": "c727a6ad08ff9204d5338dabc736bbf767812a1e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359",
+  "behavioral_passed": 9339,
+  "coverage_percent": 85.20289665970772,
+  "coverage_totals": {
+    "covered_lines": 196819,
+    "num_statements": 220632,
+    "percent_covered": 85.20289665970772,
+    "percent_covered_display": "85",
+    "missing_lines": 23813,
+    "excluded_lines": 2719,
+    "percent_statements_covered": 89.20691468146053,
+    "percent_statements_covered_display": "89",
+    "num_branches": 85928,
+    "num_partial_branches": 19449,
+    "covered_branches": 64379,
+    "missing_branches": 21549,
+    "percent_branches_covered": 74.9220277441579,
+    "percent_branches_covered_display": "75"
+  },
+  "coverage_report_recovery": {
+    "pytest_exit_code": 1,
+    "behavioral_phase_passed": true,
+    "error": "pytest-cov could not reopen .coverage for its final report: unable to open database file.",
+    "database_integrity_check": "ok",
+    "database_sha256": "9280b7c40a112929f8ab207c5022101c9d61e9716acf0da0a59bb0d0f0ccc5ff",
+    "resolution": "The same completed-run database passed standalone coverage report and JSON generation with --fail-under=85. No test result or coverage measurement was substituted."
+  },
+  "code_quality_passed": 682,
+  "checks": [
+    {
+      "name": "ruff-check",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "elapsed_seconds": 0.05474099999992177,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "ruff-format",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "elapsed_seconds": 0.16778466600226238,
+      "log_sha256": "fadd0bbf4f8365bd1c1ffc573673787373d12d47d79b00a80e8c38e10cc80eca"
+    },
+    {
+      "name": "mypy",
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "elapsed_seconds": 1.826057290978497,
+      "log_sha256": "100bb7409547afdccbb1ca9b78614ccfb68d594b569cb824b07618fec6be6106"
+    },
+    {
+      "name": "pyright",
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "elapsed_seconds": 66.6692994160112,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "behavioral-final",
+      "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/tmp/order86-validation/behavioral-final.xml",
+      "exit_code": 1,
+      "elapsed_seconds": 720.7355639169982,
+      "log_sha256": "fd8b1a402bd24abddec5844515c316403b91063fa07f91e87d85c480d24ffaf1"
+    },
+    {
+      "name": "code-quality-final",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
+      "exit_code": 0,
+      "elapsed_seconds": 121.39784545800649,
+      "log_sha256": "1fc4f2fb489668cbb677cb337f965f70ea5114508da626804ad6d32aeff786cf"
+    },
+    {
+      "name": "shard-check",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "elapsed_seconds": 0.09458912498666905,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "import-boundaries",
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "elapsed_seconds": 0.6402022500114981,
+      "log_sha256": "6ba621892c1fabaa4ba8e85c03e0641d4cbe43223f49fc4213f9ae3e8af90414"
+    },
+    {
+      "name": "pre-commit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "elapsed_seconds": 1.0132791670039296,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "name": "source-artifacts",
+      "command": "uv run python tools/build_core_table_quarters_source.py --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.13374245801242068,
+      "log_sha256": "b7fc393e70a73f089a2e170578c14a640366b18bc17440a23342c03ccf0916f0"
+    },
+    {
+      "name": "runtime-identity",
+      "command": "uv run python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.692272749991389,
+      "log_sha256": "89a498bf2fca8ed1c58b985aef633441027af1c433b256be59f16c6f10c5ce3a"
+    },
+    {
+      "name": "contract-base-check",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref c727a6ad08ff9204d5338dabc736bbf767812a1e",
+      "exit_code": 0,
+      "elapsed_seconds": 77.93676895799581,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel-smoke",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "elapsed_seconds": 13.723043958016206,
+      "log_sha256": "daed3598194dcaf50c146afbca59d6dfdd800faca6e4e1a351bd4bac64ffdb98"
+    },
+    {
+      "name": "typescript-generated",
+      "command": "cd conformance/typescript && PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" node scripts/check-generated.mjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9150937499944121,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typescript-typecheck",
+      "command": "cd conformance/typescript && PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" node node_modules/typescript/bin/tsc --noEmit",
+      "exit_code": 0,
+      "elapsed_seconds": 0.7874349170015194,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typescript-unit",
+      "command": "cd conformance/typescript && PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" node node_modules/tsx/dist/cli.mjs --test src/**/*.test.ts",
+      "exit_code": 0,
+      "elapsed_seconds": 0.8107826249906793,
+      "log_sha256": "95b178c97dc70ef1f931c19080b50656d417e5012decc5c2137879d699ecc90a"
+    },
+    {
+      "name": "typescript-conformance",
+      "command": "cd conformance/typescript && PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" node node_modules/tsx/dist/cli.mjs src/main.ts",
+      "exit_code": 0,
+      "elapsed_seconds": 113.293039665994,
+      "log_sha256": "bf7f234de10e096544644a5ed1e2cadc194d04692af2abd696b3351959827525"
+    },
+    {
+      "name": "registry-regression",
+      "command": "uv run pytest tests/unit/test_phase14a_source_identity.py::test_source_authority_registry_is_pinned_typed_and_tamper_evident -q --no-cov",
+      "exit_code": 0,
+      "elapsed_seconds": 0.8967487089976203,
+      "log_sha256": "364fae48cbe8f4ef8e995f8fb3224d43792e784eb9919ceefea2fe0106918edf"
+    },
+    {
+      "name": "focused-performance-audit",
+      "command": "uv run pytest tests/code_quality/test_order86_table_quarters.py tests/code_quality/test_action_movement_interruption.py -q --no-cov",
+      "exit_code": 0,
+      "elapsed_seconds": 0.8599474999937229,
+      "log_sha256": "b4cf5fa27b26e4dc5f5cb23a53f424e67ce09d580ef46740ff53639acac198c3"
+    },
+    {
+      "name": "coverage-report",
+      "command": "uv run coverage report --show-missing --fail-under=85",
+      "exit_code": 0,
+      "elapsed_seconds": 10.566931582987309,
+      "log_sha256": "702d61097a23517d6524d4d6035f102691a3d95d7fe5e885660118e333b34f96"
+    },
+    {
+      "name": "coverage-json",
+      "command": "uv run coverage json -o /tmp/order86-validation/coverage-final.json --fail-under=85",
+      "exit_code": 0,
+      "elapsed_seconds": 13.915239124995423,
+      "log_sha256": "6021f753a8e4c50cc5d838c7d19714e80504159b14698cc7aaa0d79899411f06"
+    },
+    {
+      "name": "shard-generate",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --junit /tmp/order86-validation/behavioral-final.xml --profile-source \"Local Order86 final coverage run; base c727a6ad08ff9204d5338dabc736bbf767812a1e plus reviewed runtime dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359; macOS26.7 Apple M5 Pro; Python3.14.5; 18 xdist worksteal workers; all 9339 cases passed\" --shard-count 8",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12259020801866427,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "initial_behavioral_attempt": {
+    "name": "behavioral",
+    "command": "PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/tmp/order86-validation/behavioral.xml",
+    "exit_code": 1,
+    "elapsed_seconds": 773.209291334002,
+    "log_sha256": "7916e08623d119cbbe0e2c3983095f7d1437c5229773797c6c49ebdcb94c39a2",
+    "passed": 9338,
+    "failed": 1,
+    "resolution": "Updated the source-authority inventory assertion from 52 to 53 to account for the new reviewed table-quarter package. Focused regression passed, followed by all 9339 cases in the complete coverage rerun; its report-only SQLite error was recovered separately as recorded above."
+  },
+  "initial_code_quality_attempt": {
+    "name": "code-quality",
+    "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov",
+    "exit_code": 1,
+    "elapsed_seconds": 118.87172195900348,
+    "log_sha256": "81eee9a5ac4e0e916471e8ef0fadda274f9838dcf8f194180118062704eef531",
+    "passed": 677,
+    "failed": 5,
+    "resolution": "Updated the static source-package count and explicit provenance classification, and measured all four required Order73/74/75 runtime-bound reports with existing workloads, baselines and budgets."
+  },
+  "performance_measurements": [
+    {
+      "name": "performance-completion-base",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order77_completion.py --runtime-src /tmp/order86-base/src --revision c727a6ad08ff9204d5338dabc736bbf767812a1e  --output docs/performance/order86/completion-base.json",
+      "exit_code": 0,
+      "elapsed_seconds": 11.31978383398382,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-completion-head",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order77_completion.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order77/r77_001_boundary/completion-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 11.43671670902404,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-ingress",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_ingress_reconstruction.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order64/head-reconstruction.json",
+      "exit_code": 0,
+      "elapsed_seconds": 61.45353862497723,
+      "log_sha256": "07b4eaa4668dd5d42d47908bf87090c5413910a2c2cda5c4c879313dc1a116a7"
+    },
+    {
+      "name": "performance-order65",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order65.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order65/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 8.028158208995592,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order66",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order66.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order66/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 7.4497093750105705,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order69",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order68.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order69/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 0.9595155419956427,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order70",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order70.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order70/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.13126804199419,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order71",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order71.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order71/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.228178625024157,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order72",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order72.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order72/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 16.732009290979477,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order73-control",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order60.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359  --output docs/performance/order73/r73_001/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 5.297669584018877,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order73-geometry",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order73.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359  --output docs/performance/order73/r73_001/geometry-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 8.363150541990763,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order74",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order74.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359  --output docs/performance/order74/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 6.321004333003657,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order75",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order75.py --runtime-src src --revision warhammer40k-core-v2:runtime-tree-sha256-v1:dad249ff3a0bbb4d2ca4794141af7cf877170e4874b5beec5d007e279f4bd359  --output docs/performance/order75/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 7.510235583002213,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order76",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order76.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order76/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 13.758988833986223,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order77",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order77.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order77/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 31.098552999988897,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order78",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order78.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order78/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 4.348731874983059,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order79",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order79.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order79/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 8.74415733400383,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order80-review",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order80.py --runtime-src src --revision order86-reviewed-head --ordinary-restore --output docs/performance/order80/review-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 18.15720320798573,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order80",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order80.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order80/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 17.763122541015036,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order83-projection",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/benchmark_order81_projection.py   --output docs/performance/order83/projection-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 5.044443833990954,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order83-revival",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order82.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order83/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 53.964402833982604,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order84",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order84.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order84/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 0.6154900829715189,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order85-rotation",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order85_rotation.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order85/rotation-head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 1.435055417008698,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order85",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order85.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order85/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 6.0996322499995586,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order86-base",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order86.py --runtime-src /tmp/order86-base/src --revision c727a6ad08ff9204d5338dabc736bbf767812a1e  --output docs/performance/order86/base.json",
+      "exit_code": 0,
+      "elapsed_seconds": 3.296557000023313,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance-order86-head",
+      "command": "PYTHONPATH=.:src:scripts uv run python scripts/measure_order86.py --runtime-src src --revision order86-reviewed-head  --output docs/performance/order86/head.json",
+      "exit_code": 0,
+      "elapsed_seconds": 2.9715248749998864,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "performance_conditions": {
+    "concurrency": 1,
+    "coverage": false,
+    "competing_test_workers": false,
+    "historical_baselines_and_budgets_preserved": true,
+    "full_game_samples": 0,
+    "full_game_certified": false
+  },
+  "independent_review": {
+    "agent": "/root/order86_review",
+    "verdict": "approved for publication; no remaining findings",
+    "implementation_findings": 0,
+    "artifact_finding": "Two diagnostics initially targeted historical Order82 report paths. Restored both historical files exactly and reran the correct workloads into the active Order83 paths without competing test workers.",
+    "finding_status": "addressed"
+  },
+  "host_note": "npm is unavailable. Equivalent installed Node entry points ran the generated-client check, TypeScript typecheck, five unit tests and 342-assertion conformance scenario."
+}

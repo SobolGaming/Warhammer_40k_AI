@@ -1,0 +1,8 @@
+{
+  "workload": "order86-five-model-quarter-witness-v1",
+  "samples": 10,
+  "mean_ratio": 1.5,
+  "mean_additive_seconds": 0.00002,
+  "maximum_query_seconds": 0.001,
+  "classification": "provisional five-model scoring component; no gameplay-slice or full-game certification"
+}

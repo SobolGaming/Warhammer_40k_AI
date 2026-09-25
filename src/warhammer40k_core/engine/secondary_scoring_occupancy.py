@@ -20,20 +20,15 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_persisted_lineage import (
     frozen_component_lineage_from_departures,
 )
-from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
-    TABLE_QUARTER_IDS,
-    TABLE_QUARTER_NORTH_EAST,
-    TABLE_QUARTER_NORTH_WEST,
-    TABLE_QUARTER_SOUTH_EAST,
-    TABLE_QUARTER_SOUTH_WEST,
-)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_is_battle_shocked,
     rules_unit_views_from_armies,
 )
+from warhammer40k_core.engine.table_quarters import scoring_table_quarter_id_or_none
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.table_quarters import TABLE_QUARTER_IDS
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -400,7 +395,7 @@ def build_secondary_battlefield_occupancy(
             no_mans_land_footprint,
         )
         if owner_id == requested_player and eligible:
-            quarter_id = _table_quarter_id_or_none(
+            quarter_id = scoring_table_quarter_id_or_none(
                 geometry_models=geometry_models,
                 center_x=center_x,
                 center_y=center_y,
@@ -767,42 +762,6 @@ def _within_distance_of_point(
         <= inches
         for model in geometry_models
     )
-
-
-def _table_quarter_id_or_none(
-    *,
-    geometry_models: tuple[GeometryModel, ...],
-    center_x: float,
-    center_y: float,
-) -> str | None:
-    if any(
-        shapely_backend.base_footprint_distance_to_point(
-            model.base,
-            model.pose,
-            x=center_x,
-            y=center_y,
-        )
-        <= _CENTER_SIX_INCHES
-        for model in geometry_models
-    ):
-        return None
-    quarter_bounds = (
-        (TABLE_QUARTER_NORTH_WEST, (0.0, center_y, center_x, 2.0 * center_y)),
-        (TABLE_QUARTER_NORTH_EAST, (center_x, center_y, 2.0 * center_x, 2.0 * center_y)),
-        (TABLE_QUARTER_SOUTH_WEST, (0.0, 0.0, center_x, center_y)),
-        (TABLE_QUARTER_SOUTH_EAST, (center_x, 0.0, 2.0 * center_x, center_y)),
-    )
-    matching = tuple(
-        quarter_id
-        for quarter_id, bounds in quarter_bounds
-        if all(
-            shapely_backend.base_footprint_within_bounds(model.base, model.pose, bounds)
-            for model in geometry_models
-        )
-    )
-    if len(matching) != 1:
-        return None
-    return matching[0]
 
 
 _EDGE_STRIP_INCHES = 0.01

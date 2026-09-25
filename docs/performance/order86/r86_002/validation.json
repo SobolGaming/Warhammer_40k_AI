@@ -1,0 +1,174 @@
+{
+  "finding": "R86-002",
+  "reviewed_revision": "0a2bfed1021a19740e8c1dd4d45b8a35410e6d0b",
+  "pr_base_revision": "c727a6ad08ff9204d5338dabc736bbf767812a1e",
+  "scope": "Test fixture only; production, runtime identity, contracts, performance reports, behavioral case inventory and shard manifests unchanged.",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
+  "test_file_sha256": "5d0c9eb6726440f5578beebda0de9321949ce299029c30ced420830ac7aafbe4",
+  "invariant": "Every derived float in an exact-contact fixture must round-trip to the exact rational input. Preserve real non-cardinal contact and both neighboring representable positions.",
+  "selection_proof": "Select the first degree in 1..89 with exact Fraction(float(value)) round-trips for r=c+s,3*r,4*r+1/8. No match raises AssertionError. All original contact and nextafter assertions remain.",
+  "confirmed_ci_failure": {
+    "url": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/36168628342/job/108182438264",
+    "platform": "Ubuntu Linux x64",
+    "python": "3.14.5",
+    "failed_cases": [
+      "outer-rectangle",
+      "divider-rectangle"
+    ],
+    "log_sha256": "abf2e76d8136fb33a26010a8f0668c9cf5326bf7572687597992700f350a0133"
+  },
+  "focused_command": "uv run pytest tests/unit/test_order86_table_quarters.py -k test_r86_001_exact_rotated_contact_and_neighbors -q --no-cov",
+  "macos_focused": {
+    "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+    "python": "3.14.5",
+    "machine": "arm64",
+    "selected_facing": 34.0,
+    "exact_coordinates": [
+      "1563008563633527/1125899906842624",
+      "4689025690900581/1125899906842624",
+      "1598192935722359/281474976710656"
+    ],
+    "passed": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "589b09447d9972c250a9e41c2a527daf0f4e33a2e56d5ace73aa1d133c9651c3",
+    "exit_code": 0
+  },
+  "linux_focused": {
+    "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.41",
+    "python": "3.14.5",
+    "libc": "glibc 2.41",
+    "selected_facing": 46.0,
+    "container_image": "python:3.14.5-slim",
+    "requested_platform": "linux/amd64",
+    "image_id": "sha256:c845af9399020c7e562969a13689e929074a10fd057acd1b1fad06a2fb068e97",
+    "image_repo_digests": [
+      "python@sha256:c845af9399020c7e562969a13689e929074a10fd057acd1b1fad06a2fb068e97"
+    ],
+    "repository_mount": "read-only",
+    "dependency_setup": "uv 0.11.29; uv sync --locked --no-default-groups --group test",
+    "log_sha256": "a667f8f4a46d2599b9b8bf445061ead8a5a9a23aaa6fabab02fe31161593e482",
+    "passed": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "0c6c9596e0ed95f9f767cd65ed5407ce1f1c4e8fc6d353dd225704114703dc34",
+    "exit_code": 0
+  },
+  "linux_setup_recovery": {
+    "initial_result": "Dependency installation failed before tests: container did not trust the host network CA.",
+    "initial_log_sha256": "8de49292076bccc6be5ddd52bdda8a4c0034f4060576a5ad71c4f79e4412f0bd",
+    "resolution": "Read-only host public trusted CA bundle supplied via PIP_CERT and SSL_CERT_FILE; TLS certificate verification remained enabled. Retry and focused tests passed."
+  },
+  "behavioral": {
+    "passed": 9382,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "c86235240c16f112bc878e0c2ce8a06593f0acc46368b6222a4453a14ee6b44a"
+  },
+  "coverage_percent": 85.2031379968359,
+  "coverage_totals": {
+    "covered_lines": 196824,
+    "num_statements": 220637,
+    "percent_covered": 85.2031379968359,
+    "percent_covered_display": "85",
+    "missing_lines": 23813,
+    "excluded_lines": 2719,
+    "percent_statements_covered": 89.20715927065723,
+    "percent_statements_covered_display": "89",
+    "num_branches": 85928,
+    "num_partial_branches": 19449,
+    "covered_branches": 64379,
+    "missing_branches": 21549,
+    "percent_branches_covered": 74.9220277441579,
+    "percent_branches_covered_display": "75"
+  },
+  "code_quality": {
+    "passed": 684,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_sha256": "251395b24591baec9eab0281312280e276441c8a1968e9f8a99661abd10adab9"
+  },
+  "checks": [
+    {
+      "name": "behavioral-final",
+      "command": "COVERAGE_FILE=/tmp/r86_002-validation/.coverage PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/tmp/r86_002-validation/behavioral-final.xml",
+      "exit_code": 0,
+      "elapsed_seconds": 755.0406523749989,
+      "log_sha256": "8652da96df1d016f8938146bb58d0e2270443a0e92c5120eb8aab3494e6db199"
+    },
+    {
+      "name": "code-quality-final",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/tmp/r86_002-validation/code-quality-final.xml",
+      "exit_code": 0,
+      "elapsed_seconds": 118.29413875000319,
+      "log_sha256": "1dddbedc5c0ba77fdbd7b3a37cff9e10252a2a83b167b6196a133ebf07c31d42"
+    },
+    {
+      "name": "contract-base",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref c727a6ad08ff9204d5338dabc736bbf767812a1e",
+      "exit_code": 0,
+      "elapsed_seconds": 72.05917441699421,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "coverage-json",
+      "command": "COVERAGE_FILE=/tmp/r86_002-validation/.coverage uv run coverage json -o /tmp/r86_002-validation/coverage.json --fail-under=85",
+      "exit_code": 0,
+      "elapsed_seconds": 14.241947000002256,
+      "log_sha256": "1c1f6e90fc769f6772485bf95cef2636611b6730d07494664d629db11759810e"
+    },
+    {
+      "name": "import-shards",
+      "command": "uv run lint-imports && uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "elapsed_seconds": 0.3833168330020271,
+      "log_sha256": "6ba621892c1fabaa4ba8e85c03e0641d4cbe43223f49fc4213f9ae3e8af90414"
+    },
+    {
+      "name": "lint-types",
+      "command": "uv run ruff check . && uv run ruff format --check . && uv run mypy src tests && uv run pyright",
+      "exit_code": 0,
+      "elapsed_seconds": 38.31150837498717,
+      "log_sha256": "a0923e885903b5b6f41cadf172f4aba96b00b09e1313ae36b3cc9f6769c1bdf8"
+    },
+    {
+      "name": "publication-checks",
+      "command": "uv run ruff check . && uv run ruff format --check . && uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8 && uv run pre-commit run --all-files && git diff --cached --check",
+      "exit_code": 0,
+      "elapsed_seconds": 1.0617489169817418,
+      "log_sha256": "812e8fc8218d05bbebb2f504001dbe9c37098f4d89d037219bea215ec3afa01e"
+    },
+    {
+      "name": "source-runtime",
+      "command": "uv run python tools/build_core_table_quarters_source.py --check && uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.6166383750096429,
+      "log_sha256": "3eb391bc5091cb3ef0189bbdd6cc735a3dd5b7308feccf21df47db9f55035587"
+    },
+    {
+      "name": "typescript",
+      "command": "cd conformance/typescript && export PATH=\"${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}\" && node scripts/check-generated.mjs && node node_modules/typescript/bin/tsc --noEmit && node node_modules/tsx/dist/cli.mjs --test src/**/*.test.ts && node node_modules/tsx/dist/cli.mjs src/main.ts",
+      "exit_code": 0,
+      "elapsed_seconds": 106.16511541701038,
+      "log_sha256": "716d9eb4ac2bb2f614d8a943e3e28f70fe528fffed8af8ef244feb24d94fb76b"
+    },
+    {
+      "name": "wheel",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "elapsed_seconds": 13.493226958002197,
+      "log_sha256": "02ee837a95c20c97a073aead84ae47366bcb161553476a212624eeaa19f82c3f"
+    }
+  ],
+  "typescript_execution": "npm unavailable; installed Node entry points run generated-client/type checks, five unit tests and the 342-assertion conformance scenario.",
+  "independent_review": {
+    "agent": "r86_002_review",
+    "implementation": "approved; no findings",
+    "cross_platform": "approved; no findings",
+    "publication": "approved; no outstanding findings after verifying all log/JUnit hashes, unchanged test source, both platform passes and every required gate"
+  }
+}

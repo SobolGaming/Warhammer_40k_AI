@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import replace
 from typing import cast
@@ -261,6 +262,7 @@ def secondary_certification_session(
     row: SecondaryMissionLifecycleCertificationRow,
     *,
     mission_setup: MissionSetup | None = None,
+    prepare_positions: Callable[[GameState], None] | None = None,
 ) -> tuple[LocalGameSession, GameLifecyclePayload, SecondaryPositiveExpectation]:
     setup = setup_for_layout() if mission_setup is None else mission_setup
     active_player_id = active_player_id_for_row(row)
@@ -283,6 +285,8 @@ def secondary_certification_session(
         event_log=decisions.event_log,
         decisions=decisions,
     )
+    if prepare_positions is not None:
+        prepare_positions(state)
     if not any(
         snapshot.active_player_id == state.active_player_id
         and snapshot.battle_round == state.battle_round
