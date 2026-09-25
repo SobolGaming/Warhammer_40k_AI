@@ -1,0 +1,9 @@
+{
+  "workload": "order85-witnessed-contact-v1",
+  "samples": 3,
+  "mean_ratio": 2.0,
+  "mean_additive_seconds": 0.5,
+  "maximum_submission_seconds": 5.0,
+  "maximum_setup_seconds": 10.0,
+  "classification": "provisional component/slice diagnostic; no full-game certification"
+}

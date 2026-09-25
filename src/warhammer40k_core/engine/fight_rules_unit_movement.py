@@ -10,6 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.aircraft_rules import aircraft_movement_target_ids
+from warhammer40k_core.engine.base_contact_authority import engine_models_in_base_contact
 from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -815,7 +816,12 @@ def _endpoint_validation(
     )
     for model in before_models:
         if (
-            any(model.range_to(enemy) <= _BASE_CONTACT_EPSILON for enemy in enemy_models_before)
+            any(
+                engine_models_in_base_contact(
+                    model, enemy, state=state, epsilon=_BASE_CONTACT_EPSILON
+                )
+                for enemy in enemy_models_before
+            )
             and after_by_id[model.model_id].pose != model.pose
         ):
             return _endpoint_invalid(request=request, code="base_contact_model_moved")

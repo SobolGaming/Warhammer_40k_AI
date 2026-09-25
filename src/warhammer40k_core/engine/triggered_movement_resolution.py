@@ -11,6 +11,10 @@ from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
     aircraft_model_ids_for_scenario,
 )
+from warhammer40k_core.engine.base_contact_authority import (
+    contact_query_for_move,
+    contacts_for_validated_move,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -282,6 +286,20 @@ def resolve_triggered_movement(
         )
         terrain_result = terrain_context.validate()
         model_contexts.append((placement, path_context, terrain_context))
+        path_result = contacts_for_validated_move(
+            path_context=path_context,
+            terrain_context=terrain_context,
+            path_result=path_result,
+            terrain_result=terrain_result,
+            query=contact_query_for_move(
+                path_context=path_context,
+                terrain_context=terrain_context,
+                scenario=scenario,
+                unit_instance_id=unit_id,
+                ruleset=ruleset_descriptor,
+                surge_target_id=target_id if is_surge else None,
+            ),
+        )
         path_validation_results.append(path_result)
         terrain_path_legality_results.append(terrain_result)
         model_movements.append(

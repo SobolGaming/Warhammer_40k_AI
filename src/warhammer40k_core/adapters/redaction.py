@@ -100,6 +100,9 @@ _INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset(
 _INTERNAL_INGRESS_AUTHORITY_KEYS = frozenset(
     {"ingress_placement_history_origin", "ingress_placement_restrictions"}
 )
+_INTERNAL_BASE_CONTACT_AUTHORITY_KEYS = frozenset(
+    {"base_contact_query", "movement_query", "without_overhang_witness"}
+)
 _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS = frozenset(
     {"target_replacement_authority_sha256", "charge_target_authority_sha256"}
 )
@@ -828,6 +831,7 @@ def _without_internal_authority_commitments(value: JsonValue) -> JsonValue:
                 | _INTERNAL_PSYCHIC_AUTHORITY_KEYS
                 | _INTERNAL_INGRESS_AUTHORITY_KEYS
                 | _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS
+                | _INTERNAL_BASE_CONTACT_AUTHORITY_KEYS
             )
         }
     if isinstance(value, list):

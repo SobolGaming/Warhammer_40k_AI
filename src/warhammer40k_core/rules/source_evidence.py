@@ -825,11 +825,11 @@ def _validate_mirror_url(*, provider_name: str, source_url: str) -> None:
     if (
         common_invalid
         or split.hostname != "game-datamissions.com"
-        or split.path != "/11th/rules/changelog"
+        or split.path not in {"/11th/rules/changelog", "/11th/rules/core-rules"}
     ):
         raise RuleEvidenceError(
             "A Game Datamissions mirror record must use its canonical HTTPS Core Rules "
-            "changelog URL."
+            "body or changelog URL."
         )
 
 

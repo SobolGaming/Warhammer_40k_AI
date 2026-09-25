@@ -117,6 +117,7 @@ from warhammer40k_core.geometry.pathing import (
     PathWitnessPayload,
     is_degenerate_endpoint_only_real_movement_path,
 )
+from warhammer40k_core.geometry.physical_model import models_overlap_physically
 from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.volume import Model
 
@@ -2529,9 +2530,7 @@ def model_is_within_battlefield(
 
 
 def _models_overlap_with_volume(first: Model, second: Model) -> bool:
-    if not first.base_overlaps(second):
-        return False
-    return first.volume.vertical_gap_to(first.pose, second.volume, second.pose) <= _EPSILON
+    return models_overlap_physically(first, second)
 
 
 def moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:

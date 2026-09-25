@@ -23,7 +23,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v32-dice-results"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v33-deemed-contact"
 
 
 class ReplayArtifactError(ValueError):

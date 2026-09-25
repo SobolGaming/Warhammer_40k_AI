@@ -15,6 +15,7 @@ from warhammer40k_core.engine.aircraft_rules import (
     aircraft_movement_target_allowed,
     aircraft_rules_unit,
 )
+from warhammer40k_core.engine.base_contact_authority import contacts_for_validated_move
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -344,6 +345,13 @@ def resolve_charge_move(
                     ruleset=ruleset_descriptor,
                 ),
             )
+        path_result = contacts_for_validated_move(
+            path_context=path_context,
+            terrain_context=terrain_context,
+            path_result=path_result,
+            terrain_result=terrain_result,
+            query=model_contexts[placement.model_instance_id].query if target_ids else None,
+        )
         path_validation_results.append(path_result)
         terrain_path_legality_results.append(terrain_result)
         model_movements.append(

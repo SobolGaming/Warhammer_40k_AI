@@ -29,6 +29,7 @@ from warhammer40k_core.engine.transports import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.disembark_fit import base_fits_disembark_distance
+from warhammer40k_core.geometry.physical_model import models_overlap_physically
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -255,11 +256,7 @@ def _model_is_within_battlefield(
 
 
 def _models_overlap_with_volume(first: Model, second: Model) -> bool:
-    if first.volume.vertical_gap_to(first.pose, second.volume, second.pose) != 0.0:
-        return False
-    if not _model_pair_can_overlap_horizontally(first, second):
-        return False
-    return first.base_overlaps(second)
+    return models_overlap_physically(first, second)
 
 
 def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
@@ -268,12 +265,6 @@ def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
             if _models_overlap_with_volume(first, second):
                 return (first.model_id, second.model_id)
     return None
-
-
-def _model_pair_can_overlap_horizontally(first: Model, second: Model) -> bool:
-    return first.pose.distance_2d_to(second.pose) <= (
-        first.base.max_radius() + second.base.max_radius()
-    )
 
 
 def _enemy_unit_ids_engaged_with_transport(

@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict
 
 from warhammer40k_core.geometry.base import (
     BaseShape,
     BaseShapePayload,
     base_shape_from_payload,
     validate_base_shape,
+)
+from warhammer40k_core.geometry.model_body import (
+    ModelBodyPart,
+    ModelBodyPartPayload,
+    validate_body_parts,
 )
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -24,6 +29,7 @@ class ModelVolumePayload(TypedDict):
 
 
 class ModelPayload(TypedDict):
+    body_parts: NotRequired[list[ModelBodyPartPayload]]
     model_id: str
     pose: PosePayload
     base: BaseShapePayload
@@ -69,8 +75,10 @@ class Model:
     pose: Pose
     base: BaseShape
     volume: ModelVolume
+    body_parts: tuple[ModelBodyPart, ...] = ()
 
     def __post_init__(self) -> None:
+        validate_body_parts(self.body_parts)
         object.__setattr__(self, "model_id", _validate_model_id(self.model_id))
         validate_pose("Model pose", self.pose)
         validate_base_shape("Model base", self.base)
@@ -113,12 +121,15 @@ class Model:
         )
 
     def to_payload(self) -> ModelPayload:
-        return {
+        payload: ModelPayload = {
             "model_id": self.model_id,
             "pose": self.pose.to_payload(),
             "base": self.base.to_payload(),
             "volume": self.volume.to_payload(),
         }
+        if self.body_parts:
+            payload["body_parts"] = [part.to_payload() for part in self.body_parts]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: ModelPayload) -> Self:
@@ -127,6 +138,9 @@ class Model:
             pose=Pose.from_payload(payload["pose"]),
             base=base_shape_from_payload(payload["base"]),
             volume=ModelVolume.from_payload(payload["volume"]),
+            body_parts=tuple(ModelBodyPart.from_payload(part) for part in payload["body_parts"])
+            if "body_parts" in payload
+            else (),
         )
 
 

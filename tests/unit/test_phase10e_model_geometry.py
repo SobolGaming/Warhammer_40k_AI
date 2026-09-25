@@ -253,6 +253,43 @@ def test_unit_factory_applies_partial_catalog_geometry_per_model_profile() -> No
     assert unresolved_geometry.height_source_kind is HeightSourceKind.KEYWORD_HEURISTIC
 
 
+def test_catalog_overhang_preserves_body_separately_from_rules_base() -> None:
+    record = _catalog_geometry_record("core-intercessor-like")
+    body_evidence = ModelGeometrySourceEvidence.from_source_dimensions(
+        evidence_id="overhang:body",
+        evidence_kind=GeometryEvidenceKind.MANUAL_MEASUREMENT,
+        measurement_kind=GeometryMeasurementKind.FOOTPRINT,
+        source_id="overhang:fixture",
+        source_units=GeometrySourceUnits.INCHES,
+        source_dimensions=(("diameter", 4.0),),
+        document_reference="Order 85 synthetic solid body",
+    )
+    body = ModelFootprintDefinition.single_part(
+        footprint_id="overhang:footprint",
+        footprint_kind=ModelFootprintKind.CIRCULAR,
+        part=ModelFootprintPartDefinition.from_evidence(
+            part_id="body", footprint_kind=ModelFootprintKind.CIRCULAR, evidence=body_evidence
+        ),
+    )
+    record = replace(
+        record,
+        rules_footprint_policy=GeometryRulesFootprintPolicy.USE_SUPPORT_BASE,
+        support_base=record.footprint,
+        footprint=body,
+        evidence=(
+            replace(record.evidence[0], measurement_kind=GeometryMeasurementKind.SUPPORT_BASE),
+            *record.evidence[1:],
+            body_evidence,
+        ),
+    )
+    geometry = ModelGeometry.from_catalog_record(record)
+    assert math.isclose(geometry.base_shape().max_radius(), 16.0 / 25.4)
+    assert len(geometry.body_parts) == 1
+    assert geometry.body_parts[0].base.max_radius() == 2.0
+    assert geometry.body_parts[0].evidence_id == body_evidence.evidence_id
+    assert ModelGeometry.from_payload(geometry.to_payload()) == geometry
+
+
 def test_model_instance_from_payload_rejects_geometry_footprint_kind_drift() -> None:
     payload = _runtime_model_payload()
     payload["geometry"] = ModelGeometry.from_base_size(

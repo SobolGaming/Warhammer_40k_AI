@@ -5,6 +5,12 @@ from bisect import bisect_right
 from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
+from warhammer40k_core.geometry.physical_model import (
+    models_overlap_physically,
+    physical_prisms,
+    physical_radius,
+    physical_top,
+)
 from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import (
@@ -74,8 +80,8 @@ class _HorizontalModelIndex:
             sorted(
                 (
                     (
-                        model.pose.position.x - model.base.max_radius(),
-                        model.pose.position.x + model.base.max_radius(),
+                        model.pose.position.x - physical_radius(model),
+                        model.pose.position.x + physical_radius(model),
                         model,
                     )
                     for model in models
@@ -240,15 +246,7 @@ class CollisionSet:
             if not _model_collision_broadphase_match(moving_model, blocker):
                 continue
             exact_check_count += 1
-            if (
-                moving_model.base_overlaps(blocker)
-                and moving_model.volume.vertical_gap_to(
-                    moving_model.pose,
-                    blocker.volume,
-                    blocker.pose,
-                )
-                == 0.0
-            ):
+            if models_overlap_physically(moving_model, blocker):
                 colliding.append(blocker.model_id)
         return CollisionQueryResult(
             blocker_ids=tuple(sorted(colliding)),
@@ -272,7 +270,7 @@ class CollisionSet:
             if not _terrain_collision_broadphase_match(moving_model, terrain):
                 continue
             exact_check_count += 1
-            if terrain.intersects_model(moving_model):
+            if any(terrain.intersects_model(part) for part in physical_prisms(moving_model)):
                 colliding.append(terrain.terrain_id)
         return CollisionQueryResult(
             blocker_ids=tuple(sorted(colliding)),
@@ -424,10 +422,13 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
 
 
 def _model_collision_broadphase_match(moving_model: Model, blocker: Model) -> bool:
-    if _model_vertical_gap(moving_model, blocker) != 0.0:
+    if (
+        physical_top(moving_model) < blocker.pose.position.z
+        or physical_top(blocker) < moving_model.pose.position.z
+    ):
         return False
     return _model_center_distance(moving_model, blocker) <= (
-        moving_model.base.max_radius() + blocker.base.max_radius()
+        physical_radius(moving_model) + physical_radius(blocker)
     )
 
 
@@ -435,7 +436,7 @@ def _terrain_collision_broadphase_match(moving_model: Model, terrain: TerrainVol
     if _model_terrain_vertical_gap(moving_model, terrain) != 0.0:
         return False
     min_x, min_y, max_x, max_y = terrain.horizontal_bounds()
-    radius = moving_model.base.max_radius()
+    radius = physical_radius(moving_model)
     model_x = moving_model.pose.position.x
     model_y = moving_model.pose.position.y
     return (
@@ -472,7 +473,7 @@ def _model_vertical_gap(first: Model, second: Model) -> float:
 
 
 def _model_terrain_vertical_gap(model: Model, terrain: TerrainVolume) -> float:
-    model_bottom, model_top = model.volume.vertical_interval(model.pose)
+    model_bottom, model_top = model.pose.position.z, physical_top(model)
     terrain_bottom, terrain_top = terrain.vertical_interval()
     if model_top < terrain_bottom:
         return terrain_bottom - model_top
@@ -486,7 +487,7 @@ def _model_candidate_x_bounds(
     *,
     extra_horizontal_inches: float = 0.0,
 ) -> tuple[float, float]:
-    radius = moving_model.base.max_radius() + extra_horizontal_inches
+    radius = physical_radius(moving_model) + extra_horizontal_inches
     model_x = moving_model.pose.position.x
     return (model_x - radius, model_x + radius)
 

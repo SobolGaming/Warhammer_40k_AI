@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`38.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`39.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,8 +27,8 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/38.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `38`, preserving the
+   its current major, currently `compatibility/39.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `39`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
    2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, 10.0.0, 11.0.0, 12.0.0,
    13.0.0, 14.0.0, 15.0.0, 16.0.0, 17.0.0, 18.0.0, 19.0.0 and 20.0.0 baselines
@@ -47,6 +47,10 @@ payload-family version changes, migration notes, and old-client support window
 must be reviewed in the same change.
 
 ## Support window
+
+Contract 39 authenticates deemed contact and body geometry separately from rules
+bases. Retain 38.x through at least 2027-09-25 and one released 39.x minor line,
+whichever is later. See [migration 38 to 39](migrations/38-to-39.md).
 
 Contract 38 requires explicit dice override component scope and assignment
 evidence in interpreted roll views. Retain 37.x through at least 2027-09-24 and

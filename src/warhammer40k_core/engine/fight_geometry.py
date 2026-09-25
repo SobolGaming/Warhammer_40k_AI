@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.base_contact_authority import engine_models_in_base_contact
 from warhammer40k_core.engine.battlefield_presence import (
     scenario_rules_unit_has_present_model,
 )
@@ -142,7 +143,7 @@ def model_in_base_contact_with_enemy(
 ) -> bool:
     del ruleset_descriptor
     return any(
-        model.range_to(enemy_model) <= base_contact_epsilon
+        engine_models_in_base_contact(model, enemy_model, state=state, epsilon=base_contact_epsilon)
         for enemy_model in enemy_geometry_models_for_player(
             scenario=scenario,
             player_id=player_id,

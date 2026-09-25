@@ -15,6 +15,8 @@ from itertools import pairwise
 
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase, base_distance
+from warhammer40k_core.geometry.base_contact_proof import endpoint_excluded_by_bodies
+from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
 from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
@@ -198,6 +200,7 @@ class MovementReachabilityQuery:
     coherency_max_span_inches: float | None = None
     coherency_all_models_distance_inches: float | None = None
     closer_target_groups: tuple[tuple[Model, ...], ...] = ()
+    required_if_reachable_goals: tuple[MovementGoal, ...] = ()
 
     def __post_init__(self) -> None:
         if self.path_context.moving_model != self.terrain_context.moving_model:
@@ -256,6 +259,17 @@ def clear_movement_reachability_cache() -> None:
 
 @lru_cache(maxsize=512)
 def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabilityResult:
+    if query.required_if_reachable_goals:
+        obligations = query.required_if_reachable_goals
+        query = replace(query, required_if_reachable_goals=())
+        for goal in obligations:
+            result = movement_reachability(
+                replace(query, goal=goal, maximum_target_range_inches=None)
+            )
+            if result.status is MovementReachabilityStatus.UNRESOLVED:
+                return result
+            if result.reachable:
+                query = replace(query, required_goals=(*query.required_goals, goal))
     source = query.path_context.moving_model
     budget = query.path_context.movement_distance_budget_inches
     if budget is None:
@@ -285,6 +299,16 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
         ignores_vertical_distance=query.path_context.ignores_vertical_distance,
         terrain=query.terrain_context.terrain,
         terrain_features=query.terrain_context.terrain_features,
+    ):
+        return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
+    if query.goal.range_inches is not None and endpoint_excluded_by_bodies(
+        source=source,
+        targets=query.goal.models,
+        range_inches=query.goal.range_inches,
+        budget=budget,
+        supported_elevations=endpoint_support_elevations(
+            terrain=query.terrain_context.terrain, features=query.terrain_context.terrain_features
+        ),
     ):
         return MovementReachabilityResult(None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE)
     nodes = _navigation_poses(query)
@@ -480,7 +504,11 @@ def _goal_poses(query: MovementReachabilityQuery, origin: Pose) -> tuple[Pose, .
             else:
                 low = t
         # Keep the endpoint on the legal side of the goal boundary.
-        t = min(1.0, high + _EPSILON)
+        t = (
+            high
+            if query.goal.range_inches is not None and query.goal.range_inches <= _EPSILON
+            else min(1.0, high + _EPSILON)
+        )
         candidates.add(
             Pose.at(
                 origin.position.x + t * (x - origin.position.x),

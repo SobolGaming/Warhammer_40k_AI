@@ -9,6 +9,8 @@ from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.geometry.base import CircularBase, OvalBase
+from warhammer40k_core.geometry.collision import CollisionSet
+from warhammer40k_core.geometry.model_body import ModelBodyPart
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathValidationContextPayload,
@@ -19,6 +21,42 @@ from warhammer40k_core.geometry.pathing import (
 from warhammer40k_core.geometry.pose import Point3, Pose
 from warhammer40k_core.geometry.terrain import TerrainVolume
 from warhammer40k_core.geometry.volume import Model, ModelVolume
+
+
+def test_overhanging_body_blocks_witnessed_endpoint_without_changing_base_range() -> None:
+    mover = _model("mover", 2.0, 5.0, radius=0.5)
+    target = replace(
+        _model("target", 6.0, 5.0, radius=0.5),
+        body_parts=(ModelBodyPart("body", CircularBase(2.0), 0, 0, 0, 2, "fixture:body"),),
+    )
+    endpoint = replace(mover, pose=Pose.at(4.0, 5.0))
+    assert endpoint.range_to(target) == 1.0
+    assert CollisionSet(model_blockers=(target,)).colliding_model_ids(endpoint) == ("target",)
+    context = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        enemy_models=(target,),
+        end_pose=endpoint.pose,
+    )
+    result = replace(context, may_end_in_enemy_engagement=True).validate()
+    assert not result.is_valid
+    assert result.violations[0].blocker_id == target.model_id
+    assert Model.from_payload(target.to_payload()) == target
+
+
+def test_overhang_closest_proof_searches_all_endpoint_positions_and_facings() -> None:
+    from warhammer40k_core.geometry.base_contact_proof import closer_body_endpoint_exists
+
+    source = _model("mover", 2.0, 5.0, radius=0.5)
+    target = replace(
+        _model("target", 6.0, 5.0, radius=0.5),
+        body_parts=(ModelBodyPart("body", CircularBase(2.0), 0, 0, 0, 2, "fixture:body"),),
+    )
+    assert not closer_body_endpoint_exists(source, target, 6.0, 1.5, (0.0,))
+    assert closer_body_endpoint_exists(source, target, 6.0, 1.6, (0.0,))
+    # Touching a projecting arm on one side does not prove the closest base gap.
+    shifted = replace(target, body_parts=(replace(target.body_parts[0], offset_x_inches=-1.0),))
+    assert closer_body_endpoint_exists(source, shifted, 6.0, 2.5, (0.0,))
 
 
 def test_circular_infantry_can_transit_friendly_infantry_but_not_end_overlapping() -> None:
@@ -619,3 +657,140 @@ def _path_context(
         enemy_model_transit_blocker_ids=enemy_model_transit_blocker_ids,
         sample_interval_inches=sample_interval_inches,
     )
+
+
+def test_deemed_contact_requires_witness_budget_and_overhang_and_is_symmetric() -> None:
+    from dataclasses import replace
+
+    from warhammer40k_core.engine.base_contact_authority import contacts_for_validated_move
+    from warhammer40k_core.geometry.base_contact import DeemedBaseContact, models_in_base_contact
+    from warhammer40k_core.geometry.pathing import TerrainPathLegalityContext
+
+    mover = _model("mover", 2.0, 5.0)
+    target = replace(
+        _model("target", 6.0, 5.0),
+        body_parts=(ModelBodyPart("body", CircularBase(2.0), 0.0, 0.0, 0.0, 2.0, "review:body"),),
+    )
+    legality = _legality_context(
+        movement_mode=MovementMode.CHARGE,
+        movement_phase_action=None,
+        displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+    )
+    path = replace(
+        _path_context(
+            legality,
+            moving_model=mover,
+            enemy_models=(target,),
+            middle_pose=Pose.at(3.0, 5.0),
+            end_pose=Pose.at(3.5, 5.0),
+        ),
+        movement_distance_budget_inches=6.0,
+    )
+    terrain = legality.to_terrain_path_legality_context(
+        moving_model=mover, witness=path.witness, terrain=(), terrain_features=()
+    )
+    assert type(terrain) is TerrainPathLegalityContext
+    result = contacts_for_validated_move(
+        path_context=path,
+        terrain_context=terrain,
+        path_result=path.validate(),
+        terrain_result=terrain.validate(),
+    )
+    assert result.is_valid, result.violations
+    assert len(result.deemed_base_contacts) == 1
+    contact = result.deemed_base_contacts[0]
+    assert DeemedBaseContact.from_payload(contact.to_payload()) == contact
+    from warhammer40k_core.geometry.base_contact import establish_deemed_base_contact
+
+    establish_deemed_base_contact.cache_clear()
+    cold = establish_deemed_base_contact(
+        query=contact.movement_query,
+        enemy_model_id=target.model_id,
+        source_rule_id=contact.source_rule_id,
+    )
+    warm = establish_deemed_base_contact(
+        query=contact.movement_query,
+        enemy_model_id=target.model_id,
+        source_rule_id=contact.source_rule_id,
+    )
+    assert cold == warm == contact
+    cache = establish_deemed_base_contact.cache_info()
+    assert cache.hits == 1
+    assert cache.maxsize == 512
+    moved_target = replace(target, pose=Pose.at(9, 5))
+    assert (
+        establish_deemed_base_contact(
+            query=replace(
+                contact.movement_query, path_context=replace(path, enemy_models=(moved_target,))
+            ),
+            enemy_model_id=target.model_id,
+            source_rule_id=contact.source_rule_id,
+        )
+        is None
+    )
+    assert establish_deemed_base_contact.cache_info().misses == 2
+    end = replace(mover, pose=Pose.at(3.5, 5.0))
+    assert end.range_to(target) == 1.5
+    assert not models_in_base_contact(end, target)
+    assert models_in_base_contact(end, target, (contact,))
+    assert models_in_base_contact(target, end, (contact,))
+    assert not models_in_base_contact(replace(end, pose=Pose.at(2.0, 5.0)), target, (contact,))
+    short = replace(path, movement_distance_budget_inches=2.0)
+    short_result = contacts_for_validated_move(
+        path_context=short,
+        terrain_context=terrain,
+        path_result=short.validate(),
+        terrain_result=terrain.validate(),
+    )
+    assert short_result.is_valid
+    assert not short_result.deemed_base_contacts
+
+
+def test_body_part_proximity_and_terrain_endpoints_use_full_shapes() -> None:
+    import pytest
+
+    from warhammer40k_core.geometry.base import RectangularBase
+    from warhammer40k_core.geometry.physical_model import (
+        body_intersects_terrain_endpoint,
+        model_parts_within,
+        models_overlap_physically,
+    )
+    from warhammer40k_core.geometry.pose import GeometryError
+
+    source = _model("source", 2.0, 5.0)
+    enemy = replace(
+        _model("enemy", 6.0, 5.0),
+        body_parts=(ModelBodyPart("arm", RectangularBase(2.0, 1.0), -1, 0, 0, 2, "measured:arm"),),
+    )
+    assert source.range_to(enemy) == 3.0
+    assert not model_parts_within(source, enemy, 1.0)
+    close = replace(source, pose=Pose.at(2.5, 5))
+    assert model_parts_within(close, enemy, 1.0)
+    assert not model_parts_within(replace(close, pose=Pose.at(2.5 - 1e-5, 5)), enemy, 1.0)
+    assert not models_overlap_physically(close, enemy)
+    assert models_overlap_physically(replace(close, pose=Pose.at(4, 5)), enemy)
+    wall = TerrainVolume("wall", Point3(4.5, 5, 0), 0.1, 2, 3)
+    assert body_intersects_terrain_endpoint(enemy, (wall,)) == "wall"
+    raised = replace(enemy, body_parts=(replace(enemy.body_parts[0], bottom_inches=4),))
+    assert body_intersects_terrain_endpoint(raised, (wall,)) is None
+    assert not model_parts_within(close, raised, 1.0)
+    with pytest.raises(GeometryError):
+        ModelBodyPart.from_payload({**enemy.body_parts[0].to_payload(), "height_inches": 0})
+    with pytest.raises(GeometryError):
+        replace(enemy, body_parts=(enemy.body_parts[0], enemy.body_parts[0]))
+
+
+def test_body_proof_support_domain_rejects_floating_endpoint() -> None:
+    from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
+
+    mover = _model("mover", 10, 8)
+    witness = PathWitness.for_paths(
+        (("mover", (Pose.at(10, 8), Pose.at(10, 8, 2.01), Pose.at(10, 11, 2.01))),)
+    )
+    context = _normal_legality_context().to_terrain_path_legality_context(
+        moving_model=mover, witness=witness, terrain=(), terrain_features=()
+    )
+    result = context.validate()
+    assert not result.is_valid
+    assert result.violations[0].message == "Model endpoint has no physical support surface."
+    assert endpoint_support_elevations(terrain=(), features=()) == (0.0,)

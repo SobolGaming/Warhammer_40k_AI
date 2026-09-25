@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from warhammer40k_core.engine.battlefield_state import UnitPlacement
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     ProposalValidationResult,
 )
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -82,3 +84,18 @@ def _invalid(request: MovementProposalRequest, code: str, message: str) -> Propo
         message=message,
         field="witness",
     )
+
+
+def validate_fight_witness_matches_unit(
+    *,
+    witness: PathWitness,
+    unit_placement: UnitPlacement,
+) -> None:
+    expected_model_ids = tuple(
+        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
+    )
+    if tuple(sorted(witness.model_ids())) != expected_model_ids:
+        raise GameLifecycleError("Fight movement witness must match selected unit models.")
+    for placement in unit_placement.model_placements:
+        if witness.poses_for_model(placement.model_instance_id)[0] != placement.pose:
+            raise GameLifecycleError("Fight movement witness must start at current model poses.")

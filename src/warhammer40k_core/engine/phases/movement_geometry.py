@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.geometry.physical_model import base_crosses_physical_model_footprint
+
 from typing import TYPE_CHECKING
 from warhammer40k_core.engine.aircraft_rules import aircraft_rules_unit
 
@@ -318,7 +320,7 @@ def _enemy_model_ids_crossed_by_witness(
     ):
         sampled_model = _model_at_pose(moving_model, pose)
         for enemy_model in enemy_models:
-            if sampled_model.base_overlaps(enemy_model):
+            if base_crosses_physical_model_footprint(sampled_model, enemy_model):
                 crossed_enemy_ids.add(enemy_model.model_id)
     return tuple(sorted(crossed_enemy_ids))
 
@@ -365,6 +367,7 @@ def _model_at_pose(model: Model, pose: Pose) -> Model:
         pose=pose,
         base=model.base,
         volume=model.volume,
+        body_parts=model.body_parts,
     )
 
 
