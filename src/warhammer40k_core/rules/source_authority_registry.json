@@ -1100,6 +1100,16 @@
           "audit_id": "core-base-contact-maintained-app-mirrors-2026-09-24",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-25T02:17:22+00:00"
+        },
+        {
+          "row_id": "table-quarters:gdm",
+          "source_observation_sha256": "f2f5ed994841e756d69c148ea95e512124d1973c6e4fde318fa882b20f2a2c32",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-table-quarters-maintained-app-mirrors-2026-09-25",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-25T15:36:30+00:00"
         }
       ],
       "legacy_observations": [
@@ -1808,6 +1818,15 @@
           "version": "maintained-app-mirrors-observed-2026-09-24",
           "allowed_rule_source_ids": [
             "gw-11e-core-base-contact:deemed-base-contact"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-table-quarters",
+          "version": "maintained-app-mirrors-observed-2026-09-25",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-table-quarters:table-quarters"
           ],
           "catalog_sha256": null
         }

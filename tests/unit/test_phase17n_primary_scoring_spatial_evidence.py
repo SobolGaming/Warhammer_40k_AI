@@ -53,7 +53,6 @@ from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION,
     PRIMARY_SCORING_SPATIAL_CONDITIONS,
     PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS,
-    TABLE_QUARTER_IDS,
     PrimaryScoringSpatialEvidence,
     PrimaryTableQuarterUnitWitness,
     PrimaryTerritoryUnitWitness,
@@ -90,6 +89,9 @@ from warhammer40k_core.engine.turn_cleanup import resolve_end_turn_cleanup
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.table_quarters import (
+    TABLE_QUARTER_IDS,
+)
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )

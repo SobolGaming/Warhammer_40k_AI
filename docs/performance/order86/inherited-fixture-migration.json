@@ -1,0 +1,15 @@
+{
+  "order": "P01I",
+  "base_revision": "c727a6ad08ff9204d5338dabc736bbf767812a1e",
+  "changed_files": {
+    "tests/phase17n_secondary_certification_fixtures.py": {
+      "base_sha256": "8413b6d67c14b21b8946635f62210971215850a697104dd20047188c7ba7700b",
+      "head_sha256": "286fe07dad1344c097f6e1d914507b6de753ca8c7637012e13ae74207f74566f"
+    },
+    "tests/phase17n_step6g_secondary_certification_helpers.py": {
+      "base_sha256": "e00dd2859b60e08f8a87b37fb9ab3dbdddfa840cf34dfc79bc98d2f4953acaea",
+      "head_sha256": "7f1a21c90524c6f607c66680e9a9dbbb980f39ec8f9dddc6c9b3d48de1865f88"
+    }
+  },
+  "reason": "The secondary fixture now owns literal expected quarter IDs independent of runtime module layout. The session helper accepts an optional position initializer; existing completion workloads leave it None, preserving the prior fixture. Fresh matched completion-base.json uses these same current helpers against the untouched PR base runtime. Historical baselines and budgets are preserved."
+}

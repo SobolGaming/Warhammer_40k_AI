@@ -27,12 +27,6 @@ from warhammer40k_core.engine.mission_terrain import (
 )
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
-from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
-    TABLE_QUARTER_NORTH_EAST,
-    TABLE_QUARTER_NORTH_WEST,
-    TABLE_QUARTER_SOUTH_EAST,
-    TABLE_QUARTER_SOUTH_WEST,
-)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardMode
 from warhammer40k_core.engine.secondary_scoring_inventory import (
@@ -55,10 +49,10 @@ TURN_CAP_TACTICAL_IDS = (
     "behind-enemy-lines",
 )
 _QUARTER_IDS = (
-    TABLE_QUARTER_NORTH_WEST,
-    TABLE_QUARTER_NORTH_EAST,
-    TABLE_QUARTER_SOUTH_WEST,
-    TABLE_QUARTER_SOUTH_EAST,
+    "table-quarter:north-west",
+    "table-quarter:north-east",
+    "table-quarter:south-west",
+    "table-quarter:south-east",
 )
 
 
@@ -522,10 +516,10 @@ def _seed_engage(
     width = state.mission_setup.battlefield_width_inches
     depth = state.mission_setup.battlefield_depth_inches
     anchors = {
-        TABLE_QUARTER_NORTH_WEST: (width * 0.25, depth * 0.75),
-        TABLE_QUARTER_NORTH_EAST: (width * 0.75, depth * 0.75),
-        TABLE_QUARTER_SOUTH_WEST: (width * 0.25, depth * 0.25),
-        TABLE_QUARTER_SOUTH_EAST: (width * 0.75, depth * 0.25),
+        "table-quarter:north-west": (width * 0.25, depth * 0.75),
+        "table-quarter:north-east": (width * 0.75, depth * 0.75),
+        "table-quarter:south-west": (width * 0.25, depth * 0.25),
+        "table-quarter:south-east": (width * 0.75, depth * 0.25),
     }
     for unit, quarter_id in zip(
         _intercessors(state, player_id=row.scoring_player_id),

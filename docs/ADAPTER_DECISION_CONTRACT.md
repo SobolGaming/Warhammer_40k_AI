@@ -6877,3 +6877,14 @@ Restore rejects source, movement, budget, geometry, turn, duplicate/missing quer
 or pair inventory drift. An unresolved feasibility calculation produces a typed
 invalid movement result and cannot create contact authority. See
 [contract migration 38 to 39](../contracts/migrations/38-to-39.md).
+
+### Order 86 / P01I: shared quarter occupancy
+
+Primary Reconnaissance Sweep and secondary Engage on All Fronts use the same
+source-pinned one-millimetre centre dividers. Every present model in the canonical
+rules unit must lie wholly inside one quarter rectangle, including attached
+components; the missions' six-inch centre exclusion remains independent.
+Scoring checkpoint reconstruction and secondary boundary reconstruction call the
+same geometry owner. Existing finite scoring choices, witness/event schemas,
+private authority redaction, persistence and replay routes cover this correction.
+No decision type, proposal, payload field or viewer-visibility shape changes.

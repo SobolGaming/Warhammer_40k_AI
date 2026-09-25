@@ -182,7 +182,6 @@ from warhammer40k_core.engine.primary_scoring_conditions import (
 )
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PRIMARY_SCORING_SPATIAL_CONDITIONS,
-    TABLE_QUARTER_IDS,
     PrimaryScoringSpatialEvidence,
     PrimaryTableQuarterUnitWitness,
     PrimaryTerritoryUnitWitness,
@@ -229,6 +228,9 @@ from warhammer40k_core.engine.triggered_movement import (
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.table_quarters import (
+    TABLE_QUARTER_IDS,
+)
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )

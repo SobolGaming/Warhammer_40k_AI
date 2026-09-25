@@ -41,7 +41,7 @@ from warhammer40k_core.engine.healing import (
 from warhammer40k_core.engine.healing_geometry import healing_phase_start_model_ids
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
-from warhammer40k_core.engine.secondary_scoring_occupancy import _table_quarter_id_or_none
+from warhammer40k_core.engine.table_quarters import scoring_table_quarter_id_or_none
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.geometry.pose import Pose
 
@@ -104,7 +104,7 @@ def table_quarters() -> dict[str, object]:
     return {
         "edge_to_center_inches": 0.01,
         "half_divider_inches": 0.5 / 25.4,
-        "observed_quarter": _table_quarter_id_or_none(
+        "observed_quarter": scoring_table_quarter_id_or_none(
             geometry_models=(geometry,), center_x=30, center_y=22
         ),
         "expected_quarter": None,

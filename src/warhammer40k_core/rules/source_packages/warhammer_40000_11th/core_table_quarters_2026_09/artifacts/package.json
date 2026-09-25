@@ -1,0 +1,80 @@
+{
+  "artifact_schema": "core-v2-core-table-quarters-source-v1",
+  "source_package_id": "gw-11e-core-table-quarters",
+  "source_version": "maintained-app-mirrors-observed-2026-09-25",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-table-quarters:table-quarters",
+      "section_id": "01.04.05",
+      "source_text": "When a rule refers to a table quarter, or table quarters, divide the battlefield with imaginary lines 1mm thick drawn lengthwise and widthwise through the centre of the battlefield to create four equal rectangles. These rectangles are the table quarters.",
+      "transcription_sha256": "743e2558a9259d96f7c169381dc53e54616bbeccf655ad871d4072572e27916c",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.table_quarters:scoring_table_quarter_id_or_none"
+      ]
+    }
+  ],
+  "divider_width_mm": 1.0,
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-table-quarters:table-quarters",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "743e2558a9259d96f7c169381dc53e54616bbeccf655ad871d4072572e27916c",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "a936c395a66136989e7ec1178a6d2554e3d005f4b626a674297a119d72553510",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.table_quarters:scoring_table_quarter_id_or_none"
+      ],
+      "evidence_id": "core-table-quarters-review:table-quarters",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01I 01.04.05 table-quarters",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-table-quarters:table-quarters",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "743e2558a9259d96f7c169381dc53e54616bbeccf655ad871d4072572e27916c",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "a84d7319c4e2f4a70b831411f383ef472852fdf1fe07ec59660d9a14cf83eccd",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.table_quarters:scoring_table_quarter_id_or_none"
+      ],
+      "evidence_id": "core-table-quarters-mirror:table-quarters:gdm",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-table-quarters-maintained-app-mirrors-2026-09-25",
+      "review_audit_row_id": "table-quarters:gdm",
+      "review_audit_source_observation_sha256": "f2f5ed994841e756d69c148ea95e512124d1973c6e4fde318fa882b20f2a2c32",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 01.04.05 table-quarters",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "observed_at": "2026-09-25T15:36:30+00:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "93ce3156fd45cf54c04e4cd16e8d1f003227c776a082c4d97c51c06bb11c8d87"
+}
