@@ -189,6 +189,8 @@ def test_deemed_contact_prevents_pile_in_rotation_and_stationary_retry_replays()
         "duplicate",
         "query",
         "policy",
+        "transit_permission",
+        "terrain_permission",
         "constraints",
     ],
 )
@@ -215,6 +217,10 @@ def test_restore_rejects_correlated_contact_evidence_forgery(corruption: str) ->
             if "path_context" in value:
                 if corruption == "policy":
                     value["path_context"]["may_end_in_enemy_engagement"] = False
+                elif corruption == "transit_permission":
+                    value["path_context"]["may_transit_enemy_models"] = True
+                elif corruption == "terrain_permission":
+                    value["terrain_context"]["can_move_through_terrain"] = True
                 elif corruption == "constraints":
                     value["coherency_max_span_inches"] = 100.0
             for key in ("base_contacts", "deemed_base_contacts"):
@@ -594,3 +600,128 @@ def test_surge_contact_uses_surge_permissions_on_restore_and_replay() -> None:
         ReplayRunner.from_payload(session.replay_artifact(artifact_id="surge-contact")).run().status
         is ReplayRunStatus.REPRODUCED
     )
+
+
+@pytest.mark.parametrize("flight", [False, True])
+def test_charge_contact_restores_real_flight_and_catalog_permissions(flight: bool) -> None:
+    from tests.order85_overhang_helpers import transit_ability
+
+    session, proposal = overhang_charge_session(
+        flight=flight,
+        source_abilities=() if flight else (transit_ability(),),
+    )
+    status = session.submit_parameterized_payload(
+        request_id=proposal.proposal_request_id,
+        result_id="authorized-charge",
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    contact = current_deemed_base_contacts(session.lifecycle.state)[0]
+    path = contact.movement_query.path_context
+    assert path.ignores_vertical_distance
+    assert path.may_transit_enemy_models is flight
+    checkpoint = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(checkpoint).to_persistence_payload() == checkpoint
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="authorized-contact"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+def test_charge_contact_restores_source_backed_temporary_permissions() -> None:
+    from tests.order85_overhang_helpers import transit_ability
+
+    session, proposal = overhang_charge_session(
+        source_abilities=(transit_ability(persisted=True),),
+        persisted_permissions=True,
+    )
+    status = session.submit_parameterized_payload(
+        request_id=proposal.proposal_request_id,
+        result_id="granted-charge",
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    contact = current_deemed_base_contacts(session.lifecycle.state)[0]
+    assert contact.movement_query.path_context.may_transit_enemy_models
+    assert contact.movement_query.path_context.enemy_model_transit_blocker_ids == (
+        contact.enemy_model_id,
+    )
+    assert contact.movement_query.terrain_context.can_move_through_terrain
+    checkpoint = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(checkpoint).to_persistence_payload() == checkpoint
+    )
+
+    from tests.psychic_modifier_helpers import submit_fixture_request
+
+    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+    state = session.lifecycle.state
+    assert state is not None
+    for _ in range(64):
+        if state.active_player_id == "player-b":
+            break
+        request = session.advance_until_decision_or_terminal().decision_request
+        assert request is not None
+        if request.decision_type == "submit_stratagem_target_proposal":
+            session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=request.request_id + ":decline",
+                payload=stratagem_decline_payload(),
+            )
+        else:
+            submit_fixture_request(session, request)
+    else:
+        pytest.fail("Temporary Charge grant did not reach turn expiry.")
+    assert not any(
+        e.source_rule_id == "fixture:order85:charge-permissions" for e in state.persisting_effects
+    )
+    expired = session.to_persistence_payload()
+    assert LocalGameSession.from_persistence_payload(expired).to_persistence_payload() == expired
+
+
+@pytest.mark.parametrize("corrupt", [False, True])
+def test_setup_reactive_charge_contact_authenticates_capabilities(corrupt: bool) -> None:
+    from tests.order85_overhang_helpers import reactive_charge_session
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.geometry.pose import GeometryError
+
+    session, proposal = reactive_charge_session()
+    status = session.submit_parameterized_payload(
+        request_id=proposal.proposal_request_id,
+        result_id="reactive-contact",
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert current_deemed_base_contacts(session.lifecycle.state)
+    checkpoint = session.lifecycle.to_payload()
+    if corrupt:
+
+        def forge(value: object) -> None:
+            if isinstance(value, dict):
+                value = cast(dict[str, Any], value)
+                if "path_context" in value and "terrain_context" in value:
+                    value["path_context"]["may_transit_enemy_models"] = True
+                for child in value.values():
+                    forge(child)
+            elif isinstance(value, list):
+                for child in cast(list[object], value):
+                    forge(child)
+
+        forge(checkpoint)
+        with pytest.raises((GameLifecycleError, GeometryError)):
+            GameLifecycle.from_payload(checkpoint)
+    else:
+        assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+        assert (
+            ReplayRunner.from_payload(session.replay_artifact(artifact_id="reactive-contact"))
+            .run()
+            .status
+            is ReplayRunStatus.REPRODUCED
+        )

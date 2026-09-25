@@ -98,21 +98,46 @@ review approved the implementation after 14 targeted tests. Final artifact revie
 also approved source, contract and performance evidence. The final geometry-import
 ownership correction received independent approval without new findings.
 
+## Review follow-up: R85-001 and R85-002
+
+Charge contact restoration now rebuilds complete path and terrain capabilities
+through the same typed owner as live Charge resolution. Historical model wounds,
+canonical keywords, source-loaded abilities, original flight choices, retained
+blockers and source-authenticated temporary grants determine the expected contexts.
+The setup-reactive branch binds its roll to the exact accepted source selection
+and proposal. Generic grant reconstruction reuses the existing effect-history
+implementation; Charge evaluates providers at grant creation and applicability
+at movement time, including when the grant has expired by restore time.
+
+Reachability classifies rotational symmetry using the complete collision geometry.
+Asymmetric bodies on circular support bases receive alternative facings, including
+submitted witness bearings. Direct candidates also try a validated rotation before
+translation. No unsuccessful bounded search becomes an unreachable certificate.
+
+Regressions reject correlated Charge model-transit and terrain permission edits,
+exercise valid flight and catalog permissions, restore temporary grants after a
+full facade-driven turn, and authenticate reactive Charge after a real Deep Strike
+arrival. Geometry regressions cover rectangular and offset circular bodies, plus
+a supplied 97-degree bearing absent from the uniform search grid. The existing
+adapter contract covers these fixes: no decision, payload or visibility shape changes.
+
+The follow-up independent review first identified two additional causal-authority
+gaps (reactive roll identity and effect-provider timing). Both were fixed. The
+reviewer approved the resulting implementation with no remaining findings and
+independently passed seven targeted tests before publication.
+
 ## Final local validation
 
-The final runtime `04db14ae5849986ba82f63ebaea65aa5f34c46b0e5ee347a9c7e38abb9a6d4db` passed:
+The final runtime `6521ee7d3578ae30734edf50729862b19eafe5c284d81d3e5ad30b43c63762a6` passed:
 
-- Complete behavioral suite: **9,284 passed**, **85.21% coverage**, with the required Node path and xdist work stealing. Ten existing SQLite ResourceWarnings were reported, not suppressed.
-- Complete code-quality suite afterward without coverage: **676 passed**.
-- Ruff check and formatting, mypy, Pyright, all import contracts and pre-commit.
+- Complete behavioral suite: **9,293 passed**, **85.20% coverage**, with the required Node path and xdist work stealing.
+- Complete code-quality suite afterward without coverage: **678 passed**.
+- Ruff check and formatting, mypy, Pyright, import contracts and pre-commit.
 - Eight shard manifests regenerated from the successful full JUnit profile; the exact fail-closed inventory check passed.
 - Engine identity, source package generation, external contract generation against the verified PR base, and installed-wheel smoke.
 - Generated TypeScript client/type checks, unit tests and HTTP conformance scenarios.
 
 [Machine-readable validation](performance/order85/validation.json) retains exact commands,
-exit codes, durations and log hashes, plus superseded failed checks and their fixes.
-After aggregate validation, a test-only compound assertion was split for Ruff;
-the affected regression passed again, with no production change.
-All runtime-pinned diagnostics were refreshed serially against the final build;
-inherited baselines and budgets are unchanged. These local checks do not claim
-remote CI success or full-game performance certification.
+exit codes, durations and log hashes. Runtime-pinned diagnostics were refreshed
+serially against the final build; inherited baselines and budgets are unchanged.
+These local checks do not claim remote CI success or full-game certification.

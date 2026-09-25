@@ -114,7 +114,7 @@ def test_generic_persisted_identity_producers_and_restore_share_activation_and_s
     assert callers == {
         "rule_execution.py",
         "primary_mission_objective_control_source_authority.py",
-        "battle_shock_generic_leadership_authority.py",
+        "generic_effect_history.py",
     }
     execution = (engine / "rule_execution.py").read_text()
     aura = (engine / "aura_execution.py").read_text()

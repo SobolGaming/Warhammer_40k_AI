@@ -18,6 +18,7 @@ from warhammer40k_core.geometry.movement_envelope import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -117,6 +118,7 @@ def validate_model_movement_history(
     events: tuple[EventRecord, ...],
     *,
     decision_records: tuple[DecisionRecord, ...] = (),
+    runtime_content_bundle: RuntimeContentBundle | None = None,
 ) -> None:
     from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
     from warhammer40k_core.engine.move_completion_triggers import MOVE_COMPLETION_EVENT_TYPES
@@ -139,7 +141,12 @@ def validate_model_movement_history(
         raise GameLifecycleError("Model movement history differs from accepted movement evidence.")
     from warhammer40k_core.engine.base_contact_history import validate_base_contact_history
 
-    validate_base_contact_history(state=state, events=events, decisions=decision_records)
+    validate_base_contact_history(
+        state=state,
+        events=events,
+        decisions=decision_records,
+        runtime_content_bundle=runtime_content_bundle,
+    )
 
 
 def models_within_turn_distance(

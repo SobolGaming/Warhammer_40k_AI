@@ -94,3 +94,52 @@ def test_physical_placement_owners_do_not_reimplement_base_only_collision() -> N
         "base_crosses_physical_model_footprint("
         in (engine / "phases/movement_geometry.py").read_text()
     )
+
+
+def test_charge_contact_permissions_have_one_live_and_historical_owner() -> None:
+    engine = ROOT / "src/warhammer40k_core/engine"
+    for name in ("charge_move_resolution.py", "base_contact_charge_history.py"):
+        assert "charge_model_path_contexts(" in (engine / name).read_text()
+    history = (engine / "base_contact_charge_history.py").read_text()
+    assert "expected_path != context or expected_terrain != query.terrain_context" in history
+    assert "historical_generic_effect_inventory(" in history
+    assert "event_index=creation_index" in history
+    owner = (engine / "base_contact_history.py").read_text()
+    assert owner.index("validate_charge_contact_permissions(") < owner.index(
+        "expected_query = charge_endpoint_query("
+    )
+
+
+def test_asymmetric_body_search_has_matched_performance_evidence() -> None:
+    from warhammer40k_core.build_identity import verified_engine_build_identity
+
+    folder = ROOT / "docs/performance/order85"
+    base, head = (
+        json.loads((folder / p).read_text()) for p in ("rotation-base.json", "rotation-head.json")
+    )
+    budget = json.loads((folder / "budget.json").read_text())
+    assert head["runtime_build_id"] == verified_engine_build_identity().build_id
+    for key in (
+        "workload",
+        "cpu",
+        "memory_bytes",
+        "platform",
+        "python",
+        "concurrency",
+        "script_sha256",
+    ):
+        assert base[key] == head[key], key
+    assert (
+        head["script_sha256"]
+        == hashlib.sha256((ROOT / "scripts/measure_order85_rotation.py").read_bytes()).hexdigest()
+    )
+    for before, after in zip(base["rows"], head["rows"], strict=True):
+        assert before["bearing"] == after["bearing"]
+        assert before["statuses"] == ["unresolved"] * budget["samples"]
+        assert after["statuses"] == ["reachable"] * budget["samples"]
+        assert (
+            statistics.mean(after["samples_seconds"])
+            <= statistics.mean(before["samples_seconds"]) * budget["mean_ratio"]
+            + budget["mean_additive_seconds"]
+        )
+        assert max(after["samples_seconds"]) <= budget["maximum_submission_seconds"]

@@ -160,7 +160,7 @@ def test_historical_leadership_uses_authenticated_generic_inventory_and_shared_r
         for node in ast.walk(tree)
     )
     assert {"expiration_for_duration", "validated_generic_execution_effect_payload"} <= _calls(
-        "engine/battle_shock_generic_leadership_authority.py", "_effect_from_execution"
+        "engine/generic_effect_history.py", "_effect_from_execution"
     )
 
 

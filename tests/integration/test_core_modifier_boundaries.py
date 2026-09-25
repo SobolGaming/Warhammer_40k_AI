@@ -41,9 +41,6 @@ from warhammer40k_core.engine.attack_sequence_model import (
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
 )
-from warhammer40k_core.engine.battle_shock_generic_leadership_authority import (
-    _expired_at_test as historical_effect_expired,  # pyright: ignore[reportPrivateUsage]
-)
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
 )
@@ -52,6 +49,12 @@ from warhammer40k_core.engine.charge_declaration import ChargeRollResult, Charge
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
+from warhammer40k_core.engine.generic_effect_history import (
+    HistoricalEffectAuthority,
+)
+from warhammer40k_core.engine.generic_effect_history import (
+    _expired_at_test as historical_effect_expired,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.generic_rule_attack_hooks import (
     generic_rule_unit_characteristic_modifiers,
 )
@@ -135,7 +138,22 @@ def test_historical_effect_expiration_uses_original_turn_and_phase(
         active_player_id="player-b",
         phase=BattlePhase.MOVEMENT,
     )
-    assert historical_effect_expired(expiration, history) is expected
+    boundary = HistoricalEffectAuthority(
+        game_id=history.game_id,
+        player_ids=history.player_ids,
+        turn_order=history.turn_order,
+        battle_phase_sequence=history.battle_phase_sequence,
+        armies=history.armies,
+        event_records=history.event_records,
+        decision_records=history.decision_records,
+        boundary_event_index=history.boundary_event_index,
+        player_id=history.request.player_id,
+        battle_round=history.request.battle_round,
+        active_player_id=history.active_player_id,
+        phase=history.phase,
+        rules_unit_at_event=lambda uid, _index: history.rules_unit_containing_unit(uid),
+    )
+    assert historical_effect_expired(expiration, boundary) is expected
 
 
 @pytest.mark.parametrize("registered", [False, True])

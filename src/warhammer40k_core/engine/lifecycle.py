@@ -915,6 +915,7 @@ class GameLifecycle:
             lifecycle._require_state(),
             lifecycle.decision_controller.event_log.records,
             decision_records=lifecycle.decision_controller.records,
+            runtime_content_bundle=lifecycle._runtime_content_bundle,
         )
         validate_restored_charge_targets(
             state=lifecycle._require_state(),

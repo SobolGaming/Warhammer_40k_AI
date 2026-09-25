@@ -4,6 +4,8 @@ import json
 from dataclasses import replace
 from typing import cast
 
+import pytest
+
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
@@ -794,3 +796,98 @@ def test_body_proof_support_domain_rejects_floating_endpoint() -> None:
     assert not result.is_valid
     assert result.violations[0].message == "Model endpoint has no physical support surface."
     assert endpoint_support_elevations(terrain=(), features=()) == (0.0,)
+
+
+@pytest.mark.parametrize("angle", [0.0, 7.0])
+def test_circular_support_with_asymmetric_body_finds_rotated_contact_witness(angle: float) -> None:
+    import math
+
+    from warhammer40k_core.engine.base_contact_authority import contacts_for_validated_move
+    from warhammer40k_core.geometry.base import RectangularBase
+
+    def pose(x: float, facing: float = 0.0) -> Pose:
+        radians = math.radians(angle)
+        return Pose.at(
+            5 + (x - 5) * math.cos(radians),
+            5 + (x - 5) * math.sin(radians),
+            facing_degrees=facing + angle,
+        )
+
+    for shape, offset, end_x in (
+        (RectangularBase(4, 0.99), 0.0, 3.5),
+        (CircularBase(0.5), 1.0, 3.5),
+    ):
+        mover = replace(
+            _model("mover", 1.5, 5.0),
+            pose=pose(1.5),
+            body_parts=(ModelBodyPart("body", shape, offset, 0, 0, 2, "review:mover"),),
+        )
+        target = replace(
+            _model("target", 6.0, 5.0),
+            pose=pose(6),
+            body_parts=(ModelBodyPart("body", CircularBase(2), 0, 0, 0, 2, "review:enemy"),),
+        )
+        witness = PathWitness.for_paths(
+            (
+                (
+                    "mover",
+                    (
+                        mover.pose,
+                        pose(1.5, 90),
+                        pose(end_x, 90),
+                    ),
+                ),
+            )
+        )
+        legality = _legality_context(
+            movement_mode=MovementMode.CHARGE,
+            movement_phase_action=None,
+            displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+        )
+        path = legality.to_path_validation_context(
+            moving_model=mover,
+            witness=witness,
+            battlefield_width_inches=10,
+            battlefield_depth_inches=10,
+            enemy_models=(target,),
+            movement_distance_budget_inches=3.5,
+        )
+        terrain = legality.to_terrain_path_legality_context(moving_model=mover, witness=witness)
+        assert path.validate().is_valid
+        assert terrain.validate().is_valid
+        bare = replace(target, body_parts=())
+        if angle == 0:
+            result = contacts_for_validated_move(
+                path_context=path,
+                terrain_context=terrain,
+                path_result=path.validate(),
+                terrain_result=terrain.validate(),
+            )
+            assert result.is_valid, result.violations
+            assert len(result.deemed_base_contacts) == 1
+            proof = result.deemed_base_contacts[0].without_overhang_witness
+        else:
+            # Exercise the same counterfactual contact search with a witness
+            # bearing absent from the uniform navigation grid.
+            from warhammer40k_core.geometry.movement_reachability import (
+                MovementGoal,
+                MovementReachabilityQuery,
+                movement_reachability,
+            )
+
+            reachable = movement_reachability(
+                MovementReachabilityQuery(
+                    path_context=replace(path, enemy_models=(bare,)),
+                    terrain_context=terrain,
+                    goal=MovementGoal(models=(bare,), range_inches=1e-9),
+                )
+            )
+            assert reachable.witness is not None, reachable.status
+            proof = reachable.witness
+            if isinstance(shape, RectangularBase):
+                assert proof.final_pose_for_model("mover").facing.degrees == 97
+        assert replace(path, enemy_models=(bare,), witness=proof).validate().is_valid
+        assert replace(terrain, witness=proof).validate().is_valid
+        endpoint = replace(mover, pose=proof.final_pose_for_model("mover"))
+        assert endpoint.range_to(bare) <= 1e-9
+        assert endpoint.pose.facing != mover.pose.facing

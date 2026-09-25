@@ -8,7 +8,6 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
-    aircraft_model_ids_for_scenario,
 )
 from warhammer40k_core.engine.aircraft_rules import (
     AIRCRAFT_INGRESS_ONLY,
@@ -36,7 +35,6 @@ from warhammer40k_core.engine.charge_move_geometry import (
     _charge_move_transition_batch,
     _enemy_geometry_models_for_player,
     _friendly_geometry_models_for_charge_path,
-    _friendly_vehicle_monster_model_ids,
     _geometry_models_for_unit_placement,
     _terrain_volumes_for_features,
     _validate_charge_witness_matches_unit,
@@ -50,16 +48,12 @@ from warhammer40k_core.engine.charge_movement_source import (
     charge_movement_placement,
     charge_placement_id,
 )
+from warhammer40k_core.engine.charge_path_contexts import charge_model_path_contexts
 from warhammer40k_core.engine.charge_phase_state import (
     _validate_identifier_tuple,  # pyright: ignore[reportPrivateUsage]
 )
-from warhammer40k_core.engine.charge_rule_effects import (
-    charge_path_context_with_rule_effect_permissions,
-    enemy_vehicle_monster_model_ids_for_player,
-)
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
@@ -249,10 +243,12 @@ def resolve_charge_move(
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
     model_movements: list[JsonValue] = []
-    enemy_vehicle_monster_model_ids = enemy_vehicle_monster_model_ids_for_player(
-        scenario=scenario,
-        player_id=unit_placement.player_id,
-    )
+    units_by_model_id = {
+        model.model_instance_id: unit
+        for army in scenario.armies
+        for unit in army.units
+        for model in unit.own_models
+    }
     for placement in unit_placement.model_placements:
         unit = scenario.army_by_id(placement.army_id).unit_by_id(placement.unit_instance_id)
         aircraft_policy = AircraftMovementPolicy.from_unit(
@@ -270,27 +266,20 @@ def resolve_charge_move(
                 ),
             )
         )
-        legality_context = MovementLegalityContext.from_keywords(
-            keywords=aircraft_policy.effective_keywords,
-            ruleset_descriptor=ruleset_descriptor,
-            movement_mode=MovementMode.CHARGE,
-            take_to_the_skies=take_to_the_skies,
-            movement_phase_action=None,
-            displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
-            ability_index=ability_index,
+        path_context, terrain_context = charge_model_path_contexts(
             unit=unit,
-            model_instance_id=placement.model_instance_id,
-            current_model_instance_ids=tuple(
-                model_placement.model_instance_id
-                for model_placement in unit_placement.model_placements
-                if model_placement.unit_instance_id == placement.unit_instance_id
-            ),
-            unit_persisting_effects=unit_persisting_effects,
-            owner_player_id=unit_placement.player_id,
-        )
-        path_context = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
+            ruleset=ruleset_descriptor,
+            owner_player_id=unit_placement.player_id,
+            current_model_instance_ids=tuple(
+                p.model_instance_id
+                for p in unit_placement.model_placements
+                if p.unit_instance_id == placement.unit_instance_id
+            ),
+            take_to_the_skies=take_to_the_skies,
+            ability_index=ability_index,
+            effects=unit_persisting_effects,
             battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
             battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
             friendly_models=_friendly_geometry_models_for_charge_path(
@@ -303,33 +292,13 @@ def resolve_charge_move(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
             ),
-            terrain=(),
-            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-                moving_model_instance_id=placement.model_instance_id,
-            ),
-            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
-            aircraft_model_ids=tuple(
-                mid
-                for mid in aircraft_model_ids_for_scenario(scenario)
-                if mid != placement.model_instance_id
-            ),
-            movement_distance_budget_inches=float(maximum_distance_inches),
-        )
-        path_context = charge_path_context_with_rule_effect_permissions(
-            path_context,
-            unit_persisting_effects=unit_persisting_effects,
-            owner_player_id=unit_placement.player_id,
-            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
-        )
-        path_result = path_context.validate()
-        terrain_context = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
+            units_by_model_id=units_by_model_id,
+            retained_model_ids=frozenset(scenario.present_destroyed_model_ids),
+            maximum_distance_inches=float(maximum_distance_inches),
             terrain=terrain_volumes,
             terrain_features=terrain_features,
         )
+        path_result = path_context.validate()
         terrain_result = terrain_context.validate()
         if target_ids:
             model_contexts[placement.model_instance_id] = ChargeModelPathContext(

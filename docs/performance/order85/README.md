@@ -11,8 +11,8 @@ all samples, median, nearest-rank p95, maximum and throughput are retained in
 
 | Case | Base result | Head result | Base mean | Head mean | Head maximum |
 |---|---|---|---:|---:|---:|
-| Stop at the physical body | Rejected | Accepted, witnessed contact | 0.0033 s | 0.0338 s | 0.0706 s |
-| Penetrate the body | Accepted | Rejected | 0.0120 s | 0.0030 s | 0.0031 s |
+| Stop at the physical body | Rejected | Accepted, witnessed contact | 0.0032 s | 0.0346 s | 0.0718 s |
+| Penetrate the body | Accepted | Rejected | 0.0128 s | 0.0031 s | 0.0033 s |
 
 The incorrect base is a cost comparison, not a rules oracle. These matched timing
 runs were collected from an exported base after implementation; the earlier
@@ -39,3 +39,31 @@ correct head outcomes, sample count and unchanged budgets. `inherited-refresh.js
 records the serial refresh of existing runtime-pinned diagnostics; inherited
 baselines and thresholds remain unchanged. Full-game performance certification
 is outstanding and is not claimed by these component/gameplay-slice measurements.
+
+
+## R85-002 rotation search
+
+`rotation-base.json` and `rotation-head.json` measure the same counterfactual
+contact query against the prior PR commit
+`4f3877be7797f2124c400f47efd5fc884ef70a2a` and this reviewed runtime. A circular
+rules base carries a rectangular body; the layout uses bearings of zero and
+seven degrees, with a supplied ninety-degree rotation relative to each bearing.
+The old search returns unresolved for both cases. The revised search returns
+reachable, with each witness checked by the ordinary path and terrain validators.
+
+Three calls per case preserve cold and cached costs. Mean head times are
+0.163 seconds in both cases, with a 0.489-second maximum across them. The existing
+Order 85 mean ratio/additive and maximum budgets also gate this diagnostic;
+no thresholds were raised. Run `scripts/measure_order85_rotation.py` with the
+same `--runtime-src`, `--revision` and `--output` arguments as the Charge diagnostic.
+These measurements cover the changed search, not full-game performance.
+
+
+An additional exploratory full-contact trial at the seven-degree bearing was
+interrupted in the existing exact closest-endpoint solver. Its incomplete result,
+fixture and log hash are retained in `incomplete-diagnostics.json`; it was not an
+isolated timing measurement and establishes no budget verdict. The completed
+rotation diagnostic isolates counterfactual path search. Full-contact latency for
+that rotated stress layout, and full-game certification, remain unestablished
+under the existing Order 32 efficiency deferral. The interruption produced an
+explicit computation error, never an invented reachability answer.

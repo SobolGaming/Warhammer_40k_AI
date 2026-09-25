@@ -12,27 +12,27 @@
   "fixture": "Canonical one-model character and one-model vehicle, reviewed solid 8-inch cylinder on 120mm base; 100x100 empty board; fixed fixture seed and +10 Charge roll modifier; same body-touch and penetrating paths",
   "hashes": {
     "scripts/measure_order85.py": "9bc3ea520ce94fe6fd5000e41547d005c2b07c5a77bc12bf460ae067a1e8e66c",
-    "tests/order85_overhang_helpers.py": "2262d2990295028a8476281a67ee95e18b149dcd6d63b625e5743bdce6bb64b3",
+    "tests/order85_overhang_helpers.py": "75b571041cd7a9293eece454ec173b293eccc8d9b2db3575f8024533a230d587",
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
   "rows": [
     {
       "case": "body-touch",
       "samples_seconds": [
-        0.003971750003984198,
-        0.0029087500006426126,
-        0.00311762499040924
+        0.0037739580147899687,
+        0.0030719590140506625,
+        0.002887374983401969
       ],
       "setup_seconds": [
-        2.344706666015554,
-        0.4854121250100434,
-        0.450692791986512
+        2.3989252089813817,
+        0.4905827920010779,
+        0.4519663329992909
       ],
-      "mean_seconds": 0.0033327083316786834,
-      "maximum_seconds": 0.003971750003984198,
-      "median_seconds": 0.00311762499040924,
-      "p95_seconds_nearest_rank": 0.003971750003984198,
-      "submissions_per_second": 300.05626069782727,
+      "mean_seconds": 0.0032444306707475334,
+      "maximum_seconds": 0.0037739580147899687,
+      "median_seconds": 0.0030719590140506625,
+      "p95_seconds_nearest_rank": 0.0037739580147899687,
+      "submissions_per_second": 308.22048657602994,
       "statuses": [
         "invalid",
         "invalid",
@@ -42,20 +42,20 @@
     {
       "case": "body-penetration",
       "samples_seconds": [
-        0.012833458022214472,
-        0.011511124990647659,
-        0.011704459000611678
+        0.015221583016682416,
+        0.011656832997687161,
+        0.0116473340021912
       ],
       "setup_seconds": [
-        0.4493415839970112,
-        0.4484317089954857,
-        0.4478615000261925
+        0.45309104199986905,
+        0.45578979098354466,
+        0.45409166702302173
       ],
-      "mean_seconds": 0.012016347337824604,
-      "maximum_seconds": 0.012833458022214472,
-      "median_seconds": 0.011704459000611678,
-      "p95_seconds_nearest_rank": 0.012833458022214472,
-      "submissions_per_second": 83.21996459375286,
+      "mean_seconds": 0.012841916672186926,
+      "maximum_seconds": 0.015221583016682416,
+      "median_seconds": 0.011656832997687161,
+      "p95_seconds_nearest_rank": 0.015221583016682416,
+      "submissions_per_second": 77.86999600813513,
       "statuses": [
         "waiting_for_decision",
         "waiting_for_decision",

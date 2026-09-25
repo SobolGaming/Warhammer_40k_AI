@@ -9,13 +9,27 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from warhammer40k_core.geometry.terrain import TerrainVolume
 
-from warhammer40k_core.geometry.base import RectangularBase
+from warhammer40k_core.geometry.base import CircularBase, RectangularBase
 from warhammer40k_core.geometry.physical_predicates import (
     physical_footprints_overlap,
     physical_footprints_within,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model, ModelVolume
+
+
+def collision_geometry_is_rotation_invariant(model: Model) -> bool:
+    """Only concentric circular prisms can safely omit candidate rotations.
+
+    This is a sufficient condition: overlapping asymmetric parts may happen to
+    form a symmetric union, but retaining rotations for them is harmless.
+    """
+    return isinstance(model.base, CircularBase) and all(
+        isinstance(part.base, CircularBase)
+        and part.offset_x_inches == 0.0
+        and part.offset_y_inches == 0.0
+        for part in model.body_parts
+    )
 
 
 def physical_prisms(model: Model) -> tuple[Model, ...]:

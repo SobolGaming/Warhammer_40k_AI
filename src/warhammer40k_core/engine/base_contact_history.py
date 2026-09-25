@@ -42,6 +42,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_base_cont
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -50,6 +51,7 @@ def validate_base_contact_history(
     state: GameState,
     events: tuple[EventRecord, ...],
     decisions: tuple[DecisionRecord, ...],
+    runtime_content_bundle: RuntimeContentBundle | None,
 ) -> None:
     identities = {
         model.model_instance_id: (army, unit, model)
@@ -286,6 +288,23 @@ def validate_base_contact_history(
                 "charge_move_completed",
                 "catalog_setup_reactive_charge_move_completed",
             }:
+                from warhammer40k_core.engine.base_contact_charge_history import (
+                    validate_charge_contact_permissions,
+                )
+
+                if runtime_content_bundle is None:
+                    raise GameLifecycleError("Charge contact requires loaded runtime authority.")
+                validate_charge_contact_permissions(
+                    state=state,
+                    unit=unit,
+                    physical=physical,
+                    query=query,
+                    payload=payload,
+                    events=events,
+                    decisions=decisions,
+                    event_index=index,
+                    runtime_content_bundle=runtime_content_bundle,
+                )
                 endpoint = payload["endpoint_witness"]
                 if not isinstance(endpoint, dict) or not isinstance(
                     endpoint["selected_target_unit_instance_ids"], list
