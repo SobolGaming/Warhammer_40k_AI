@@ -1,0 +1,9 @@
+{
+  "finding": "R87-001",
+  "baseline_commit": "c65126b3c8f851b56f791d37fd2f3dbdbae882bc",
+  "baseline_result": "Facade-driven two-weapon group of four attacks evaluates random Toughness for attacks three/four; persistence fails with Random defensive profile lacks its declared attack target.",
+  "baseline_test_log_sha256": "4d10ca5205a7dbcf66fde1c4a0079c961b054fa3a6987484207b34c777e0984a",
+  "corrected_runtime": "warhammer40k-core-v2:runtime-tree-sha256-v1:d687c193f560a9c1cdbbc32ab3566440a5994c5c7ec6515ded0b7448b7a8310f",
+  "regression_test": "tests/unit/test_order87_gathered_profile_restore.py",
+  "review": "Independent code review approved; additionally verified every multi-group checkpoint for T/Save and real retargeted selection history."
+}

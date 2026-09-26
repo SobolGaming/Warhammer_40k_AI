@@ -3,15 +3,16 @@
 from __future__ import annotations
 
 import re
-from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.random_attack_authority import validate_generated_profile_attack
+from warhammer40k_core.engine.random_profile_attack_groups import validate_profile_attack_group
 
 
 def validate_profile_scope(
@@ -25,6 +26,7 @@ def validate_profile_scope(
     events: tuple[EventRecord, ...],
     prior_events: tuple[EventRecord, ...],
     requests: tuple[DecisionRequest, ...],
+    decisions: tuple[DecisionRecord, ...],
 ) -> None:
     if characteristic is Characteristic.MOVEMENT:
         return  # The movement authority additionally checks the accepted selection.
@@ -108,38 +110,15 @@ def validate_profile_scope(
                 generated_hit_number=None if match[4] is None else int(match[4]),
                 events=prior_events,
             )
-        for event in reversed(prior_events):
-            payload = event.payload
-            if not isinstance(payload, dict) or event.event_type not in {
-                "shooting_declaration_accepted",
-                "out_of_phase_shooting_declaration_accepted",
-                "melee_declaration_accepted",
-                "target_replacement_resolved",
-            }:
-                continue
-            sequence = (
-                payload.get("attack_sequence_id")
-                if event.event_type != "shooting_declaration_accepted"
-                else f"attack-sequence:{payload.get('result_id')}"
-            )
-            if event.event_type == "target_replacement_resolved":
-                context = payload.get("context")
-                sequence = context.get("action_id") if isinstance(context, dict) else None
-            if sequence != match[1]:
-                continue
-            pools = payload.get("attack_pools")
-            if isinstance(pools, list):
-                index = int(match[2]) - 1
-                if index >= len(pools) or not isinstance(pools[index], dict):
-                    break
-                pool = cast(dict[str, JsonValue], pools[index])
-                if pool.get("target_unit_instance_id") != unit_id:
-                    break
-                attacks = pool.get("attacks")
-                if match[3] is not None and (type(attacks) is not int or int(match[3]) > attacks):
-                    break
-                return
-        raise GameLifecycleError("Random defensive profile lacks its declared attack target.")
+        validate_profile_attack_group(
+            sequence_id=match[1],
+            pool_index=int(match[2]) - 1,
+            attack_index=None if match[3] is None else int(match[3]) - 1,
+            target_unit_instance_id=unit_id,
+            events=prior_events,
+            decisions=decisions,
+        )
+        return
     if characteristic is Characteristic.LEADERSHIP:
         for event in events:
             payload = event.payload

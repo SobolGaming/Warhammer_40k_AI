@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-26",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:904893c11619a82868f043182ee2c96023cbaaa1b686a3875d3c77028bc27726",
+  "base_commit": "7f4384b89ff9f91c1c69f0f39377d71ccd574f4c",
+  "behavioral": {
+    "passed": 9413,
+    "failed": 0,
+    "coverage_percent": 85.16,
+    "seconds": 738.6,
+    "workers": 18,
+    "distribution": "worksteal",
+    "warnings": 10,
+    "junit_sha256": "68c396b50fd24eb90fc47f1506bbff6ae7b1a861dbe3559ca0c4f752082ef34f"
+  },
+  "code_quality": {
+    "passed": 684,
+    "failed": 0,
+    "seconds": 108.3,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": false,
+    "junit_sha256": "09c2b703c52e57929e2d22c8a868fdd09abd110b585993069faae601a283a3da"
+  },
+  "checks_passed": [
+    "ruff check",
+    "ruff format --check",
+    "mypy src tests",
+    "pyright",
+    "11 import-linter contracts",
+    "build_test_shards --check --shard-count 8",
+    "pre-commit --all-files",
+    "source generator --check",
+    "engine build identity --check",
+    "external contract --check --base-ref 7f4384b89ff9f91c1c69f0f39377d71ccd574f4c",
+    "TypeScript generated client and typecheck",
+    "5 TypeScript unit tests",
+    "342 HTTP conformance assertions",
+    "installed wheel: 27 schemas, 2984 resources"
+  ],
+  "performance": "24 inherited head reports remeasured with unchanged numeric budgets; dedicated five-sample matched base/head fixed-profile diagnostic; full-game and random-profile timing unmeasured",
+  "independent_review": "FINAL APPROVED: no outstanding findings; final runtime, both JUnit hashes/counts, coverage, and all 24 refreshed report hashes independently verified before first push."
+}

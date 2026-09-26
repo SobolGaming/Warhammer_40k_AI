@@ -16,51 +16,51 @@
   "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
   "samples": [
     {
-      "setup_seconds": 2.4042207919992507,
-      "charge_seconds": 0.08224524999968708,
-      "twenty_views_seconds": 0.07077449999633245,
+      "setup_seconds": 2.3870767499902286,
+      "charge_seconds": 0.0766836249968037,
+      "twenty_views_seconds": 0.071183917025337,
       "events": 88
     },
     {
-      "setup_seconds": 0.5018387919990346,
-      "charge_seconds": 0.04475470801116899,
-      "twenty_views_seconds": 0.07225450000260025,
+      "setup_seconds": 0.49643704199115746,
+      "charge_seconds": 0.0428046660090331,
+      "twenty_views_seconds": 0.07101537499693222,
       "events": 88
     },
     {
-      "setup_seconds": 0.5050726250046864,
-      "charge_seconds": 0.04517237498657778,
-      "twenty_views_seconds": 0.07202370802406222,
+      "setup_seconds": 0.495143125008326,
+      "charge_seconds": 0.04328829099540599,
+      "twenty_views_seconds": 0.07077741698594764,
       "events": 88
     },
     {
-      "setup_seconds": 0.5028740410052706,
-      "charge_seconds": 0.04466695900191553,
-      "twenty_views_seconds": 0.07169116599834524,
+      "setup_seconds": 0.49523250001948327,
+      "charge_seconds": 0.04290637499070726,
+      "twenty_views_seconds": 0.0713000420073513,
       "events": 88
     },
     {
-      "setup_seconds": 0.5025171250163112,
-      "charge_seconds": 0.0817637080035638,
-      "twenty_views_seconds": 0.0716756249894388,
+      "setup_seconds": 0.49571649997960776,
+      "charge_seconds": 0.07638966600643471,
+      "twenty_views_seconds": 0.07102645898703486,
       "events": 88
     }
   ],
   "summary": {
     "setup_seconds": {
-      "mean": 0.8833046750049107,
-      "median": 0.5028740410052706,
-      "maximum": 2.4042207919992507
+      "mean": 0.8739211833977606,
+      "median": 0.49571649997960776,
+      "maximum": 2.3870767499902286
     },
     "charge_seconds": {
-      "mean": 0.05972060000058264,
-      "median": 0.04517237498657778,
-      "maximum": 0.08224524999968708
+      "mean": 0.056414524599676955,
+      "median": 0.04328829099540599,
+      "maximum": 0.0766836249968037
     },
     "twenty_views_seconds": {
-      "mean": 0.0716838998021558,
-      "median": 0.07169116599834524,
-      "maximum": 0.07225450000260025
+      "mean": 0.0710606420005206,
+      "median": 0.07102645898703486,
+      "maximum": 0.0713000420073513
     }
   },
   "completion_rate": 1.0,

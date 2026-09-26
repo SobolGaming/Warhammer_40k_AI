@@ -1167,6 +1167,7 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds(
                 : decisions.event_log.records.index(evaluation)
             ],
             requests=(),
+            decisions=decisions.records,
         )
     leadership_roll = cast(dict[str, JsonValue], payload["leadership_roll"])
     assert set(leadership_roll) == {

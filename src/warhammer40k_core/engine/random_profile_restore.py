@@ -172,6 +172,7 @@ def validate_random_profile_history(
                 events=event_records,
                 prior_events=event_records[:event_index],
                 requests=(*tuple(record.request for record in decision_records), *pending_requests),
+                decisions=decision_records,
             )
             movement = value.characteristic is Characteristic.MOVEMENT
             roll_subject = (

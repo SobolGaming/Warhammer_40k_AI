@@ -161,13 +161,14 @@ Result: 5 passed, 294 deselected. This focused check establishes existing random
 Attacks/Damage and dice-manager behavior only; it is not Order 87 acceptance or
 an aggregate final gate.
 
-## Final validation — September 26, 2026
+## Initial publication validation — September 26, 2026
 
 Final runtime manifest:
 `904893c11619a82868f043182ee2c96023cbaaa1b686a3875d3c77028bc27726`.
 The complete behavioral suite passed with **9,413 tests and 85.16% coverage**, in
 738.60 seconds, using 18 xdist work-stealing workers. Ten unclosed-SQLite-connection
-ResourceWarnings were reported. No runtime edits followed this successful run.
+ResourceWarnings were reported. At initial publication, no runtime edits followed
+that successful run.
 The eight-shard inventory was regenerated from its complete successful local
 JUnit profile; the report SHA and host details are retained in
 `ci/test_shards/durations.json`. The exact inventory check passed.
@@ -204,3 +205,64 @@ fixtures against a historical engine is explicitly retained in the
 [refresh record](performance/order87/inherited-refresh.json). See
 [performance evidence](performance/order87/README.md) for sample counts, matched
 conditions, current results, and unmeasured full-game/random-profile limitations.
+
+
+## R87-001 — gathered defensive-profile restoration
+
+The violated invariant was that a state produced by a legal engine decision must
+pass persistence validation. The initial restore validator bounded a random
+Toughness occurrence by the primary physical weapon's attack count, although the
+live executor numbers every contribution in its selected gathered group through
+that primary pool. A facade regression reproduced the reported two-weapon,
+four-attack restoration failure before the repair.
+
+The owning authority is the recorded finite weapon-group selection plus its
+accepted declaration (and subsequent retargeting inventory). Restore now matches
+the prior selection event to its DecisionRecord, authenticates the selected
+contributions and signature with the live engine's group validators, and checks
+the occurrence's primary index, target, and combined count. Merely offered groups,
+secondary contribution indices, and attacks from another group aimed at the same
+target cannot extend that authority. Retired and forgone pool indices remain
+excluded after retargeting.
+
+The bug-class audit includes Save and invulnerable Save occurrences, which share
+this defensive boundary, and random weapon Skill/Strength/AP. The latter retain
+physical-weapon isolation in the identical-attack signature, so their existing
+physical-pool bound remains appropriate. No live resolution procedure, source
+rule, player decision, or adapter payload shape changes; the existing Contract 40
+covers the correction. Generated examples change only with the runtime identity.
+A static quality audit protects the shared defensive/group validation boundary.
+
+The new tests drive real two-weapon declarations through LocalGameSession, prove
+that the group contains both contributions, retain Toughness evaluations for
+attacks three/four across JSON persistence, and complete the restored attack with
+no additional profile dice. A third incompatible weapon verifies that another
+offered group cannot expand the selected group's bound. Save and Toughness,
+missing selection authority, substituted pool/target, and forged persisted attack
+indices are covered. The change stays within Order 87's authorized restore and
+random-characteristic scope; it adds no adjacent gameplay behavior.
+
+Final post-review aggregate validation and matched performance evidence are
+recorded in `docs/performance/order87/validation.json` after the final gates.
+
+
+### R87-001 final validation — September 26, 2026
+
+Runtime `d687c193f560a9c1cdbbc32ab3566440a5994c5c7ec6515ded0b7448b7a8310f`
+passed all **9,418 behavioral tests with 85.16% coverage** in 756.25 seconds
+(18 work-stealing workers; ten non-failing SQLite ResourceWarnings), followed by
+**685 code-quality tests** in 117.67 seconds without coverage. No production
+changes followed either run. The complete successful behavioral JUnit report
+supplies the regenerated eight-shard inventory; the exact inventory check passed.
+
+Ruff check/format, mypy (3,279 files), Pyright, all eleven import contracts,
+pre-commit, source/runtime generation checks, exact-base contract compatibility,
+TypeScript generation/type checks and five unit tests, all 342 HTTP conformance
+assertions, and installed-wheel smoke (27 schemas, 2,985 runtime resources) passed.
+All 24 inherited performance reports were refreshed under unchanged budgets;
+the matched restore diagnostic preserves checkpoint and dice identity on both
+revisions. Current results, JUnit hashes and prior-publication evidence are
+retained under `docs/performance/order87/`.
+
+Independent code, artifact/performance, and final evidence review all approved
+R87-001 with no outstanding findings before the PR update was pushed.
