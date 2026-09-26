@@ -23,7 +23,7 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "b1b8224dfc0bde7fe5290688cabca0f7c1a68b80a8dc462b59826d8666010f78"
+EXPECTED_ARTIFACT_SHA256: Final = "63691af5b0337ea1e6e99958dca71b4eaaaaccd4fbb8779ac5536381d6533cea"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-modifiers"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-07"
 ORDERED_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ordered-modifiers"
@@ -33,6 +33,7 @@ TARGETING_RANGE_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:detection-lone-o
 PSYCHIC_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:psychic-individual-modifiers"
 STRATAGEM_COST_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:stratagem-cost-limits"
 IGNORE_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ignore-individual-modifiers"
+ABSENT_STRENGTH_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:weapons-with-no-strength"
 
 
 class CoreModifiersSourceError(ValueError):
@@ -79,6 +80,7 @@ def validate_source_artifact_bytes(raw: bytes) -> CoreModifiersSourceArtifact:
             PSYCHIC_MODIFIERS_SOURCE_ID,
             IGNORE_MODIFIERS_SOURCE_ID,
             STRATAGEM_COST_LIMITS_SOURCE_ID,
+            ABSENT_STRENGTH_SOURCE_ID,
         )
     ):
         raise CoreModifiersSourceError("Core modifiers source identity drifted.")

@@ -14,6 +14,10 @@ selection among tied highest/lowest physical dice. See
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
 remains separate under Order 95; Orders 85–94 remain open.
 
+Order 88 / P02G treats absent weapon Strength as one for wound rolls and rule
+comparisons while preserving the immutable dash descriptor. Shooting, Fight and
+rerolls share the same query. See [scope and evidence](docs/ORDER_88_SCOPE_PLAN.md).
+
 Order 83 / P01F fixes phase-start revival coherency anchors. Shared producers
 and restore authenticate the phase-opening physical inventory, so models absent
 at phase start cannot become anchors through later returns. Contract 37

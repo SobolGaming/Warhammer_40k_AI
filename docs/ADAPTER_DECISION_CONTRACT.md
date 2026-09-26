@@ -6936,3 +6936,14 @@ Automatic attack stages may contain null target/characteristic metadata.
 All existing decision families retain their shared lifecycle validation and
 mutation path. No adapter, projection, validation or restore path is authorized to
 roll or choose a random characteristic. See [contract migration 39 to 40](../contracts/migrations/39-to-40.md).
+
+
+## Order 88 — absent Strength interactions
+
+Contract 40 already carries `source_dash`/`replacement_dash` in weapon profiles and
+positive integer Strength in resolved WoundRoll payloads. Core 02.04.01 maps the
+dash to one at the interaction query only. Profile payloads, attack signatures,
+modifier eligibility, pending decisions, submission validation and viewer
+redaction retain their existing shapes and authority. Shooting, Fight, reaction
+attacks and rerolls consume that same query. No new decision or schema version
+is introduced; the runtime build identity records the semantic repair.

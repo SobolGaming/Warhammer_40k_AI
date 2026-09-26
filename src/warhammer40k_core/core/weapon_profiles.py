@@ -681,6 +681,23 @@ class WeaponProfile:
     def stable_identity(self) -> str:
         return f"weapon-profile:{self.profile_id}"
 
+    def strength_for_interaction(self) -> int:
+        """Core 02.04.01: absent Strength is one for a rule interaction only.
+
+        Keep the stored descriptor intact: dash remains immune to modifiers,
+        and random Strength still requires its engine-owned evaluation.
+        """
+        value = (
+            self.strength.resolved_value()
+            if isinstance(self.strength, RandomProfileValue)
+            else self.strength
+        )
+        if value.is_dash:
+            return 1
+        if not value.is_numeric or value.final < 1:
+            raise WeaponProfileError("Strength interaction requires a positive value or dash.")
+        return value.final
+
     def to_payload(self) -> WeaponProfilePayload:
         payload: WeaponProfilePayload = {
             "profile_id": self.profile_id,

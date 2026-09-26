@@ -73,11 +73,23 @@
       "transcription_sha256": "3a2de7d2e6ccb69167c07c653367318efe5ff5d7a2413e8b88c794969349f444",
       "provider_non_affiliation_recorded": true,
       "source_observation_sha256": "2b6e22fd3d73428ececafb8f388c795c9fa338a7d3d77ca93bcedfa0eb3dd37e"
+    },
+    {
+      "row_id": "weapons-with-no-strength:gdm",
+      "provider_name": "Game Datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "observed_at": "2026-09-26T14:43:34.151423+00:00",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-modifiers:weapons-with-no-strength",
+      "transcription_sha256": "1317770dea2170439335e5e2d19690874f42f7ff6902ee81e9e0596fc86ee03a",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "c772e59dbeceb87e497d5cf61a68b9fe921809233be35f69dd9baa267f886506"
     }
   ],
   "official_historical_source": {
     "source_id": "gw-11e-core-rules",
     "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
   },
-  "co_version_comparison": "02.02.01, 02.02.02 and 24.29 operative clauses observed through the 40k.app search index; direct retrieval returned HTTP 403. No App version or co-version comparison is inferred. The retained transcription separates reviewed obligations. Order 37 adds the 02.02.01 CP-cost limit observed in the same search index on 2026-09-11T19:52:51Z; earlier observation tuples remain unchanged."
+  "co_version_comparison": "02.02.01, 02.02.02 and 24.29 operative clauses observed through the 40k.app search index; direct retrieval returned HTTP 403. No App version or co-version comparison is inferred. The retained transcription separates reviewed obligations. Order 37 adds the 02.02.01 CP-cost limit observed in the same search index on 2026-09-11T19:52:51Z; earlier observation tuples remain unchanged. Order 88 adds 02.04.01 from the exact GDM asset retained by Order 84, retrieved and hash-verified on 2026-09-26. See the Order 88 scope record for the asset and source-row pins. No App build or co-version match is inferred."
 }
