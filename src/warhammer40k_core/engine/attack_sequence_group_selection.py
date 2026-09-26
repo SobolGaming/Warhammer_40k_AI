@@ -1328,23 +1328,6 @@ def _resolve_grouped_current_pool(
         )
     if allocation_target_state is DamageAllocationTargetState.ABSENT:
         raise GameLifecycleError("Pooled attack target is absent from the battlefield.")
-    allocation_context = allocation_context_for_unit(
-        state=state,
-        target_unit_instance_id=pool.target_unit_instance_id,
-        already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
-            state=state,
-            target_unit_instance_id=pool.target_unit_instance_id,
-            allocated_model_ids=allocated_model_ids,
-        ),
-        attacker_constraint=None,
-    )
-    allocation_groups = allocation_groups_for_context(
-        state=state,
-        allocation_context=allocation_context,
-        include_priority_tiers=True,
-    )
-    if not allocation_groups:
-        raise GameLifecycleError("Pooled attack resolution has no legal allocation groups.")
 
     wounded_contexts: tuple[
         tuple[AttackSequence, AttackResolutionContextPayload],
@@ -1389,6 +1372,49 @@ def _resolve_grouped_current_pool(
             allocated_model_ids,
             None,
         )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+    )
+
+    save_scope = (
+        f"{attack_sequence.sequence_id}:pool-{attack_sequence.pool_index + 1:03d}:save-profiles"
+    )
+    if attack_sequence.post_roll_attack_pools is not None:
+        selected_pool = attack_sequence.post_roll_attack_pools.selected_pool
+        if selected_pool is None:
+            raise GameLifecycleError("Save profile evaluation requires its selected attack pool.")
+        save_scope = f"{save_scope}:{selected_pool.pool_id}"
+    evaluate_unit_profile_characteristics(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=pool.target_unit_instance_id,
+        scope_id=save_scope,
+        characteristics=(
+            Characteristic.WOUNDS,
+            Characteristic.SAVE,
+            Characteristic.INVULNERABLE_SAVE,
+        ),
+        dice_manager=manager,
+    )
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            allocated_model_ids=allocated_model_ids,
+        ),
+        attacker_constraint=None,
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+        include_priority_tiers=True,
+    )
+    if not allocation_groups:
+        raise GameLifecycleError("Pooled attack resolution has no legal allocation groups.")
+
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.PRECISION):
         precision_selection = _precision_pool_selection(
             decisions=decisions,

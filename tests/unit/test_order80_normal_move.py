@@ -147,7 +147,7 @@ def test_second_reaction_same_phase_is_decline_only(parameterized: bool) -> None
             state=state,
             target_unit_instance_id=unit_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     survivor = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)

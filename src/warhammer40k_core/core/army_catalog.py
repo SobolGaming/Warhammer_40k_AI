@@ -8,7 +8,11 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentRole,
     AttachmentTargetEligibility,
 )
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import (
+    Characteristic,
+    CharacteristicError,
+    CharacteristicValue,
+)
 from warhammer40k_core.core.construction_constraints import selector_datasheet_ids
 from warhammer40k_core.core.content_scope import (
     SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES,
@@ -49,6 +53,7 @@ from warhammer40k_core.core.model_keywords import (
     ModelKeywordAssignmentPayload,
     validate_model_keyword_assignments,
 )
+from warhammer40k_core.core.random_profile_values import validate_catalog_random_values
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear, WargearError, WargearPayload
@@ -111,6 +116,24 @@ class ArmyCatalog:
         )
         datasheets = _validate_datasheet_tuple("ArmyCatalog datasheets", self.datasheets)
         wargear = _validate_wargear_tuple("ArmyCatalog wargear", self.wargear)
+        try:
+            for item in wargear:
+                for profile in item.weapon_profiles:
+                    validate_catalog_random_values(
+                        (
+                            profile.skill,
+                            profile.strength,
+                            profile.armor_penetration,
+                            *(
+                                (profile.range_profile.random_value,)
+                                if profile.range_profile.random_value is not None
+                                else ()
+                            ),
+                        ),
+                        source_ids=profile.source_ids,
+                    )
+        except CharacteristicError as exc:
+            raise ArmyCatalogError(str(exc)) from exc
         factions = _validate_faction_tuple("ArmyCatalog factions", self.factions)
         army_rules = _validate_army_rule_tuple("ArmyCatalog army_rules", self.army_rules)
         detachments = _validate_detachment_tuple("ArmyCatalog detachments", self.detachments)

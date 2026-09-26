@@ -57,7 +57,7 @@ def record_order57_logical_death(
     assert state.battlefield_state is not None
     placement = state.battlefield_state.model_placement_by_id(model.model_instance_id)
     current = model_by_id(state=state, model_instance_id=model.model_instance_id)
-    starting = current.wounds_remaining
+    starting = current.current_wounds
     set_order57_model_wounds(
         state,
         model_instance_id=model.model_instance_id,

@@ -112,6 +112,7 @@ def prepare_phase_end_boundary(
     if phase is None:
         raise GameLifecycleError("Phase-end preparation requires a current phase.")
     phase_end_objective_control_record = state.determine_current_phase_end_objective_control(
+        decisions=decisions,
         runtime_modifier_registry=runtime_modifier_registry,
     )
     emit_objective_control_boundary(decisions=decisions, record=phase_end_objective_control_record)
@@ -127,7 +128,10 @@ def prepare_turn_end_control_boundary(
     if phase is None:
         raise GameLifecycleError("Turn-end preparation requires a current phase.")
     record = determine_turn_end_control(
-        state=state, completed_phase=phase, runtime_modifier_registry=runtime_modifier_registry
+        decisions=decisions,
+        state=state,
+        completed_phase=phase,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     emit_objective_control_boundary(decisions=decisions, record=record)
 

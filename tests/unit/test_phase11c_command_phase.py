@@ -1222,7 +1222,7 @@ def test_off_battlefield_singleton_resolves_required_command_test_and_restores()
             ),
             target_unit_instance_id=unit.unit_instance_id,
             defender_player_id="player-a",
-            mortal_wounds=sum(model.wounds_remaining for model in unit.own_models[:3]),
+            mortal_wounds=sum(model.current_wounds for model in unit.own_models[:3]),
             spill_over=True,
         ),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
@@ -1381,7 +1381,7 @@ def test_completed_rerolled_battle_shock_target_destruction_does_not_block_reent
                 state=state,
                 target_unit_instance_id=unit_id,
                 model_instance_id=model.model_instance_id,
-                damage=model.wounds_remaining,
+                damage=model.current_wounds,
                 damage_kind=DamageKind.NORMAL,
             )
     assert not any(model.is_alive for model in _unit_by_id(state, unit_id).own_models)
@@ -2422,6 +2422,7 @@ def test_live_battle_shock_materializer_validates_current_runtime_boundary() -> 
             "runtime": runtime,
             "state": state,
             "request_id": request_id,
+            "decisions": DecisionController(),
             "target_unit_instance_id": unit_id,
             "reason": BattleShockTestReason.COMMAND_PHASE_REQUIRED,
             "active_player_id": "player-a",
@@ -9243,7 +9244,7 @@ def test_bodyguard_loss_preserves_original_attached_rules_unit_identity() -> Non
             state=state,
             target_unit_instance_id=attached_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     validate_attached_rules_unit_identity_after_destruction(
@@ -9335,7 +9336,7 @@ def test_battle_shock_state_remains_bound_to_original_attached_rules_unit() -> N
             state=state,
             target_unit_instance_id=attached_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     validate_attached_rules_unit_identity_after_destruction(
@@ -10900,7 +10901,7 @@ def _remove_first_models(state: GameState, *, unit_instance_id: str, count: int)
             state=state,
             target_unit_instance_id=unit_instance_id,
             model_instance_id=model_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
 

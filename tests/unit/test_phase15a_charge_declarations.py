@@ -2809,7 +2809,7 @@ def test_charge_targets_include_retained_units_and_measure_mixed_retained_geomet
             state=state,
             target_unit_instance_id=retained_only.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     retain_destroyed_model_for_fixture(
@@ -2825,7 +2825,7 @@ def test_charge_targets_include_retained_units_and_measure_mixed_retained_geomet
         state=state,
         target_unit_instance_id=mixed_target.unit_instance_id,
         model_instance_id=mixed_model.model_instance_id,
-        damage=mixed_model.wounds_remaining,
+        damage=mixed_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(

@@ -118,7 +118,7 @@ def record_primary_turn_start_evidence_for_fixture(
     snapshot_ids_before = tuple(
         value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
     )
-    record_primary_turn_start_evidence(state=state)
+    record_primary_turn_start_evidence(state=state, decisions=resolved_decisions)
     record_new_primary_turn_start_evidence_events(
         state=state,
         event_log=resolved_decisions.event_log,

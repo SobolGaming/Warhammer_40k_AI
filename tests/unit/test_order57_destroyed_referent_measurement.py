@@ -305,7 +305,7 @@ def test_destroyed_referent_uses_latest_occurrence_after_return() -> None:
     own_unit = order57_beta_unit(state)
     enemy_unit_id = order57_alpha_unit(state).unit_instance_id
     first_distance = ordinary_order57_distance(state=state, source=source, target=target)
-    starting_wounds = target.wounds_remaining
+    starting_wounds = target.current_wounds
     assert state.battlefield_state is not None
     first_placement = state.battlefield_state.model_placement_by_id(target.model_instance_id)
     returned_placement = first_placement.with_pose(

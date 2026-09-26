@@ -1083,7 +1083,7 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
         state=cast(GameState, session.lifecycle.state),
         model_instance_id=selected_model_id,
     )
-    assert selected_model.wounds_remaining == selected_model.starting_wounds - 1
+    assert selected_model.current_wounds == selected_model.initial_wounds - 1
     _assert_event_types(
         session.events_since(cursor, viewer_player_id="player-b"),
         "decision_recorded",
@@ -1148,8 +1148,8 @@ def test_mortal_wound_packet_retains_attached_identity_with_two_character_compon
     state = cast(GameState, session.lifecycle.state)
     leader = model_by_id(state=state, model_instance_id=leader_model_id)
     support = model_by_id(state=state, model_instance_id=support_model_id)
-    assert leader.wounds_remaining == leader.starting_wounds - 1
-    assert support.wounds_remaining == support.starting_wounds
+    assert leader.current_wounds == leader.initial_wounds - 1
+    assert support.current_wounds == support.initial_wounds
     assert any(
         event.event_type == "devastating_wounds_mortal_wounds_applied"
         for event in session.lifecycle.decision_controller.event_log.records
@@ -1184,7 +1184,7 @@ def test_mortal_wound_packet_retains_attached_identity_with_one_character_compon
     )
     state = cast(GameState, session.lifecycle.state)
     leader = model_by_id(state=state, model_instance_id=leader_model_id)
-    assert leader.wounds_remaining == leader.starting_wounds - 1
+    assert leader.current_wounds == leader.initial_wounds - 1
     assert any(
         event.event_type == "devastating_wounds_mortal_wounds_applied"
         for event in session.lifecycle.decision_controller.event_log.records
@@ -1430,7 +1430,7 @@ def _retained_attached_mortal_wound_session(
         state=state,
         target_unit_instance_id=attached_id,
         model_instance_id=bodyguard.model_instance_id,
-        damage=bodyguard.starting_wounds - 1,
+        damage=bodyguard.initial_wounds - 1,
         damage_kind=DamageKind.NORMAL,
     )
     state.record_model_feel_no_pain_sources(
@@ -1708,7 +1708,7 @@ def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -
         state=cast(GameState, session.lifecycle.state),
         model_instance_id=selected_model_id,
     )
-    assert selected_model.wounds_remaining == selected_model.starting_wounds - 1
+    assert selected_model.current_wounds == selected_model.initial_wounds - 1
     assert any(
         event.event_type == "devastating_wounds_mortal_wounds_applied"
         for event in session.lifecycle.decision_controller.event_log.records

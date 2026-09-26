@@ -696,7 +696,7 @@ def test_persisting_effect_remains_scoped_to_retained_attached_identity() -> Non
         state=state,
         target_unit_instance_id=attached_id,
         model_instance_id=bodyguard.own_models[0].model_instance_id,
-        damage=bodyguard.own_models[0].wounds_remaining,
+        damage=bodyguard.own_models[0].current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     validate_attached_rules_unit_identity_after_destruction(
@@ -1238,7 +1238,7 @@ def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() 
     )
     root_source = _deadly_demise_source(
         source_id="test:rule-deadly-demise:root",
-        mortal_wounds=bodyguard.own_models[0].wounds_remaining,
+        mortal_wounds=bodyguard.own_models[0].current_wounds,
     )
     collateral_source = _deadly_demise_source(
         source_id="test:rule-deadly-demise:collateral",
@@ -1330,7 +1330,7 @@ def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() 
     assert model_by_id(
         state=restored_state,
         model_instance_id=leader_model_id,
-    ).wounds_remaining == (leader.own_models[0].starting_wounds - 1)
+    ).current_wounds == (leader.own_models[0].initial_wounds - 1)
     assert all(
         effect.effect_id != liability.effect_id for effect in restored_state.persisting_effects
     )
@@ -1523,7 +1523,7 @@ def _run_collateral_mandatory_action_after_restore(
         sources=(
             _deadly_demise_source(
                 source_id="test:rule-deadly-demise:root",
-                mortal_wounds=sum(model.wounds_remaining for model in bodyguard.own_models),
+                mortal_wounds=sum(model.current_wounds for model in bodyguard.own_models),
             ),
         ),
     )
@@ -1691,7 +1691,7 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         sources=(
             _deadly_demise_source(
                 source_id="test:rule-deadly-demise:fod-root",
-                mortal_wounds=bodyguard.own_models[0].wounds_remaining,
+                mortal_wounds=bodyguard.own_models[0].current_wounds,
             ),
         ),
     )
@@ -1769,8 +1769,8 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     assert collateral_authority.logical_death_event is not None
     assert root_authority.model_destroyed_event is None
     assert collateral_authority.model_destroyed_event is None
-    assert model_by_id(state=state, model_instance_id=root_model_id).wounds_remaining == 0
-    assert model_by_id(state=state, model_instance_id=bodyguard_model_id).wounds_remaining == 0
+    assert model_by_id(state=state, model_instance_id=root_model_id).current_wounds == 0
+    assert model_by_id(state=state, model_instance_id=bodyguard_model_id).current_wounds == 0
     assert state.battlefield_state is not None
     assert root_model_id in state.battlefield_state.placed_model_ids()
     assert bodyguard_model_id in state.battlefield_state.placed_model_ids()
@@ -2014,7 +2014,7 @@ def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_proven
         state=state,
         target_unit_instance_id=unit.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
     )
@@ -2156,7 +2156,7 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
         state=state,
         target_unit_instance_id=unit.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
     )
@@ -2280,7 +2280,7 @@ def test_applied_fight_on_death_continues_and_retains_attached_activation_identi
         state=state,
         target_unit_instance_id=attached_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
     )

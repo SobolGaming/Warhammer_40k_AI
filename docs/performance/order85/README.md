@@ -1,5 +1,10 @@
 # Order 85 witnessed-contact diagnostic
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The identical Charge facade workload is measured against
 `19a5b863e8bd3b15541facb73fd4c0f78a835ce1` and the recorded head runtime.
 Both runs use the same current fixture, dependency lock, Python 3.14.5 and

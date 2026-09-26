@@ -1215,7 +1215,7 @@ def test_vengeful_sorrow_uses_retained_physical_engagement_and_keeps_fod_target_
         state=engaged_state,
         target_unit_instance_id=enemy.unit_instance_id,
         model_instance_id=enemy_model.model_instance_id,
-        damage=enemy_model.wounds_remaining,
+        damage=enemy_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -1256,7 +1256,7 @@ def test_vengeful_sorrow_uses_retained_physical_engagement_and_keeps_fod_target_
         state=retained_target_state,
         target_unit_instance_id=corsair.unit_instance_id,
         model_instance_id=corsair_model.model_instance_id,
-        damage=corsair_model.wounds_remaining,
+        damage=corsair_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(

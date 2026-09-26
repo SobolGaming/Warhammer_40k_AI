@@ -13,17 +13,31 @@ from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicError,
     CharacteristicValue,
-    CharacteristicValuePayload,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceExpressionPayload, DiceRollSpecError
 from warhammer40k_core.core.modifiers import Modifier, ModifierPayload
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    ProfileCharacteristicValuePayload,
+    RandomProfileValue,
+    profile_characteristic_from_payload,
+)
+from warhammer40k_core.core.range_profiles import (
+    RangeProfile as RangeProfile,
+)
+from warhammer40k_core.core.range_profiles import (
+    RangeProfileKind as RangeProfileKind,
+)
+from warhammer40k_core.core.range_profiles import (
+    RangeProfilePayload as RangeProfilePayload,
+)
+from warhammer40k_core.core.range_profiles import (
+    range_profile_kind_from_token as range_profile_kind_from_token,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import validate_weapon_ability_sources
+from warhammer40k_core.core.weapon_profile_errors import WeaponProfileError as WeaponProfileError
 from warhammer40k_core.core.weapon_skill_modifiers import validate_weapon_skill_modifiers
-
-
-class WeaponProfileError(ValueError):
-    """Raised when weapon profile data violates CORE V2 invariants."""
 
 
 class WeaponKeyword(StrEnum):
@@ -89,16 +103,6 @@ class TargetKeywordMatchMode(StrEnum):
     MISSING_KEYWORD = "missing_keyword"
 
 
-class RangeProfileKind(StrEnum):
-    DISTANCE = "distance"
-    MELEE = "melee"
-
-
-class RangeProfilePayload(TypedDict):
-    kind: str
-    distance_inches: int | None
-
-
 class AttackProfilePayload(TypedDict):
     fixed_attacks: int | None
     dice_expression: DiceExpressionPayload | None
@@ -133,9 +137,9 @@ class WeaponProfilePayload(TypedDict):
     name: str
     range_profile: RangeProfilePayload
     attack_profile: AttackProfilePayload
-    skill: CharacteristicValuePayload
-    strength: CharacteristicValuePayload
-    armor_penetration: CharacteristicValuePayload
+    skill: ProfileCharacteristicValuePayload
+    strength: ProfileCharacteristicValuePayload
+    armor_penetration: ProfileCharacteristicValuePayload
     damage_profile: DamageProfilePayload
     keywords: list[str]
     abilities: list[AbilityDescriptorPayload]
@@ -507,48 +511,6 @@ class AbilityDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
-class RangeProfile:
-    kind: RangeProfileKind
-    distance_inches: int | None = None
-
-    def __post_init__(self) -> None:
-        kind = _validate_range_kind(self.kind)
-        if kind != self.kind:
-            object.__setattr__(self, "kind", kind)
-
-        if kind is RangeProfileKind.DISTANCE:
-            if type(self.distance_inches) is not int:
-                raise WeaponProfileError("RangeProfile distance_inches must be an integer.")
-            if self.distance_inches < 1:
-                raise WeaponProfileError("RangeProfile distance_inches must be at least 1.")
-            return
-
-        if self.distance_inches is not None:
-            raise WeaponProfileError("Melee RangeProfile must not include distance_inches.")
-
-    @classmethod
-    def distance(cls, distance_inches: int) -> Self:
-        return cls(kind=RangeProfileKind.DISTANCE, distance_inches=distance_inches)
-
-    @classmethod
-    def melee(cls) -> Self:
-        return cls(kind=RangeProfileKind.MELEE)
-
-    def to_payload(self) -> RangeProfilePayload:
-        return {
-            "kind": self.kind.value,
-            "distance_inches": self.distance_inches,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: RangeProfilePayload) -> Self:
-        return cls(
-            kind=range_profile_kind_from_token(payload["kind"]),
-            distance_inches=payload["distance_inches"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class AttackProfile:
     fixed_attacks: int | None = None
     dice_expression: DiceExpression | None = None
@@ -648,9 +610,9 @@ class WeaponProfile:
     name: str
     range_profile: RangeProfile
     attack_profile: AttackProfile
-    skill: CharacteristicValue
-    strength: CharacteristicValue
-    armor_penetration: CharacteristicValue
+    skill: ProfileCharacteristicValue
+    strength: ProfileCharacteristicValue
+    armor_penetration: ProfileCharacteristicValue
     damage_profile: DamageProfile
     keywords: tuple[WeaponKeyword, ...] = ()
     abilities: tuple[AbilityDescriptor, ...] = ()
@@ -863,15 +825,6 @@ def target_keyword_match_mode_from_token(token: object) -> TargetKeywordMatchMod
         raise WeaponProfileError(f"Unsupported TargetKeywordMatchMode token: {token}.") from exc
 
 
-def range_profile_kind_from_token(token: object) -> RangeProfileKind:
-    if type(token) is not str:
-        raise WeaponProfileError("RangeProfile kind token must be a string.")
-    try:
-        return RangeProfileKind(token)
-    except ValueError as exc:
-        raise WeaponProfileError(f"Unsupported range profile kind token: {token}.") from exc
-
-
 _validate_identifier = IdentifierValidator(WeaponProfileError)
 
 
@@ -915,12 +868,6 @@ def _validate_profile_id(value: object) -> str:
             "WeaponProfile profile_id must not include the stable identity prefix."
         )
     return identifier
-
-
-def _validate_range_kind(kind: object) -> RangeProfileKind:
-    if type(kind) is not RangeProfileKind:
-        raise WeaponProfileError("RangeProfile kind must be a RangeProfileKind.")
-    return kind
 
 
 def _validate_ability_kind(kind: object) -> AbilityKind:
@@ -1008,9 +955,9 @@ def _validate_characteristic_profile(
     field_name: str,
     value: object,
     allowed_characteristics: frozenset[Characteristic],
-) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue:
-        raise WeaponProfileError(f"{field_name} must be a CharacteristicValue.")
+) -> ProfileCharacteristicValue:
+    if not isinstance(value, (CharacteristicValue, RandomProfileValue)):
+        raise WeaponProfileError(f"{field_name} must be a typed profile characteristic.")
     if value.characteristic not in allowed_characteristics:
         raise WeaponProfileError(f"{field_name} has the wrong characteristic.")
     return value
@@ -1020,12 +967,14 @@ def _validate_unmodified_characteristic_profile(
     field_name: str,
     value: object,
     allowed_characteristics: frozenset[Characteristic],
-) -> CharacteristicValue:
+) -> ProfileCharacteristicValue:
     characteristic_value = _validate_characteristic_profile(
         field_name,
         value,
         allowed_characteristics,
     )
+    if isinstance(characteristic_value, RandomProfileValue):
+        return characteristic_value
     if (
         characteristic_value.raw != characteristic_value.base
         or characteristic_value.base != characteristic_value.final
@@ -1037,10 +986,10 @@ def _validate_unmodified_characteristic_profile(
 
 def _characteristic_value_from_payload(
     field_name: str,
-    payload: CharacteristicValuePayload,
-) -> CharacteristicValue:
+    payload: ProfileCharacteristicValuePayload,
+) -> ProfileCharacteristicValue:
     try:
-        return CharacteristicValue.from_payload(payload)
+        return profile_characteristic_from_payload(payload)
     except CharacteristicError as exc:
         raise WeaponProfileError(f"{field_name} payload is invalid.") from exc
 

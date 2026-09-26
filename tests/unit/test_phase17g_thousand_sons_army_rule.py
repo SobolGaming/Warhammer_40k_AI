@@ -1054,7 +1054,7 @@ def _unit_remaining_wounds(state: GameState, *, unit_instance_id: str) -> int:
         raise AssertionError("enemy army is required")
     for unit in army.units:
         if unit.unit_instance_id == unit_instance_id:
-            return sum(model.wounds_remaining for model in unit.own_models)
+            return sum(model.current_wounds for model in unit.own_models)
     raise AssertionError(f"missing unit {unit_instance_id}")
 
 

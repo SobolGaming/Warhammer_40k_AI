@@ -415,6 +415,18 @@ def _apply_crushing_impact_handler(
     enemy_unit_id = rules_unit_view_by_id(
         state=state, unit_instance_id=enemy_unit_id
     ).unit_instance_id
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+    )
+
+    evaluate_unit_profile_characteristics(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=source_unit_id,
+        scope_id=f"stratagem-use:{use_record.use_id}:toughness",
+        characteristics=(Characteristic.TOUGHNESS,),
+        model_instance_ids=(model_id,),
+    )
     toughness = _model_toughness(state=state, model_instance_id=model_id)
     if toughness is None:
         raise GameLifecycleError("Crushing Impact model Toughness was not prevalidated.")

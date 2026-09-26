@@ -563,7 +563,7 @@ def test_ability_presence_requires_current_living_and_explicit_presence_authorit
             state=state,
             target_unit_instance_id=source.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
             remove_destroyed_model=False,
         )

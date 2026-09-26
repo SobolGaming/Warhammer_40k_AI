@@ -693,7 +693,7 @@ def _resolve_daemonic_manifestation(
         return None
     wounded_models: list[ModelInstance] = []
     for model in target_rules_unit.own_models:
-        if model.is_alive and model.wounds_remaining < model.starting_wounds:
+        if model.is_alive and model.current_wounds < model.initial_wounds:
             wounded_models.append(model)
     if not wounded_models:
         _emit_daemonic_manifestation_no_effect(
@@ -714,7 +714,7 @@ def _resolve_daemonic_manifestation(
         )
         return None
     model = wounded_models[0]
-    missing_wounds = model.starting_wounds - model.wounds_remaining
+    missing_wounds = model.initial_wounds - model.current_wounds
     healing_amount = min(d3_result.value, missing_wounds)
     effect = HealingEffect(
         effect_id=f"{hook_id}:daemonic-manifestation:{result.result_id}",

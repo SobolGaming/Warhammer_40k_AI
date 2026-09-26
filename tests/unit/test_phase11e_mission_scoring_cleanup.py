@@ -934,7 +934,7 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     (defender_model,) = defender.own_models
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     state.replace_shooting_phase_state(
         ShootingPhaseState(
@@ -2696,7 +2696,7 @@ def test_purge_and_secure_real_attack_from_objective_scores_through_lifecycle() 
     (defender_model,) = defender.own_models
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     state.replace_shooting_phase_state(
         ShootingPhaseState(
@@ -2924,7 +2924,7 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
     (defender_model,) = defender.own_models
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence_id = "out-of-phase-attack-sequence:phase17n-meatgrinder-overwatch-return-on-death"
     attack_context_id = f"{sequence_id}:pool-001:attack-001"
@@ -3361,7 +3361,7 @@ def test_primary_destruction_capture_does_not_complete_attached_unit_for_bodygua
     attached_unit_id = "attached-unit:army-alpha:bodyguard-unit"
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(surviving_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(surviving_model.current_wounds),
     )
     state.replace_shooting_phase_state(
         ShootingPhaseState(
@@ -8186,7 +8186,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         initial_lifecycle_payload=terminal_payload,
         final_lifecycle=terminal_lifecycle,
     )
-    assert terminal_artifact.schema_version == "replay-artifact-v33-deemed-contact"
+    assert terminal_artifact.schema_version == "replay-artifact-v34-random-profiles"
     replay_snapshot = GameLifecycle.from_payload(terminal_artifact.initial_lifecycle_payload)
     replay_snapshot_state = replay_snapshot.state
     assert replay_snapshot_state is not None
@@ -10996,7 +10996,7 @@ def _authentic_primary_destruction_lifecycle_payload() -> GameLifecyclePayload:
     (defender_model,) = defender.own_models
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     state.replace_shooting_phase_state(
         ShootingPhaseState(

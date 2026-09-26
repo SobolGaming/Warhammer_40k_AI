@@ -185,7 +185,10 @@ def _crushing_impact_context_error(
         target_unit_instance_id=enemy_unit_id,
     ):
         return "crushing_impact_model_not_engaged_with_target"
-    if _model_toughness(state=state, model_instance_id=model_id) is None:
+    if not any(
+        value.characteristic is Characteristic.TOUGHNESS
+        for value in source.model_by_id(model_id).characteristics
+    ):
         return "crushing_impact_model_missing_toughness"
     trigger = context.trigger_payload
     if (

@@ -17,8 +17,6 @@ from warhammer40k_core.core.attachment_eligibility import (
 from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicError,
-    CharacteristicValue,
-    CharacteristicValuePayload,
     characteristic_from_token,
 )
 from warhammer40k_core.core.content_scope import (
@@ -30,6 +28,13 @@ from warhammer40k_core.core.datasheet_ability import (
     DatasheetAbilityDescriptor as DatasheetAbilityDescriptor,
 )
 from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    ProfileCharacteristicValuePayload,
+    canonical_profile_characteristics,
+    profile_characteristic_from_payload,
+    validate_catalog_random_values,
+)
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.core.wargear_selection_limits import (
     DatasheetWargearSelectionLimit,
@@ -123,7 +128,7 @@ class BaseSizeDefinitionPayload(TypedDict):
 class ModelProfileDefinitionPayload(TypedDict):
     model_profile_id: str
     name: str
-    characteristics: list[CharacteristicValuePayload]
+    characteristics: list[ProfileCharacteristicValuePayload]
     base_size: BaseSizeDefinitionPayload
     source_ids: list[str]
 
@@ -294,7 +299,7 @@ class BaseSizeDefinition:
 class ModelProfileDefinition:
     model_profile_id: str
     name: str
-    characteristics: tuple[CharacteristicValue, ...]
+    characteristics: tuple[ProfileCharacteristicValue, ...]
     base_size: BaseSizeDefinition
     source_ids: tuple[str, ...] = ()
 
@@ -317,6 +322,10 @@ class ModelProfileDefinition:
         if not characteristics:
             raise DatasheetCatalogError("ModelProfileDefinition characteristics must not be empty.")
         _validate_required_model_characteristics(characteristics)
+        try:
+            validate_catalog_random_values(characteristics, source_ids=self.source_ids)
+        except CharacteristicError as exc:
+            raise DatasheetCatalogError(str(exc)) from exc
         object.__setattr__(self, "characteristics", characteristics)
         if type(self.base_size) is not BaseSizeDefinition:
             raise DatasheetCatalogError(
@@ -328,7 +337,7 @@ class ModelProfileDefinition:
             _validate_identifier_tuple("ModelProfileDefinition source_ids", self.source_ids),
         )
 
-    def characteristic(self, characteristic: Characteristic) -> CharacteristicValue:
+    def characteristic(self, characteristic: Characteristic) -> ProfileCharacteristicValue:
         requested_characteristic = _characteristic_from_token(characteristic)
         for value in self.characteristics:
             if value.characteristic is requested_characteristic:
@@ -1382,9 +1391,11 @@ def _characteristic_from_token(token: object) -> Characteristic:
         raise DatasheetCatalogError("Characteristic token is invalid.") from exc
 
 
-def _characteristic_value_from_payload(payload: CharacteristicValuePayload) -> CharacteristicValue:
+def _characteristic_value_from_payload(
+    payload: ProfileCharacteristicValuePayload,
+) -> ProfileCharacteristicValue:
     try:
-        return CharacteristicValue.from_payload(payload)
+        return profile_characteristic_from_payload(payload)
     except CharacteristicError as exc:
         raise DatasheetCatalogError("CharacteristicValue payload is invalid.") from exc
 
@@ -1550,28 +1561,16 @@ def _validate_no_damaged_selection_limit(
 
 
 def _canonical_characteristic_values(
-    values: tuple[CharacteristicValue, ...],
-) -> tuple[CharacteristicValue, ...]:
-    if type(values) is not tuple:
-        raise DatasheetCatalogError("ModelProfileDefinition characteristics must be a tuple.")
-    seen: set[Characteristic] = set()
-    validated: list[CharacteristicValue] = []
-    for value in values:
-        if type(value) is not CharacteristicValue:
-            raise DatasheetCatalogError(
-                "ModelProfileDefinition characteristics must be CharacteristicValue values."
-            )
-        if value.characteristic in seen:
-            raise DatasheetCatalogError(
-                "ModelProfileDefinition characteristics must not contain duplicates."
-            )
-        seen.add(value.characteristic)
-        validated.append(value)
-    return tuple(sorted(validated, key=lambda value: value.characteristic.value))
+    values: tuple[ProfileCharacteristicValue, ...],
+) -> tuple[ProfileCharacteristicValue, ...]:
+    try:
+        return canonical_profile_characteristics(values)
+    except CharacteristicError as exc:
+        raise DatasheetCatalogError(str(exc)) from exc
 
 
 def _validate_required_model_characteristics(
-    values: tuple[CharacteristicValue, ...],
+    values: tuple[ProfileCharacteristicValue, ...],
 ) -> None:
     present = {value.characteristic for value in values}
     missing = tuple(

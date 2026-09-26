@@ -4,6 +4,10 @@ import re
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpecError
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.weapon_profiles import AttackProfile, DamageProfile, RangeProfile
 from warhammer40k_core.rules.catalog_generation_errors import CatalogGenerationError
 from warhammer40k_core.rules.catalog_generation_fields import optional_field, required_field
@@ -21,9 +25,10 @@ def characteristic_from_row(
     row: NormalizedSourceRow,
     column_name: str,
     characteristic: Characteristic,
-) -> CharacteristicValue:
+) -> ProfileCharacteristicValue:
     return characteristic_value_from_raw_text(
         characteristic=characteristic,
+        source_id=row.stable_source_id(),
         raw_text=required_field(row=row, column_name=column_name),
     )
 
@@ -33,9 +38,10 @@ def optional_characteristic_from_row(
     row: NormalizedSourceRow,
     column_name: str,
     characteristic: Characteristic,
-) -> CharacteristicValue:
+) -> ProfileCharacteristicValue:
     return characteristic_value_from_raw_text(
         characteristic=characteristic,
+        source_id=row.stable_source_id(),
         raw_text=optional_field(row=row, column_name=column_name) or "-",
     )
 
@@ -44,11 +50,15 @@ def characteristic_value_from_raw_text(
     *,
     characteristic: Characteristic,
     raw_text: str,
-) -> CharacteristicValue:
+    source_id: str,
+) -> ProfileCharacteristicValue:
     text = raw_text.strip()
     if text == "-":
         return CharacteristicValue.source_dash(characteristic)
-    return CharacteristicValue.from_raw(characteristic, _int_from_text(text))
+    fixed = _optional_int_from_text(text)
+    if fixed is not None:
+        return CharacteristicValue.from_raw(characteristic, fixed)
+    return RandomProfileValue(characteristic, _dice_expression_from_text(text), source_id)
 
 
 def characteristic_token_from_field(value: str) -> Characteristic:
@@ -61,10 +71,15 @@ def characteristic_token_from_field(value: str) -> Characteristic:
     )
 
 
-def range_profile_from_token(value: str) -> RangeProfile:
+def range_profile_from_token(value: str, *, source_id: str) -> RangeProfile:
     if value.strip().lower() == "melee":
         return RangeProfile.melee()
-    return RangeProfile.distance(_int_from_text(value))
+    fixed = _optional_int_from_text(value)
+    if fixed is not None:
+        return RangeProfile.distance(fixed)
+    return RangeProfile.random(
+        RandomProfileValue(Characteristic.RANGE, _dice_expression_from_text(value), source_id)
+    )
 
 
 def attack_profile_from_raw_text(value: str) -> AttackProfile:
@@ -131,7 +146,9 @@ def _required_int(row: NormalizedSourceRow, column_name: str) -> int:
 
 
 def _dice_expression_from_text(value: str) -> DiceExpression:
-    match = _DICE_CHARACTERISTIC_RE.fullmatch(value.strip().replace(" ", ""))
+    match = _DICE_CHARACTERISTIC_RE.fullmatch(
+        value.strip().removesuffix('"').removesuffix("+").replace(" ", "")
+    )
     if match is None:
         raise CatalogGenerationError(
             f"Source value must be fixed integer or dice expression: {value}."

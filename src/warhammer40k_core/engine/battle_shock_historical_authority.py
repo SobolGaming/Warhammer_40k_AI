@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.ability_presence import (
     AbilityPresence,
     AbilitySpatialRelationship,
@@ -26,6 +27,7 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     PhysicalModelAuthority,
     physical_model_authority_before_event,
 )
+from warhammer40k_core.engine.random_profile_history import armies_with_historical_random_profiles
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_from_armies,
@@ -429,7 +431,11 @@ def historical_battle_shock_authority_context(
         player_ids=tuple(state.player_ids),
         turn_order=tuple(state.turn_order),
         battle_phase_sequence=tuple(state.battle_phase_sequence),
-        armies=tuple(state.army_definitions),
+        armies=armies_with_historical_random_profiles(
+            armies=tuple(state.army_definitions),
+            prior_events=event_records[:boundary_event_index],
+            characteristics=(Characteristic.LEADERSHIP,),
+        ),
         mission_setup=state.mission_setup,
         battlefield_width_inches=state.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=state.battlefield_state.battlefield_depth_inches,

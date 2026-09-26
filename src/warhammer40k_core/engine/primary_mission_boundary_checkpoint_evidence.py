@@ -8,9 +8,11 @@ from warhammer40k_core.core.descriptor_hash import (
     canonical_payload_sha256,
     validate_sha256_hex,
 )
+from warhammer40k_core.core.random_profile_values import RandomProfileValue
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.profile_snapshot import profile_snapshot_from_json
 
 PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT = "primary_mission_boundary_checkpoint_recorded"
 PRIMARY_MISSION_BOUNDARY_CHECKPOINT_SCHEMA = "primary-mission-boundary-checkpoint-v1"
@@ -770,16 +772,20 @@ class PrimaryMissionBoundaryCheckpoint:
 def _validate_modifier_references(checkpoint: PrimaryMissionBoundaryCheckpoint) -> None:
     source_ids = {source.modifier_id for source in checkpoint.objective_control_modifier_sources}
     for model in checkpoint.model_states:
-        source = _json_object(model.source_objective_control_json)
-        resolved = _json_object(model.resolved_objective_control_json)
-        source_modifier_ids = _json_string_list(source, key="applied_modifier_ids")
-        resolved_modifier_ids = _json_string_list(resolved, key="applied_modifier_ids")
-        added = set(resolved_modifier_ids).difference(source_modifier_ids)
+        source = profile_snapshot_from_json(model.source_objective_control_json)
+        resolved = profile_snapshot_from_json(model.resolved_objective_control_json)
+        if isinstance(source, RandomProfileValue) and source.evaluation is None:
+            if resolved != source:
+                raise GameLifecycleError(
+                    "Unresolved Objective Control snapshot cannot invent a value."
+                )
+            continue
+        added = set(resolved.applied_modifier_ids).difference(source.applied_modifier_ids)
         if not added <= source_ids:
             raise GameLifecycleError(
                 "Primary mission boundary Objective Control modifier source is missing."
             )
-        if resolved.get("final") != source.get("final") and not added:
+        if resolved.final != source.final and not added:
             raise GameLifecycleError(
                 "Primary mission boundary Objective Control change lacks source identity."
             )
@@ -1129,15 +1135,6 @@ def _json_object(value: str) -> dict[str, JsonValue]:
         raise GameLifecycleError("Primary mission boundary JSON must encode an object.")
     decoded_object = cast(dict[object, object], decoded)
     return cast(dict[str, JsonValue], validate_json_value(decoded_object))
-
-
-def _json_string_list(raw: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    value = raw.get(key)
-    if not isinstance(value, list) or any(type(item) is not str for item in value):
-        raise GameLifecycleError(
-            "Primary mission boundary Objective Control modifier inventory is invalid."
-        )
-    return cast(tuple[str, ...], tuple(value))
 
 
 __all__ = (

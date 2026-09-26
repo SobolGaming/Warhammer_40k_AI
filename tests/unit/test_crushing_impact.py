@@ -369,7 +369,7 @@ def test_crushing_impact_rejects_a_destroyed_but_retained_selected_model() -> No
         state=state,
         target_unit_instance_id=SOURCE,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
         remove_destroyed_model=False,
     )
@@ -534,3 +534,46 @@ def test_crushing_impact_rejects_a_missing_completed_destruction_receipt() -> No
     completed["event_type"] = "altered_completion_receipt"
     with pytest.raises(GameLifecycleError):
         GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize("decline", [False, True])
+def test_random_toughness_is_evaluated_only_for_accepted_crushing_impact(decline: bool) -> None:
+    session = crushing_session(random_toughness=True, game_id="order87-crushing-random")
+    request = complete_charge(session).decision_request
+    assert request is not None
+    decisions = session.lifecycle.decision_controller
+    assert not any(
+        e.event_type == "random_profile_values_evaluated" for e in decisions.event_log.records
+    )
+    saved = session.to_persistence_payload()
+    assert LocalGameSession.from_persistence_payload(saved).to_persistence_payload() == saved
+    option = next(
+        o
+        for o in request.options
+        if (
+            o.option_id == "decline_stratagem_window"
+            if decline
+            else o.option_id.startswith("use-stratagem:crushing-impact:")
+        )
+    )
+    status = session.submit_option(
+        request_id=request.request_id, option_id=option.option_id, result_id="order87:crushing-use"
+    )
+    evaluations = [
+        e for e in decisions.event_log.records if e.event_type == "random_profile_values_evaluated"
+    ]
+    assert len(evaluations) == (0 if decline else 1)
+    for step in range(20):
+        nested = status.decision_request
+        if nested is None or nested.decision_type not in {
+            "select_mortal_wound_model",
+            "select_feel_no_pain",
+        }:
+            break
+        status = session.submit_option(
+            request_id=nested.request_id,
+            option_id=nested.options[0].option_id,
+            result_id=f"order87:crushing:{step}",
+        )
+    saved = session.to_persistence_payload()
+    assert LocalGameSession.from_persistence_payload(saved).to_persistence_payload() == saved

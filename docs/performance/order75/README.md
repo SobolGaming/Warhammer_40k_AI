@@ -1,5 +1,10 @@
 # P21C fixed-target Surge evidence
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The workload measures a cold-cache `LocalGameSession` submission after finite
 target selection. Three repetitions each cover a five-model rectangular-target
 approach, a six-model attached-unit approach to a rectangle facing 37 degrees,

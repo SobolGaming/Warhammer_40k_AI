@@ -43,7 +43,7 @@ def test_failed_save_changes_incoming_damage_to_zero_after_the_save() -> None:
     lifecycle, units = order58_shooting_lifecycle()
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    starting = defender.own_models[0].wounds_remaining
+    starting = defender.own_models[0].current_wounds
     resolve_order58_attack(
         lifecycle=lifecycle,
         attacker=attacker,
@@ -68,7 +68,7 @@ def test_successful_save_does_not_replace_incoming_damage() -> None:
     lifecycle, units = order58_shooting_lifecycle()
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    starting = defender.own_models[0].wounds_remaining
+    starting = defender.own_models[0].current_wounds
     resolve_order58_attack(
         lifecycle=lifecycle,
         attacker=attacker,
@@ -86,7 +86,7 @@ def test_failed_save_without_replacement_inflicts_weapon_damage() -> None:
     lifecycle, units = order58_shooting_lifecycle()
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    starting = defender.own_models[0].wounds_remaining
+    starting = defender.own_models[0].current_wounds
     resolve_order58_attack(
         lifecycle=lifecycle,
         attacker=attacker,
@@ -103,7 +103,7 @@ def test_failed_save_replacement_is_once_per_turn() -> None:
     lifecycle, units = order58_shooting_lifecycle()
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    starting = defender.own_models[0].wounds_remaining
+    starting = defender.own_models[0].current_wounds
     resolve_order58_attack(
         lifecycle=lifecycle,
         attacker=attacker,
@@ -140,7 +140,7 @@ def test_allocated_attack_damage_modifier_does_not_run_when_damage_is_replaced()
             ),
         ),
     )
-    starting = defender.own_models[0].wounds_remaining
+    starting = defender.own_models[0].current_wounds
     resolve_order58_attack(
         lifecycle=lifecycle,
         attacker=attacker,
@@ -209,7 +209,7 @@ def test_failed_save_replacement_survives_adapter_restore_and_viewer_events() ->
     lifecycle, units = order58_shooting_lifecycle(game_id="order58-restore")
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    starting = defender.own_models[0].wounds_remaining
+    starting = defender.own_models[0].current_wounds
     resolve_order58_attack(
         lifecycle=lifecycle,
         attacker=attacker,
@@ -240,7 +240,7 @@ def test_failed_save_replacement_survives_adapter_restore_and_viewer_events() ->
         model_by_id(
             state=restored_state,
             model_instance_id=defender.own_models[0].model_instance_id,
-        ).wounds_remaining
+        ).current_wounds
         == starting
     )
     assert len(replacement_events(lifecycle)) == 1

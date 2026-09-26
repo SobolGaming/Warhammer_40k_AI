@@ -1,7 +1,7 @@
 {
   "workload": "order85-witnessed-contact-v1",
-  "revision": "r86-001-exact-half-planes",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:904893c11619a82868f043182ee2c96023cbaaa1b686a3875d3c77028bc27726",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:904893c11619a82868f043182ee2c96023cbaaa1b686a3875d3c77028bc27726",
   "cpu": "Apple M5 Pro",
   "memory_bytes": 68719476736,
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
@@ -19,20 +19,20 @@
     {
       "case": "body-touch",
       "samples_seconds": [
-        0.06820854198304005,
-        0.01593291701283306,
-        0.015463666000869125
+        0.06919108299189247,
+        0.016376207990106195,
+        0.015861499996390194
       ],
       "setup_seconds": [
-        2.392796083993744,
-        0.4502062920073513,
-        0.45098670898005366
+        2.381011582998326,
+        0.45531216700328514,
+        0.4540525409975089
       ],
-      "mean_seconds": 0.033201708332247414,
-      "maximum_seconds": 0.06820854198304005,
-      "median_seconds": 0.01593291701283306,
-      "p95_seconds_nearest_rank": 0.06820854198304005,
-      "submissions_per_second": 30.11893213424631,
+      "mean_seconds": 0.03380959699279629,
+      "maximum_seconds": 0.06919108299189247,
+      "median_seconds": 0.016376207990106195,
+      "p95_seconds_nearest_rank": 0.06919108299189247,
+      "submissions_per_second": 29.577400766210467,
       "statuses": [
         "waiting_for_decision",
         "waiting_for_decision",
@@ -42,20 +42,20 @@
     {
       "case": "body-penetration",
       "samples_seconds": [
-        0.003783833992201835,
-        0.0030490829958580434,
-        0.0034409159852657467
+        0.003202332998625934,
+        0.0030889170011505485,
+        0.0030814580095466226
       ],
       "setup_seconds": [
-        0.46377987498999573,
-        0.45652720899670385,
-        0.455984250002075
+        0.45350016601150855,
+        0.45470987498993054,
+        0.4562644159886986
       ],
-      "mean_seconds": 0.003424610991108542,
-      "maximum_seconds": 0.003783833992201835,
-      "median_seconds": 0.0034409159852657467,
-      "p95_seconds_nearest_rank": 0.003783833992201835,
-      "submissions_per_second": 292.0039685080557,
+      "mean_seconds": 0.003124236003107702,
+      "maximum_seconds": 0.003202332998625934,
+      "median_seconds": 0.0030889170011505485,
+      "p95_seconds_nearest_rank": 0.003202332998625934,
+      "submissions_per_second": 320.0782524128434,
       "statuses": [
         "invalid",
         "invalid",

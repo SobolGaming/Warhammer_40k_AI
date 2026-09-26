@@ -547,7 +547,7 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
         )
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     discovery_before = (state.to_payload(), decisions.to_payload())
     candidates = handler.fight_phase_end_hooks.candidates_for(
@@ -630,7 +630,7 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
     assert application["mortal_wounds"] == 3
     assert (
         starting_wounds
-        - sum(model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models)
+        - sum(model.current_wounds for model in unit_by_id(state, target_unit_id).own_models)
         == 3
     )
     assert (
@@ -666,7 +666,7 @@ def test_relentless_carnage_targets_retained_presence() -> None:
                 state=state,
                 target_unit_instance_id=target_unit_id,
                 model_instance_id=model.model_instance_id,
-                damage=model.wounds_remaining,
+                damage=model.current_wounds,
                 damage_kind=DamageKind.NORMAL,
             )
         retain_destroyed_model_for_fixture(
@@ -701,7 +701,7 @@ def test_relentless_carnage_targets_retained_presence() -> None:
         state=retained_source_state,
         target_unit_instance_id=source_unit_id,
         model_instance_id=source_model.model_instance_id,
-        damage=source_model.wounds_remaining,
+        damage=source_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -732,7 +732,7 @@ def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -
         )
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     status = advance_fight_end_fixture(handler=handler, state=state, decisions=decisions)
     request = _decision_request(status.decision_request)
@@ -750,7 +750,7 @@ def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -
     assert payload["selected_option_id"] == decline_option.option_id
     assert payload["target_enemy_unit_instance_id"] is None
     assert (
-        sum(model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models)
+        sum(model.current_wounds for model in unit_by_id(state, target_unit_id).own_models)
         == starting_wounds
     )
 
@@ -767,7 +767,7 @@ def test_relentless_carnage_records_zero_mortal_wounds_without_application() -> 
         )
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     status = advance_fight_end_fixture(handler=handler, state=state, decisions=decisions)
     request = _decision_request(status.decision_request)
@@ -786,7 +786,7 @@ def test_relentless_carnage_records_zero_mortal_wounds_without_application() -> 
     assert payload["mortal_wounds"] == 0
     assert payload["mortal_wound_application"] is None
     assert (
-        sum(model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models)
+        sum(model.current_wounds for model in unit_by_id(state, target_unit_id).own_models)
         == starting_wounds
     )
 

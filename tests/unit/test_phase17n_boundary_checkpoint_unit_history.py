@@ -191,7 +191,7 @@ def _attached_root_failure_checkpoint() -> tuple[
             state=state,
             target_unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     attached = rules_unit_view_by_id(
@@ -518,7 +518,7 @@ def _pending_action_opportunity_after_failed_battle_shock() -> tuple[
                     own_models=(
                         replace(
                             unit.own_models[0],
-                            wounds_remaining=unit.own_models[0].wounds_remaining - 1,
+                            wounds_remaining=unit.own_models[0].current_wounds - 1,
                         ),
                     ),
                 )

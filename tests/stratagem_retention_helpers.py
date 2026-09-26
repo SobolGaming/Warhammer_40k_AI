@@ -8,6 +8,7 @@ from tests.retained_attack_helpers import for_the_chapter_catalog
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.random_profile_values import resolved_profile_characteristic
 from warhammer40k_core.engine.decision_request import DecisionRequest
 
 
@@ -27,9 +28,11 @@ def offered_stratagem_reaction(
                     replace(
                         profile,
                         characteristics=tuple(
-                            replace(value, raw=1, base=1, final=1)
+                            replace(resolved_profile_characteristic(value), raw=1, base=1, final=1)
                             if value.characteristic is Characteristic.WOUNDS
-                            else replace(value, raw=96, base=96, final=96)
+                            else replace(
+                                resolved_profile_characteristic(value), raw=96, base=96, final=96
+                            )
                             if collateral_depth and value.characteristic is Characteristic.TOUGHNESS
                             else value
                             for value in profile.characteristics

@@ -272,7 +272,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v39-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v40-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -448,7 +448,7 @@ export interface components {
             parameters: components["schemas"]["proposal-payload--ability_parameter.schema"][];
             target_keywords: components["schemas"]["proposal-payload--identifier_array.schema"]; timing: string | null;
         };
-        "proposal-payload--characteristic_value.schema": {
+        "proposal-payload--fixed_characteristic_value.schema": {
             applied_modifier_ids: components["schemas"]["proposal-payload--identifier_array.schema"]; base: number;
             characteristic: components["schemas"]["proposal-payload--identifier.schema"]; final: number; raw: number;
             /** @enum {string} */
@@ -457,6 +457,29 @@ export interface components {
         "proposal-payload--dice_expression.schema": {
             modifier: number; quantity: number; sides: number;
         };
+        "proposal-payload--profile_modifier.schema": {
+            modifier_id: components["schemas"]["proposal-payload--identifier.schema"];
+            source_id: components["schemas"]["proposal-payload--identifier.schema"];
+            scope: {
+                characteristics: components["schemas"]["proposal-payload--identifier.schema"][] | null;
+                target_ids: components["schemas"]["proposal-payload--identifier.schema"][] | null;
+            };
+            /** @enum {unknown} */
+            timing: "base" | "multiplicative" | "additive" | "divisive" | "subtractive" | "final";
+            /** @enum {unknown} */
+            operation: "set" | "set_dash" | "set_star" | "add" | "multiply" | "divide" | "subtract" | "floor" | "ceiling";
+            operand: number; priority: number; exclusive_group: string | null;
+        };
+        "proposal-payload--random_characteristic_value.schema": {
+            characteristic: components["schemas"]["proposal-payload--identifier.schema"];
+            /** @constant */
+            value_kind: "random"; expression: components["schemas"]["proposal-payload--dice_expression.schema"];
+            source_id: components["schemas"]["proposal-payload--identifier.schema"];
+            modifiers?: components["schemas"]["proposal-payload--profile_modifier.schema"][];
+            evaluation?: components["schemas"]["proposal-payload--fixed_characteristic_value.schema"];
+            evaluation_id?: components["schemas"]["proposal-payload--identifier.schema"];
+        };
+        "proposal-payload--characteristic_value.schema": components["schemas"]["proposal-payload--fixed_characteristic_value.schema"] | components["schemas"]["proposal-payload--random_characteristic_value.schema"];
         "proposal-payload--attack_profile.schema": {
             dice_expression: null; fixed_attacks: number;
         } | {
@@ -475,6 +498,10 @@ export interface components {
             distance_inches: null;
             /** @constant */
             kind: "melee";
+        } | {
+            /** @constant */
+            kind: "distance"; distance_inches: number | null;
+            random_value: components["schemas"]["proposal-payload--random_characteristic_value.schema"];
         };
         "proposal-payload--weapon_skill_modifier.schema": {
             modifier_id: components["schemas"]["proposal-payload--identifier.schema"];
@@ -637,7 +664,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v39-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v40-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -835,6 +862,7 @@ export interface components {
         "game-view--characteristic.schema": {
             applied_modifier_ids: string[]; display_value: string | null; final: number | null; label: string;
             redaction: components["schemas"]["game-view--redaction.schema"];
+            random_expression?: components["schemas"]["proposal-payload--dice_expression.schema"];
         } & {
             [key: string]: unknown;
         };
@@ -1023,7 +1051,7 @@ export interface components {
             pending_proposal: components["schemas"]["game-view--json_value.schema"];
             nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][]; player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v12-model-keywords"; projection_state_hash: string;
+            projection_schema: "game-view-v13-random-profiles"; projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_choices: components["schemas"]["game-view--json_value.schema"][];
@@ -1044,7 +1072,7 @@ export interface components {
             event_cursor: string; game_id: string; projection: components["schemas"]["game-view.schema"];
             projection_state_hash: string; retention_limit: number; revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v8-model-keywords"; session_id: string; session_revision: number;
+            schema_version: "session-projection-v9-random-profiles"; session_id: string; session_revision: number;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
         };
@@ -1289,7 +1317,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v33-deemed-contact";
+            schema_version: "replay-artifact-v34-random-profiles";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

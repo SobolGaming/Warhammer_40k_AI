@@ -437,6 +437,13 @@ def apply_recorded_catalog_model_materialization_placement(
             }
         ),
     )
+    from warhammer40k_core.engine.random_objective_control import (
+        prepare_objective_control_after_placement,
+    )
+
+    prepare_objective_control_after_placement(
+        state=state, decisions=decisions, event_id=event.event_id
+    )
     return validated.transition_batch.placements
 
 
@@ -462,6 +469,19 @@ def materialization_request(
         descriptor=descriptor,
         roll_event_id=roll_event_id,
         army_catalog=army_catalog,
+    )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import evaluate_model_profile_inventory
+
+    models = evaluate_model_profile_inventory(
+        state=state,
+        decisions=decisions,
+        models=models,
+        unit_instance_id=source.source_unit_instance_id,
+        player_id=army.player_id,
+        scope_id=f"materialization-wounds:{roll_event_id}",
+        characteristics=(Characteristic.WOUNDS,),
+        initialize_wounds=True,
     )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
@@ -583,6 +603,17 @@ def _validated_materialization_submission(
         descriptor=descriptor,
         roll_event_id=roll_event_id,
         army_catalog=army_catalog,
+    )
+    from warhammer40k_core.engine.random_wounds_initialization import (
+        restore_initialized_model_wounds,
+    )
+
+    models = restore_initialized_model_wounds(
+        models=models,
+        unit_instance_id=source_unit_id,
+        player_id=army.player_id,
+        scope_id=f"materialization-wounds:{roll_event_id}",
+        event_records=decisions.event_log.records,
     )
     expected_models_payload = [model.to_payload() for model in models]
     if payload.get("models") != expected_models_payload:
@@ -904,7 +935,15 @@ def _replace_unit_datasheet(
             source_id=source.source_rule_id,
             materialization_descriptor_id=variant.materialization_descriptor_id,
         )
-        remapped_models.append(replace(template, wounds_remaining=model.wounds_remaining))
+        # A datasheet handoff retains the physical model's health; an unresolved
+        # replacement profile is evaluated when a later rule needs its W value.
+        remapped_models.append(
+            replace(
+                template,
+                starting_wounds=model.initial_wounds,
+                wounds_remaining=model.current_wounds,
+            )
+        )
     updated_unit = replace(
         unit,
         datasheet_id=replacement_datasheet.datasheet_id,

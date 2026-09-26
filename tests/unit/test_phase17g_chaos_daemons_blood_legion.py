@@ -433,7 +433,7 @@ def test_furys_cage_adapter_decline_inflicts_no_wounds_and_records_no_rerolls() 
         state=state,
         unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
     )
-    starting_wounds = bearer.own_models[0].wounds_remaining
+    starting_wounds = bearer.own_models[0].current_wounds
     starting_effect_ids = tuple(effect.effect_id for effect in state.persisting_effects)
     session = LocalGameSession(lifecycle=lifecycle)
     grant_request = _select_furys_cage_grant_request(
@@ -481,7 +481,7 @@ def test_furys_cage_adapter_decline_inflicts_no_wounds_and_records_no_rerolls() 
         state=state,
         unit_instance_id=bearer.unit_instance_id,
     )
-    assert refreshed_bearer.own_models[0].wounds_remaining == starting_wounds
+    assert refreshed_bearer.own_models[0].current_wounds == starting_wounds
     assert tuple(effect.effect_id for effect in state.persisting_effects) == starting_effect_ids
     assert not _events_of_type(
         lifecycle.decision_controller,
@@ -1026,7 +1026,7 @@ def test_furys_cage_adapter_accept_hits_exact_bearer_and_grants_scoped_rerolls()
     )
     bearer_model = bearer.own_models[0]
     bodyguard_starting_wounds = {
-        model.model_instance_id: model.wounds_remaining for model in bodyguard.own_models
+        model.model_instance_id: model.current_wounds for model in bodyguard.own_models
     }
     session = LocalGameSession(lifecycle=lifecycle)
     grant_request = _select_furys_cage_grant_request(
@@ -1083,11 +1083,11 @@ def test_furys_cage_adapter_accept_hits_exact_bearer_and_grants_scoped_rerolls()
         expected_mortal_wounds
     )
     assert (
-        bearer_model.wounds_remaining - refreshed_bearer.own_models[0].wounds_remaining
+        bearer_model.current_wounds - refreshed_bearer.own_models[0].current_wounds
         == expected_mortal_wounds
     )
     assert {
-        model.model_instance_id: model.wounds_remaining for model in refreshed_bodyguard.own_models
+        model.model_instance_id: model.current_wounds for model in refreshed_bodyguard.own_models
     } == bodyguard_starting_wounds
 
     reroll_effects = _furys_cage_reroll_effects(state)
@@ -3646,7 +3646,7 @@ def _destroy_enemy_unit_for_blood_tainted(
         decisions=decisions,
         source_unit_instance_id=_BLOOD_UNIT_ID,
         application_id="phase17g-blood-tainted-destruction",
-        mortal_wounds=sum(model.wounds_remaining for model in enemy_unit.own_models),
+        mortal_wounds=sum(model.current_wounds for model in enemy_unit.own_models),
     )
     if destroyed_ids != expected_destroyed_ids:
         raise AssertionError("Blood Tainted fixture did not destroy the complete enemy unit")
@@ -3746,7 +3746,7 @@ def _destroy_enemy_unit_with_gateway_attack(
             state=state,
             unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
         ),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 
@@ -3919,7 +3919,7 @@ def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
         decisions=decisions,
         source_unit_instance_id=_BLOOD_UNIT_ID,
         application_id="phase17g-blood-tainted-split-first-attacker",
-        mortal_wounds=first_model.wounds_remaining,
+        mortal_wounds=first_model.current_wounds,
     )
     if first_destroyed_ids != (first_model.model_instance_id,):
         raise AssertionError("split-attacker fixture first source destroyed unexpected models")
@@ -3929,7 +3929,7 @@ def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
         decisions=decisions,
         source_unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
         application_id="phase17g-blood-tainted-split-completion-attacker",
-        mortal_wounds=sum(model.wounds_remaining for model in remaining_models),
+        mortal_wounds=sum(model.current_wounds for model in remaining_models),
     )
     expected_completion_ids = tuple(model.model_instance_id for model in remaining_models)
     if completion_destroyed_ids != expected_completion_ids:

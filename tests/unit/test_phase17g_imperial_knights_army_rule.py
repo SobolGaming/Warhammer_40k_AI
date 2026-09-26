@@ -1980,7 +1980,7 @@ def _record_enemy_unit_destroyed(
         },
         target_unit_instance_id=enemy.unit_instance_id,
         defender_player_id="player-b",
-        mortal_wounds=sum(model.wounds_remaining for model in enemy.own_models),
+        mortal_wounds=sum(model.current_wounds for model in enemy.own_models),
         spill_over=True,
         destruction_evidence=destruction_evidence,
     )

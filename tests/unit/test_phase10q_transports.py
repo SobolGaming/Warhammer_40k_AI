@@ -571,7 +571,7 @@ def test_destroying_last_model_of_embarked_component_reconciles_current_cargo(
             state=state,
             target_unit_instance_id=leader.unit_instance_id,
             model_instance_id=leader_model.model_instance_id,
-            damage=leader_model.wounds_remaining,
+            damage=leader_model.current_wounds,
             damage_kind=DamageKind.MORTAL,
             remove_destroyed_model=False,
         )
@@ -1153,9 +1153,7 @@ def test_embarked_model_revival_requires_remaining_transport_capacity_without_de
     assert follow_up is None
     assert resolved.resolved_steps[0].step_kind is expected_kind
     assert (
-        model_by_id(
-            state=state, model_instance_id=destroyed_model.model_instance_id
-        ).wounds_remaining
+        model_by_id(state=state, model_instance_id=destroyed_model.model_instance_id).current_wounds
         == expected_wounds
     )
     assert state.battlefield_state is not None
@@ -2043,7 +2041,7 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     assert is_mortal_wound_feel_no_pain_request(fnp_request)
     assert mortal_wound_feel_no_pain_source_context(fnp_request) == source_context
     before_wounds = sum(
-        int(model.wounds_remaining)
+        int(model.current_wounds)
         for army in restored_state.army_definitions
         for unit in army.units
         if unit.unit_instance_id in component_ids
@@ -2076,7 +2074,7 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
         is None
     )
     after_wounds = sum(
-        int(model.wounds_remaining)
+        int(model.current_wounds)
         for army in restored_state.army_definitions
         for unit in army.units
         if unit.unit_instance_id in component_ids
@@ -6347,8 +6345,8 @@ def test_combat_disembark_hazard_mortal_wounds_use_shared_damage_service() -> No
         is None
     )
     assert (
-        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
-        == target_model.wounds_remaining - 1
+        model_by_id(state=state, model_instance_id=target_model.model_instance_id).current_wounds
+        == target_model.current_wounds - 1
     )
     event_payloads = [
         record.payload
@@ -6450,8 +6448,8 @@ def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() ->
         "phase14h-transport-fnp",
     }
     assert (
-        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
-        == target_model.wounds_remaining
+        model_by_id(state=state, model_instance_id=target_model.model_instance_id).current_wounds
+        == target_model.current_wounds
     )
     assert TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE not in {
         record.event_type for record in decisions.event_log.records
@@ -6476,8 +6474,8 @@ def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() ->
 
     assert resume_status is None
     assert (
-        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
-        == target_model.wounds_remaining - 1
+        model_by_id(state=state, model_instance_id=target_model.model_instance_id).current_wounds
+        == target_model.current_wounds - 1
     )
     assert len(event_payloads) == 1
     final_payload = cast(TransportHazardMortalWoundsPayload, event_payloads[0])
@@ -6658,8 +6656,8 @@ def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() ->
         is None
     )
     assert (
-        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
-        == target_model.wounds_remaining - 1
+        model_by_id(state=state, model_instance_id=target_model.model_instance_id).current_wounds
+        == target_model.current_wounds - 1
     )
     emergency_result = resolve_destroyed_transport_disembark(
         scenario=disembark_scenario,
@@ -8283,7 +8281,7 @@ def test_combat_disembark_uses_retained_attached_engagement_as_canonical_permiss
         state=state,
         target_unit_instance_id=leader.unit_instance_id,
         model_instance_id=leader_model.model_instance_id,
-        damage=leader_model.wounds_remaining,
+        damage=leader_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed

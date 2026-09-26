@@ -23,10 +23,10 @@ class _HealingModelLike(Protocol):
     def is_alive(self) -> bool: ...
 
     @property
-    def wounds_remaining(self) -> int: ...
+    def current_wounds(self) -> int: ...
 
     @property
-    def starting_wounds(self) -> int: ...
+    def initial_wounds(self) -> int: ...
 
 
 def selected_wounded_healing_model_ids(
@@ -48,7 +48,7 @@ def selected_wounded_healing_model_ids(
             model.model_instance_id
             for model in models
             if model.is_alive
-            and model.wounds_remaining < model.starting_wounds
+            and model.current_wounds < model.initial_wounds
             and (locked_model_id is None or model.model_instance_id == locked_model_id)
         )
     )

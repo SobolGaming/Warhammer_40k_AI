@@ -899,6 +899,26 @@ def resolve_battle_shock_effect(
             phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
         )
     )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+    )
+
+    random_profile_scope = unit_move_completed_battle_shock_request_id(
+        battle_round=state.battle_round,
+        effect=effect,
+    )
+    evaluate_unit_profile_characteristics(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=effect.target_unit_instance_id,
+        scope_id=random_profile_scope,
+        characteristics=(Characteristic.LEADERSHIP,),
+        model_instance_ids=current_model_ids,
+    )
+    target_rules_unit = rules_unit_view_by_id(
+        state=state, unit_instance_id=effect.target_unit_instance_id
+    )
     request = BattleShockTestRequest.for_unit(
         request_id=unit_move_completed_battle_shock_request_id(
             battle_round=state.battle_round,

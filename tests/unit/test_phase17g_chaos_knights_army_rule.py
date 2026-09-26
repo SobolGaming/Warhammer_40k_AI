@@ -1001,7 +1001,7 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
         target_unit_id=target_unit_id,
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     decisions = DecisionController()
     handler = CommandPhaseHandler(
@@ -1031,7 +1031,7 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
     application = cast(dict[str, JsonValue], delirium_payload["mortal_wound_application"])
     assert application["mortal_wounds"] in (1, 2, 3)
     final_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
 
@@ -1081,7 +1081,7 @@ def test_harbingers_uses_attached_rules_unit_identity_for_forced_test_and_outcom
         target_unit_id=bodyguard_id,
     )
     starting_wounds = sum(
-        model.wounds_remaining
+        model.current_wounds
         for unit_id in (bodyguard_id, leader_id)
         for model in unit_by_id(state, unit_id).own_models
     )
@@ -1103,7 +1103,7 @@ def test_harbingers_uses_attached_rules_unit_identity_for_forced_test_and_outcom
     application = cast(dict[str, JsonValue], delirium["mortal_wound_application"])
     assert application["target_unit_instance_id"] == attached_id
     final_wounds = sum(
-        model.wounds_remaining
+        model.current_wounds
         for unit_id in (bodyguard_id, leader_id)
         for model in unit_by_id(state, unit_id).own_models
     )
@@ -1210,7 +1210,7 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
         sources=(FeelNoPainSource(source_id="phase17g-chaos-knights-fnp", threshold=5),),
         decline_allowed=True,
     )
-    starting_wounds = sum(model.wounds_remaining for model in target_unit.own_models)
+    starting_wounds = sum(model.current_wounds for model in target_unit.own_models)
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_battle_shock_hooks(),
@@ -1278,7 +1278,7 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
     assert applied_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
     assert applied_payload["feel_no_pain_result_id"] is not None
     final_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
 
@@ -1290,7 +1290,7 @@ def test_delirium_applies_immediate_damage_in_non_command_phase() -> None:
         with_feel_no_pain=False,
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
 
     _resolve_failed_delirium_battle_shock(
@@ -1313,7 +1313,7 @@ def test_delirium_applies_immediate_damage_in_non_command_phase() -> None:
     assert applied["phase"] == BattlePhase.SHOOTING.value
     assert not decisions.queue.pending_requests
     assert (
-        sum(model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models)
+        sum(model.current_wounds for model in unit_by_id(state, target_unit_id).own_models)
         < starting_wounds
     )
 
@@ -3173,7 +3173,7 @@ def _command_delirium_lifecycle_fixture(
             ),
             target_unit_instance_id=target_unit_id,
             defender_player_id="player-a",
-            mortal_wounds=target_model.wounds_remaining // 2 + 1,
+            mortal_wounds=target_model.current_wounds // 2 + 1,
             spill_over=True,
         ),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
@@ -3383,7 +3383,7 @@ def _delirium_outcome_fixture(
             ),
             target_unit_instance_id=target_unit_id,
             defender_player_id="player-b",
-            mortal_wounds=sum(model.wounds_remaining for model in target.own_models[:3]),
+            mortal_wounds=sum(model.current_wounds for model in target.own_models[:3]),
             spill_over=True,
         ),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),

@@ -1,5 +1,10 @@
 # Order 70 Fights First query assessment
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 R73-001 refreshes the head evidence for runtime `2f6bea48` with unchanged
 baselines, workloads and budgets. Current qualification is recorded in
 [review-fix validation](../order73/r73_001/validation.json); prior results below

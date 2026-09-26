@@ -438,7 +438,7 @@ def _model_state(
     transport_unit_id: str | None,
     reserve_status: ReserveStatus | None,
 ) -> Literal["placed", "destroyed", "embarked", "reserves", "removed", "undeployed"]:
-    if reserve_status is ReserveStatus.DESTROYED or model.wounds_remaining == 0:
+    if reserve_status is ReserveStatus.DESTROYED or model.current_wounds == 0:
         return "destroyed"
     if removed:
         return "removed"

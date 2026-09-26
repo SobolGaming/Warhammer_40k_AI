@@ -1,5 +1,10 @@
 # P03C mandatory endpoint proof evidence
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The versioned workload is one five-model Charge facade submission with a
 3.75-inch movement budget and a feature-owned wall. Three independent samples
 clear the shared reachability cache before submission. Fixture construction and

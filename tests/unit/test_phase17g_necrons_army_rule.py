@@ -89,7 +89,7 @@ def test_lifecycle_reanimation_heals_wounded_unit_then_requests_next_activation(
     _set_model_wounds(
         state,
         model_instance_id=wounded.model_instance_id,
-        wounds_remaining=wounded.starting_wounds - 1,
+        wounds_remaining=wounded.initial_wounds - 1,
     )
 
     session = LocalGameSession(lifecycle=lifecycle)
@@ -116,9 +116,7 @@ def test_lifecycle_reanimation_heals_wounded_unit_then_requests_next_activation(
         )
     )
 
-    assert (
-        _model_by_id(state, wounded.model_instance_id).wounds_remaining == wounded.starting_wounds
-    )
+    assert _model_by_id(state, wounded.model_instance_id).current_wounds == wounded.initial_wounds
     assert follow_up_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     follow_up_request = _require_request(follow_up_status.decision_request)
     assert {option.option_id for option in follow_up_request.options} == {
@@ -237,7 +235,7 @@ def test_reanimation_revive_choice_uses_necron_player_and_json_safe_records() ->
     assert state.battlefield_state is not None
     assert selected_model_id in state.battlefield_state.placed_model_ids()
     assert selected_model_id not in state.battlefield_state.removed_model_ids
-    assert _model_by_id(state, selected_model_id).wounds_remaining >= 1
+    assert _model_by_id(state, selected_model_id).current_wounds >= 1
     assert "<" not in json.dumps(lifecycle.decision_controller.to_payload(), sort_keys=True)
 
 

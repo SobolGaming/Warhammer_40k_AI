@@ -5,7 +5,6 @@ from dataclasses import dataclass, replace
 from typing import cast
 
 from warhammer40k_core.core.weapon_profiles import (
-    RangeProfile,
     RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
@@ -40,6 +39,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.profile_modifiers import range_with_delta
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
@@ -159,9 +159,6 @@ class CatalogConditionalLeadingRuntime:
             or profile.range_profile.kind is not RangeProfileKind.DISTANCE
         ):
             return profile
-        distance = profile.range_profile.distance_inches
-        if distance is None:
-            raise GameLifecycleError("Ranged weapon profile distance is missing.")
         source_ids = (
             profile.source_ids
             if effects[0].source_rule_id in profile.source_ids
@@ -169,7 +166,12 @@ class CatalogConditionalLeadingRuntime:
         )
         return replace(
             profile,
-            range_profile=RangeProfile.distance(distance + 6),
+            range_profile=range_with_delta(
+                profile.range_profile,
+                6,
+                source_id=effects[0].source_rule_id,
+                target_id=context.attacker_model_instance_id,
+            ),
             source_ids=source_ids,
         )
 

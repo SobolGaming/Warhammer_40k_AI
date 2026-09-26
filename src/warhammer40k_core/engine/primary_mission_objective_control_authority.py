@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.attributes import CharacteristicValue
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
@@ -20,7 +24,10 @@ def resolve_checkpoint_objective_control(
     unit_instance_id: str,
     model: ModelInstance,
     runtime_modifier_registry: RuntimeModifierRegistry,
-) -> CharacteristicValue:
+) -> ProfileCharacteristicValue:
+    descriptor = model.characteristic(Characteristic.OBJECTIVE_CONTROL)
+    if isinstance(descriptor, RandomProfileValue) and descriptor.evaluation is None:
+        return descriptor
     source = model_objective_control_characteristic(model, battle_shocked=False)
     context = ObjectiveControlModifierContext(
         state=state,

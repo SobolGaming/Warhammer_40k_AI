@@ -2416,7 +2416,7 @@ def _retain_models_for_fight_on_death(
             state=state,
             target_unit_instance_id=placement.unit_instance_id,
             model_instance_id=placement.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
         assert damage.destroyed

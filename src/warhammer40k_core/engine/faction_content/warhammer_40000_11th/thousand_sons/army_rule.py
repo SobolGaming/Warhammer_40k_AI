@@ -12,6 +12,10 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -75,6 +79,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -1816,11 +1821,13 @@ def _source_context_subset(payload: dict[str, JsonValue]) -> dict[str, JsonValue
     }
 
 
-def _improve_armor_penetration(value: CharacteristicValue, bonus: int) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue:
+def _improve_armor_penetration(
+    value: ProfileCharacteristicValue, bonus: int
+) -> ProfileCharacteristicValue:
+    if type(value) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Cabal of Sorcerers AP modifier requires CharacteristicValue.")
     amount = _validate_positive_int("armor_penetration_bonus", bonus)
-    return CharacteristicValue.from_raw(value.characteristic, value.final - amount)
+    return profile_with_delta(value, -amount, source_id=SOURCE_RULE_ID)
 
 
 def _source_ids_with_cabal(source_ids: tuple[str, ...]) -> tuple[str, ...]:

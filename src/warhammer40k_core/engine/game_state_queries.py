@@ -3,15 +3,21 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.objective_control_boundary_proposal import (
     commit_canonical_objective_control_proposal,
+    objective_control_context_for_boundary,
     propose_canonical_objective_control_boundary,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.random_objective_control import (
+    objective_control_boundary_scope,
+    prepare_objective_control,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.transports import TransportCargoState
 
@@ -54,6 +60,7 @@ def transport_cargo_state_for_embarked_unit(
 def determine_current_phase_end_objective_control(
     *,
     state: GameState,
+    decisions: DecisionController | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> ObjectiveControlRecord:
     if state.stage is not GameLifecycleStage.BATTLE:
@@ -62,6 +69,7 @@ def determine_current_phase_end_objective_control(
         raise GameLifecycleError("End-boundary objective control requires a battle phase.")
     completed_phase = state.battle_phase_sequence[state.battle_phase_index]
     return state.record_objective_control_boundary(
+        decisions=decisions,
         completed_phase=completed_phase,
         timing=ObjectiveControlTiming.PHASE_END,
         runtime_modifier_registry=runtime_modifier_registry,
@@ -71,10 +79,20 @@ def determine_current_phase_end_objective_control(
 def record_objective_control_boundary(
     *,
     state: GameState,
+    decisions: DecisionController | None = None,
     completed_phase: BattlePhase,
     timing: ObjectiveControlTiming,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> ObjectiveControlRecord:
+    context = objective_control_context_for_boundary(
+        state=state,
+        completed_phase=completed_phase,
+        timing=timing,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    scope_id = objective_control_boundary_scope(context)
+    if not any(record.record_id == scope_id for record in state.objective_control_records):
+        prepare_objective_control(context, decisions=decisions, scope_id=scope_id)
     proposal = propose_canonical_objective_control_boundary(
         state=state,
         completed_phase=completed_phase,

@@ -8,6 +8,7 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.core.modifiers import ModifierTerm, RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.core.weapon_skill_modifiers import same_weapon_skill_source
 from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierBinding,
     AllocatedAttackDamageModifierContext,
@@ -1268,7 +1269,7 @@ class RuntimeModifierRegistry:
             )
             if (
                 (updated.skill != current.skill and not updated.skill_modifiers)
-                or updated.skill.raw != current.skill.raw
+                or not same_weapon_skill_source(updated, current)
                 or not set(current.skill_modifiers).issubset(updated.skill_modifiers)
             ):
                 raise GameLifecycleError("Weapon skill provider discarded source operations.")

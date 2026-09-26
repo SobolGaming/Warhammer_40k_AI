@@ -216,6 +216,7 @@ from warhammer40k_core.engine.phases.fight_movement_lifecycle import (
     request_fight_movement,
     request_overrun_pile_in,
 )
+from warhammer40k_core.engine.random_weapon_profiles import random_melee_pool_evidence
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
@@ -1471,6 +1472,7 @@ def _apply_melee_declaration_decision(
                 "proposal_request": proposal_request.to_payload(),
                 "proposal": proposal.to_payload(),
                 "attack_sequence_id": attack_sequence.sequence_id,
+                **random_melee_pool_evidence(attack_sequence.attack_pools, state=state),
                 "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
             }
         ),

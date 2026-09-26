@@ -1155,7 +1155,7 @@ def test_retained_only_aeldari_keeps_sudden_strike_and_pending_attacks() -> None
         state=state,
         target_unit_instance_id=fighter.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -1249,7 +1249,7 @@ def test_mixed_aeldari_with_retained_model_keeps_sudden_strike_authority() -> No
         state=state,
         target_unit_instance_id=fighter.unit_instance_id,
         model_instance_id=destroyed_model.model_instance_id,
-        damage=destroyed_model.wounds_remaining,
+        damage=destroyed_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -1362,7 +1362,7 @@ def test_opportunity_seized_requires_living_unit_but_measures_retained_physical_
                 state=state,
                 target_unit_instance_id=friendly_unit.unit_instance_id,
                 model_instance_id=model.model_instance_id,
-                damage=model.wounds_remaining,
+                damage=model.current_wounds,
                 damage_kind=DamageKind.NORMAL,
             )
         retain_destroyed_model_for_fixture(

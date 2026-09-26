@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -64,9 +65,14 @@ def move_witness(session: LocalGameSession, unit_id: str, dx: float = 0.25) -> P
 
 
 def reaction_session(
-    *, attached: bool = False, parameterized: bool = False, enqueue_reaction: bool = True
+    *,
+    attached: bool = False,
+    parameterized: bool = False,
+    enqueue_reaction: bool = True,
+    catalog: ArmyCatalog | None = None,
 ) -> tuple[LocalGameSession, str]:
     lifecycle, _ = fight_lifecycle(
+        catalog=catalog,
         alpha_unit_ids=("source",),
         enemy_unit_ids=("reactor", "leader") if attached else ("reactor",),
         origins={

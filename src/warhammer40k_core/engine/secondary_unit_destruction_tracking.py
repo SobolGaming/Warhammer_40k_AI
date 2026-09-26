@@ -63,7 +63,7 @@ def secondary_unit_destruction_from_primary(
         destroyed_models=tuple(
             SecondaryDestroyedModelState(
                 model_instance_id=model_id,
-                starting_wounds=model_by_id[model_id].starting_wounds,
+                starting_wounds=model_by_id[model_id].initial_wounds,
             )
             for model_id in destroyed_model_ids
         ),

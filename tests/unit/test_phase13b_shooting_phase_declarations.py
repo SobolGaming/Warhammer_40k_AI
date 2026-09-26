@@ -630,8 +630,11 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
         "removals": [model_destroyed_payload["removal_record"]],
         "displacements": [],
     }
-    assert any(
-        cast(dict[str, object], hit_event["payload"])["target_number"] == 4
+    assert hit_events
+    assert all(
+        cast(dict[str, object], hit_event["payload"])["target_number"] == profile.skill.final
+        and cast(dict[str, object], hit_event["payload"])["skipped"] is True
+        and cast(dict[str, object], hit_event["payload"])["roll_state"] is None
         for hit_event in hit_events
     )
     assert not any(_save_payload_has_cover(save_event) for save_event in save_events)
@@ -2251,7 +2254,7 @@ def test_order39_removed_models_stop_counting_but_retained_models_still_count(
         state=state,
         target_unit_instance_id=target.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     if retained:
@@ -2430,6 +2433,7 @@ def test_order39_cover_metadata_and_skill_agree_for_all_attack_windows(
     )
     options = _save_options_for_allocation(
         state=state,
+        decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
         attack_sequence=sequence,
         attack_context=context,
@@ -2504,7 +2508,7 @@ def test_order39_conditional_leader_grant_survives_retention_until_removal(retai
         state=state,
         target_unit_instance_id=view.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     if retained:
@@ -4686,7 +4690,7 @@ def test_order71_candidate_cache_rechecks_attached_vehicle_keyword_after_casualt
         state=state,
         target_unit_instance_id=leader.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     after = candidate()

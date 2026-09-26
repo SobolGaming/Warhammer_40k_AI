@@ -14835,8 +14835,8 @@
     "markers": []
   },
   "primary_rules_unit_turn_start_snapshots": [],
-  "projection_schema": "game-view-v12-model-keywords",
-  "projection_state_hash": "271be2d66b7c9f3b35a5b0599cd43e108cf867e1ece3996e29e243814b28162c",
+  "projection_schema": "game-view-v13-random-profiles",
+  "projection_state_hash": "9939108d7178ae173931bf029f71dd2528ade03c661157ad1722cf82636266d1",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

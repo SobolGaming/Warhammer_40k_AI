@@ -161,6 +161,26 @@ def resolve_selected_target_battle_shock_effect(
             phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
         )
     )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+    )
+
+    random_profile_scope = (
+        f"catalog-selected-target-battle-shock:{state.battle_round:02d}:"
+        f"{result.result_id}:{target_unit_id}:{_payload_int(record, key='effect_index'):03d}"
+    )
+    evaluate_unit_profile_characteristics(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=target_unit_id,
+        scope_id=random_profile_scope,
+        characteristics=(Characteristic.LEADERSHIP,),
+        model_instance_ids=current_model_ids,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     request = BattleShockTestRequest.for_unit(
         request_id=(
             f"catalog-selected-target-battle-shock:{state.battle_round:02d}:"

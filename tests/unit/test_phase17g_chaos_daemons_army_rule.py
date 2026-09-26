@@ -529,7 +529,7 @@ def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> N
     )
     healing_effect = cast(dict[str, JsonValue], manifestation_payload["healing_effect"])
     assert healing_effect["source_rule_id"] == army_rule.SOURCE_RULE_ID
-    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    assert _model_by_id(state, wounded_model_id).current_wounds == 2
 
 
 def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
@@ -576,7 +576,7 @@ def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
     )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
-    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    assert _model_by_id(state, wounded_model_id).current_wounds == 2
     manifestation_payload = _event_payload(
         decisions,
         "chaos_daemons_daemonic_manifestation_healing_resolved",
@@ -629,7 +629,7 @@ def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() 
     )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
-    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    assert _model_by_id(state, wounded_model_id).current_wounds == 2
     manifestation_payload = _event_payload(
         decisions,
         "chaos_daemons_daemonic_manifestation_healing_resolved",
@@ -1205,7 +1205,7 @@ def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> 
     removed_ids = set(state.battlefield_state.removed_model_ids)
     assert set(destroyed_model_ids).isdisjoint(placed_ids)
     assert set(destroyed_model_ids) <= removed_ids
-    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    assert _model_by_id(state, wounded_model_id).current_wounds == 2
 
 
 def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> None:
@@ -1264,7 +1264,7 @@ def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> 
     assert stale_status.status_kind is LifecycleStatusKind.INVALID
     assert invalid_status.status_kind is LifecycleStatusKind.INVALID
     assert session.lifecycle.decision_controller.queue.peek_next() == placement_request
-    assert _model_by_id(state, selected_model_id).wounds_remaining == 0
+    assert _model_by_id(state, selected_model_id).current_wounds == 0
 
     next_status = session.submit_parameterized_payload(
         request_id=placement_request.request_id,
@@ -1309,8 +1309,8 @@ def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> 
 
     assert tuple(sorted(revived_ids)) == tuple(sorted(destroyed_model_ids))
     assert all(
-        _model_by_id(state, model_instance_id).wounds_remaining
-        == _model_by_id(state, model_instance_id).starting_wounds
+        _model_by_id(state, model_instance_id).current_wounds
+        == _model_by_id(state, model_instance_id).initial_wounds
         for model_instance_id in destroyed_model_ids
     )
     healing_events = _event_payloads(
@@ -1428,7 +1428,7 @@ def test_daemonic_manifestation_effect_kind_drift_rejects_before_lifecycle_mutat
         == before_dice_events
     )
     assert all(
-        _model_by_id(state, model_instance_id).wounds_remaining == 0
+        _model_by_id(state, model_instance_id).current_wounds == 0
         for model_instance_id in destroyed_model_ids
     )
 
@@ -1524,7 +1524,7 @@ def test_daemonic_manifestation_dual_identity_drift_keeps_provider_ownership() -
         == before_dice_events
     )
     assert all(
-        _model_by_id(state, model_instance_id).wounds_remaining == 0
+        _model_by_id(state, model_instance_id).current_wounds == 0
         for model_instance_id in destroyed_model_ids
     )
 
@@ -1661,7 +1661,7 @@ def test_daemonic_manifestation_placement_identity_drift_retains_provider_owners
     assert decisions.queue.pending_requests == before_queue
     assert decisions.records == before_records
     assert decisions.event_log.records == before_events
-    assert _model_by_id(state, selected_model_id).wounds_remaining == 0
+    assert _model_by_id(state, selected_model_id).current_wounds == 0
     assert state.battlefield_state is not None
     assert selected_model_id not in state.battlefield_state.placed_model_ids()
 
@@ -1714,7 +1714,7 @@ def test_staged_july_daemonic_manifestation_can_finish_before_first_revival() ->
 
     assert completed.status_kind is not LifecycleStatusKind.INVALID
     assert all(
-        _model_by_id(state, model_id).wounds_remaining == 0 for model_id in destroyed_model_ids
+        _model_by_id(state, model_id).current_wounds == 0 for model_id in destroyed_model_ids
     )
     finish_event = _event_payloads(
         session.lifecycle.decision_controller,
@@ -1760,14 +1760,14 @@ def test_staged_july_daemonic_manifestation_can_finish_after_partial_revival() -
 
     assert completed.status_kind is not LifecycleStatusKind.INVALID
     assert (
-        _model_by_id(state, selected_model_id).wounds_remaining
+        _model_by_id(state, selected_model_id).current_wounds
         == _model_by_id(
             state,
             selected_model_id,
-        ).starting_wounds
+        ).initial_wounds
     )
     assert all(
-        _model_by_id(state, model_id).wounds_remaining == 0
+        _model_by_id(state, model_id).current_wounds == 0
         for model_id in destroyed_model_ids
         if model_id != selected_model_id
     )
@@ -2297,7 +2297,7 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
         "chaos_daemons_daemonic_manifestation_healing_resolved",
     )
     assert manifestation_payload["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
-    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    assert _model_by_id(state, wounded_model_id).current_wounds == 2
 
 
 def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> None:
@@ -2385,7 +2385,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
         target_unit_id=target_unit_id,
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     decisions = DecisionController()
     handler = CommandPhaseHandler(
@@ -2429,7 +2429,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
     application = cast(dict[str, JsonValue], terror_payload["mortal_wound_application"])
     assert application["mortal_wounds"] in (1, 2, 3)
     final_wounds = sum(
-        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+        model.current_wounds for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
 

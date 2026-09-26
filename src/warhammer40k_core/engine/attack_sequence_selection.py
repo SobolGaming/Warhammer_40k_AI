@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.random_profile_values import RandomProfileValue
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.weapon_ability_sources import reidentify_weapon_profile
@@ -58,7 +60,11 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
     hit_basis = (
         "auto_hit:torrent"
         if WeaponKeyword.TORRENT in profile.keywords
-        else f"hit_target:{_hit_skill(profile)}"
+        else (
+            "random_hit_target:" + canonical_json(profile.skill.to_payload())
+            if isinstance(profile.skill, RandomProfileValue)
+            else f"hit_target:{_hit_skill(profile)}"
+        )
     )
     return IdenticalAttackSignature(
         attacker_model_instance_id=pool.attacker_model_instance_id,
@@ -72,6 +78,14 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         damage=canonical_json(profile.damage_profile.to_payload()),
         weapon_rule_tokens=(
             *_weapon_rule_tokens_for_signature(profile),
+            *(
+                (f"random-profile-weapon:{pool.weapon_instance_id}",)
+                if any(
+                    isinstance(value, RandomProfileValue)
+                    for value in (profile.skill, profile.strength, profile.armor_penetration)
+                )
+                else ()
+            ),
             *(
                 f"skill-modifier:{canonical_json(item.to_payload())}"
                 for item in profile.skill_modifiers
@@ -247,9 +261,9 @@ def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
     profile = pool.weapon_profile
     return (
         pool.target_unit_instance_id,
-        profile.skill.final,
-        profile.strength.final,
-        profile.armor_penetration.final,
+        profile.skill.to_payload(),
+        profile.strength.to_payload(),
+        profile.armor_penetration.to_payload(),
         profile.damage_profile.to_payload(),
         tuple(keyword.value for keyword in profile.keywords),
         tuple(ability.to_payload() for ability in profile.abilities),

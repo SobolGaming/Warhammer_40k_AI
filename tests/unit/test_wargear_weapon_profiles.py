@@ -848,7 +848,7 @@ def test_weapon_profile_rejects_modified_characteristic_values() -> None:
 
 def test_weapon_profile_payload_errors_stay_in_weapon_profile_domain() -> None:
     profile_payload = _bolt_rifle_profile().to_payload()
-    profile_payload["skill"]["raw"] = -1
+    cast(dict[str, object], profile_payload["skill"])["raw"] = -1
 
     with pytest.raises(WeaponProfileError):
         WeaponProfile.from_payload(profile_payload)
@@ -914,7 +914,7 @@ def test_wargear_payload_errors_stay_in_wargear_domain() -> None:
         name="Bolt rifle",
         weapon_profiles=(_bolt_rifle_profile(),),
     ).to_payload()
-    payload["weapon_profiles"][0]["skill"]["raw"] = -1
+    cast(dict[str, object], payload["weapon_profiles"][0]["skill"])["raw"] = -1
 
     with pytest.raises(WargearError):
         Wargear.from_payload(payload)

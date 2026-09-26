@@ -28,6 +28,7 @@ from warhammer40k_core.core.dice import (
     DiceRollSpec,
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
+from warhammer40k_core.core.random_profile_values import ProfileCharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
     LineOfSightPolicy,
@@ -1800,10 +1801,10 @@ def _destroyed_transport_pending_for_test(
             target_unit_instance_id=transport.unit_instance_id,
             model_instance_id=transport_model.model_instance_id,
             damage_kind=DamageKind.NORMAL,
-            requested_damage=transport_model.wounds_remaining,
-            wounds_lost=transport_model.wounds_remaining,
+            requested_damage=transport_model.current_wounds,
+            wounds_lost=transport_model.current_wounds,
             excess_damage_lost=0,
-            starting_wounds_remaining=transport_model.wounds_remaining,
+            starting_wounds_remaining=transport_model.current_wounds,
             final_wounds_remaining=0,
             destroyed=True,
         ),
@@ -1811,9 +1812,7 @@ def _destroyed_transport_pending_for_test(
             "save_kind": SaveKind.ARMOUR.value,
             "successful": False,
         },
-        feel_no_pain=FeelNoPainResolution.declined(
-            requested_wounds=transport_model.wounds_remaining
-        ),
+        feel_no_pain=FeelNoPainResolution.declined(requested_wounds=transport_model.current_wounds),
         destroyed_model_controller_player_id="player-b",
         transport_unit_instance_id=transport.unit_instance_id,
         pending_unit_instance_ids=(passenger.unit_instance_id,),
@@ -1898,9 +1897,7 @@ def _destroyed_transport_attack_context_for_test(
         "weapon_profile_id": weapon_profile.profile_id,
         "selected_weapon_ability_ids": [],
         "is_psychic_attack": False,
-        "damage_profile": DamageProfile.fixed(
-            transport.own_models[0].wounds_remaining
-        ).to_payload(),
+        "damage_profile": DamageProfile.fixed(transport.own_models[0].current_wounds).to_payload(),
         "hit_roll": HitRoll.auto_hit(target_number=3).to_payload(),
         "wound_roll": WoundRoll.auto_wound(
             strength=strength,
@@ -2394,7 +2391,7 @@ def _phase14l_test1_target_model(model: ModelInstance) -> ModelInstance:
     )
     override_values = dict(overrides)
     seen: set[Characteristic] = set()
-    characteristics: list[CharacteristicValue] = []
+    characteristics: list[ProfileCharacteristicValue] = []
     for value in model.characteristics:
         if value.characteristic in override_values:
             characteristics.append(
@@ -2611,7 +2608,7 @@ def _reduce_unit_to_last_model_with_mortal_wounds(
             state=state,
             unit_instance_id=target_unit.unit_instance_id,
         ),
-        mortal_wounds=sum(model.wounds_remaining for model in casualty_models),
+        mortal_wounds=sum(model.current_wounds for model in casualty_models),
         spill_over=True,
     )
     routing = continue_mortal_wound_application(

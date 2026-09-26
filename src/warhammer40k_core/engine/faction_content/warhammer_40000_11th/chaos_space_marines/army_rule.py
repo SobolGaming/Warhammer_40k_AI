@@ -726,7 +726,7 @@ def dark_pact_resolution_payload(
     rules_unit: RulesUnitView,
     effect: PersistingEffect,
     selected_pact: DarkPactKind,
-    leadership_target: int,
+    leadership_target: int | None,
     leadership_roll: JsonValue,
     leadership_modified_roll: JsonValue,
     passed: bool,

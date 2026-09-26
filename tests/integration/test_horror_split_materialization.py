@@ -162,6 +162,73 @@ class _SplitScenario:
     attached_unit_instance_id: str
 
 
+def test_random_wounds_materialization_uses_recorded_health_for_placement_and_handoff() -> None:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind="attack",
+        random_materialized_wounds=True,
+    )
+    assert resolve_horror_completion(scenario.runtime, scenario.context) is not None
+    request = scenario.decisions.queue.peek_next()
+    body = cast(dict[str, JsonValue], request.payload)
+    rows = cast(list[dict[str, JsonValue]], body["models"])
+    assert len(rows) == 2
+    assert all(
+        type(row["starting_wounds"]) is int and 3 <= row["starting_wounds"] <= 8 for row in rows
+    )
+    lifecycle = GameLifecycle(state=scenario.state, decision_controller=scenario.decisions)
+    _configure_phase_lifecycle(lifecycle=lifecycle, scenario=scenario)
+    from warhammer40k_core.engine.random_profile_restore import validate_random_profile_history
+
+    validate_random_profile_history(
+        state=GameState.from_payload(scenario.state.to_payload()),
+        catalog=scenario.package.army_catalog,
+        pending_requests=scenario.decisions.queue.pending_requests,
+        event_records=scenario.decisions.event_log.records,
+        decision_records=scenario.decisions.records,
+    )
+    session = LocalGameSession(lifecycle)
+    before = tuple(
+        event
+        for event in scenario.decisions.event_log.records
+        if event.event_type == "random_characteristic_rolled"
+    )
+    assert len(before) == 2
+    for viewer in (scenario.source_army.player_id, scenario.enemy_army.player_id):
+        session.view(viewer_player_id=viewer)
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="random-wounds-placement",
+        payload=_placement_payload(
+            request=request, army=scenario.source_army, unit=scenario.bodyguard
+        ),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    after = tuple(
+        event
+        for event in scenario.decisions.event_log.records
+        if event.event_type == "random_characteristic_rolled"
+    )
+    assert after == before
+    assert any(
+        event.event_type == CATALOG_MODELS_MATERIALIZED_EVENT
+        for event in scenario.decisions.event_log.records
+    )
+    updated = _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id)
+    assert updated.datasheet_id == "000002583"
+    assert {model.model_instance_id: model.initial_wounds for model in updated.own_models} == {
+        row["model_instance_id"]: row["starting_wounds"] for row in rows
+    }
+    validate_random_profile_history(
+        state=scenario.state,
+        catalog=scenario.package.army_catalog,
+        pending_requests=scenario.decisions.queue.pending_requests,
+        event_records=scenario.decisions.event_log.records,
+        decision_records=scenario.decisions.records,
+    )
+
+
 @pytest.mark.parametrize(
     ("pink_datasheet_id", "blue_datasheet_id", "source_phase"),
     [
@@ -1328,7 +1395,7 @@ def test_deadly_demise_collateral_finalizes_horror_composition_handoff() -> None
         base_pool.weapon_profile,
         strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
-        damage_profile=DamageProfile.fixed(enemy_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(enemy_model.current_wounds),
         keywords=(WeaponKeyword.TORRENT,),
         abilities=(),
     )
@@ -2391,8 +2458,42 @@ def _split_scenario(
     models_start_destroyed: bool = True,
     emit_destruction_events: bool = True,
     game_id: str | None = None,
+    random_materialized_wounds: bool = False,
 ) -> _SplitScenario:
     package = horrors_package()
+    if random_materialized_wounds:
+        from warhammer40k_core.core.random_profile_values import RandomProfileValue
+
+        source_sheet = package.army_catalog.datasheet_by_id(pink_datasheet_id)
+        source_sheet = replace(
+            source_sheet,
+            model_profiles=tuple(
+                replace(
+                    profile,
+                    characteristics=tuple(
+                        RandomProfileValue(
+                            Characteristic.WOUNDS, DiceExpression(1, 6, 2), profile.source_ids[0]
+                        )
+                        if value.characteristic is Characteristic.WOUNDS
+                        else value
+                        for value in profile.characteristics
+                    ),
+                )
+                if profile.model_profile_id.endswith(":blue-horror-brimstone-horror")
+                else profile
+                for profile in source_sheet.model_profiles
+            ),
+        )
+        package = replace(
+            package,
+            army_catalog=replace(
+                package.army_catalog,
+                datasheets=tuple(
+                    source_sheet if sheet.datasheet_id == pink_datasheet_id else sheet
+                    for sheet in package.army_catalog.datasheets
+                ),
+            ),
+        )
     bodyguard = _model_count_unit(
         package=package,
         army_id="army-horrors",

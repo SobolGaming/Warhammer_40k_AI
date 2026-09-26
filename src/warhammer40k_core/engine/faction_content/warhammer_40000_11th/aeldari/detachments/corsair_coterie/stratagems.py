@@ -9,6 +9,10 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import (
@@ -76,6 +80,7 @@ from warhammer40k_core.engine.physical_engagement import (
     current_rules_unit_is_physically_engaged,
     physical_geometry_models_for_rules_unit,
 )
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -1190,10 +1195,10 @@ def _triggered_move_event_payload(
     )
 
 
-def _improved_ap(value: CharacteristicValue) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue:
+def _improved_ap(value: ProfileCharacteristicValue) -> ProfileCharacteristicValue:
+    if type(value) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Outcast Ambush AP modifier requires a CharacteristicValue.")
-    return CharacteristicValue.from_raw(value.characteristic, value.final - 1)
+    return profile_with_delta(value, -1, source_id=OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID)
 
 
 def _abilities_with_rapid_fire_one(
@@ -1287,7 +1292,7 @@ def _alive_wounds_for_unit(
     unit_instance_id: str,
 ) -> int:
     return sum(
-        model.wounds_remaining
+        model.current_wounds
         for model in rules_unit_view_by_id(
             state=context.state,
             unit_instance_id=unit_instance_id,

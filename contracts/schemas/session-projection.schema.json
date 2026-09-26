@@ -9,7 +9,7 @@
     "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "retention_limit": {"minimum": 1, "type": "integer"},
     "revision_retention_limit": {"minimum": 1, "type": "integer"},
-    "schema_version": {"const": "session-projection-v8-model-keywords", "type": "string"},
+    "schema_version": {"const": "session-projection-v9-random-profiles", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "visibility_role": {

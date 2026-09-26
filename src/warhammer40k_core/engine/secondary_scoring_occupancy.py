@@ -534,8 +534,8 @@ def _enemy_character_models(
                         model_instance_id=model.model_instance_id,
                         unit_instance_id=unit.unit_instance_id,
                         owner_player_id=army.player_id,
-                        starting_wounds=model.starting_wounds,
-                        wounds_remaining=model.wounds_remaining,
+                        starting_wounds=model.initial_wounds,
+                        wounds_remaining=model.current_wounds,
                     )
                 )
     return tuple(

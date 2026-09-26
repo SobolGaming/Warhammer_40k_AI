@@ -558,7 +558,7 @@ def test_order_30_aura_preserves_retained_source_and_target(retain_source: bool)
         state=fixture.state,
         target_unit_instance_id=unit.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
         remove_destroyed_model=False,
     )
@@ -613,7 +613,7 @@ def test_order_30_keyworded_proximity_preserves_retained_geometry(
         state=fixture.state,
         target_unit_instance_id=fixture.prince.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
         remove_destroyed_model=False,
     )
@@ -1112,7 +1112,7 @@ def _ecstatic_death_fight_session(
             state=state,
             target_unit_instance_id=unit.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining - 1,
+            damage=model.current_wounds - 1,
             damage_kind=DamageKind.NORMAL,
         )
         assert setup_damage.final_wounds_remaining == 1
@@ -1153,7 +1153,7 @@ def _ecstatic_death_chain_session() -> tuple[
             state=state,
             target_unit_instance_id=unit.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining - 1,
+            damage=model.current_wounds - 1,
             damage_kind=DamageKind.NORMAL,
         )
         assert setup_damage.final_wounds_remaining == 1

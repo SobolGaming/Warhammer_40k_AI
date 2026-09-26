@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.activity_restrictions import has_activity_restriction
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
@@ -38,26 +39,27 @@ def mission_action_unit_ineligibility_reason(
     unit_instance_id: str,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> str | None:
-    _require_game_state(state, operation="eligibility")
-    _require_runtime_modifier_registry(runtime_modifier_registry)
+    preliminary = mission_action_pre_oc_ineligibility_reason(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    if preliminary is not None:
+        return preliminary
     requested_player_id = _validated_player_id(state=state, player_id=player_id)
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
-    if rules_unit.owner_player_id != requested_player_id:
-        return MISSION_ACTION_UNIT_WRONG_OWNER
-    placed_alive_models = _placed_alive_models(state=state, rules_unit=rules_unit)
-    if not placed_alive_models:
-        return MISSION_ACTION_UNIT_OFF_BATTLEFIELD
+    placed_alive_models = tuple(
+        sorted(
+            _placed_alive_models(state=state, rules_unit=rules_unit),
+            key=lambda item: (
+                not item[1].characteristic(Characteristic.OBJECTIVE_CONTROL).is_numeric,
+                item[1].model_instance_id,
+            ),
+        )
+    )
     keyword_set = frozenset(rules_unit.keywords)
-    if "AIRCRAFT" in keyword_set:
-        return MISSION_ACTION_UNIT_AIRCRAFT
-    if "FORTIFICATION" in keyword_set:
-        return MISSION_ACTION_UNIT_FORTIFICATION
     state_unit_ids = _rules_unit_state_unit_ids(rules_unit)
-    if rules_unit_is_battle_shocked(
-        state=state,
-        unit_instance_id=rules_unit.unit_instance_id,
-    ):
-        return MISSION_ACTION_UNIT_BATTLE_SHOCKED
     if not any(
         (
             characteristic := model_objective_control_characteristic(
@@ -106,6 +108,35 @@ def mission_action_unit_ineligibility_reason(
         return MISSION_ACTION_UNIT_ALREADY_SHOT
     if has_activity_restriction(state=state, rules_unit=rules_unit, activity="started_action"):
         return MISSION_ACTION_UNIT_ALREADY_STARTED_ACTION
+    return None
+
+
+def mission_action_pre_oc_ineligibility_reason(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> str | None:
+    _require_game_state(state, operation="eligibility")
+    _require_runtime_modifier_registry(runtime_modifier_registry)
+    requested_player_id = _validated_player_id(state=state, player_id=player_id)
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    if rules_unit.owner_player_id != requested_player_id:
+        return MISSION_ACTION_UNIT_WRONG_OWNER
+    placed_alive_models = _placed_alive_models(state=state, rules_unit=rules_unit)
+    if not placed_alive_models:
+        return MISSION_ACTION_UNIT_OFF_BATTLEFIELD
+    keyword_set = frozenset(rules_unit.keywords)
+    if "AIRCRAFT" in keyword_set:
+        return MISSION_ACTION_UNIT_AIRCRAFT
+    if "FORTIFICATION" in keyword_set:
+        return MISSION_ACTION_UNIT_FORTIFICATION
+    if rules_unit_is_battle_shocked(
+        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
+    ):
+        return MISSION_ACTION_UNIT_BATTLE_SHOCKED
     return None
 
 

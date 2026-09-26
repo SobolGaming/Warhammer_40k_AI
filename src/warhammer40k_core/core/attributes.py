@@ -28,6 +28,7 @@ class Characteristic(StrEnum):
 
 
 class CharacteristicValueKind(StrEnum):
+    RANDOM = "random"
     NUMERIC = "numeric"
     SOURCE_DASH = "source_dash"
     REPLACEMENT_DASH = "replacement_dash"
@@ -86,6 +87,8 @@ class CharacteristicValue:
         characteristic = _ensure_characteristic(self.characteristic)
         object.__setattr__(self, "characteristic", characteristic)
         value_kind = characteristic_value_kind_from_token(self.value_kind)
+        if value_kind is CharacteristicValueKind.RANDOM:
+            raise CharacteristicError("Random profile values require a typed random descriptor.")
         object.__setattr__(self, "value_kind", value_kind)
         _validate_characteristic_number(characteristic, "raw", self.raw)
         _validate_characteristic_number(characteristic, "base", self.base)

@@ -230,6 +230,7 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     build_primary_unit_destruction_state,
     record_primary_unit_destructions_for_end_turn_cleanup,
 )
+from warhammer40k_core.engine.random_weapon_range import WeaponRangeEvaluation
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
     ranged_attack_history_source_unit_ids as _ranged_attack_history_source_unit_ids,
 )
@@ -1167,6 +1168,9 @@ class GameState:
     one_shot_weapon_use_records: list[OneShotWeaponUseRecord] = field(
         default_factory=_new_one_shot_weapon_use_records
     )
+    random_weapon_ranges: list[WeaponRangeEvaluation] = field(
+        default_factory=list[WeaponRangeEvaluation]
+    )
     ranged_attack_history_records: list[RangedAttackHistoryRecord] = field(
         default_factory=_new_ranged_attack_history_records
     )
@@ -1428,6 +1432,12 @@ class GameState:
             self.one_shot_weapon_use_records,
             army_definitions=self.army_definitions,
         )
+        if type(self.random_weapon_ranges) is not list or any(
+            type(record) is not WeaponRangeEvaluation for record in self.random_weapon_ranges
+        ):
+            raise GameLifecycleError(
+                "Random weapon Range inventory requires typed evaluation records."
+            )
         self.ranged_attack_history_records = _validate_ranged_attack_history_records(
             self.ranged_attack_history_records,
             army_definitions=self.army_definitions,
@@ -2022,7 +2032,7 @@ class GameState:
         self.setup_step_index = None
         return current
 
-    def enter_battle(self) -> None:
+    def enter_battle(self, *, decisions: DecisionController | None = None) -> None:
         if self.stage is not GameLifecycleStage.SETUP:
             raise GameLifecycleError("GameState can enter battle only from setup.")
         self.stage = GameLifecycleStage.BATTLE
@@ -2031,7 +2041,7 @@ class GameState:
         self.battle_phase_index = 0
         self._expire_persisting_effects_at_current_battle_round_start()
         self._expire_persisting_effects_at_current_turn_start()
-        self._record_primary_objective_turn_start_boundary_if_available()
+        self._record_primary_objective_turn_start_boundary_if_available(decisions=decisions)
         self._expire_persisting_effects_at_current_phase_start()
 
     def replace_active_player_scopes(
@@ -2046,6 +2056,7 @@ class GameState:
     def advance_to_next_battle_phase(
         self,
         *,
+        decisions: DecisionController | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
         event_log: EventLog | None = None,
     ) -> BattlePhase:
@@ -2060,6 +2071,7 @@ class GameState:
         if completed_player_id is None:
             raise GameLifecycleError("GameState active player is required during battle.")
         phase_end_record = self.determine_current_phase_end_objective_control(
+            decisions=decisions,
             runtime_modifier_registry=runtime_modifier_registry,
         )
         from warhammer40k_core.engine.turn_end_boundary import expire_completed_phase_effects
@@ -2084,6 +2096,7 @@ class GameState:
             self._expire_persisting_effects_at_current_phase_start()
             return completed_phase
         turn_end_record = self.prepare_current_turn_end_boundary(
+            decisions=decisions,
             completed_phase=completed_phase,
             runtime_modifier_registry=runtime_modifier_registry,
         )
@@ -2128,7 +2141,7 @@ class GameState:
             self._expire_persisting_effects_at_current_battle_round_start()
         self._expire_persisting_effects_at_current_turn_start()
         self._record_primary_objective_turn_start_boundary_if_available(
-            runtime_modifier_registry=runtime_modifier_registry
+            decisions=decisions, runtime_modifier_registry=runtime_modifier_registry
         )
         self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
@@ -2136,9 +2149,11 @@ class GameState:
     def determine_current_phase_end_objective_control(
         self,
         *,
+        decisions: DecisionController | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> ObjectiveControlRecord:
         return _queries.determine_current_phase_end_objective_control(
+            decisions=decisions,
             state=self,
             runtime_modifier_registry=runtime_modifier_registry,
         )
@@ -4640,7 +4655,7 @@ class GameState:
         )
 
     def to_payload(self) -> GameStatePayload:
-        return {
+        payload: GameStatePayload = {
             "game_id": self.game_id,
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "rules_overlay_ids": list(self.rules_overlay_ids),
@@ -4828,6 +4843,11 @@ class GameState:
                 self.tactical_secondary_replacement_player_ids
             ),
         }
+        if self.random_weapon_ranges:
+            payload["random_weapon_ranges"] = [
+                record.to_payload() for record in self.random_weapon_ranges
+            ]
+        return payload
 
     def to_public_payload(self, *, viewer_player_id: str) -> dict[str, JsonValue]:
         viewer = _validate_player_id(viewer_player_id, player_ids=self.player_ids)
@@ -5086,6 +5106,10 @@ class GameState:
                 OneShotWeaponUseRecord.from_payload(record)
                 for record in payload["one_shot_weapon_use_records"]
             ],
+            random_weapon_ranges=[
+                WeaponRangeEvaluation.from_payload(record)
+                for record in payload.get("random_weapon_ranges", [])
+            ],
             ranged_attack_history_records=[
                 RangedAttackHistoryRecord.from_payload(record)
                 for record in payload["ranged_attack_history_records"]
@@ -5335,11 +5359,13 @@ class GameState:
     def record_objective_control_boundary(
         self,
         *,
+        decisions: DecisionController | None = None,
         completed_phase: BattlePhase,
         timing: ObjectiveControlTiming,
         runtime_modifier_registry: RuntimeModifierRegistry | None,
     ) -> ObjectiveControlRecord:
         return _queries.record_objective_control_boundary(
+            decisions=decisions,
             state=self,
             completed_phase=completed_phase,
             timing=timing,
@@ -5349,12 +5375,14 @@ class GameState:
     def prepare_current_turn_end_boundary(
         self,
         *,
+        decisions: DecisionController | None = None,
         completed_phase: BattlePhase,
         runtime_modifier_registry: RuntimeModifierRegistry | None,
     ) -> ObjectiveControlRecord:
         from warhammer40k_core.engine.turn_end_boundary import prepare_turn_end_boundary
 
         return prepare_turn_end_boundary(
+            decisions=decisions,
             state=self,
             completed_phase=completed_phase,
             runtime_modifier_registry=runtime_modifier_registry,
@@ -5381,9 +5409,11 @@ class GameState:
     def _record_primary_objective_turn_start_boundary_if_available(
         self,
         *,
+        decisions: DecisionController | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> None:
         record_primary_turn_start_evidence(
+            decisions=decisions,
             state=self,
             runtime_modifier_registry=runtime_modifier_registry,
         )

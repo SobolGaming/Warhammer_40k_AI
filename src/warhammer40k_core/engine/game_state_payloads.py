@@ -60,6 +60,7 @@ from warhammer40k_core.engine.primary_scoring_state_evidence import (
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
+from warhammer40k_core.engine.random_weapon_range import WeaponRangeEvaluationPayload
 from warhammer40k_core.engine.reserves import (
     ReserveStatePayload,
     ReserveUnitPointValuePayload,
@@ -161,6 +162,7 @@ class RangedAttackHistoryRecordPayload(TypedDict):
 
 
 class GameStatePayload(TypedDict):
+    random_weapon_ranges: NotRequired[list[WeaponRangeEvaluationPayload]]
     game_id: str
     ruleset_descriptor_hash: str
     rules_overlay_ids: list[str]

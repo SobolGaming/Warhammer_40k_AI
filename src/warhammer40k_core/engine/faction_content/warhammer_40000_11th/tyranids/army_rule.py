@@ -6,6 +6,10 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -66,6 +70,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_component_unit,
     present_geometry_models_for_rules_unit,
@@ -1475,14 +1480,14 @@ def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
     return requested_keyword in unit.faction_keywords
 
 
-def _strength_with_plus_one(strength: CharacteristicValue) -> CharacteristicValue:
-    if type(strength) is not CharacteristicValue:
+def _strength_with_plus_one(strength: ProfileCharacteristicValue) -> ProfileCharacteristicValue:
+    if type(strength) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Synapse strength requires CharacteristicValue.")
     if strength.characteristic is not Characteristic.STRENGTH:
         raise GameLifecycleError("Synapse strength characteristic drift.")
-    if not strength.is_numeric:
+    if not isinstance(strength, RandomProfileValue) and not strength.is_numeric:
         raise GameLifecycleError("Synapse cannot modify non-numeric Strength.")
-    return CharacteristicValue.from_raw(Characteristic.STRENGTH, strength.final + 1)
+    return profile_with_delta(strength, 1, source_id=SOURCE_RULE_ID)
 
 
 def _source_ids_with_synapse(source_ids: tuple[str, ...]) -> tuple[str, ...]:

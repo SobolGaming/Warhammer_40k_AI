@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.random_weapon_range import weapon_with_selected_range
 
 from typing import TYPE_CHECKING
 
@@ -510,7 +511,12 @@ def _available_weapons_for_rules_unit(
         ]
     return tuple(
         sorted(
-            weapons,
+            (
+                weapon_with_selected_range(
+                    state=state, unit_instance_id=rules_unit.unit_instance_id, weapon=weapon
+                )
+                for weapon in weapons
+            ),
             key=lambda weapon: (
                 weapon.get("firing_deck_source_unit_instance_id") or "",
                 weapon.get("firing_deck_source_model_instance_id") or "",

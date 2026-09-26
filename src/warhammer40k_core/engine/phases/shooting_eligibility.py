@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.random_weapon_range import has_unresolved_weapon_range
 
 from warhammer40k_core.engine.shooting_eligibility_state import shooting_state_restriction_reason
 
@@ -154,6 +155,8 @@ def _rules_unit_has_legal_shooting_declaration(
             rules_unit=rules_unit,
             weapon=weapon,
         )
+        if resolved_target_unit_ids and has_unresolved_weapon_range(weapon):
+            return True  # Selecting this unit commits to evaluating Range before choosing targets.
         for target_unit_id in resolved_target_unit_ids:
             candidate = _cached_shooting_target_candidate_for_model(
                 cache=candidate_cache,
@@ -335,6 +338,8 @@ def _unit_has_legal_shooting_declaration(
         player_id=actor_id,
         selected_shooting_type=selected_shooting_type,
     ):
+        if resolved_target_unit_ids and has_unresolved_weapon_range(weapon):
+            return True  # Selecting this unit commits to evaluating Range before choosing targets.
         for target_unit_id in resolved_target_unit_ids:
             candidate = _cached_shooting_target_candidate_for_model(
                 cache=candidate_cache,

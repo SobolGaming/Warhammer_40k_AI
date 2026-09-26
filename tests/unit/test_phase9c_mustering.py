@@ -1687,7 +1687,7 @@ def test_army_mustering_consumes_catalog_and_produces_runtime_instances() -> Non
     assert model.datasheet_id == unit.datasheet_id
     assert model.model_profile_id == "core-intercessor-like"
     assert model.base_size.diameter_mm == 32.0
-    assert model.starting_wounds == 2
+    assert model.initial_wounds == 2
     assert model.source_ids == (
         "datasheet:core-intercessor-like-infantry",
         "datasheet:core-intercessor-like-infantry:profile",

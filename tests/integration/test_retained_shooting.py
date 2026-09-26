@@ -970,7 +970,7 @@ def test_order_30_unending_fidelity_rejects_a_model_that_already_fought() -> Non
         state=state,
         target_unit_instance_id=units["enemy"].unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining - 1,
+        damage=model.current_wounds - 1,
         damage_kind=DamageKind.NORMAL,
     )
     state.gain_command_points(

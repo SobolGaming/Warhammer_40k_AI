@@ -169,6 +169,17 @@ def _validated_materialization_event(
         source_unit=source_unit,
         roll_event_id=roll_event.event_id,
     )
+    from warhammer40k_core.engine.random_wounds_initialization import (
+        restore_initialized_model_wounds,
+    )
+
+    expected_models = restore_initialized_model_wounds(
+        models=expected_models,
+        unit_instance_id=source_unit.unit_instance_id,
+        player_id=source_army.player_id,
+        scope_id=f"materialization-wounds:{roll_event.event_id}",
+        event_records=event_records[: event_index_by_id[materialized_event.event_id]],
+    )
     _validate_request(
         record=record,
         source=source,

@@ -15,6 +15,10 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
 )
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
@@ -57,6 +61,7 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.runtime_modifiers import (
     AdvanceRollModifierBinding,
     AdvanceRollModifierContext,
@@ -1490,18 +1495,19 @@ def _miracle_die_spend_count_for_unit_phase(
 
 
 def _improve_armor_penetration(
-    armor_penetration: CharacteristicValue,
+    armor_penetration: ProfileCharacteristicValue,
     *,
     bonus: int,
-) -> CharacteristicValue:
-    if type(armor_penetration) is not CharacteristicValue:
+) -> ProfileCharacteristicValue:
+    if type(armor_penetration) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Triumph Relics AP modifier requires value.")
     if armor_penetration.characteristic is not Characteristic.ARMOR_PENETRATION:
         raise GameLifecycleError("Triumph Relics AP characteristic drift.")
     amount = _validate_positive_int("armor_penetration_bonus", bonus)
-    return CharacteristicValue.from_raw(
-        Characteristic.ARMOR_PENETRATION,
-        armor_penetration.final - amount,
+    return profile_with_delta(
+        armor_penetration,
+        -amount,
+        source_id=_TRIUMPH_RELIC_SOURCE_RULE_IDS[TriumphRelic.PETALS_OF_THE_BLOODY_ROSE],
     )
 
 

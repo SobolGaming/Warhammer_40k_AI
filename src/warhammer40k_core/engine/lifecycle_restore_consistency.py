@@ -61,6 +61,38 @@ def validate_payload_consistency(
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
+    from warhammer40k_core.engine.random_profile_restore import validate_random_profile_history
+    from warhammer40k_core.engine.random_profile_roll_authority import (
+        validate_profile_roll_inventory,
+    )
+    from warhammer40k_core.engine.random_weapon_range import validate_weapon_range_history
+    from warhammer40k_core.engine.random_weapon_restore import validate_random_weapon_history
+
+    validate_profile_roll_inventory(event_records)
+
+    validate_weapon_range_history(
+        state=state,
+        config=config,
+        pending_requests=pending_decision_requests,
+        catalog=None if config is None else config.army_catalog,
+        events=event_records,
+        decisions=decision_records,
+    )
+
+    validate_random_weapon_history(
+        catalog=None if config is None else config.army_catalog,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+
+    validate_random_profile_history(
+        state=state,
+        config=config,
+        pending_requests=pending_decision_requests,
+        catalog=None if config is None else config.army_catalog,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     from warhammer40k_core.engine.activity_restriction_restore import (
         validate_activity_restriction_inventory,
     )

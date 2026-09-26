@@ -174,12 +174,12 @@ def _command_fixture(
     complete_setup_through_gate(state=state, decisions=decisions, config=config)
     if single:
         model = target_unit.own_models[0]
-        if model.wounds_remaining != remaining:
+        if model.current_wounds != remaining:
             apply_damage_to_model(
                 state=state,
                 target_unit_instance_id=unit_id,
                 model_instance_id=model.model_instance_id,
-                damage=model.wounds_remaining - remaining,
+                damage=model.current_wounds - remaining,
                 damage_kind=DamageKind.NORMAL,
                 remove_destroyed_model=False,
             )
@@ -189,7 +189,7 @@ def _command_fixture(
                 state=state,
                 target_unit_instance_id=unit_id,
                 model_instance_id=model.model_instance_id,
-                damage=model.wounds_remaining,
+                damage=model.current_wounds,
                 damage_kind=DamageKind.NORMAL,
                 remove_destroyed_model=False,
             )
@@ -505,7 +505,7 @@ def test_mixed_battlefield_and_off_battlefield_candidates_share_finite_sequencin
             state=state,
             target_unit_instance_id=healthy.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     session = LocalGameSession(

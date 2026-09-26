@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from tests.performance_fixture_migration_helpers import assert_order87_fixture_migration
 from warhammer40k_core.build_identity import verified_engine_build_identity
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -58,10 +59,12 @@ def test_order80_matched_occurrence_performance() -> None:
         "cpu",
         "memory_bytes",
         "concurrency",
-        "hashes",
         "timing_boundary",
     ):
         assert base[key] == head[key], key
+    assert_order87_fixture_migration(
+        base["hashes"], head["hashes"], changed_file="tests/normal_move_occurrence_helpers.py"
+    )
     assert head["workload"] == budget["workload"]
     for path, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
@@ -117,10 +120,12 @@ def test_order80_ordinary_restore_matched_performance() -> None:
         "cpu",
         "memory_bytes",
         "concurrency",
-        "hashes",
         "timing_boundary",
     ):
         assert base[key] == head[key], key
+    assert_order87_fixture_migration(
+        base["hashes"], head["hashes"], changed_file="tests/normal_move_occurrence_helpers.py"
+    )
     assert head["workload"] == "order80-ordinary-move-authority-v1"
     for path, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest

@@ -5801,7 +5801,7 @@ def test_order70_fight_order_rechecks_casualties_and_retained_cleanup(retained: 
             state=state,
             target_unit_instance_id=leader.unit_instance_id,
             model_instance_id=leader.own_models[0].model_instance_id,
-            damage=leader.own_models[0].wounds_remaining,
+            damage=leader.own_models[0].current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
@@ -6009,7 +6009,7 @@ def test_order70_revival_reintroduces_every_model_obligation() -> None:
         state=state,
         target_unit_instance_id=view.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert FightsFirstRegistry.from_state(state).has_unit(view.unit_instance_id)
@@ -6019,7 +6019,7 @@ def test_order70_revival_reintroduces_every_model_obligation() -> None:
             healing_army_definitions_with_model_wounds(
                 armies=tuple(state.army_definitions),
                 model_instance_id=model.model_instance_id,
-                wounds_remaining=model.starting_wounds,
+                wounds_remaining=model.initial_wounds,
             )
         )
     )
@@ -6808,7 +6808,7 @@ def _retain_model_for_fight_on_death(
         state=state,
         target_unit_instance_id=unit.unit_instance_id,
         model_instance_id=model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
         remove_destroyed_model=False,
     )

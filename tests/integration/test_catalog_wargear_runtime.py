@@ -481,13 +481,13 @@ def test_world_eaters_maulerfiend_exact_rule_ir_resolves_scent_and_savage_exalta
     set_current_model_wounds(
         state,
         model_instance_id=target_model.model_instance_id,
-        wounds_remaining=target_model.starting_wounds - 1,
+        wounds_remaining=target_model.initial_wounds - 1,
     )
     assert scent_modifiers() == ((1, 1),)
     set_current_model_wounds(
         state,
         model_instance_id=target_model.model_instance_id,
-        wounds_remaining=(target_model.starting_wounds - 1) // 2,
+        wounds_remaining=(target_model.initial_wounds - 1) // 2,
     )
     assert scent_modifiers() == ((2, 2),)
 

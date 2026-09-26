@@ -71,6 +71,7 @@ from warhammer40k_core.engine.prebattle import (
     redeploy_unit_selection_request,
 )
 from warhammer40k_core.engine.prebattle_records import PreBattleActionKind
+from warhammer40k_core.engine.random_wounds_initialization import initialize_army_random_wounds
 from warhammer40k_core.engine.reserve_declarations import (
     SELECT_RESERVE_DECLARATION_DECISION_TYPE,
     apply_mandatory_aircraft_reserve_declarations,
@@ -664,7 +665,12 @@ class SetupFlow:
                 )
             except ArmyMusteringError as exc:
                 raise GameLifecycleError("MUSTER_ARMIES failed during army mustering.") from exc
-        for army_definition in army_definitions:
+        for roster_definition in army_definitions:
+            army_definition = initialize_army_random_wounds(
+                state=state,
+                decisions=decisions,
+                army=roster_definition,
+            )
             state.record_army_definition(army_definition)
             cargo_states, transport_consequences = _record_dedicated_transport_manifests(
                 state=state,

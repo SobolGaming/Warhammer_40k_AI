@@ -9,6 +9,11 @@ from tests.setup_completion_helpers import record_primary_turn_start_evidence_fo
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.random_profile_values import (
+    RandomProfileValue,
+    resolved_profile_characteristic,
+)
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.charge_movement_source import charge_movement_placement
@@ -29,6 +34,7 @@ def crushing_session(
     *,
     keyword: str = "VEHICLE",
     toughness: int = 4,
+    random_toughness: bool = False,
     attached: bool = False,
     wounds: int = 2,
     game_id: str = "order48-crushing-impact",
@@ -49,7 +55,15 @@ def crushing_session(
                     replace(
                         profile,
                         characteristics=tuple(
-                            replace(value, raw=n, base=n, final=n)
+                            RandomProfileValue(
+                                Characteristic.TOUGHNESS,
+                                DiceExpression(1, 3, 1),
+                                profile.source_ids[0],
+                            )
+                            if random_toughness and value.characteristic is Characteristic.TOUGHNESS
+                            else replace(
+                                resolved_profile_characteristic(value), raw=n, base=n, final=n
+                            )
                             if (
                                 n := {
                                     Characteristic.TOUGHNESS: (

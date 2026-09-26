@@ -861,7 +861,7 @@ class SetupCompletionGate:
             value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
         )
         completed_setup_step = state.complete_final_setup_step_before_battle()
-        state.enter_battle()
+        state.enter_battle(decisions=decisions)
         record_new_primary_turn_start_evidence_events(
             state=state,
             event_log=decisions.event_log,

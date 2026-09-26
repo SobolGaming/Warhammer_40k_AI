@@ -108,6 +108,7 @@ __all__ = (
 def _save_options_for_allocation(
     *,
     state: GameState,
+    decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
@@ -116,7 +117,17 @@ def _save_options_for_allocation(
 ) -> tuple[SaveOption, ...]:
     from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_sources
 
-    pool = attack_sequence.current_pool()
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_weapon_profiles import evaluate_attack_weapon_profile
+
+    pool = evaluate_attack_weapon_profile(
+        pool=attack_sequence.current_pool(),
+        decisions=decisions,
+        manager=None,
+        attack_context_id=attack_context["attack_context_id"],
+        player_id=attack_context["attacker_player_id"],
+        characteristics=(Characteristic.ARMOR_PENETRATION,),
+    )
     cover_result = _cover_for_allocated_model(
         state=state,
         ruleset_descriptor=ruleset_descriptor,

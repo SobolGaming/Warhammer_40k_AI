@@ -4,7 +4,9 @@ import json
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
-from warhammer40k_core.core.attributes import CharacteristicValue, CharacteristicValuePayload
+from warhammer40k_core.core.attributes import (
+    Characteristic,
+)
 from warhammer40k_core.core.descriptor_hash import (
     canonical_payload_sha256,
     validate_sha256_hex,
@@ -21,6 +23,10 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.profile_snapshot import (
+    profile_snapshot_from_json,
+    same_profile_source,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.sticky_objective_control import (
@@ -884,11 +890,13 @@ def _base_result_from_authority(
                 checkpoint.battle_shocked_unit_instance_ids
             )
         )
-        resolved = CharacteristicValue.from_payload(
-            cast(
-                CharacteristicValuePayload,
-                _canonical_json_object(model.resolved_objective_control_json),
-            )
+        from warhammer40k_core.core.random_profile_values import RandomProfileValue
+        from warhammer40k_core.engine.profile_snapshot import profile_snapshot_from_json
+
+        source = profile_snapshot_from_json(model.source_objective_control_json)
+        resolved = profile_snapshot_from_json(model.resolved_objective_control_json)
+        expected_base = (
+            None if shocked and isinstance(source, RandomProfileValue) else resolved.final
         )
         expected_effective = 0 if shocked else resolved.final
         if (
@@ -911,7 +919,7 @@ def _base_result_from_authority(
             or not model.alive
             or model.presence != "battlefield"
             or contribution.battle_shocked is not shocked
-            or contribution.objective_control != resolved.final
+            or contribution.objective_control != expected_base
             or contribution.effective_objective_control != expected_effective
         ):
             raise GameLifecycleError(
@@ -961,6 +969,16 @@ def _frozen_spatial_record(
                     own_models=tuple(
                         replace(
                             model,
+                            characteristics=tuple(
+                                profile_snapshot_from_json(
+                                    checkpoint_by_model_id[
+                                        model.model_instance_id
+                                    ].source_objective_control_json
+                                )
+                                if value.characteristic is Characteristic.OBJECTIVE_CONTROL
+                                else value
+                                for value in model.characteristics
+                            ),
                             wounds_remaining=checkpoint_by_model_id[
                                 model.model_instance_id
                             ].wounds_remaining,
@@ -1066,12 +1084,7 @@ def _validate_checkpoint_model_identity(
         raise GameLifecycleError("ObjectiveControlRecord checkpoint model inventory drifted.")
     for row in checkpoint.model_states:
         owner_id, component_id, model = expected[row.model_instance_id]
-        source = CharacteristicValue.from_payload(
-            cast(
-                CharacteristicValuePayload,
-                _canonical_json_object(row.source_objective_control_json),
-            )
-        )
+        source = profile_snapshot_from_json(row.source_objective_control_json)
         source_from_model = next(
             (
                 value
@@ -1080,10 +1093,15 @@ def _validate_checkpoint_model_identity(
             ),
             None,
         )
-        if (row.owner_player_id, row.component_unit_instance_id) != (
-            owner_id,
-            component_id,
-        ) or source_from_model != source:
+        if (
+            (row.owner_player_id, row.component_unit_instance_id)
+            != (
+                owner_id,
+                component_id,
+            )
+            or source_from_model is None
+            or not same_profile_source(source_from_model, source)
+        ):
             raise GameLifecycleError("ObjectiveControlRecord checkpoint model identity drifted.")
 
 

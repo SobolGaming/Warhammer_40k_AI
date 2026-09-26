@@ -1,7 +1,7 @@
 {
   "workload": "order80-ordinary-move-authority-v1",
-  "revision": "r86-001-exact-half-planes",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d752d54c962b0d57be09531b2cd49ac5be3f08bad09014d34963c6ab042272b",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:904893c11619a82868f043182ee2c96023cbaaa1b686a3875d3c77028bc27726",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:904893c11619a82868f043182ee2c96023cbaaa1b686a3875d3c77028bc27726",
   "cpu": "Apple M5 Pro",
   "memory_bytes": 68719476736,
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
@@ -11,7 +11,7 @@
   "timing_boundary": "Accepted ordinary Normal Move selection/proposal, checkpoint export and restore; initial scene/reaction/turn preparation excluded; three serial samples without coverage",
   "hashes": {
     "scripts/measure_order80.py": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "tests/normal_move_occurrence_helpers.py": "52169e54f13f5dc49774d1bec3a54f3ac44b303b5eb85e699a3f5dc041b0e837",
+    "tests/normal_move_occurrence_helpers.py": "4dd0d0bfff7f30e330421567a1e256b232dd43ac0aede66b30a33306a6b67928",
     "tests/phase15c_fight_order_helpers.py": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
@@ -19,12 +19,12 @@
     {
       "case": "standalone",
       "samples_seconds": [
-        2.0630490419862326,
-        2.025002709007822,
-        2.05986037501134
+        2.0870974579884205,
+        2.04759862498031,
+        2.063817709014984
       ],
-      "mean_seconds": 2.0493040420017983,
-      "maximum_seconds": 2.0630490419862326,
+      "mean_seconds": 2.0661712639945713,
+      "maximum_seconds": 2.0870974579884205,
       "complete": true,
       "normal_move_available": [
         true,
@@ -35,12 +35,12 @@
     {
       "case": "attached",
       "samples_seconds": [
-        2.086516292009037,
-        2.077207416994497,
-        2.082939999992959
+        2.1174261670093983,
+        2.141945208015386,
+        2.120114958001068
       ],
-      "mean_seconds": 2.0822212363321646,
-      "maximum_seconds": 2.086516292009037,
+      "mean_seconds": 2.1264954443419506,
+      "maximum_seconds": 2.141945208015386,
       "complete": true,
       "normal_move_available": [
         true,

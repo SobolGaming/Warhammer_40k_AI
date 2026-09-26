@@ -1,5 +1,10 @@
 # Order 78 — Gone to Ground
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The workload `order78-gone-to-ground-v1` measures both shared query consumers on
 real canonical models and terrain. Each of seven serial samples runs ten pairs
 of model-target candidate and shared LOS queries. Fixture preparation is excluded;

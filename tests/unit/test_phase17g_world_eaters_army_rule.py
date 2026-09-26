@@ -858,7 +858,7 @@ def test_total_carnage_current_round_source_opens_reaction_window() -> None:
         _melee_profile(),
         profile_id="phase17g-current-total-carnage-killing-blow",
         strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence_id = "phase17g-current-total-carnage"
     sequence = AttackSequence.start(
@@ -986,7 +986,7 @@ def test_total_carnage_stale_source_does_not_trigger_after_blessing_expires() ->
         _melee_profile(),
         profile_id="phase17g-stale-total-carnage-killing-blow",
         strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence_id = "phase17g-stale-total-carnage"
     sequence = AttackSequence.start(

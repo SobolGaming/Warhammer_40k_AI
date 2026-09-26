@@ -109,6 +109,8 @@ def materialize_battle_shock_test_request(
     *,
     runtime: BattleShockTestRuntime,
     state: GameState,
+    decisions: DecisionController,
+    dice_manager: DiceRollManager | None = None,
     request_id: str,
     target_unit_instance_id: str,
     reason: BattleShockTestReason,
@@ -170,6 +172,21 @@ def materialize_battle_shock_test_request(
             phase_start_battle_shocked_unit_ids=phase_start_ids,
         )
     )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+    )
+
+    evaluate_unit_profile_characteristics(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=canonical_target_id,
+        scope_id=requested_id,
+        characteristics=(Characteristic.LEADERSHIP,),
+        model_instance_ids=current_model_ids,
+        dice_manager=dice_manager,
+    )
+    target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=canonical_target_id)
     return BattleShockTestRequest.for_unit(
         request_id=requested_id,
         game_id=state.game_id,
@@ -226,6 +243,7 @@ def resolve_battle_shock_test(
         phase_start_battle_shocked_unit_ids,
     )
     request = materialize_battle_shock_test_request(
+        decisions=decisions,
         runtime=runtime,
         state=state,
         request_id=request_id,
