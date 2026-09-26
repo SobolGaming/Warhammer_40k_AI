@@ -15135,8 +15135,8 @@
       "source_id": "ui-contract-visible-modifier:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v12-model-keywords",
-  "projection_state_hash": "e633580c9e87cbffe8d891d0f7d88bb3bee81d05ef78fc4aec1e4882e4fc850d",
+  "projection_schema": "game-view-v13-random-profiles",
+  "projection_state_hash": "35eec251e8b92f9015e64a09851207c00e0727c8e41d764f99bc7c4112543d13",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

@@ -1,5 +1,10 @@
 # Order 79 / P14A boundary assessment
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 `base.json` measures merged main `68c6bccb7d1f44e3b03409a86565a3d285c8449d`;
 `head.json` binds the repaired runtime identity. Both use the same measurement
 script, canonical Aircraft fixture, dependency lock and provisional host:

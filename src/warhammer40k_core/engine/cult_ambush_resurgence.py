@@ -126,7 +126,7 @@ def replacement_unit_for_destroyed_unit(
             replace(
                 model,
                 model_instance_id=f"{new_unit_id}:model-{index:03d}",
-                wounds_remaining=model.starting_wounds,
+                wounds_remaining=model.initial_wounds,
             )
         )
     return replace(destroyed_unit, unit_instance_id=new_unit_id, own_models=tuple(new_models))

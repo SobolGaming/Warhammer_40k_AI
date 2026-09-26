@@ -240,7 +240,7 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
     replacement = _unit_by_id(state, f"{destroyed_unit.unit_instance_id}:cult-ambush-001")
     assert replacement.unit_instance_id != destroyed_unit.unit_instance_id
     assert len(replacement.own_models) == 10
-    assert all(model.wounds_remaining == model.starting_wounds for model in replacement.own_models)
+    assert all(model.current_wounds == model.initial_wounds for model in replacement.own_models)
     assert not state.one_shot_weapon_available(
         model_instance_id=first_model_id,
         weapon_instance_id=first_weapon_instance_id,

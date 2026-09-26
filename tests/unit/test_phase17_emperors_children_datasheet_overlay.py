@@ -49,6 +49,7 @@ from warhammer40k_core.core.datasheet import DamagedEffectKind
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+from warhammer40k_core.core.random_profile_values import resolved_profile_characteristic
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -1410,7 +1411,7 @@ def test_selected_target_retains_attached_identity_in_lifecycle_replay_round_tri
         game_id="order34-complete-boundary-attached-1",
     )
     assert len(target_noise_marines.own_models) == 1
-    assert target_noise_marines.own_models[0].wounds_remaining == 1
+    assert target_noise_marines.own_models[0].current_wounds == 1
     decisions = DecisionController()
     record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_existing_primary_turn_start_evidence_events_for_fixture(
@@ -1538,7 +1539,7 @@ def test_leader_support_retained_identity_lifecycle_and_replay_round_trip(
         game_id=explicit_game_id,
     )
     assert len(target_bodyguard.own_models) == 1
-    assert target_bodyguard.own_models[0].wounds_remaining == 1
+    assert target_bodyguard.own_models[0].current_wounds == 1
     _record_attached_rules_unit_authoritative_state(
         state=state,
         target_attached_id=target_attached_id,
@@ -3790,9 +3791,7 @@ def test_maulerfiend_glutton_for_punishment_uses_live_source_strength_gates() ->
         damage=1,
         damage_kind=DamageKind.NORMAL,
     )
-    assert (
-        _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].wounds_remaining == 11
-    )
+    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].current_wounds == 11
     assert current_modifiers() == (1, 0)
     apply_damage_to_model(
         state=state,
@@ -3801,7 +3800,7 @@ def test_maulerfiend_glutton_for_punishment_uses_live_source_strength_gates() ->
         damage=6,
         damage_kind=DamageKind.NORMAL,
     )
-    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].wounds_remaining == 5
+    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].current_wounds == 5
     assert current_modifiers() == (1, 1)
     apply_damage_to_model(
         state=state,
@@ -3810,7 +3809,7 @@ def test_maulerfiend_glutton_for_punishment_uses_live_source_strength_gates() ->
         damage=1,
         damage_kind=DamageKind.NORMAL,
     )
-    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].wounds_remaining == 4
+    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].current_wounds == 4
     assert current_modifiers() == (0, 1)
 
 
@@ -5188,7 +5187,7 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     assert resolved_payload["poison_effect_ids"] == poison_effect_ids
     assert resolved_payload["mortal_wounds"] == 2
     updated_enemy = _unit_from_state(state, enemy.unit_instance_id)
-    assert updated_enemy.own_models[0].wounds_remaining == 10
+    assert updated_enemy.own_models[0].current_wounds == 10
 
 
 def test_command_owner_orders_mode_before_poison_across_provider_families() -> None:
@@ -5417,7 +5416,7 @@ def test_fulgrim_poisoned_command_fnp_pause_round_trips_and_resumes_once() -> No
             enemy.unit_instance_id,
         )
         .own_models[0]
-        .wounds_remaining
+        .current_wounds
     )
 
     unchanged_counts = {
@@ -5439,7 +5438,7 @@ def test_fulgrim_poisoned_command_fnp_pause_round_trips_and_resumes_once() -> No
         event_type: reentered_event_types.count(event_type) for event_type in unchanged_counts
     } == unchanged_counts
     assert (
-        _unit_from_state(state, enemy.unit_instance_id).own_models[0].wounds_remaining
+        _unit_from_state(state, enemy.unit_instance_id).own_models[0].current_wounds
         == enemy_wounds_after_resolution
     )
 
@@ -6452,7 +6451,9 @@ def _configured_kakophonist_fixture(
                 replace(
                     core_bodyguard_profile,
                     characteristics=tuple(
-                        replace(characteristic, raw=1, base=1, final=1)
+                        replace(
+                            resolved_profile_characteristic(characteristic), raw=1, base=1, final=1
+                        )
                         if characteristic.characteristic is Characteristic.WOUNDS
                         else characteristic
                         for characteristic in core_bodyguard_profile.characteristics
@@ -6477,7 +6478,7 @@ def _configured_kakophonist_fixture(
         single_wound_disharmonist = replace(
             disharmonist,
             characteristics=tuple(
-                replace(characteristic, raw=1, base=1, final=1)
+                replace(resolved_profile_characteristic(characteristic), raw=1, base=1, final=1)
                 if characteristic.characteristic is Characteristic.WOUNDS
                 else characteristic
                 for characteristic in disharmonist.characteristics
@@ -7182,7 +7183,7 @@ def _battleline_lifecycle_session(
             target_profile,
             characteristics=tuple(
                 replace(
-                    characteristic,
+                    resolved_profile_characteristic(characteristic),
                     raw=(6 if characteristic.characteristic is Characteristic.SAVE else 1),
                     base=(6 if characteristic.characteristic is Characteristic.SAVE else 1),
                     final=(6 if characteristic.characteristic is Characteristic.SAVE else 1),
@@ -7301,7 +7302,9 @@ def _battleline_lifecycle_session(
                 replace(
                     profile,
                     characteristics=tuple(
-                        replace(characteristic, raw=5, base=5, final=5)
+                        replace(
+                            resolved_profile_characteristic(characteristic), raw=5, base=5, final=5
+                        )
                         if characteristic.characteristic is Characteristic.LEADERSHIP
                         else characteristic
                         for characteristic in profile.characteristics
@@ -7338,10 +7341,14 @@ def _battleline_lifecycle_session(
         deterministic_lifecycle_profile = replace(
             boltgun_profile,
             attack_profile=AttackProfile.fixed(12),
-            skill=replace(boltgun_profile.skill, raw=2, base=2, final=2),
-            strength=replace(boltgun_profile.strength, raw=12, base=12, final=12),
+            skill=replace(
+                resolved_profile_characteristic(boltgun_profile.skill), raw=2, base=2, final=2
+            ),
+            strength=replace(
+                resolved_profile_characteristic(boltgun_profile.strength), raw=12, base=12, final=12
+            ),
             armor_penetration=replace(
-                boltgun_profile.armor_penetration,
+                resolved_profile_characteristic(boltgun_profile.armor_penetration),
                 raw=-6,
                 base=-6,
                 final=-6,
@@ -8340,12 +8347,12 @@ def _leave_one_wound_on_unit(
         for model in _unit_from_state(state, unit.unit_instance_id).own_models
         if model.model_instance_id == survivor_id
     )
-    if survivor.wounds_remaining > 1:
+    if survivor.current_wounds > 1:
         apply_damage_to_model(
             state=state,
             target_unit_instance_id=unit.unit_instance_id,
             model_instance_id=survivor_id,
-            damage=survivor.wounds_remaining - 1,
+            damage=survivor.current_wounds - 1,
             damage_kind=DamageKind.NORMAL,
         )
     assert (
@@ -8353,7 +8360,7 @@ def _leave_one_wound_on_unit(
             model
             for model in _unit_from_state(state, unit.unit_instance_id).own_models
             if model.model_instance_id == survivor_id
-        ).wounds_remaining
+        ).current_wounds
         == 1
     )
     return survivor_id

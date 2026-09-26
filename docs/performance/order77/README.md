@@ -1,5 +1,10 @@
 # Order 77 / P16B completed-move Action interruption
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The workload measures one finite reactive movement submission through `LocalGameSession`,
 after a source-backed Maintain Control start. Both revisions stop at the same legal
 Shooting choice for a second friendly unit. Preparation is timed separately. Each saved Action-containing lifecycle is also

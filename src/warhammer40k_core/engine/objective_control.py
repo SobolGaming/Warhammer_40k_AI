@@ -13,6 +13,10 @@ from warhammer40k_core.core.objectives import (
     ObjectiveMarker,
     TerrainObjectiveAnchor,
 )
+from warhammer40k_core.core.random_profile_values import (
+    RandomProfileValue,
+    resolved_profile_characteristic,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainObjectiveControlPolicy,
@@ -83,7 +87,7 @@ class ObjectiveControlContributionPayload(TypedDict):
     player_id: str
     unit_instance_id: str
     model_instance_id: str
-    objective_control: int
+    objective_control: int | None
     effective_objective_control: int
     battle_shocked: bool
     horizontal_distance_inches: float
@@ -144,7 +148,7 @@ class ObjectiveControlContribution:
     player_id: str
     unit_instance_id: str
     model_instance_id: str
-    objective_control: int
+    objective_control: int | None
     effective_objective_control: int
     battle_shocked: bool
     horizontal_distance_inches: float
@@ -162,11 +166,17 @@ class ObjectiveControlContribution:
             "model_instance_id",
             _validate_identifier("model_instance_id", self.model_instance_id),
         )
-        object.__setattr__(
-            self,
-            "objective_control",
-            _validate_non_negative_int("objective_control", self.objective_control),
-        )
+        if self.objective_control is None:
+            if not self.battle_shocked or self.effective_objective_control != 0:
+                raise GameLifecycleError(
+                    "Unevaluated OC requires a terminal Battle-shock replacement."
+                )
+        else:
+            object.__setattr__(
+                self,
+                "objective_control",
+                _validate_non_negative_int("objective_control", self.objective_control),
+            )
         object.__setattr__(
             self,
             "effective_objective_control",
@@ -869,13 +879,20 @@ def _objective_control_contribution(
         if state is not None
         else measurement.rules_unit_instance_id in battle_shocked_unit_ids
     )
-    objective_control_characteristic = model_objective_control_characteristic(
-        model_instance,
-        battle_shocked=False,
-        state=state,
-        unit_instance_id=measurement.unit_instance_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-        model_instance_id=measurement.model_instance_id,
+    suppressed_random_source = battle_shocked and isinstance(
+        model_instance.characteristic(Characteristic.OBJECTIVE_CONTROL), RandomProfileValue
+    )
+    objective_control_characteristic = (
+        None
+        if suppressed_random_source
+        else model_objective_control_characteristic(
+            model_instance,
+            battle_shocked=False,
+            state=state,
+            unit_instance_id=measurement.unit_instance_id,
+            runtime_modifier_registry=runtime_modifier_registry,
+            model_instance_id=measurement.model_instance_id,
+        )
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
@@ -889,7 +906,9 @@ def _objective_control_contribution(
         player_id=measurement.player_id,
         unit_instance_id=measurement.unit_instance_id,
         model_instance_id=measurement.model_instance_id,
-        objective_control=objective_control_characteristic.final,
+        objective_control=None
+        if objective_control_characteristic is None
+        else objective_control_characteristic.final,
         effective_objective_control=effective_objective_control_characteristic.final,
         battle_shocked=battle_shocked,
         horizontal_distance_inches=measurement.horizontal_distance_inches,
@@ -1043,8 +1062,9 @@ def model_objective_control_characteristic(
             Characteristic.OBJECTIVE_CONTROL,
             applied_modifier_ids=("battle_shock",),
         )
-    for characteristic in model.characteristics:
-        if characteristic.characteristic is Characteristic.OBJECTIVE_CONTROL:
+    for profile_value in model.characteristics:
+        if profile_value.characteristic is Characteristic.OBJECTIVE_CONTROL:
+            characteristic = resolved_profile_characteristic(profile_value)
             if state is None:
                 return characteristic
             if unit_instance_id is None:

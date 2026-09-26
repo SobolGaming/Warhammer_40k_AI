@@ -471,6 +471,13 @@ def apply_return_on_death_placement_decision(
     )
     if record is not None:
         state.phase_movement_history.append(record)
+    from warhammer40k_core.engine.random_objective_control import (
+        prepare_objective_control_after_placement,
+    )
+
+    prepare_objective_control_after_placement(
+        state=state, decisions=decisions, event_id=event.event_id
+    )
     return resolved
 
 
@@ -759,7 +766,7 @@ def _restore_returned_target(
         wounds_remaining = (
             pending.wounds_remaining
             if pending.restore_wounds_mode is ReturnRestoreWoundsMode.FIXED_REMAINING
-            else _model_by_id(state=state, model_instance_id=model_id).starting_wounds
+            else _model_by_id(state=state, model_instance_id=model_id).initial_wounds
         )
         if wounds_remaining is None:
             raise GameLifecycleError("Return-on-death fixed wounds are missing.")
@@ -909,7 +916,7 @@ def _army_definitions_with_unit_full_health(
                 replace(
                     unit,
                     own_models=tuple(
-                        replace(model, wounds_remaining=model.starting_wounds)
+                        replace(model, wounds_remaining=model.initial_wounds)
                         for model in unit.own_models
                     ),
                 )

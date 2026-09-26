@@ -1,5 +1,10 @@
 # Order 86 quarter-query diagnostic
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The workload measures one primary quarter witness for a real five-model squad,
 including geometry materialization and the mission's six-inch centre exclusion.
 Ten batches of 100 calls cover overlapping, nominally tangent, clear and distant bases.

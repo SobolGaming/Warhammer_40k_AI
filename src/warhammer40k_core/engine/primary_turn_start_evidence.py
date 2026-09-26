@@ -5,12 +5,17 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import ModelPlacement
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlTiming,
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.random_objective_control import (
+    objective_control_boundary_scope,
+    prepare_objective_control,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_views_from_armies,
@@ -474,6 +479,7 @@ def primary_rules_unit_turn_start_snapshots_from_payload(
 def record_primary_turn_start_evidence(
     *,
     state: GameState,
+    decisions: DecisionController | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> None:
     """Atomically derive objective control and exact rules-unit position evidence."""
@@ -488,15 +494,17 @@ def record_primary_turn_start_evidence(
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Primary turn-start tracking requires a battle phase.")
-    objective_record = resolve_objective_control(
-        ObjectiveControlContext.from_game_state(
-            state,
-            timing=ObjectiveControlTiming.TURN_START,
-            phase=current_phase,
-            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
-            runtime_modifier_registry=runtime_modifier_registry,
-        )
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.TURN_START,
+        phase=current_phase,
+        ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+        runtime_modifier_registry=runtime_modifier_registry,
     )
+    context = prepare_objective_control(
+        context, decisions=decisions, scope_id=objective_control_boundary_scope(context)
+    )
+    objective_record = resolve_objective_control(context)
     objective_state = PrimaryObjectiveTurnStartState(
         state_id=_turn_evidence_id("primary-turn-start", state),
         game_id=state.game_id,

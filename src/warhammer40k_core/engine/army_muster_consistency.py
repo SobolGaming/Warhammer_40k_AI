@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
+from warhammer40k_core.core.random_profile_values import RandomProfileValue
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusteringError,
@@ -25,7 +27,7 @@ from warhammer40k_core.engine.starting_attached_units import (
     StartingAttachedUnitRecord,
     starting_attached_unit_records_for_army,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, ModelInstancePayload, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_initializations_for_army,
 )
@@ -61,6 +63,15 @@ def validate_mustered_army_consistency(
     except ArmyMusteringError as exc:
         raise GameLifecycleError("Lifecycle config army muster requests are invalid.") from exc
     state_armies = tuple(state.army_definitions)
+    if state_armies:
+        from warhammer40k_core.engine.random_wounds_initialization import (
+            restore_muster_random_wounds,
+        )
+
+        expected_armies = restore_muster_random_wounds(
+            armies=expected_armies,
+            event_records=event_records,
+        )
     _validate_starting_attached_mappings_against_muster(
         state=state,
         expected_armies=expected_armies,
@@ -145,7 +156,29 @@ def _armies_match_muster_runtime_state(
         # shared decision/event history rather than the immutable muster input.
         state_army = replace(
             state_army,
-            units=tuple(replace(unit, core_ability_selections=()) for unit in state_army.units),
+            units=tuple(
+                replace(
+                    unit,
+                    core_ability_selections=(),
+                    own_models=tuple(
+                        replace(
+                            model,
+                            characteristics=tuple(
+                                replace(value, evaluation=None, evaluation_id=None)
+                                if isinstance(value, RandomProfileValue)
+                                else value
+                                for value in model.characteristics
+                            ),
+                        )
+                        if any(
+                            isinstance(value, RandomProfileValue) for value in model.characteristics
+                        )
+                        else model
+                        for model in unit.own_models
+                    ),
+                )
+                for unit in state_army.units
+            ),
         )
         if state.stage not in {
             GameLifecycleStage.BATTLE,
@@ -201,14 +234,14 @@ def _units_with_authenticated_setup_casualty_muster_wounds(
             if state_model.model_instance_id not in casualty_model_ids:
                 normalized_models.append(state_model)
                 continue
-            if state_model.wounds_remaining != 0:
+            if state_model.current_wounds != 0:
                 return state_army.units
             normalized_models.append(
                 replace(
                     state_model,
                     wounds_remaining=expected_models_by_id[
                         state_model.model_instance_id
-                    ].wounds_remaining,
+                    ].current_wounds,
                 )
             )
         normalized_units.append(replace(state_unit, own_models=tuple(normalized_models)))
@@ -254,7 +287,7 @@ def _units_with_expected_muster_wounds(
                 own_models=tuple(
                     replace(
                         state_models_by_id[model_id],
-                        wounds_remaining=expected_models_by_id[model_id].wounds_remaining,
+                        wounds_remaining=expected_models_by_id[model_id].current_wounds,
                     )
                     for model_id in expected_unit.own_model_ids()
                 ),
@@ -268,6 +301,19 @@ def _runtime_model_matches_materialization_event(
     model: ModelInstance,
     event_payload: dict[str, JsonValue],
 ) -> bool:
+    event_model = ModelInstance.from_payload(cast(ModelInstancePayload, event_payload))
+    event_payload = cast(
+        dict[str, JsonValue],
+        replace(
+            event_model,
+            characteristics=tuple(
+                replace(value, evaluation=None, evaluation_id=None)
+                if isinstance(value, RandomProfileValue)
+                else value
+                for value in event_model.characteristics
+            ),
+        ).to_payload(),
+    )
     runtime_payload = model.to_payload()
     if set(runtime_payload) != set(event_payload):
         return False

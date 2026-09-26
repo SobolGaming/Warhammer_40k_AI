@@ -286,7 +286,7 @@ def _casualty_model_ids_from_destruction_event(
         expected_model_ids = unit.own_model_ids()
         if tuple(model_ids) != expected_model_ids:
             raise GameLifecycleError("Empty Dedicated Transport destruction event models drifted.")
-        if any(model.is_alive or model.wounds_remaining != 0 for model in unit.own_models):
+        if any(model.is_alive or model.current_wounds != 0 for model in unit.own_models):
             raise GameLifecycleError(
                 "Empty Dedicated Transport destruction event requires destroyed models."
             )

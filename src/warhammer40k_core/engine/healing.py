@@ -975,9 +975,9 @@ def _apply_healing_step_to_model(
 ) -> HealingStep:
     model = model_by_id(state=state, model_instance_id=model_instance_id)
     if step_kind is HealingStepKind.HEAL_WOUND:
-        if not model.is_alive or model.wounds_remaining >= model.starting_wounds:
+        if not model.is_alive or model.current_wounds >= model.initial_wounds:
             raise GameLifecycleError("Healing selected model is not wounded.")
-        final_wounds = model.wounds_remaining + 1
+        final_wounds = model.current_wounds + 1
         _replace_model_wounds(
             state=state,
             model_instance_id=model_instance_id,
@@ -987,7 +987,7 @@ def _apply_healing_step_to_model(
             step_index=effect.next_step_index(),
             step_kind=HealingStepKind.HEAL_WOUND,
             model_instance_id=model_instance_id,
-            starting_wounds_remaining=model.wounds_remaining,
+            starting_wounds_remaining=model.current_wounds,
             final_wounds_remaining=final_wounds,
             request_id=request_id,
             result_id=result_id,

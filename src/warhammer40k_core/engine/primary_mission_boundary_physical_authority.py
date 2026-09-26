@@ -1258,7 +1258,7 @@ def _current_authority_by_model(*, state: GameState) -> dict[str, _PhysicalAutho
                 placement = battlefield.model_placement_or_none(model.model_instance_id)
                 if placement is not None:
                     presence, pose = "battlefield", placement.pose
-                elif model.wounds_remaining == 0:
+                elif model.current_wounds == 0:
                     presence, pose = "destroyed", None
                 elif model.model_instance_id in embarked_ids:
                     presence, pose = "embarked", None
@@ -1269,14 +1269,14 @@ def _current_authority_by_model(*, state: GameState) -> dict[str, _PhysicalAutho
                 current[model.model_instance_id] = _PhysicalAuthority(
                     presence=presence,
                     pose=pose,
-                    wounds_remaining=model.wounds_remaining,
+                    wounds_remaining=model.current_wounds,
                 )
     return current
 
 
 def _starting_wounds_by_model_id(*, state: GameState) -> dict[str, int]:
     values = {
-        model.model_instance_id: model.starting_wounds
+        model.model_instance_id: model.initial_wounds
         for army in state.army_definitions
         for unit in army.units
         for model in unit.own_models

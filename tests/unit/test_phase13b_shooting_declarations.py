@@ -1764,7 +1764,7 @@ def test_phase18b_command_reroll_decline_then_twin_linked_rerolls_wound_once() -
             state=state,
             target_unit_instance_id=defender.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     _grant_command_reroll_cp(state, player_id="player-a")
@@ -2371,7 +2371,7 @@ def test_phase13d_pending_mortal_fnp_allocation_authority_rejects_tampering(
     selected_before = model_by_id(
         state=_state(lifecycle),
         model_instance_id=selected_model_id,
-    ).wounds_remaining
+    ).current_wounds
     status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=f"phase13d-authority-{tamper_kind}-decline",
@@ -2390,7 +2390,7 @@ def test_phase13d_pending_mortal_fnp_allocation_authority_rejects_tampering(
         model_by_id(
             state=_state(lifecycle),
             model_instance_id=selected_model_id,
-        ).wounds_remaining
+        ).current_wounds
         == selected_before
     )
 
@@ -2520,7 +2520,7 @@ def test_phase13d_mortal_progress_rejects_cross_unit_model_before_damage() -> No
         destruction_evidence=_test_mortal_wound_destruction_evidence(state),
     )
     checkpoint = lifecycle.to_payload()
-    foreign_wounds = foreign_model.wounds_remaining
+    foreign_wounds = foreign_model.current_wounds
 
     with pytest.raises(GameLifecycleError, match="not in the rules unit"):
         progress.after_wound_resolution(
@@ -2531,7 +2531,7 @@ def test_phase13d_mortal_progress_rejects_cross_unit_model_before_damage() -> No
         )
 
     assert lifecycle.to_payload() == checkpoint
-    assert foreign_model.wounds_remaining == foreign_wounds
+    assert foreign_model.current_wounds == foreign_wounds
 
 
 def _pending_tied_mortal_fnp_lifecycle() -> tuple[GameLifecycle, str, str, str]:
@@ -2699,7 +2699,7 @@ def test_phase13d_mortal_wound_priority_tiers_cover_attached_characters() -> Non
             state=state,
             target_unit_instance_id=attached_id,
             model_instance_id=current.model_instance_id,
-            damage=current.wounds_remaining,
+            damage=current.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     assert mortal_wound_priority_selection(
@@ -2718,7 +2718,7 @@ def test_phase13d_mortal_wound_priority_tiers_cover_attached_characters() -> Non
         state=state,
         target_unit_instance_id=attached_id,
         model_instance_id=current_leader.model_instance_id,
-        damage=current_leader.wounds_remaining,
+        damage=current_leader.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert mortal_wound_priority_selection(
@@ -3147,15 +3147,15 @@ def test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_charac
         model_by_id(
             state=state,
             model_instance_id=character_model.model_instance_id,
-        ).wounds_remaining
-        == character_model.starting_wounds - 1
+        ).current_wounds
+        == character_model.initial_wounds - 1
     )
     assert (
         model_by_id(
             state=state,
             model_instance_id=bodyguard_model.model_instance_id,
-        ).wounds_remaining
-        == bodyguard_model.starting_wounds
+        ).current_wounds
+        == bodyguard_model.initial_wounds
     )
     mortal_wound_application = cast(dict[str, object], applied[0]["mortal_wound_application"])
     assert (
@@ -3957,11 +3957,11 @@ def test_phase14k_damage_model_choice_wounded_priority_drift_rejects_before_queu
     )
     selected_model = defender.own_models[1]
     wounded_model = defender.own_models[2]
-    assert wounded_model.starting_wounds > 1
+    assert wounded_model.initial_wounds > 1
     defender_after_drift = replace(
         defender,
         own_models=tuple(
-            replace(model, wounds_remaining=wounded_model.starting_wounds - 1)
+            replace(model, wounds_remaining=wounded_model.initial_wounds - 1)
             if model.model_instance_id == wounded_model.model_instance_id
             else model
             for model in defender.own_models
@@ -4355,11 +4355,11 @@ def test_phase14h_pending_grouped_damage_round_trips_across_fnp_pause() -> None:
     restored_wounds = model_by_id(
         state=restored_state,
         model_instance_id=original_model_id,
-    ).wounds_remaining
+    ).current_wounds
     original_wounds = model_by_id(
         state=original_state,
         model_instance_id=original_model_id,
-    ).wounds_remaining
+    ).current_wounds
     assert restored_wounds == original_wounds
 
 
@@ -5042,7 +5042,7 @@ def test_phase14e_grouped_failed_saves_transition_to_next_ordered_group() -> Non
         _first_weapon_profile(lifecycle, attacker),
         profile_id="phase14e-ordered-group-transition",
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
-        damage_profile=DamageProfile.fixed(first_group_model.starting_wounds),
+        damage_profile=DamageProfile.fixed(first_group_model.initial_wounds),
         keywords=(),
         abilities=(),
     )
@@ -5590,7 +5590,7 @@ def test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard
         _first_weapon_profile(lifecycle, attacker),
         profile_id="phase14e-grouped-precision",
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
-        damage_profile=DamageProfile.fixed(character_model.starting_wounds),
+        damage_profile=DamageProfile.fixed(character_model.initial_wounds),
         keywords=(WeaponKeyword.PRECISION,),
     )
     sequence = AttackSequence.start(
@@ -7710,7 +7710,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
             state=state,
             target_unit_instance_id=defender.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     weapon_profile = replace(
@@ -7883,7 +7883,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     assert applied_payload["mortal_wounds"] == 1
     assert applications[0]["target_unit_instance_id"] == attacker.unit_instance_id
     assert applications[0]["model_instance_id"] == attacker_model.model_instance_id
-    assert updated_model.wounds_remaining == attacker_model.wounds_remaining - 1
+    assert updated_model.current_wounds == attacker_model.current_wounds - 1
     assert state.shooting_phase_state is None
 
 
@@ -11907,7 +11907,7 @@ def test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage()
     assert status is None
     assert fnp_payload["ignored_wounds"] == 1
     assert application["requested_damage"] == 1
-    assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
+    assert updated_model.current_wounds == defender_model.current_wounds - 1
 
 
 def test_allocated_attack_damage_modifier_runs_after_model_allocation() -> None:
@@ -12010,7 +12010,7 @@ def test_allocated_attack_damage_modifier_runs_after_model_allocation() -> None:
     assert len(observed_contexts) == 1
     assert observed_contexts[0].allocated_model_instance_id == defender_model.model_instance_id
     assert observed_contexts[0].current_value == 2
-    assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
+    assert updated_model.current_wounds == defender_model.current_wounds - 1
 
 
 def test_psychic_attack_classification_enables_psychic_only_feel_no_pain() -> None:
@@ -12118,7 +12118,7 @@ def test_psychic_attack_classification_enables_psychic_only_feel_no_pain() -> No
     assert status is None
     assert cast(dict[str, object], hit_payload["payload"])["is_psychic_attack"] is True
     assert source_payload["attack_condition"] == FeelNoPainAttackCondition.PSYCHIC_ATTACK.value
-    assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
+    assert updated_model.current_wounds == defender_model.current_wounds - 1
 
 
 @pytest.mark.parametrize("native_threshold", [None, 5, 6])
@@ -12285,7 +12285,7 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle(
         assert record.result.selected_option_id == source_a.source_id
         assert source_a.source_id != source_b.source_id
         assert {source_a.threshold, source_b.threshold} == {5, native_threshold}
-        assert updated_model.wounds_remaining <= defender_model.wounds_remaining
+        assert updated_model.current_wounds <= defender_model.current_wounds
 
 
 @pytest.mark.parametrize(
@@ -12327,7 +12327,7 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13e-destruction-reaction",
@@ -12501,7 +12501,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
             Characteristic.ARMOR_PENETRATION,
             -10,
         ),
-        damage_profile=DamageProfile.fixed(first_target.wounds_remaining),
+        damage_profile=DamageProfile.fixed(first_target.current_wounds),
         keywords=(WeaponKeyword.TORRENT,),
     )
     sequence_id = "attack-sequence:order-9-p05a-destruction-boundary"
@@ -13123,7 +13123,7 @@ def _retain_attack_casualty_for_fight_on_death(
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(target_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(target_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id=f"attack-sequence:{fixture_id}-sequence",
@@ -13523,7 +13523,7 @@ def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13e-deadly-demise-reaction",
@@ -14416,7 +14416,7 @@ def _p18c_attached_hazard_placement_request(
             state=state,
             target_unit_instance_id=transport.unit_instance_id,
             model_instance_id=transport.own_models[0].model_instance_id,
-            damage=transport.own_models[0].wounds_remaining,
+            damage=transport.own_models[0].current_wounds,
             damage_kind=DamageKind.NORMAL,
             remove_destroyed_model=False,
         ),
@@ -14814,7 +14814,7 @@ def test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot()
             state=state,
             target_unit_instance_id=transport.unit_instance_id,
             model_instance_id=transport.own_models[0].model_instance_id,
-            damage=transport.own_models[0].wounds_remaining,
+            damage=transport.own_models[0].current_wounds,
             damage_kind=DamageKind.NORMAL,
             remove_destroyed_model=False,
         ),
@@ -15039,18 +15039,18 @@ def test_phase14h_pending_destroyed_transport_state_round_trips_and_rejects_drif
         requested_damage=1,
         wounds_lost=0,
         excess_damage_lost=1,
-        starting_wounds_remaining=transport.own_models[0].wounds_remaining,
-        final_wounds_remaining=transport.own_models[0].wounds_remaining,
+        starting_wounds_remaining=transport.own_models[0].current_wounds,
+        final_wounds_remaining=transport.own_models[0].current_wounds,
         destroyed=False,
     )
     drifted_damage = DamageApplication(
         target_unit_instance_id=passenger.unit_instance_id,
         model_instance_id=transport.own_models[0].model_instance_id,
         damage_kind=DamageKind.NORMAL,
-        requested_damage=transport.own_models[0].wounds_remaining,
-        wounds_lost=transport.own_models[0].wounds_remaining,
+        requested_damage=transport.own_models[0].current_wounds,
+        wounds_lost=transport.own_models[0].current_wounds,
         excess_damage_lost=0,
-        starting_wounds_remaining=transport.own_models[0].wounds_remaining,
+        starting_wounds_remaining=transport.own_models[0].current_wounds,
         final_wounds_remaining=0,
         destroyed=True,
     )
@@ -16324,7 +16324,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="attack-sequence:phase13e-success-deadly-demise",
@@ -16482,9 +16482,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     assert sum(cast(int, application["wounds_lost"]) for application in applications) == 2
     assert applications[0]["wounds_lost"] == 1
     assert (
-        model_by_id(
-            state=state, model_instance_id=attacker_model.model_instance_id
-        ).wounds_remaining
+        model_by_id(state=state, model_instance_id=attacker_model.model_instance_id).current_wounds
         == 0
     )
     assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
@@ -16653,7 +16651,7 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13e-fnp-deadly-demise",
@@ -16771,9 +16769,7 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
             )
         )
     assert (
-        model_by_id(
-            state=state, model_instance_id=defender_model.model_instance_id
-        ).wounds_remaining
+        model_by_id(state=state, model_instance_id=defender_model.model_instance_id).current_wounds
         == 0
     )
     assert all(
@@ -16871,7 +16867,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         payload={
             "trigger_roll_threshold": 6,
             "range_inches": 6.0,
-            "mortal_wounds": {"kind": "fixed", "value": collateral_model.wounds_remaining},
+            "mortal_wounds": {"kind": "fixed", "value": collateral_model.current_wounds},
         },
         optional=False,
     )
@@ -16881,7 +16877,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13e-secondary-casualty",
@@ -17197,7 +17193,7 @@ def test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal() 
         payload={
             "trigger_roll_threshold": 6,
             "range_inches": 6.0,
-            "mortal_wounds": {"kind": "fixed", "value": attacker_model.wounds_remaining},
+            "mortal_wounds": {"kind": "fixed", "value": attacker_model.current_wounds},
         },
         optional=False,
     )
@@ -17207,7 +17203,7 @@ def test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal() 
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13e-secondary-chain",
@@ -17388,7 +17384,7 @@ def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue(
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13e-invalid-reaction",
@@ -17671,10 +17667,8 @@ def test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound() -> None:
     assert application.applications == ()
     assert application.feel_no_pain_resolutions[0].ignored_wounds == 1
     assert (
-        model_by_id(
-            state=state, model_instance_id=defender_model.model_instance_id
-        ).wounds_remaining
-        == defender_model.wounds_remaining
+        model_by_id(state=state, model_instance_id=defender_model.model_instance_id).current_wounds
+        == defender_model.current_wounds
     )
 
 
@@ -17971,7 +17965,7 @@ def test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows
     state = _state(lifecycle)
     defender = units["enemy"]
     defender_model = defender.own_models[0]
-    assert defender_model.wounds_remaining > 1
+    assert defender_model.current_wounds > 1
     _retain_only_placed_model(
         state=state,
         unit=defender,
@@ -17986,7 +17980,7 @@ def test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows
         source_context={"source_kind": "phase13d_multi_wound_restore_test"},
         destruction_evidence=_test_mortal_wound_destruction_evidence(state),
         target_unit_instance_id=defender.unit_instance_id,
-        mortal_wounds=defender_model.wounds_remaining,
+        mortal_wounds=defender_model.current_wounds,
     )
 
     model_applications = tuple(
@@ -17994,7 +17988,7 @@ def test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows
         for damage in application.applications
         if damage.model_instance_id == defender_model.model_instance_id
     )
-    assert len(model_applications) == defender_model.wounds_remaining
+    assert len(model_applications) == defender_model.current_wounds
     assert all(not damage.destroyed for damage in model_applications[:-1])
     assert model_applications[-1].destroyed
 
@@ -18077,14 +18071,14 @@ def test_phase13d_multi_model_mortal_fnp_pause_persists_first_logical_death_boun
         model_by_id(
             state=state,
             model_instance_id=first_model.model_instance_id,
-        ).wounds_remaining
+        ).current_wounds
         == 0
     )
     assert (
         model_by_id(
             state=state,
             model_instance_id=second_model.model_instance_id,
-        ).wounds_remaining
+        ).current_wounds
         > 0
     )
     assert state.battlefield_state is not None
@@ -19341,7 +19335,7 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
         actor_id="player-a",
     )
     wound_roll_state = DiceRollManager("phase13c-invalid-wound").roll_fixed(wound_spec, [2])
-    with pytest.raises(GameLifecycleError, match="roll_state must be DiceRollState"):
+    with pytest.raises(GameLifecycleError, match="requires a roll_state unless skipped"):
         WoundRoll(
             strength=4,
             toughness=4,
@@ -19798,7 +19792,7 @@ def test_r33_001_retained_engagement_survives_restoration(attached: bool) -> Non
         state=state,
         target_unit_instance_id=engager_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed

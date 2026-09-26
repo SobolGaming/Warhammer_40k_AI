@@ -1109,7 +1109,7 @@ def test_bring_it_down_when_drawn_sees_w10_model_inside_attached_unit() -> None:
     enemy_army = state.army_definitions[1]
     formation = enemy_army.attached_units[0]
     leader = enemy_army.unit_by_id(formation.leader_unit_instance_ids[0])
-    assert leader.own_models[0].starting_wounds == 10
+    assert leader.own_models[0].initial_wounds == 10
     assert (
         next_tactical_secondary_when_drawn_request(
             state=state,
@@ -1420,7 +1420,7 @@ def _restore_unit_wounds(state: GameState, unit_instance_id: str) -> None:
                 unit = replace(
                     unit,
                     own_models=tuple(
-                        replace(model, wounds_remaining=model.starting_wounds)
+                        replace(model, wounds_remaining=model.initial_wounds)
                         for model in unit.own_models
                     ),
                 )

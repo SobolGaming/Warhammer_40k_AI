@@ -1,5 +1,10 @@
 # Order 80 / P09C performance
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 The matched workload accepts an opponent's reactive Normal Move, advances through
 the turn boundary to the moving unit's own Movement action, and exports/restores
 the session checkpoint. Initial fixture and permission preparation are excluded.

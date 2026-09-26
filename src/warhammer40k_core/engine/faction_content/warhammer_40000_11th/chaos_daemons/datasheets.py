@@ -8,6 +8,10 @@ from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -81,6 +85,7 @@ from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
     scenario_rules_units_are_physically_engaged,
 )
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
@@ -1331,14 +1336,11 @@ def _profile_with_strength_modifier(
 ) -> WeaponProfile:
     if source_id in profile.source_ids:
         return profile
-    if not profile.strength.is_numeric:
+    if not isinstance(profile.strength, RandomProfileValue) and not profile.strength.is_numeric:
         raise GameLifecycleError("Daemon Lord of Tzeentch cannot modify dash Strength.")
     return replace(
         profile,
-        strength=CharacteristicValue.from_raw(
-            profile.strength.characteristic,
-            profile.strength.final + 1,
-        ),
+        strength=profile_with_delta(profile.strength, 1, source_id=source_id),
         source_ids=tuple(sorted({*profile.source_ids, source_id})),
     )
 
@@ -1386,21 +1388,24 @@ def _profile_with_ap_modifier(
         armor_penetration=_armor_penetration_with_delta(
             profile.armor_penetration,
             delta=-1,
+            source_id=source_id,
         ),
         source_ids=tuple(sorted({*profile.source_ids, source_id})),
     )
 
 
-def _armor_penetration_with_delta(value: CharacteristicValue, *, delta: int) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue:
+def _armor_penetration_with_delta(
+    value: ProfileCharacteristicValue, *, delta: int, source_id: str
+) -> ProfileCharacteristicValue:
+    if type(value) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Daemon Lord of Slaanesh requires CharacteristicValue AP.")
     if value.characteristic is not Characteristic.ARMOR_PENETRATION:
         raise GameLifecycleError("Daemon Lord of Slaanesh requires Armor Penetration.")
     if type(delta) is not int:
         raise GameLifecycleError("Armor Penetration delta must be an integer.")
-    if not value.is_numeric:
+    if not isinstance(value, RandomProfileValue) and not value.is_numeric:
         raise GameLifecycleError("Daemon Lord of Slaanesh cannot modify dash AP.")
-    return CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, value.final + delta)
+    return profile_with_delta(value, delta, source_id=source_id)
 
 
 def _rules_unit_has_keywords(

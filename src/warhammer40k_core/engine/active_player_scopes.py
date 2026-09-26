@@ -140,6 +140,20 @@ def begin_reactive_move(
         selection_request_id=result.request_id,
         selection_result_id=result.result_id,
     )
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+        has_random_profile_characteristics,
+    )
+
+    if has_random_profile_characteristics(state=state, characteristics=(Characteristic.MOVEMENT,)):
+        evaluate_unit_profile_characteristics(
+            state=state,
+            decisions=decisions,
+            unit_instance_id=unit_instance_id,
+            scope_id=result.result_id,
+            characteristics=(Characteristic.MOVEMENT,),
+        )
     push_scope(state, scope)
     decisions.event_log.append("active_player_scope_started", dict(scope.to_payload()))
 

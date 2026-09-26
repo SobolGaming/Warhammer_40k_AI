@@ -140,6 +140,18 @@ def _resolve_denial(
     ability_indexes: Mapping[str, AbilityCatalogIndex],
     modifiers: RuntimeModifierRegistry,
 ) -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+    )
+
+    evaluate_unit_profile_characteristics(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=pending.unit_instance_id,
+        scope_id=f"{pending.result_id}:{identity}",
+        characteristics=(Characteristic.LEADERSHIP,),
+    )
     target = rules_unit_view_by_id(state=state, unit_instance_id=pending.unit_instance_id)
     index = ability_indexes[target.owner_player_id]
     components = tuple(

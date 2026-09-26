@@ -257,7 +257,7 @@ def apply_recorded_healing_revival_placement_decision(
         transition_batch=validated.transition_batch,
     )
     updated = active_effect.with_step(step)
-    decisions.event_log.append(
+    event = decisions.event_log.append(
         "healing_step_resolved",
         {
             "effect_id": updated.effect_id,
@@ -269,6 +269,13 @@ def apply_recorded_healing_revival_placement_decision(
             "revival_engagement": validate_json_value(validated.revival_engagement),
             "revival_phase_start": validate_json_value(validated.revival_phase_start),
         },
+    )
+    from warhammer40k_core.engine.random_objective_control import (
+        prepare_objective_control_after_placement,
+    )
+
+    prepare_objective_control_after_placement(
+        state=state, decisions=decisions, event_id=event.event_id
     )
     return resolve_healing_until_blocked(
         state=state,
@@ -435,7 +442,7 @@ def _validate_revival_placement(
         placements=(placement,),
         placement_label="Healing revival placement",
     )
-    final_wounds = hctx.revival_wounds_remaining(effect.source_context, model.starting_wounds)
+    final_wounds = hctx.revival_wounds_remaining(effect.source_context, model.initial_wounds)
     hypothetical_armies = healing_army_definitions_with_model_wounds(
         armies=tuple(state.army_definitions),
         model_instance_id=model.model_instance_id,
@@ -493,7 +500,7 @@ def _validate_revival_placement(
     return ValidatedHealingRevival(
         effect=effect,
         model_instance_id=model.model_instance_id,
-        starting_wounds_remaining=model.wounds_remaining,
+        starting_wounds_remaining=model.current_wounds,
         final_wounds_remaining=final_wounds,
         placement=placement,
         hypothetical_armies=hypothetical_armies,

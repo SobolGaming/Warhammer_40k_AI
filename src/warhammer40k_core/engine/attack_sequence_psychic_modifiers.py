@@ -7,6 +7,7 @@ from hashlib import sha256
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -17,7 +18,7 @@ from warhammer40k_core.engine.psychic_modifier_selection import (
     AttackModifierSnapshot,
     PsychicAttackModifierIgnoreSelection,
 )
-from warhammer40k_core.engine.weapon_abilities import is_psychic_weapon_profile
+from warhammer40k_core.engine.weapon_abilities import has_weapon_keyword, is_psychic_weapon_profile
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_modifiers_2026_09 import (
     IGNORE_MODIFIERS_SOURCE_ID,
     PSYCHIC_MODIFIERS_SOURCE_ID,
@@ -67,7 +68,9 @@ def _psychic_attack_modifier_ignore_request(
     previous_selection: PsychicAttackModifierIgnoreSelection | None = None,
     request_id: str | None = None,
 ) -> DecisionRequest | None:
-    if not is_psychic_weapon_profile(pool.weapon_profile):
+    if not is_psychic_weapon_profile(pool.weapon_profile) or has_weapon_keyword(
+        pool.weapon_profile, WeaponKeyword.TORRENT
+    ):
         if previous_selection is not None:
             raise GameLifecycleError("Psychic weapon permission drift.")
         return None

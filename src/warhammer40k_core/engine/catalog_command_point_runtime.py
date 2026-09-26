@@ -7,7 +7,6 @@ from functools import partial
 from types import MappingProxyType
 from typing import cast
 
-from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
@@ -25,9 +24,6 @@ from warhammer40k_core.engine.ability_presence import (
     active_ability_model_ids_for_unit,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battle_shock import (
-    battle_shock_leadership_target_for_rules_unit,
-)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
@@ -75,7 +71,6 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.runtime_event_candidates import runtime_event_candidate
-from warhammer40k_core.engine.runtime_modifiers import UnitCharacteristicModifierContext
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
@@ -1125,32 +1120,21 @@ def _resolve_phase_command_point_gain(
                 armies=tuple(context.state.army_definitions),
                 unit_instance_id=unit.unit_instance_id,
             )
-            if gate_parameters.get("test_target") == "this_unit":
-                rules_unit = rules_unit_view_by_id(
-                    state=context.state,
-                    unit_instance_id=rules_unit_id,
-                )
-                leadership_target = battle_shock_leadership_target_for_rules_unit(
-                    rules_unit,
-                    current_model_ids=tuple(
-                        model.model_instance_id for model in rules_unit.alive_models()
-                    ),
-                    ability_index=ability_index,
-                    state=context.state,
-                    runtime_modifier_registry=context.runtime_modifier_registry,
-                )
-            else:
-                model = _model_in_unit(unit, model_instance_id=source_model_instance_id)
-                base_leadership = _model_leadership(model)
-                leadership_target = context.runtime_modifier_registry.modified_unit_characteristic(
-                    UnitCharacteristicModifierContext(
-                        state=context.state,
-                        unit_instance_id=rules_unit_id,
-                        characteristic=Characteristic.LEADERSHIP,
-                        base_value=base_leadership,
-                        current_value=base_leadership,
-                    )
-                )
+            from warhammer40k_core.engine.leadership_evaluation import (
+                evaluate_leadership_test_target,
+            )
+
+            leadership_target = evaluate_leadership_test_target(
+                state=context.state,
+                decisions=context.decisions,
+                unit_instance_id=rules_unit_id,
+                scope_id=f"{context.event.event_id}:{source.record.definition.source_id}:{source_model_instance_id}",
+                model_instance_id=None
+                if gate_parameters.get("test_target") == "this_unit"
+                else source_model_instance_id,
+                ability_index=ability_index,
+                runtime_modifier_registry=context.runtime_modifier_registry,
+            )
             success_threshold = leadership_target
             roll_type = "catalog_ir.command_point_leadership_test"
             reason = f"Command-point Leadership test for {source_model_instance_id}"
@@ -1393,13 +1377,6 @@ def _required_trigger(clause: RuleClause) -> RuleTrigger:
     if clause.trigger is None:
         raise GameLifecycleError("Catalog CP supported clause is missing its trigger.")
     return clause.trigger
-
-
-def _model_leadership(model: ModelInstance) -> int:
-    for value in model.characteristics:
-        if value.characteristic is Characteristic.LEADERSHIP:
-            return value.final
-    raise GameLifecycleError("Catalog CP source model is missing Leadership.")
 
 
 def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:

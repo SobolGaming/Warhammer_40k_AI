@@ -404,7 +404,7 @@ def _enemy_wounds_10_present(state: GameState, player_id: str) -> bool:
     for rules_unit in placed_alive_rules_unit_views(state=state):
         if rules_unit.owner_player_id == player_id:
             continue
-        if any(model.starting_wounds >= 10 for model in rules_unit.alive_models()):
+        if any(model.initial_wounds >= 10 for model in rules_unit.alive_models()):
             return True
     return False
 

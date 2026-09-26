@@ -81,6 +81,9 @@ def _roll_hit(
 ) -> HitRoll:
     from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
 
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
+        skill_value = pool.weapon_profile.skill
+        return HitRoll.auto_hit(target_number=skill_value.final if skill_value.is_numeric else None)
     _hit_skill(pool.weapon_profile)
     snapshots = attack_modifier_snapshots(
         state=state,
@@ -113,8 +116,6 @@ def _roll_hit(
         FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
         or SNAP_SHOOTING_RULE_ID in pool.targeting_rule_ids
     )
-    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
-        return HitRoll.auto_hit(target_number=skill)
     roll_state = _roll_or_reuse_state(
         manager,
         attack_sequence_hit_roll_spec(
@@ -345,7 +346,7 @@ def _reroll_wound_for_twin_linked_if_needed(
         return initial_wound_roll
     if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TWIN_LINKED):
         return initial_wound_roll
-    if initial_wound_roll.roll_state is None:
+    if initial_wound_roll.roll_state is None or initial_wound_roll.target_number is None:
         raise GameLifecycleError("Twin-linked reroll requires a wound roll state.")
     if initial_wound_roll.roll_state.result_override is not None:
         return initial_wound_roll

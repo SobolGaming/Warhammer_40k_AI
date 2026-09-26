@@ -222,7 +222,7 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement(
         with pytest.raises(GameLifecycleError, match=message):
             completion_phase_record(state=state, event=altered, turn_player_id=turn_player)
     assert all(
-        model.wounds_remaining == model.starting_wounds for model in _beta_unit(state).own_models
+        model.current_wounds == model.initial_wounds for model in _beta_unit(state).own_models
     )
     assert state.battlefield_state is not None
     assert not (
@@ -279,7 +279,7 @@ def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds(
         if model.model_instance_id == destroyed_model_id
     )
     assert resolved.resolved
-    assert returned_model.wounds_remaining == 1
+    assert returned_model.current_wounds == 1
     assert bool(state.phase_movement_history) is whole_unit_destroyed
     from warhammer40k_core.engine.phase_movement_history import validate_phase_movement_history
 
@@ -1087,7 +1087,7 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
             source_step="return_on_death_regression",
         ),
         target_unit_instance_id=beta.unit_instance_id,
-        mortal_wounds=destroyed_model.wounds_remaining,
+        mortal_wounds=destroyed_model.current_wounds,
         spill_over=False,
     )
 
@@ -1173,7 +1173,7 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
         if model.model_instance_id == destroyed_model.model_instance_id
     )
     assert returned_model.is_alive
-    assert returned_model.wounds_remaining == 1
+    assert returned_model.current_wounds == 1
 
 
 def _placement_result(*, request: DecisionRequest, placement: UnitPlacement) -> DecisionResult:

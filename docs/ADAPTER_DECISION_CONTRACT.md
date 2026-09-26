@@ -6888,3 +6888,51 @@ Scoring checkpoint reconstruction and secondary boundary reconstruction call the
 same geometry owner. Existing finite scoring choices, witness/event schemas,
 private authority redaction, persistence and replay routes cover this correction.
 No decision type, proposal, payload field or viewer-visibility shape changes.
+
+## Order 87: random source characteristics (contract 40)
+
+Random model and weapon characteristics use a source-linked descriptor with
+`value_kind: "random"`, an integral dice `expression`, and a stable `source_id`.
+Catalog values contain no evaluation or runtime modifiers. Runtime values may
+add source-bound `modifiers` and the paired `evaluation` / `evaluation_id` fields.
+A missing evaluation is an explicit unresolved value, never numeric zero.
+
+The engine evaluates Movement after accepting a unit's move selection. Fixed
+profiles remain fixed. Under the owner's recorded mixed-profile interpretation,
+equal random expressions in the attached rules unit share one roll; different
+expressions receive independent rolls. Proposal validation, views, retries and
+restore reuse this occurrence. A later selection starts a new occurrence.
+
+Random weapon Range is evaluated for the selected unit's physical weapon/profile
+inventory before target options are built. A Range profile adds `random_value`;
+`distance_inches` is null until evaluated. If no targets remain legal, the engine
+records `shooting_selection_without_targets` and completes that unit's selection.
+Target replacement retains the committed physical Range result. Skill, Strength
+and AP evaluations remain associated with the individual attack's physical weapon;
+automatic Hit/Wound stages do not require their skipped numeric characteristics.
+
+Model Toughness is evaluated for the relevant target inventory at the Wound step.
+Save-group construction evaluates the relevant Wounds and save profiles. Initial
+random Wounds establish live health during army or model creation; later profile
+rolls do not change remaining Wounds or healing capacity. Leadership is evaluated
+before a test's unit comparison. Objective Control has explicit engine evaluation
+boundaries before control, scoring and Action choices; their read-only validators
+and projections consume the recorded values. Accepted movement and placement
+completions refresh in-range OC before subsequent rule/option queries, bound to
+the exact physical completion event. Action evaluation scopes require the actual
+Action request or an explicit no-options outcome; a request counter is not proof.
+Crushing Impact evaluates only its selected model's Toughness after acceptance.
+Dark Pacts evaluates Leadership for its completed attack sequence; an automatic
+pass skips both profile and test dice and records a null Leadership target.
+
+`random_profile_values_evaluated`, `random_weapon_profile_evaluated`, and
+`random_weapon_range_evaluated` identify the source, owner, occurrence and dice.
+Operator persistence preserves those events and the nonempty `random_weapon_ranges`
+inventory. A datacard characteristic can expose `random_expression`, null numeric
+fields and its expression as `display_value`. Suppressed Battle-shock OC remains a
+dash; its random source is not rolled merely to produce a numeric audit field.
+Automatic attack stages may contain null target/characteristic metadata.
+
+All existing decision families retain their shared lifecycle validation and
+mutation path. No adapter, projection, validation or restore path is authorized to
+roll or choose a random characteristic. See [contract migration 39 to 40](../contracts/migrations/39-to-40.md).

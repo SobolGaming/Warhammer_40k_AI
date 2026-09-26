@@ -20,6 +20,7 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.random_profile_values import ProfileCharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -1006,7 +1007,7 @@ def _model_with_movement_modifier(
     modifier_id: str,
     movement: int,
 ) -> ModelInstance:
-    characteristics: list[CharacteristicValue] = []
+    characteristics: list[ProfileCharacteristicValue] = []
     for value in model.characteristics:
         if value.characteristic is Characteristic.MOVEMENT:
             characteristics.append(

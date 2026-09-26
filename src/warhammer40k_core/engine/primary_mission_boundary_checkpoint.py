@@ -4,6 +4,7 @@ import json
 from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatePayload,
@@ -66,6 +67,10 @@ from warhammer40k_core.engine.primary_mission_objective_control_source_authority
 from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionMarkerState,
     PrimaryMissionMarkerStatus,
+)
+from warhammer40k_core.engine.profile_snapshot import (
+    profile_snapshot_from_json,
+    snapshot_modifier_ids,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -1030,18 +1035,17 @@ def _checkpoint_applied_oc_modifier_ids(
 
 
 def _applied_oc_modifier_ids(values: tuple[tuple[str, str], ...]) -> tuple[str, ...]:
-    applied: set[str] = set()
-    for source_json, resolved_json in values:
-        source_ids = _json_string_list(
-            _json_object(source_json),
-            key="applied_modifier_ids",
+    return tuple(
+        sorted(
+            {
+                modifier_id
+                for source_json, resolved_json in values
+                for modifier_id in set(snapshot_modifier_ids(resolved_json)).difference(
+                    snapshot_modifier_ids(source_json)
+                )
+            }
         )
-        resolved_ids = _json_string_list(
-            _json_object(resolved_json),
-            key="applied_modifier_ids",
-        )
-        applied.update(set(resolved_ids).difference(source_ids))
-    return tuple(sorted(applied))
+    )
 
 
 def _validate_checkpoint_modifier_source_registry(
@@ -1101,6 +1105,15 @@ def _validate_current_checkpoint_oc_resolutions(
     }
     for row in checkpoint.model_states:
         unit_id, model = models_by_id[row.model_instance_id]
+        model = replace(
+            model,
+            characteristics=tuple(
+                profile_snapshot_from_json(row.source_objective_control_json)
+                if value.characteristic is Characteristic.OBJECTIVE_CONTROL
+                else value
+                for value in model.characteristics
+            ),
+        )
         resolved = resolve_checkpoint_objective_control(
             state=state,
             unit_instance_id=unit_id,
@@ -1307,7 +1320,7 @@ def _validate_retained_turn_end_model_state(
     for row in checkpoint.model_states:
         model = current_models[row.model_instance_id]
         placement = battlefield.model_placement_or_none(row.model_instance_id)
-        alive = model.wounds_remaining > 0
+        alive = model.current_wounds > 0
         if placement is not None:
             presence = "battlefield"
             placement_json = canonical_json(placement.to_payload())
@@ -1325,7 +1338,7 @@ def _validate_retained_turn_end_model_state(
             placement_json = None
         if (
             row.alive is not alive
-            or row.wounds_remaining != model.wounds_remaining
+            or row.wounds_remaining != model.current_wounds
             or row.presence != presence
             or row.model_placement_json != placement_json
         ):
@@ -1343,13 +1356,6 @@ def _json_object(value: str) -> dict[str, JsonValue]:
         raise GameLifecycleError("Primary mission boundary JSON must encode an object.")
     decoded_object = cast(dict[object, object], decoded)
     return cast(dict[str, JsonValue], validate_json_value(decoded_object))
-
-
-def _json_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    values = payload.get(key)
-    if not isinstance(values, list) or any(type(value) is not str for value in values):
-        raise GameLifecycleError("Primary mission Objective Control source list is invalid.")
-    return tuple(cast(list[str], values))
 
 
 def _unit_ids_from_state_jsons(values: tuple[str, ...]) -> tuple[str, ...]:

@@ -240,7 +240,7 @@ def _validate_destroyed_damage_matches_state(
     if not damage_application.destroyed:
         raise GameLifecycleError("Applied mortal-wound destruction requires lethal damage.")
     model = model_by_id(state=state, model_instance_id=damage_application.model_instance_id)
-    if model.wounds_remaining != damage_application.final_wounds_remaining or model.is_alive:
+    if model.current_wounds != damage_application.final_wounds_remaining or model.is_alive:
         raise GameLifecycleError("Applied mortal-wound destruction damage state drift.")
 
 

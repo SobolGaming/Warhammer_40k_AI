@@ -232,7 +232,7 @@ def remove_first_models(state: GameState, *, unit_instance_id: str, count: int) 
             state=state,
             target_unit_instance_id=unit_instance_id,
             model_instance_id=model_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
 
@@ -286,7 +286,7 @@ def destroy_models_with_recorded_mortal_wounds(
             target_unit_instance_id=unit_instance_id,
             defender_player_id=target.owner_player_id,
             mortal_wounds=sum(
-                models[identifier].wounds_remaining for identifier in model_instance_ids
+                models[identifier].current_wounds for identifier in model_instance_ids
             ),
             spill_over=True,
         ),

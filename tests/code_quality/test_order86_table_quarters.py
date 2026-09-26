@@ -10,6 +10,7 @@ from pathlib import Path
 
 from tools.build_core_table_quarters_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
+from tests.performance_fixture_migration_helpers import assert_order87_fixture_migration
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_table_quarters_2026_09 as source,
 )
@@ -74,9 +75,11 @@ def test_quarter_query_matched_cost_and_result_gate() -> None:
         "python",
         "concurrency",
         "timing_boundary",
-        "hashes",
     ):
         assert base[key] == head[key], key
+    assert_order87_fixture_migration(
+        base["hashes"], head["hashes"], changed_file="tests/phase11c_command_phase_helpers.py"
+    )
     for name, digest in head["hashes"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     assert head["workload"] == budget["workload"]

@@ -3680,7 +3680,7 @@ def test_phase15d_retained_destroyed_source_base_stays_a_fixed_endpoint_blocker(
         state=state,
         target_unit_instance_id=bodyguard.unit_instance_id,
         model_instance_id=destroyed_model.model_instance_id,
-        damage=destroyed_model.wounds_remaining,
+        damage=destroyed_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
@@ -3840,7 +3840,7 @@ def test_phase15d_fight_on_death_only_enemy_is_a_fight_movement_target(
         state=state,
         target_unit_instance_id=target.unit_instance_id,
         model_instance_id=target_model.model_instance_id,
-        damage=target_model.wounds_remaining,
+        damage=target_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
@@ -3932,7 +3932,7 @@ def test_phase15d_mixed_enemy_remains_selectable_through_retained_pile_in_geomet
         state=state,
         target_unit_instance_id=target.unit_instance_id,
         model_instance_id=retained_model.model_instance_id,
-        damage=retained_model.wounds_remaining,
+        damage=retained_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
@@ -3995,7 +3995,7 @@ def test_phase15d_fight_on_death_only_enemy_remains_a_fight_movement_collision_b
         state=state,
         target_unit_instance_id=retained_target.unit_instance_id,
         model_instance_id=retained_model.model_instance_id,
-        damage=retained_model.wounds_remaining,
+        damage=retained_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
@@ -4099,7 +4099,7 @@ def test_phase15d_retained_enemy_base_contact_pins_objective_consolidation() -> 
         state=state,
         target_unit_instance_id=retained_target.unit_instance_id,
         model_instance_id=retained_model.model_instance_id,
-        damage=retained_model.wounds_remaining,
+        damage=retained_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
@@ -4222,7 +4222,7 @@ def test_phase15d_grouped_completed_event_accepts_living_component_subset() -> N
         state=state,
         target_unit_instance_id=bodyguard.unit_instance_id,
         model_instance_id=destroyed_model.model_instance_id,
-        damage=destroyed_model.wounds_remaining,
+        damage=destroyed_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed

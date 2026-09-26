@@ -5105,7 +5105,7 @@ def test_engaged_fall_back_policy_can_target_fight_on_death_only_unit_from_snaps
             state=state,
             target_unit_instance_id=target_unit_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
     retain_destroyed_model_for_fixture(
@@ -5966,7 +5966,7 @@ def _remove_first_models(state: GameState, *, unit_instance_id: str, count: int)
             state=state,
             target_unit_instance_id=unit_instance_id,
             model_instance_id=model_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
 

@@ -1823,7 +1823,7 @@ def test_phase17n_step5a_restore_rejects_rehashed_battle_shock_removal() -> None
                 replace(
                     contribution,
                     battle_shocked=False,
-                    effective_objective_control=contribution.objective_control,
+                    effective_objective_control=cast(int, contribution.objective_control),
                 )
                 if contribution.unit_instance_id == shocked_unit.unit_instance_id
                 else contribution

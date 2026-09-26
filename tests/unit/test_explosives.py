@@ -30,7 +30,7 @@ def test_explosives_uses_shared_destruction_continuation_and_replays_collateral_
         session, model_instance_id=units["target"].own_models[0].model_instance_id
     )
     source_id = units["source"].unit_instance_id
-    before = sum(model.wounds_remaining for model in units["source"].own_models)
+    before = sum(model.current_wounds for model in units["source"].own_models)
     request = session.advance_until_decision_or_terminal().decision_request
     assert request is not None
     option = next(o for o in request.options if o.option_id.startswith("use-stratagem:explosives:"))
@@ -63,7 +63,7 @@ def test_explosives_uses_shared_destruction_continuation_and_replays_collateral_
     assert state is not None
     assert (
         sum(
-            model.wounds_remaining
+            model.current_wounds
             for model in rules_unit_view_by_id(state=state, unit_instance_id=source_id).own_models
         )
         == before - 1

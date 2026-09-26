@@ -525,7 +525,7 @@ def test_phase16c_opponent_projection_hides_mutable_model_wounds_until_reveal() 
     assert owner_army is not None
     transport = owner_army.unit_by_id("army-alpha:empty-transport")
     (transport_model,) = transport.own_models
-    current_wounds = transport_model.starting_wounds - 3
+    current_wounds = transport_model.initial_wounds - 3
     wounded_transport = replace(
         transport,
         own_models=(replace(transport_model, wounds_remaining=current_wounds),),
@@ -556,7 +556,7 @@ def test_phase16c_opponent_projection_hides_mutable_model_wounds_until_reveal() 
     assert owner_view["model_display_by_id"][model_id]["wounds_remaining"] == current_wounds
     assert admin_view["model_display_by_id"][model_id]["wounds_remaining"] == current_wounds
     assert opponent_view["model_display_by_id"][model_id]["wounds_remaining"] == (
-        transport_model.starting_wounds
+        transport_model.initial_wounds
     )
     opponent_battlefield = opponent_view["battlefield_view"]
     assert opponent_battlefield is not None
@@ -1322,7 +1322,7 @@ def test_phase16c_embarked_cargo_with_destroyed_model_in_reserves_round_trips() 
     restored_bodyguard = restored_army.unit_by_id(bodyguard.unit_instance_id)
     restored_destroyed_model = restored_bodyguard.own_models[0]
     assert restored_destroyed_model.model_instance_id == destroyed_model.model_instance_id
-    assert restored_destroyed_model.wounds_remaining == 0
+    assert restored_destroyed_model.current_wounds == 0
     assert (
         tuple(model.model_instance_id for model in restored_bodyguard.own_models[1:])
         == surviving_bodyguard_model_ids

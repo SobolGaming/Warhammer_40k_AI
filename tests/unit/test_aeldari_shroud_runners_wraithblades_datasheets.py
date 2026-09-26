@@ -465,7 +465,7 @@ def test_psychic_guidance_uses_only_keyworded_component_models_for_attached_unit
         state=destroyed,
         target_unit_instance_id=fixture.psyker.unit_instance_id,
         model_instance_id=psyker_model.model_instance_id,
-        damage=psyker_model.wounds_remaining,
+        damage=psyker_model.current_wounds,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
     )
@@ -507,7 +507,7 @@ def test_unit_scoped_lone_operative_proximity_uses_qualifying_rules_unit_geometr
             state=fixture.state,
             target_unit_instance_id=bodyguard.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.MORTAL,
             remove_destroyed_model=False,
         )
@@ -919,7 +919,7 @@ def test_malevolent_souls_rejects_descendant_of_attached_unit_that_already_fough
             state=fixture.state,
             target_unit_instance_id=fixture.shroud.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
         assert damage.destroyed
@@ -949,7 +949,7 @@ def test_malevolent_souls_rejects_descendant_of_attached_unit_that_already_fough
         state=state,
         target_unit_instance_id=fixture.wraith_shields.unit_instance_id,
         model_instance_id=target_model.model_instance_id,
-        damage=target_model.wounds_remaining,
+        damage=target_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
         remove_destroyed_model=False,
     )
@@ -990,7 +990,7 @@ def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight
         payload={
             "trigger_roll_threshold": 6,
             "range_inches": 6.0,
-            "mortal_wounds": {"kind": "fixed", "value": attacker_model.wounds_remaining},
+            "mortal_wounds": {"kind": "fixed", "value": attacker_model.current_wounds},
         },
         optional=False,
     )
@@ -1000,7 +1000,7 @@ def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight
     )
     profile = replace(
         _profile(WRAITHBLADES_ID, "Ghostaxe"),
-        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(defender_model.current_wounds),
     )
     sequence = _attack_sequence(
         sequence_id="attack-sequence:malevolent-deadly-demise",
@@ -1112,7 +1112,7 @@ def test_malevolent_souls_does_not_trigger_for_ability_mortal_wounds_in_fight() 
         state=fixture.state,
         target_unit_instance_id=target.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
     )
@@ -1547,7 +1547,7 @@ def _resolve_malevolent_attack(
     profile = replace(
         profile,
         damage_profile=DamageProfile.fixed(
-            target_model.wounds_remaining if damage_per_attack is None else damage_per_attack
+            target_model.current_wounds if damage_per_attack is None else damage_per_attack
         ),
     )
     if sustained_hits:

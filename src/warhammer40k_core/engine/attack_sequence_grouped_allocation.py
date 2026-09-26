@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.engine.random_weapon_profiles import evaluate_attack_weapon_profile
 
 from typing import TYPE_CHECKING
 
@@ -114,8 +116,18 @@ def _continue_grouped_allocation_for_wound_contexts(
                     precision_selection=precision_selection,
                 )
             )
+    for wounded_sequence, wounded_context in wounded_contexts:
+        evaluate_attack_weapon_profile(
+            pool=wounded_sequence.current_pool(),
+            decisions=decisions,
+            manager=manager,
+            attack_context_id=wounded_context["attack_context_id"],
+            player_id=attack_sequence.attacker_player_id,
+            characteristics=(Characteristic.ARMOR_PENETRATION,),
+        )
     allocation_groups = _allocation_groups_by_effective_save_profile(
         state=state,
+        decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         allocation_groups=allocation_groups,
         wounded_contexts=wounded_contexts,
@@ -221,6 +233,7 @@ def _continue_grouped_allocation_for_wound_contexts(
 def _allocation_groups_by_effective_save_profile(
     *,
     state: GameState,
+    decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     allocation_groups: tuple[AllocationGroup, ...],
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
@@ -232,6 +245,7 @@ def _allocation_groups_by_effective_save_profile(
         for model_id in allocation_group.model_ids:
             signature = _effective_save_profile_signature(
                 state=state,
+                decisions=decisions,
                 ruleset_descriptor=ruleset_descriptor,
                 model_id=model_id,
                 wounded_contexts=wounded_contexts,
@@ -287,6 +301,7 @@ def _allocation_groups_by_effective_save_profile(
 def _effective_save_profile_signature(
     *,
     state: GameState,
+    decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     model_id: str,
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
@@ -296,6 +311,7 @@ def _effective_save_profile_signature(
     for wounded_sequence, attack_context in wounded_contexts:
         save_options = _save_options_for_allocation(
             state=state,
+            decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=wounded_sequence,
             attack_context=attack_context,
@@ -537,6 +553,7 @@ def _resolve_grouped_damage_from(
         )
         save_options = _save_options_for_allocation(
             state=state,
+            decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=save_attack_sequence,
             attack_context=attack_context,
@@ -935,6 +952,7 @@ def _roll_grouped_saves(
         )
         save_options = _save_options_for_allocation(
             state=state,
+            decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=wounded_sequence,
             attack_context=attack_context,

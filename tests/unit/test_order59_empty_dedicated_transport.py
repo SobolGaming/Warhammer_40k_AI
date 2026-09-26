@@ -51,7 +51,7 @@ def test_empty_dedicated_transport_is_destroyed_at_declare_battle_formations() -
     battlefield = state.battlefield_state
     assert battlefield is not None
     assert transport.own_models[0].is_alive is False
-    assert transport.own_models[0].wounds_remaining == 0
+    assert transport.own_models[0].current_wounds == 0
     assert model_id in battlefield.removed_model_ids
     assert model_id not in state.unavailable_model_ids()
     events = order59_destruction_events(lifecycle)

@@ -20,6 +20,7 @@ from warhammer40k_core.adapters.projection import (
 from warhammer40k_core.adapters.redaction import HIDDEN_REQUEST_ID
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.random_profile_values import ProfileCharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
@@ -749,7 +750,7 @@ def _model_with_movement_modifier(
     modifier_id: str,
     movement: int,
 ) -> ModelInstance:
-    characteristics: list[CharacteristicValue] = []
+    characteristics: list[ProfileCharacteristicValue] = []
     for value in model.characteristics:
         if value.characteristic is Characteristic.MOVEMENT:
             characteristics.append(

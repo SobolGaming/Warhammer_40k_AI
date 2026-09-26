@@ -7,8 +7,6 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import (
     Characteristic,
-    CharacteristicValue,
-    CharacteristicValuePayload,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import (
@@ -50,6 +48,7 @@ from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence impor
     PrimaryMissionBoundaryModelState,
 )
 from warhammer40k_core.engine.primary_mission_state import PrimaryMissionMarkerState
+from warhammer40k_core.engine.profile_snapshot import profile_snapshot_from_json
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardStatus,
@@ -421,12 +420,7 @@ def _json_string_tuple(payload: dict[str, object], *, key: str) -> tuple[str, ..
 def _checkpoint_boundary_model(
     *, model: ModelInstance, row: PrimaryMissionBoundaryModelState
 ) -> ModelInstance:
-    resolved = CharacteristicValue.from_payload(
-        cast(
-            CharacteristicValuePayload,
-            _json_object(row.resolved_objective_control_json),
-        )
-    )
+    resolved = profile_snapshot_from_json(row.resolved_objective_control_json)
     return replace(
         model,
         wounds_remaining=row.wounds_remaining,

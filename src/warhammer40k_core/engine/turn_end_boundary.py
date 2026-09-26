@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import EffectExpirationBoundary
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
@@ -19,6 +20,7 @@ if TYPE_CHECKING:
 def determine_turn_end_control(
     *,
     state: GameState,
+    decisions: DecisionController | None = None,
     completed_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> ObjectiveControlRecord:
@@ -42,6 +44,7 @@ def determine_turn_end_control(
         state=state, completed_phase=completed_phase, player_id=player_id
     )
     return state.record_objective_control_boundary(
+        decisions=decisions,
         completed_phase=completed_phase,
         timing=ObjectiveControlTiming.TURN_END,
         runtime_modifier_registry=runtime_modifier_registry,
@@ -51,11 +54,13 @@ def determine_turn_end_control(
 def prepare_turn_end_boundary(
     *,
     state: GameState,
+    decisions: DecisionController | None = None,
     completed_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> ObjectiveControlRecord:
     """Finish non-mission cleanup once, preserving the earlier control snapshot."""
     record = determine_turn_end_control(
+        decisions=decisions,
         state=state,
         completed_phase=completed_phase,
         runtime_modifier_registry=runtime_modifier_registry,

@@ -40,28 +40,11 @@ def propose_canonical_objective_control_boundary(
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> CanonicalObjectiveControlProposal:
     """Project the canonical sticky-aware Objective Control record without mutation."""
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Canonical Objective Control proposal requires GameState.")
-    if type(completed_phase) is not BattlePhase:
-        raise GameLifecycleError("Canonical Objective Control proposal requires a BattlePhase.")
-    if type(timing) is not ObjectiveControlTiming:
-        raise GameLifecycleError(
-            "Canonical Objective Control proposal requires ObjectiveControlTiming."
-        )
-    if state.mission_setup is None:
-        raise GameLifecycleError("Objective control updates require MissionSetup.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Objective control updates require battlefield_state.")
-    if state.active_player_id is None:
-        raise GameLifecycleError("Objective control updates require an active player.")
     resolved_record = resolve_objective_control(
-        ObjectiveControlContext.from_game_state(
-            state,
+        objective_control_context_for_boundary(
+            state=state,
+            completed_phase=completed_phase,
             timing=timing,
-            phase=completed_phase,
-            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
             runtime_modifier_registry=runtime_modifier_registry,
         )
     )
@@ -144,3 +127,35 @@ __all__ = (
     "commit_canonical_objective_control_proposal",
     "propose_canonical_objective_control_boundary",
 )
+
+
+def objective_control_context_for_boundary(
+    *,
+    state: GameState,
+    completed_phase: BattlePhase,
+    timing: ObjectiveControlTiming,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> ObjectiveControlContext:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Canonical Objective Control proposal requires GameState.")
+    if type(completed_phase) is not BattlePhase:
+        raise GameLifecycleError("Canonical Objective Control proposal requires a BattlePhase.")
+    if type(timing) is not ObjectiveControlTiming:
+        raise GameLifecycleError(
+            "Canonical Objective Control proposal requires ObjectiveControlTiming."
+        )
+    if state.mission_setup is None:
+        raise GameLifecycleError("Objective control updates require MissionSetup.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Objective control updates require battlefield_state.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("Objective control updates require an active player.")
+    return ObjectiveControlContext.from_game_state(
+        state,
+        timing=timing,
+        phase=completed_phase,
+        ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+        runtime_modifier_registry=runtime_modifier_registry,
+    )

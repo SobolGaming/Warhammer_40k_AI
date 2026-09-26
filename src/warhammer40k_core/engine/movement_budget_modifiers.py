@@ -15,6 +15,11 @@ from warhammer40k_core.core.modifiers import (
     resolve_characteristic_value,
     resolve_distance_deltas,
 )
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+    resolved_profile_characteristic,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -31,7 +36,7 @@ class MovementBudgetModifierContext:
     state: GameState
     unit_instance_id: str
     model_instance_id: str
-    movement: CharacteristicValue
+    movement: ProfileCharacteristicValue
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -49,7 +54,7 @@ class MovementBudgetModifierContext:
             _validate_identifier("model_instance_id", self.model_instance_id),
         )
         if (
-            type(self.movement) is not CharacteristicValue
+            type(self.movement) not in {CharacteristicValue, RandomProfileValue}
             or self.movement.characteristic is not Characteristic.MOVEMENT
         ):
             raise GameLifecycleError("Movement modifiers require a typed Movement characteristic.")
@@ -60,7 +65,7 @@ def model_movement_characteristic(model: ModelInstance) -> CharacteristicValue:
         raise GameLifecycleError("Movement model must be a ModelInstance.")
     for value in model.characteristics:
         if value.characteristic is Characteristic.MOVEMENT:
-            return value
+            return resolved_profile_characteristic(value)
     raise GameLifecycleError("Normal Move requires a Movement characteristic.")
 
 
@@ -166,7 +171,7 @@ def _resolve_movement(
         if modifier.modifier_id not in ignored_ids
     )
     resolved = resolve_characteristic_value(
-        replace(context.movement, raw=context.movement.final),
+        replace(resolved_profile_characteristic(context.movement), raw=context.movement.final),
         modifiers,
         target_id=context.model_instance_id,
     )

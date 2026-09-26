@@ -2893,7 +2893,7 @@ def test_phase17d_champion_slayer_heal_only_applies_after_enemy_character_or_mon
         "source_event_id": "event:enemy-monster-destroyed",
     }
     healed_unit = _unit_by_id(state, unit.unit_instance_id)
-    assert healed_unit.own_models[0].wounds_remaining == model.starting_wounds
+    assert healed_unit.own_models[0].current_wounds == model.initial_wounds
 
 
 def test_phase17d_champion_slayer_heal_does_not_revive_after_source_model_is_full() -> None:
@@ -2905,7 +2905,7 @@ def test_phase17d_champion_slayer_heal_does_not_revive_after_source_model_is_ful
     _set_model_wounds(
         state,
         model_instance_id=source_model.model_instance_id,
-        wounds_remaining=source_model.starting_wounds - 1,
+        wounds_remaining=source_model.initial_wounds - 1,
     )
     _destroy_model(state, model_instance_id=destroyed_model.model_instance_id)
     wounded_unit = _unit_by_id(state, unit.unit_instance_id)
@@ -2930,8 +2930,8 @@ def test_phase17d_champion_slayer_heal_does_not_revive_after_source_model_is_ful
     assert effect.amount == 1
     assert len(effect.resolved_steps) == 1
     resolved_unit = _unit_by_id(state, unit.unit_instance_id)
-    assert resolved_unit.own_models[0].wounds_remaining == source_model.starting_wounds
-    assert resolved_unit.own_models[1].wounds_remaining == 0
+    assert resolved_unit.own_models[0].current_wounds == source_model.initial_wounds
+    assert resolved_unit.own_models[1].current_wounds == 0
     assert state.battlefield_state is not None
     assert destroyed_model.model_instance_id in state.battlefield_state.removed_model_ids
 
@@ -2945,7 +2945,7 @@ def test_phase17d_champion_slayer_heal_ignores_other_wounded_model_when_source_f
     _set_model_wounds(
         state,
         model_instance_id=other_model.model_instance_id,
-        wounds_remaining=other_model.starting_wounds - 1,
+        wounds_remaining=other_model.initial_wounds - 1,
     )
     wounded_unit = _unit_by_id(state, unit.unit_instance_id)
 
@@ -2965,8 +2965,8 @@ def test_phase17d_champion_slayer_heal_ignores_other_wounded_model_when_source_f
 
     resolved_unit = _unit_by_id(state, unit.unit_instance_id)
     assert resolved is None
-    assert resolved_unit.own_models[0].wounds_remaining == source_model.starting_wounds
-    assert resolved_unit.own_models[1].wounds_remaining == other_model.starting_wounds - 1
+    assert resolved_unit.own_models[0].current_wounds == source_model.initial_wounds
+    assert resolved_unit.own_models[1].current_wounds == other_model.initial_wounds - 1
 
 
 def test_phase17d_champion_slayer_heal_fails_closed_for_multiple_wounded_models() -> None:
@@ -2978,12 +2978,12 @@ def test_phase17d_champion_slayer_heal_fails_closed_for_multiple_wounded_models(
     _set_model_wounds(
         state,
         model_instance_id=source_model.model_instance_id,
-        wounds_remaining=source_model.starting_wounds - 1,
+        wounds_remaining=source_model.initial_wounds - 1,
     )
     _set_model_wounds(
         state,
         model_instance_id=other_model.model_instance_id,
-        wounds_remaining=other_model.starting_wounds - 1,
+        wounds_remaining=other_model.initial_wounds - 1,
     )
     wounded_unit = _unit_by_id(state, unit.unit_instance_id)
 
@@ -3072,7 +3072,7 @@ def test_phase17d_champion_slayer_heal_ignores_nonqualifying_destroyed_units() -
 
     assert non_keyword is None
     assert friendly_destroyed is None
-    assert _unit_by_id(state, unit.unit_instance_id).own_models[0].wounds_remaining == 1
+    assert _unit_by_id(state, unit.unit_instance_id).own_models[0].current_wounds == 1
 
 
 def test_phase17d_generic_vp_scoring_rule_mutates_victory_point_ledger() -> None:

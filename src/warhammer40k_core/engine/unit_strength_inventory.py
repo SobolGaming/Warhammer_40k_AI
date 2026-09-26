@@ -87,7 +87,7 @@ def starting_strength_records_for_army(
                     player_id=army_definition.player_id,
                     unit_instance_id=split.successor_id(index),
                     starting_model_count=len(models),
-                    single_model_starting_wounds=models[0].starting_wounds
+                    single_model_starting_wounds=models[0].initial_wounds
                     if len(models) == 1
                     else None,
                     source_id=split.source_id,

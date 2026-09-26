@@ -34,7 +34,6 @@ from warhammer40k_core.engine.mission_turn_end_sequencing import request_mission
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlTiming,
-    resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -394,6 +393,7 @@ class BattleRoundFlow:
                 if round_status is not None:
                     return round_status
         completed_phase = state.advance_to_next_battle_phase(
+            decisions=decisions,
             runtime_modifier_registry=self._runtime_modifier_registry,
             event_log=decisions.event_log,
         )
@@ -635,14 +635,18 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
         value=snapshot_id,
     ):
         return
-    record = resolve_objective_control(
+    from warhammer40k_core.engine.random_objective_control import evaluate_objective_control
+
+    record = evaluate_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
             timing=ObjectiveControlTiming.PHASE_END,
             phase=current_phase,
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
             runtime_modifier_registry=runtime_modifier_registry,
-        )
+        ),
+        decisions=decisions,
+        scope_id=snapshot_id,
     )
     objective_ids_by_unit: dict[str, set[str]] = {}
     for result in record.results:

@@ -15,7 +15,6 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicValue,
-    CharacteristicValuePayload,
 )
 from warhammer40k_core.core.datasheet import (
     BaseSizeDefinition,
@@ -40,6 +39,12 @@ from warhammer40k_core.core.model_keywords import (
     ModelKeywordAssignment,
     ModelKeywordAssignmentPayload,
     model_keyword_assignment,
+)
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    ProfileCharacteristicValuePayload,
+    RandomProfileValue,
+    profile_characteristic_from_payload,
 )
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.engine.core_ability_state import (
@@ -100,11 +105,11 @@ class ModelInstancePayload(TypedDict):
     datasheet_id: str
     model_profile_id: str
     name: str
-    characteristics: list[CharacteristicValuePayload]
+    characteristics: list[ProfileCharacteristicValuePayload]
     base_size: BaseSizeDefinitionPayload
     geometry: ModelGeometryPayload
-    starting_wounds: int
-    wounds_remaining: int
+    starting_wounds: int | None
+    wounds_remaining: int | None
     wargear_ids: list[str]
     source_ids: list[str]
 
@@ -134,11 +139,11 @@ class ModelInstance:
     datasheet_id: str
     model_profile_id: str
     name: str
-    characteristics: tuple[CharacteristicValue, ...]
+    characteristics: tuple[ProfileCharacteristicValue, ...]
     base_size: BaseSizeDefinition
     geometry: ModelGeometry
-    starting_wounds: int
-    wounds_remaining: int
+    starting_wounds: int | None
+    wounds_remaining: int | None
     wargear_ids: tuple[str, ...]
     source_ids: tuple[str, ...]
 
@@ -185,20 +190,30 @@ class ModelInstance:
         if type(self.geometry) is not ModelGeometry:
             raise UnitFactoryError("ModelInstance geometry must be a ModelGeometry.")
         _validate_geometry_matches_base_size(base_size=self.base_size, geometry=self.geometry)
-        starting_wounds = _validate_positive_int(
-            "ModelInstance starting_wounds",
-            self.starting_wounds,
-        )
-        wounds_remaining = _validate_non_negative_int(
-            "ModelInstance wounds_remaining",
-            self.wounds_remaining,
-        )
-        if wounds_remaining > starting_wounds:
-            raise UnitFactoryError(
-                "ModelInstance wounds_remaining must not exceed starting_wounds."
+        if self.starting_wounds is None or self.wounds_remaining is None:
+            wounds = self.characteristic(Characteristic.WOUNDS)
+            if (
+                self.starting_wounds is not None
+                or self.wounds_remaining is not None
+                or not isinstance(wounds, RandomProfileValue)
+                or wounds.evaluation is not None
+            ):
+                raise UnitFactoryError(
+                    "Uninitialized health requires an unresolved random Wounds profile."
+                )
+        else:
+            starting_wounds = _validate_positive_int(
+                "ModelInstance starting_wounds",
+                self.starting_wounds,
             )
-        object.__setattr__(self, "starting_wounds", starting_wounds)
-        object.__setattr__(self, "wounds_remaining", wounds_remaining)
+            wounds_remaining = _validate_non_negative_int(
+                "ModelInstance wounds_remaining",
+                self.wounds_remaining,
+            )
+            if wounds_remaining > starting_wounds:
+                raise UnitFactoryError(
+                    "ModelInstance wounds_remaining must not exceed starting_wounds."
+                )
         object.__setattr__(
             self,
             "wargear_ids",
@@ -234,9 +249,22 @@ class ModelInstance:
 
     @property
     def is_alive(self) -> bool:
-        return self.wounds_remaining > 0
+        return self.current_wounds > 0
 
-    def characteristic(self, characteristic: Characteristic) -> CharacteristicValue:
+    @property
+    def initial_wounds(self) -> int:
+        """The engine-initialized health limit; roster blueprints have no health."""
+        if self.starting_wounds is None:
+            raise UnitFactoryError("Model health has not been initialized by the engine.")
+        return self.starting_wounds
+
+    @property
+    def current_wounds(self) -> int:
+        if self.wounds_remaining is None:
+            raise UnitFactoryError("Model health has not been initialized by the engine.")
+        return self.wounds_remaining
+
+    def characteristic(self, characteristic: Characteristic) -> ProfileCharacteristicValue:
         requested_characteristic = _ensure_characteristic(characteristic)
         for value in self.characteristics:
             if value.characteristic is requested_characteristic:
@@ -270,7 +298,7 @@ class ModelInstance:
             model_profile_id=payload["model_profile_id"],
             name=payload["name"],
             characteristics=tuple(
-                CharacteristicValue.from_payload(value) for value in payload["characteristics"]
+                profile_characteristic_from_payload(value) for value in payload["characteristics"]
             ),
             base_size=BaseSizeDefinition.from_payload(payload["base_size"]),
             geometry=ModelGeometry.from_payload(payload["geometry"]),
@@ -640,7 +668,8 @@ class UnitFactory:
                 }
             )
         )
-        starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
+        wounds = profile.characteristic(Characteristic.WOUNDS)
+        starting_wounds = None if isinstance(wounds, RandomProfileValue) else wounds.final
         assignment = model_keyword_assignment(
             datasheet=datasheet,
             model_profile_id=profile.model_profile_id,
@@ -697,7 +726,8 @@ def _instantiate_models_for_profile(
     keyword_assignment: ModelKeywordAssignment,
     geometry_record: ModelGeometryCatalogRecord | None,
 ) -> tuple[ModelInstance, ...]:
-    starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
+    wounds = profile.characteristic(Characteristic.WOUNDS)
+    starting_wounds = None if isinstance(wounds, RandomProfileValue) else wounds.final
     source_ids = _merge_source_ids(datasheet.source_ids, profile.source_ids)
     geometry = _model_geometry_for_profile(
         keywords=keyword_assignment.keywords,
@@ -1259,16 +1289,16 @@ def _validate_geometry_matches_base_size(
         raise UnitFactoryError("ModelInstance geometry radius_y_inches does not match base_size.")
 
 
-def _validate_characteristics(values: object) -> tuple[CharacteristicValue, ...]:
+def _validate_characteristics(values: object) -> tuple[ProfileCharacteristicValue, ...]:
     if type(values) is not tuple:
         raise UnitFactoryError("ModelInstance characteristics must be a tuple.")
     if not values:
         raise UnitFactoryError("ModelInstance characteristics must not be empty.")
-    validated: list[CharacteristicValue] = []
+    validated: list[ProfileCharacteristicValue] = []
     seen: set[Characteristic] = set()
     raw_values = cast(tuple[object, ...], values)
     for value in raw_values:
-        if type(value) is not CharacteristicValue:
+        if not isinstance(value, (CharacteristicValue, RandomProfileValue)):
             raise UnitFactoryError(
                 "ModelInstance characteristics must contain CharacteristicValue values."
             )

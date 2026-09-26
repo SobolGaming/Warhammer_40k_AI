@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import partial
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -30,6 +31,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.random_profile_evaluation import evaluate_unit_profile_characteristics
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
@@ -82,9 +84,6 @@ def _activate(context: AttackSequenceCompletedContext) -> LifecycleStatus | None
     )
     payload = _rules.dark_pact_payload(effect.effect_payload)
     selected_pact = _rules.dark_pact_kind_from_token(payload["selected_dark_pact"])
-    leadership_target = _rules.leadership_target_for_rules_unit(
-        context=context, rules_unit=rules_unit
-    )
     if _rules.dark_pact_leadership_auto_passes(payload):
         context.decisions.event_log.append(
             "chaos_space_marines_dark_pact_resolved",
@@ -93,7 +92,7 @@ def _activate(context: AttackSequenceCompletedContext) -> LifecycleStatus | None
                 rules_unit=rules_unit,
                 effect=effect,
                 selected_pact=selected_pact,
-                leadership_target=leadership_target,
+                leadership_target=None,
                 leadership_roll=None,
                 leadership_modified_roll=None,
                 passed=True,
@@ -103,6 +102,19 @@ def _activate(context: AttackSequenceCompletedContext) -> LifecycleStatus | None
             ),
         )
         return None
+    evaluate_unit_profile_characteristics(
+        state=context.state,
+        decisions=context.decisions,
+        unit_instance_id=rules_unit.unit_instance_id,
+        scope_id=f"leadership-test:{context.attack_sequence_completed_event_id}:{effect.effect_id}",
+        characteristics=(Characteristic.LEADERSHIP,),
+    )
+    rules_unit = rules_unit_view_by_id(
+        state=context.state, unit_instance_id=rules_unit.unit_instance_id
+    )
+    leadership_target = _rules.leadership_target_for_rules_unit(
+        context=context, rules_unit=rules_unit
+    )
     leadership_roll = context.dice_manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=2, sides=6),

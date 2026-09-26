@@ -1,0 +1,69 @@
+{
+  "workload": "order87-fixed-profile-charge-and-view-v1",
+  "scope": "Fixed-profile gameplay slice; no full-game or random-profile timing claim.",
+  "hardware_status": "provisional",
+  "cpu": "Apple M5 Pro",
+  "logical_cpus": 18,
+  "memory_bytes": 68719476736,
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "workers": 1,
+  "coverage": false,
+  "fixture": "crushing_session default: fixed profiles, 4 five-model units, no terrain",
+  "seed": "order87-fixed-profile-benchmark",
+  "policy": "legal witnessed Charge then no Stratagem selection",
+  "script_sha256": "2a1a7cae93e46afec2fa8199e10816de9c6a6743ed71a93633f684365eee0034",
+  "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+  "samples": [
+    {
+      "setup_seconds": 2.3870767499902286,
+      "charge_seconds": 0.0766836249968037,
+      "twenty_views_seconds": 0.071183917025337,
+      "events": 88
+    },
+    {
+      "setup_seconds": 0.49643704199115746,
+      "charge_seconds": 0.0428046660090331,
+      "twenty_views_seconds": 0.07101537499693222,
+      "events": 88
+    },
+    {
+      "setup_seconds": 0.495143125008326,
+      "charge_seconds": 0.04328829099540599,
+      "twenty_views_seconds": 0.07077741698594764,
+      "events": 88
+    },
+    {
+      "setup_seconds": 0.49523250001948327,
+      "charge_seconds": 0.04290637499070726,
+      "twenty_views_seconds": 0.0713000420073513,
+      "events": 88
+    },
+    {
+      "setup_seconds": 0.49571649997960776,
+      "charge_seconds": 0.07638966600643471,
+      "twenty_views_seconds": 0.07102645898703486,
+      "events": 88
+    }
+  ],
+  "summary": {
+    "setup_seconds": {
+      "mean": 0.8739211833977606,
+      "median": 0.49571649997960776,
+      "maximum": 2.3870767499902286
+    },
+    "charge_seconds": {
+      "mean": 0.056414524599676955,
+      "median": 0.04328829099540599,
+      "maximum": 0.0766836249968037
+    },
+    "twenty_views_seconds": {
+      "mean": 0.0710606420005206,
+      "median": 0.07102645898703486,
+      "maximum": 0.0713000420073513
+    }
+  },
+  "completion_rate": 1.0,
+  "timing_budget": "diagnostic; component budgets deferred by Order 32 owner exception",
+  "work_gate": "20 viewer queries add no events/dice; fixed profiles add no profile rolls"
+}

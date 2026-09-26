@@ -32,6 +32,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
     PrimaryMissionBoundaryCheckpoint,
 )
+from warhammer40k_core.engine.profile_snapshot import validate_snapshot_profile_history
 from warhammer40k_core.engine.rule_duration_execution import expiration_for_duration
 from warhammer40k_core.engine.rule_execution import RuleExecutionContext
 from warhammer40k_core.engine.rule_target_resolution import (
@@ -78,6 +79,13 @@ def validate_primary_mission_oc_effect_event_authority(
     faction_rule_execution_registry: FactionRuleExecutionRegistry | None = None,
     runtime_content_activation: RuntimeContentActivation | None = None,
 ) -> None:
+    validate_snapshot_profile_history(
+        values=tuple(
+            (row.model_instance_id, row.source_objective_control_json)
+            for row in checkpoint.model_states
+        ),
+        prior_events=event_records[:checkpoint_index],
+    )
     for source in checkpoint.objective_control_modifier_sources:
         if source.source_effect_id is None:
             continue

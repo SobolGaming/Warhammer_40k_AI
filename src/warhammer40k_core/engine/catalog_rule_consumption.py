@@ -4502,14 +4502,14 @@ def _this_model_restore_missing_wounds(
     wounded_model_ids = tuple(
         model.model_instance_id
         for model in unit.own_models
-        if model.is_alive and model.wounds_remaining < model.starting_wounds
+        if model.is_alive and model.current_wounds < model.initial_wounds
     )
     if not wounded_model_ids:
         return 0
     for model in unit.own_models:
         if model.model_instance_id != source_model_id:
             continue
-        source_missing_wounds = model.starting_wounds - model.wounds_remaining
+        source_missing_wounds = model.initial_wounds - model.current_wounds
         break
     if source_missing_wounds is None:
         raise GameLifecycleError("Catalog this-model healing source model is missing.")

@@ -1281,6 +1281,8 @@ def _resolve_battle_shock_step(
         request = command_state.battle_shock_in_flight_test_request
         if request is None:
             request = materialize_battle_shock_test_request(
+                decisions=decisions,
+                dice_manager=manager,
                 runtime=runtime,
                 state=state,
                 request_id=_cbsc.command_battle_shock_request_id(

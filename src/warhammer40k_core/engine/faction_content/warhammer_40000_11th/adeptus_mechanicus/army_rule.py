@@ -5,6 +5,10 @@ from enum import StrEnum
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
@@ -42,6 +46,7 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
@@ -871,19 +876,16 @@ def _doctrina_effect_payload(payload: JsonValue) -> dict[str, JsonValue]:
 
 
 def _improve_armor_penetration(
-    armor_penetration: CharacteristicValue,
+    armor_penetration: ProfileCharacteristicValue,
     *,
     bonus: int,
-) -> CharacteristicValue:
-    if type(armor_penetration) is not CharacteristicValue:
+) -> ProfileCharacteristicValue:
+    if type(armor_penetration) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Doctrina Imperatives AP modifier requires value.")
     if armor_penetration.characteristic is not Characteristic.ARMOR_PENETRATION:
         raise GameLifecycleError("Doctrina Imperatives AP characteristic drift.")
     amount = _validate_positive_int("armor_penetration_bonus", bonus)
-    return CharacteristicValue.from_raw(
-        Characteristic.ARMOR_PENETRATION,
-        armor_penetration.final - amount,
-    )
+    return profile_with_delta(armor_penetration, -amount, source_id=SOURCE_RULE_ID)
 
 
 def _source_ids_with_doctrina(source_ids: tuple[str, ...]) -> tuple[str, ...]:

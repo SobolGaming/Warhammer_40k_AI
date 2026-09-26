@@ -119,13 +119,10 @@ def _target_unit_toughness(
                 current_value=base_toughness,
             )
         )
-    toughness_values = _toughness_values_for_models(
+    base_toughness = _highest_toughness_for_models(
         state=state,
         model_instance_ids=alive_model_ids,
     )
-    if len(toughness_values) != 1:
-        raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 14H/16D.")
-    base_toughness = next(iter(toughness_values))
     return runtime_modifiers.modified_unit_characteristic(
         UnitCharacteristicModifierContext(
             state=state,
@@ -307,7 +304,7 @@ def _legal_model_ids_for_allocation_group_damage(
     wounded_model_ids = tuple(
         model.model_instance_id
         for model in alive_models
-        if model.wounds_remaining < model.starting_wounds
+        if model.current_wounds < model.initial_wounds
     )
     if wounded_model_ids:
         return wounded_model_ids

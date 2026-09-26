@@ -4,10 +4,13 @@ from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
-    RangeProfile,
     RangeProfileKind,
     WeaponProfile,
 )
@@ -29,6 +32,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta, range_with_delta
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
@@ -126,6 +130,7 @@ def everstave_weapon_profile_modifier(context: WeaponProfileModifierContext) -> 
         profile=profile,
         strength_delta=strength_delta,
         range_delta=range_delta,
+        target_id=context.attacker_model_instance_id,
         source_id=EVERSTAVE_SOURCE_RULE_ID,
         rule_label="Everstave",
     )
@@ -245,6 +250,7 @@ def _profile_with_attacks_and_strength_delta(
         strength=_strength_with_delta(
             profile.strength,
             delta=strength_delta,
+            source_id=source_id,
             rule_label=rule_label,
         ),
         source_ids=tuple(sorted({*profile.source_ids, source_id})),
@@ -256,21 +262,23 @@ def _profile_with_strength_and_range_delta(
     profile: WeaponProfile,
     strength_delta: int,
     range_delta: int,
+    target_id: str,
     source_id: str,
     rule_label: str,
 ) -> WeaponProfile:
     if source_id in profile.source_ids:
         return profile
-    if profile.range_profile.distance_inches is None:
-        raise GameLifecycleError(f"{rule_label} requires a ranged weapon profile.")
     return replace(
         profile,
         strength=_strength_with_delta(
             profile.strength,
             delta=strength_delta,
+            source_id=source_id,
             rule_label=rule_label,
         ),
-        range_profile=RangeProfile.distance(profile.range_profile.distance_inches + range_delta),
+        range_profile=range_with_delta(
+            profile.range_profile, range_delta, source_id=source_id, target_id=target_id
+        ),
         source_ids=tuple(sorted({*profile.source_ids, source_id})),
     )
 
@@ -298,20 +306,21 @@ def _attack_profile_with_delta(
 
 
 def _strength_with_delta(
-    value: CharacteristicValue,
+    value: ProfileCharacteristicValue,
     *,
     delta: int,
+    source_id: str,
     rule_label: str,
-) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue:
+) -> ProfileCharacteristicValue:
+    if type(value) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError(f"{rule_label} requires a Strength characteristic value.")
     if value.characteristic is not Characteristic.STRENGTH:
         raise GameLifecycleError(f"{rule_label} requires a Strength weapon profile.")
     if type(delta) is not int:
         raise GameLifecycleError(f"{rule_label} Strength delta must be an integer.")
-    if not value.is_numeric:
+    if not isinstance(value, RandomProfileValue) and not value.is_numeric:
         raise GameLifecycleError(f"{rule_label} cannot modify dash Strength.")
-    return CharacteristicValue.from_raw(Characteristic.STRENGTH, value.final + delta)
+    return profile_with_delta(value, delta, source_id=source_id)
 
 
 def destroyed_enemy_model_events_for_sequence(
@@ -418,11 +427,11 @@ def heal_bearer_model(
                     updated_models.append(model)
                     continue
                 found_model = True
-                before_wounds = model.wounds_remaining
+                before_wounds = model.current_wounds
                 after_wounds = (
-                    model.wounds_remaining
-                    if model.wounds_remaining <= 0
-                    else min(model.starting_wounds, model.wounds_remaining + amount)
+                    model.current_wounds
+                    if model.current_wounds <= 0
+                    else min(model.initial_wounds, model.current_wounds + amount)
                 )
                 updated_models.append(replace(model, wounds_remaining=after_wounds))
             updated_units.append(replace(unit, own_models=tuple(updated_models)))

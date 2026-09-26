@@ -209,6 +209,19 @@ def _request_movement_action(
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.active_selection != active_selection:
         raise GameLifecycleError("Movement action request requires active selection state.")
+    from warhammer40k_core.engine.random_profile_evaluation import (
+        evaluate_unit_profile_characteristics,
+        has_random_profile_characteristics,
+    )
+
+    if has_random_profile_characteristics(state=state, characteristics=(Characteristic.MOVEMENT,)):
+        evaluate_unit_profile_characteristics(
+            state=state,
+            decisions=decisions,
+            unit_instance_id=active_selection.unit_instance_id,
+            scope_id=active_selection.result_id,
+            characteristics=(Characteristic.MOVEMENT,),
+        )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,

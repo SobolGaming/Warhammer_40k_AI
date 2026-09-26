@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.random_weapon_range import prepare_selected_weapon_ranges
 
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
@@ -65,6 +66,9 @@ def _request_shooting_type_selection(
         state=state,
         unit_instance_id=active_selection.unit_instance_id,
     )
+    prepare_selected_weapon_ranges(
+        state=state, decisions=decisions, selection=active_selection, catalog=army_catalog
+    )
     legal_types = _legal_shooting_types_for_rules_unit(
         state=state,
         rules_unit=rules_unit,
@@ -73,7 +77,36 @@ def _request_shooting_type_selection(
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if not legal_types:
-        raise GameLifecycleError("Selected shooting unit has no legal shooting types.")
+        if not any(
+            record.selection_result_id == active_selection.result_id
+            for record in state.random_weapon_ranges
+        ):
+            raise GameLifecycleError("Selected shooting unit has no legal shooting types.")
+        from dataclasses import replace
+
+        state.replace_shooting_phase_state(
+            replace(
+                shooting_state,
+                skipped_unit_ids=tuple(
+                    sorted((*shooting_state.skipped_unit_ids, active_selection.unit_instance_id))
+                ),
+                active_selection=None,
+            )
+        )
+        decisions.event_log.append(
+            "shooting_selection_without_targets",
+            {
+                "selection": active_selection.to_payload(),
+                "reason": "evaluated_random_weapon_ranges",
+            },
+        )
+        return LifecycleStatus.advanced(
+            stage=GameLifecycleStage.BATTLE,
+            payload={
+                "phase": BattlePhase.SHOOTING.value,
+                "phase_body_status": "selected_unit_has_no_targets",
+            },
+        )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=SELECT_SHOOTING_TYPE_DECISION_TYPE,
@@ -141,6 +174,9 @@ def _request_shooting_declaration(
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus:
+    prepare_selected_weapon_ranges(
+        state=state, decisions=decisions, selection=active_selection, catalog=army_catalog
+    )
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
     terrain_areas = _terrain_areas_for_state(state)

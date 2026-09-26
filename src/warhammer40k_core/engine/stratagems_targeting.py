@@ -678,25 +678,16 @@ def _battle_shock_test_unit_ids(*, state: GameState, player_id: str) -> tuple[st
     army = state.army_definition_for_player(player_id)
     if army is None:
         return ()
-    requests = collect_battle_shock_test_requests(
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id=player_id,
-        army=army,
-        battlefield_state=battlefield_state,
-        starting_strength_records=tuple(state.starting_strength_records),
-        battle_shocked_unit_ids=tuple(
-            rules_unit.unit_instance_id
-            for rules_unit in fight_present_rules_unit_views(state=state)
-            if rules_unit.owner_player_id == player_id
-            and rules_unit_is_battle_shocked(
-                state=state,
-                unit_instance_id=rules_unit.unit_instance_id,
-            )
-        ),
-        state=state,
+    from warhammer40k_core.engine.command_battle_shock_candidates import (
+        command_battle_shock_candidate_inventory,
     )
-    return tuple(sorted({request.unit_instance_id for request in requests}))
+
+    # Eligibility requires strength and shock state, never a Leadership dice roll.
+    return tuple(
+        candidate.unit_instance_id
+        for candidate in command_battle_shock_candidate_inventory(state, player_id, ())
+        if candidate.test_reason is not None
+    )
 
 
 def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:

@@ -1,0 +1,15 @@
+{
+  "scope": "Order 80 leaves the new optional catalog parameter at None; Order 86 never invokes either damaged-model helper. The complete fixture AST must match the retained baseline after removing exactly these changes. All original samples, semantic assertions and numeric budgets remain unchanged.",
+  "changed_files": {
+    "tests/normal_move_occurrence_helpers.py": {
+      "base_sha256": "52169e54f13f5dc49774d1bec3a54f3ac44b303b5eb85e699a3f5dc041b0e837",
+      "head_sha256": "4dd0d0bfff7f30e330421567a1e256b232dd43ac0aede66b30a33306a6b67928",
+      "baseline_module_ast_sha256": "d2bb524cd93cf15ec97201768a1b3a5065ba8b05dca4549d790f8288f606dab9"
+    },
+    "tests/phase11c_command_phase_helpers.py": {
+      "base_sha256": "966c49f33a097d0b3599226b18695c9a0464f0cb111d27f372c431c46849c37b",
+      "head_sha256": "c37e20ee74053dbe02916b39b5a5ff34da7bbd5a85d574d6ab715d8b6e35ea01",
+      "baseline_module_ast_sha256": "03c5cb3db889dcfaf4b9ae6bc75fdb74ceeb1c99f3bd1ee0e6dc65d688e5be7b"
+    }
+  }
+}

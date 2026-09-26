@@ -537,7 +537,7 @@ def mortal_wound_priority_selection(
     wounded_ids = {
         model.model_instance_id
         for model in alive_models
-        if model.wounds_remaining < model.starting_wounds
+        if model.current_wounds < model.initial_wounds
     }
     tiers = (
         (

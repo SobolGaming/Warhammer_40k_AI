@@ -669,10 +669,13 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
     profile = WeaponProfile(
         profile_id=_required_field(row=row, column_name="weapon_profile_id"),
         name=_required_field(row=row, column_name="name"),
-        range_profile=_range_profile_from_token(_required_field(row=row, column_name="range")),
+        range_profile=_range_profile_from_token(
+            _required_field(row=row, column_name="range"), source_id=row.stable_source_id()
+        ),
         attack_profile=_attack_profile_from_raw_text(_required_field(row=row, column_name="a")),
         skill=_characteristic_value_from_raw_text(
             characteristic=skill_characteristic,
+            source_id=row.stable_source_id(),
             raw_text=_required_field(row=row, column_name="skill"),
         ),
         strength=_characteristic_from_row(

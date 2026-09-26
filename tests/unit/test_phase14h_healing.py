@@ -98,7 +98,7 @@ def test_healing_iterates_wound_revival_revived_wound_and_no_effect() -> None:
     unit = _unit_by_id(state, unit_id)
     wounded = unit.own_models[0]
     removed = unit.own_models[1]
-    assert wounded.starting_wounds == 2
+    assert wounded.initial_wounds == 2
     record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     wound_model_for_healing_fixture(
         state=state,
@@ -154,11 +154,11 @@ def test_healing_iterates_wound_revival_revived_wound_and_no_effect() -> None:
         HealingStepKind.NO_EFFECT,
     ]
     assert (
-        model_by_id(state=state, model_instance_id=wounded.model_instance_id).wounds_remaining
-        == wounded.starting_wounds
+        model_by_id(state=state, model_instance_id=wounded.model_instance_id).current_wounds
+        == wounded.initial_wounds
     )
     revived = model_by_id(state=state, model_instance_id=removed.model_instance_id)
-    assert revived.wounds_remaining == revived.starting_wounds
+    assert revived.current_wounds == revived.initial_wounds
     assert state.battlefield_state is not None
     assert removed.model_instance_id in state.battlefield_state.placed_model_ids()
     assert removed.model_instance_id not in state.battlefield_state.removed_model_ids
@@ -218,8 +218,8 @@ def test_attached_unit_multiple_wounded_models_use_opposing_healing_decision() -
     assert resolved.resolved_steps[1].model_instance_id == bodyguard_id
     assert decisions.queue.pending_requests == ()
     assert len(decisions.records) == 1
-    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 2
-    assert model_by_id(state=state, model_instance_id=bodyguard_id).wounds_remaining == 2
+    assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 2
+    assert model_by_id(state=state, model_instance_id=bodyguard_id).current_wounds == 2
 
 
 def test_healing_selection_drift_rejects_before_queue_pop() -> None:
@@ -262,7 +262,7 @@ def test_healing_selection_drift_rejects_before_queue_pop() -> None:
 
     assert decisions.queue.pending_requests == (request,)
     assert decisions.records == ()
-    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+    assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 1
 
 
 def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component() -> None:
@@ -379,7 +379,7 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
         HealingStepKind.REVIVE_MODEL,
     ]
     assert (
-        model_by_id(state=state, model_instance_id=revived_model.model_instance_id).wounds_remaining
+        model_by_id(state=state, model_instance_id=revived_model.model_instance_id).current_wounds
         == 1
     )
     bodyguard_placement = state.battlefield_state.unit_placement_by_id(bodyguard.unit_instance_id)
@@ -408,12 +408,12 @@ def test_mustered_attached_unit_healing_stale_candidates_reject_before_queue_pop
     _set_model_wounds(
         state,
         model_instance_id=leader_model.model_instance_id,
-        wounds_remaining=leader_model.starting_wounds - 1,
+        wounds_remaining=leader_model.initial_wounds - 1,
     )
     _set_model_wounds(
         state,
         model_instance_id=support_model.model_instance_id,
-        wounds_remaining=support_model.starting_wounds - 1,
+        wounds_remaining=support_model.initial_wounds - 1,
     )
     record_healing_phase_start(state=state, decisions=decisions)
     effect = HealingEffect(
@@ -437,7 +437,7 @@ def test_mustered_attached_unit_healing_stale_candidates_reject_before_queue_pop
     _set_model_wounds(
         state,
         model_instance_id=leader_model.model_instance_id,
-        wounds_remaining=leader_model.starting_wounds,
+        wounds_remaining=leader_model.initial_wounds,
     )
 
     with pytest.raises(GameLifecycleError, match="stale"):
@@ -462,8 +462,8 @@ def test_mustered_attached_unit_healing_stale_candidates_reject_before_queue_pop
         model_by_id(
             state=state,
             model_instance_id=support_model.model_instance_id,
-        ).wounds_remaining
-        == support_model.starting_wounds - 1
+        ).current_wounds
+        == support_model.initial_wounds - 1
     )
 
 
@@ -519,8 +519,8 @@ def test_lifecycle_submit_healing_model_decision_routes_through_submit_decision(
     assert lifecycle.decision_controller.records[-1].request.decision_type == (
         SELECT_HEALING_MODEL_DECISION_TYPE
     )
-    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 2
-    assert model_by_id(state=state, model_instance_id=bodyguard_id).wounds_remaining == 2
+    assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 2
+    assert model_by_id(state=state, model_instance_id=bodyguard_id).current_wounds == 2
     assert not any(
         request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
         for request in lifecycle.decision_controller.queue.pending_requests
@@ -571,7 +571,7 @@ def test_lifecycle_healing_selection_stale_rejects_before_queue_pop() -> None:
     }
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
     assert lifecycle.decision_controller.records == ()
-    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+    assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 1
 
 
 def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_choice() -> None:
@@ -622,7 +622,7 @@ def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_cho
         "target_unit_instance_id": unit_id,
     }
     assert follow_up_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
-    assert model_by_id(state=state, model_instance_id=selected_model_id).wounds_remaining == 0
+    assert model_by_id(state=state, model_instance_id=selected_model_id).current_wounds == 0
 
     placement_status = lifecycle.submit_decision(
         _healing_revival_result(
@@ -634,7 +634,7 @@ def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_cho
     next_request = lifecycle.decision_controller.queue.peek_next()
     assert placement_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert next_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
-    assert model_by_id(state=state, model_instance_id=selected_model_id).wounds_remaining == 2
+    assert model_by_id(state=state, model_instance_id=selected_model_id).current_wounds == 2
 
 
 def test_lifecycle_healing_revival_rejects_stale_and_malformed_then_round_trips() -> None:
@@ -695,7 +695,7 @@ def test_lifecycle_healing_revival_rejects_stale_and_malformed_then_round_trips(
         model_by_id(
             state=state,
             model_instance_id=removed.model_instance_id,
-        ).wounds_remaining
+        ).current_wounds
         == 0
     )
 
@@ -972,7 +972,7 @@ def test_recorded_healing_model_decision_rejects_effect_drift_without_mutation()
             ),
         )
 
-    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+    assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 1
 
 
 def test_recorded_healing_model_decision_can_replay_from_request_effect() -> None:
@@ -1013,7 +1013,7 @@ def test_recorded_healing_model_decision_can_replay_from_request_effect() -> Non
 
     assert follow_up is None
     assert resolved.is_complete()
-    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 2
+    assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 2
 
 
 def test_multiple_wounded_non_attached_unit_rejects_without_choice() -> None:
@@ -1083,7 +1083,7 @@ def test_revival_requires_explicit_candidate_placement_without_mutation() -> Non
         model_by_id(
             state=state,
             model_instance_id=removed_placement.model_instance_id,
-        ).wounds_remaining
+        ).current_wounds
         == 0
     )
     assert decisions.queue.pending_requests == (request,)
@@ -1195,7 +1195,7 @@ def test_multiple_missing_models_use_opposing_revival_decision() -> None:
     assert follow_up is None
     assert resolved.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL
     assert resolved.resolved_steps[0].model_instance_id == selected_model_id
-    assert model_by_id(state=state, model_instance_id=selected_model_id).wounds_remaining == 1
+    assert model_by_id(state=state, model_instance_id=selected_model_id).current_wounds == 1
     assert state.battlefield_state is not None
     assert selected_model_id in state.battlefield_state.placed_model_ids()
     assert selected_model_id not in state.battlefield_state.removed_model_ids
@@ -1244,7 +1244,7 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
         model_by_id(
             state=state,
             model_instance_id=removed_placement.model_instance_id,
-        ).wounds_remaining
+        ).current_wounds
         == 0
     )
     assert state.battlefield_state is not None

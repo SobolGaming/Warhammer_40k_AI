@@ -8,6 +8,18 @@ from warhammer40k_core.adapters.battlefield_projection import (
     BattlefieldViewPayload,
     project_battlefield_view,
 )
+from warhammer40k_core.adapters.characteristic_projection import (
+    CharacteristicDisplayPayload as CharacteristicDisplayPayload,
+)
+from warhammer40k_core.adapters.characteristic_projection import (
+    RedactionDisplayPayload as RedactionDisplayPayload,
+)
+from warhammer40k_core.adapters.characteristic_projection import (
+    characteristic_display_payload as _characteristic_display_payload,
+)
+from warhammer40k_core.adapters.characteristic_projection import (
+    visible_redaction as _visible_redaction,
+)
 from warhammer40k_core.adapters.external_contract import (
     DECISION_REQUEST_VIEW_SCHEMA_VERSION,
 )
@@ -22,8 +34,12 @@ from warhammer40k_core.adapters.redaction import (
     visible_army_units,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetAbilityDescriptor
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import (
@@ -60,7 +76,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v12-model-keywords"
+PROJECTION_SCHEMA_VERSION = "game-view-v13-random-profiles"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -226,23 +242,6 @@ class SourceMetadataDisplayPayload(TypedDict):
     catalog_id: str
     source_package_id: str
     source_ids: list[str]
-
-
-class RedactionDisplayPayload(TypedDict):
-    hidden: bool
-    reason: str | None
-
-
-class CharacteristicDisplayPayload(TypedDict):
-    characteristic: str
-    label: str
-    value_kind: str
-    raw: int | None
-    base: int | None
-    final: int | None
-    display_value: str | None
-    applied_modifier_ids: list[str]
-    redaction: RedactionDisplayPayload
 
 
 class ModifierTargetDisplayPayload(TypedDict):
@@ -893,9 +892,9 @@ def _model_display_payload(
         ),
         "geometry": validate_json_value(model.geometry.to_payload()),
         "wounds_remaining": (
-            model.wounds_remaining if formation_state_visible else model.starting_wounds
+            model.current_wounds if formation_state_visible else model.initial_wounds
         ),
-        "starting_wounds": model.starting_wounds,
+        "starting_wounds": model.initial_wounds,
         "base_characteristics": base_characteristics,
         "current_characteristics": current_characteristics,
         "visible_modifiers": (
@@ -941,14 +940,20 @@ def _model_characteristic_display_map(
 
 def _model_display_characteristic(
     *,
-    by_characteristic: dict[Characteristic, CharacteristicValue],
+    by_characteristic: dict[Characteristic, ProfileCharacteristicValue],
     state: GameState,
     unit: UnitInstance,
     model: ModelInstance,
     characteristic: Characteristic,
     use_base_values: bool,
-) -> CharacteristicValue:
-    if characteristic is Characteristic.OBJECTIVE_CONTROL:
+) -> ProfileCharacteristicValue:
+    if characteristic is Characteristic.OBJECTIVE_CONTROL and (
+        not isinstance(by_characteristic.get(characteristic), RandomProfileValue)
+        or (
+            not use_base_values
+            and rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)
+        )
+    ):
         return model_objective_control_characteristic(
             model,
             battle_shocked=(
@@ -962,32 +967,6 @@ def _model_display_characteristic(
     if value is None:
         raise GameLifecycleError("Model display projection missing datacard characteristic.")
     return value
-
-
-def _characteristic_display_payload(
-    *,
-    value: CharacteristicValue,
-    label: str,
-    use_base_values: bool,
-) -> CharacteristicDisplayPayload:
-    if type(value) is not CharacteristicValue:
-        raise GameLifecycleError("Characteristic display requires CharacteristicValue.")
-    final = value.base if use_base_values else value.final
-    return {
-        "characteristic": value.characteristic.value,
-        "label": label,
-        "value_kind": value.value_kind.value,
-        "raw": value.raw,
-        "base": value.base,
-        "final": final,
-        "display_value": _characteristic_display_value(
-            characteristic=value.characteristic,
-            value=final,
-            is_dash=value.is_dash,
-        ),
-        "applied_modifier_ids": [] if use_base_values else list(value.applied_modifier_ids),
-        "redaction": _visible_redaction(),
-    }
 
 
 def _unknown_datacard_characteristics(
@@ -1042,7 +1021,7 @@ def _visible_modifier_traces(
 
 
 def _datacard_characteristics(
-    characteristics: tuple[CharacteristicValue, ...],
+    characteristics: tuple[ProfileCharacteristicValue, ...],
 ) -> dict[str, JsonValue]:
     by_characteristic = {value.characteristic: value for value in characteristics}
     payload: dict[str, JsonValue] = {}
@@ -1073,25 +1052,6 @@ def _datasheet_ability_display_profile(
         "timing_tags": list(ability.timing_tags),
         "parameter_tokens": list(ability.parameter_tokens),
     }
-
-
-def _characteristic_display_value(
-    *,
-    characteristic: Characteristic,
-    value: int,
-    is_dash: bool,
-) -> str:
-    if is_dash:
-        return "-"
-    if characteristic is Characteristic.MOVEMENT:
-        return f'{value}"'
-    if characteristic in {
-        Characteristic.SAVE,
-        Characteristic.INVULNERABLE_SAVE,
-        Characteristic.LEADERSHIP,
-    }:
-        return f"{value}+"
-    return str(value)
 
 
 def _base_size_display(
@@ -1152,10 +1112,6 @@ def _projection_state_hash(payload: GameViewPayload) -> str:
 
 def _base_size_id(model_profile_id: str) -> str:
     return f"base-size:{_validate_identifier('model_profile_id', model_profile_id)}"
-
-
-def _visible_redaction() -> RedactionDisplayPayload:
-    return {"hidden": False, "reason": None}
 
 
 def _redaction(*, reason: str) -> RedactionDisplayPayload:

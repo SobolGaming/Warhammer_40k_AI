@@ -243,7 +243,7 @@ def defender_wounds(lifecycle: GameLifecycle, defender: UnitInstance) -> int:
     return model_by_id(
         state=_state(lifecycle),
         model_instance_id=defender.own_models[0].model_instance_id,
-    ).wounds_remaining
+    ).current_wounds
 
 
 def typed_replacement_payload(event: EventRecord) -> dict[str, object]:

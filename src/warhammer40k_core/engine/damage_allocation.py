@@ -2070,7 +2070,7 @@ def allocation_context_for_unit(
         wounded_model_ids=tuple(
             model.model_instance_id
             for model in alive_models
-            if model.wounds_remaining < model.starting_wounds
+            if model.current_wounds < model.initial_wounds
         ),
         already_allocated_model_ids=already_allocated_model_ids,
         attached_unit_bodyguard_model_ids=bodyguard_model_ids,
@@ -2116,7 +2116,7 @@ def allocation_groups_for_context(
     ] = {}
     for model_id in legal_model_ids:
         model = model_by_id(state=state, model_instance_id=model_id)
-        wounds = model.starting_wounds
+        wounds = model.characteristic(Characteristic.WOUNDS).final
         save = _model_characteristic(model, Characteristic.SAVE)
         invulnerable = _model_characteristic(model, Characteristic.INVULNERABLE_SAVE)
         if model_id in character_ids:
@@ -2621,8 +2621,8 @@ def apply_damage_to_model(
     model = model_by_id(state=state, model_instance_id=model_instance_id)
     if not model.is_alive:
         raise GameLifecycleError("Damage cannot be applied to a destroyed model.")
-    wounds_lost = min(model.wounds_remaining, requested_damage)
-    final_wounds = model.wounds_remaining - wounds_lost
+    wounds_lost = min(model.current_wounds, requested_damage)
+    final_wounds = model.current_wounds - wounds_lost
     application = DamageApplication(
         target_unit_instance_id=target_unit_instance_id,
         model_instance_id=model_instance_id,
@@ -2630,7 +2630,7 @@ def apply_damage_to_model(
         requested_damage=requested_damage,
         wounds_lost=wounds_lost,
         excess_damage_lost=requested_damage - wounds_lost,
-        starting_wounds_remaining=model.wounds_remaining,
+        starting_wounds_remaining=model.current_wounds,
         final_wounds_remaining=final_wounds,
         destroyed=final_wounds == 0,
     )

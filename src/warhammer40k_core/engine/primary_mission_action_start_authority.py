@@ -4,9 +4,12 @@ import json
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import (
-    CharacteristicValue,
+    Characteristic,
     CharacteristicValueKind,
-    CharacteristicValuePayload,
+)
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -18,7 +21,6 @@ from warhammer40k_core.engine.mission_terrain import (
     mission_logical_terrain_areas,
     model_intersects_logical_terrain_area,
 )
-from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_mission_action_identity_authority import (
     allowed_rules_unit_ids_for_component,
@@ -32,6 +34,10 @@ from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
 )
 from warhammer40k_core.engine.primary_mission_objective_control_authority import (
     resolve_checkpoint_objective_control,
+)
+from warhammer40k_core.engine.profile_snapshot import (
+    profile_snapshot_from_json,
+    same_profile_source,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_id_for_unit_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -77,7 +83,7 @@ def capture_primary_mission_action_terrain_model_inventory(
                 unit_instance_id=unit.unit_instance_id,
             )
             for model in unit.own_models:
-                source_oc = model_objective_control_characteristic(model, battle_shocked=False)
+                source_oc = model.characteristic(Characteristic.OBJECTIVE_CONTROL)
                 resolved_oc = resolve_checkpoint_objective_control(
                     state=state,
                     unit_instance_id=unit.unit_instance_id,
@@ -102,7 +108,7 @@ def capture_primary_mission_action_terrain_model_inventory(
                         rules_unit_instance_id=rules_unit_id,
                         component_unit_instance_id=unit.unit_instance_id,
                         model_instance_id=model.model_instance_id,
-                        wounds_remaining_at_boundary=model.wounds_remaining,
+                        wounds_remaining_at_boundary=model.current_wounds,
                         model_placement_json=(
                             None if placement is None else _canonical_json(placement.to_payload())
                         ),
@@ -155,19 +161,9 @@ def validate_primary_mission_action_terrain_model_inventory(
     area_ids = {area.logical_terrain_area_id for area in mission_logical_terrain_areas(setup)}
     for row in values:
         owner_id, component_id, model = expected[row.model_instance_id]
-        source_oc = CharacteristicValue.from_payload(
-            cast(
-                CharacteristicValuePayload,
-                _json_object(row.source_objective_control_json),
-            )
-        )
-        resolved_oc = CharacteristicValue.from_payload(
-            cast(
-                CharacteristicValuePayload,
-                _json_object(row.resolved_objective_control_json),
-            )
-        )
-        expected_source_oc = model_objective_control_characteristic(model, battle_shocked=False)
+        source_oc = profile_snapshot_from_json(row.source_objective_control_json)
+        resolved_oc = profile_snapshot_from_json(row.resolved_objective_control_json)
+        expected_source_oc = model.characteristic(Characteristic.OBJECTIVE_CONTROL)
         placement = (
             None
             if row.model_placement_json is None
@@ -200,7 +196,7 @@ def validate_primary_mission_action_terrain_model_inventory(
                 component_unit_instance_id=row.component_unit_instance_id,
             )
             or not set(row.logical_terrain_area_ids) <= area_ids
-            or row.wounds_remaining_at_boundary > model.starting_wounds
+            or row.wounds_remaining_at_boundary > model.initial_wounds
             or (
                 placement is not None
                 and (
@@ -210,17 +206,23 @@ def validate_primary_mission_action_terrain_model_inventory(
                 )
             )
             or row.logical_terrain_area_ids != expected_area_ids
-            or source_oc != expected_source_oc
+            or not same_profile_source(source_oc, expected_source_oc)
             or not _runtime_oc_retains_source_lineage(source_oc, resolved_oc)
         ):
             raise GameLifecycleError("Primary Mission Action terrain-model inventory drifted.")
 
 
 def _runtime_oc_retains_source_lineage(
-    source: CharacteristicValue,
-    resolved: CharacteristicValue,
+    source: ProfileCharacteristicValue,
+    resolved: ProfileCharacteristicValue,
 ) -> bool:
     """Structural lineage only; checkpoint runtime authority recomputes every field."""
+    if isinstance(source, RandomProfileValue):
+        if source.evaluation is None:
+            return source == resolved
+        source = source.resolved_value()
+    if isinstance(resolved, RandomProfileValue):
+        return False
     if source.characteristic is not resolved.characteristic:
         return False
     if not source.is_numeric or source.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO:

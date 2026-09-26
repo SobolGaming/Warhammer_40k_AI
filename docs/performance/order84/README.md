@@ -1,5 +1,10 @@
 # Order 84 validation and performance evidence
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 `review.json` records the independent review/fix loop and final runtime approval
 before the first push. `validation.json` records final commands and results,
 including the initial unsuccessful aggregate attempt and its corrections.

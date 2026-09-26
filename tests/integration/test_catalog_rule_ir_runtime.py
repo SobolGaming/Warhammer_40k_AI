@@ -1479,8 +1479,8 @@ def test_daemonic_patrons_deadly_demise_routes_mortal_wound_fnp_before_removal()
         is None
     )
     assert source_model_id not in state.battlefield_state.placed_model_ids()
-    assert model_by_id(state=state, model_instance_id=enemy_model_id).wounds_remaining == (
-        enemy.own_models[0].starting_wounds - 1
+    assert model_by_id(state=state, model_instance_id=enemy_model_id).current_wounds == (
+        enemy.own_models[0].initial_wounds - 1
     )
     assert not state.persisting_effects
     assert any(

@@ -279,8 +279,8 @@ def _assert_datasheet_backed_infantry(army: ArmyDefinition) -> None:
     assert characteristics[Characteristic.MOVEMENT] == 6
     assert characteristics[Characteristic.OBJECTIVE_CONTROL] == 2
     assert characteristics[Characteristic.BALLISTIC_SKILL] == 3
-    assert model.starting_wounds == 2
-    assert model.wounds_remaining == 2
+    assert model.initial_wounds == 2
+    assert model.current_wounds == 2
     assert model.source_ids == (
         "datasheet:core-intercessor-like-infantry",
         "datasheet:core-intercessor-like-infantry:profile",

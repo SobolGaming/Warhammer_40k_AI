@@ -91,6 +91,13 @@ def record_move_completion_event(
             decisions=decisions, kind=RuleTriggerKind.MOVE_COMPLETION, context=context
         )
         capture_move_rules(state=state, decisions=decisions, event=event, source_context=context)
+    from warhammer40k_core.engine.random_objective_control import (
+        prepare_objective_control_after_placement,
+    )
+
+    prepare_objective_control_after_placement(
+        state=state, decisions=decisions, event_id=event.event_id
+    )
     from warhammer40k_core.engine.primary_mission_action_interruptions import (
         reconcile_primary_mission_action_interruptions,
     )

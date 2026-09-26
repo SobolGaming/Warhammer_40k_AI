@@ -10,11 +10,11 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import (
     Characteristic,
-    CharacteristicValue,
     CharacteristicValueKind,
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.objectives import Objective, ObjectiveMarker, ObjectiveMarkerPayload
+from warhammer40k_core.core.random_profile_values import ProfileCharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
@@ -228,7 +228,7 @@ def test_order_30_objective_measurement_includes_retained_target_for_attack_rule
         state=state,
         target_unit_instance_id=unit_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -413,7 +413,10 @@ def test_p14_battle_shocked_attached_unit_has_no_oc_for_any_component(
         formation.component_unit_instance_ids
     )
     assert len(result.contributors) == 6
-    assert all(row.objective_control > 0 for row in result.contributors)
+    assert all(
+        row.objective_control is not None and row.objective_control > 0
+        for row in result.contributors
+    )
     assert all(row.battle_shocked for row in result.contributors)
     assert all(row.effective_objective_control == 0 for row in result.contributors)
     assert result.status is ObjectiveControlStatus.UNCONTROLLED
@@ -1748,7 +1751,7 @@ def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:
     return armies
 
 
-def _model_objective_control(characteristics: tuple[CharacteristicValue, ...]) -> int:
+def _model_objective_control(characteristics: tuple[ProfileCharacteristicValue, ...]) -> int:
     if type(characteristics) is not tuple:
         raise AssertionError("model characteristics must be a tuple")
     for characteristic in characteristics:

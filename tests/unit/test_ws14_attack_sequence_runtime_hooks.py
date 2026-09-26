@@ -1214,7 +1214,7 @@ def test_ws14_generic_this_model_half_strength_hit_modifier_gates_target() -> No
         == 0
     )
 
-    below_half_wounds = _below_half_wounds(defender.own_models[0].starting_wounds)
+    below_half_wounds = _below_half_wounds(defender.own_models[0].initial_wounds)
     _replace_unit(state, _unit_with_model_wounds(defender, wounds_remaining=below_half_wounds))
 
     assert registry.hit_roll_modifier(context) == 0
@@ -1282,7 +1282,7 @@ def test_ws14_generic_this_model_attack_modifiers_use_source_rules_unit_strength
 
     attacker = _unit_with_model_wounds(
         attacker,
-        wounds_remaining=attacker.own_models[0].starting_wounds - 1,
+        wounds_remaining=attacker.own_models[0].initial_wounds - 1,
     )
     _replace_unit(state, attacker)
     assert registry.hit_roll_modifier(hit_context) == 1
@@ -1290,7 +1290,7 @@ def test_ws14_generic_this_model_attack_modifiers_use_source_rules_unit_strength
 
     attacker = _unit_with_model_wounds(
         attacker,
-        wounds_remaining=_below_half_wounds(attacker.own_models[0].starting_wounds),
+        wounds_remaining=_below_half_wounds(attacker.own_models[0].initial_wounds),
     )
     _replace_unit(state, attacker)
     assert registry.hit_roll_modifier(hit_context) == 1
@@ -1367,7 +1367,7 @@ def test_ws14_generic_this_model_melee_modifiers_use_target_rules_unit_strength(
 
     defender = _unit_with_model_wounds(
         defender,
-        wounds_remaining=defender.own_models[0].starting_wounds - 1,
+        wounds_remaining=defender.own_models[0].initial_wounds - 1,
     )
     _replace_unit(state, defender)
     assert registry.hit_roll_modifier(hit_context) == 1
@@ -1375,7 +1375,7 @@ def test_ws14_generic_this_model_melee_modifiers_use_target_rules_unit_strength(
 
     defender = _unit_with_model_wounds(
         defender,
-        wounds_remaining=defender.own_models[0].starting_wounds // 2,
+        wounds_remaining=defender.own_models[0].initial_wounds // 2,
     )
     _replace_unit(state, defender)
     assert registry.hit_roll_modifier(hit_context) == 1
@@ -1383,7 +1383,7 @@ def test_ws14_generic_this_model_melee_modifiers_use_target_rules_unit_strength(
 
     defender = _unit_with_model_wounds(
         defender,
-        wounds_remaining=_below_half_wounds(defender.own_models[0].starting_wounds),
+        wounds_remaining=_below_half_wounds(defender.own_models[0].initial_wounds),
     )
     _replace_unit(state, defender)
     assert registry.hit_roll_modifier(hit_context) == 1

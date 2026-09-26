@@ -230,7 +230,7 @@ class AttackSequenceEventPayload(TypedDict):
 
 
 class HitRollPayload(TypedDict):
-    target_number: int
+    target_number: int | None
     roll_state: DiceRollStatePayload | None
     unmodified_roll: int | None
     minimum_unmodified_success: int
@@ -249,9 +249,9 @@ class HitRollPayload(TypedDict):
 
 
 class WoundRollPayload(TypedDict):
-    strength: int
-    toughness: int
-    target_number: int
+    strength: int | None
+    toughness: int | None
+    target_number: int | None
     roll_state: DiceRollStatePayload | None
     unmodified_roll: int | None
     critical_threshold: int
@@ -446,7 +446,7 @@ class GatheredAttackGroupPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class HitRoll:
-    target_number: int
+    target_number: int | None
     roll_state: DiceRollState | None
     unmodified_roll: int | None
     modifier: int
@@ -464,9 +464,10 @@ class HitRoll:
     generated_hits: int = 1
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "target_number", _validate_d6_target("HitRoll target_number", self.target_number)
-        )
+        if self.target_number is not None:
+            _validate_d6_target("HitRoll target_number", self.target_number)
+        elif not self.skipped:
+            raise GameLifecycleError("An actual Hit roll requires a target number.")
         object.__setattr__(
             self,
             "minimum_unmodified_success",
@@ -513,6 +514,8 @@ class HitRoll:
             return
         if self.roll_state is None:
             raise GameLifecycleError("HitRoll requires a roll_state unless skipped.")
+        if self.target_number is None:
+            raise GameLifecycleError("HitRoll requires a target unless skipped.")
         if type(self.roll_state) is not DiceRollState:
             raise GameLifecycleError("HitRoll roll_state must be DiceRollState.")
         if type(self.unmodified_roll) is not int:
@@ -541,7 +544,7 @@ class HitRoll:
             )
 
     @classmethod
-    def auto_hit(cls, *, target_number: int, generated_hits: int = 1) -> Self:
+    def auto_hit(cls, *, target_number: int | None, generated_hits: int = 1) -> Self:
         return cls(
             target_number=target_number,
             roll_state=None,
@@ -601,9 +604,9 @@ class HitRoll:
 
 @dataclass(frozen=True, slots=True)
 class WoundRoll:
-    strength: int
-    toughness: int
-    target_number: int
+    strength: int | None
+    toughness: int | None
+    target_number: int | None
     roll_state: DiceRollState | None
     unmodified_roll: int | None
     modifier: int
@@ -616,19 +619,21 @@ class WoundRoll:
     skipped: bool = False
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "strength",
-            _validate_positive_int("WoundRoll strength", self.strength),
-        )
-        object.__setattr__(
-            self,
-            "toughness",
-            _validate_positive_int("WoundRoll toughness", self.toughness),
-        )
-        expected_target = wound_roll_target_number(strength=self.strength, toughness=self.toughness)
-        if self.target_number != expected_target:
-            raise GameLifecycleError("WoundRoll target_number does not match Strength/Toughness.")
+        if self.strength is None or self.toughness is None or self.target_number is None:
+            if not self.skipped or any(
+                value is not None for value in (self.strength, self.toughness, self.target_number)
+            ):
+                raise GameLifecycleError("Only an automatic Wound may omit all comparison values.")
+        else:
+            _validate_positive_int("WoundRoll strength", self.strength)
+            _validate_positive_int("WoundRoll toughness", self.toughness)
+            expected_target = wound_roll_target_number(
+                strength=self.strength, toughness=self.toughness
+            )
+            if self.target_number != expected_target:
+                raise GameLifecycleError(
+                    "WoundRoll target_number does not match Strength/Toughness."
+                )
         object.__setattr__(
             self,
             "critical_threshold",
@@ -653,7 +658,9 @@ class WoundRoll:
                 raise GameLifecycleError("Skipped WoundRoll cannot be a Critical Wound.")
             return
         if type(self.roll_state) is not DiceRollState:
-            raise GameLifecycleError("WoundRoll roll_state must be DiceRollState.")
+            raise GameLifecycleError("WoundRoll requires a roll_state unless skipped.")
+        if self.target_number is None:
+            raise GameLifecycleError("WoundRoll requires a target number unless skipped.")
         if type(self.unmodified_roll) is not int:
             raise GameLifecycleError("WoundRoll unmodified_roll must be an integer.")
         validate_interpreted_d6(state=self.roll_state, value=self.unmodified_roll)
@@ -672,9 +679,9 @@ class WoundRoll:
     def auto_wound(
         cls,
         *,
-        strength: int,
-        toughness: int,
-        target_number: int,
+        strength: int | None,
+        toughness: int | None,
+        target_number: int | None,
     ) -> Self:
         return cls(
             strength=strength,

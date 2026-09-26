@@ -82,7 +82,7 @@ def destroy_horror_models_for_completion_fixture(
             destruction_evidence=evidence,
             target_unit_instance_id=target.unit_instance_id,
             defender_player_id=target.owner_player_id,
-            mortal_wounds=sum(models[model_id].wounds_remaining for model_id in model_ids),
+            mortal_wounds=sum(models[model_id].current_wounds for model_id in model_ids),
             spill_over=True,
         ),
     )

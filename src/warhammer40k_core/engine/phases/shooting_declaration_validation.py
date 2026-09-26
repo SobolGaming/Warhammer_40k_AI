@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.random_weapon_range import weapon_with_committed_range
 
 from typing import TYPE_CHECKING
 
@@ -381,6 +382,10 @@ def _attack_pools_or_validation(
             state=state,
             unit_instance_id=declaration.target_unit_instance_id,
         )
+        if committed_selection_context is not None:
+            weapon_profile = weapon_with_committed_range(
+                weapon_profile, context=committed_selection_context
+            )
         selection_context = shooting_weapon_selection_context(
             state=state,
             runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),

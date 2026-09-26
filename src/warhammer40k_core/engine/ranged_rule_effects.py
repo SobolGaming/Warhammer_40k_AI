@@ -3,12 +3,12 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import replace
 
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 
 DETECTION_RANGE_BONUS_EFFECT_KIND = "detection_range_bonus"
 RANGED_ATTACKS_KEEP_HIDDEN_EFFECT_KIND = "ranged_attacks_keep_hidden"
@@ -184,6 +184,7 @@ def weapon_profile_with_character_target_ap_effects(
     if "CHARACTER" not in {_canonical_keyword(keyword) for keyword in target_keywords}:
         return profile
     total_bonus = 0
+    armor_penetration = profile.armor_penetration
     source_ids: set[str] = set()
     for effect in effects:
         if type(effect) is not PersistingEffect:
@@ -198,17 +199,20 @@ def weapon_profile_with_character_target_ap_effects(
         raw_bonus = payload.get("ap_bonus")
         if type(raw_bonus) is not int:
             raise GameLifecycleError("Character-target AP payload requires ap_bonus.")
-        total_bonus += _validate_positive_int("ap_bonus", raw_bonus)
+        amount = _validate_positive_int("ap_bonus", raw_bonus)
+        total_bonus += amount
+        armor_penetration = profile_with_delta(
+            armor_penetration,
+            -amount,
+            source_id=effect.source_rule_id,
+            modifier_id=effect.effect_id,
+        )
         source_ids.add(effect.source_rule_id)
     if total_bonus == 0:
         return profile
-    modified_ap = profile.armor_penetration.final - total_bonus
     return replace(
         profile,
-        armor_penetration=CharacteristicValue.from_raw(
-            Characteristic.ARMOR_PENETRATION,
-            modified_ap,
-        ),
+        armor_penetration=armor_penetration,
         source_ids=tuple(sorted({*profile.source_ids, *source_ids})),
     )
 

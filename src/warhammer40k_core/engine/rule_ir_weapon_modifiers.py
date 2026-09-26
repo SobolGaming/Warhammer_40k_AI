@@ -6,8 +6,6 @@ from typing import cast
 
 from warhammer40k_core.core.attributes import (
     Characteristic,
-    CharacteristicBoundPolicy,
-    CharacteristicValue,
 )
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
@@ -22,6 +20,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 
 
 def rule_ir_weapon_selector_applies(
@@ -54,13 +53,25 @@ def rule_ir_modified_weapon_profile(
     if characteristic is Characteristic.STRENGTH:
         return replace(
             profile,
-            strength=_modified_characteristic_value(profile.strength, delta),
+            strength=profile_with_delta(
+                profile.strength,
+                delta,
+                source_id=source_id,
+                modifier_id=modifier_id,
+                bound_numeric=True,
+            ),
             source_ids=source_ids,
         )
     if characteristic is Characteristic.ARMOR_PENETRATION:
         return replace(
             profile,
-            armor_penetration=_modified_characteristic_value(profile.armor_penetration, delta),
+            armor_penetration=profile_with_delta(
+                profile.armor_penetration,
+                delta,
+                source_id=source_id,
+                modifier_id=modifier_id,
+                bound_numeric=True,
+            ),
             source_ids=source_ids,
         )
     if characteristic in {Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL}:
@@ -203,15 +214,6 @@ def _required_positive_weapon_ability_value(parameters: Mapping[str, object]) ->
     if type(value) is not int or value < 1:
         raise GameLifecycleError("RuleIR weapon_ability_value must be a positive int.")
     return value
-
-
-def _modified_characteristic_value(value: CharacteristicValue, delta: int) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue or not value.is_numeric:
-        raise GameLifecycleError("RuleIR weapon modifier requires a numeric characteristic.")
-    bounded = CharacteristicBoundPolicy.for_characteristic(value.characteristic).apply(
-        value.final + delta
-    )
-    return CharacteristicValue.from_raw(value.characteristic, bounded)
 
 
 def _modified_attack_profile(profile: AttackProfile, delta: int) -> AttackProfile:

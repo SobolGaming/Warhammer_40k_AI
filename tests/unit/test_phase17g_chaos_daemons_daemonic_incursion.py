@@ -452,7 +452,7 @@ def test_soulstealer_heals_bearer_after_destroying_enemy_model_with_melee_attack
     _set_model_wounds(
         state,
         model_instance_id=bearer_model.model_instance_id,
-        wounds_remaining=bearer_model.starting_wounds - 1,
+        wounds_remaining=bearer_model.initial_wounds - 1,
     )
     _assign_daemonic_enhancement(
         state,
@@ -533,7 +533,7 @@ def test_soulstealer_heals_bearer_after_destroying_enemy_model_with_melee_attack
 
     assert status is None
     healed_bearer = _unit_by_id(state, bearer.unit_instance_id)
-    assert healed_bearer.own_models[0].wounds_remaining == bearer_model.starting_wounds
+    assert healed_bearer.own_models[0].current_wounds == bearer_model.initial_wounds
     payload = last_event_payload(decisions, enhancements.SOULSTEALER_RESOLVED_EVENT)
     assert payload["destroyed_model_event_id"] == destroyed_event.event_id
     assert payload["roll_total"] == 5

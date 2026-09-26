@@ -1,0 +1,44 @@
+{
+  "date": "2026-09-26",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d687c193f560a9c1cdbbc32ab3566440a5994c5c7ec6515ded0b7448b7a8310f",
+  "base_commit": "7f4384b89ff9f91c1c69f0f39377d71ccd574f4c",
+  "behavioral": {
+    "passed": 9418,
+    "failed": 0,
+    "coverage_percent": 85.16,
+    "seconds": 756.25,
+    "workers": 18,
+    "distribution": "worksteal",
+    "warnings": 10,
+    "junit_sha256": "003cb4abe853d1b8e835d03dac824a3083f3e4526fb10e00e1fd6a92407296f5"
+  },
+  "code_quality": {
+    "passed": 685,
+    "failed": 0,
+    "seconds": 117.67,
+    "workers": 18,
+    "distribution": "worksteal",
+    "coverage": false,
+    "junit_sha256": "2c04167d5e96127d16a7d93097d288ec1a743e1a9245c046045f6c9d2bdcaf66"
+  },
+  "checks_passed": [
+    "ruff check",
+    "ruff format --check",
+    "mypy src tests",
+    "pyright",
+    "11 import-linter contracts",
+    "build_test_shards --check --shard-count 8",
+    "pre-commit --all-files",
+    "source generator --check",
+    "engine build identity --check",
+    "external contract --check --base-ref 7f4384b89ff9f91c1c69f0f39377d71ccd574f4c",
+    "TypeScript generated client and typecheck",
+    "5 TypeScript unit tests",
+    "342 HTTP conformance assertions",
+    "installed wheel: 27 schemas, 2985 resources"
+  ],
+  "performance": "24 inherited head reports remeasured serially with unchanged numeric budgets; dedicated five-sample matched base/head fixed-profile diagnostic and five-sample random-Toughness restore diagnostic; full-game and random-profile gameplay timing unmeasured",
+  "independent_review": "FINAL APPROVED for R87-001: no outstanding findings. Independently verified unchanged approved runtime, 9418 passing behavioral tests, 85.16% coverage, 685 passing quality tests, exact JUnit hashes, regenerated shard provenance, generated artifacts and all 24 refreshed performance report hashes before push.",
+  "correction": "R87-001",
+  "correction_base_commit": "c65126b3c8f851b56f791d37fd2f3dbdbae882bc"
+}

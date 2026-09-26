@@ -10,7 +10,11 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetAbilityDescriptorPayload,
 )
-from warhammer40k_core.core.modifiers import ModifierOperation
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -694,7 +698,7 @@ def _apply_model_characteristic_modifier(
     model: ModelInstance,
     effect: EnhancementCharacteristicModifier,
 ) -> tuple[ModelInstance, dict[str, JsonValue] | None]:
-    updated_characteristics: list[CharacteristicValue] = []
+    updated_characteristics: list[ProfileCharacteristicValue] = []
     characteristic_seen = False
     payload: dict[str, JsonValue] | None = None
     for value in model.characteristics:
@@ -707,8 +711,13 @@ def _apply_model_characteristic_modifier(
         if updated_value != value:
             payload = {
                 "model_instance_id": model.model_instance_id,
-                "before_final": value.final,
-                "after_final": updated_value.final,
+                "before_final": None
+                if isinstance(value, RandomProfileValue) and value.evaluation is None
+                else value.final,
+                "after_final": None
+                if isinstance(updated_value, RandomProfileValue)
+                and updated_value.evaluation is None
+                else updated_value.final,
                 "modifier_id": effect.modifier_id,
             }
     if not characteristic_seen:
@@ -719,10 +728,21 @@ def _apply_model_characteristic_modifier(
 
 
 def _modified_characteristic_value(
-    value: CharacteristicValue,
+    value: ProfileCharacteristicValue,
     *,
     effect: EnhancementCharacteristicModifier,
-) -> CharacteristicValue:
+) -> ProfileCharacteristicValue:
+    if isinstance(value, RandomProfileValue):
+        if effect.modifier_id in value.applied_modifier_ids:
+            return value
+        modifier = ModifierTerm(effect.operation, effect.operand).bind(
+            modifier_id=effect.modifier_id,
+            source_id=effect.source_id,
+            characteristic=effect.characteristic,
+        )
+        if value.evaluation is not None:
+            raise GameLifecycleError("Muster enhancement cannot change an evaluated profile.")
+        return replace(value, modifiers=(*value.modifiers, modifier))
     if type(value) is not CharacteristicValue:
         raise GameLifecycleError("Enhancement effect requires CharacteristicValue.")
     if effect.modifier_id in value.applied_modifier_ids:

@@ -972,8 +972,46 @@ def test_dark_pacts_fight_grant_and_melee_profile_add_sustained_hits() -> None:
     assert any(ability.ability_id == "sustained-hits:1" for ability in modified.abilities)
 
 
-def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
+@pytest.mark.parametrize("random_leadership", [False, True])
+def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds(
+    random_leadership: bool,
+) -> None:
     state = _csm_battle_state()
+    if random_leadership:
+        from warhammer40k_core.core.random_profile_values import RandomProfileValue
+
+        state.replace_army_definitions(
+            [
+                replace(
+                    army,
+                    units=tuple(
+                        replace(
+                            unit,
+                            own_models=tuple(
+                                replace(
+                                    model,
+                                    characteristics=tuple(
+                                        RandomProfileValue(
+                                            Characteristic.LEADERSHIP,
+                                            DiceExpression(1, 3, 5),
+                                            "test:random-ld",
+                                        )
+                                        if value.characteristic is Characteristic.LEADERSHIP
+                                        else value
+                                        for value in model.characteristics
+                                    ),
+                                )
+                                for model in unit.own_models
+                            ),
+                        )
+                        for unit in army.units
+                    ),
+                )
+                if army.player_id == "player-a"
+                else army
+                for army in state.army_definitions
+            ]
+        )
     unit = _unit_for_player(state, player_id="player-a")
     target = _unit_for_player(state, player_id="player-b")
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
@@ -1066,7 +1104,7 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
             ),
         ),
     )
-    starting_wounds = sum(model.wounds_remaining for model in unit.own_models)
+    starting_wounds = sum(model.current_wounds for model in unit.own_models)
 
     status = army_rule.resolve_dark_pact_attack_sequence_completion(
         AttackSequenceCompletedContext(
@@ -1106,6 +1144,31 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
 
     payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
     assert payload["passed"] is False
+    evaluations = [
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "random_profile_values_evaluated"
+    ]
+    assert len(evaluations) == (1 if random_leadership else 0)
+    if random_leadership:
+        from warhammer40k_core.engine.random_profile_scope_authority import validate_profile_scope
+
+        evaluation = evaluations[0]
+        body = cast(dict[str, JsonValue], evaluation.payload)
+        validate_profile_scope(
+            state=state,
+            scope=cast(str, body["scope_id"]),
+            unit_id=unit.unit_instance_id,
+            player_id="player-a",
+            characteristic=Characteristic.LEADERSHIP,
+            body=body,
+            events=decisions.event_log.records,
+            prior_events=decisions.event_log.records[
+                : decisions.event_log.records.index(evaluation)
+            ],
+            requests=(),
+            decisions=decisions.records,
+        )
     leadership_roll = cast(dict[str, JsonValue], payload["leadership_roll"])
     assert set(leadership_roll) == {
         "original_result",
@@ -1128,7 +1191,7 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
     application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
     assert application["mortal_wounds"] == 3
     refreshed_unit = _unit_for_player(state, player_id="player-a")
-    ending_wounds = sum(model.wounds_remaining for model in refreshed_unit.own_models)
+    ending_wounds = sum(model.current_wounds for model in refreshed_unit.own_models)
     assert starting_wounds - ending_wounds == 3
 
 
@@ -1197,7 +1260,7 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
             ),
         ),
     )
-    starting_wounds = sum(model.wounds_remaining for model in unit.own_models)
+    starting_wounds = sum(model.current_wounds for model in unit.own_models)
 
     status = army_rule.resolve_dark_pact_attack_sequence_completion(
         AttackSequenceCompletedContext(
@@ -1247,7 +1310,7 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
     assert not _has_event(decisions, "chaos_space_marines_dark_pact_resolved")
     assert (
         sum(
-            model.wounds_remaining
+            model.current_wounds
             for model in _unit_for_player(state, player_id="player-a").own_models
         )
         == starting_wounds
@@ -1295,7 +1358,7 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
     assert (
         starting_wounds
         - sum(
-            model.wounds_remaining
+            model.current_wounds
             for model in _unit_for_player(state, player_id="player-a").own_models
         )
         == 1

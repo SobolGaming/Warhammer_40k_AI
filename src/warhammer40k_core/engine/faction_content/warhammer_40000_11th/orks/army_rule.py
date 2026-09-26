@@ -5,6 +5,10 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.random_profile_values import (
+    ProfileCharacteristicValue,
+    RandomProfileValue,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
@@ -37,6 +41,7 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta
 from warhammer40k_core.engine.runtime_modifiers import (
     SaveOptionModifierBinding,
     SaveOptionModifierContext,
@@ -576,14 +581,14 @@ def _attack_profile_with_plus_one(profile: AttackProfile) -> AttackProfile:
     )
 
 
-def _strength_with_plus_one(strength: CharacteristicValue) -> CharacteristicValue:
-    if type(strength) is not CharacteristicValue:
+def _strength_with_plus_one(strength: ProfileCharacteristicValue) -> ProfileCharacteristicValue:
+    if type(strength) not in {CharacteristicValue, RandomProfileValue}:
         raise GameLifecycleError("Waaagh! strength requires CharacteristicValue.")
     if strength.characteristic is not Characteristic.STRENGTH:
         raise GameLifecycleError("Waaagh! strength characteristic drift.")
-    if not strength.is_numeric:
+    if not isinstance(strength, RandomProfileValue) and not strength.is_numeric:
         raise GameLifecycleError("Waaagh! cannot modify non-numeric Strength.")
-    return CharacteristicValue.from_raw(Characteristic.STRENGTH, strength.final + 1)
+    return profile_with_delta(strength, 1, source_id=SOURCE_RULE_ID)
 
 
 def _source_ids_with_waaagh(source_ids: tuple[str, ...]) -> tuple[str, ...]:

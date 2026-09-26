@@ -1313,3 +1313,67 @@ def test_order69_old_catalog_schema_cannot_be_loaded() -> None:
     payload["schema_version"] = "phase17b-canonical-catalog-v1"
     with pytest.raises(CanonicalCatalogPackageError, match="schema version"):
         CanonicalCatalogPackage.from_payload(payload)
+
+
+def test_random_profiles_generate_from_normalized_model_and_weapon_rows() -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.random_profile_values import RandomProfileValue
+
+    model = _artifact(
+        table_name="Datasheets_models",
+        csv_text=(
+            "datasheet_id,line,name,model_profile_id,content_scope,m,t,sv,w,ld,oc,ws,bs,"
+            "min_models,max_models,base_size,height,height_units,height_source_id,"
+            "height_document_reference,height_reviewer_status,height_evidence_kind\n"
+            "dg-plague-marines,1,Plague Marine,dg-plague-marine,matched_play,2D6,D6+2,D3+1,"
+            "D6+2,D3+4,D3,D3+1,D3+1,5,10,32mm,1.55,inches,death-guard-pdf-p12,"
+            "Death Guard Faction Pack p.12,accepted,manual_measurement\n"
+        ),
+    )
+    weapon = _artifact(
+        table_name="Datasheets_wargear",
+        csv_text=(
+            "datasheet_id,line,line_in_wargear,name,wargear_id,weapon_profile_id,model_profile_id,"
+            "range,a,skill_characteristic,skill,s,ap,d,weapon_keywords\n"
+            "dg-plague-marines,1,1,Plague bolter,dg-plague-bolter,dg-plague-bolter:standard,"
+            'dg-plague-marine,2D6",D3+1,ballistic_skill,D3+1,D6+2,D6-6,D3+2,Lethal Hits\n'
+        ),
+    )
+    artifacts = tuple(
+        model
+        if item.source_table == "Datasheets_models"
+        else weapon
+        if item.source_table == "Datasheets_wargear"
+        else item
+        for item in _source_artifacts()
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    loaded = CanonicalCatalogPackage.from_payload(json.loads(package.to_json_bytes()))
+    profile = loaded.army_catalog.datasheet_by_id("dg-plague-marines").model_profiles[0]
+    for characteristic in (
+        Characteristic.MOVEMENT,
+        Characteristic.TOUGHNESS,
+        Characteristic.SAVE,
+        Characteristic.WOUNDS,
+        Characteristic.LEADERSHIP,
+        Characteristic.OBJECTIVE_CONTROL,
+    ):
+        value = profile.characteristic(characteristic)
+        assert isinstance(value, RandomProfileValue)
+        assert value.source_id == model.rows[0].stable_source_id()
+        assert value.evaluation is None
+    gun = loaded.army_catalog.wargear[0].weapon_profiles[0]
+    for weapon_value in (
+        gun.skill,
+        gun.strength,
+        gun.armor_penetration,
+        gun.range_profile.random_value,
+    ):
+        assert isinstance(weapon_value, RandomProfileValue)
+        assert weapon_value.source_id == weapon.rows[0].stable_source_id()
+    assert gun.attack_profile.dice_expression is not None
+    assert gun.damage_profile.dice_expression is not None

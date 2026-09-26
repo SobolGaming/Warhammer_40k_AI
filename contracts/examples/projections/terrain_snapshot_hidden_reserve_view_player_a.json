@@ -14984,8 +14984,8 @@
       "source_id": "ui-contract-terrain-snapshot-hidden-reserve:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v12-model-keywords",
-  "projection_state_hash": "4ff48bb94b8e8439a312e2a452bdc09d0e2f7885f0d0c7060ac3de842409f126",
+  "projection_schema": "game-view-v13-random-profiles",
+  "projection_state_hash": "340dd5f1294628e6a2c7452e98ea45f7a930843b642a189a62c9efe3be116f4f",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

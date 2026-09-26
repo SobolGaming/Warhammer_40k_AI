@@ -1,0 +1,27 @@
+{
+  "workload": "order87-r87-001-single-contribution-random-toughness-restore-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d687c193f560a9c1cdbbc32ab3566440a5994c5c7ec6515ded0b7448b7a8310f",
+  "python": "3.14.5",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "workers": 1,
+  "coverage": false,
+  "fixture": "one attacker, two defending models, one selected two-attack Torrent weapon",
+  "seed": "order87-gathered-profiles",
+  "script_sha256": "775c34d078b498b40599c395998472a8ebcc5a7de6c662b799425f9929d91e29",
+  "fixture_sha256": "3d65a5b71a0568da459ca481ea451366fa11c89f6cdcec54a011bfbafd98d07f",
+  "lock_sha256": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+  "restore_seconds": [
+    1.3496859169972595,
+    1.3364657500060275,
+    1.3767877089849208,
+    1.3458942090219352,
+    1.3711253750079777
+  ],
+  "mean": 1.3559917920036242,
+  "median": 1.3496859169972595,
+  "maximum": 1.3767877089849208,
+  "events": 40,
+  "work_gate": "JSON round-trip and restore preserve payload and events, including profile dice",
+  "timing_budget": "diagnostic; component budgets deferred by Order 32 owner exception",
+  "limitations": "Five restores of one legal checkpoint, not full games. The two-contribution regression fails on base and is excluded from timing comparison."
+}

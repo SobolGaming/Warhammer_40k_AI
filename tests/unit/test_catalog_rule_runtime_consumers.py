@@ -6964,8 +6964,10 @@ def test_catalog_command_point_runtime_helpers_fail_fast_on_contract_drift() -> 
         command_point_runtime._model_in_unit(  # pyright: ignore[reportPrivateUsage]
             source_unit, model_instance_id="unknown-model"
         )
+    from warhammer40k_core.engine.leadership_evaluation import leadership_for_model
+
     with pytest.raises(GameLifecycleError, match="missing Leadership"):
-        command_point_runtime._model_leadership(  # pyright: ignore[reportPrivateUsage]
+        leadership_for_model(
             replace(
                 source_unit.own_models[0],
                 characteristics=tuple(
@@ -9315,7 +9317,7 @@ def test_command_forced_provider_rejects_unrederivable_selected_target_effect() 
             model_instance_id=model.model_instance_id,
             presence="battlefield",
             pose=battlefield.model_placement_by_id(model.model_instance_id).pose,
-            wounds_remaining=model.wounds_remaining,
+            wounds_remaining=model.current_wounds,
         )
         for army in (source_army, target_army)
         for unit in army.units

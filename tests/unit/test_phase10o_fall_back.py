@@ -2553,7 +2553,7 @@ def _movement_lifecycle_with_overflight_engagement(
                 ),
                 target_unit_instance_id=target_unit_id,
                 defender_player_id="player-a",
-                mortal_wounds=fnp_model.wounds_remaining - target_wounds_remaining,
+                mortal_wounds=fnp_model.current_wounds - target_wounds_remaining,
                 spill_over=True,
             ),
             dice_manager=DiceRollManager(

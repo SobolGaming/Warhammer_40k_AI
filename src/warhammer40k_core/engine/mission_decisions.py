@@ -67,6 +67,10 @@ from warhammer40k_core.engine.primary_mission_choices import (
     apply_primary_mission_choice,
     invalid_primary_mission_choice_request_status,
 )
+from warhammer40k_core.engine.random_objective_control import (
+    prepare_mission_action_profile_values,
+    record_unavailable_mission_action_profiles,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
@@ -159,6 +163,13 @@ def request_mission_action_opportunity(
                 "target_policies": [action.target_policy for action in unsupported_actions],
             },
         )
+    prepare_mission_action_profile_values(
+        state=state,
+        decisions=decisions,
+        player_id=requested_player,
+        actions=relevant_actions,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     options = _mission_action_opportunity_options(
         state=state,
         player_id=requested_player,
@@ -166,6 +177,7 @@ def request_mission_action_opportunity(
         relevant_actions=relevant_actions,
     )
     if not options:
+        record_unavailable_mission_action_profiles(state=state, decisions=decisions)
         return None
     legal_action_option_id_values = [option.option_id() for option in options]
     legal_action_option_ids = cast(list[JsonValue], legal_action_option_id_values)
@@ -494,6 +506,13 @@ def request_mission_action_start(
                 "required_phase": mission_action.start_phase,
             },
         )
+    prepare_mission_action_profile_values(
+        state=state,
+        decisions=decisions,
+        player_id=requested_player,
+        actions=(mission_action,),
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     options = _mission_action_start_options(
         state=state,
         player_id=requested_player,
@@ -501,6 +520,7 @@ def request_mission_action_start(
         runtime_modifier_registry=runtime_modifier_registry,
     )
     if not options:
+        record_unavailable_mission_action_profiles(state=state, decisions=decisions)
         return LifecycleStatus.unsupported(
             stage=state.stage,
             message="No legal Mission Action start options are available.",

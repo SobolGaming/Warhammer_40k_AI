@@ -1,5 +1,10 @@
 # P03D physical proposal prevalidation evidence
 
+Order 87 refreshed the active head report for runtime `904893c1`; prior tables and
+revision notes below describe historical runs. Current samples and refresh details
+are recorded in [Order 87 evidence](../order87/README.md). Baselines and budgets
+remain unchanged.
+
 `base.json` measures main `f96d235db3de236531a089fa2d95b8c20baaa418`;
 `head.json` identifies the measured P03D runtime. The workload submits one valid
 or invalid-kind proposal through `LocalGameSession`, three times for each of

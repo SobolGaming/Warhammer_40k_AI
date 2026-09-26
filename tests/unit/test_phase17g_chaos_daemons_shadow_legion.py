@@ -590,7 +590,7 @@ def test_shadow_legion_death_denied_heals_and_revives_tzeentch_model_at_full_wou
     unit = _unit_for_player(state, player_id="player-a")
     wounded_model = unit.own_models[0]
     destroyed_model = unit.own_models[1]
-    if wounded_model.starting_wounds < 2 or destroyed_model.starting_wounds < 2:
+    if wounded_model.initial_wounds < 2 or destroyed_model.initial_wounds < 2:
         raise AssertionError("Death Denied fixture requires multi-wound models.")
     from tests.destruction_occurrence_fixture_helpers import destroy_rule_model_for_fixture
     from tests.healing_phase_start_helpers import wound_model_for_healing_fixture
@@ -662,8 +662,8 @@ def test_shadow_legion_death_denied_heals_and_revives_tzeentch_model_at_full_wou
     healed_model = _model_by_id(refreshed, wounded_model.model_instance_id)
     returned_model = _model_by_id(refreshed, destroyed_model.model_instance_id)
 
-    assert healed_model.wounds_remaining == healed_model.starting_wounds
-    assert returned_model.wounds_remaining == returned_model.starting_wounds
+    assert healed_model.current_wounds == healed_model.initial_wounds
+    assert returned_model.current_wounds == returned_model.initial_wounds
     assert state.battlefield_state is not None
     assert destroyed_model.model_instance_id not in state.battlefield_state.removed_model_ids
     assert _event_count(decisions, "generic_stratagem_restore_lost_wounds_resolved") == 1
@@ -1142,20 +1142,20 @@ def test_shadow_legion_healing_source_context_flags_lock_and_validate_model_choi
     _set_model_wounds(
         state,
         model_instance_id=first_model.model_instance_id,
-        wounds_remaining=first_model.starting_wounds - 1,
+        wounds_remaining=first_model.initial_wounds - 1,
     )
     _set_model_wounds(
         state,
         model_instance_id=second_model.model_instance_id,
-        wounds_remaining=second_model.starting_wounds - 1,
+        wounds_remaining=second_model.initial_wounds - 1,
     )
     refreshed = _refreshed_unit(state, unit)
     first_healing_step = HealingStep(
         step_index=1,
         step_kind=HealingStepKind.HEAL_WOUND,
         model_instance_id=first_model.model_instance_id,
-        starting_wounds_remaining=first_model.starting_wounds - 1,
-        final_wounds_remaining=first_model.starting_wounds,
+        starting_wounds_remaining=first_model.initial_wounds - 1,
+        final_wounds_remaining=first_model.initial_wounds,
     )
 
     assert healing_source_context.selected_wounded_healing_model_ids(
@@ -1858,7 +1858,7 @@ def test_mantle_of_gloom_retains_source_ability_and_measurement() -> None:
         state=state,
         target_unit_instance_id=bearer.unit_instance_id,
         model_instance_id=retained_model.model_instance_id,
-        damage=retained_model.wounds_remaining,
+        damage=retained_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -1885,7 +1885,7 @@ def test_mantle_of_gloom_retains_source_ability_and_measurement() -> None:
             state=state,
             target_unit_instance_id=current_bearer.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
 
@@ -1930,7 +1930,7 @@ def test_malice_manifest_targets_retained_presence() -> None:
         state=state,
         target_unit_instance_id=target.unit_instance_id,
         model_instance_id=retained_model.model_instance_id,
-        damage=retained_model.wounds_remaining,
+        damage=retained_model.current_wounds,
         damage_kind=DamageKind.NORMAL,
     )
     retain_destroyed_model_for_fixture(
@@ -1953,7 +1953,7 @@ def test_malice_manifest_targets_retained_presence() -> None:
             state=state,
             target_unit_instance_id=current_target.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            damage=model.wounds_remaining,
+            damage=model.current_wounds,
             damage_kind=DamageKind.NORMAL,
         )
 
@@ -2052,7 +2052,7 @@ def test_malice_made_manifest_fight_start_applies_three_mortal_wounds_on_six() -
     _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     decisions = DecisionController()
-    starting_wounds = sum(model.wounds_remaining for model in target.own_models)
+    starting_wounds = sum(model.current_wounds for model in target.own_models)
 
     request = _decision_request(
         enhancements.malice_made_manifest_fight_phase_start_request(
@@ -2117,7 +2117,7 @@ def test_malice_made_manifest_fight_start_applies_three_mortal_wounds_on_six() -
     assert application["mortal_wounds"] == 3
     assert (
         starting_wounds
-        - sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
+        - sum(model.current_wounds for model in _refreshed_unit(state, target).own_models)
         == 3
     )
     completion = enhancements.malice_made_manifest_fight_phase_start_request(
@@ -2158,7 +2158,7 @@ def test_malice_made_manifest_routes_mortal_wound_feel_no_pain_choice() -> None:
         sources=(source_a, source_b),
     )
     decisions = DecisionController()
-    starting_wounds = sum(model.wounds_remaining for model in target.own_models)
+    starting_wounds = sum(model.current_wounds for model in target.own_models)
     request = _decision_request(
         enhancements.malice_made_manifest_fight_phase_start_request(
             FightPhaseStartRequestContext(state=state, decisions=decisions)
@@ -2260,7 +2260,7 @@ def test_malice_made_manifest_routes_mortal_wound_feel_no_pain_choice() -> None:
     assert application["mortal_wounds"] == 1
     assert (
         starting_wounds
-        - sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
+        - sum(model.current_wounds for model in _refreshed_unit(state, target).own_models)
         == 1
     )
 
@@ -2388,7 +2388,7 @@ def test_malice_made_manifest_fight_start_records_no_effect_on_one() -> None:
     _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     decisions = DecisionController()
-    starting_wounds = sum(model.wounds_remaining for model in target.own_models)
+    starting_wounds = sum(model.current_wounds for model in target.own_models)
     request = _decision_request(
         enhancements.malice_made_manifest_fight_phase_start_request(
             FightPhaseStartRequestContext(state=state, decisions=decisions)
@@ -2416,7 +2416,7 @@ def test_malice_made_manifest_fight_start_records_no_effect_on_one() -> None:
     assert payload["mortal_wounds"] == 0
     assert payload["target_enemy_unit_instance_id"] == target.unit_instance_id
     assert (
-        sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
+        sum(model.current_wounds for model in _refreshed_unit(state, target).own_models)
         == starting_wounds
     )
     assert (
@@ -2964,7 +2964,7 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
             ),
         ),
     )
-    starting_wounds = sum(model.wounds_remaining for model in unit.own_models)
+    starting_wounds = sum(model.current_wounds for model in unit.own_models)
     bundle = _shadow_legion_runtime_bundle(state)
 
     status = bundle.attack_sequence_completed_hook_registry.resolve_completed_sequence(
@@ -3014,7 +3014,7 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
         source_b.source_id,
     }
     assert not _has_event(decisions, "chaos_space_marines_dark_pact_resolved")
-    assert sum(model.wounds_remaining for model in _refreshed_unit(state, unit).own_models) == (
+    assert sum(model.current_wounds for model in _refreshed_unit(state, unit).own_models) == (
         starting_wounds
     )
 
@@ -3063,7 +3063,7 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
     assert application["mortal_wounds"] == 1
     assert (
         starting_wounds
-        - sum(model.wounds_remaining for model in _refreshed_unit(state, unit).own_models)
+        - sum(model.current_wounds for model in _refreshed_unit(state, unit).own_models)
         == 1
     )
 

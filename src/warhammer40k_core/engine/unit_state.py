@@ -96,7 +96,7 @@ class StartingStrengthRecord:
         starting_model_count = len(unit.own_models)
         single_model_wounds = None
         if starting_model_count == 1:
-            single_model_wounds = unit.own_models[0].starting_wounds
+            single_model_wounds = unit.own_models[0].initial_wounds
         return cls(
             player_id=player_id,
             unit_instance_id=unit.unit_instance_id,
@@ -278,7 +278,7 @@ class BelowHalfStrengthContext:
                 raise GameLifecycleError(
                     "Single-model BelowHalfStrengthContext requires exactly one current model."
                 )
-            single_model_wounds_remaining = models[0].wounds_remaining if model_ids else 0
+            single_model_wounds_remaining = models[0].current_wounds if model_ids else 0
         return cls(
             player_id=player_id,
             unit_instance_id=unit_instance_id,

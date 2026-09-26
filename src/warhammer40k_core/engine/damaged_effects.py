@@ -317,7 +317,7 @@ def catalog_damaged_shooting_weapon_selection_limit_for_profile(
         raise GameLifecycleError("DAMAGED shooting weapon selection limit is missing max.")
     if effect.baseline_max_selections is None:
         raise GameLifecycleError("DAMAGED shooting weapon selection limit is missing baseline.")
-    active = effect.applies_to_wounds(model.wounds_remaining)
+    active = effect.applies_to_wounds(model.current_wounds)
     return CatalogDamagedShootingWeaponSelectionLimit(
         damaged_effect_id=effect.damaged_effect_id,
         source_id=effect.source_id,
@@ -365,7 +365,7 @@ def catalog_damaged_ability_selection_limit_for_model(
         raise GameLifecycleError("DAMAGED ability selection limit is missing baseline.")
     if effect.selection_group is None:
         raise GameLifecycleError("DAMAGED ability selection limit is missing selection group.")
-    active = effect.applies_to_wounds(model.wounds_remaining)
+    active = effect.applies_to_wounds(model.current_wounds)
     return CatalogDamagedAbilitySelectionLimit(
         damaged_effect_id=effect.damaged_effect_id,
         source_id=effect.source_id,
@@ -391,7 +391,7 @@ def _active_damaged_effects_for_model(
         for effect in unit.damaged_effects
         if _damaged_effect_targets_model(effect=effect, model=model)
         and model.is_alive
-        and effect.applies_to_wounds(model.wounds_remaining)
+        and effect.applies_to_wounds(model.current_wounds)
     )
 
 

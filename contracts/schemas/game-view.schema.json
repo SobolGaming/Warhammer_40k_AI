@@ -79,7 +79,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v12-model-keywords",
+      "const": "game-view-v13-random-profiles",
       "minLength": 1,
       "type": "string"
     },
@@ -258,6 +258,9 @@
         },
         "redaction": {
           "$ref": "#/$defs/redaction"
+        },
+        "random_expression": {
+          "$ref": "https://warhammer40k-core.local/contracts/v2/proposal-payload.schema.json#/$defs/dice_expression"
         }
       },
       "required": [

@@ -2,6 +2,10 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.engine.random_weapon_profiles import evaluate_attack_weapon_profile
+from warhammer40k_core.engine.random_profile_evaluation import evaluate_unit_profile_characteristics
+
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 
 from typing import TYPE_CHECKING
@@ -89,6 +93,17 @@ def _roll_hit_and_wound(
 ) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
     pool = attack_sequence.current_pool()
     attack_context_id = attack_sequence.attack_context_id()
+    if attack_sequence.generated_hit_index == 0 and not has_weapon_keyword(
+        pool.weapon_profile, WeaponKeyword.TORRENT
+    ):
+        pool = evaluate_attack_weapon_profile(
+            pool=pool,
+            decisions=decisions,
+            manager=manager,
+            attack_context_id=attack_context_id,
+            player_id=attack_sequence.attacker_player_id,
+            characteristics=(Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL),
+        )
     is_psychic_attack = is_psychic_weapon_profile(pool.weapon_profile)
     if attack_sequence.generated_hit_index == 0:
         psychic_modifier_selection = _psychic_attack_modifier_ignore_selection_for_attack(
@@ -248,30 +263,47 @@ def _roll_hit_and_wound(
     if not hit_roll.successful:
         return None, None
 
-    target_rules_unit = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=pool.target_unit_instance_id,
-    )
-    toughness = _target_unit_toughness(
-        state=state,
-        target_unit_instance_id=pool.target_unit_instance_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
     auto_wound, status = lethal_hit_wound_choice(
         state=state, decisions=decisions, sequence=attack_sequence, hit=hit_roll
     )
     if status is not None:
         return None, status
     if auto_wound:
-        wound_roll = WoundRoll.auto_wound(
-            strength=pool.weapon_profile.strength.final,
-            toughness=toughness,
-            target_number=wound_roll_target_number(
-                strength=pool.weapon_profile.strength.final,
-                toughness=toughness,
+        wound_roll = WoundRoll.auto_wound(strength=None, toughness=None, target_number=None)
+    else:
+        pool = evaluate_attack_weapon_profile(
+            pool=pool,
+            decisions=decisions,
+            manager=manager,
+            attack_context_id=attack_context_id,
+            player_id=attack_sequence.attacker_player_id,
+            characteristics=(Characteristic.STRENGTH,),
+        )
+        toughness_context = allocation_context_for_unit(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+        )
+        evaluate_unit_profile_characteristics(
+            state=state,
+            decisions=decisions,
+            unit_instance_id=pool.target_unit_instance_id,
+            scope_id=attack_context_id,
+            characteristics=(Characteristic.TOUGHNESS,),
+            dice_manager=manager,
+            model_instance_ids=(
+                toughness_context.attached_unit_bodyguard_model_ids
+                or toughness_context.alive_model_ids
             ),
         )
-    else:
+        target_rules_unit = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=pool.target_unit_instance_id,
+        )
+        toughness = _target_unit_toughness(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         wound_roll = _roll_wound(
             manager=manager,
             pool=pool,

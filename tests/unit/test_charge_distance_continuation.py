@@ -1256,7 +1256,7 @@ def test_r47_001_historical_fly_charge_survives_a_later_retained_casualty(casual
         state=state,
         target_unit_instance_id=unit_id,
         model_instance_id=model.model_instance_id,
-        damage=model.wounds_remaining,
+        damage=model.current_wounds,
         damage_kind=DamageKind.NORMAL,
         remove_destroyed_model=False,
     )
@@ -1296,7 +1296,7 @@ def test_r47_001_component_snapshot_excludes_later_keywords_and_model_inventory(
     assert "PSYKER" in current.keywords
     physical = (
         PhysicalModelAuthority(
-            ordinary.model_instance_id, "battlefield", Pose.at(10, 10), ordinary.starting_wounds
+            ordinary.model_instance_id, "battlefield", Pose.at(10, 10), ordinary.initial_wounds
         ),
         PhysicalModelAuthority(specialist.model_instance_id, "destroyed", None, 0),
     )
