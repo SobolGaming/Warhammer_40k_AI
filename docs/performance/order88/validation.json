@@ -1,0 +1,69 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9cc51543a177cd4c2f166f1721a65c16966a673506c3ffe05f11609c029f4c32",
+  "base_ref": "1fe279fe3bf8ed503da5cd1e0d09dd3c6f55fce2",
+  "behavioral": {
+    "tests": 9432,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 702.103,
+    "junit_sha256": "aba59804c2bd334b452d937115de802086c482e8428426a24e66d6e7ec43ce10",
+    "log_sha256": "59a7c543c1482b2e01ecd76cbabe854f39c886916a05e2330ec3063c9cc66acc",
+    "coverage_percent": 85.16
+  },
+  "code_quality": {
+    "tests": 688,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 106.588,
+    "junit_sha256": "6cee60a6fbe9fd3ddc0802de50c81a09d72ec457bac17af41057b15b3ec350d2",
+    "log_sha256": "e1ab78175b141f60ee1f311fcecc965e327b8f441d835a443168240c1b249525"
+  },
+  "distribution": "18 xdist work-stealing workers; behavioral with coverage, code-quality without",
+  "gates": {
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "mypy": "passed",
+    "pyright": "passed",
+    "import_linter": "11 contracts kept",
+    "source_generator": "passed",
+    "engine_build_identity": "passed",
+    "external_contract_exact_base": "passed",
+    "installed_wheel": "27 schemas and 2985 runtime resources validated",
+    "typescript_generated_and_typecheck": "passed via direct Node entry points; npm executable absent",
+    "typescript_unit": "5 passed",
+    "http_conformance": "342 assertions passed, Contract 40.0.0",
+    "shard_inventory": "passed, eight shards regenerated from complete successful local JUnit",
+    "pre_commit": "passed"
+  },
+  "logs_sha256": {
+    "mypy.log": "81804f095ce477e423303dffb68974d5e6216ededd20e3c77259027d8e56c003",
+    "pyright.log": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332",
+    "typescript-direct.log": "f1494d4d82b7da0a08f74e1fa7b85b58dfeb5cf9491a33e798bd5967eb9062d7",
+    "wheel.log": "9621059880058afe8299f605ecded9fc6323aebd80a4eb65816da2872ff97d86",
+    "contract.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "inherited_refresh_sha256": "ecfe8f0172377e10ceb6a832a7dbc5cd5b7103e180f5bcc4a0c123d3aa00069e",
+  "first_aggregate_attempt": {
+    "passed": 9431,
+    "failed": 1,
+    "coverage_percent": 85.16,
+    "failure": "Existing source inventory expected six rows; changed to seven for new Order 88 row. No runtime change.",
+    "junit_sha256": "3510410e4976c7e98e4be188074f3b152d85424176ff4b48955aee2d725cc386"
+  },
+  "independent_review": {
+    "status": "APPROVED",
+    "before_first_push": true,
+    "focused_tests_passed": 18,
+    "independent_checks": [
+      "final staged diff",
+      "aggregate JUnit counts and retained evidence hashes",
+      "eight-shard inventory",
+      "source generation",
+      "exact-base external contract"
+    ],
+    "findings": []
+  },
+  "full_game_certified": false
+}

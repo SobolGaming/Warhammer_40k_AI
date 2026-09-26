@@ -1,4 +1,4 @@
-"""Build the reviewed Orders 26, 27, 28, 29 and 37 source artifacts offline."""
+"""Build the reviewed Orders 26, 27, 28, 29, 37 and 88 source artifacts offline."""
 
 from __future__ import annotations
 
@@ -87,7 +87,9 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "review_audit_row_id": None,
             "review_audit_source_observation_sha256": None,
             "provider_name": "CORE V2 Source Review",
-            "source_title": f"P02E {section} {slug}"
+            "source_title": f"P02G {section} {slug}"
+            if slug == "weapons-with-no-strength"
+            else f"P02E {section} {slug}"
             if slug == "stratagem-cost-limits"
             else f"P02A/P02B/P02C {section} {slug}"
             if section == "02.02.01"
@@ -101,9 +103,12 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         }
         review["observation_sha256"] = _observation(review)
         evidence.append(review)
-        providers: list[tuple[str, str, str | None]] = [("40k.app", source_url, None)]
+        providers: list[tuple[str, str, str | None]] = [
+            (row.get("provider_name", "40k.app"), source_url, None)
+        ]
         for provider, url, version in providers:
-            row_id = f"{slug}:{'gdm-v931' if version else '40k-app'}"
+            provider_slug = "gdm" if provider == "Game Datamissions" else "40k-app"
+            row_id = f"{slug}:{provider_slug}"
             audit: dict[str, object] = {
                 "row_id": row_id,
                 "provider_name": provider,
@@ -160,7 +165,10 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "direct retrieval returned HTTP 403. No App version or co-version comparison "
             "is inferred. The retained transcription separates reviewed obligations. "
             "Order 37 adds the 02.02.01 CP-cost limit observed in the same search index "
-            "on 2026-09-11T19:52:51Z; earlier observation tuples remain unchanged."
+            "on 2026-09-11T19:52:51Z; earlier observation tuples remain unchanged. "
+            "Order 88 adds 02.04.01 from the exact GDM asset retained by Order 84, "
+            "retrieved and hash-verified on 2026-09-26. See the Order 88 scope record "
+            "for the asset and source-row pins. No App build or co-version match is inferred."
         ),
     }
 

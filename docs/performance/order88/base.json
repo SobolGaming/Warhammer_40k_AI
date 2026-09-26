@@ -1,0 +1,88 @@
+{
+  "workload": "order88-numeric-strength-attacks-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d687c193f560a9c1cdbbc32ab3566440a5994c5c7ec6515ded0b7448b7a8310f",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "fixture": "Two units, Shooting 1+1 models; Fight 1+1; no terrain; twelve Torrent/Twin-linked attacks, S1 versus T1",
+  "seeds": [
+    "order88-shooting",
+    "order88-fight"
+  ],
+  "policy": "First legal fixture option/proposal through LocalGameSession",
+  "timing_boundary": "pending phase choice through first attack sequence completion; setup separate",
+  "hashes": {
+    "scripts/benchmark_order88_strength.py": "6ea19e9377d0ab0b4c51e818a2f22420891742b29878e8c6d3604b7a9fd33de6",
+    "tests/absent_strength_helpers.py": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
+    "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+    "tests/psychic_modifier_helpers.py": "64bd3f5977170151081dd89edc083c2d7ded5b96b6686771d240b044ea66ede0",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "phase": "shooting",
+      "setup_seconds": [
+        2.239098542020656,
+        0.251846541010309,
+        0.25061495800036937,
+        0.252504540985683,
+        0.2518326250137761
+      ],
+      "samples_seconds": [
+        0.29868091698153876,
+        0.2459022919938434,
+        0.24471187498420477,
+        0.28541216702433303,
+        0.24679337500128895
+      ],
+      "wound_count": [
+        12,
+        12,
+        12,
+        12,
+        12
+      ],
+      "mean": 0.26430012519704177,
+      "median": 0.24679337500128895,
+      "p95_and_maximum": 0.29868091698153876,
+      "slices_per_second": 3.7835774737317176
+    },
+    {
+      "phase": "fight",
+      "setup_seconds": [
+        0.4971665409975685,
+        0.4969918749993667,
+        0.5006596249877475,
+        0.4959541250136681,
+        0.4968259170127567
+      ],
+      "samples_seconds": [
+        0.14590983401285484,
+        0.14381741601391695,
+        0.14456099999370053,
+        0.18335795801249333,
+        0.14393937500426546
+      ],
+      "wound_count": [
+        12,
+        12,
+        12,
+        12,
+        12
+      ],
+      "mean": 0.15231711660744623,
+      "median": 0.14456099999370053,
+      "p95_and_maximum": 0.18335795801249333,
+      "slices_per_second": 6.565250329529371
+    }
+  ],
+  "completion_rate": 1.0,
+  "full_game_samples": 0,
+  "full_game_certified": false,
+  "timing_budget": "Diagnostic; component timing budgets remain deferred by Order 32",
+  "work_gate": "Twelve wound interactions; no random-profile evaluation for fixed/dash S"
+}

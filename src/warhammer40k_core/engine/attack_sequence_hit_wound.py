@@ -243,7 +243,7 @@ def _roll_wound(
     critical_threshold: CriticalRollThreshold,
     wound_modifier: int = 0,
 ) -> WoundRoll:
-    strength = pool.weapon_profile.strength.final
+    strength = pool.weapon_profile.strength_for_interaction()
     target_number = wound_roll_target_number(strength=strength, toughness=toughness)
     roll_state = _roll_or_reuse_state(
         manager,
@@ -297,7 +297,7 @@ def _wound_roll_modifier(
             attacker_model_instance_id=pool.attacker_model_instance_id,
             target_unit_instance_id=pool.target_unit_instance_id,
             weapon_profile=pool.weapon_profile,
-            strength=pool.weapon_profile.strength.final,
+            strength=pool.weapon_profile.strength_for_interaction(),
             toughness=toughness,
         )
     )
@@ -392,7 +392,7 @@ def _reroll_wound_for_twin_linked_if_needed(
     )
     critical = critical_threshold.matches(unmodified)
     wound_roll = WoundRoll(
-        strength=pool.weapon_profile.strength.final,
+        strength=pool.weapon_profile.strength_for_interaction(),
         toughness=toughness,
         target_number=initial_wound_roll.target_number,
         roll_state=updated_state,
