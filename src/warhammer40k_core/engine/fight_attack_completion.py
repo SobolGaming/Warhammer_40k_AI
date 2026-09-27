@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine import attached_unit_reconciliation as _aur
 from warhammer40k_core.engine.attack_sequence import (
@@ -16,6 +17,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.melee_target_replacement import request_melee_target_replacement
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
@@ -27,6 +29,7 @@ def advance_fight_attack_sequence_until_completion(
     state: GameState,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     stratagem_index: StratagemCatalogIndex,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     hooks: AttackSequenceCompletedHookRegistry,
@@ -40,6 +43,14 @@ def advance_fight_attack_sequence_until_completion(
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
+        before_gathering=lambda sequence: request_melee_target_replacement(
+            state=state,
+            decisions=decisions,
+            sequence=sequence,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            runtime_modifier_registry=runtime_modifier_registry,
+        ),
         attack_sequence=completed_candidate,
         already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
         stratagem_index=stratagem_index,

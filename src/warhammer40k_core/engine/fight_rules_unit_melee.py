@@ -23,6 +23,7 @@ from warhammer40k_core.engine.fight_resolution import (
     target_model_ids_for_melee_attack,
     validate_melee_declaration_rules,
 )
+from warhammer40k_core.engine.melee_weapon_commitment import MeleeAttackBudget
 from warhammer40k_core.engine.movement_proposals import ProposalKind, ProposalValidationResult
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
@@ -147,6 +148,7 @@ def rules_unit_available_melee_weapons_payloads(
             _payload_string(row, "model_instance_id"),
             _payload_string(row, "wargear_id"),
             _payload_string(row, "weapon_profile_id"),
+            _payload_string(row, "weapon_instance_id"),
         )
     )
     return tuple(rows)
@@ -161,6 +163,7 @@ def validate_rules_unit_melee_declaration(
     proposal: MeleeDeclarationProposal,
     army_catalog: ArmyCatalog,
     state: GameState,
+    committed_budgets: dict[str, MeleeAttackBudget] | None = None,
 ) -> ProposalValidationResult:
     rules_unit = _canonical_rules_unit(
         state=state,
@@ -175,6 +178,18 @@ def validate_rules_unit_melee_declaration(
         source_decision_result_id=request.source_decision_result_id,
         runtime_modifier_registry=runtime_modifier_registry,
     )
+    if committed_budgets is not None:
+        from warhammer40k_core.engine.melee_pool_authority import commitment_inventory
+
+        expected_rows = commitment_inventory(expected_rows, state)
+        expected_rows = tuple(
+            row
+            for row in expected_rows
+            if isinstance(row, dict)
+            and row["weapon_instance_id"] in committed_budgets
+            and row["weapon_profile_id"]
+            == committed_budgets[str(row["weapon_instance_id"])].weapon_profile_id
+        )
     if expected_rows != request.available_weapons:
         return _invalid(request=request, code="weapon_ability_inventory_drift")
     if not rules_unit.is_attached_rules_unit and not _request_has_attached_target(
@@ -182,6 +197,7 @@ def validate_rules_unit_melee_declaration(
         request=request,
     ):
         return validate_melee_declaration_rules(
+            committed_budgets=committed_budgets,
             runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -241,6 +257,7 @@ def validate_rules_unit_melee_declaration(
             physical_rows=physical_rows,
         )
         validation = validate_melee_declaration_rules(
+            committed_budgets=committed_budgets,
             runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -276,6 +293,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
     sequence_id: str,
     state: GameState,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    committed_budgets: dict[str, MeleeAttackBudget] | None = None,
 ) -> AttackSequence:
     rules_unit = _canonical_rules_unit(
         state=state,
@@ -286,6 +304,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
         proposal=proposal,
     ):
         return melee_attack_sequence_from_proposal(
+            committed_budgets=committed_budgets,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             proposal=proposal,
@@ -324,6 +343,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
             require_mapping=True,
         )
         component_sequence = melee_attack_sequence_from_proposal(
+            committed_budgets=committed_budgets,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             proposal=replace(
@@ -498,7 +518,13 @@ def _physical_component_declarations(
     targets_by_weapon = _physical_targets_by_weapon(physical_rows)
     translated: list[MeleeWeaponDeclaration] = []
     for declaration in declarations:
-        physical_target_ids = targets_by_weapon.get(declaration.weapon_key)
+        matching = [
+            targets
+            for key, targets in targets_by_weapon.items()
+            if key[:3] == declaration.weapon_key
+            and (declaration.weapon_instance_id is None or key[3] == declaration.weapon_instance_id)
+        ]
+        physical_target_ids = matching[0] if len(matching) == 1 else None
         if physical_target_ids is None:
             translated.append(declaration)
             continue
@@ -540,8 +566,8 @@ def _physical_target_ids_for_rows(rows: tuple[JsonValue, ...]) -> tuple[str, ...
 
 def _physical_targets_by_weapon(
     physical_rows: tuple[JsonValue, ...],
-) -> dict[tuple[str, str, str], tuple[str, ...]]:
-    targets_by_weapon: dict[tuple[str, str, str], tuple[str, ...]] = {}
+) -> dict[tuple[str, str, str, str], tuple[str, ...]]:
+    targets_by_weapon: dict[tuple[str, str, str, str], tuple[str, ...]] = {}
     for row in physical_rows:
         if not isinstance(row, dict):
             raise GameLifecycleError("Melee weapon availability row must be an object.")
@@ -549,6 +575,7 @@ def _physical_targets_by_weapon(
             _payload_string(row, "model_instance_id"),
             _payload_string(row, "wargear_id"),
             _payload_string(row, "weapon_profile_id"),
+            _payload_string(row, "weapon_instance_id"),
         )
         if weapon_key in targets_by_weapon:
             raise GameLifecycleError("Melee weapon availability keys must be unique.")
@@ -576,7 +603,12 @@ def _canonical_attack_pool(
     if target.unit_instance_id == pool.target_unit_instance_id:
         return pool
     physical_target_ids = _physical_targets_by_weapon(physical_rows).get(
-        (pool.attacker_model_instance_id, pool.wargear_id, pool.weapon_profile_id)
+        (
+            pool.attacker_model_instance_id,
+            pool.wargear_id,
+            pool.weapon_profile_id,
+            pool.weapon_instance_id,
+        )
     )
     if physical_target_ids is None:
         raise GameLifecycleError("Melee attack pool lost its physical availability row.")

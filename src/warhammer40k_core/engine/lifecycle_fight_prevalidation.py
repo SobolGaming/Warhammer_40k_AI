@@ -48,6 +48,7 @@ def pre_validate_fight_decision(
         if lifecycle._result_resolves_active_reaction_frame(result):
             lifecycle.reaction_queue.validate_result(result)
         invalid_status = invalid_melee_declaration_status(
+            decisions=lifecycle.decision_controller,
             runtime_modifier_registry=lifecycle._fight_phase_handler.runtime_modifier_registry,
             state=state,
             request=request,

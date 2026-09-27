@@ -27,6 +27,7 @@ from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import healing_off_battlefield_history as _obh
 from warhammer40k_core.engine import ingress_placement_history as _iph
 from warhammer40k_core.engine import lifecycle_history_origins as _history_origins
+from warhammer40k_core.engine import melee_commitment_dispatch as _melee_commitment_dispatch
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
@@ -889,6 +890,11 @@ class GameLifecycle:
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered(
             preserve_existing_bundle=runtime_content_bundle is not None,
         )
+        from warhammer40k_core.engine.melee_commitment_history import (
+            validate_melee_commitment_history,
+        )
+
+        validate_melee_commitment_history(lifecycle)
         from warhammer40k_core.engine.shooting_target_replacement_authority import (
             validate_restored_replacements,
         )
@@ -1231,6 +1237,7 @@ class GameLifecycle:
                 *_cmmd.decision_dispatch_handlers(self),
                 *_unit_split_dispatch.decision_dispatch_handlers(self),
                 *_target_replacement_dispatch.decision_dispatch_handlers(self),
+                *_melee_commitment_dispatch.decision_dispatch_handlers(self),
                 *(
                     DecisionDispatchHandler(
                         decision_type=decision_type,

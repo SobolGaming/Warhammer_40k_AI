@@ -7022,3 +7022,43 @@ projects these public shooting facts for both viewers; unrelated hidden decision
 retain their existing redaction. Save/restore and replay authenticate the terminal
 against its decisions, historical phase, host and restriction inventory. Contract
 40's JSON-safe opaque payload schemas already cover these additions.
+
+
+## Order 92: provisional random melee attack splits (Contract 40.1)
+
+The owner-approved timing convention is documented in [Order 92](ORDER_92_SCOPE_PLAN.md).
+For a Fight activation with eligible random-A melee weapons, the engine emits
+finite `select_melee_weapon` requests. Select one emitted physical weapon/profile
+option for each model's primary weapon, and one profile or `skip_extra` for each
+Extra Attacks weapon. The engine commits all choices before generating any A dice.
+Each request binds the activation result, stage and physical inventory. Inventory rows
+include `melee_target_facts`, keyed by physical target ID, with canonical target ID,
+then-alive model IDs and canonical keywords. These immutable facts authenticate
+single-target Cleave after casualties; the existing weapon selection context
+authenticates the effective profile and selected ability instances. These
+public battle decisions use the existing finite submission and viewer scope.
+
+`melee_weapons_committed` records physical IDs, raw attack profiles, underlying dice,
+base counts, accepted selection result IDs and the provisional convention ID.
+The following `submit_melee_declaration` exposes this under `melee_weapon_commitment`.
+A declaration must include `weapon_instance_id` for every committed weapon and use
+exactly the committed physical weapons/profiles. The field is optional only for
+uncommitted fixed-A declarations with an unambiguous physical inventory. Positive
+integer `target_allocations[].attacks` are required for every split target and
+must conserve that weapon's effective total independently of other weapons/models.
+Single-target declarations may omit the count; explicit counts include applicable
+Cleave. Cleave contributes only to a single-target weapon and cannot fund a split.
+
+Invalid, stale, malformed or drifted submissions return existing typed diagnostics
+before queue pop, without changing histories, rolling dice, spending One Shot or
+emitting selected-target triggers. Accepted committed declarations include `attack_pools`;
+resolution uses their committed counts. `select_target_replacement` also covers
+committed Melee activations: each invalid unresolved allocation offers new legal destinations or explicit
+forgoing. Replacement preserves its physical source, abilities and attack count.
+Both ordinary and retained/forced Fight hosts use the same lifecycle owners.
+
+Restore authenticates selection stages, physical inventory, underlying random
+events, commitment identity, every accepted pool's physical/profile/ability identity,
+single-target and split totals, and replacement history. Replay
+regenerates the same decisions and dice. Existing exact runtime identity rejects
+older histories; no compatibility conversion is introduced. Shooting is unchanged.

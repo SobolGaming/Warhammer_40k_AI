@@ -1,0 +1,103 @@
+{
+  "workload": "order92-melee-declaration-v1",
+  "rows": [
+    {
+      "random": false,
+      "setup_seconds": [
+        2.0896581250126474,
+        0.24602558300830424,
+        0.2761369170038961,
+        0.24751583399483934,
+        0.24503545794868842
+      ],
+      "samples_seconds": [
+        0.03562999999849126,
+        0.0302689999807626,
+        0.030361125012859702,
+        0.03027845802716911,
+        0.030725874996278435
+      ],
+      "mean": 0.031452891603112224,
+      "median": 0.030361125012859702,
+      "p95_and_maximum": 0.03562999999849126,
+      "outcomes": [
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        }
+      ]
+    },
+    {
+      "random": true,
+      "setup_seconds": [
+        0.2442779999691993,
+        0.2504158330266364,
+        0.2526370420237072,
+        0.25212683400604874,
+        0.25333458301611245
+      ],
+      "samples_seconds": [
+        0.030228457995690405,
+        0.03251245798310265,
+        0.03167066699825227,
+        0.03280674997949973,
+        0.03208391700172797
+      ],
+      "mean": 0.031860449991654605,
+      "median": 0.03208391700172797,
+      "p95_and_maximum": 0.03280674997949973,
+      "outcomes": [
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        },
+        {
+          "decision_type": "submit_melee_declaration",
+          "weapon_choices": 0
+        }
+      ]
+    }
+  ],
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6d965672035785244fee2bda00f5b3a258e6d548dcad2067949285f2372cb40d",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "hardware": "provisional Apple M5 Pro, 64 GiB",
+  "concurrency": 1,
+  "coverage": false,
+  "full_game_samples": 0,
+  "fixture": "three single-model leaders, no terrain, two engaged enemies; seeded game ID",
+  "timing_boundary": "Fight phase progression to target declaration, including weapon choices",
+  "hashes": {
+    "scripts/benchmark_order92_melee.py": "ec85032ce454332f6ec58ce033d889c1c16ea335c7bf260b67a49dad789a6829",
+    "tests/random_melee_helpers.py": "d19d26b549346c921786ef9da6126f14d561f400a65f56fc106d92328af7083c",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  }
+}

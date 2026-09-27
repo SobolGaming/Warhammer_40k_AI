@@ -3078,7 +3078,7 @@ def test_phase15d_melee_rejects_multiple_primary_weapons_per_model() -> None:
     assert validation.violations[0].violation_code == "melee_model_declared_multiple_weapons"
 
 
-def test_phase15d_random_attack_melee_target_allocation_is_explicitly_unsupported() -> None:
+def test_phase15d_random_melee_split_requires_a_committed_budget() -> None:
     catalog, ruleset, scenario, attacker, target_a, target_b = _melee_fixture()
     leader_blade = next(
         wargear for wargear in catalog.wargear if wargear.wargear_id == "core-leader-blade"
@@ -3155,7 +3155,7 @@ def test_phase15d_random_attack_melee_target_allocation_is_explicitly_unsupporte
     assert single_target.violations[0].violation_code == (
         "random_melee_single_target_count_declared"
     )
-    assert split.violations[0].violation_code == "random_melee_split_unsupported"
+    assert split.violations[0].violation_code == "random_melee_commitment_required"
 
 
 def test_phase15d_melee_split_rejects_missing_or_drifted_attack_counts() -> None:

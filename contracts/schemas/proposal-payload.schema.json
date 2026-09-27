@@ -1357,6 +1357,10 @@
               },
               "weapon_profile_id": {
                 "$ref": "#/$defs/identifier"
+              },
+              "weapon_instance_id": {
+                "type": "string",
+                "minLength": 1
               }
             },
             "required": [

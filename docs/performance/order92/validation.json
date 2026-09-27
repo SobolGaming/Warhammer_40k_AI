@@ -1,0 +1,143 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "base_ref": "ad096b7f238bd623c7c1c17c0cd42d70564e87d8",
+  "behavioral": {
+    "tests": 9559,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 956.444,
+    "junit_sha256": "7f8ab830891fbdaa85b7d9c6c93133505bff1044b86832b6e93a354c1ebcf540",
+    "log_sha256": "fc996ea671a10d8dddf0a27951a764ea1dc64ea4f832bb07a01533b476cc0fb9",
+    "coverage_percent": 85.15758592595216,
+    "coverage_json_sha256": "0a6046486bc6854274dfb84cea8078e1f057696d0c144dc3c4228a6b3f7c2e7b"
+  },
+  "code_quality": {
+    "tests": 698,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 117.893,
+    "junit_sha256": "9b1b4ffbc460d41b74f13afe5b376090e10c09cdbd15ba629ad047ad19aa5c1c",
+    "log_sha256": "d494acc95adfad90f991b9e2524f31ee07b28debc60f0f07b4e92f4bd0065f35"
+  },
+  "distribution": "18 xdist work-stealing workers; complete successful behavioral run with coverage, then code-quality without coverage",
+  "gate_runs": [
+    {
+      "gate": "ruff",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "gate": "format",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "log_sha256": "c3e98ebca34f283cc01df47663194234d2d5dd1851dbb43c7851df8d42dcd1aa"
+    },
+    {
+      "gate": "mypy",
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "log_sha256": "1aa21456630aa635622e93ed1d73cd25cfca3c647c16b6dd77bd4c926559683f"
+    },
+    {
+      "gate": "pyright",
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "gate": "imports",
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "log_sha256": "b84d6d3b9ce82b8696676f852c2ba59aa4310a69252b46c24238cc7e29e5ceea"
+    },
+    {
+      "gate": "source-actions",
+      "command": "uv run --no-sync python tools/build_core_actions_source.py --check",
+      "exit_code": 0,
+      "log_sha256": "57197041c73b6b472455346324327eccec08a4e75cbfc3486b356e19c0b7a9ab"
+    },
+    {
+      "gate": "identity",
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "log_sha256": "546df8eb093b57070ef2951d4c1cfe4bb5203c6fde86dca634d4b81b23604c7c"
+    },
+    {
+      "gate": "contract-base",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref ad096b7f238bd623c7c1c17c0cd42d70564e87d8",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "installed-wheel",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "log_sha256": "37e40a5400b0254b5d8e0743eac6be051555c597940b4578a52eef7fc473fbc3"
+    },
+    {
+      "gate": "typescript",
+      "command": "npm run check",
+      "exit_code": 0,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "gate": "typescript-unit",
+      "command": "npm run test:unit",
+      "exit_code": 0,
+      "log_sha256": "3551beceaeddd73200077576a92037ccbff0007265da58ae0d50ff9a16a74e6b"
+    },
+    {
+      "gate": "http-conformance",
+      "command": "npm run conformance",
+      "exit_code": 0,
+      "log_sha256": "38997b4d267db967f39e3183886a8234d1d7c5b67cf78a66064a731d6432fff4"
+    },
+    {
+      "gate": "shards",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "pre-commit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "prior_diagnostics": [
+    {
+      "kind": "behavioral",
+      "tests": 9559,
+      "passed": 9558,
+      "failed": 1,
+      "reason": "Stale server API expected external contract 40.0.0; corrected to 40.1.0. Production unchanged. Focused test and independent review passed before the clean complete rerun.",
+      "log_sha256": "80c4738b237a426c67ef240b1ea58209518a836eb724ff505d4b2d3aa18786dd"
+    },
+    {
+      "kind": "code_quality",
+      "tests": 698,
+      "passed": 697,
+      "failed": 1,
+      "reason": "Decision submission catalog omitted select_melee_weapon. Added finite row, allocation and replacement documentation; focused catalog audit passed. Production unchanged.",
+      "log_sha256": "0041d26e6cc4252bc31b839b5ac4cb01e151a6cea9d1fbcad908918dc65912a0"
+    }
+  ],
+  "independent_review": {
+    "status": "approved",
+    "resolved_findings": [
+      "Single-target accepted-pool restore authentication",
+      "Mixed attached-unit eligible-random predicate"
+    ],
+    "test_only_contract_version_correction": "approved"
+  },
+  "performance": {
+    "full_game_samples": 0,
+    "full_game_targets": "unverified",
+    "component_report": "README.md",
+    "runtime_diagnostics": "inherited-refresh.json"
+  }
+}

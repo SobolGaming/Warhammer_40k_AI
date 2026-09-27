@@ -14,6 +14,11 @@ selection among tied highest/lowest physical dice. See
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
 remains separate under Order 95; Orders 85–94 remain open.
 
+Order 92 / P04D implements recorded random melee attack splits under the owner's
+provisional timing convention. Weapons/profiles commit before one physical A roll
+per weapon; invalid retries and target replacement preserve the counts. See the
+[convention and evidence](docs/ORDER_92_SCOPE_PLAN.md).
+
 Order 91 / P04C permits legal Shooting unit/type selection when no attacks can be
 made. Empty completion applies type and cargo restrictions without recording that
 the unit shot. Ordinary and retained hosts share the same engine owner; see the

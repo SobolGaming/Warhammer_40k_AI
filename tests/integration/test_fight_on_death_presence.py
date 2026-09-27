@@ -452,9 +452,32 @@ def test_order_30_cleanup_feel_no_pain_pauses_and_restores_before_source_removal
     )
 
 
-def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> None:
+@pytest.mark.parametrize("random_attacks", [False, True])
+def test_order_30_retained_model_fights_from_original_base_then_is_removed(
+    random_attacks: bool,
+) -> None:
     from tests.activity_restriction_assertions import assert_completed_melee_is_authenticated
 
+    from warhammer40k_core.core.dice import DiceExpression
+    from warhammer40k_core.core.weapon_profiles import AttackProfile
+
+    catalog = lethal_retained_attack_catalog()
+    if random_attacks:
+        catalog = replace(
+            catalog,
+            wargear=tuple(
+                replace(
+                    item,
+                    weapon_profiles=tuple(
+                        replace(profile, attack_profile=AttackProfile.dice(DiceExpression(1, 3, 3)))
+                        for profile in item.weapon_profiles
+                    ),
+                )
+                if item.wargear_id == "core-leader-blade"
+                else item
+                for item in catalog.wargear
+            ),
+        )
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
@@ -463,7 +486,7 @@ def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> 
         model_count=1,
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
-        catalog=lethal_retained_attack_catalog(),
+        catalog=catalog,
         fights_first_unit_keys=("intercessor-1",),
     )
     state = lifecycle.state
@@ -485,7 +508,7 @@ def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> 
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
     accepted = False
     retained_melee = False
-    for _ in range(50):
+    for _ in range(100):
         request = pending_request(session)
         if request.decision_type == "select_destruction_reaction":
             session.submit_option(
@@ -497,7 +520,17 @@ def test_order_30_retained_model_fights_from_original_base_then_is_removed() -> 
         else:
             if accepted and request.decision_type == "submit_melee_declaration":
                 retained_melee = True
-            submit_fixture_request(session, request)
+            if random_attacks and request.decision_type == "submit_melee_declaration":
+                from tests.random_melee_helpers import single_target_commitment_payload
+
+                status = session.submit_parameterized_payload(
+                    request_id=request.request_id,
+                    result_id=f"{request.request_id}:fixture-choice",
+                    payload=single_target_commitment_payload(request),
+                )
+                assert status.status_kind is not LifecycleStatusKind.INVALID
+            else:
+                submit_fixture_request(session, request)
         state = session.lifecycle.state
         assert state is not None
         assert state.battlefield_state is not None

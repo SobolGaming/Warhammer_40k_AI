@@ -154,6 +154,15 @@ from warhammer40k_core.engine.fight_weapon_selection import (
 from warhammer40k_core.engine.fight_weapon_selection import (
     validate_melee_declaration_rules as validate_melee_declaration_rules,
 )
+from warhammer40k_core.engine.melee_attack_counts import (
+    _require_declared_melee_attacks as _require_declared_melee_attacks,
+)
+from warhammer40k_core.engine.melee_attack_counts import (
+    _validate_melee_target_allocation_counts as _validate_melee_target_allocation_counts,
+)
+from warhammer40k_core.engine.melee_attack_counts import (
+    _validate_melee_target_count_limit as _validate_melee_target_count_limit,
+)
 
 PILE_IN_ACTION = "pile_in"
 CONSOLIDATE_ACTION = "consolidate"
@@ -224,6 +233,7 @@ class MeleeTargetAllocationPayload(TypedDict):
 
 
 class MeleeWeaponDeclarationPayload(TypedDict):
+    weapon_instance_id: NotRequired[str]
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -1246,7 +1256,9 @@ def record_one_shot_melee_weapon_uses(
     )
     records: list[OneShotWeaponUseRecord] = []
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
-        available_weapon = available.get(declaration.weapon_key)
+        from warhammer40k_core.engine.melee_weapon_identity import declared_melee_weapon
+
+        available_weapon = declared_melee_weapon(available, declaration)
         if available_weapon is None:
             raise GameLifecycleError("Accepted melee declaration references an unknown weapon.")
         profile = available_weapon["weapon_profile"]
@@ -2038,7 +2050,7 @@ def _required_primary_melee_model_ids(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
-    available: dict[tuple[str, str, str], _AvailableMeleeWeapon],
+    available: dict[tuple[str, str, str, str], _AvailableMeleeWeapon],
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> set[str]:
@@ -2087,12 +2099,13 @@ def _available_melee_weapons_by_key(
     army_catalog: ArmyCatalog,
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
-) -> dict[tuple[str, str, str], _AvailableMeleeWeapon]:
+) -> dict[tuple[str, str, str, str], _AvailableMeleeWeapon]:
     return {
         (
             weapon["model_instance_id"],
             weapon["wargear_id"],
             weapon["weapon_profile"].profile_id,
+            weapon["weapon_instance_id"],
         ): weapon
         for weapon in _available_melee_weapons_for_unit(
             unit=unit,
@@ -2211,106 +2224,6 @@ def _maximum_attacks_for_profile(profile: WeaponProfile) -> int:
         raise GameLifecycleError("Weapon attack profile requires attacks.")
     maximum = dice_expression.quantity * dice_expression.sides + dice_expression.modifier
     return _validate_positive_int("WeaponProfile maximum attacks", maximum)
-
-
-def _require_declared_melee_attacks(allocation: MeleeTargetAllocation) -> int:
-    if type(allocation) is not MeleeTargetAllocation:
-        raise GameLifecycleError("_require_declared_melee_attacks requires an allocation.")
-    attacks = allocation.attacks
-    if attacks is None:
-        raise GameLifecycleError("Split melee attack allocation is missing attacks.")
-    return attacks
-
-
-def _validate_melee_target_allocation_counts(
-    *,
-    request: MeleeDeclarationProposalRequest,
-    declaration: MeleeWeaponDeclaration,
-    profile: WeaponProfile,
-    scenario: BattlefieldScenario,
-    state: GameState | None,
-) -> ProposalValidationResult | None:
-    target_count_validation = _validate_melee_target_count_limit(
-        request=request,
-        declaration=declaration,
-        profile=profile,
-    )
-    if target_count_validation is not None:
-        return target_count_validation
-    target_count = len(declaration.target_allocations)
-    fixed_attacks = profile.attack_profile.fixed_attacks
-    if target_count == 1:
-        declared_attacks = declaration.target_allocations[0].attacks
-        expected_attacks = fixed_attacks
-        if expected_attacks is not None:
-            expected_attacks += _cleave_attack_bonus_for_target(
-                scenario=scenario,
-                profile=profile,
-                single_target=True,
-                target_unit_instance_id=declaration.target_allocations[0].target_unit_instance_id,
-                state=state,
-            )
-        if (
-            declared_attacks is not None
-            and expected_attacks is not None
-            and declared_attacks != expected_attacks
-        ):
-            return _invalid_melee_validation(
-                request=request,
-                violation_code="melee_attack_count_drift",
-                message="Single-target melee declaration must allocate every weapon attack.",
-                field="target_allocations",
-            )
-        if declared_attacks is not None and fixed_attacks is None:
-            return _invalid_melee_validation(
-                request=request,
-                violation_code="random_melee_single_target_count_declared",
-                message="Single-target random Attacks melee declarations must omit attacks.",
-                field="target_allocations",
-            )
-        return None
-    if fixed_attacks is None:
-        return _invalid_melee_validation(
-            request=request,
-            violation_code="random_melee_split_unsupported",
-            message="Splitting random Attacks melee weapons requires a fixed attack count first.",
-            field="target_allocations",
-        )
-    if any(allocation.attacks is None for allocation in declaration.target_allocations):
-        return _invalid_melee_validation(
-            request=request,
-            violation_code="split_melee_attack_count_required",
-            message="Split melee declarations require attacks for every target.",
-            field="target_allocations",
-        )
-    declared_total = sum(
-        _require_declared_melee_attacks(allocation) for allocation in declaration.target_allocations
-    )
-    if declared_total != fixed_attacks:
-        return _invalid_melee_validation(
-            request=request,
-            violation_code="split_melee_attack_count_drift",
-            message="Split melee declarations must allocate exactly the weapon Attacks.",
-            field="target_allocations",
-        )
-    return None
-
-
-def _validate_melee_target_count_limit(
-    *,
-    request: MeleeDeclarationProposalRequest,
-    declaration: MeleeWeaponDeclaration,
-    profile: WeaponProfile,
-) -> ProposalValidationResult | None:
-    maximum_attacks = _maximum_attacks_for_profile(profile)
-    if len(declaration.target_allocations) > maximum_attacks:
-        return _invalid_melee_validation(
-            request=request,
-            violation_code="melee_target_count_exceeds_attacks",
-            message="Melee declaration cannot select more target units than weapon Attacks.",
-            field="target_allocations",
-        )
-    return None
 
 
 def _cleave_attack_bonus_for_target(
@@ -2582,6 +2495,7 @@ def _key_error_field(error: KeyError) -> str:
 
 # Explicit engine-internal surface shared with the extracted selection owner.
 __all__ = (
+    "_AvailableMeleeWeapon",
     "_available_melee_weapons_by_key",
     "_available_melee_weapons_for_unit",
     "_cleave_attack_bonus_for_target",
