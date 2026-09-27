@@ -16,6 +16,7 @@ from warhammer40k_core.engine.assault_disembark import (
 from warhammer40k_core.engine.shock_disembark import (
     shock_disembark_restriction_overrides,
 )
+from warhammer40k_core.engine.transport_cargo_membership import rules_unit_retains_phase_start_cargo
 from warhammer40k_core.engine.transport_disembark_state import (
     assault_disembark_transport_movement_is_eligible,
 )
@@ -78,11 +79,7 @@ def _disembark_candidates_for_movement_unit(
     )
     if not all(active_cargo.contains_unit(component_id) for component_id in component_ids):
         return ()
-    if not all(
-        active_cargo.unit_started_phase_embarked(component_id)
-        and not active_cargo.unit_disembarked_this_phase(component_id)
-        for component_id in component_ids
-    ):
+    if not rules_unit_retains_phase_start_cargo(cargo=active_cargo, rules_unit=rules_unit):
         return ()
     if (
         state.disembarked_unit_state_for_unit(

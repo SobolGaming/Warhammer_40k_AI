@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, UnitPlacement
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.transport_cargo_membership import rules_unit_retains_phase_start_cargo
 from warhammer40k_core.engine.transports import (
     ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
     SHOCK_DISEMBARK_MOVE_SOURCE_ID,
@@ -40,9 +42,11 @@ def append_disembark_eligibility_violations(
                 source_rule_id=_CORE_TRANSPORT_RULE_ID,
             )
         )
-    if require_started_phase_embarked and (
-        not active_cargo.unit_started_phase_embarked(unit.unit_instance_id)
-        or active_cargo.unit_disembarked_this_phase(unit.unit_instance_id)
+    if require_started_phase_embarked and not rules_unit_retains_phase_start_cargo(
+        cargo=active_cargo,
+        rules_unit=rules_unit_view_from_armies(
+            armies=scenario.armies, unit_instance_id=unit.unit_instance_id
+        ),
     ):
         violations.append(
             TransportOperationViolation(

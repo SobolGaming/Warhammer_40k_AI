@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.transport_cargo_membership import reserve_state_with_updated_cargo
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -53,17 +54,9 @@ def reconcile_transport_cargo_after_model_destruction(
         embarked_unit_instance_ids=remaining_embarked_ids,
     )
 
-    reserve_state = state.reserve_state_for_unit(cargo_state.transport_unit_instance_id)
-    updated_reserve_state = None
-    if reserve_state is not None and reserve_state.is_unarrived:
-        if reserve_state.embarked_unit_instance_ids != cargo_state.embarked_unit_instance_ids:
-            raise GameLifecycleError(
-                "Destroyed embarked-component reconciliation found reserve cargo drift."
-            )
-        updated_reserve_state = replace(
-            reserve_state,
-            embarked_unit_instance_ids=remaining_embarked_ids,
-        )
+    updated_reserve_state = reserve_state_with_updated_cargo(
+        state=state, before=cargo_state, after=updated_cargo_state
+    )
 
     state.replace_transport_cargo_state(updated_cargo_state)
     if updated_reserve_state is not None:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.engine.event_log import EventRecord
@@ -167,6 +168,7 @@ def validate_initial_reserve_destruction_policy_authority(
         source_states_by_identity[identity] = source_state
 
     consumed_source_identities = _initial_source_identities_with_arrival(
+        state=state,
         source_states_by_identity=source_states_by_identity,
         event_records=event_records,
     )
@@ -174,6 +176,7 @@ def validate_initial_reserve_destruction_policy_authority(
         identity = (reserve_state.player_id, reserve_state.unit_instance_id)
         recorded_state = source_states_by_identity.get(identity)
         if recorded_state is None or not _initial_reserve_fields_match(
+            state=state,
             first=recorded_state,
             second=reserve_state,
         ):
@@ -185,6 +188,7 @@ def validate_initial_reserve_destruction_policy_authority(
 
 def _initial_source_identities_with_arrival(
     *,
+    state: GameState,
     source_states_by_identity: dict[tuple[str, str], ReserveState],
     event_records: tuple[EventRecord, ...],
 ) -> set[tuple[str, str]]:
@@ -221,12 +225,22 @@ def _initial_source_identities_with_arrival(
             ) from exc
         identity = (reserve_state.player_id, reserve_state.unit_instance_id)
         source_state = source_states_by_identity.get(identity)
-        if source_state is not None and source_state.to_payload() == reserve_state.to_payload():
+        if (
+            source_state is not None
+            and _embarked_rules_unit_ids(state, source_state)
+            == _embarked_rules_unit_ids(state, reserve_state)
+            and source_state
+            == replace(
+                reserve_state, embarked_unit_instance_ids=source_state.embarked_unit_instance_ids
+            )
+        ):
             consumed.add(identity)
     return consumed
 
 
-def _initial_reserve_fields_match(*, first: ReserveState, second: ReserveState) -> bool:
+def _initial_reserve_fields_match(
+    *, state: GameState, first: ReserveState, second: ReserveState
+) -> bool:
     return (
         first.player_id == second.player_id
         and first.unit_instance_id == second.unit_instance_id
@@ -242,5 +256,17 @@ def _initial_reserve_fields_match(*, first: ReserveState, second: ReserveState) 
         and first.required_arrival_source_rule_id == second.required_arrival_source_rule_id
         and first.required_arrival_placement_kind == second.required_arrival_placement_kind
         and first.destruction_deadline_policy == second.destruction_deadline_policy
-        and first.embarked_unit_instance_ids == second.embarked_unit_instance_ids
+        and _embarked_rules_unit_ids(state, first) == _embarked_rules_unit_ids(state, second)
+    )
+
+
+def _embarked_rules_unit_ids(state: GameState, reserve: ReserveState) -> frozenset[str]:
+    # Declarations bind immutable attached lineage. Current physical component
+    # membership changes on death/return and is checked against live cargo by the
+    # transport integrity owner; comparing raw component lists conflates the two.
+    return frozenset(
+        rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions), unit_instance_id=component_id
+        ).unit_instance_id
+        for component_id in reserve.embarked_unit_instance_ids
     )

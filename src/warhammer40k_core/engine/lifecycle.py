@@ -24,6 +24,7 @@ from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
+from warhammer40k_core.engine import healing_off_battlefield_history as _obh
 from warhammer40k_core.engine import ingress_placement_history as _iph
 from warhammer40k_core.engine import lifecycle_history_origins as _history_origins
 from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
@@ -342,6 +343,7 @@ class GameLifecyclePayload(TypedDict):
     runtime_content_audit: NotRequired[dict[str, JsonValue]]
     psychic_modifier_history_origin: NotRequired[dict[str, JsonValue]]
     ingress_placement_history_origin: NotRequired[dict[str, JsonValue]]
+    off_battlefield_revival_history_origin: NotRequired[dict[str, JsonValue]]
 
 
 _MOVEMENT_PROPOSAL_DECISION_TYPES = frozenset(
@@ -547,6 +549,7 @@ class GameLifecycle:
     parameterized_movement_proposals: bool = True
     _psychic_modifier_history_origin: _pmh.PsychicModifierHistoryOrigin | None = None
     _ingress_placement_history_origin: _iph.IngressPlacementHistoryOrigin | None = None
+    _off_battlefield_revival_history_origin: _obh.OffBattlefieldRevivalHistoryOrigin | None = None
     _config: GameConfig | None = None
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
@@ -771,10 +774,13 @@ class GameLifecycle:
                 request=pending_request,
                 runtime_content_bundle=self._runtime_content_bundle,
             )
-        history_origin, ingress_origin = _history_origins.capture(self, pending_request)
+        history_origin, ingress_origin, revival_origin = _history_origins.capture(
+            self, pending_request
+        )
         record = self.decision_controller.submit_result(result)
         self._psychic_modifier_history_origin = history_origin
         self._ingress_placement_history_origin = ingress_origin
+        self._off_battlefield_revival_history_origin = revival_origin
         status = self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
             record,
             result,

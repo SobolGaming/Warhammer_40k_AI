@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine import healing_off_battlefield_history as revival
 from warhammer40k_core.engine import ingress_placement_history as ingress
 from warhammer40k_core.engine import psychic_modifier_history_origin as psychic
 
@@ -18,6 +19,7 @@ def capture(
 ) -> tuple[
     psychic.PsychicModifierHistoryOrigin | None,
     ingress.IngressPlacementHistoryOrigin | None,
+    revival.OffBattlefieldRevivalHistoryOrigin | None,
 ]:
     return (
         psychic.capture_psychic_history_origin(
@@ -30,6 +32,11 @@ def capture(
             request=request,
             existing=lifecycle._ingress_placement_history_origin,
         ),
+        revival.capture_revival_history_origin(
+            lifecycle=lifecycle,
+            request=request,
+            existing=lifecycle._off_battlefield_revival_history_origin,
+        ),
     )
 
 
@@ -41,6 +48,11 @@ def serialize(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
     if lifecycle._ingress_placement_history_origin is not None:
         payload["ingress_placement_history_origin"] = (
             lifecycle._ingress_placement_history_origin.to_payload()
+        )
+
+    if lifecycle._off_battlefield_revival_history_origin is not None:
+        payload["off_battlefield_revival_history_origin"] = (
+            lifecycle._off_battlefield_revival_history_origin.to_payload()
         )
 
 
@@ -60,6 +72,14 @@ def restore(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
         else None
     )
 
+    lifecycle._off_battlefield_revival_history_origin = (
+        revival.OffBattlefieldRevivalHistoryOrigin.from_payload(
+            payload["off_battlefield_revival_history_origin"]
+        )
+        if "off_battlefield_revival_history_origin" in payload
+        else None
+    )
+
 
 def validate(lifecycle: GameLifecycle) -> None:
     psychic.validate_psychic_history_origin(
@@ -67,4 +87,7 @@ def validate(lifecycle: GameLifecycle) -> None:
     )
     ingress.validate_ingress_history_origin(
         lifecycle=lifecycle, origin=lifecycle._ingress_placement_history_origin
+    )
+    revival.validate_revival_history_origin(
+        lifecycle=lifecycle, origin=lifecycle._off_battlefield_revival_history_origin
     )

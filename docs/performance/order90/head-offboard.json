@@ -1,0 +1,115 @@
+{
+  "workload": "order90-offboard-dispatch-restore-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc0f39d591efe6594d13c63adb5970dc12a69d8a8df1b039b772ad45c041bb01",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "concurrency": 1,
+  "coverage": false,
+  "full_game_samples": 0,
+  "hardware": "provisional Apple M5 Pro, 64 GiB",
+  "baseline_limitation": "Base cannot correctly execute full-health cargo/reserve returns.",
+  "timing_boundary": "finite submission and independently authenticated lifecycle restore",
+  "hashes": {
+    "scripts/benchmark_order90_revival.py": "3ef6a094fdc322b4d05a5dc17c150f6281dd77bf095ad2f072e7f361005f14c9",
+    "tests/order90_revival_helpers.py": "5cd906cfa7426597e67c7f058ad034877835443a278ed5393705c6703e13439d",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "reserves": false,
+      "full_health": false,
+      "samples": [
+        {
+          "setup_seconds": 2.1516430000192486,
+          "submit_seconds": 0.08130941598210484,
+          "restore_seconds": 1.129832417005673,
+          "returned_wounds": 1
+        },
+        {
+          "setup_seconds": 0.25927124998997897,
+          "submit_seconds": 0.07615183299640194,
+          "restore_seconds": 1.0939357920142356,
+          "returned_wounds": 1
+        },
+        {
+          "setup_seconds": 0.2601184580125846,
+          "submit_seconds": 0.07632054199348204,
+          "restore_seconds": 1.0880125830008183,
+          "returned_wounds": 1
+        }
+      ]
+    },
+    {
+      "reserves": false,
+      "full_health": true,
+      "samples": [
+        {
+          "setup_seconds": 0.26148025001748465,
+          "submit_seconds": 0.0768715419981163,
+          "restore_seconds": 1.0970926249865443,
+          "returned_wounds": 2
+        },
+        {
+          "setup_seconds": 0.2605856670124922,
+          "submit_seconds": 0.11300616699736565,
+          "restore_seconds": 1.09269687498454,
+          "returned_wounds": 2
+        },
+        {
+          "setup_seconds": 0.2602117499918677,
+          "submit_seconds": 0.07672608399298042,
+          "restore_seconds": 1.0963800000026822,
+          "returned_wounds": 2
+        }
+      ]
+    },
+    {
+      "reserves": true,
+      "full_health": false,
+      "samples": [
+        {
+          "setup_seconds": 0.2618787919927854,
+          "submit_seconds": 0.07798529099090956,
+          "restore_seconds": 1.0958765420073178,
+          "returned_wounds": 1
+        },
+        {
+          "setup_seconds": 0.2594295000017155,
+          "submit_seconds": 0.07806425000308082,
+          "restore_seconds": 1.1351898749999236,
+          "returned_wounds": 1
+        },
+        {
+          "setup_seconds": 0.2584823750075884,
+          "submit_seconds": 0.07764108298579231,
+          "restore_seconds": 1.0968899579893332,
+          "returned_wounds": 1
+        }
+      ]
+    },
+    {
+      "reserves": true,
+      "full_health": true,
+      "samples": [
+        {
+          "setup_seconds": 0.2582891250203829,
+          "submit_seconds": 0.07721016599680297,
+          "restore_seconds": 1.0964785419928376,
+          "returned_wounds": 2
+        },
+        {
+          "setup_seconds": 0.2592296249931678,
+          "submit_seconds": 0.07651479198830202,
+          "restore_seconds": 1.094087125005899,
+          "returned_wounds": 2
+        },
+        {
+          "setup_seconds": 0.2616487499908544,
+          "submit_seconds": 0.07740812501288019,
+          "restore_seconds": 1.1420111659972463,
+          "returned_wounds": 2
+        }
+      ]
+    }
+  ]
+}

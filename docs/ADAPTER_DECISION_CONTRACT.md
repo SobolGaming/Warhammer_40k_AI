@@ -1930,9 +1930,24 @@ Phase 14H updates Transport Disembark decisions to expose the source-backed `dis
 
 Phase 14H Healing Wounds effects use the finite `select_healing_model` decision when the next one-wound healing step has multiple legal targets. The engine iterates each healing amount separately: wounded models are healed before any revival; if the unit is below Starting Strength and every alive model is at full wounds, one destroyed removed non-CHARACTER model becomes the next revival candidate; if the unit is at Starting Strength and full wounds, the step records no effect. Ambiguous wounded-model choices in any rules unit and ambiguous destroyed-model revival choices default to the controlling player, but source-backed effects may set `selection_actor_player_id` when the source rule gives the choice to another player; Necrons Reanimation Protocols uses the owning Necrons player. Option IDs are emitted by the engine, and model-option payloads include `submission_kind: "select_healing_model"`, `selection_kind` (`heal_wound` or `revive_model`), `effect_id`, `target_unit_instance_id`, `step_index`, the selected `model_instance_id`, `legal_model_ids`, and source rule/context. A source-backed optional revival may also set `allow_revival_finish: true`; the engine then emits `select_healing_model` even for one candidate and adds a deterministic `selection_kind: "finish"` option with `model_instance_id: null` before the first revival and after every completed revival while legal candidates remain. Selecting it records a replay-safe terminal healing step without returning another model. The request payload embeds the serialized `HealingEffect`, including `selection_actor_player_id` when present. Adapters select one pending option ID and do not invent model IDs, early-completion state, or wound mutations from local state.
 
-Every revival candidate, including a single unambiguous candidate, then emits the parameterized `submit_healing_revival_placement` decision with proposal kind `healing_revival_placement`. Its request binds the serialized `HealingEffect`, step, destroyed model ID, authoritative component-unit ID, and any preceding model-selection request/result IDs. The submission contains exactly one attempted `UnitPlacement` for that component and model. Before queue pop and mutation, the engine rejects stale or malformed context, wrong actor, army, player, rules-unit component, model, placement kind, or proposal kind; model overlap; returned-model overlap; impassable or occupied terrain; a returned base crossing the battlefield boundary; broken attached-rules-unit coherency; failure to cohere with phase-start models; or engaging an enemy rules unit that was not engaged with the receiving rules unit immediately before this placement. All rules-present models, including retained destroyed models and attached components, contribute through the shared physical engagement authority. Accepted placement restores the source-backed wound amount and records return-to-battlefield transition evidence. Adapters must not infer a default pose, component ownership, or placement legality locally.
+Every battlefield revival candidate, including a single unambiguous candidate, then emits the parameterized `submit_healing_revival_placement` decision with proposal kind `healing_revival_placement`. Its request binds the serialized `HealingEffect`, step, destroyed model ID, authoritative component-unit ID, and any preceding model-selection request/result IDs. The submission contains exactly one attempted `UnitPlacement` for that component and model. Before queue pop and mutation, the engine rejects stale or malformed context, wrong actor, army, player, rules-unit component, model, placement kind, or proposal kind; model overlap; returned-model overlap; impassable or occupied terrain; a returned base crossing the battlefield boundary; broken attached-rules-unit coherency; failure to cohere with phase-start models; or engaging an enemy rules unit that was not engaged with the receiving rules unit immediately before this placement. All rules-present models, including retained destroyed models and attached components, contribute through the shared physical engagement authority. Accepted placement restores the source-backed wound amount and records return-to-battlefield transition evidence. Adapters must not infer a default pose, component ownership, or placement legality locally.
 
 Healing and revival placement decisions expose public battlefield facts in the current rules scope. Their requests, results and events still pass through centralized viewer redaction, including protected fields nested in source context. Any future hidden healing source must define and test viewer-scoped request, record, event, and status projection before it is registered.
+
+Order 90 / P01J resolves embarked and unarrived-reserve returns through the same
+finite `select_healing_model` family, even with one candidate. No placement decision
+is emitted off the battlefield. The engine preserves source-defined wounds and
+starting model equipment. The private request `revival_location` snapshot binds
+phase/turn, all cargo or reserve ownership and occupied capacity; it is removed
+recursively by shared adapter redaction. Location/phase/capacity drift rejects
+before recording or mutation. Public `healing_step_resolved` payloads use
+`revive_model_embarked`, `revive_model_in_reserves`, or
+`revive_model_destroyed_no_capacity`. Successful off-battlefield steps have positive
+source-defined final wounds and no transition batch; capacity failure has zero
+wounds, retains removal and triggers no destroyed-model rule. Source and decision
+provenance authenticate restore. Later ingress/disembark uses ordinary placement
+and its existing restrictions. Contract 40's opaque payload schemas cover these
+values; engine-build matching remains mandatory for persistence and replay.
 
 Order 89 / P02H separates ordinary unit healing from explicit source-authorized
 revival. Only ordinary unit-healing revival excludes models with the canonical
@@ -6960,3 +6975,20 @@ modifier eligibility, pending decisions, submission validation and viewer
 redaction retain their existing shapes and authority. Shooting, Fight, reaction
 attacks and rerolls consume that same query. No new decision or schema version
 is introduced; the runtime build identity records the semantic repair.
+
+
+Order 90 completed non-spatial healing decisions additionally require the private
+`off_battlefield_revival_history_origin` lifecycle field. The existing lifecycle
+history-origin service captures the pre-return state only after validation and
+before queue pop, and installs it only on an accepted choice. Restore validates the
+original pending request against state and reproduces the accepted suffix, including
+cargo capacity, attached-component membership, reserve sources and later ingress.
+This operator-only root and `revival_location` are removed by shared recursive
+adapter redaction. Contract 40's opaque lifecycle JSON contains the new private
+field; public submission envelopes are unchanged. Exact engine build identity is
+required, and missing origins on completed returns are invalid.
+
+The existing Disembark option and placement families share rules-unit phase-start
+cargo eligibility. A returned attached component inherits its receiving unit's
+embarked history; this does not add that component to the recorded phase-start
+physical inventory. All currently living components still require the same carrier.

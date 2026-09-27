@@ -881,6 +881,7 @@ def _validate_completed_selection_step(
         or step.step_kind
         not in {
             HealingStepKind.REVIVE_MODEL_EMBARKED,
+            HealingStepKind.REVIVE_MODEL_IN_RESERVES,
             HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY,
         }
         or step.model_instance_id != model_id
@@ -1126,6 +1127,7 @@ def _validate_exact_pending_request(
         in {
             HealingStepKind.REVIVE_MODEL,
             HealingStepKind.REVIVE_MODEL_EMBARKED,
+            HealingStepKind.REVIVE_MODEL_IN_RESERVES,
         }
         and step.model_instance_id is not None
     }
@@ -1173,6 +1175,11 @@ def _validate_exact_pending_request(
                 ),
             ),
         )
+        from warhammer40k_core.engine.healing_off_battlefield import revival_location
+
+        location = revival_location(
+            state=context.state, unit_instance_id=effect.target_unit_instance_id
+        )
         expected_request = DecisionRequest(
             request_id=f"{effect.effect_id}:healing-step-{step_index:03d}",
             decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
@@ -1183,6 +1190,7 @@ def _validate_exact_pending_request(
                     "effect": effect.to_payload(),
                     "step_index": step_index,
                     "legal_model_ids": list(remaining_ids),
+                    **({"revival_location": location} if location is not None else {}),
                 }
             ),
             options=options,
