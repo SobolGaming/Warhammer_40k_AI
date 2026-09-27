@@ -636,7 +636,10 @@ def _restoration_mutations(
             ):
                 raise GameLifecycleError("Healing restoration placement drift.")
             placed = True
-        elif step.step_kind is HealingStepKind.REVIVE_MODEL_EMBARKED:
+        elif step.step_kind in {
+            HealingStepKind.REVIVE_MODEL_EMBARKED,
+            HealingStepKind.REVIVE_MODEL_IN_RESERVES,
+        }:
             placed = False
         else:
             raise GameLifecycleError("Authenticated healing event is not a restoration.")

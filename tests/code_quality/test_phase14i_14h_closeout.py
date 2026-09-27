@@ -678,7 +678,13 @@ def test_order38_eligibility_has_one_owner_and_bounded_permission_work() -> None
     assert "scenario_physically_engaged_enemy_rules_unit_ids" not in calls
     assert "start_engaged_enemy_unit_instance_ids=()" in candidate
     assert "assault_disembark_transport_movement_is_eligible" in candidate
-    assert "unit_disembarked_this_phase" in candidate
+    assert calls.count("rules_unit_retains_phase_start_cargo") == 1
+    cargo_history = function_source_for(
+        (ENGINE_ROOT / "transport_cargo_membership.py",), "rules_unit_retains_phase_start_cargo"
+    )
+    assert "component_unit_instance_ids" in cargo_history
+    assert "unit_started_phase_embarked" in cargo_history
+    assert "unit_disembarked_this_phase" in cargo_history
     assert "unit_placement_or_none" in candidate
     state_source = source_for(TRANSPORT_DISEMBARK_STATE_PATH)
     assert "assault_disembark_transport_movement_is_eligible(status)" in state_source
@@ -687,7 +693,7 @@ def test_order38_eligibility_has_one_owner_and_bounded_permission_work() -> None
         "ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK", ""
     )
     validator = source_for(ENGINE_ROOT / "transport_disembark_validation.py")
-    assert "unit_disembarked_this_phase" in validator
+    assert "rules_unit_retains_phase_start_cargo" in validator
     assert "unit_placement_or_none" in validator
     assert "append_disembark_eligibility_violations" in source_for(TRANSPORTS_PATH)
     prevalidation = function_source_for(

@@ -14,6 +14,11 @@ selection among tied highest/lowest physical dice. See
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
 remains separate under Order 95; Orders 85–94 remain open.
 
+Order 90 / P01J preserves source-defined wounds and equipment for embarked and
+reserve revival. Shared finite decisions keep returns unplaced, enforce cargo
+capacity and authenticate restore before ordinary later ingress. See
+[scope and evidence](docs/ORDER_90_SCOPE_PLAN.md).
+
 Order 89 / P02H separates ordinary unit healing, model healing and explicit
 revival. All units can choose among wounded models; ordinary healing excludes
 destroyed Characters, model heals discard excess, and source ownership persists

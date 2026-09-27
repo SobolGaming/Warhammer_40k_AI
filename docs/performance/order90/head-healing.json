@@ -1,0 +1,131 @@
+{
+  "workload": "order89-healing-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc0f39d591efe6594d13c63adb5970dc12a69d8a8df1b039b772ad45c041bb01",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "concurrency": 1,
+  "coverage": false,
+  "full_game_samples": 0,
+  "hardware": "provisional Apple M5 Pro, 64 GiB",
+  "timing_boundary": "shared healing resolution through completion or placement request; setup separate",
+  "fixture": "5 infantry, optional attached Character, 5 enemy infantry, no terrain; seed order89-healing",
+  "hashes": {
+    "scripts/benchmark_order89_healing.py": "59a7de96e3d1b71cb70546e27f266882e56bf6fb7945d94f3490e951813cf1e7",
+    "tests/order89_healing_helpers.py": "9f45fbfaadecd96a3923229810794c6a86493c3462033bd615e0a12fd1178590",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "attached": false,
+      "revival": false,
+      "setup_seconds": [
+        2.1502230830083136,
+        0.2556467080139555,
+        0.2534764999873005,
+        0.2891918329987675,
+        0.25397516699740663
+      ],
+      "samples_seconds": [
+        0.00045708398101851344,
+        0.0004275419923942536,
+        0.00042904200381599367,
+        0.0004232499923091382,
+        0.0004202499985694885
+      ],
+      "mean": 0.0004314335936214775,
+      "median": 0.0004275419923942536,
+      "p95_and_maximum": 0.00045708398101851344,
+      "steps": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "attached": false,
+      "revival": true,
+      "setup_seconds": [
+        0.2558420839777682,
+        0.2533138750004582,
+        0.25712258301791735,
+        0.25265691700042225,
+        0.25532529200427234
+      ],
+      "samples_seconds": [
+        0.0005187909991946071,
+        0.0005152500234544277,
+        0.0005804589891340584,
+        0.0005119580018799752,
+        0.0005132079822942615
+      ],
+      "mean": 0.000527933199191466,
+      "median": 0.0005152500234544277,
+      "p95_and_maximum": 0.0005804589891340584,
+      "steps": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "attached": true,
+      "revival": false,
+      "setup_seconds": [
+        0.2528344160236884,
+        0.2547446249809582,
+        0.2551352080190554,
+        0.25425112500670366,
+        0.25346354200155474
+      ],
+      "samples_seconds": [
+        0.0004318749997764826,
+        0.0004357089928817004,
+        0.0004386249929666519,
+        0.00043104198994114995,
+        0.0004384579951874912
+      ],
+      "mean": 0.0004351417941506952,
+      "median": 0.0004357089928817004,
+      "p95_and_maximum": 0.0004386249929666519,
+      "steps": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "attached": true,
+      "revival": true,
+      "setup_seconds": [
+        0.25751054199645296,
+        0.2556962920061778,
+        0.26107995898928493,
+        0.26496695799869485,
+        0.2693921659956686
+      ],
+      "samples_seconds": [
+        0.0005794999888166785,
+        0.0005792919837404042,
+        0.0005966660100966692,
+        0.0005651249957736582,
+        0.0005833340110257268
+      ],
+      "mean": 0.0005807833978906274,
+      "median": 0.0005794999888166785,
+      "p95_and_maximum": 0.0005966660100966692,
+      "steps": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

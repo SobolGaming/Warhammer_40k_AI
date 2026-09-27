@@ -611,7 +611,7 @@ def _healing_restored_model_ids(payload: dict[str, JsonValue]) -> tuple[str, ...
     if not isinstance(raw_step, dict):
         raise GameLifecycleError("healing_step_resolved step must be an object.")
     step_kind = raw_step.get("step_kind")
-    if step_kind not in {"revive_model", "revive_model_embarked"}:
+    if step_kind not in {"revive_model", "revive_model_embarked", "revive_model_in_reserves"}:
         return ()
     return (_validate_identifier("restored_model_instance_id", raw_step.get("model_instance_id")),)
 
@@ -740,6 +740,7 @@ def _authenticate_healing_restoration_event(
     if step.step_kind not in {
         HealingStepKind.REVIVE_MODEL,
         HealingStepKind.REVIVE_MODEL_EMBARKED,
+        HealingStepKind.REVIVE_MODEL_IN_RESERVES,
     }:
         raise GameLifecycleError("Healing restoration event has a non-restoration step.")
     if step.request_id is None or step.result_id is None or step.model_instance_id is None:
@@ -783,6 +784,10 @@ def _authenticate_healing_restoration_event(
             step=step,
             event_payload=payload,
         )
+    if step.step_kind is not HealingStepKind.REVIVE_MODEL:
+        from warhammer40k_core.engine.healing_off_battlefield import validate_off_battlefield_step
+
+        validate_off_battlefield_step(state=state, request=record.request, step=step)
     return step.result_id
 
 

@@ -107,6 +107,37 @@ def validate_revival_engagement_history(
         if not isinstance(payload, dict) or not isinstance(payload.get("step"), dict):
             raise GameLifecycleError("Revival history requires a typed healing step.")
         step = cast(dict[str, JsonValue], payload["step"])
+        if step.get("step_kind") == "revive_model_destroyed_no_capacity":
+            from warhammer40k_core.engine.healing import HealingStep, HealingStepPayload
+            from warhammer40k_core.engine.healing_off_battlefield import (
+                validate_off_battlefield_step,
+            )
+
+            failure_step = HealingStep.from_payload(cast(HealingStepPayload, step))
+            if failure_step.request_id is None or failure_step.result_id is None:
+                raise GameLifecycleError("Capacity-failed revival requires selection authority.")
+            record = validate_mutation_decision_closure(
+                event_records=event_records,
+                decision_records=decision_records,
+                mutation_index=index,
+                request_id=failure_step.request_id,
+                result_id=failure_step.result_id,
+            )
+            result_payload = record.result.payload
+            if not isinstance(result_payload, dict) or any(
+                result_payload.get(key) != value
+                for key, value in {
+                    "model_instance_id": failure_step.model_instance_id,
+                    "step_index": failure_step.step_index,
+                    "effect_id": payload.get("effect_id"),
+                    "source_rule_id": payload.get("source_rule_id"),
+                    "source_context": payload.get("source_context"),
+                    "target_unit_instance_id": payload.get("target_unit_instance_id"),
+                    "selection_kind": "revive_model",
+                }.items()
+            ):
+                raise GameLifecycleError("Capacity-failed revival selection drifted.")
+            validate_off_battlefield_step(state=state, request=record.request, step=failure_step)
         if step.get("step_kind") != "revive_model":
             continue
         request_id, result_id = step.get("request_id"), step.get("result_id")

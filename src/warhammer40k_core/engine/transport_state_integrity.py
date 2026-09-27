@@ -3,6 +3,7 @@ from __future__ import annotations
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 
 
 def validate_transport_cargo_state_consistency(*, state: GameState) -> None:
@@ -51,6 +52,15 @@ def validate_transport_cargo_state_consistency(*, state: GameState) -> None:
             if not cargo_state.capacity_profile.allows_unit(embarked_unit):
                 raise GameLifecycleError("transport_cargo_states capacity profile rejects cargo.")
             cargo_model_count += sum(model.is_alive for model in embarked_unit.own_models)
+            rules_unit = rules_unit_view_from_armies(
+                armies=tuple(state.army_definitions), unit_instance_id=embarked_unit_id
+            )
+            if not {
+                component.unit.unit_instance_id for component in rules_unit.living_components
+            } <= set(cargo_state.embarked_unit_instance_ids):
+                raise GameLifecycleError(
+                    "transport_cargo_states has incomplete living attached cargo."
+                )
         if cargo_model_count > cargo_state.capacity_profile.max_model_count:
             raise GameLifecycleError("transport_cargo_states capacity is exceeded.")
     for unarrived_route in state.reserve_states:

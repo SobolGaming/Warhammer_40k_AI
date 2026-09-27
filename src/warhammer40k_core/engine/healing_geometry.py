@@ -22,6 +22,10 @@ def healing_phase_start_model_ids(
     decisions: DecisionController,
     rules_unit: RulesUnitView,
 ) -> tuple[str, ...]:
+    from warhammer40k_core.engine.healing_off_battlefield import revival_location
+
+    if revival_location(state=state, unit_instance_id=rules_unit.unit_instance_id) is not None:
+        return ()
     evidence = revival_phase_start_evidence(
         state=state,
         event_records=decisions.event_log.records,

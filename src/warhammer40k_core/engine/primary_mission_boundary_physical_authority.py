@@ -1077,6 +1077,8 @@ def _apply_healing_step(
     pose = None if updated is None else updated.pose
     if step.step_kind is HealingStepKind.REVIVE_MODEL_EMBARKED:
         presence, pose = "embarked", None
+    elif step.step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES:
+        presence, pose = "reserves", None
     elif step.step_kind is HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY:
         presence, pose = "destroyed", None
     authority[step.model_instance_id] = _PhysicalAuthority(

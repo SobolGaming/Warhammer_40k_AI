@@ -225,11 +225,12 @@ def validate_revival_selection_phase_start(
     model_ids = payload.get("legal_model_ids")
     if not isinstance(model_ids, list) or any(type(model_id) is not str for model_id in model_ids):
         raise GameLifecycleError("Revival selection model inventory is invalid.")
-    if all(
-        state.transport_cargo_state_for_embarked_unit(state.unit_instance_id_for_model(model_id))
-        is not None
-        for model_id in cast(list[str], model_ids)
-    ):
+    from warhammer40k_core.engine.healing_off_battlefield import revival_location
+
+    location = revival_location(state=state, unit_instance_id=target_unit_instance_id)
+    if payload.get("revival_location") != location:
+        raise GameLifecycleError("Revival selection off-battlefield location drifted.")
+    if location is not None:
         return
     expected = revival_phase_start_for_request(
         state=state,
