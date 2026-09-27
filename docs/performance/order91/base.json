@@ -1,0 +1,148 @@
+{
+  "workload": "order91-shooting-selection-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc0f39d591efe6594d13c63adb5970dc12a69d8a8df1b039b772ad45c041bb01",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "concurrency": 1,
+  "coverage": false,
+  "hardware": "provisional Apple M5 Pro, 64 GiB",
+  "full_game_samples": 0,
+  "timing_boundary": "shared unit and type eligibility queries; catalog/facade restore setup separate",
+  "fixture": "one friendly and one enemy infantry, no terrain, 20 inch separation, game_id order91-empty-shooting",
+  "hashes": {
+    "scripts/benchmark_order91_shooting.py": "a60ca179de6b5910a48b0ba47e0640d13923e4a6fbe4d3dead1ae7299c383007",
+    "tests/empty_shooting_helpers.py": "76808ac647ce03c7e20d4046c53bb5b7877460f0a5ed1d787adab57e8010393b",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "no_weapons": true,
+      "reachable": false,
+      "setup_seconds": [
+        2.1901569170004223,
+        0.25355074999970384,
+        0.2974367080023512,
+        0.2726125420012977,
+        0.26342670898884535
+      ],
+      "samples_seconds": [
+        0.0014475419884547591,
+        0.00019424999481998384,
+        0.00019441702170297503,
+        0.00020787501125596464,
+        0.00019295798847451806
+      ],
+      "mean": 0.00044740840094164013,
+      "median": 0.00019441702170297503,
+      "p95_and_maximum": 0.0014475419884547591,
+      "counts": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "no_weapons": false,
+      "reachable": false,
+      "setup_seconds": [
+        0.2595300829852931,
+        0.25999087499803863,
+        0.25610416699782945,
+        0.25457591700251214,
+        0.2579568749933969
+      ],
+      "samples_seconds": [
+        0.000672875001328066,
+        0.0005062080163042992,
+        0.0004355830023996532,
+        0.0004559170047286898,
+        0.0004577919899020344
+      ],
+      "mean": 0.0005056750029325485,
+      "median": 0.0004577919899020344,
+      "p95_and_maximum": 0.000672875001328066,
+      "counts": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "no_weapons": false,
+      "reachable": true,
+      "setup_seconds": [
+        0.25692237497423775,
+        0.2517419169889763,
+        0.25744324998231605,
+        0.2529372079879977,
+        0.2530497919942718
+      ],
+      "samples_seconds": [
+        0.0010219170071650296,
+        0.0007628330204170197,
+        0.000720292009646073,
+        0.000723917008144781,
+        0.0007297080010175705
+      ],
+      "mean": 0.0007917334092780948,
+      "median": 0.0007297080010175705,
+      "p95_and_maximum": 0.0010219170071650296,
+      "counts": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

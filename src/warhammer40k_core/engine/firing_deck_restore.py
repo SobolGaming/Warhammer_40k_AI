@@ -32,11 +32,15 @@ def validate_firing_deck_restrictions(
     from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
 
     for pending in pending_decision_requests:
-        if pending.decision_type != "submit_shooting_declaration":
+        if pending.decision_type not in {"submit_shooting_declaration", "select_shooting_type"}:
             continue
         if army_catalog is None:
             raise GameLifecycleError("Firing Deck pending declaration requires the catalog.")
-        request = _object(_object(pending.payload).get("proposal_request"))
+        request = (
+            _object(pending.payload)
+            if pending.decision_type == "select_shooting_type"
+            else _object(_object(pending.payload).get("proposal_request"))
+        )
         unit_id = request.get("unit_instance_id")
         if type(unit_id) is not str:
             raise GameLifecycleError("Firing Deck pending declaration has no unit identity.")
@@ -47,7 +51,15 @@ def validate_firing_deck_restrictions(
                 army_catalog=army_catalog,
             )
         )
-        expected_snapshot = expected_ids if request["firing_deck_value"] is not None else None
+        expected_snapshot = (
+            expected_ids
+            if (
+                bool(expected_ids)
+                if pending.decision_type == "select_shooting_type"
+                else request["firing_deck_value"] is not None
+            )
+            else None
+        )
         if request.get("firing_deck_embarked_unit_instance_ids") != expected_snapshot:
             raise GameLifecycleError("Firing Deck pending cargo snapshot drifted.")
     decisions = {record.result.result_id: record for record in decision_records}
@@ -121,6 +133,20 @@ def validate_firing_deck_restrictions(
         if row.request.decision_type == "submit_shooting_declaration"
     }:
         raise GameLifecycleError("Firing Deck declaration completion history is incomplete.")
+    from warhammer40k_core.engine.shooting_without_attacks import validate_no_attack_completions
+
+    for row in validate_no_attack_completions(
+        state=state, events=event_records, decisions=decision_records
+    ).values():
+        if row.firing_deck_embarked_unit_instance_ids:
+            effect = build_firing_deck_restriction(
+                player_id=row.player_id,
+                battle_round=row.battle_round,
+                transport_unit_instance_id=row.unit_instance_id,
+                embarked_unit_instance_ids=row.firing_deck_embarked_unit_instance_ids,
+                result_id=row.source_decision_result_id,
+            )
+            expected[effect.effect_id] = effect
     for boundary_record in state.objective_control_records:
         if boundary_record.timing is ObjectiveControlTiming.TURN_END:
             boundary = EffectExpirationBoundary.turn_end(

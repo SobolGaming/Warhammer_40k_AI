@@ -57,8 +57,8 @@ def test_explosives_uses_shared_destruction_continuation_and_replays_collateral_
         )
     assert restored
     assert request is not None
-    # Both enemy models are gone; the facade advances through the empty phases.
-    assert request.decision_type == "select_movement_unit"
+    # Both enemy models are gone; shooting selection still permits an empty activation.
+    assert request.decision_type == "select_shooting_unit"
     state = session.lifecycle.state
     assert state is not None
     assert (

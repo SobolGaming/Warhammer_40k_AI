@@ -83,6 +83,7 @@ def restore_checkpoint_activity_restrictions(
                 ),
             )
         )
+    restore_no_attack_checkpoint_restrictions(state=state, events=prior_events)
     model_owners = {
         model.model_instance_id: (army.player_id, unit.unit_instance_id)
         for army in state.army_definitions
@@ -141,3 +142,24 @@ def restore_checkpoint_activity_restrictions(
                 ),
             )
         )
+
+
+def restore_no_attack_checkpoint_restrictions(
+    *, state: GameState, events: tuple[EventRecord, ...]
+) -> None:
+    from warhammer40k_core.engine.shooting_without_attacks import (
+        NO_ATTACK_COMPLETION_EVENT,
+        completion_from_event,
+        restriction_for_completion,
+    )
+
+    for event in events:
+        if event.event_type != NO_ATTACK_COMPLETION_EVENT:
+            continue
+        row = completion_from_event(event)
+        if (
+            row.battle_round == state.battle_round
+            and row.active_player_id == state.active_player_id
+            and row.phase is state.current_battle_phase
+        ):
+            state.record_persisting_effect(restriction_for_completion(state=state, row=row))

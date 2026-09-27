@@ -62,7 +62,7 @@ def test_retained_attack_paths_share_selection_dice_presence_and_removal_owners(
         for node in ast.walk(request_builder)
         if isinstance(node, ast.Call)
         and isinstance(node.func, ast.Name)
-        and node.func.id == "_complete_out_of_phase_shooting"
+        and node.func.id == "complete_shooting_without_attacks"
     )
     enqueue = next(
         node
@@ -72,6 +72,20 @@ def test_retained_attack_paths_share_selection_dice_presence_and_removal_owners(
         and node.func.attr == "request_decision"
     )
     assert completion.lineno < enqueue.lineno
+    empty_owner = next(
+        node
+        for node in ast.walk(ast_for(engine / "shooting_without_attacks.py"))
+        if isinstance(node, ast.FunctionDef) and node.name == "complete_shooting_without_attacks"
+    )
+    retained_completion = [
+        node
+        for node in ast.walk(empty_owner)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_complete_out_of_phase_shooting"
+    ]
+    assert len(retained_completion) == 1
+    assert any(keyword.arg == "completed_state" for keyword in retained_completion[0].keywords)
     assert "continue_applied_mortal_wound_destruction_with_rule_reactions(" in hazardous
     assert not (engine / "rule_model_destruction_fight_on_death.py").exists()
     assert not (engine / "rule_model_destruction_fight_continuation.py").exists()

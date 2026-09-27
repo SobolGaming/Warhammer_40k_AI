@@ -609,8 +609,12 @@ def test_random_characteristics_are_evaluated_at_shooting_uses(
     ).decision_request
     assert request is not None
     if characteristic is Characteristic.RANGE and torrent_skill:
+        assert request.decision_type == "select_shooting_type"
+        session.submit_option(
+            request_id=request.request_id, option_id="normal", result_id="empty-range-type"
+        )
         assert any(
-            event.event_type == "shooting_selection_without_targets"
+            event.event_type == "shooting_without_attacks_completed"
             for event in lifecycle.decision_controller.event_log.records
         )
         checkpoint = session.to_persistence_payload()

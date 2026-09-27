@@ -77,7 +77,6 @@ def _legal_shooting_unit_ids(
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
     candidate_unit_ids: tuple[str, ...] | None = None,
 ) -> tuple[str, ...]:
-    scenario = _battlefield_scenario(state)
     active_player_id = _active_player_id(state)
     placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
     legal: list[str] = []
@@ -97,9 +96,8 @@ def _legal_shooting_unit_ids(
             army_catalog=army_catalog,
         ):
             continue
-        if _rules_unit_has_legal_shooting_declaration(
+        if _legal_shooting_types_for_rules_unit(
             state=state,
-            scenario=scenario,
             rules_unit=rules_unit,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
@@ -398,93 +396,49 @@ def _legal_shooting_types_for_rules_unit(
     ):
         return ()
 
-    resolved_target_unit_ids = (
-        _enemy_placed_unit_ids(state=state, player_id=actor_id)
-        if target_unit_ids is None
-        else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
+    # Type eligibility belongs to the unit, independent of weapon targets.
+    # Target restrictions are evaluated only when declaring actual attacks.
+    del target_unit_ids, shooting_target_restriction_hooks
+    from warhammer40k_core.engine.battlefield_presence import rules_unit_has_present_model
+
+    if not rules_unit_has_present_model(state=state, rules_unit=rules_unit):
+        return ()
+    advanced = _rules_unit_advanced_this_turn(
+        state=state, rules_unit=rules_unit, player_id=actor_id
     )
-    scenario = _battlefield_scenario(state)
-    terrain_features = _terrain_features_for_state(state)
-    terrain_areas = _terrain_areas_for_state(state)
-    hidden_target_model_ids = _hidden_target_model_ids(
-        state=state,
+    engaged = _rules_unit_within_enemy_engagement_range(
+        scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
-        target_unit_ids=resolved_target_unit_ids,
+        rules_unit=rules_unit,
+        player_id=actor_id,
     )
-    target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
-        state=state,
-        target_unit_ids=resolved_target_unit_ids,
-    )
-    detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
-        state=state,
-        target_unit_ids=resolved_target_unit_ids,
-    )
-    candidate_cache: _ShootingModelCandidateCache = {}
-    legal_types: set[ShootingType] = set()
-    for shooting_type in (
-        ShootingType.NORMAL,
-        ShootingType.ASSAULT,
-        ShootingType.CLOSE_QUARTERS,
-        ShootingType.INDIRECT,
-    ):
-        for weapon in _available_weapons_for_rules_unit(
-            state=state,
-            rules_unit=rules_unit,
-            army_catalog=army_catalog,
-            player_id=actor_id,
-            selected_shooting_type=shooting_type,
+    if advanced:
+        if not engaged and _rules_unit_has_assault_ranged_weapon(
+            state=state, rules_unit=rules_unit, army_catalog=army_catalog, player_id=actor_id
         ):
-            attacker_unit = _component_unit_for_available_weapon(
-                rules_unit=rules_unit,
-                weapon=weapon,
+            return (ShootingType.ASSAULT,)
+        return ()
+    if engaged:
+        if _rules_unit_has_vehicle_or_monster_keyword(rules_unit) or any(
+            has_close_quarters_weapon_keyword(weapon["weapon_profile"])
+            for component in rules_unit.components
+            for model in component.unit.own_models
+            for weapon in _available_own_weapons_for_model(
+                state=state,
+                model=model,
+                unit=component.unit,
+                army_catalog=army_catalog,
+                player_id=actor_id,
+                include_spent_one_shot=True,
             )
-            for target_unit_id in resolved_target_unit_ids:
-                candidate = _cached_shooting_target_candidate_for_model(
-                    cache=candidate_cache,
-                    scenario=scenario,
-                    ruleset_descriptor=ruleset_descriptor,
-                    attacker_unit=attacker_unit,
-                    weapon=weapon,
-                    target_unit_id=target_unit_id,
-                    terrain_features=terrain_features,
-                    terrain_areas=terrain_areas,
-                    hidden_target_model_ids=hidden_target_model_ids,
-                    target_unit_ids_with_recent_ranged_attacks=(
-                        target_unit_ids_with_recent_ranged_attacks
-                    ),
-                    target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
-                        target_unit_id,
-                        0,
-                    ),
-                    shooting_target_restriction_hooks=shooting_target_restriction_hooks,
-                    state=state,
-                    player_id=actor_id,
-                )
-                if not candidate.is_legal:
-                    continue
-                if _shooting_types_for_selected_type_for_rules_unit(
-                    state=state,
-                    base_types=candidate.shooting_types,
-                    rules_unit=rules_unit,
-                    weapon_profile=weapon["weapon_profile"],
-                    selected_shooting_type=shooting_type,
-                    player_id=actor_id,
-                    army_catalog=army_catalog,
-                ):
-                    legal_types.add(shooting_type)
-                    break
-            if shooting_type in legal_types:
-                break
-    return tuple(
-        shooting_type
-        for shooting_type in (
-            ShootingType.NORMAL,
-            ShootingType.ASSAULT,
-            ShootingType.CLOSE_QUARTERS,
-            ShootingType.INDIRECT,
-        )
-        if shooting_type in legal_types
-    )
+        ):
+            return (ShootingType.CLOSE_QUARTERS,)
+        return ()
+    if _rules_unit_has_indirect_ranged_weapon(
+        state=state, rules_unit=rules_unit, army_catalog=army_catalog, player_id=actor_id
+    ):
+        return (ShootingType.NORMAL, ShootingType.INDIRECT)
+    return (ShootingType.NORMAL,)
 
 
 def _cached_shooting_target_candidate_for_model(
@@ -662,21 +616,18 @@ def shooting_rules_unit_is_eligible_to_shoot(
     player_id: str,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> bool:
-    if not _rules_unit_can_select_to_shoot(
-        state=state,
-        rules_unit=rules_unit,
-        army_catalog=army_catalog,
-        player_id=player_id,
-    ):
+    shooting = state.shooting_phase_state
+    if shooting is not None and rules_unit.unit_instance_id in shooting.selected_unit_ids:
         return False
-    return _rules_unit_has_legal_shooting_declaration(
-        state=state,
-        scenario=_battlefield_scenario(state),
-        rules_unit=rules_unit,
-        ruleset_descriptor=ruleset_descriptor,
-        army_catalog=army_catalog,
-        player_id=player_id,
-        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+    return bool(
+        _legal_shooting_types_for_rules_unit(
+            state=state,
+            rules_unit=rules_unit,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            player_id=player_id,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        )
     )
 
 
@@ -809,6 +760,7 @@ def _unit_has_assault_ranged_weapon(
             unit=unit,
             army_catalog=army_catalog,
             player_id=player_id,
+            include_spent_one_shot=True,
         ):
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT):
                 return True
@@ -833,24 +785,30 @@ def _rules_unit_has_assault_ranged_weapon(
     )
 
 
-def _unit_has_indirect_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
-    for model in unit.own_models:
-        for weapon in _available_weapons_for_model(
+def _unit_has_indirect_ranged_weapon(
+    *, state: GameState, unit: UnitInstance, army_catalog: ArmyCatalog, player_id: str
+) -> bool:
+    return any(
+        has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE)
+        for model in unit.own_models
+        for weapon in _available_own_weapons_for_model(
+            state=state,
             model=model,
+            unit=unit,
             army_catalog=army_catalog,
-        ):
-            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE):
-                return True
-    return False
+            player_id=player_id,
+            include_spent_one_shot=True,
+        )
+    )
 
 
 def _rules_unit_has_indirect_ranged_weapon(
-    *,
-    rules_unit: RulesUnitView,
-    army_catalog: ArmyCatalog,
+    *, state: GameState, rules_unit: RulesUnitView, army_catalog: ArmyCatalog, player_id: str
 ) -> bool:
     return any(
-        _unit_has_indirect_ranged_weapon(unit=component.unit, army_catalog=army_catalog)
+        _unit_has_indirect_ranged_weapon(
+            state=state, unit=component.unit, army_catalog=army_catalog, player_id=player_id
+        )
         for component in rules_unit.components
     )
 

@@ -538,6 +538,20 @@ def test_order_30_shoot_on_death_without_available_weapons_completes_once() -> N
         == 1
     )
 
+    empty = [event for event in events if event.event_type == "shooting_without_attacks_completed"]
+    assert len(empty) == 1
+    assert isinstance(empty[0].payload, dict)
+    assert empty[0].payload["out_of_phase"] is True
+    assert empty[0].payload["unit_instance_id"] == units["enemy"].unit_instance_id
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="empty-retained"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
 
 @pytest.mark.parametrize("action", [RetainedAttackAction.SHOOT, RetainedAttackAction.FIGHT])
 @pytest.mark.parametrize("attached", [False, True])

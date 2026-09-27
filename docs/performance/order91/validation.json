@@ -1,0 +1,333 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6d965672035785244fee2bda00f5b3a258e6d548dcad2067949285f2372cb40d",
+  "base_ref": "cacde87c9e4d94e25ee60522bc2cbcf7a07a0269",
+  "behavioral": {
+    "tests": 9523,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 727.785,
+    "junit_sha256": "7edc3d9e5dd5080c37133bf261a6269e3e6535e40cfcbd83a72fda6f026f7e31",
+    "log_sha256": "399f7624bbda1271ff3c0ffa001d9915763f36ddbd76d68a937758ff8c80cad1",
+    "coverage_percent": 85.15943976432891,
+    "coverage_json_sha256": "e8079d708951f661f0213b3813d724505787ecb1e8d60cd705744b7bfb34ab5a"
+  },
+  "code_quality": {
+    "tests": 696,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 113.529,
+    "junit_sha256": "6f4dfcb535a0bd29a0a560785dbf8451595bd1b491d370b027f7b3f203563c80",
+    "log_sha256": "425bb4c4a60dd097742fa4f178cce61df214e89278183c39e1e53a3f1adeae7e"
+  },
+  "distribution": "18 xdist work-stealing workers; complete final behavioral run once with coverage, then code-quality without coverage",
+  "gate_runs": [
+    {
+      "gate": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.25394995900569484,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "gate": "format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.08292837499175221,
+      "log_sha256": "a31d207b8d8953a82322e3378a3fc55b3587987a32f7f4ac9948057fbba894d5"
+    },
+    {
+      "gate": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.0009850829956122,
+      "log_sha256": "f8afce5bf3b265912b4f6611aea5dc60ec42edbc0ec5bc5351c7e73daaa3f813"
+    },
+    {
+      "gate": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 73.26279024998075,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "gate": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.3040486669924576,
+      "log_sha256": "82d0f08cda8b0ed1732965352a539f6631c6c2eb9048ae3b64986a3530cb87a7"
+    },
+    {
+      "gate": "source-actions",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "tools/build_core_actions_source.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.051634542003739625,
+      "log_sha256": "57197041c73b6b472455346324327eccec08a4e75cbfc3486b356e19c0b7a9ab"
+    },
+    {
+      "gate": "build-check",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.28941108399885707,
+      "log_sha256": "9baa006d50c6b527156545bf7216491c67cfc63706c68e54bbc43f4356d1b1a3"
+    },
+    {
+      "gate": "contract-check",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "cacde87c9e4d94e25ee60522bc2cbcf7a07a0269"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 39.886335416988004,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.880833167000674,
+      "log_sha256": "eff5c49ad899908dc724a3cb28b99dfd78c04ee5ab003328c23b4283358377e3"
+    },
+    {
+      "gate": "typescript-check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.5032407919934485,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "gate": "typescript-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.6673385000030976,
+      "log_sha256": "a90b91a521a0d813293dc1ec548e5c6981abed05cb29cda245f36014a717df0f"
+    },
+    {
+      "gate": "typescript-conformance",
+      "command": [
+        "npm",
+        "run",
+        "conformance"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 64.56612916701124,
+      "log_sha256": "e3d4bc9c80e7bc96e13ad73c1159fcf1c46eb8d057c030e1dd2048c4512b2cde"
+    },
+    {
+      "gate": "performance",
+      "command": [
+        "/Users/andrzej.gorski/.codex/worktrees/order91-empty-shooting/Warhammer_40k_AI/.venv/bin/python3",
+        "/tmp/order91-performance.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 318.72451199998613,
+      "log_sha256": "7914315d638d53a3126cbf5d8153db129627f14b45baea1e3c58213fc11ef9eb"
+    },
+    {
+      "gate": "behavioral",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=reports/order91/behavioral.xml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 729.8634957089962,
+      "log_sha256": "399f7624bbda1271ff3c0ffa001d9915763f36ddbd76d68a937758ff8c80cad1"
+    },
+    {
+      "gate": "coverage-json",
+      "command": [
+        "uv",
+        "run",
+        "coverage",
+        "json",
+        "-o",
+        "reports/order91/coverage.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 13.987431749992538,
+      "log_sha256": "76cac34a62595b8b0e6565e02b662f58cad4e3ac6eb76cd83ca8f4c0763ddbae"
+    },
+    {
+      "gate": "shard-build",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "reports/order91/behavioral.xml",
+        "--profile-source",
+        "Order 91; base cacde87c9e4d94e25ee60522bc2cbcf7a07a0269; runtime warhammer40k-core-v2:runtime-tree-sha256-v1:6d965672035785244fee2bda00f5b3a258e6d548dcad2067949285f2372cb40d; local macOS Apple M5 Pro 64 GiB; 18 xdist work-stealing workers; coverage enabled",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.09527204200276174,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "code-quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=reports/order91/code-quality.xml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 113.96224345799419,
+      "log_sha256": "425bb4c4a60dd097742fa4f178cce61df214e89278183c39e1e53a3f1adeae7e"
+    },
+    {
+      "gate": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.06432254199171439,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.9433635419991333,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "additional_gates": {
+    "npm_ci": "passed using the existing lockfile",
+    "wheel": "27 schemas and 2991 runtime resources verified",
+    "typescript_unit": "5 tests passed",
+    "http_conformance": "342 assertions passed, Contract 40.0.0; successful process exit",
+    "shard_inventory": "eight shards regenerated from complete successful local JUnit"
+  },
+  "diagnostic_attempts": [
+    {
+      "kind": "interrupted earlier behavioral run",
+      "passed": 6028,
+      "failed": 119,
+      "seconds": 294.78,
+      "reason": "Diagnosed obsolete auto-skip fixtures and replay-history validation; fixes independently reviewed and focused retests passed before final validation. This was not a final coverage pass.",
+      "log_sha256": "cf8e716134ca0c4bf537b09e01263702a12907f2a652dc104ab1a3282c4084ae",
+      "junit_sha256": "7be1a30cc22fc4b12860ce1bf9c5a9d3234ebd786b25601000e3701b86f20dfe"
+    },
+    {
+      "kind": "complete earlier behavioral run before test expectation corrections",
+      "passed": 9521,
+      "failed": 2,
+      "coverage_percent": 85.16,
+      "seconds": 821.9,
+      "reason": "Corrected two obsolete target-dependent selection/auto-skip assertions; runtime unchanged; targeted reruns passed and independent reviewer approved corrections before final validation.",
+      "log_sha256": "23736e9e6dff80f2101f9db3975c136a421c94eb56ff11921d161562978e3c6f",
+      "junit_sha256": "abf0e62f408ef467f2ffbf3e7b14cea36b15069abcd1876b57d3c713585fd581"
+    },
+    {
+      "kind": "initial code-quality run",
+      "passed": 694,
+      "failed": 2,
+      "seconds": 111.74,
+      "reason": "Updated legacy architecture assertions to enforce target-independent rules-unit eligibility and retained cleanup via the shared no-attack owner. Runtime unchanged; focused four quality tests passed.",
+      "log_sha256": "9a14e9233846c61f4aad3a366db40d4874a17b075220511c8405a5f5f55ce36b",
+      "junit_sha256": "36a9d98b0f47910a30eaa554f2e62eb54096d98e24c3de25cd07e9b59a755064"
+    },
+    {
+      "kind": "earlier runtime TypeScript conformance",
+      "assertions_passed": 342,
+      "process_exit_code": 1,
+      "reason": "Reference-server shutdown timed out; clean rerun passed. Final-runtime gate result is recorded separately.",
+      "log_sha256": "7cb3e214873fa5c0859d652ca6b36e6c2ef1a0d2e5f6c1db6dc8157743056390"
+    }
+  ],
+  "inherited_refresh_sha256": "d015295e71801d5e09877a5ebbbf1e1fa8f0226a21e4017cc6a80e70d11004b9",
+  "inherited_report_count": 25,
+  "base_head_input_hashes_match": true,
+  "complete_game_samples": 0
+}

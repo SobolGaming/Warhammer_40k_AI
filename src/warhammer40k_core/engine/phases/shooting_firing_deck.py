@@ -560,6 +560,7 @@ def _available_own_weapons_for_model(
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
     player_id: str | None,
+    include_spent_one_shot: bool = False,
 ) -> tuple[_AvailableWeapon, ...]:
     from warhammer40k_core.engine.retained_shooting import current_retained_shooter
 
@@ -584,12 +585,16 @@ def _available_own_weapons_for_model(
             effects,
             owner_player_id=owner_player_id,
         )
-        if has_weapon_keyword(weapon_profile, WeaponKeyword.ONE_SHOT) and not (
-            state.one_shot_weapon_available(
-                weapon_instance_id=weapon["weapon_instance_id"],
-                model_instance_id=weapon["model_instance_id"],
-                wargear_id=weapon["wargear_id"],
-                weapon_profile_id=weapon_profile.profile_id,
+        if (
+            not include_spent_one_shot
+            and has_weapon_keyword(weapon_profile, WeaponKeyword.ONE_SHOT)
+            and not (
+                state.one_shot_weapon_available(
+                    weapon_instance_id=weapon["weapon_instance_id"],
+                    model_instance_id=weapon["model_instance_id"],
+                    wargear_id=weapon["wargear_id"],
+                    weapon_profile_id=weapon_profile.profile_id,
+                )
             )
         ):
             continue

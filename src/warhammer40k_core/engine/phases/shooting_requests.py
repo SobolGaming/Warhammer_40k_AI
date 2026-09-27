@@ -77,36 +77,12 @@ def _request_shooting_type_selection(
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if not legal_types:
-        if not any(
-            record.selection_result_id == active_selection.result_id
-            for record in state.random_weapon_ranges
-        ):
-            raise GameLifecycleError("Selected shooting unit has no legal shooting types.")
-        from dataclasses import replace
+        raise GameLifecycleError("Selected shooting unit has no legal shooting types.")
+    from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
 
-        state.replace_shooting_phase_state(
-            replace(
-                shooting_state,
-                skipped_unit_ids=tuple(
-                    sorted((*shooting_state.skipped_unit_ids, active_selection.unit_instance_id))
-                ),
-                active_selection=None,
-            )
-        )
-        decisions.event_log.append(
-            "shooting_selection_without_targets",
-            {
-                "selection": active_selection.to_payload(),
-                "reason": "evaluated_random_weapon_ranges",
-            },
-        )
-        return LifecycleStatus.advanced(
-            stage=GameLifecycleStage.BATTLE,
-            payload={
-                "phase": BattlePhase.SHOOTING.value,
-                "phase_body_status": "selected_unit_has_no_targets",
-            },
-        )
+    cargo_snapshot = firing_deck_cargo_snapshot(
+        state=state, unit_instance_id=rules_unit.unit_instance_id, army_catalog=army_catalog
+    )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=SELECT_SHOOTING_TYPE_DECISION_TYPE,
@@ -121,6 +97,11 @@ def _request_shooting_type_selection(
                 "source_decision_request_id": active_selection.request_id,
                 "source_decision_result_id": active_selection.result_id,
                 "legal_shooting_types": [shooting_type.value for shooting_type in legal_types],
+                **(
+                    {"firing_deck_embarked_unit_instance_ids": list(cargo_snapshot)}
+                    if cargo_snapshot
+                    else {}
+                ),
             }
         ),
         options=_shooting_type_options(
@@ -289,18 +270,23 @@ def _request_shooting_declaration(
                     forced_shooting_type=forced_shooting_type,
                 )
             )
-    out_of_phase = state.out_of_phase_shooting_state
-    if (
-        out_of_phase is not None
-        and active_selection.request_id == out_of_phase.source_decision_request_id
-        and active_selection.result_id == out_of_phase.source_decision_result_id
-        and not any(
-            isinstance(candidate, dict) and candidate["is_legal"] is True
-            for candidate in target_candidates
-        )
+    if not any(
+        isinstance(candidate, dict)
+        and candidate["is_legal"] is True
+        and bool(candidate["shooting_types"])
+        for candidate in target_candidates
     ):
-        return _complete_out_of_phase_shooting(
-            state=state, decisions=decisions, completed_state=out_of_phase
+        from warhammer40k_core.engine.shooting_without_attacks import (
+            complete_shooting_without_attacks,
+        )
+
+        return complete_shooting_without_attacks(
+            state=state,
+            decisions=decisions,
+            selection=active_selection,
+            selected_shooting_type=selected_shooting_type,
+            forced_shooting_type=forced_shooting_type,
+            army_catalog=army_catalog,
         )
     from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
 
@@ -781,6 +767,8 @@ def _shooting_types_for_selected_type_for_rules_unit(
         return ()
     if shooting_type is ShootingType.INDIRECT:
         if advanced or not _rules_unit_has_indirect_ranged_weapon(
+            state=state,
+            player_id=player_id,
             rules_unit=rules_unit,
             army_catalog=army_catalog,
         ):

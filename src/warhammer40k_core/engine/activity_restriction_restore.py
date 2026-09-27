@@ -77,6 +77,14 @@ def activity_restrictions_from_history(
     validate_declared_model_attack_completions(
         state=state, event_records=event_records, decision_records=decision_records
     )
+    from warhammer40k_core.engine.shooting_without_attacks import (
+        NO_ATTACK_COMPLETION_EVENT,
+        completion_from_event,
+        restriction_for_completion,
+        validate_no_attack_completions,
+    )
+
+    validate_no_attack_completions(state=state, events=event_records, decisions=decision_records)
     decisions = {record.result.result_id: record for record in decision_records}
     participations: dict[str, CompletedAttackModels] = {}
     seen: set[str] = set()
@@ -136,6 +144,12 @@ def activity_restrictions_from_history(
                 ),
             )
             _add(live, seen, effect)
+        elif event.event_type == NO_ATTACK_COMPLETION_EVENT:
+            _add(
+                live,
+                seen,
+                restriction_for_completion(state=state, row=completion_from_event(event)),
+            )
         elif event.event_type == "mission_action_started":
             payload = _object(event.payload)
             action = MissionActionState.from_payload(

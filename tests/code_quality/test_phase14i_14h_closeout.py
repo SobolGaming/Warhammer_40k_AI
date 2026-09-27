@@ -577,7 +577,8 @@ def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> 
 
     assert "rules_unit_view_by_id" in legal_selector_source
     assert "_unit_by_id" not in legal_selector_source
-    assert "_rules_unit_has_legal_shooting_declaration" in legal_selector_source
+    assert "_legal_shooting_types_for_rules_unit" in legal_selector_source
+    assert "_rules_unit_has_legal_shooting_declaration" not in legal_selector_source
     assert "legal.append(rules_unit.unit_instance_id)" in legal_selector_source
 
     assert "option_id=rules_unit.unit_instance_id" in options_source
