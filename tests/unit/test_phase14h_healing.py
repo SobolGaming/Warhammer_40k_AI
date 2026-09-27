@@ -166,7 +166,7 @@ def test_healing_iterates_wound_revival_revived_wound_and_no_effect() -> None:
     assert "<" not in json.dumps(decisions.to_payload(), sort_keys=True)
 
 
-def test_attached_unit_multiple_wounded_models_use_opposing_healing_decision() -> None:
+def test_attached_unit_multiple_wounded_models_use_owning_healing_decision() -> None:
     state = _battle_state()
     decisions = DecisionController()
     unit_id = "army-alpha:intercessor-unit-1"
@@ -191,7 +191,7 @@ def test_attached_unit_multiple_wounded_models_use_opposing_healing_decision() -
     assert blocked.resolved_steps == ()
     assert request is not None
     assert request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
-    assert request.actor_id == "player-b"
+    assert request.actor_id == "player-a"
     assert _option_model_ids(request) == (bodyguard_id, leader_id)
 
     result = DecisionResult.for_request(
@@ -747,7 +747,7 @@ def test_healing_lifecycle_validation_helpers_cover_invalid_finite_fields() -> N
         request_id=request.request_id,
         result_id="phase14h-healing-wrong-actor",
         decision_type=request.decision_type,
-        actor_id="player-a",
+        actor_id="player-b",
         selected_option_id=option.option_id,
         payload=option.payload,
     )
@@ -1016,7 +1016,7 @@ def test_recorded_healing_model_decision_can_replay_from_request_effect() -> Non
     assert model_by_id(state=state, model_instance_id=leader_id).current_wounds == 2
 
 
-def test_multiple_wounded_non_attached_unit_rejects_without_choice() -> None:
+def test_multiple_wounded_non_attached_unit_offers_choice() -> None:
     state = _battle_state()
     decisions = DecisionController()
     unit_id = "army-alpha:intercessor-unit-1"
@@ -1040,15 +1040,15 @@ def test_multiple_wounded_non_attached_unit_rejects_without_choice() -> None:
         phase_start_model_ids=_placed_model_ids(state, unit_id),
     )
 
-    with pytest.raises(GameLifecycleError, match="attached-unit healing decision"):
-        resolve_healing_until_blocked(
-            state=state,
-            decisions=decisions,
-            ruleset_descriptor=_ruleset(),
-            effect=effect,
-        )
-
-    assert decisions.queue.pending_requests == ()
+    _, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    assert request.actor_id == "player-a"
+    assert len(request.options) == 2
     assert decisions.records == ()
 
 
@@ -1142,7 +1142,7 @@ def test_malformed_healing_selection_rejects_before_queue_pop() -> None:
     assert decisions.records == ()
 
 
-def test_multiple_missing_models_use_opposing_revival_decision() -> None:
+def test_multiple_missing_models_use_owning_revival_decision() -> None:
     state = _battle_state()
     decisions = DecisionController()
     unit_id = "army-alpha:intercessor-unit-1"
@@ -1165,7 +1165,7 @@ def test_multiple_missing_models_use_opposing_revival_decision() -> None:
         effect=effect,
     )
     assert request is not None
-    assert request.actor_id == "player-b"
+    assert request.actor_id == "player-a"
     selected_model_id = second_removed.model_instance_id
     result = DecisionResult.for_request(
         result_id="phase14h-revive-choice-result",

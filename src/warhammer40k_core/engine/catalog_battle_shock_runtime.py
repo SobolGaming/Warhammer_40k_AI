@@ -53,6 +53,9 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
 )
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.generic_rule_attack_conditions import (
+    generic_rule_source_model_instance_id_from_payload,
+)
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import (
@@ -406,6 +409,12 @@ def _resolve_failed_battle_shock_heal_effect(
             },
         )
         return
+    payload = effect.effect_payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Catalog model healing requires a generic effect object.")
+    source_model_id = generic_rule_source_model_instance_id_from_payload(payload)
+    if source_model_id is None:
+        raise GameLifecycleError("Catalog model healing requires its source model identity.")
     d3_result = _roll_d3(
         context=context,
         reason="Catalog Battle-shock failed heal",
@@ -421,6 +430,7 @@ def _resolve_failed_battle_shock_heal_effect(
         source_context=validate_json_value(
             {
                 "source_kind": "generic_rule_ir_battle_shock_failed_heal",
+                "healing_model_instance_id": source_model_id,
                 "hook_id": CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
                 "battle_shock_result_id": context.result.result_id,
                 "persisting_effect": validate_json_value(effect.to_payload()),

@@ -79,6 +79,17 @@
       "runtime_consumer_ids": [
         "warhammer40k_core.core.weapon_profiles:WeaponProfile.strength_for_interaction"
       ]
+    },
+    {
+      "source_id": "gw-11e-core-modifiers:healing",
+      "section_id": "02.02.04",
+      "source_text": "When a unit heals or regains a number of wounds, it regains up to that number of lost wounds. For each wound healed or regained, consult the following: • If that unit has one or more models that does not have its full wounds remaining, select one of those models; that model regains one lost wound. • If all models in that unit have their starting number of wounds, but one or more models from that unit are currently destroyed, revive one of those destroyed models (excluding Character models), with one wound remaining. This cannot cause a model to have more wounds remaining than it started the battle with. If a rule states that a model heals or regains a number of wounds, only that model can regain wounds up to its starting number of wounds. Any excess regained wounds are lost and do not cause a destroyed model from that unit to revive.",
+      "transcription_sha256": "c63778ee0ab76fd30c447ad7bf4d11c27581f9c3e65f4f7a167b1d651f8c9eb0",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.healing:resolve_healing_until_blocked"
+      ]
     }
   ],
   "evidence": [
@@ -487,7 +498,65 @@
       "app_version": null,
       "verification_status": "authoritative_app_mirror",
       "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:healing",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "c63778ee0ab76fd30c447ad7bf4d11c27581f9c3e65f4f7a167b1d651f8c9eb0",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "89b013a59f0f0ac01e6009d7c72ebabc8f34720565692c9afc64aed02958fde5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.healing:resolve_healing_until_blocked"
+      ],
+      "evidence_id": "core-modifiers-review:healing",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P02H 02.02.04 healing",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:healing",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "c63778ee0ab76fd30c447ad7bf4d11c27581f9c3e65f4f7a167b1d651f8c9eb0",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "9cb816e4c2c354b581399ebcd91f2f946f836b395b8d4b7b86845712a2c7ece5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.healing:resolve_healing_until_blocked"
+      ],
+      "evidence_id": "core-modifiers-mirror:healing:gdm",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "healing:gdm",
+      "review_audit_source_observation_sha256": "9fe3b9b237ec1b5cf6d13bad82a292153357e88345c05ee4c3e774385f5cac4e",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 02.02.04 healing",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/core-rules",
+      "observed_at": "2026-09-26T17:51:03+00:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
     }
   ],
-  "package_hash": "b93c288ef8268e1bb11d31c4086285d7fd4466d623cbe420ece294a83eabf7fa"
+  "package_hash": "ad408bc8ccf6b81582aa0d5e7921599d68121ef3c6cd6d959bb49c0aa8f2bcf1"
 }

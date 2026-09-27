@@ -2890,6 +2890,7 @@ def test_phase17d_champion_slayer_heal_only_applies_after_enemy_character_or_mon
         "destroyed_unit_keywords": ["MONSTER"],
         "effect_kind": "restore_lost_wounds",
         "source_model_instance_id": model.model_instance_id,
+        "healing_model_instance_id": model.model_instance_id,
         "source_event_id": "event:enemy-monster-destroyed",
     }
     healed_unit = _unit_by_id(state, unit.unit_instance_id)
@@ -2969,7 +2970,7 @@ def test_phase17d_champion_slayer_heal_ignores_other_wounded_model_when_source_f
     assert resolved_unit.own_models[1].current_wounds == other_model.initial_wounds - 1
 
 
-def test_phase17d_champion_slayer_heal_fails_closed_for_multiple_wounded_models() -> None:
+def test_phase17d_champion_slayer_heals_source_among_multiple_wounded_models() -> None:
     state = _battle_state_with_scenario()
     unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
     source_model = unit.own_models[0]
@@ -2987,20 +2988,22 @@ def test_phase17d_champion_slayer_heal_fails_closed_for_multiple_wounded_models(
     )
     wounded_unit = _unit_by_id(state, unit.unit_instance_id)
 
-    with pytest.raises(GameLifecycleError, match="multiple wounded models"):
-        catalog_restore_lost_wounds_after_destroying_unit(
-            state=state,
-            decisions=DecisionController(),
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
-            ability_index=ability_index,
-            unit=wounded_unit,
-            current_model_instance_ids=(source_model.model_instance_id,),
-            player_id="player-a",
-            destroyed_player_id="player-b",
-            destroyed_unit_keywords=("MONSTER",),
-            healing_amount=3,
-            source_event_id="event:enemy-monster-destroyed",
-        )
+    catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(source_model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("MONSTER",),
+        healing_amount=3,
+        source_event_id="event:enemy-monster-destroyed",
+    )
+    healed_unit = _unit_by_id(state, unit.unit_instance_id)
+    assert healed_unit.own_models[0].current_wounds == source_model.initial_wounds
+    assert healed_unit.own_models[1].current_wounds == other_model.initial_wounds - 1
 
 
 def test_phase17d_champion_slayer_restore_clause_executes_to_generic_payload() -> None:

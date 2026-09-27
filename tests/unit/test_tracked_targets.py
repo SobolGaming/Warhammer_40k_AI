@@ -454,7 +454,10 @@ def test_catalog_battle_shock_runtime_detects_forced_test_effects() -> None:
                 {
                     "effect_kind": GENERIC_RULE_EFFECT_KIND,
                     "effect": forced_effect.to_payload(),
-                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                    "context": {
+                        "source_unit_instance_id": source_unit.unit_instance_id,
+                        "source_model_instance_id": source_unit.own_models[0].model_instance_id,
+                    },
                 },
             ),
         )
@@ -503,9 +506,28 @@ def test_catalog_battle_shock_runtime_detects_forced_test_effects() -> None:
     )
 
 
-def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect() -> None:
-    state = _battle_state_with_scenario()
-    decisions = DecisionController()
+@pytest.mark.parametrize("source_status", ["wounded", "full", "destroyed"])
+def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect(
+    source_status: str,
+) -> None:
+    from tests.order89_healing_helpers import healing_scene
+
+    from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
+    from warhammer40k_core.engine.damage_allocation import model_by_id
+    from warhammer40k_core.engine.healing import (
+        HealingEffect,
+        HealingEffectPayload,
+        HealingStepKind,
+    )
+
+    lifecycle, _, model_ids, _ = healing_scene(
+        wounded=(0, 1) if source_status == "wounded" else (1,),
+        destroyed=(0, 2) if source_status == "destroyed" else (2,),
+        battle_phase=BattlePhase.COMMAND,
+    )
+    state = lifecycle.state
+    assert state is not None
+    decisions = lifecycle.decision_controller
     source_unit = state.army_definitions[0].units[0]
     target_unit = state.army_definitions[1].units[0]
     pall_rule_ir = _belakor_rule_ir(BELAKOR_PALL_OF_DESPAIR_ROW_ID)
@@ -529,7 +551,10 @@ def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect() -> N
                 {
                     "effect_kind": GENERIC_RULE_EFFECT_KIND,
                     "effect": heal_effect.to_payload(),
-                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                    "context": {
+                        "source_unit_instance_id": source_unit.unit_instance_id,
+                        "source_model_instance_id": source_unit.own_models[0].model_instance_id,
+                    },
                 },
             ),
         )
@@ -561,7 +586,23 @@ def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect() -> N
             [1, 1],
         ),
     )
-    dice_manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    dice_manager = DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+        injected_results=(
+            DiceRollResult.from_values(
+                roll_id="order89-aura-d3",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason="Catalog Battle-shock failed heal",
+                    roll_type=CATALOG_BATTLE_SHOCK_FAILED_HEAL_ROLL_TYPE,
+                    actor_id=source_unit.unit_instance_id,
+                ),
+                values=(6,),
+                source="injected",
+            ),
+        ),
+    )
 
     resolve_catalog_battle_shock_failed_heal(
         BattleShockOutcomeContext(
@@ -599,6 +640,26 @@ def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect() -> N
     assert isinstance(catalog_event.payload, dict)
     assert catalog_event.payload["source_unit_instance_id"] == source_unit.unit_instance_id
     assert catalog_event.payload["target_unit_instance_id"] == target_unit.unit_instance_id
+    resolved = HealingEffect.from_payload(
+        cast(HealingEffectPayload, catalog_event.payload["healing_effect"])
+    )
+    assert resolved.is_complete()
+    assert resolved.amount > 1
+    assert len(resolved.resolved_steps) == resolved.amount
+    healed_ids = tuple(
+        step.model_instance_id
+        for step in resolved.resolved_steps
+        if step.step_kind is HealingStepKind.HEAL_WOUND
+    )
+    assert healed_ids == ((model_ids[0],) if source_status == "wounded" else ())
+    assert [
+        model_by_id(state=state, model_instance_id=i).current_wounds for i in model_ids[:3]
+    ] == [
+        0 if source_status == "destroyed" else 2,
+        1,
+        0,
+    ]
+    assert decisions.queue.pending_requests == ()
 
 
 def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
@@ -632,7 +693,10 @@ def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
                 {
                     "effect_kind": GENERIC_RULE_EFFECT_KIND,
                     "effect": forced_effect.to_payload(),
-                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                    "context": {
+                        "source_unit_instance_id": source_unit.unit_instance_id,
+                        "source_model_instance_id": source_unit.own_models[0].model_instance_id,
+                    },
                 },
             ),
         )
@@ -687,7 +751,10 @@ def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
                 {
                     "effect_kind": GENERIC_RULE_EFFECT_KIND,
                     "effect": heal_effect.to_payload(),
-                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                    "context": {
+                        "source_unit_instance_id": source_unit.unit_instance_id,
+                        "source_model_instance_id": source_unit.own_models[0].model_instance_id,
+                    },
                 },
             ),
         )

@@ -1163,14 +1163,12 @@ def test_shadow_legion_healing_source_context_flags_lock_and_validate_model_choi
         resolved_steps=(first_healing_step,),
         heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
         models=refreshed.own_models,
-        allows_multiple_wounded_models=False,
     ) == (first_model.model_instance_id,)
     assert healing_source_context.selected_wounded_healing_model_ids(
         source_context={},
         resolved_steps=(),
         heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
         models=refreshed.own_models,
-        allows_multiple_wounded_models=True,
     ) == tuple(sorted((first_model.model_instance_id, second_model.model_instance_id)))
     assert (
         healing_source_context.selected_wounded_healing_model_ids(
@@ -1178,19 +1176,9 @@ def test_shadow_legion_healing_source_context_flags_lock_and_validate_model_choi
             resolved_steps=(),
             heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
             models=refreshed.own_models,
-            allows_multiple_wounded_models=False,
         )
         == ()
     )
-    with pytest.raises(GameLifecycleError, match="Multiple wounded models"):
-        healing_source_context.selected_wounded_healing_model_ids(
-            source_context={},
-            resolved_steps=(),
-            heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
-            models=refreshed.own_models,
-            allows_multiple_wounded_models=False,
-        )
-
     assert not healing_source_context.healing_source_context_bool(None, "single_model_heal")
     assert not healing_source_context.healing_source_context_bool(
         {"single_model_heal": False},

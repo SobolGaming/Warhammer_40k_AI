@@ -48,5 +48,14 @@
     "source_url": "https://game-datamissions.com/11th/rules/core-rules",
     "provider_name": "Game Datamissions",
     "observed_at": "2026-09-26T14:43:34.151423+00:00"
+  },
+  {
+    "slug": "healing",
+    "section": "02.02.04",
+    "source_text": "When a unit heals or regains a number of wounds, it regains up to that number of lost wounds. For each wound healed or regained, consult the following: • If that unit has one or more models that does not have its full wounds remaining, select one of those models; that model regains one lost wound. • If all models in that unit have their starting number of wounds, but one or more models from that unit are currently destroyed, revive one of those destroyed models (excluding Character models), with one wound remaining. This cannot cause a model to have more wounds remaining than it started the battle with. If a rule states that a model heals or regains a number of wounds, only that model can regain wounds up to its starting number of wounds. Any excess regained wounds are lost and do not cause a destroyed model from that unit to revive.",
+    "consumer": "warhammer40k_core.engine.healing:resolve_healing_until_blocked",
+    "observed_at": "2026-09-26T17:51:03+00:00",
+    "provider_name": "Game Datamissions",
+    "source_url": "https://game-datamissions.com/11th/rules/core-rules"
   }
 ]

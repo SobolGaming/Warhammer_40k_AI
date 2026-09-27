@@ -1426,7 +1426,6 @@ def catalog_restore_lost_wounds_after_destroying_unit(
         raise GameLifecycleError("Catalog restore lost wounds requires RulesetDescriptor.")
     _validate_ability_index(ability_index)
     _validate_unit(unit)
-    from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 
     current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
     source_model_id = _validate_this_model_source_id(
@@ -1469,16 +1468,24 @@ def catalog_restore_lost_wounds_after_destroying_unit(
     effect_parameters = parameter_payload(effect.parameters)
     if effect_parameters.get("amount") != "D6":
         raise GameLifecycleError("Catalog restore lost wounds requires a D6 amount.")
-    missing_wounds = _this_model_restore_missing_wounds(
+    from warhammer40k_core.engine.catalog_model_healing import catalog_model_missing_wounds
+
+    missing_wounds = catalog_model_missing_wounds(
         unit=unit,
         source_model_id=source_model_id,
     )
     if missing_wounds == 0:
         return None
     amount = min(amount, missing_wounds)
-    healing_effect = HealingEffect(
+    from warhammer40k_core.engine.catalog_model_healing import restore_catalog_model_wounds
+
+    return restore_catalog_model_wounds(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
         effect_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}:heal",
-        target_unit_instance_id=unit.unit_instance_id,
+        unit=unit,
+        model_id=source_model_id,
         amount=amount,
         opposing_player_id=opposing_player_id,
         source_rule_id=record.definition.source_id,
@@ -1490,13 +1497,6 @@ def catalog_restore_lost_wounds_after_destroying_unit(
             "effect_kind": RuleEffectKind.RESTORE_LOST_WOUNDS.value,
             "source_model_instance_id": source_model_id,
         },
-        phase_start_model_ids=unit.own_model_ids(),
-    )
-    return resolve_healing_until_blocked(
-        state=state,
-        decisions=decisions,
-        ruleset_descriptor=ruleset_descriptor,
-        effect=healing_effect,
     )
 
 
@@ -4491,35 +4491,6 @@ def _validate_model_scoped_advance_eligibility_source(
             unit_instance_id=unit.unit_instance_id,
         ),
     )
-
-
-def _this_model_restore_missing_wounds(
-    *,
-    unit: UnitInstance,
-    source_model_id: str,
-) -> int:
-    source_missing_wounds: int | None = None
-    wounded_model_ids = tuple(
-        model.model_instance_id
-        for model in unit.own_models
-        if model.is_alive and model.current_wounds < model.initial_wounds
-    )
-    if not wounded_model_ids:
-        return 0
-    for model in unit.own_models:
-        if model.model_instance_id != source_model_id:
-            continue
-        source_missing_wounds = model.initial_wounds - model.current_wounds
-        break
-    if source_missing_wounds is None:
-        raise GameLifecycleError("Catalog this-model healing source model is missing.")
-    if source_missing_wounds <= 0:
-        return 0
-    if wounded_model_ids == (source_model_id,):
-        return source_missing_wounds
-    if source_model_id not in wounded_model_ids:
-        return 0
-    raise GameLifecycleError("Catalog this-model healing cannot target multiple wounded models.")
 
 
 def _clause_targets_this_unit(clause: RuleClause) -> bool:

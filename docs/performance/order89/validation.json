@@ -1,0 +1,92 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:04eff5aa5adfb67c1b1bbef795dc15e45152a3db78d3a84b685ca89cd8ae0b81",
+  "base_ref": "84a1de10aafe2f64ccb9c734794e6c9e6a35f2e1",
+  "behavioral": {
+    "tests": 9457,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1233.744,
+    "junit_sha256": "e358062d500b0ddad1245b989c4121c975dde52ca4995b8bfacfb6bfdf20546b",
+    "log_sha256": "6f0b514489df4c9f9885015d69b2462dbeddbd3e2a128e1adf78a0c013a3682f",
+    "coverage_percent": 85.16,
+    "coverage_json_sha256": "25aa11ad1857c1854d5ee0548ec304d25123bda7e0d5fbb86c95ade1998bbd3c"
+  },
+  "code_quality": {
+    "tests": 691,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 114.55,
+    "junit_sha256": "4fbce11f932cddd77702a011d760108362d4da6466238ffea4755f9255bdfa1e",
+    "log_sha256": "cd54f2a7abb69669aab27966cd6a9cebea7ab9fba45cc49a2e6eb7343ff0217d"
+  },
+  "distribution": "18 xdist work-stealing workers; behavioral with coverage, code-quality without",
+  "gates": {
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "mypy": "passed",
+    "pyright": "passed",
+    "import_linter": "11 contracts kept",
+    "source_generator": "passed",
+    "engine_build_identity": "passed",
+    "external_contract_exact_base": "passed",
+    "installed_wheel": "27 schemas and 2987 runtime resources validated",
+    "typescript_generated_and_typecheck": "passed via direct Node entry points; bundled runtime has no npm executable",
+    "typescript_unit": "5 passed",
+    "http_conformance": "342 assertions passed, Contract 40.0.0",
+    "shard_inventory": "passed, eight shards regenerated from complete successful local JUnit",
+    "pre_commit": "passed"
+  },
+  "logs_sha256": {
+    "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "format.log": "f59d59c8831811feccab90c8250ab3add1dd368f5c6ed0e1ec51a76bbad789d5",
+    "mypy.log": "4feedeab4610a0518f81e4a5205deb202b9d482bd475031c57c35b42eb929eaf",
+    "pyright.log": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332",
+    "imports.log": "48a1a9fb9394fdedff75663472f7485706f5b57ac55fdede51bf7619823fee01",
+    "source-check.log": "84dd10f70e8812547ca25bd4e2d1a64a6687985ca613ab350065c9f394f5e902",
+    "identity.log": "d4b7d8908ba8f295e641118ee3c69d754e226dc37618cab821a741776dbbd187",
+    "contract-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "wheel.log": "40477de21a0061e6ffbef175b1a2cd3b0a5b000ee9238020fcd7d8f62eac13d5",
+    "ts-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ts-unit.log": "b6e042f951ba664c095c90c74a036cdf57bb63279aba9e7f52040dc4a19e98af",
+    "conformance.log": "f1dc196d8f0815704394add19132198351fb2ed4295b7527aa8caf9db58ea131",
+    "shards.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "precommit.log": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+  },
+  "inherited_refresh_sha256": "9217af76bb19139288d8ec9d2b73e00f39d75fa4ee8d2154e20939e16734bce2",
+  "inherited_report_count": 25,
+  "first_code_quality_attempt": {
+    "tests": 691,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 115.208,
+    "junit_sha256": "f56379abc7f7d565cfc3879593f252ff7d4beb4e4022d1a5bee65c4d0fcfd01c",
+    "log_sha256": "cc03f153b28cc68f5f15c2a9bfabcc2e129b7b9ea9648eb0fc2ef13918faf035",
+    "failure": "Order 88 head diagnostic still identified the preceding runtime. Refreshed that missing report with the existing workload and historical baseline unchanged; no runtime or test change."
+  },
+  "independent_review": {
+    "status": "APPROVED",
+    "before_first_push": true,
+    "initial_focused_tests_passed": 227,
+    "fix_verification_tests_passed": 11,
+    "resolved_findings": [
+      "P2: eagerly validate scope flags even when a preceding model-lock or flag is true.",
+      "P2: exercise the Aura model-healing producer with wounded/full/destroyed source, another wound, a casualty, and excess wounds."
+    ],
+    "unresolved_findings": [],
+    "final_staged_review": "APPROVED; no unresolved findings",
+    "independent_final_checks": [
+      "staged scope and diff cleanliness",
+      "current runtime/artifact identities",
+      "successful aggregate JUnit counts and coverage JSON",
+      "all validation and 25 inherited report hashes",
+      "unchanged inherited workloads, fixtures, budgets and baselines",
+      "matched Order89 base/head input hashes",
+      "source generator --check",
+      "exact eight-shard inventory --check; new behavioral file appears once"
+    ]
+  },
+  "full_game_certified": false
+}
