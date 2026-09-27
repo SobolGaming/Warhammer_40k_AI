@@ -14,6 +14,11 @@ selection among tied highest/lowest physical dice. See
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
 remains separate under Order 95; Orders 85–94 remain open.
 
+Order 89 / P02H separates ordinary unit healing, model healing and explicit
+revival. All units can choose among wounded models; ordinary healing excludes
+destroyed Characters, model heals discard excess, and source ownership persists
+through the shared facade and replay. See [scope and evidence](docs/ORDER_89_SCOPE_PLAN.md).
+
 Order 88 / P02G treats absent weapon Strength as one for wound rolls and rule
 comparisons while preserving the immutable dash descriptor. Shooting, Fight and
 rerolls share the same query. See [scope and evidence](docs/ORDER_88_SCOPE_PLAN.md).

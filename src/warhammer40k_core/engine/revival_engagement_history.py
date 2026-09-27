@@ -16,6 +16,7 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import (
     SELECT_HEALING_MODEL_DECISION_TYPE,
     healing_effect_from_request,
+    healing_model_request,
 )
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
@@ -60,6 +61,12 @@ def validate_revival_engagement_history(
     for request in requests:
         if request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
             effect = healing_effect_from_request(request=request)
+            if request in pending_decision_requests and request != healing_model_request(
+                state=state, effect=effect
+            ):
+                raise GameLifecycleError(
+                    "Pending healing selection drifted from its source or candidates."
+                )
             if request in pending_decision_requests:
                 validate_revival_selection_phase_start(
                     state=state,

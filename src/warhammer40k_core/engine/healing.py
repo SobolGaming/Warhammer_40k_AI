@@ -22,13 +22,12 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.revival_phase_start import validate_revival_selection_phase_start
 from warhammer40k_core.engine.rules_units import (
-    RulesUnitView,
     rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 SELECT_HEALING_MODEL_DECISION_TYPE = "select_healing_model"
-CORE_HEALING_RULE_ID = "core_rules_healing"
+CORE_HEALING_RULE_ID = "gw-11e-core-modifiers:healing"
 
 
 class HealingStepKind(StrEnum):
@@ -256,6 +255,7 @@ class HealingEffect:
             _validate_identifier("source_rule_id", self.source_rule_id),
         )
         object.__setattr__(self, "source_context", validate_json_value(self.source_context))
+        hctx.validate_healing_source_scope(self.source_context)
         object.__setattr__(
             self,
             "phase_start_model_ids",
@@ -731,6 +731,12 @@ def invalid_healing_model_decision_status(
         return finite_status
     effect = healing_effect_from_request(request=request)
     _validate_effect_for_state(state=state, effect=effect)
+    if request.actor_id != healing_selection_actor_player_id(effect, state=state):
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Healing selection actor drifted from its source.",
+            payload={"invalid_reason": invalid_reason, "field": "actor_id"},
+        )
     selection = HealingModelSelection.from_result(request=request, result=result)
     stale_field = _healing_selection_stale_field(
         state=state,
@@ -786,13 +792,12 @@ def _healing_candidates_for_next_step(
         effect.resolved_steps,
         HealingStepKind.HEAL_WOUND,
         rules_unit.own_models,
-        _rules_unit_allows_multiple_wounded_healing(rules_unit),
     )
     if wounded_model_ids:
         return _HealingStepCandidates(
             step_kind=HealingStepKind.HEAL_WOUND, model_ids=wounded_model_ids
         )
-    if hctx.healing_source_context_bool(effect.source_context, "heal_wounded_models_only"):
+    if hctx.healing_is_model_scoped(effect.source_context):
         return _HealingStepCandidates(step_kind=HealingStepKind.NO_EFFECT)
     starting_strength = state.starting_strength_record_for_unit(rules_unit.unit_instance_id)
     alive_count = len(tuple(model for model in rules_unit.own_models if model.is_alive))
@@ -823,6 +828,15 @@ def _healing_candidates_for_next_step(
             raise GameLifecycleError(
                 "Healing eligible revival model IDs must belong to the target rules unit."
             )
+    if not hctx.healing_source_context_bool(effect.source_context, "revive_destroyed_models_only"):
+        non_character_ids = {
+            model.model_instance_id
+            for model in rules_unit.own_models
+            if "CHARACTER" not in model.keywords
+        }
+        if missing_model_ids and not non_character_ids.intersection(missing_model_ids):
+            return _HealingStepCandidates(step_kind=HealingStepKind.NO_EFFECT)
+        missing_model_ids = tuple(i for i in missing_model_ids if i in non_character_ids)
     if not missing_model_ids:
         if eligible_revival_model_ids is not None:
             return _HealingStepCandidates(step_kind=HealingStepKind.NO_EFFECT)
@@ -842,6 +856,11 @@ def _build_healing_model_request(
     effect: HealingEffect,
     candidates: _HealingStepCandidates,
 ) -> DecisionRequest:
+    return decisions.request_decision(healing_model_request(state=state, effect=effect))
+
+
+def healing_model_request(*, state: GameState, effect: HealingEffect) -> DecisionRequest:
+    candidates = _healing_candidates_for_next_step(state=state, effect=effect)
     if candidates.step_kind is HealingStepKind.NO_EFFECT:
         raise GameLifecycleError("No-effect healing must not request a model selection.")
     step_index = effect.next_step_index()
@@ -891,10 +910,10 @@ def _build_healing_model_request(
                 ),
             )
         )
-    request = DecisionRequest(
+    return DecisionRequest(
         request_id=f"{effect.effect_id}:healing-step-{step_index:03d}",
         decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
-        actor_id=healing_selection_actor_player_id(effect),
+        actor_id=healing_selection_actor_player_id(effect, state=state),
         payload=validate_json_value(
             {
                 "selection_kind": candidates.step_kind.value,
@@ -905,7 +924,6 @@ def _build_healing_model_request(
         ),
         options=tuple(options),
     )
-    return decisions.request_decision(request)
 
 
 def _apply_forced_healing_step(
@@ -1086,17 +1104,22 @@ def _validate_effect_for_state(*, state: GameState, effect: HealingEffect) -> No
         raise GameLifecycleError(
             "Healing an active attached unit must target the attached-unit identity."
         )
+    model_id = hctx.healing_model_instance_id(effect.source_context)
+    if model_id is not None and model_id not in {
+        model.model_instance_id for model in rules_unit.own_models
+    }:
+        raise GameLifecycleError("Healing model must belong to the target rules unit.")
     owner = unit_owner_player_id(state=state, unit_instance_id=effect.target_unit_instance_id)
     if effect.opposing_player_id == owner:
         raise GameLifecycleError("Healing opposing player cannot control the target unit.")
 
 
-def healing_selection_actor_player_id(effect: HealingEffect) -> str:
+def healing_selection_actor_player_id(effect: HealingEffect, *, state: GameState) -> str:
     if type(effect) is not HealingEffect:
         raise GameLifecycleError("Healing selection actor lookup requires a HealingEffect.")
     if effect.selection_actor_player_id is not None:
         return effect.selection_actor_player_id
-    return effect.opposing_player_id
+    return unit_owner_player_id(state=state, unit_instance_id=effect.target_unit_instance_id)
 
 
 def _validate_selection_matches_effect(
@@ -1126,6 +1149,8 @@ def _validated_healing_selection(
 ) -> tuple[HealingModelSelection, _HealingStepCandidates]:
     result.validate_for_request(request)
     selection = HealingModelSelection.from_result(request=request, result=result)
+    if selection.player_id != healing_selection_actor_player_id(effect, state=state):
+        raise GameLifecycleError("Healing selection actor drifted from its source.")
     _validate_selection_matches_effect(selection=selection, effect=effect)
     candidates = _healing_candidates_for_next_step(state=state, effect=effect)
     if selection.selection_kind is HealingStepKind.FINISH:
@@ -1375,24 +1400,6 @@ def healing_army_definitions_with_model_wounds(
     return tuple(updated_armies)
 
 
-def _unit_is_attached_rules_unit(unit: UnitInstance) -> bool:
-    if any(_canonical_keyword(keyword) == "ATTACHED UNIT" for keyword in unit.keywords):
-        return True
-    return any(
-        source_id.startswith(("attached-role:", "runtime-attached-unit:"))
-        for model in unit.own_models
-        for source_id in model.source_ids
-    )
-
-
-def _rules_unit_allows_multiple_wounded_healing(rules_unit: RulesUnitView) -> bool:
-    if type(rules_unit) is not RulesUnitView:
-        raise GameLifecycleError("Healing rules-unit validation requires a RulesUnitView.")
-    if rules_unit.is_attached_rules_unit:
-        return True
-    return _unit_is_attached_rules_unit(rules_unit.components[0].unit)
-
-
 def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
     battlefield = state.battlefield_state
     if battlefield is None:
@@ -1437,10 +1444,6 @@ def _payload_optional_identifier(
     if key not in payload:
         raise GameLifecycleError(f"Healing payload missing required key: {key}.")
     return _validate_optional_identifier(key, payload[key])
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return keyword.replace("-", " ").replace("_", " ").upper()
 
 
 def _validate_identifier_tuple(

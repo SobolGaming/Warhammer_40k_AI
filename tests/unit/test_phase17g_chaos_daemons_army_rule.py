@@ -1192,20 +1192,46 @@ def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> 
     resolved_steps = cast(list[JsonValue], healing_effect["resolved_steps"])
     first_step = cast(dict[str, JsonValue], resolved_steps[0])
     assert d3_result["value"] == 3
-    assert healing_effect["amount"] == 1
-    assert len(resolved_steps) == 1
+    assert healing_effect["amount"] == 3
+    assert len(resolved_steps) == 3
     assert first_step["step_kind"] == "heal_wound"
     assert first_step["model_instance_id"] == wounded_model_id
     assert first_step["transition_batch"] is None
-    assert _event_payloads(decisions, "healing_step_resolved") == (
-        _event_payload(decisions, "healing_step_resolved"),
-    )
+    assert len(_event_payloads(decisions, "healing_step_resolved")) == 3
     assert state.battlefield_state is not None
     placed_ids = set(state.battlefield_state.placed_model_ids())
     removed_ids = set(state.battlefield_state.removed_model_ids)
     assert set(destroyed_model_ids).isdisjoint(placed_ids)
     assert set(destroyed_model_ids) <= removed_ids
     assert _model_by_id(state, wounded_model_id).current_wounds == 2
+
+
+def test_manifestation_multiple_wounded_models_use_loaded_facade_restore_and_replay() -> None:
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session, _state, _, _, request = _july_manifestation_revival_session(model_healing=True)
+    assert request.actor_id == "player-a"
+    assert len(request.options) == 2
+    initial = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(initial))
+    assert restored.to_payload() == initial
+    session = LocalGameSession(restored)
+    session._initial_replay_lifecycle_payload = deepcopy(initial)  # pyright: ignore[reportPrivateUsage]
+    session.advance_until_decision_or_terminal()
+    for player_id in ("player-a", "player-b"):
+        session.view(viewer_player_id=player_id)
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[0].option_id,
+        result_id="order89-manifestation-model",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="order89-manifestation"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
 
 
 def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> None:
@@ -2578,11 +2604,10 @@ def test_daemonic_manifestation_records_no_effect_and_multiple_wound_choice_boun
         )
     )
 
-    unsupported = _event_payload(
-        choice_decisions,
-        "chaos_daemons_daemonic_manifestation_unsupported",
-    )
-    assert unsupported["unsupported_reason"] == "multiple_wounded_models_require_decision"
+    request = choice_decisions.queue.peek_next()
+    assert request.decision_type == "select_healing_model"
+    assert request.actor_id == "player-a"
+    assert len(request.options) == 2
     assert _event_payloads(choice_decisions, "healing_step_resolved") == ()
     assert (
         GameState.from_payload(choice_state.to_payload()).to_payload() == choice_state.to_payload()
@@ -3541,7 +3566,9 @@ def _healing_revival_payload(
     )
 
 
-def _july_manifestation_revival_session() -> tuple[
+def _july_manifestation_revival_session(
+    *, model_healing: bool = False
+) -> tuple[
     LocalGameSession,
     GameState,
     tuple[str, ...],
@@ -3549,7 +3576,7 @@ def _july_manifestation_revival_session() -> tuple[
     DecisionRequest,
 ]:
     config = replace(
-        _chaos_daemons_lifecycle_config(battleline=True),
+        _chaos_daemons_lifecycle_config(battleline=not model_healing),
         game_id="order36-manifestation-revival-3",
     )
     session = LocalGameSession()
@@ -3595,6 +3622,12 @@ def _july_manifestation_revival_session() -> tuple[
         application_id="order36-manifestation-fixture-casualties",
         destroying_player_id="player-b",
     )
+    if model_healing:
+        from tests.order89_healing_helpers import wound_models_with_recorded_priority
+
+        wound_models_with_recorded_priority(
+            session.lifecycle, unit_id, tuple(starting_placements)[-2:]
+        )
     _record_battle_shock_auto_pass(
         state,
         decisions=session.lifecycle.decision_controller,
@@ -3603,9 +3636,7 @@ def _july_manifestation_revival_session() -> tuple[
     candidate = july_2026_candidate.runtime_contribution()
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
-        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
-            candidate.battle_shock_hook_bindings
-        ),
+        battle_shock_hooks=_runtime_content_bundle(session.lifecycle).battle_shock_hook_registry,
     )
     completed = advance_command_phase_with_outcomes(
         handler=handler,

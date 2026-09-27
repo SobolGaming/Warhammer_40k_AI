@@ -232,6 +232,10 @@ def validate_daemonic_terror_pending_outcome(
     return battle_shock_outcome_authority.validate_daemonic_terror_pending_outcome(
         context,
         source_rule_id=SOURCE_RULE_ID,
+    ) or battle_shock_outcome_authority.validate_july_daemonic_manifestation_pending_outcome(
+        context,
+        hook_id=HOOK_ID,
+        source_rule_id=SOURCE_RULE_ID,
     )
 
 
@@ -704,66 +708,18 @@ def _resolve_daemonic_manifestation(
             no_effect_reason="unit_has_no_wounded_models",
         )
         return None
-    if len(wounded_models) > 1:
-        _emit_daemonic_manifestation_unsupported(
-            context=context,
-            target_rules_unit=target_rules_unit,
-            d3_result=d3_result,
-            source_rule_id=source_rule_id,
-            unsupported_reason="multiple_wounded_models_require_decision",
-        )
-        return None
-    model = wounded_models[0]
-    missing_wounds = model.initial_wounds - model.current_wounds
-    healing_amount = min(d3_result.value, missing_wounds)
-    effect = HealingEffect(
-        effect_id=f"{hook_id}:daemonic-manifestation:{result.result_id}",
-        target_unit_instance_id=target_rules_unit.unit_instance_id,
-        amount=healing_amount,
-        opposing_player_id=_opposing_player_id(
-            state=context.state,
-            player_id=daemon_player_id,
-        ),
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        manifestation_healing,
+    )
+
+    return manifestation_healing.resolve_manifestation_healing(
+        context=context,
+        daemon_player_id=daemon_player_id,
+        target=target_rules_unit,
+        hook_id=hook_id,
         source_rule_id=source_rule_id,
-        source_context=validate_json_value(
-            {
-                "hook_id": hook_id,
-                "effect_kind": "daemonic_manifestation",
-                "battle_shock_result_id": result.result_id,
-                "player_id": daemon_player_id,
-                "unit_instance_id": target_rules_unit.unit_instance_id,
-                "model_instance_id": model.model_instance_id,
-                "d3_result": d3_result.to_payload(),
-            }
-        ),
-        phase_start_model_ids=_placed_model_ids_for_unit(
-            state=context.state,
-            rules_unit=target_rules_unit,
-        ),
+        d3_result=d3_result,
     )
-    resolved_effect, pending_request = resolve_healing_until_blocked(
-        state=context.state,
-        decisions=context.decisions,
-        ruleset_descriptor=context.state.runtime_ruleset_descriptor(),
-        effect=effect,
-    )
-    if pending_request is not None:
-        raise GameLifecycleError("Daemonic Manifestation healing unexpectedly requested a choice.")
-    context.decisions.event_log.append(
-        "chaos_daemons_daemonic_manifestation_healing_resolved",
-        {
-            "game_id": context.state.game_id,
-            "battle_round": context.state.battle_round,
-            "phase": context.phase.value,
-            "source_rule_id": source_rule_id,
-            "battle_shock_result_id": result.result_id,
-            "player_id": daemon_player_id,
-            "unit_instance_id": target_rules_unit.unit_instance_id,
-            "d3_result": validate_json_value(d3_result.to_payload()),
-            "healing_effect": validate_json_value(resolved_effect.to_payload()),
-        },
-    )
-    return None
 
 
 def _resolve_july_battleline_daemonic_manifestation(
@@ -1660,22 +1616,6 @@ def _roll_d3(
         )
     )
     return D3RollResult.from_source_d6_result(roll_state.original_result)
-
-
-def _placed_model_ids_for_unit(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[str, ...]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Daemonic Manifestation healing requires battlefield_state.")
-    placed_model_ids: list[str] = []
-    for component_id in rules_unit.component_unit_instance_ids:
-        placement = state.battlefield_state.unit_placement_or_none(component_id)
-        if placement is None:
-            continue
-        placed_model_ids.extend(model.model_instance_id for model in placement.model_placements)
-    return tuple(sorted(placed_model_ids))
 
 
 def _opposing_player_id(*, state: GameState, player_id: str) -> str:

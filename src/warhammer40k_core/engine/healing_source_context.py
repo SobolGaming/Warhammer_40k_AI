@@ -34,7 +34,6 @@ def selected_wounded_healing_model_ids(
     resolved_steps: Iterable[_HealingStepLike],
     heal_wound_step_kind: object,
     models: Iterable[_HealingModelLike],
-    allows_multiple_wounded_models: bool,
 ) -> tuple[str, ...]:
     if healing_source_context_bool(source_context, "revive_destroyed_models_only"):
         return ()
@@ -43,7 +42,7 @@ def selected_wounded_healing_model_ids(
         resolved_steps=resolved_steps,
         heal_wound_step_kind=heal_wound_step_kind,
     )
-    wounded_model_ids = tuple(
+    return tuple(
         sorted(
             model.model_instance_id
             for model in models
@@ -52,11 +51,6 @@ def selected_wounded_healing_model_ids(
             and (locked_model_id is None or model.model_instance_id == locked_model_id)
         )
     )
-    if len(wounded_model_ids) > 1 and not allows_multiple_wounded_models:
-        raise GameLifecycleError(
-            "Multiple wounded models require an attached-unit healing decision."
-        )
-    return wounded_model_ids
 
 
 def healing_source_context_bool(source_context: JsonValue, key: str) -> bool:
@@ -109,9 +103,37 @@ def _locked_healing_model_id(
     resolved_steps: Iterable[_HealingStepLike],
     heal_wound_step_kind: object,
 ) -> str | None:
+    model_id = healing_model_instance_id(source_context)
+    if model_id is not None:
+        return model_id
     if not healing_source_context_bool(source_context, "single_model_heal"):
         return None
     for step in resolved_steps:
         if step.step_kind == heal_wound_step_kind and step.model_instance_id is not None:
             return step.model_instance_id
     return None
+
+
+def healing_model_instance_id(source_context: JsonValue) -> str | None:
+    if not isinstance(source_context, dict) or "healing_model_instance_id" not in source_context:
+        return None
+    value = source_context["healing_model_instance_id"]
+    if type(value) is not str or not value or value != value.strip():
+        raise GameLifecycleError("Healing model identity must be a non-empty identifier.")
+    return value
+
+
+def healing_is_model_scoped(source_context: JsonValue) -> bool:
+    model_id = healing_model_instance_id(source_context)
+    single_model = healing_source_context_bool(source_context, "single_model_heal")
+    wounded_only = healing_source_context_bool(source_context, "heal_wounded_models_only")
+    return model_id is not None or single_model or wounded_only
+
+
+def validate_healing_source_scope(source_context: JsonValue) -> None:
+    model_scoped = healing_is_model_scoped(source_context)
+    revive_only = healing_source_context_bool(source_context, "revive_destroyed_models_only")
+    if model_scoped and revive_only:
+        raise GameLifecycleError("Model healing cannot also request explicit revival.")
+    if healing_source_context_bool(source_context, "revive_model_full_health") and not revive_only:
+        raise GameLifecycleError("Full-health revival requires explicit revival scope.")

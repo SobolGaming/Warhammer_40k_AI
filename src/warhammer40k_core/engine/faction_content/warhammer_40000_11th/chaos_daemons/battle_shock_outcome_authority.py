@@ -39,6 +39,7 @@ from warhammer40k_core.engine.healing import (
     HealingStepKind,
     HealingStepPayload,
     healing_effect_from_request,
+    healing_model_request,
 )
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
@@ -305,13 +306,21 @@ def validate_july_daemonic_manifestation_pending_outcome(
         return None
     source_context = effect.source_context if isinstance(effect.source_context, dict) else None
     source_identifies_provider = effect.source_rule_id == source_rule_id
-    kind_identifies_provider = (
-        source_context is not None and source_context.get("effect_kind") == _EFFECT_KIND
+    model_healing = (
+        source_context is not None and source_context.get("effect_kind") == "daemonic_manifestation"
     )
+    kind_identifies_provider = source_context is not None and source_context.get("effect_kind") in {
+        _EFFECT_KIND,
+        "daemonic_manifestation",
+    }
     hook_identifies_provider = (
         source_context is not None and source_context.get("hook_id") == hook_id
     )
-    provider_effect_id_prefix = f"{hook_id}:daemonic-manifestation-battleline:"
+    provider_effect_id_prefix = (
+        f"{hook_id}:daemonic-manifestation:"
+        if model_healing
+        else f"{hook_id}:daemonic-manifestation-battleline:"
+    )
     effect_id_identifies_provider = effect.effect_id.startswith(provider_effect_id_prefix)
     request_id_identifies_provider = context.request.request_id.startswith(
         provider_effect_id_prefix
@@ -342,7 +351,20 @@ def validate_july_daemonic_manifestation_pending_outcome(
         or source_context is None
     ):
         raise GameLifecycleError("Daemonic Manifestation outcome provider identity drifted.")
-    if frozenset(source_context) != _SOURCE_CONTEXT_KEYS:
+    context_keys = (
+        {
+            "hook_id",
+            "effect_kind",
+            "battle_shock_result_id",
+            "player_id",
+            "unit_instance_id",
+            "single_model_heal",
+            "d3_result",
+        }
+        if model_healing
+        else _SOURCE_CONTEXT_KEYS
+    )
+    if frozenset(source_context) != context_keys:
         raise GameLifecycleError("Daemonic Manifestation outcome source context drifted.")
 
     request_event_index = _exact_request_event_index(events=events, request=context.request)
@@ -391,7 +413,7 @@ def validate_july_daemonic_manifestation_pending_outcome(
         not result.passed
         or target.owner_player_id != result.request.player_id
         or daemon_army.detachment_selection.faction_id != army_rule.CHAOS_DAEMONS_FACTION_ID
-        or not army_rule.rules_unit_has_keyword(target, "BATTLELINE")
+        or army_rule.rules_unit_has_keyword(target, "BATTLELINE") == model_healing
         or not army_rule.historical_daemonic_manifestation_applies(
             context=historical,
             daemon_army=daemon_army,
@@ -416,7 +438,7 @@ def validate_july_daemonic_manifestation_pending_outcome(
             and row.model_instance_id not in character_model_ids
         )
     )
-    if not destroyed_ids:
+    if not model_healing and not destroyed_ids:
         raise GameLifecycleError("Daemonic Manifestation revival lacks destroyed models.")
     activation_index = outcome_activation_index(
         events=events,
@@ -439,6 +461,42 @@ def validate_july_daemonic_manifestation_pending_outcome(
     )
     if len(opponent_ids) != 1:
         raise GameLifecycleError("Daemonic Manifestation opponent authority drifted.")
+    if model_healing:
+        expected_effect = HealingEffect(
+            effect_id=f"{hook_id}:daemonic-manifestation:{result.result_id}",
+            target_unit_instance_id=target.unit_instance_id,
+            amount=d3_result.value,
+            opposing_player_id=opponent_ids[0],
+            selection_actor_player_id=daemon_army.player_id,
+            source_rule_id=source_rule_id,
+            source_context={
+                "hook_id": hook_id,
+                "effect_kind": "daemonic_manifestation",
+                "battle_shock_result_id": result.result_id,
+                "player_id": daemon_army.player_id,
+                "unit_instance_id": target.unit_instance_id,
+                "single_model_heal": True,
+                "d3_result": validate_json_value(d3_result.to_payload()),
+            },
+        )
+        initial_wounds = {m.model_instance_id: m.initial_wounds for m in target.own_models}
+        eligible = sorted(
+            row.model_instance_id
+            for row in historical.physical_models
+            if row.model_instance_id in initial_wounds
+            and 0 < row.wounds_remaining < initial_wounds[row.model_instance_id]
+        )
+        if (
+            effect != expected_effect
+            or len(eligible) < 2
+            or context.request != healing_model_request(state=context.state, effect=expected_effect)
+            or not isinstance(context.request.payload, dict)
+            or context.request.payload.get("legal_model_ids") != eligible
+        ):
+            raise GameLifecycleError("Daemonic Manifestation model-healing authority drifted.")
+        return BattleShockPendingOutcomeAuthority(
+            result=result, resolved_event_index=resolved_index
+        )
     expected_effect = HealingEffect(
         effect_id=f"{hook_id}:daemonic-manifestation-battleline:{result.result_id}",
         target_unit_instance_id=target.unit_instance_id,

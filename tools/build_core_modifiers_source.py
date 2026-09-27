@@ -1,4 +1,4 @@
-"""Build the reviewed Orders 26, 27, 28, 29, 37 and 88 source artifacts offline."""
+"""Build the reviewed Orders 26, 27, 28, 29, 37, 88 and 89 source artifacts offline."""
 
 from __future__ import annotations
 
@@ -87,7 +87,9 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "review_audit_row_id": None,
             "review_audit_source_observation_sha256": None,
             "provider_name": "CORE V2 Source Review",
-            "source_title": f"P02G {section} {slug}"
+            "source_title": f"P02H {section} {slug}"
+            if slug == "healing"
+            else f"P02G {section} {slug}"
             if slug == "weapons-with-no-strength"
             else f"P02E {section} {slug}"
             if slug == "stratagem-cost-limits"
@@ -166,6 +168,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "is inferred. The retained transcription separates reviewed obligations. "
             "Order 37 adds the 02.02.01 CP-cost limit observed in the same search index "
             "on 2026-09-11T19:52:51Z; earlier observation tuples remain unchanged. "
+            "Order 89 adds 02.02.04 from the same exact hash-verified asset on September 26. "
             "Order 88 adds 02.04.01 from the exact GDM asset retained by Order 84, "
             "retrieved and hash-verified on 2026-09-26. See the Order 88 scope record "
             "for the asset and source-row pins. No App build or co-version match is inferred."
