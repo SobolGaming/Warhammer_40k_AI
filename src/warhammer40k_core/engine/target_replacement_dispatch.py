@@ -11,6 +11,12 @@ from warhammer40k_core.engine.decision_dispatch import DecisionDispatchHandler
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.melee_target_replacement import (
+    active_melee_sequence,
+    current_melee_replacement,
+    is_melee_replacement,
+    replace_active_melee_sequence,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.shooting_target_replacement import (
     active_shooting_sequence,
@@ -32,11 +38,15 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
         if is_charge_target_replacement_request(state=state, request=request):
             return charge_target_dispatch.validate_charge_replacement(host, request, result)
         try:
-            current = next_shooting_target_replacement(
-                handler=host._shooting_phase_handler,  # pyright: ignore[reportPrivateUsage]
-                state=state,
-                decisions=host.decision_controller,
-                sequence=active_shooting_sequence(state),
+            current = (
+                current_melee_replacement(host)
+                if is_melee_replacement(state, request)
+                else next_shooting_target_replacement(
+                    handler=host._shooting_phase_handler,  # pyright: ignore[reportPrivateUsage]
+                    state=state,
+                    decisions=host.decision_controller,
+                    sequence=active_shooting_sequence(state),
+                )
             )
             if current is None:
                 return LifecycleStatus.invalid(
@@ -57,12 +67,17 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
         state = host._require_state()  # pyright: ignore[reportPrivateUsage]
         if is_charge_target_replacement_request(state=state, request=record.request):
             return charge_target_dispatch.apply_charge_replacement(host, record, result)
-        sequence = active_shooting_sequence(state)
-        current = next_shooting_target_replacement(
-            handler=host._shooting_phase_handler,  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            decisions=host.decision_controller,
-            sequence=sequence,
+        melee = is_melee_replacement(state, record.request)
+        sequence = active_melee_sequence(state) if melee else active_shooting_sequence(state)
+        current = (
+            current_melee_replacement(host)
+            if melee
+            else next_shooting_target_replacement(
+                handler=host._shooting_phase_handler,  # pyright: ignore[reportPrivateUsage]
+                state=state,
+                decisions=host.decision_controller,
+                sequence=sequence,
+            )
         )
         if current is None:
             raise GameLifecycleError("Prevalidated replacement disappeared.")
@@ -85,7 +100,10 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
             used_pool_indices=used_indices,
             selected_target_unit_instance_id=None,
         )
-        replace_active_shooting_sequence(state, updated)
+        if melee:
+            replace_active_melee_sequence(state, updated)
+        else:
+            replace_active_shooting_sequence(state, updated)
         host.decision_controller.event_log.append(
             "target_replacement_resolved",
             {

@@ -22,6 +22,8 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.interaction_metadata import (
     interaction_annotated_decision_request_payload,
 )
+from warhammer40k_core.engine.melee_weapon_commitment import MeleeAttackBudget
+from warhammer40k_core.engine.melee_weapon_identity import declared_melee_weapon
 from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
     ProposalValidationResult,
@@ -101,6 +103,7 @@ class MeleeWeaponDeclaration:
     weapon_profile_id: str
     target_allocations: tuple[MeleeTargetAllocation, ...]
     selected_weapon_ability_ids: tuple[str, ...] = ()
+    weapon_instance_id: str | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.fight_resolution import (
@@ -109,6 +112,10 @@ class MeleeWeaponDeclaration:
             _validate_melee_target_allocations,
         )
 
+        if self.weapon_instance_id is not None:
+            _validate_identifier(
+                "MeleeWeaponDeclaration weapon_instance_id", self.weapon_instance_id
+            )
         object.__setattr__(
             self,
             "attacker_model_instance_id",
@@ -157,7 +164,7 @@ class MeleeWeaponDeclaration:
         return tuple(allocation.target_unit_instance_id for allocation in self.target_allocations)
 
     def to_payload(self) -> MeleeWeaponDeclarationPayload:
-        return {
+        payload: MeleeWeaponDeclarationPayload = {
             "attacker_model_instance_id": self.attacker_model_instance_id,
             "wargear_id": self.wargear_id,
             "weapon_profile_id": self.weapon_profile_id,
@@ -167,9 +174,14 @@ class MeleeWeaponDeclaration:
             ],
         }
 
+        if self.weapon_instance_id is not None:
+            payload["weapon_instance_id"] = self.weapon_instance_id
+        return payload
+
     @classmethod
     def from_payload(cls, payload: MeleeWeaponDeclarationPayload) -> Self:
         return cls(
+            weapon_instance_id=payload.get("weapon_instance_id"),
             attacker_model_instance_id=payload["attacker_model_instance_id"],
             wargear_id=payload["wargear_id"],
             weapon_profile_id=payload["weapon_profile_id"],
@@ -230,6 +242,7 @@ def available_melee_weapons_payloads(
             )
         row = validate_json_value(
             {
+                "weapon_instance_id": weapon["weapon_instance_id"],
                 "model_instance_id": weapon["model_instance_id"],
                 "wargear_id": weapon["wargear_id"],
                 "weapon_profile_id": weapon["weapon_profile"].profile_id,
@@ -266,6 +279,7 @@ def validate_melee_declaration_rules(
     army_catalog: ArmyCatalog,
     state: GameState | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    committed_budgets: dict[str, MeleeAttackBudget] | None = None,
 ) -> ProposalValidationResult:
     from warhammer40k_core.engine.fight_resolution import (
         _available_melee_weapons_by_key,
@@ -317,18 +331,9 @@ def validate_melee_declaration_rules(
         source_decision_result_id=request.source_decision_result_id,
     )
     declared_primary_model_ids: set[str] = set()
-    declared_weapon_keys: set[tuple[str, str, str]] = set()
+    declared_weapon_keys: set[str] = set()
     for declaration in proposal.declarations:
-        key = declaration.weapon_key
-        if key in declared_weapon_keys:
-            return _invalid_melee_validation(
-                request=request,
-                violation_code="duplicate_melee_weapon_declaration",
-                message="Each model/wargear/profile melee declaration may be used once.",
-                field="declarations",
-            )
-        declared_weapon_keys.add(key)
-        available_weapon = available.get(key)
+        available_weapon = declared_melee_weapon(available, declaration)
         if available_weapon is None:
             return _invalid_melee_validation(
                 request=request,
@@ -336,6 +341,15 @@ def validate_melee_declaration_rules(
                 message="Melee declaration selected a weapon that is not available.",
                 field="declarations",
             )
+        physical_id = available_weapon["weapon_instance_id"]
+        if physical_id in declared_weapon_keys:
+            return _invalid_melee_validation(
+                request=request,
+                violation_code="duplicate_melee_weapon_declaration",
+                message="Each physical melee weapon may be selected once.",
+                field="declarations",
+            )
+        declared_weapon_keys.add(physical_id)
         profile = available_weapon["weapon_profile"]
         if profile.range_profile.kind is not RangeProfileKind.MELEE:
             return _invalid_melee_validation(
@@ -359,13 +373,14 @@ def validate_melee_declaration_rules(
                 message="Declared melee model is not engaged with any enemy unit.",
                 field="attacker_model_instance_id",
             )
-        target_count_validation = _validate_melee_target_count_limit(
-            request=request,
-            declaration=declaration,
-            profile=profile,
-        )
-        if target_count_validation is not None:
-            return target_count_validation
+        if committed_budgets is None:
+            target_count_validation = _validate_melee_target_count_limit(
+                request=request,
+                declaration=declaration,
+                profile=profile,
+            )
+            if target_count_validation is not None:
+                return target_count_validation
         for allocation in declaration.target_allocations:
             if allocation.target_unit_instance_id not in engaged_target_ids:
                 return _invalid_melee_validation(
@@ -390,6 +405,7 @@ def validate_melee_declaration_rules(
             for row in request.available_weapons
             if isinstance(row, dict)
             and row.get("model_instance_id") == declaration.attacker_model_instance_id
+            and row.get("weapon_instance_id") == physical_id
             and row.get("wargear_id") == declaration.wargear_id
             and row.get("weapon_profile_id") == declaration.weapon_profile_id
         )
@@ -421,6 +437,9 @@ def validate_melee_declaration_rules(
             profile=profile,
             scenario=scenario,
             state=state,
+            resolved_attacks=None
+            if committed_budgets is None
+            else committed_budgets[physical_id].attacks_for(profile),
         )
         if attack_allocation_validation is not None:
             return attack_allocation_validation
@@ -458,6 +477,7 @@ def melee_attack_sequence_from_proposal(
     sequence_id: str,
     state: GameState | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    committed_budgets: dict[str, MeleeAttackBudget] | None = None,
 ) -> AttackSequence:
     from warhammer40k_core.engine.fight_resolution import (
         _available_melee_weapons_by_key,
@@ -482,7 +502,9 @@ def melee_attack_sequence_from_proposal(
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pools: list[RangedAttackPool] = []
     for declaration_index, declaration in enumerate(proposal.declarations):
-        available_weapon = available[declaration.weapon_key]
+        available_weapon = declared_melee_weapon(available, declaration)
+        if available_weapon is None:
+            raise GameLifecycleError("Melee physical weapon drifted after validation.")
         profile = available_weapon["weapon_profile"]
         target_ids = _melee_target_unit_ids_for_model(
             scenario=scenario,
@@ -507,15 +529,19 @@ def melee_attack_sequence_from_proposal(
         profile = context.selected_profile(
             declaration.target_unit_instance_ids[0], declaration.selected_weapon_ability_ids
         )
-        resolved_attacks = attacks_for_profile(
-            profile,
-            manager=dice_manager,
-            scope_id=(
-                f"{sequence_id}:declaration-{declaration_index:03d}:"
-                f"{declaration.attacker_model_instance_id}:{declaration.wargear_id}:"
-                f"{declaration.weapon_profile_id}:attacks"
-            ),
-            actor_id=proposal.player_id,
+        resolved_attacks = (
+            committed_budgets[available_weapon["weapon_instance_id"]].attacks_for(profile)
+            if committed_budgets is not None
+            else attacks_for_profile(
+                profile,
+                manager=dice_manager,
+                scope_id=(
+                    f"{sequence_id}:declaration-{declaration_index:03d}:"
+                    f"{declaration.attacker_model_instance_id}:{declaration.wargear_id}:"
+                    f"{declaration.weapon_profile_id}:attacks"
+                ),
+                actor_id=proposal.player_id,
+            )
         )
         single_target = len(declaration.target_allocations) == 1
         if not single_target:

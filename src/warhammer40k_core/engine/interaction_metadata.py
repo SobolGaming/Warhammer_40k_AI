@@ -290,6 +290,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         "select_tempting_target_objective": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_charge_targets": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_target_replacement": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
+        "select_melee_weapon": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_tracked_target": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("target_unit",),

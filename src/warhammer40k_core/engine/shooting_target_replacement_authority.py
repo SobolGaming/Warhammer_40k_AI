@@ -9,7 +9,7 @@ import msgspec
 from warhammer40k_core.engine.charge_target_continuation import is_charge_target_replacement_request
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.target_replacement import (
     SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
     TargetReplacementContext,
@@ -64,6 +64,7 @@ def _accepted_pools(
         if event.event_type
         in (
             "shooting_declaration_accepted",
+            "melee_declaration_accepted",
             "out_of_phase_shooting_declaration_accepted",
         )
         and isinstance(event.payload, dict)
@@ -216,6 +217,10 @@ def _validate_sequence_history(
             raise GameLifecycleError(
                 "Replacement changed a committed physical weapon or shooting type."
             )
+        if sequence.source_phase is BattlePhase.FIGHT and any(
+            old.attacks != new.attacks for old, new in zip(expected, updated, strict=True)
+        ):
+            raise GameLifecycleError("Melee replacement changed a committed allocation count.")
         if _pool_tuple(payload.get("attack_pools")) != updated:
             raise GameLifecycleError("Replacement event changed unselected attack pools.")
         forgone.update(skipped)
@@ -259,17 +264,38 @@ def validate_restored_replacements(
         r.result.result_id for r in replacement_records
     ):
         raise GameLifecycleError("Replacement decision/resolution history is incomplete.")
+    from warhammer40k_core.engine.melee_target_replacement import (
+        active_melee_sequence,
+        is_melee_replacement,
+        next_melee_target_replacement,
+    )
+    from warhammer40k_core.engine.phases.shooting_validation import (
+        _army_catalog_for_handler,
+        _ruleset_descriptor_for_handler,
+    )
+
     for pending in decisions.queue.pending_requests:
         if (
             pending.decision_type != SELECT_TARGET_REPLACEMENT_DECISION_TYPE
             or is_charge_target_replacement_request(state=state, request=pending)
         ):
             continue
-        current = next_shooting_target_replacement(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            sequence=active_shooting_sequence(state),
+        current = (
+            next_melee_target_replacement(
+                state=state,
+                decisions=decisions,
+                sequence=active_melee_sequence(state),
+                ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
+                army_catalog=_army_catalog_for_handler(handler),
+                runtime_modifier_registry=handler.runtime_modifier_registry,
+            )
+            if is_melee_replacement(state, pending)
+            else next_shooting_target_replacement(
+                handler=handler,
+                state=state,
+                decisions=decisions,
+                sequence=active_shooting_sequence(state),
+            )
         )
         if (
             current is None

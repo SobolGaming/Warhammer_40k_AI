@@ -379,6 +379,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_melee_weapon",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_mortal_wound_model",
         "interaction_kinds": [
           "entity_selection"
@@ -1106,13 +1113,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "40.0.0",
+        "contract_version": "40.1.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "3e340cdc9199a331f5afe97e9b2fed51e1c88df43f7d0bfcf82ecfe58de68013",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6d965672035785244fee2bda00f5b3a258e6d548dcad2067949285f2372cb40d"
+        "identity_hash": "63bcfe9f45c3647ff432aa7ce96c021a62c1e9d99c605a44065e5b7e68c02647",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -3783,6 +3790,13 @@
       "decision_type": "select_lethal_hit_wound",
       "interaction_kinds": [
         "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_melee_weapon",
+      "interaction_kinds": [
+        "finite_option_list"
       ],
       "submission_kind": "finite"
     },

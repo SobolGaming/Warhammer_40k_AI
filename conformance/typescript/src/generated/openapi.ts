@@ -576,7 +576,7 @@ export interface components {
                     attacks?: number; target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 }[];
                 wargear_id: components["schemas"]["proposal-payload--identifier.schema"];
-                weapon_profile_id: components["schemas"]["proposal-payload--identifier.schema"];
+                weapon_profile_id: components["schemas"]["proposal-payload--identifier.schema"]; weapon_instance_id?: string;
             }[];
             player_id: components["schemas"]["proposal-payload--identifier.schema"];
             /** @constant */

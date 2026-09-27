@@ -10,7 +10,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     FightOrderingBandKind,
     FightPhaseStepKind,
     FightPolicyDescriptor,
-    FightTypeKind,
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -68,7 +67,7 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
@@ -94,9 +93,6 @@ from warhammer40k_core.engine.fight_activation_completion import (
 )
 from warhammer40k_core.engine.fight_activation_requests import (
     request_fight_activation as _request_fight_activation,
-)
-from warhammer40k_core.engine.fight_activation_units import (
-    active_fight_activation_rules_unit,
 )
 from warhammer40k_core.engine.fight_attack_completion import (
     advance_fight_attack_sequence_until_completion,
@@ -146,22 +142,16 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     request_fight_phase_start_rule_if_available,
 )
 from warhammer40k_core.engine.fight_resolution import (
-    MELEE_DECLARATION_PROPOSAL_KIND,
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     FightMovementProposal,
     MeleeDeclarationProposal,
     MeleeDeclarationProposalRequest,
-    build_melee_declaration_request,
     fight_movement_proposal_from_payload,
     fight_movement_proposal_payload_parse_failure,
     melee_declaration_proposal_from_payload,
 )
 from warhammer40k_core.engine.fight_rules_unit_melee import (
-    record_rules_unit_one_shot_melee_weapon_uses,
-    rules_unit_available_melee_weapons_payloads,
-    rules_unit_melee_attack_sequence_from_proposal,
     rules_unit_melee_target_unit_ids,
-    validate_rules_unit_melee_declaration,
 )
 from warhammer40k_core.engine.fight_rules_unit_movement import (
     fight_rules_unit_movement_rule_validation,
@@ -214,9 +204,7 @@ from warhammer40k_core.engine.phases.fight_attack_sequence_selection import (
 from warhammer40k_core.engine.phases.fight_movement_lifecycle import (
     apply_fight_movement_proposal,
     request_fight_movement,
-    request_overrun_pile_in,
 )
-from warhammer40k_core.engine.random_weapon_profiles import random_melee_pool_evidence
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
@@ -257,6 +245,16 @@ from warhammer40k_core.geometry.pose import GeometryError
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
+
+from warhammer40k_core.engine.phases.fight_melee import (
+    _advance_active_fight_activation as _advance_active_fight_activation,
+)
+from warhammer40k_core.engine.phases.fight_melee import (
+    _apply_melee_declaration_decision as _apply_melee_declaration_decision,
+)
+from warhammer40k_core.engine.phases.fight_melee import (
+    invalid_melee_declaration_status as invalid_melee_declaration_status,
+)
 
 _FIGHT_PHASE_COMPLETE_STATUS = "fight_phase_complete"
 _FIGHT_PILE_IN_REQUIRED_STATUS = "fight_pile_in_required"
@@ -737,6 +735,7 @@ def _advance_fight_attack_sequence(
         return stratagem_status
     continuation = advance_fight_attack_sequence_until_completion(
         state=state,
+        army_catalog=_army_catalog_for_handler(handler),
         decisions=decisions,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         stratagem_index=handler.stratagem_index,
@@ -781,158 +780,6 @@ def _resolve_completed_fight_attack_sequence_continuation(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=continuation,
-    )
-
-
-def _advance_active_fight_activation(
-    *,
-    handler: FightPhaseHandler,
-    state: GameState,
-    decisions: DecisionController,
-    reaction_queue: ReactionQueue | None,
-    policy: FightPolicyDescriptor,
-) -> LifecycleStatus | None:
-    fight_state = require_fight_state(state)
-    activation = fight_state.active_activation
-    if activation is None:
-        raise GameLifecycleError("Active fight activation advance requires selection.")
-    melee_rules_unit = active_fight_activation_rules_unit(
-        state=state,
-        activation=activation,
-    )
-    if melee_rules_unit is None:
-        return _complete_active_fight_activation_without_melee_declaration(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            reaction_queue=reaction_queue,
-            policy=policy,
-            activation=activation,
-            target_unit_instance_ids=(),
-            available_weapon_count=0,
-        )
-    if (
-        activation.fight_type is FightTypeKind.OVERRUN
-        and not fight_state.overrun_pile_in_is_completed(
-            activation_result_id=activation.result_id,
-        )
-    ):
-        if not melee_rules_unit.alive_models():
-            state.replace_fight_phase_state(
-                fight_state.with_overrun_pile_in_completed(
-                    activation_result_id=activation.result_id,
-                )
-            )
-            decisions.event_log.append(
-                "overrun_pile_in_not_available",
-                validate_json_value(
-                    {
-                        "game_id": state.game_id,
-                        "battle_round": state.battle_round,
-                        "phase": BattlePhase.FIGHT.value,
-                        "phase_body_status": "overrun_pile_in_not_available",
-                        "activation_selection": activation.to_payload(),
-                        "reason": "no_living_movable_models",
-                    }
-                ),
-            )
-            return None
-        return request_overrun_pile_in(
-            state=state,
-            decisions=decisions,
-            activation=activation,
-        )
-    scenario = _battlefield_scenario(state)
-    target_ids = rules_unit_melee_target_unit_ids(
-        scenario=scenario,
-        ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        rules_unit=melee_rules_unit,
-        state=state,
-    )
-    available_weapons = rules_unit_available_melee_weapons_payloads(
-        runtime_modifier_registry=handler.runtime_modifier_registry,
-        scenario=scenario,
-        ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        rules_unit=melee_rules_unit,
-        army_catalog=_army_catalog_for_handler(handler),
-        state=state,
-        source_decision_result_id=activation.result_id,
-    )
-    if not target_ids or not available_weapons:
-        return _complete_active_fight_activation_without_melee_declaration(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            reaction_queue=reaction_queue,
-            policy=policy,
-            activation=activation,
-            target_unit_instance_ids=target_ids,
-            available_weapon_count=len(available_weapons),
-        )
-    ability_status = _request_fight_activation_ability_if_available(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        fight_state=fight_state,
-        activation=activation,
-        target_unit_instance_ids=target_ids,
-    )
-    if ability_status is not None:
-        return ability_status
-    epic_status = _request_epic_challenge_if_available(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        activation=activation,
-    )
-    if epic_status is not None:
-        return epic_status
-    selected_to_fight_stratagem_status = _request_selected_to_fight_stratagem_if_available(
-        handler=handler,
-        state=state,
-        decisions=decisions,
-        activation=activation,
-    )
-    if selected_to_fight_stratagem_status is not None:
-        return selected_to_fight_stratagem_status
-    request = build_melee_declaration_request(
-        request_id=state.next_decision_request_id(),
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        active_player_id=fight_state.active_player_id,
-        actor_id=activation.player_id,
-        unit_instance_id=melee_rules_unit.unit_instance_id,
-        source_decision_request_id=activation.request_id,
-        source_decision_result_id=activation.result_id,
-        ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        available_weapons=available_weapons,
-        target_unit_instance_ids=target_ids,
-    )
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "melee_declaration_requested",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.FIGHT.value,
-                "phase_body_status": _MELEE_DECLARATION_REQUIRED_STATUS,
-                "request_id": request.request_id,
-                "activation_selection": activation.to_payload(),
-                "target_unit_instance_ids": list(target_ids),
-                "available_weapon_count": len(available_weapons),
-            }
-        ),
-    )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload={
-            "phase": BattlePhase.FIGHT.value,
-            "phase_body_status": _MELEE_DECLARATION_REQUIRED_STATUS,
-            "unit_instance_id": melee_rules_unit.unit_instance_id,
-            "proposal_kind": MELEE_DECLARATION_PROPOSAL_KIND,
-        },
     )
 
 
@@ -1271,49 +1118,6 @@ def invalid_fight_movement_proposal_status(
     return None
 
 
-def invalid_melee_declaration_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    ruleset_descriptor: RulesetDescriptor,
-    army_catalog: ArmyCatalog,
-    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
-) -> LifecycleStatus | None:
-    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(request)
-    parsed = _parse_melee_declaration_or_invalid(
-        state=state,
-        proposal_request=proposal_request,
-        result=result,
-    )
-    if isinstance(parsed, LifecycleStatus):
-        return parsed
-    proposal = parsed
-    proposal_validation = proposal.validation_result_for_request(proposal_request)
-    if not proposal_validation.is_valid:
-        return _reject_invalid_fight_proposal(
-            state=state,
-            proposal_validation=proposal_validation,
-            message="Melee declaration proposal does not match the pending request.",
-        )
-    rule_validation = validate_rules_unit_melee_declaration(
-        runtime_modifier_registry=runtime_modifier_registry,
-        scenario=_battlefield_scenario(state),
-        ruleset_descriptor=ruleset_descriptor,
-        request=proposal_request,
-        proposal=proposal,
-        army_catalog=army_catalog,
-        state=state,
-    )
-    if not rule_validation.is_valid:
-        return _reject_invalid_fight_proposal(
-            state=state,
-            proposal_validation=rule_validation,
-            message="Melee declaration proposal is not currently legal.",
-        )
-    return None
-
-
 def invalid_fight_attack_sequence_selection_status(
     *,
     state: GameState,
@@ -1419,65 +1223,6 @@ def invalid_fight_attack_sequence_selection_status(
         expected_request=expected_request,
         invalid_reason="fight_attack_group_payload_drift",
     )
-
-
-def _apply_melee_declaration_decision(
-    *,
-    handler: FightPhaseHandler,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-) -> LifecycleStatus | None:
-    record = decisions.record_for_result(result)
-    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(record.request)
-    proposal = melee_declaration_proposal_from_payload(result.payload)
-    sequence_id = (
-        f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
-        f"{proposal.unit_instance_id}:{result.result_id}"
-    )
-    attack_sequence = rules_unit_melee_attack_sequence_from_proposal(
-        scenario=_battlefield_scenario(state),
-        ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        proposal=proposal,
-        army_catalog=_army_catalog_for_handler(handler),
-        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
-        sequence_id=sequence_id,
-        state=state,
-        runtime_modifier_registry=handler.runtime_modifier_registry,
-    )
-    one_shot_records = record_rules_unit_one_shot_melee_weapon_uses(
-        state=state,
-        scenario=_battlefield_scenario(state),
-        proposal=proposal,
-        army_catalog=_army_catalog_for_handler(handler),
-        result_id=result.result_id,
-    )
-    fight_state = require_fight_state(state)
-    state.replace_fight_phase_state(
-        fight_state.with_attack_sequence_update(
-            attack_sequence=attack_sequence,
-            allocated_model_ids_this_phase=fight_state.allocated_model_ids_this_phase,
-        )
-    )
-    decisions.event_log.append(
-        "melee_declaration_accepted",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.FIGHT.value,
-                "phase_body_status": _MELEE_DECLARATION_ACCEPTED_STATUS,
-                "request_id": result.request_id,
-                "result_id": result.result_id,
-                "proposal_request": proposal_request.to_payload(),
-                "proposal": proposal.to_payload(),
-                "attack_sequence_id": attack_sequence.sequence_id,
-                **random_melee_pool_evidence(attack_sequence.attack_pools, state=state),
-                "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
-            }
-        ),
-    )
-    return None
 
 
 def _apply_fight_attack_sequence_decision(
@@ -3659,3 +3404,13 @@ def _next_player_id(*, player_ids: tuple[str, ...], current_player_id: str) -> s
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+# Engine-internal declaration orchestration extracted to fight_melee.
+__all__ = (
+    "_complete_active_fight_activation_without_melee_declaration",
+    "_parse_melee_declaration_or_invalid",
+    "_request_epic_challenge_if_available",
+    "_request_fight_activation_ability_if_available",
+    "_request_selected_to_fight_stratagem_if_available",
+)
