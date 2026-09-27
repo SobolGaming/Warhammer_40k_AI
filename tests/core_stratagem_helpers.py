@@ -281,6 +281,8 @@ def _battle_lifecycle(
                 selected_option_id = request.options[0].option_id
             elif request.decision_type == "select_movement_action":
                 selected_option_id = "remain_stationary"
+            elif request.decision_type == "select_shooting_unit":
+                selected_option_id = "complete_shooting_phase"
             elif request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
                 status = lifecycle.submit_decision(
                     DecisionResult(

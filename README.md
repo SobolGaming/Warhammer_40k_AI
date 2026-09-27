@@ -14,6 +14,11 @@ selection among tied highest/lowest physical dice. See
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
 remains separate under Order 95; Orders 85–94 remain open.
 
+Order 91 / P04C permits legal Shooting unit/type selection when no attacks can be
+made. Empty completion applies type and cargo restrictions without recording that
+the unit shot. Ordinary and retained hosts share the same engine owner; see the
+[scope and source record](docs/ORDER_91_SCOPE_PLAN.md).
+
 Order 90 / P01J preserves source-defined wounds and equipment for embarked and
 reserve revival. Shared finite decisions keep returns unplaced, enforce cargo
 capacity and authenticate restore before ordinary later ingress. See

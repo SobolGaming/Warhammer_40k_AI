@@ -3668,3 +3668,88 @@ def _last_event_payload(decisions: DecisionController, event_type: str) -> dict[
             raise TypeError(f"{event_type} payload is not an object.")
         return payload
     raise AssertionError(f"Missing event {event_type}.")
+
+
+def test_order91_no_target_selection_executes_source_loaded_selected_unit_grant() -> None:
+    from tests.empty_shooting_helpers import SHOOTER, empty_shooting_session
+    from tests.phase13b_shooting_declaration_helpers import _shooting_lifecycle
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    config = empty_shooting_session(spare=True).lifecycle.config
+    assert config is not None
+    catalog = config.army_catalog
+    catalog = replace(
+        catalog,
+        factions=(
+            *catalog.factions,
+            replace(catalog.factions[0], faction_id="drukhari", faction_keywords=("DRUKHARI",)),
+        ),
+        detachments=(
+            *catalog.detachments,
+            replace(
+                catalog.detachments[0],
+                faction_id="drukhari",
+                detachment_id="drukhari-test",
+                canonical_detachment_id="drukhari-test",
+            ),
+        ),
+        datasheets=tuple(
+            replace(
+                sheet,
+                abilities=(*sheet.abilities, _hatred_eternal_ability()),
+                keywords=replace(
+                    sheet.keywords, faction_keywords=(*sheet.keywords.faction_keywords, "DRUKHARI")
+                ),
+            )
+            for sheet in catalog.datasheets
+        ),
+    )
+    lifecycle, _ = _shooting_lifecycle(
+        alpha_unit_ids=("shooter", "spare"),
+        catalog=catalog,
+        alpha_faction_id="drukhari",
+        alpha_detachment_ids=("drukhari-test",),
+    )
+    state = _lifecycle_state(lifecycle)
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="order91-grant-token",
+    )
+    _refresh_lifecycle_runtime_content(lifecycle)
+    session = LocalGameSession(GameLifecycle.from_payload(lifecycle.to_payload()))
+    request = _decision_request_from_status(session.advance_until_decision_or_terminal())
+    request = _decision_request_from_status(
+        session.submit_option(
+            request_id=request.request_id, option_id=SHOOTER, result_id="order91-grant-unit"
+        )
+    )
+    assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+    request = _decision_request_from_status(
+        session.submit_option(
+            request_id=request.request_id,
+            option_id=army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID,
+            result_id="order91-grant",
+        )
+    )
+    assert request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
+    session.submit_option(
+        request_id=request.request_id, option_id="normal", result_id="order91-grant-type"
+    )
+    state = _lifecycle_state(session.lifecycle)
+    assert pain_tokens_available(state, player_id="player-a") == 0
+    assert not state.ranged_attack_history_records
+    assert any(
+        event.event_type == "shooting_without_attacks_completed"
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+    assert session.fork().lifecycle.to_payload() == session.lifecycle.to_payload()
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="selected-grant-empty"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )

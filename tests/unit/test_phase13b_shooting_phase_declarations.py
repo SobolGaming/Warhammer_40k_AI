@@ -3294,8 +3294,8 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
         terrain_features=(blocking_ruin,),
     )
     status = lifecycle.advance_until_decision_or_terminal()
-    _assert_waiting_for_movement_unit(status)
-    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert _decision_request(status).decision_type == "select_shooting_unit"
+    assert state.current_battle_phase is BattlePhase.SHOOTING
 
 
 def test_shooting_los_uses_third_party_model_blockers() -> None:

@@ -6992,3 +6992,33 @@ The existing Disembark option and placement families share rules-unit phase-star
 cargo eligibility. A returned attached component inherits its receiving unit's
 embarked history; this does not add that component to the recorded phase-start
 physical inventory. All currently living components still require the same carrier.
+
+
+## Order 91: shooting without attacks
+
+`select_shooting_unit` and `select_shooting_type` enumerate legal unit/type choices
+without requiring a legal weapon/target pair. Unit restrictions and type-specific
+Advance, engagement and equipped-keyword conditions still apply. Selected-unit
+hooks/grants run before the type resolves, including when there can be no attacks.
+`select_shooting_type.payload.firing_deck_embarked_unit_instance_ids` commits the
+current nonempty cargo snapshot (omitted when no cargo is subject to the restriction). Stale cargo or
+unit/type context rejects before recording, queue pop or mutation.
+
+If the selected type has no legal declaration candidate, the engine resolves it
+automatically and emits `shooting_without_attacks_completed`. The payload contains
+`game_id`, `battle_round`, `active_player_id`, actual `phase`, `player_id`, canonical
+`unit_instance_id`, the source selection request/result IDs, nullable type request/
+result IDs, nullable `shooting_type`, `out_of_phase`, and the cargo snapshot.
+Ordinary terminals require the accepted type. Out-of-phase hosts retain their
+source's forced type, when present, and resume their existing continuation.
+
+This terminal consumes the ordinary unit selection, applies the existing phase-end
+Action restriction and Firing Deck turn-end cargo restriction, and continues the
+phase. It does not mean the unit has shot: no attack sequence, shot membership,
+model/ranged attack history, One Shot expenditure, hidden-status loss or after-shot
+reaction is produced. No zero-entry attack proposal is introduced. The existing
+phase-completion option can still skip remaining units. The shared adapter path
+projects these public shooting facts for both viewers; unrelated hidden decisions
+retain their existing redaction. Save/restore and replay authenticate the terminal
+against its decisions, historical phase, host and restriction inventory. Contract
+40's JSON-safe opaque payload schemas already cover these additions.

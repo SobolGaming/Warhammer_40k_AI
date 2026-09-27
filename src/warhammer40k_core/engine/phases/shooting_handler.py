@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.phase import LifecycleStatusKind
 
 from warhammer40k_core.engine.shooting_target_replacement import request_shooting_target_replacement
 from warhammer40k_core.engine.selected_target_stratagem_reactions import (
@@ -258,7 +259,7 @@ class ShootingPhaseHandler:
             shooting_state.active_selection is not None
             and shooting_state.selected_shooting_type is not None
         ):
-            return _request_shooting_declaration(
+            declaration_status = _request_shooting_declaration(
                 state=state,
                 runtime_modifier_registry=self.runtime_modifier_registry,
                 decisions=decisions,
@@ -268,6 +269,10 @@ class ShootingPhaseHandler:
                 army_catalog=_army_catalog_for_handler(self),
                 shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
+
+            if declaration_status.status_kind is not LifecycleStatusKind.ADVANCED:
+                return declaration_status
+            shooting_state = _ensure_shooting_phase_state(state=state)
 
         active_stratagem_status = _request_active_shooting_phase_stratagem_if_available(
             state=state,
@@ -599,6 +604,21 @@ class ShootingPhaseHandler:
                 stage=state.stage,
                 message="Shooting type selection unit drifted.",
                 payload={"invalid_reason": "shooting_type_unit_drift"},
+            )
+        from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
+
+        cargo_snapshot = firing_deck_cargo_snapshot(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            army_catalog=_army_catalog_for_handler(self),
+        )
+        if _decision_payload_object(request.payload).get(
+            "firing_deck_embarked_unit_instance_ids"
+        ) != (list(cargo_snapshot) if cargo_snapshot else None):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Shooting type cargo snapshot drifted.",
+                payload={"invalid_reason": "shooting_type_cargo_drift"},
             )
         shooting_type = shooting_type_from_token(_payload_string(payload, key="shooting_type"))
         rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)

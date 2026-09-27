@@ -115,7 +115,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.engine.phases.movement import (
-    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
@@ -1334,6 +1333,8 @@ def test_phase14i_new_orders_is_not_offered_after_first_use_in_same_game() -> No
             selected_movement_option_id = movement_request.options[0].option_id
         elif movement_request.decision_type == "select_movement_action":
             selected_movement_option_id = "remain_stationary"
+        elif movement_request.decision_type == "select_shooting_unit":
+            selected_movement_option_id = "complete_shooting_phase"
         elif movement_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
             from tests.fire_overwatch_helpers import decline_overwatch
 
@@ -4166,6 +4167,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
     restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
     restored_request = _decision_request(restored.advance_until_decision_or_terminal())
 
+    command_points_before = _state(restored).command_point_total("player-b")
     declined = restored.submit_decision(
         DecisionResult(
             result_id="phase12c-decline-rapid-ingress",
@@ -4181,7 +4183,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
     restored_reserve_state = restored_state.reserve_state_for_unit(reserve_state.unit_instance_id)
     assert restored_reserve_state is not None
     assert restored_reserve_state.status is ReserveStatus.IN_RESERVES
-    assert restored_state.command_point_total("player-b") == 2
+    assert restored_state.command_point_total("player-b") == command_points_before
     assert restored_state.stratagem_use_records == []
     assert restored.reaction_queue.frames == ()
     assert _has_event(restored.decision_controller, "stratagem_window_declined")
@@ -4190,7 +4192,8 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
         == "rapid-ingress-end-movement-round-02-player-player-b-resume"
     )
     declined_request = _decision_request(declined)
-    assert declined_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert declined_request.decision_type == "select_shooting_unit"
+    assert restored_state.current_battle_phase is BattlePhase.SHOOTING
     assert not _has_event(restored.decision_controller, "rapid_ingress_resolved")
 
 

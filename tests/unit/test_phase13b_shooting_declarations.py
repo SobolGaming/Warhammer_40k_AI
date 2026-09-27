@@ -20005,7 +20005,7 @@ def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -
         for record in session.lifecycle.decision_controller.records
         if record.request.decision_type == "select_shooting_type"
     )
-    assert ShootingType.NORMAL.value not in {option.option_id for option in mode_request.options}
+    assert ShootingType.NORMAL.value in {option.option_id for option in mode_request.options}
     proposal = _proposal_from_request(
         request=request, target_unit_id=TARGET, weapon_profile_id=INDIRECT_PROFILE
     )
