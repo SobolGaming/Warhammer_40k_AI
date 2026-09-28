@@ -1,0 +1,67 @@
+{
+  "decline_all_targets": {
+    "decision_type": "submit_shooting_declaration",
+    "decline_diagnostic": {
+      "proposal_validation": {
+        "is_valid": false,
+        "proposal_kind": "shooting_declaration",
+        "proposal_request_id": "decision-request-000003",
+        "status": "invalid",
+        "violations": [
+          {
+            "field": null,
+            "message": "ShootingDeclarationProposal requires declarations.",
+            "violation_code": "proposal_schema_invalid"
+          }
+        ]
+      }
+    },
+    "decline_status": "invalid",
+    "nonempty_control_status": "waiting_for_decision",
+    "options": [
+      "submit_parameterized_payload"
+    ],
+    "rejection_preserves_authoritative_state": true,
+    "scope": "ordinary_shooting_facade; retained_host_is_consumer_trace_only"
+  },
+  "schema": "core-v2-order95-probes-v1",
+  "twin_linked": [
+    {
+      "automatic_reroll_count": 8,
+      "both_viewers_restore": true,
+      "exact_restore": true,
+      "phase": "shooting",
+      "replay_status": "reproduced",
+      "reroll_events_sha256": "ad1df255f379da7391cd1e213f9e303694e6c6ee0e2af5f6526389cfb6669552",
+      "rerolls_without_submitted_decision": 8,
+      "scope": "facade_shooting_and_fight; successful_roll_exclusion_is_consumer_trace",
+      "submitted_decision_types": [
+        "select_shooting_unit",
+        "select_shooting_type",
+        "submit_shooting_declaration",
+        "select_resolve_target_unit",
+        "select_attack_weapon_group"
+      ],
+      "wound_count": 12
+    },
+    {
+      "automatic_reroll_count": 8,
+      "both_viewers_restore": true,
+      "exact_restore": true,
+      "phase": "fight",
+      "replay_status": "reproduced",
+      "reroll_events_sha256": "aa5c746ec89fbb88b326054abb3419e37f03688e80e1cba07f24e09750c3f071",
+      "rerolls_without_submitted_decision": 8,
+      "scope": "facade_shooting_and_fight; successful_roll_exclusion_is_consumer_trace",
+      "submitted_decision_types": [
+        "submit_movement_proposal",
+        "submit_movement_proposal",
+        "select_fight_activation",
+        "submit_melee_declaration",
+        "select_resolve_target_unit",
+        "select_attack_weapon_group"
+      ],
+      "wound_count": 12
+    }
+  ]
+}

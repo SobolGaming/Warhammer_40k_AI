@@ -1,0 +1,249 @@
+{
+  "schema": "core-v2-order95-validation-v1",
+  "reviewed_runtime_commit": "bb2bbf7e63b7a5fd52df6401c9f879c615dc61f7",
+  "runtime_source_contract_and_shard_changes": false,
+  "environment": {
+    "os": "Darwin",
+    "machine": "arm64",
+    "python": "3.14.5",
+    "uv": "0.12.1",
+    "node": "24.19.0",
+    "xdist_workers": 18,
+    "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin"
+  },
+  "checks": [
+    {
+      "name": "ruff",
+      "command": "uv run ruff check .",
+      "started_at": "2026-09-28T17:28:09.714370+00:00",
+      "duration_seconds": 0.133,
+      "exit_code": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "name": "format",
+      "command": "uv run ruff format --check .",
+      "started_at": "2026-09-28T17:28:09.847864+00:00",
+      "duration_seconds": 0.059,
+      "exit_code": 0,
+      "log_sha256": "a9c7ba95757bc33907a198bdf269cc543538b5efc803adb8aa5caaa30f17de81"
+    },
+    {
+      "name": "mypy",
+      "command": "uv run mypy src tests",
+      "started_at": "2026-09-28T17:28:09.907273+00:00",
+      "duration_seconds": 1.768,
+      "exit_code": 0,
+      "log_sha256": "2bc7343759f819f2043e03ef8410844200755e5f21b9efb40118d96df7e31737"
+    },
+    {
+      "name": "pyright",
+      "command": "uv run pyright",
+      "started_at": "2026-09-28T17:28:11.683376+00:00",
+      "duration_seconds": 74.597,
+      "exit_code": 0,
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "name": "imports",
+      "command": "uv run lint-imports",
+      "started_at": "2026-09-28T17:29:26.281753+00:00",
+      "duration_seconds": 0.486,
+      "exit_code": 0,
+      "log_sha256": "beaa779f13113b29025e92ac223dc0c0c4dae725768476464f92a8a8c49ea91e"
+    },
+    {
+      "name": "behavioral",
+      "command": "uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/tmp/order95-behavioral.xml",
+      "started_at": "2026-09-28T17:28:06.154034+00:00",
+      "duration_seconds": 798.055,
+      "exit_code": 0,
+      "log_sha256": "60b9bf12cdb0c078a66f79efdb3d3ab7e105bf568d9e18e00b73797a2e9656af"
+    },
+    {
+      "name": "quality",
+      "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/tmp/order95-quality.xml",
+      "started_at": "2026-09-28T17:41:24.235143+00:00",
+      "duration_seconds": 111.173,
+      "exit_code": 0,
+      "log_sha256": "b85e6a6e19f9c4a888aeb2053b93ad50e257290891fc2eae451d80c7770c7b85"
+    },
+    {
+      "name": "engine-identity",
+      "command": "uv run --no-sync python scripts/build_engine_build_identity.py --check",
+      "started_at": "2026-09-28T17:10:16.643685+00:00",
+      "duration_seconds": 0.628,
+      "exit_code": 0,
+      "log_sha256": "b1b22ca84a698371baac564225064bbbeb2d80ca9cb9fcb5af494572519fe690"
+    },
+    {
+      "name": "base-contract",
+      "command": "uv run --no-sync python scripts/build_external_contract.py --check --base-ref bb2bbf7e63b7a5fd52df6401c9f879c615dc61f7",
+      "started_at": "2026-09-28T17:10:17.273183+00:00",
+      "duration_seconds": 78.284,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "wheel",
+      "command": "uv run --no-sync python scripts/smoke_installed_contract_wheel.py",
+      "started_at": "2026-09-28T17:11:35.559407+00:00",
+      "duration_seconds": 13.174,
+      "exit_code": 0,
+      "log_sha256": "24ced3586dfecd320d4570ace2b9283f2ed1122fe92c70f0fccd1fbf7a8963df"
+    },
+    {
+      "name": "shards",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "started_at": "2026-09-28T17:11:48.736109+00:00",
+      "duration_seconds": 0.121,
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "precommit",
+      "command": "uv run pre-commit run --all-files",
+      "started_at": "2026-09-28T17:11:48.857926+00:00",
+      "duration_seconds": 1.363,
+      "exit_code": 0,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67",
+      "final_recheck": {
+        "exit_code": 0,
+        "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+      },
+      "note": "Repeated after the reviewed audit/tooling changes; final exit code 0."
+    },
+    {
+      "name": "ts-generated",
+      "command": "$NODE_BIN scripts/check-generated.mjs",
+      "exit_code": 0,
+      "duration_seconds": 0.982,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ts-types",
+      "command": "$NODE_BIN node_modules/typescript/bin/tsc --noEmit",
+      "exit_code": 0,
+      "duration_seconds": 0.722,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ts-unit",
+      "command": "$NODE_BIN node_modules/tsx/dist/cli.mjs --test src/battlefield-conformance.test.ts src/canonical-json.test.ts src/interaction-conformance.test.ts",
+      "exit_code": 0,
+      "duration_seconds": 1.386,
+      "log_sha256": "34f5047c29ae4e071e66d52fdbd0bd3bb62ac95e780bedf18fe84302f5951d4d"
+    },
+    {
+      "name": "ts-conformance",
+      "command": "$NODE_BIN node_modules/tsx/dist/cli.mjs src/main.ts",
+      "exit_code": 0,
+      "duration_seconds": 117.085,
+      "log_sha256": "3204cb1aec3e1ef8a9ac58ac914ca5485d1fa195edfa265cdda3458ef699edc2"
+    }
+  ],
+  "behavioral": {
+    "tests": 9756,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 795.971,
+    "passed": 9756,
+    "coverage_percent": 85.20337902454574,
+    "coverage_required_percent": 85,
+    "junit_sha256": "6c6296f449de7ca8ace1026bcee44b5260cf1daf07f49df2a167c8328836c7e2",
+    "total_runs_with_coverage": 2,
+    "final_successful_runs_with_coverage": 1,
+    "additional_final_runs_without_coverage": 0
+  },
+  "code_quality": {
+    "tests": 762,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 110.693,
+    "passed": 762,
+    "junit_sha256": "b974eeab0483f727993e6e82c539b96317b6e2c92b846ad1f08754a82097f028",
+    "coverage": false
+  },
+  "focused_cross_category": {
+    "tests": 183,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 258.426,
+    "junit_sha256": "09321f8e91d20f17f18804b255a662bf1b2fc51e23a7bafea72417cedafb1f2f",
+    "command": "uv run --no-sync pytest tests/unit/test_order80_normal_move.py tests/unit/test_order79_control_first.py tests/unit/test_action_movement_interruption.py tests/unit/test_order51_flight.py tests/unit/test_phase9b_lifecycle.py::test_battle_phases_advance_command_movement_shooting_charge_fight tests/unit/test_phase9b_lifecycle.py::test_phase_wrap_switches_active_player tests/unit/test_phase9b_lifecycle.py::test_battle_round_increments_after_all_players_complete_fight_phase tests/unit/test_order36_timing_authority.py::test_r36_001_scope_history_preserves_movement_attack_interleaving tests/unit/test_phase10q_transports.py::test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_replay -q --no-cov --junitxml=/tmp/order95-cross-category.xml"
+  },
+  "audit_checks": {
+    "focused_audit_and_roadmap_tests_passed": 31,
+    "focused_final_failure_regressions_passed": 2,
+    "core_and_changelog_exact_capture_verification": "passed",
+    "order84_and_order94_historical_report_checks": "passed",
+    "current_comparison_report_check": "passed",
+    "negative_probes": "independently_reproduced_byte_for_byte"
+  },
+  "typescript": {
+    "npm_available": false,
+    "execution": "Invoked the package scripts directly with bundled Node and existing dependencies from an identical package-lock.json; the temporary dependency symlink was removed. npm ci/npm test were not run.",
+    "unit_tests_passed": 5,
+    "http_conformance_assertions_passed": 342
+  },
+  "independent_review": {
+    "rounds": [
+      {
+        "round": 1,
+        "outcome": "changes_requested",
+        "findings": [
+          "Own the missing complete clause-evidence inventory before PFINAL.",
+          "Refresh README current audit and certification status."
+        ]
+      },
+      {
+        "round": 2,
+        "outcome": "approved_no_actionable_findings",
+        "verification": "31 focused tests, both source captures; final aggregate results were still pending."
+      },
+      {
+        "round": 3,
+        "outcome": "approved_no_actionable_findings",
+        "verification": "FAQ display preserves observed ordinals and exact JSON identities; focused tests and generated report pass."
+      }
+    ],
+    "push_before_approval": false
+  },
+  "initial_aggregate_attempt": {
+    "checks": [
+      {
+        "name": "behavioral",
+        "command": "uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85 --junitxml=/tmp/order95-behavioral.xml",
+        "started_at": "2026-09-28T17:09:06.310934+00:00",
+        "duration_seconds": 859.58,
+        "exit_code": 1,
+        "log_sha256": "6177e9a2bfc55679a6dce97f4efe8e1f1b380fd43c5917f72696ddd0a837328e"
+      },
+      {
+        "name": "quality",
+        "command": "uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov --junitxml=/tmp/order95-quality.xml",
+        "started_at": "2026-09-28T17:23:25.903798+00:00",
+        "duration_seconds": 115.514,
+        "exit_code": 1,
+        "log_sha256": "66e8f57822598518dd555ca58caa9ac577447331732db454bd7e0e7f38477a42"
+      }
+    ],
+    "behavioral_passed": 9755,
+    "behavioral_failed": 1,
+    "coverage_percent": 85.2,
+    "quality_passed": 761,
+    "quality_failed": 1,
+    "disposition": "Invalidated: workers had imported the pre-review comparison module; quality also identified an opaque FAQ UUID matching a retired-edition token. Both focused failures were verified fixed before restarting final suites on frozen code."
+  },
+  "iteration_failures_resolved": [
+    "Initial audit test collection failed before its module existed.",
+    "Changelog parser fixture initially used different JSON spacing from the fixed observed wire capture.",
+    "Pyright required an explicit type on the JSON fixture.",
+    "The comparison generator originally recognized only CAUDIT-01; it now accepts the validated global CAUDIT finding family."
+  ],
+  "complete_game_performance": "not_certified_no_complete_game_samples",
+  "caudit_01_closed": false
+}

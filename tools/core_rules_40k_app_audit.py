@@ -138,7 +138,7 @@ def category_pr_ids(rows: tuple[RoadmapRow, ...]) -> dict[str, tuple[str, ...]]:
     inventory: dict[str, list[str]] = {f"{number:02d}": [] for number in range(1, 26)}
     for row in rows:
         for finding in row.finding_ids:
-            if finding == "CAUDIT-01":
+            if re.fullmatch(r"CAUDIT-\d{2}[A-Z]?", finding) is not None:
                 continue
             category = finding[1:3]
             if category not in inventory:
