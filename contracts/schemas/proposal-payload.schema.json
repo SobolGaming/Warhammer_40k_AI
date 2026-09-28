@@ -1364,7 +1364,10 @@
                 "$ref": "#/$defs/identifier"
               },
               "target_unit_instance_id": {
-                "$ref": "#/$defs/identifier"
+                "anyOf": [
+                  {"$ref": "#/$defs/identifier"},
+                  {"type": "null"}
+                ]
               },
               "wargear_id": {
                 "$ref": "#/$defs/identifier"

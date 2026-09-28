@@ -1,5 +1,11 @@
 # CORE V2 external contract
 
+Contract 42 permits nullable ranged targets and empty ranged declarations.
+Optional selected-weapon inventories retain Hazardous and One Shot authority.
+See [Order 95](../docs/ORDER_95_SCOPE_PLAN.md) and the adapter contract.
+Persistence envelopes bind Contract 42.0 and use
+`session-persistence-v34-optional-ranged-targets` with exact runtime identity.
+
 Contract 41 preserves source modifier operations and engine-owned per-occurrence
 subset selections. See [40 to 41 migration](migrations/40-to-41.md).
 
@@ -23,7 +29,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `41.0.0`
+Contract version: `42.0.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 
@@ -154,7 +155,7 @@ def _apply_shooting_declaration_decision(
     if shooting_state is None or shooting_state.active_selection is None:
         raise GameLifecycleError("Shooting declaration requires active_selection.")
     proposal = shooting_declaration_proposal_from_json(result.payload)
-    attack_pools, ineligible_unit_ids = _attack_pools_for_proposal(
+    attack_pools, ineligible_unit_ids, targetless = _attack_pools_for_proposal(
         state=state,
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
@@ -166,7 +167,7 @@ def _apply_shooting_declaration_decision(
     )
     one_shot_records = _record_one_shot_weapon_uses_for_attack_pools(
         state=state,
-        attack_pools=attack_pools,
+        attack_pools=(*attack_pools, *targetless),
         source_phase=BattlePhase.SHOOTING,
         result_id=result.result_id,
     )
@@ -175,6 +176,7 @@ def _apply_shooting_declaration_decision(
         attacker_player_id=_active_player_id(state),
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=attack_pools,
+        weapons_without_attacks=targetless if targetless or not attack_pools else None,
     )
     from warhammer40k_core.engine.firing_deck_restrictions import record_firing_deck_restriction
 
@@ -190,23 +192,25 @@ def _apply_shooting_declaration_decision(
             attack_sequence=attack_sequence,
         )
     )
-    ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
-        state=state,
-        player_id=_active_player_id(state),
-        unit_instance_id=proposal.unit_instance_id,
-        phase=BattlePhase.SHOOTING,
-        request_id=result.request_id,
-        result_id=result.result_id,
-    )
-    apply_hidden_status_loss_after_ranged_attacks(
-        state=state,
-        decisions=decisions,
-        unit_instance_id=proposal.unit_instance_id,
-        request_id=result.request_id,
-        result_id=result.result_id,
-        ruleset_descriptor=ruleset_descriptor,
-        event_type="unit_hidden_status_lost_after_shooting",
-    )
+    ranged_attack_history_record = None
+    if attack_pools:
+        ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
+            state=state,
+            player_id=_active_player_id(state),
+            unit_instance_id=proposal.unit_instance_id,
+            phase=BattlePhase.SHOOTING,
+            request_id=result.request_id,
+            result_id=result.result_id,
+        )
+        apply_hidden_status_loss_after_ranged_attacks(
+            state=state,
+            decisions=decisions,
+            unit_instance_id=proposal.unit_instance_id,
+            request_id=result.request_id,
+            result_id=result.result_id,
+            ruleset_descriptor=ruleset_descriptor,
+            event_type="unit_hidden_status_lost_after_shooting",
+        )
     decisions.event_log.append(
         "shooting_declaration_accepted",
         validate_json_value(
@@ -222,7 +226,14 @@ def _apply_shooting_declaration_decision(
                 "visibility_cache_key": proposal.visibility_cache_key,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
                 "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
-                "ranged_attack_history_record": ranged_attack_history_record.to_payload(),
+                "ranged_attack_history_record": None
+                if ranged_attack_history_record is None
+                else ranged_attack_history_record.to_payload(),
+                **(
+                    {"weapons_without_attacks": [row.to_payload() for row in targetless]}
+                    if targetless or not attack_pools
+                    else {}
+                ),
                 "ineligible_unit_instance_ids": list(ineligible_unit_ids),
                 "phase_body_status": "declaration_accepted",
             }
@@ -249,7 +260,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         or proposal.source_decision_result_id != out_of_phase_state.source_decision_result_id
     ):
         return False
-    attack_pools, ineligible_unit_ids = _attack_pools_for_proposal(
+    attack_pools, ineligible_unit_ids, targetless = _attack_pools_for_proposal(
         state=state,
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
@@ -265,7 +276,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         raise GameLifecycleError("Out-of-phase shooting cannot mark extra units as shot.")
     one_shot_records = _record_one_shot_weapon_uses_for_attack_pools(
         state=state,
-        attack_pools=attack_pools,
+        attack_pools=(*attack_pools, *targetless),
         source_phase=out_of_phase_state.parent_phase,
         result_id=result.result_id,
     )
@@ -274,6 +285,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         attacker_player_id=out_of_phase_state.player_id,
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=attack_pools,
+        weapons_without_attacks=targetless if targetless or not attack_pools else None,
         source_phase=BattlePhase.SHOOTING,
     )
     state.replace_out_of_phase_shooting_state(
@@ -282,23 +294,25 @@ def _apply_out_of_phase_shooting_declaration_decision(
             attack_sequence=attack_sequence,
         )
     )
-    ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
-        state=state,
-        player_id=out_of_phase_state.player_id,
-        unit_instance_id=proposal.unit_instance_id,
-        phase=out_of_phase_state.parent_phase,
-        request_id=result.request_id,
-        result_id=result.result_id,
-    )
-    apply_hidden_status_loss_after_ranged_attacks(
-        state=state,
-        decisions=decisions,
-        unit_instance_id=proposal.unit_instance_id,
-        request_id=result.request_id,
-        result_id=result.result_id,
-        ruleset_descriptor=ruleset_descriptor,
-        event_type="unit_hidden_status_lost_after_out_of_phase_shooting",
-    )
+    ranged_attack_history_record = None
+    if attack_pools:
+        ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
+            state=state,
+            player_id=out_of_phase_state.player_id,
+            unit_instance_id=proposal.unit_instance_id,
+            phase=out_of_phase_state.parent_phase,
+            request_id=result.request_id,
+            result_id=result.result_id,
+        )
+        apply_hidden_status_loss_after_ranged_attacks(
+            state=state,
+            decisions=decisions,
+            unit_instance_id=proposal.unit_instance_id,
+            request_id=result.request_id,
+            result_id=result.result_id,
+            ruleset_descriptor=ruleset_descriptor,
+            event_type="unit_hidden_status_lost_after_out_of_phase_shooting",
+        )
     decisions.event_log.append(
         "out_of_phase_shooting_declaration_accepted",
         validate_json_value(
@@ -306,6 +320,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "player_id": out_of_phase_state.player_id,
+                **({"active_player_id": state.active_player_id} if not attack_pools else {}),
                 "parent_phase": out_of_phase_state.parent_phase.value,
                 "source_rule_id": out_of_phase_state.source_rule_id,
                 "unit_instance_id": proposal.unit_instance_id,
@@ -316,7 +331,14 @@ def _apply_out_of_phase_shooting_declaration_decision(
                 "attack_sequence_id": attack_sequence.sequence_id,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
                 "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
-                "ranged_attack_history_record": ranged_attack_history_record.to_payload(),
+                "ranged_attack_history_record": None
+                if ranged_attack_history_record is None
+                else ranged_attack_history_record.to_payload(),
+                **(
+                    {"weapons_without_attacks": [row.to_payload() for row in targetless]}
+                    if targetless or not attack_pools
+                    else {}
+                ),
             }
         ),
     )
@@ -353,7 +375,7 @@ def _record_ranged_attack_history_for_declaration(
 def _record_one_shot_weapon_uses_for_attack_pools(
     *,
     state: GameState,
-    attack_pools: tuple[RangedAttackPool, ...],
+    attack_pools: tuple[RangedAttackPool | TargetlessWeapon, ...],
     source_phase: BattlePhase,
     result_id: str,
 ) -> tuple[OneShotWeaponUseRecord, ...]:

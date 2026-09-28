@@ -16,10 +16,14 @@ from warhammer40k_core.engine.shooting_types import ShootingType
 
 if TYPE_CHECKING:
     from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+        AttackSequenceCompletedHookRegistry,
+    )
     from warhammer40k_core.engine.decision_controller import DecisionController
     from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phases.shooting_model import ShootingUnitSelection
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 NO_ATTACK_COMPLETION_EVENT = "shooting_without_attacks_completed"
 
@@ -77,6 +81,8 @@ def complete_shooting_without_attacks(
     selected_shooting_type: ShootingType | None,
     forced_shooting_type: ShootingType | None,
     army_catalog: ArmyCatalog,
+    completion_hooks: AttackSequenceCompletedHookRegistry | None = None,
+    runtime_modifiers: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus:
     from warhammer40k_core.engine.firing_deck_restrictions import record_firing_deck_restriction
     from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
@@ -132,17 +138,43 @@ def complete_shooting_without_attacks(
         embarked_unit_instance_ids=cargo,
         result_id=selection.result_id,
     )
-    decisions.event_log.append(
+    event = decisions.event_log.append(
         NO_ATTACK_COMPLETION_EVENT, validate_json_value(msgspec.to_builtins(row))
     )
-    if host is not None:
-        return _complete_out_of_phase_shooting(
-            state=state, decisions=decisions, completed_state=host
+    pending = None
+    if completion_hooks is not None:
+        if runtime_modifiers is None:
+            raise GameLifecycleError("Selection obligations require their runtime modifiers.")
+        from warhammer40k_core.engine.shooting_selection_completion import (
+            pending_selection_obligations,
         )
-    assert ordinary is not None
-    state.replace_shooting_phase_state(
-        replace(ordinary, active_selection=None, selected_shooting_type=None)
-    )
+
+        pending = pending_selection_obligations(
+            row=row,
+            event=event,
+            state=state,
+            decisions=decisions,
+            hooks=completion_hooks,
+            modifiers=runtime_modifiers,
+        )
+    if host is not None:
+        if pending is None:
+            return _complete_out_of_phase_shooting(
+                state=state, decisions=decisions, completed_state=host
+            )
+        state.replace_out_of_phase_shooting_state(
+            host.with_pending_completed_attack_sequence(pending)
+        )
+    else:
+        assert ordinary is not None
+        state.replace_shooting_phase_state(
+            replace(
+                ordinary,
+                active_selection=None,
+                selected_shooting_type=None,
+                pending_completed_attack_sequence=pending,
+            )
+        )
     return LifecycleStatus.advanced(
         stage=state.stage,
         payload={

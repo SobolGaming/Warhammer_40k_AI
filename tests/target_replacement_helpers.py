@@ -19,6 +19,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_declaration import WeaponDeclaration
 from warhammer40k_core.geometry.pose import Pose
 
 
@@ -27,6 +28,7 @@ def replacement_scene(
     mode: str = "normal",
     moved: bool = True,
     alternatives: bool = True,
+    targetless_prefix: bool = False,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance], DecisionRequest]:
     profile = _weapon_profile_by_wargear(wargear_id="core-bolt-rifle", weapon_profile_id=None)
     if mode == "one_shot":
@@ -117,11 +119,29 @@ def replacement_scene(
         weapon_profile_id=cast(str, second["weapon_profile_id"]),
         target_unit_instance_id=units["old" if mode == "snap" else "new"].unit_instance_id,
     )
+    declarations: tuple[WeaponDeclaration, ...] = (first, declaration)
+    if targetless_prefix:
+        other = next(
+            w
+            for w in weapons
+            if w["model_instance_id"]
+            not in {first.attacker_model_instance_id, declaration.attacker_model_instance_id}
+        )
+        declarations = (
+            replace(
+                first,
+                weapon_instance_id=cast(str, other["weapon_instance_id"]),
+                attacker_model_instance_id=cast(str, other["model_instance_id"]),
+                weapon_profile_id=cast(str, other["weapon_profile_id"]),
+                target_unit_instance_id=None,
+            ),
+            *declarations,
+        )
     request = _decision_request(
         _submit_payload(
             lifecycle,
             request=request,
-            payload=replace(original, declarations=(first, declaration)).to_payload(),
+            payload=replace(original, declarations=declarations).to_payload(),
             result_id="order42:declaration",
         )
     )

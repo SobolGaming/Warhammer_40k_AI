@@ -7,7 +7,7 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSeque
 from warhammer40k_core.engine.attack_sequence_completion_hooks import AttackSequenceCompletedContext
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -88,32 +88,51 @@ def attack_context_for_trigger(
         phase = BattlePhase(payload["source_phase"])
     except ValueError as error:
         raise GameLifecycleError("Attack completion trigger phase is invalid.") from error
-    source = tuple(
-        event
-        for event in decisions.event_log.records
-        if event.event_id == payload["trigger_event_id"]
+    from warhammer40k_core.engine.shooting_selection_completion import selection_completion_origin
+    from warhammer40k_core.engine.shooting_without_attacks import completion_from_event
+
+    origin = selection_completion_origin(
+        events=decisions.event_log.records, sequence_id=sequence.sequence_id
     )
-    if (
-        len(source) != 1
-        or source[0].event_type != "attack_sequence_completed"
-        or source[0].payload
-        != {
-            "sequence_id": sequence.sequence_id,
-            "attacker_player_id": sequence.attacker_player_id,
-            "attacking_unit_instance_id": sequence.attacking_unit_instance_id,
+    if origin is not None:
+        if origin[0].event_id != payload["trigger_event_id"] or origin[1] != sequence:
+            raise GameLifecycleError("Selection completion trigger source authority drift.")
+        row = completion_from_event(origin[0])
+        evidence: dict[str, JsonValue] = {
+            "game_id": row.game_id,
+            "battle_round": row.battle_round,
+            "phase": row.phase.value,
+            "attack_phase": sequence.source_phase.value,
         }
-    ):
-        raise GameLifecycleError("Attack completion trigger source authority drift.")
-    participation = tuple(
-        event
-        for event in decisions.event_log.records
-        if event.event_type == "attack_sequence_models_attacked"
-        and isinstance(event.payload, dict)
-        and event.payload.get("sequence_id") == sequence.sequence_id
-    )
-    if len(participation) != 1 or not isinstance(participation[0].payload, dict):
-        raise GameLifecycleError("Attack completion trigger lacks model participation authority.")
-    evidence = participation[0].payload
+    else:
+        source = tuple(
+            event
+            for event in decisions.event_log.records
+            if event.event_id == payload["trigger_event_id"]
+        )
+        if (
+            len(source) != 1
+            or source[0].event_type != "attack_sequence_completed"
+            or source[0].payload
+            != {
+                "sequence_id": sequence.sequence_id,
+                "attacker_player_id": sequence.attacker_player_id,
+                "attacking_unit_instance_id": sequence.attacking_unit_instance_id,
+            }
+        ):
+            raise GameLifecycleError("Attack completion trigger source authority drift.")
+        participation = tuple(
+            event
+            for event in decisions.event_log.records
+            if event.event_type == "attack_sequence_models_attacked"
+            and isinstance(event.payload, dict)
+            and event.payload.get("sequence_id") == sequence.sequence_id
+        )
+        if len(participation) != 1 or not isinstance(participation[0].payload, dict):
+            raise GameLifecycleError(
+                "Attack completion trigger lacks model participation authority."
+            )
+        evidence = participation[0].payload
     if (
         payload["game_id"] != state.game_id
         or evidence.get("game_id") != state.game_id

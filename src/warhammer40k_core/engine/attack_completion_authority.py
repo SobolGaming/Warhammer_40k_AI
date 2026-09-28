@@ -36,6 +36,14 @@ def completed_attack_sequence(
         and isinstance(event.payload, dict)
         and event.payload.get("sequence_id") == sequence_id
     )
+    if not matches:
+        from warhammer40k_core.engine.shooting_selection_completion import (
+            selection_completion_origin,
+        )
+
+        origin = selection_completion_origin(events=event_records, sequence_id=sequence_id)
+        if origin is not None:
+            return origin[1]
     if len(matches) != 1:
         raise GameLifecycleError("Attack completion requires unique executor state evidence.")
     index, event = matches[0]

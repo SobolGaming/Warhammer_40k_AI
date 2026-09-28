@@ -114,7 +114,9 @@ def _validate_gathered_group_matches_attack_pools(
             raise GameLifecycleError("GatheredAttackGroup signature drift.")
 
 
-def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
+def _validate_attack_pools(
+    values: object, *, allow_empty: bool = False
+) -> tuple[RangedAttackPool, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError("AttackSequence attack_pools must be a tuple.")
     pools: list[RangedAttackPool] = []
@@ -122,7 +124,7 @@ def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
         if type(value) is not RangedAttackPool:
             raise GameLifecycleError("AttackSequence attack_pools must contain attack pools.")
         pools.append(value)
-    if not pools:
+    if not pools and not allow_empty:
         raise GameLifecycleError("AttackSequence requires at least one attack pool.")
     return tuple(pools)
 
@@ -148,7 +150,7 @@ def _validate_pool_indices_within_attack_pools(
     attack_pools: tuple[RangedAttackPool, ...],
 ) -> None:
     _validate_pool_index_tuple(field_name, pool_indices)
-    _validate_attack_pools(attack_pools)
+    _validate_attack_pools(attack_pools, allow_empty=True)
     for pool_index in pool_indices:
         if pool_index >= len(attack_pools):
             raise GameLifecycleError(f"{field_name} contains an index outside attack_pools.")

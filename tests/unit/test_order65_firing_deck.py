@@ -8,6 +8,10 @@ from dataclasses import replace
 
 import pytest
 from tests.firing_deck_helpers import PASSENGERS, TRANSPORT, firing_deck_session, submit_firing_deck
+from tests.phase13b_shooting_declaration_helpers import (
+    _compact_test_unit_poses,
+    _unit_placement_at,
+)
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -17,6 +21,7 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.shooting_eligibility_state import shooting_state_restriction_reason
+from warhammer40k_core.geometry.pose import Pose
 
 
 @pytest.mark.parametrize("contribute", [False, True])
@@ -106,12 +111,7 @@ def test_restriction_survives_phase_and_cargo_changes_and_expires_at_turn_end(
 
 def test_noncontributor_cargo_drift_rejects_before_queue_pop_or_mutation() -> None:
     session, request, proposal = firing_deck_session()
-    state = session.lifecycle.state
-    assert state is not None
-    state.transport_cargo_states[0] = replace(
-        state.transport_cargo_states[0],
-        embarked_unit_instance_ids=(PASSENGERS[0],),
-    )
+    _remove_noncontributor_from_cargo_with_valid_presence(session)
     before = copy.deepcopy(session.lifecycle.to_payload())
     status = submit_firing_deck(session, request, proposal)
     assert status.status_kind is LifecycleStatusKind.INVALID
@@ -121,12 +121,7 @@ def test_noncontributor_cargo_drift_rejects_before_queue_pop_or_mutation() -> No
 
 def test_restore_rejects_pending_noncontributor_snapshot_drift() -> None:
     session, _request, _proposal = firing_deck_session()
-    state = session.lifecycle.state
-    assert state is not None
-    state.transport_cargo_states[0] = replace(
-        state.transport_cargo_states[0],
-        embarked_unit_instance_ids=(PASSENGERS[0],),
-    )
+    _remove_noncontributor_from_cargo_with_valid_presence(session)
     with pytest.raises(GameLifecycleError, match="pending cargo snapshot drifted"):
         GameLifecycle.from_payload(session.lifecycle.to_payload())
 
@@ -276,4 +271,29 @@ def test_engine_turn_boundary_expires_restriction_and_restores_exactly() -> None
     persisted = session.to_persistence_payload()
     assert (
         LocalGameSession.from_persistence_payload(persisted).to_persistence_payload() == persisted
+    )
+
+
+def _remove_noncontributor_from_cargo_with_valid_presence(session: LocalGameSession) -> None:
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    state.transport_cargo_states[0] = replace(
+        state.transport_cargo_states[0],
+        embarked_unit_instance_ids=(PASSENGERS[0],),
+    )
+    # Isolate cargo snapshot drift without introducing unaccounted living models.
+    passenger = rules_unit_view_by_id(state=state, unit_instance_id=PASSENGERS[1])
+    unit = passenger.components[0].unit
+    state.replace_battlefield_state(
+        state.battlefield_state.with_added_unit_placement(
+            _unit_placement_at(
+                unit,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=_compact_test_unit_poses(
+                    origin=Pose.at(10.0, 20.0), model_count=len(unit.own_models)
+                ),
+            )
+        )
     )

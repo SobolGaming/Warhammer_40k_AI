@@ -1,0 +1,180 @@
+{
+  "workload": "order95-optional-shooting-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c62586d84bbcf166e273482e3d8c3815292291dff6007c479dd209dcb51b293b",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "fixture": "Two friendly single-model units; one enemy; no terrain; One Shot bolter.",
+  "seeds": [
+    "order91-empty-shooting"
+  ],
+  "policy": "Engine-enumerated options and validated proposals through LocalGameSession",
+  "timing_boundary": "Declaration through executor completion; setup and restore separate",
+  "hashes": {
+    "scripts/benchmark_order95_shooting.py": "3c6626546bde358ff1a895765b01e5e9ef569ddc651f51d85f0b3e7aa86766bf",
+    "tests/empty_shooting_helpers.py": "f018623d3fd365df0512096f309f891892f7baf18eb45ce704d464bb65257213",
+    "tests/optional_shooting_helpers.py": "4d2663d282dac38329584deb9383bad1ba46425ef881851727a4c09c61d953e0",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "targeted",
+      "setup_seconds": [
+        2.1392179579706863,
+        0.2519215829670429,
+        0.2532711669919081,
+        0.253212290990632,
+        0.25261454097926617
+      ],
+      "samples_seconds": [
+        0.0772358329850249,
+        0.07328979199519381,
+        0.07266441703541204,
+        0.072675125033129,
+        0.072732291999273
+      ],
+      "restore_seconds": [
+        0.2917725419974886,
+        0.25797183299437165,
+        0.25830816599773243,
+        0.2590535419876687,
+        0.2602332920068875
+      ],
+      "mean": 0.07371949180960655,
+      "median": 0.072732291999273,
+      "p95_and_maximum": 0.0772358329850249,
+      "restore_mean": 0.2654678749968298,
+      "work_counts": [
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        }
+      ]
+    },
+    {
+      "case": "targetless",
+      "setup_seconds": [
+        0.25287016603397205,
+        0.2583182090311311,
+        0.2572636249824427,
+        0.2547552500036545,
+        0.2533377500367351
+      ],
+      "samples_seconds": [
+        0.044665833993349224,
+        0.00846441596513614,
+        0.008550250029657036,
+        0.008399875019676983,
+        0.008880082983523607
+      ],
+      "restore_seconds": [
+        0.25557129096705467,
+        0.25870941701577976,
+        0.2623618749785237,
+        0.2560511669726111,
+        0.257488208997529
+      ],
+      "mean": 0.0157920915982686,
+      "median": 0.008550250029657036,
+      "p95_and_maximum": 0.044665833993349224,
+      "restore_mean": 0.25803639178629967,
+      "work_counts": [
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 1
+        }
+      ]
+    },
+    {
+      "case": "empty",
+      "setup_seconds": [
+        0.28716758301015943,
+        0.25174095801776275,
+        0.25182700000004843,
+        0.2521988329826854,
+        0.25435058400034904
+      ],
+      "samples_seconds": [
+        0.007746791990939528,
+        0.007736624975223094,
+        0.007515208970289677,
+        0.008109792019240558,
+        0.00772858300479129
+      ],
+      "restore_seconds": [
+        0.25459979102015495,
+        0.25639483402483165,
+        0.25536391604691744,
+        0.2589785829768516,
+        0.2563614579848945
+      ],
+      "mean": 0.00776740019209683,
+      "median": 0.007736624975223094,
+      "p95_and_maximum": 0.008109792019240558,
+      "restore_mean": 0.25633971641073006,
+      "work_counts": [
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 0
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 0
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 0
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 0
+        },
+        {
+          "ranged_history": 0,
+          "one_shot_selections": 0
+        }
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "full_game_samples": 0,
+  "full_game_certified": false,
+  "timing_budget": "Diagnostic; component timing gates remain deferred by Order 32"
+}

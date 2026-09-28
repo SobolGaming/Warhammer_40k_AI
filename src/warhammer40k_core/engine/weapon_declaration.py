@@ -30,7 +30,7 @@ class WeaponDeclarationPayload(TypedDict):
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
-    target_unit_instance_id: str
+    target_unit_instance_id: str | None
     shooting_type: str
     selected_weapon_ability_ids: list[str]
     firing_deck_source_unit_instance_id: str | None
@@ -100,7 +100,7 @@ class WeaponDeclaration:
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
-    target_unit_instance_id: str
+    target_unit_instance_id: str | None
     shooting_type: ShootingType
     selected_weapon_ability_ids: tuple[str, ...] = ()
     firing_deck_source_unit_instance_id: str | None = None
@@ -139,7 +139,7 @@ class WeaponDeclaration:
         object.__setattr__(
             self,
             "target_unit_instance_id",
-            _validate_identifier(
+            _validate_optional_identifier(
                 "WeaponDeclaration target_unit_instance_id",
                 self.target_unit_instance_id,
             ),
@@ -586,6 +586,8 @@ class RangedAttackPool:
     ) -> Self:
         if type(declaration) is not WeaponDeclaration:
             raise GameLifecycleError("RangedAttackPool requires a WeaponDeclaration.")
+        if declaration.target_unit_instance_id is None:
+            raise GameLifecycleError("An attack pool requires a selected target.")
         from warhammer40k_core.engine.attack_hit_modifiers import declaration_hit_modifiers
 
         return cls(
@@ -1016,8 +1018,6 @@ def unresolved_attacks_for_validation(weapon_profile: WeaponProfile) -> int:
 def _validate_weapon_declarations(values: object) -> tuple[WeaponDeclaration, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError("ShootingDeclarationProposal declarations must be a tuple.")
-    if not values:
-        raise GameLifecycleError("ShootingDeclarationProposal requires declarations.")
     declarations = cast(tuple[object, ...], values)
     validated: list[WeaponDeclaration] = []
     for value in declarations:

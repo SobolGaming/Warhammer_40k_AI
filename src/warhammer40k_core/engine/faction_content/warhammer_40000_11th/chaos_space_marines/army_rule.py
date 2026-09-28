@@ -151,6 +151,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=SOURCE_RULE_ID,
                 handler=resolve_dark_pact_attack_sequence_completion,
                 candidate_handler=dark_pact_completion_candidates,
+                requires_attacks=False,
             ),
         ),
         mortal_wound_feel_no_pain_hook_bindings=(

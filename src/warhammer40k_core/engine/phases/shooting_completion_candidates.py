@@ -27,6 +27,8 @@ def shooting_completion_candidates(
 ) -> tuple[TimingRuleCandidate, ...]:
     from warhammer40k_core.engine.phases.shooting_surge_candidates import surge_candidates
 
+    if not sequence.attack_pools:
+        return ()
     candidates: list[TimingRuleCandidate] = []
     for player_id in state.player_ids:
         friendly = player_id == sequence.attacker_player_id

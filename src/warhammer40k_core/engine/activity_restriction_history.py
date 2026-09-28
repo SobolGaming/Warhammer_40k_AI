@@ -118,9 +118,16 @@ def restore_checkpoint_activity_restrictions(
             or row.sequence_id not in completed_sequences
         ):
             continue
-        if not row.model_instance_ids or not set(row.model_instance_ids) <= model_owners.keys():
+        if not set(row.model_instance_ids) <= model_owners.keys():
             raise GameLifecycleError("Completed shooting activity model identity drifted.")
-        owners = {model_owners[model_id][0] for model_id in row.model_instance_ids}
+        from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+        owners = {
+            rules_unit_view_by_id(
+                state=state, unit_instance_id=row.attacking_unit_instance_id
+            ).owner_player_id,
+            *(model_owners[model_id][0] for model_id in row.model_instance_ids),
+        }
         if len(owners) != 1:
             raise GameLifecycleError("Completed shooting activity model ownership drifted.")
         target_ids = {

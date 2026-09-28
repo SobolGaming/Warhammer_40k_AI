@@ -28,7 +28,7 @@ from warhammer40k_core.engine.objective_control_boundary_history_integrity impor
     objective_control_record_for_boundary_event,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_identity_ids
+from warhammer40k_core.engine.rules_units import rules_unit_identity_ids, rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -108,9 +108,14 @@ def activity_restrictions_from_history(
             row = participations[sequence_id]
             if row.attack_phase != BattlePhase.SHOOTING.value:
                 continue
-            if not row.model_instance_ids or not set(row.model_instance_ids) <= model_owners.keys():
+            if not set(row.model_instance_ids) <= model_owners.keys():
                 raise GameLifecycleError("Activity restriction model ownership is invalid.")
-            owner_ids = {model_owners[model_id] for model_id in row.model_instance_ids}
+            owner_ids = {
+                rules_unit_view_by_id(
+                    state=state, unit_instance_id=row.attacking_unit_instance_id
+                ).owner_player_id,
+                *(model_owners[model_id] for model_id in row.model_instance_ids),
+            }
             if (
                 len(owner_ids) != 1
                 or payload

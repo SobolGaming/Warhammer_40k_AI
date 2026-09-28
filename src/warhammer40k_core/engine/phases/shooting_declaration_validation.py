@@ -3,6 +3,7 @@
 from __future__ import annotations
 from warhammer40k_core.engine.random_weapon_range import weapon_with_committed_range
 
+from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.weapon_profiles import AttackProfile
@@ -107,6 +108,21 @@ def _validate_declaration_submission(
             field="declarations",
         )
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
+    if (
+        shooting_state.selected_shooting_type.shooting_type
+        not in _legal_shooting_types_for_rules_unit(
+            state=state,
+            rules_unit=rules_unit,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+        )
+    ):
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="shooting_type_unavailable",
+            message="Selected shooting type is no longer available.",
+            field="declarations",
+        )
     if not _rules_unit_can_select_to_shoot(
         state=state,
         rules_unit=rules_unit,
@@ -217,7 +233,7 @@ def _attack_pools_for_proposal(
     runtime_modifier_registry: RuntimeModifierRegistry,
     shooting_player_id: str | None = None,
     out_of_phase_state: OutOfPhaseShootingState | None = None,
-) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...]]:
+) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...], tuple[TargetlessWeapon, ...]]:
     accepted_requests = tuple(
         record.request
         for record in decisions.records
@@ -244,7 +260,8 @@ def _attack_pools_for_proposal(
 
 
 type _AttackPoolValidationResult = (
-    tuple[tuple[RangedAttackPool, ...], tuple[str, ...]] | ShootingProposalValidationResult
+    tuple[tuple[RangedAttackPool, ...], tuple[str, ...], tuple[TargetlessWeapon, ...]]
+    | ShootingProposalValidationResult
 )
 
 
@@ -317,7 +334,13 @@ def _attack_pools_or_validation(
         out_of_phase_state,
     )
     proposal_target_unit_ids = tuple(
-        sorted({declaration.target_unit_instance_id for declaration in proposal.declarations})
+        sorted(
+            {
+                declaration.target_unit_instance_id
+                for declaration in proposal.declarations
+                if declaration.target_unit_instance_id is not None
+            }
+        )
     )
     if allowed_out_of_phase_target_ids is not None and any(
         target_id not in allowed_out_of_phase_target_ids for target_id in proposal_target_unit_ids
@@ -342,6 +365,7 @@ def _attack_pools_or_validation(
         target_unit_ids=proposal_target_unit_ids,
     )
     attack_pools: list[RangedAttackPool] = []
+    targetless: list[TargetlessWeapon] = []
     seen_declaration_keys: set[tuple[str, str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
     shooting_weapon_selection_counts: dict[tuple[str, str, WeaponKeyword, str], int] = {}
@@ -387,6 +411,31 @@ def _attack_pools_or_validation(
         )
         if pistol_validation is not None:
             return pistol_validation
+        if declaration.target_unit_instance_id is None:
+            from warhammer40k_core.engine.targetless_weapon_validation import (
+                validate_targetless_weapon,
+            )
+
+            targetless_result = validate_targetless_weapon(
+                declaration=declaration,
+                weapon_profile=weapon_profile,
+                proposal=proposal,
+                pending_request=pending_request,
+                selected_type=selected_shooting_type,
+            )
+            if isinstance(targetless_result, ShootingProposalValidationResult):
+                return targetless_result
+            limit = _validate_shooting_weapon_selection_limit(
+                proposal=proposal,
+                source_unit=source_unit,
+                declaration=declaration,
+                weapon_profile=targetless_result.weapon_profile,
+                selection_counts=shooting_weapon_selection_counts,
+            )
+            if limit is not None:
+                return limit
+            targetless.append(targetless_result)
+            continue
         target_rules_unit = rules_unit_view_by_id(
             state=state,
             unit_instance_id=declaration.target_unit_instance_id,
@@ -626,7 +675,7 @@ def _attack_pools_or_validation(
         return ShootingProposalValidationResult.valid(
             proposal_request_id=proposal.proposal_request_id
         )
-    return (tuple(attack_pools), ineligible_unit_ids)
+    return (tuple(attack_pools), ineligible_unit_ids, tuple(targetless))
 
 
 def _validate_shooting_weapon_selection_limit(
@@ -682,6 +731,8 @@ def _validate_duplicate_weapon_ability_selection(
 ) -> ShootingProposalValidationResult | None:
     from warhammer40k_core.engine.ability_instance_selection import WeaponInstanceSelectionError
 
+    if declaration.target_unit_instance_id is None:
+        raise GameLifecycleError("Targeted ability validation requires a target.")
     try:
         selection_context.selected_profile(
             declaration.target_unit_instance_id, declaration.selected_weapon_ability_ids
@@ -854,6 +905,8 @@ def _shooting_types_for_declaration_candidate(
     selected_shooting_type: ShootingType | None,
     army_catalog: ArmyCatalog,
 ) -> tuple[ShootingType, ...]:
+    if declaration.target_unit_instance_id is None:
+        raise GameLifecycleError("Target candidate validation requires a target.")
     forced_shooting_type = _forced_shooting_type_for_out_of_phase(out_of_phase_state)
     if forced_shooting_type is not None:
         if forced_shooting_type is not ShootingType.SNAP:

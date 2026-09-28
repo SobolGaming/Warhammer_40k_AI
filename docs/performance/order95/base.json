@@ -1,0 +1,80 @@
+{
+  "workload": "order95-optional-shooting-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "fixture": "Two friendly single-model units; one enemy; no terrain; One Shot bolter.",
+  "seeds": [
+    "order91-empty-shooting"
+  ],
+  "policy": "Engine-enumerated options and validated proposals through LocalGameSession",
+  "timing_boundary": "Declaration through executor completion; setup and restore separate",
+  "hashes": {
+    "scripts/benchmark_order95_shooting.py": "3c6626546bde358ff1a895765b01e5e9ef569ddc651f51d85f0b3e7aa86766bf",
+    "tests/empty_shooting_helpers.py": "f018623d3fd365df0512096f309f891892f7baf18eb45ce704d464bb65257213",
+    "tests/optional_shooting_helpers.py": "4d2663d282dac38329584deb9383bad1ba46425ef881851727a4c09c61d953e0",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "case": "targeted",
+      "setup_seconds": [
+        2.2285840829717927,
+        0.25418566702865064,
+        0.2548502499703318,
+        0.25426595902536064,
+        0.25305437500355765
+      ],
+      "samples_seconds": [
+        0.08688037504907697,
+        0.07308166695293039,
+        0.07305525004630908,
+        0.07259820797480643,
+        0.07264083297923207
+      ],
+      "restore_seconds": [
+        0.29316141695016995,
+        0.2588912910432555,
+        0.25842754100449383,
+        0.25808320799842477,
+        0.2578194999950938
+      ],
+      "mean": 0.07565126660047099,
+      "median": 0.07305525004630908,
+      "p95_and_maximum": 0.08688037504907697,
+      "restore_mean": 0.2652765913982876,
+      "work_counts": [
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        },
+        {
+          "ranged_history": 1,
+          "one_shot_selections": 1
+        }
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "full_game_samples": 0,
+  "full_game_certified": false,
+  "timing_budget": "Diagnostic; component timing gates remain deferred by Order 32"
+}

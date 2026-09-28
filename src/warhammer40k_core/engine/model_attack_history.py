@@ -198,7 +198,11 @@ def _participation_for_declaration(event: EventRecord) -> dict[str, JsonValue]:
         sequence_id = f"{'out-of-phase-' if out_of_phase else ''}attack-sequence:{result_id}"
         phase = _identifier(payload.get("parent_phase") if out_of_phase else payload.get("phase"))
         active_player_id = (
-            _object(payload.get("ranged_attack_history_record")).get("active_player_id")
+            (
+                payload.get("active_player_id")
+                if not entries
+                else _object(payload.get("ranged_attack_history_record")).get("active_player_id")
+            )
             if out_of_phase
             else payload.get("active_player_id")
         )
@@ -256,7 +260,14 @@ def validate_declared_model_attack_completions(
     from warhammer40k_core.engine.primary_mission_event_decision_authority import (
         validate_primary_mission_shooting_event_decision_authority,
     )
+    from warhammer40k_core.engine.targetless_weapon_history import (
+        validate_targetless_weapon_history,
+    )
     from warhammer40k_core.engine.weapon_declaration import shooting_declaration_proposal_from_json
+
+    validate_targetless_weapon_history(
+        state=state, events=event_records, decisions=decision_records
+    )
 
     records = {record.result.result_id: record for record in decision_records}
     ranged_history = {record.result_id: record for record in state.ranged_attack_history_records}
@@ -287,24 +298,38 @@ def validate_declared_model_attack_completions(
         )
         result_id = _identifier(payload.get("result_id"))
         ranged = ranged_history.get(result_id)
-        if ranged is None or (
-            ranged.player_id != authority_payload.get("active_player_id")
-            or ranged.request_id != payload.get("request_id")
-            or ranged.unit_instance_id != expected["attacking_unit_instance_id"]
-            or ranged.battle_round != expected["battle_round"]
-            or ranged.active_player_id != expected["active_player_id"]
-            or ranged.phase.value != expected["phase"]
-        ):
-            raise GameLifecycleError("Model attack history lacks its original ranged activation.")
-        if event.event_type == "out_of_phase_shooting_declaration_accepted":
-            if payload.get("ranged_attack_history_record") != ranged.to_payload():
-                raise GameLifecycleError("Model attack history parent timing authority drifted.")
-        elif payload.get("phase") != "shooting":
-            raise GameLifecycleError("Model attack history ordinary shooting phase drifted.")
+        if not payload.get("attack_pools"):
+            if ranged is not None or payload.get("ranged_attack_history_record") is not None:
+                raise GameLifecycleError("Targetless selections cannot claim ranged attacks.")
+        else:
+            if ranged is None or (
+                ranged.player_id != authority_payload.get("active_player_id")
+                or ranged.request_id != payload.get("request_id")
+                or ranged.unit_instance_id != expected["attacking_unit_instance_id"]
+                or ranged.battle_round != expected["battle_round"]
+                or ranged.active_player_id != expected["active_player_id"]
+                or ranged.phase.value != expected["phase"]
+            ):
+                raise GameLifecycleError(
+                    "Model attack history lacks its original ranged activation."
+                )
+            if event.event_type == "out_of_phase_shooting_declaration_accepted":
+                if payload.get("ranged_attack_history_record") != ranged.to_payload():
+                    raise GameLifecycleError(
+                        "Model attack history parent timing authority drifted."
+                    )
+            elif payload.get("phase") != "shooting":
+                raise GameLifecycleError("Model attack history ordinary shooting phase drifted.")
         record = records[result_id]
         proposal = shooting_declaration_proposal_from_json(record.result.payload)
         if (
-            sorted({entry.attacker_model_instance_id for entry in proposal.declarations})
+            sorted(
+                {
+                    entry.attacker_model_instance_id
+                    for entry in proposal.declarations
+                    if entry.target_unit_instance_id is not None
+                }
+            )
             != expected["model_instance_ids"]
         ):
             raise GameLifecycleError("Model attack history declaration model authority drifted.")
