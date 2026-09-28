@@ -846,6 +846,10 @@ Current status:
   `core_stratagems_2026_08/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_stratagem_app_source.py` and the
   same command plus `--check`.
+- Order 94 retains complete Heroic Intervention source evidence and reconciles
+  the historical GDM truncation without inventing App versions. Verify the
+  offline review with `uv run python -m tools.core_rules_order94_audit --check`;
+  see [scope and evidence](docs/ORDER_94_SCOPE_PLAN.md). PFINAL remains open.
 - The dependency-ordered
   [Core Rules remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md)
   tracks the itemized implementation findings from the accompanying

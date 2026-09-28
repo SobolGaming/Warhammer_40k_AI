@@ -1,0 +1,395 @@
+{
+  "schema": "core-v2-order94-validation-v1",
+  "base_ref": "94f7e18cf369461063dcd78eaa19199c72fb1374",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+  "runtime_changed": false,
+  "behavioral": {
+    "tests": 9756,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 924.058,
+    "junit_sha256": "47bd8ab900c8404b8ffd20caa674e77f6bffa25366659109d898b5c040cbed6d"
+  },
+  "code_quality": {
+    "tests": 741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 113.944,
+    "junit_sha256": "0d858b3968d58b37bf893a04a0ba737660dc489ed3a79b7fe0d335b3653f03fc"
+  },
+  "coverage_percent": 85.20337902454574,
+  "coverage_json_sha256": "047cd7d913dd07c04ccd8e17b37bda09f07b38741be7db2280d194a213576814",
+  "distribution": "18 xdist workers, work stealing; behavioral suite once with coverage, then code quality without coverage",
+  "gate_runs": [
+    {
+      "label": "ruff-final",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:16.881233+00:00",
+      "elapsed_seconds": 0.242,
+      "exit_code": 0,
+      "log_path": "reports/order94/ruff-final.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "format-final",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:17.179238+00:00",
+      "elapsed_seconds": 0.139,
+      "exit_code": 0,
+      "log_path": "reports/order94/format-final.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "b267620b1cb940aa95729abee40f38677a580453398c94d5013f75bf4552d7bb"
+    },
+    {
+      "label": "mypy-final",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:54.412985+00:00",
+      "elapsed_seconds": 1.944,
+      "exit_code": 0,
+      "log_path": "reports/order94/mypy-final.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "3df3ab801c80af110cdd751fd6e032a8efef95218df8fa23c5a072b3b4367e29"
+    },
+    {
+      "label": "pyright-final",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:51:10.971529+00:00",
+      "elapsed_seconds": 103.381,
+      "exit_code": 0,
+      "log_path": "reports/order94/pyright-final.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "label": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "started_at": "2026-09-28T15:48:21.006576+00:00",
+      "elapsed_seconds": 0.658,
+      "exit_code": 0,
+      "log_path": "reports/order94/imports.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "cwd": ".",
+      "log_sha256": "beaa779f13113b29025e92ac223dc0c0c4dae725768476464f92a8a8c49ea91e"
+    },
+    {
+      "label": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "started_at": "2026-09-28T15:48:21.707843+00:00",
+      "elapsed_seconds": 2.45,
+      "exit_code": 0,
+      "log_path": "reports/order94/shards.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "cwd": ".",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=reports/order94/behavior.xml"
+      ],
+      "started_at": "2026-09-28T15:48:17.481924+00:00",
+      "elapsed_seconds": 926.195,
+      "exit_code": 0,
+      "log_path": "reports/order94/behavior.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "cwd": ".",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--junitxml=reports/order94/quality.xml"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T16:03:43.761410+00:00",
+      "elapsed_seconds": 114.431,
+      "exit_code": 0,
+      "log_path": "reports/order94/quality.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "6de2f6cf1317c5f04b02f451486f4a8302f51443ae6ce5d464682d2dd91ac014"
+    },
+    {
+      "label": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:17.361187+00:00",
+      "elapsed_seconds": 1.113,
+      "exit_code": 0,
+      "log_path": "reports/order94/precommit.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "label": "source94",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "tools.core_rules_order94_audit",
+        "--check"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:18.524236+00:00",
+      "elapsed_seconds": 0.296,
+      "exit_code": 0,
+      "log_path": "reports/order94/source94.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "source84",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "tools.core_rules_order84_audit",
+        "--check"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:18.866186+00:00",
+      "elapsed_seconds": 0.119,
+      "exit_code": 0,
+      "log_path": "reports/order94/source84.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "affd19e9d1531b2ff6b195846a872a43f1dcbe4cd84c1c447e31ec15c4296e2a"
+    },
+    {
+      "label": "source-comparison",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "tools.core_rules_40k_app_audit",
+        "--check"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:19.029035+00:00",
+      "elapsed_seconds": 0.176,
+      "exit_code": 0,
+      "log_path": "reports/order94/source-comparison.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "historical-capture",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "tools.core_rules_order84_audit",
+        "--check",
+        "--verify-capture",
+        "/tmp/order94-gdm-historical.js"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:53:45.941232+00:00",
+      "elapsed_seconds": 0.311,
+      "exit_code": 0,
+      "log_path": "reports/order94/historical-capture.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "affd19e9d1531b2ff6b195846a872a43f1dcbe4cd84c1c447e31ec15c4296e2a"
+    },
+    {
+      "label": "identity",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:51:10.065795+00:00",
+      "elapsed_seconds": 0.814,
+      "exit_code": 0,
+      "log_path": "reports/order94/identity.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "b1b22ca84a698371baac564225064bbbeb2d80ca9cb9fcb5af494572519fe690"
+    },
+    {
+      "label": "contract",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "94f7e18cf369461063dcd78eaa19199c72fb1374"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:51:10.924176+00:00",
+      "elapsed_seconds": 88.514,
+      "exit_code": 0,
+      "log_path": "reports/order94/contract.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "wheel",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-09-28T15:52:39.582798+00:00",
+      "elapsed_seconds": 15.176,
+      "exit_code": 0,
+      "log_path": "reports/order94/wheel.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "0bcc009224ae180be5a9730a11a0e8cc079c05faec227151edcb54e55796ed1c"
+    },
+    {
+      "label": "client-generated",
+      "command": [
+        "node",
+        "scripts/check-generated.mjs"
+      ],
+      "cwd": "conformance/typescript",
+      "started_at": "2026-09-28T15:51:09.730459+00:00",
+      "elapsed_seconds": 0.939,
+      "exit_code": 0,
+      "log_path": "reports/order94/client-generated.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "client-types",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "conformance/typescript",
+      "started_at": "2026-09-28T15:51:10.714035+00:00",
+      "elapsed_seconds": 0.818,
+      "exit_code": 0,
+      "log_path": "reports/order94/client-types.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "client-unit-final",
+      "command": [
+        "node",
+        "node_modules/tsx/dist/cli.mjs",
+        "--test",
+        "src/canonical-json.test.ts",
+        "src/interaction-conformance.test.ts",
+        "src/battlefield-conformance.test.ts"
+      ],
+      "cwd": "conformance/typescript",
+      "started_at": "2026-09-28T15:52:05.630108+00:00",
+      "elapsed_seconds": 0.951,
+      "exit_code": 0,
+      "log_path": "reports/order94/client-unit-final.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "298e679a3bd5b7553e34b293ef17b0af8a7742fd72fee5ce72be1b8650bf60c2"
+    },
+    {
+      "label": "conformance",
+      "command": [
+        "node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/main.ts"
+      ],
+      "cwd": "conformance/typescript",
+      "started_at": "2026-09-28T15:52:06.627034+00:00",
+      "elapsed_seconds": 127.06,
+      "exit_code": 0,
+      "log_path": "reports/order94/conformance.log",
+      "node_path_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin",
+      "log_sha256": "3204cb1aec3e1ef8a9ac58ac914ca5485d1fa195edfa265cdda3458ef699edc2"
+    }
+  ],
+  "limitations": [
+    "npm is not installed on the host. The package scripts were executed directly with bundled Node and existing locked dependencies; no npm ci run is claimed.",
+    "No gameplay or full-game performance certification is claimed.",
+    "An initial Pyright check identified an untyped empty list in a malformed-input regression. It was annotated and both final type checks passed.",
+    "An initial client unit invocation named a nonexistent test file. The corrected invocation ran all three actual test files, with five passing tests.",
+    "The behavioral console log is empty in this redirected run. Successful process exit, the complete JUnit profile and coverage JSON retain the aggregate results.",
+    "Audit-only fingerprint and quality-test corrections happened while the behavioral suite was running. Runtime, behavioral tests and contracts did not change. Final static checks and the subsequent complete quality suite used the corrected audit."
+  ],
+  "independent_review": {
+    "reviewer": "order94_review",
+    "finding": "P2: source-observation identity included implementation statuses",
+    "resolution": "Excluded statuses from source identity; whole-review hash still covers them. Added status-independence and rehashed-truncation regressions.",
+    "code_source_review": "APPROVE; no remaining actionable findings",
+    "publication_review": "APPROVE for publication; no remaining actionable findings. Independently verified all 20 gate-log hashes, JUnit totals, coverage, client/conformance results and unchanged runtime/behavioral/contract inputs before the first push."
+  }
+}
