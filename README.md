@@ -2,14 +2,17 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
-Current Core status: the requested Order 95 audit surveyed all 25 categories, 59 FAQs
-and all observed changelog versions after Orders 1–94 merged. It found two gameplay
-gaps and a missing complete clause-evidence inventory. Orders 95–97 own those
-repairs; PFINAL is Order 98. Core Rules and full-game performance remain uncertified.
-See the [roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md),
-[current audit](docs/ORDER_95_AUDIT_REPORT.md) and
-[evidence limits](docs/ORDER_95_AUDIT_NOTES.md). Earlier implementation notes below
-retain historical numbering.
+Order 95 / P04E implements optional ranged targets. A selected Shooting unit can
+select no weapons or decline targets for selected physical weapons; Hazardous,
+One Shot and selection restrictions still resolve through the shared engine.
+See [scope and evidence](docs/ORDER_95_SCOPE_PLAN.md).
+
+Current Core status: the retained [Order 95 audit](docs/ORDER_95_AUDIT_REPORT.md)
+found two gameplay gaps and an incomplete clause-evidence inventory after Orders
+1–94. This implementation addresses C04-06. Orders 96–97 remain open and PFINAL
+is Order 98. Core Rules and full-game performance remain uncertified; see the
+[roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) and
+[evidence limits](docs/ORDER_95_AUDIT_NOTES.md). Historical audit observations remain unchanged.
 
 Order 84 / P01G implements source-assigned dice results and active-player
 selection among tied highest/lowest physical dice. See

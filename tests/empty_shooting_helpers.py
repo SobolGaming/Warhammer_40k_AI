@@ -10,6 +10,8 @@ from tests.phase13b_shooting_declaration_helpers import (
     _shooting_lifecycle,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.ability_sources import AbilitySourceInstance
+from warhammer40k_core.core.weapon_ability_sources import weapon_keyword_ability_id
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
@@ -28,6 +30,9 @@ def empty_shooting_session(
     vehicle: bool = False,
     engaged: bool = False,
     keywords: tuple[WeaponKeyword, ...] = (),
+    model_count: int = 1,
+    duplicate_hazardous: bool = False,
+    game_id: str = "order91-empty-shooting",
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     catalog = replace(
@@ -56,6 +61,18 @@ def empty_shooting_session(
                         ),
                         keywords=keywords,
                         abilities=(),
+                        ability_sources=tuple(
+                            AbilitySourceInstance(
+                                owner_id=profile.stable_identity(),
+                                source_id=profile.stable_identity(),
+                                source_instance_id=f"fixture-hazardous-{index}",
+                                slot_id="hazardous",
+                                ability_id=weapon_keyword_ability_id(WeaponKeyword.HAZARDOUS),
+                            )
+                            for index in range(2)
+                        )
+                        if duplicate_hazardous
+                        else (),
                     )
                     if profile.range_profile.distance_inches is not None
                     else profile
@@ -79,7 +96,7 @@ def empty_shooting_session(
             ),
         )
     specs: tuple[tuple[str, str, str, int], ...] = (
-        ("shooter", "core-intercessor-like-infantry", "core-intercessor-like", 1),
+        ("shooter", "core-intercessor-like-infantry", "core-intercessor-like", model_count),
     )
     if attached:
         specs += (("leader", "core-character-leader", "core-character-leader", 1),)
@@ -94,7 +111,7 @@ def empty_shooting_session(
         enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 1),
         enemy_pose=Pose.at(11.8 if engaged else 30, 35),
         catalog=catalog,
-        game_id="order91-empty-shooting",
+        game_id=game_id,
     )
     if advanced:
         from tests.phase13b_shooting_declaration_helpers import _advanced_unit_state

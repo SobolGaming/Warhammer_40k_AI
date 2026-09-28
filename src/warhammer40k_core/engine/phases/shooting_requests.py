@@ -154,6 +154,7 @@ def _request_shooting_declaration(
     forced_shooting_type: ShootingType | None = None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    completion_hooks: AttackSequenceCompletedHookRegistry | None = None,
 ) -> LifecycleStatus:
     prepare_selected_weapon_ranges(
         state=state, decisions=decisions, selection=active_selection, catalog=army_catalog
@@ -316,6 +317,8 @@ def _request_shooting_declaration(
             selected_shooting_type=selected_shooting_type,
             forced_shooting_type=forced_shooting_type,
             army_catalog=army_catalog,
+            completion_hooks=completion_hooks,
+            runtime_modifiers=runtime_modifier_registry,
         )
     from warhammer40k_core.engine.phases.shooting_firing_deck import firing_deck_cargo_snapshot
 
@@ -358,8 +361,18 @@ def _request_shooting_declaration(
                 state=state, unit_instance_id=rules_unit.unit_instance_id, army_catalog=army_catalog
             )
         )
+    from warhammer40k_core.engine.targetless_weapon_validation import targetless_candidates
+
+    targetless = targetless_candidates(
+        weapons=proposal_request["available_weapons"],
+        actor_id=active_selection.player_id,
+        request_id=request_id,
+        shooting_type=forced_shooting_type or selected_shooting_type or ShootingType.NORMAL,
+    )
+    if targetless:
+        proposal_request["targetless_weapon_candidates"] = targetless
     nested_interaction_requests = _nested_interaction_requests_for_target_candidates(
-        target_candidates
+        [*target_candidates, *targetless]
     )
     request = DecisionRequest(
         request_id=request_id,
@@ -426,6 +439,7 @@ def request_out_of_phase_shooting_declaration(
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    completion_hooks: AttackSequenceCompletedHookRegistry | None = None,
 ) -> LifecycleStatus:
     if state.out_of_phase_shooting_state is not None:
         raise GameLifecycleError("Out-of-phase shooting state is already active.")
@@ -485,6 +499,7 @@ def request_out_of_phase_shooting_declaration(
         decisions=decisions,
         active_selection=selection,
         runtime_modifier_registry=runtime_modifier_registry,
+        completion_hooks=completion_hooks,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         phase=parent_phase,

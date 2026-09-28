@@ -264,6 +264,7 @@ class ShootingPhaseHandler:
                 runtime_modifier_registry=self.runtime_modifier_registry,
                 decisions=decisions,
                 active_selection=shooting_state.active_selection,
+                completion_hooks=self.attack_sequence_completed_hooks,
                 selected_shooting_type=shooting_state.selected_shooting_type.shooting_type,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
@@ -273,6 +274,8 @@ class ShootingPhaseHandler:
             if declaration_status.status_kind is not LifecycleStatusKind.ADVANCED:
                 return declaration_status
             shooting_state = _ensure_shooting_phase_state(state=state)
+            if shooting_state.pending_completed_attack_sequence is not None:
+                return self.begin_phase(state=state, decisions=decisions)
 
         active_stratagem_status = _request_active_shooting_phase_stratagem_if_available(
             state=state,
@@ -908,6 +911,7 @@ class ShootingPhaseHandler:
                 result=result,
                 decisions=decisions,
                 registry=self.shooting_unit_selected_grant_hooks,
+                completion_hooks=self.attack_sequence_completed_hooks,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
                 shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,

@@ -758,6 +758,7 @@ def attack_sequence_completed_hook_bindings(
                     source_id=descriptor.source_rule_id,
                     handler=descriptor.handler,
                     candidate_handler=descriptor.candidate_handler,
+                    requires_attacks=descriptor.requires_attacks,
                 )
             )
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))

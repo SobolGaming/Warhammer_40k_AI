@@ -144,6 +144,7 @@ class ShootingDeclarationProposalRequestPayload(TypedDict):
     available_weapons: list[AvailableWeaponPayload]
     shooting_weapon_selection_limits: list[ShootingWeaponSelectionLimitPayload]
     target_candidates: list[JsonValue]
+    targetless_weapon_candidates: NotRequired[list[JsonValue]]
 
 
 class ShootingDeclarationDecisionPayload(TypedDict):
@@ -526,7 +527,11 @@ class ShootingPhaseState:
             if attack_sequence.attacking_unit_instance_id != self.active_selection.unit_instance_id:
                 raise GameLifecycleError("Shooting declaration attack_sequence unit drift.")
         completed_unit_id = self.active_selection.unit_instance_id
-        shot_unit_ids = tuple(sorted({*self.shot_unit_ids, completed_unit_id}))
+        shot_unit_ids = (
+            tuple(sorted({*self.shot_unit_ids, completed_unit_id}))
+            if attack_pools
+            else self.shot_unit_ids
+        )
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,

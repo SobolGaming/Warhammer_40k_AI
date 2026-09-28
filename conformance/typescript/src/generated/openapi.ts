@@ -272,7 +272,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v41-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v42-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -567,7 +567,7 @@ export interface components {
                 firing_deck_source_model_instance_id: string | null; firing_deck_source_unit_instance_id: string | null;
                 selected_weapon_ability_ids: components["schemas"]["proposal-payload--identifier_array.schema"];
                 shooting_type: components["schemas"]["proposal-payload--identifier.schema"];
-                target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+                target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"] | null;
                 wargear_id: components["schemas"]["proposal-payload--identifier.schema"];
                 weapon_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 weapon_profile_id: components["schemas"]["proposal-payload--identifier.schema"];
@@ -679,7 +679,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v41-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v42-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;

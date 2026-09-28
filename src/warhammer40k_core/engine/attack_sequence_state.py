@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 from warhammer40k_core.engine.attack_sequence_imports import *
 from warhammer40k_core.engine.attack_sequence_destruction_model import PendingAttackDestruction
 from warhammer40k_core.engine.post_roll_attack_profiles import PostRollAttackPoolSet
@@ -58,6 +59,8 @@ class AttackSequence:
     post_roll_attack_pools: PostRollAttackPoolSet | None = None
     post_roll_attack_contexts: tuple[AttackResolutionContextPayload, ...] = ()
 
+    weapons_without_attacks: tuple[TargetlessWeapon, ...] | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -85,8 +88,20 @@ class AttackSequence:
         object.__setattr__(
             self,
             "attack_pools",
-            _validate_attack_pools(self.attack_pools),
+            _validate_attack_pools(
+                self.attack_pools, allow_empty=self.weapons_without_attacks is not None
+            ),
         )
+        if self.weapons_without_attacks is not None and (
+            type(self.weapons_without_attacks) is not tuple
+            or any(type(row) is not TargetlessWeapon for row in self.weapons_without_attacks)
+        ):
+            raise GameLifecycleError("Selected targetless weapons require typed records.")
+        if (
+            self.weapons_without_attacks is not None
+            and self.source_phase is not BattlePhase.SHOOTING
+        ):
+            raise GameLifecycleError("Only ranged weapons may decline targets.")
         object.__setattr__(
             self,
             "used_pool_indices",
@@ -317,6 +332,7 @@ class AttackSequence:
         attacking_unit_instance_id: str,
         attack_pools: tuple[RangedAttackPool, ...],
         source_phase: BattlePhase = BattlePhase.SHOOTING,
+        weapons_without_attacks: tuple[TargetlessWeapon, ...] | None = None,
     ) -> Self:
         return cls(
             sequence_id=sequence_id,
@@ -324,7 +340,12 @@ class AttackSequence:
             attacker_player_id=attacker_player_id,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attack_pools=attack_pools,
+            weapons_without_attacks=weapons_without_attacks,
         )
+
+    @property
+    def selected_weapons(self) -> tuple[RangedAttackPool | TargetlessWeapon, ...]:
+        return (*self.attack_pools, *(self.weapons_without_attacks or ()))
 
     @property
     def is_complete(self) -> bool:
@@ -420,6 +441,7 @@ class AttackSequence:
                 attacker_player_id=self.attacker_player_id,
                 attacking_unit_instance_id=self.attacking_unit_instance_id,
                 attack_pools=self.attack_pools,
+                weapons_without_attacks=self.weapons_without_attacks,
                 source_phase=self.source_phase,
                 used_pool_indices=self.used_pool_indices,
                 selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -440,6 +462,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -473,6 +496,7 @@ class AttackSequence:
                 attacker_player_id=self.attacker_player_id,
                 attacking_unit_instance_id=self.attacking_unit_instance_id,
                 attack_pools=self.attack_pools,
+                weapons_without_attacks=self.weapons_without_attacks,
                 source_phase=self.source_phase,
                 used_pool_indices=self.used_pool_indices,
                 selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -492,6 +516,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -517,6 +542,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -588,6 +614,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -613,6 +640,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -634,6 +662,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -658,6 +687,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -681,6 +711,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -706,6 +737,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=target_id,
@@ -729,6 +761,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=None,
@@ -752,6 +785,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            weapons_without_attacks=self.weapons_without_attacks,
             source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
@@ -767,7 +801,7 @@ class AttackSequence:
         )
 
     def to_payload(self) -> AttackSequencePayload:
-        return {
+        payload: AttackSequencePayload = {
             "sequence_id": self.sequence_id,
             "source_phase": self.source_phase.value,
             "attacker_player_id": self.attacker_player_id,
@@ -810,11 +844,21 @@ class AttackSequence:
             ),
             "post_roll_attack_contexts": list(self.post_roll_attack_contexts),
         }
+        if self.weapons_without_attacks is not None:
+            payload["weapons_without_attacks"] = [
+                row.to_payload() for row in self.weapons_without_attacks
+            ]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: AttackSequencePayload) -> Self:
         pending_destroyed_transport_payload = payload.get("pending_destroyed_transport_disembark")
         return cls(
+            weapons_without_attacks=tuple(
+                TargetlessWeapon.from_payload(row) for row in payload["weapons_without_attacks"]
+            )
+            if "weapons_without_attacks" in payload
+            else None,
             sequence_id=payload["sequence_id"],
             source_phase=battle_phase_kind_from_token(
                 payload.get("source_phase", BattlePhase.SHOOTING.value)

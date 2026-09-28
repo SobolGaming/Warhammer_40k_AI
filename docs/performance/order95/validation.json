@@ -1,0 +1,856 @@
+{
+  "base_ref": "185d7c55",
+  "runs": [
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.09607987495837733,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ruff-format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.045664541015867144,
+      "log_path": "/tmp/order95-ruff-format.log",
+      "log_sha256": "d4f3ebf22439477e7120e8c23f03771904061173a85aee907d1c921de1e66dd7"
+    },
+    {
+      "label": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 13.870900042005815,
+      "log_path": "/tmp/order95-mypy.log",
+      "log_sha256": "49493817f106111326cd89af60c60010d84f54789b16bebf8720dae28d49e6ed"
+    },
+    {
+      "label": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 40.763635665993206,
+      "log_path": "/tmp/order95-pyright.log",
+      "log_sha256": "9ec1a5965f8b972c5a249df0b66268ea15b539003123e7715fa84e192cd53282"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.10003741702530533,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ruff-format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04549341701203957,
+      "log_path": "/tmp/order95-ruff-format.log",
+      "log_sha256": "a784c15e3becc4e81cd4f5f5681546bb3fe77a7ebacaf7ad53154f9d621b4aac"
+    },
+    {
+      "label": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 11.191792458004784,
+      "log_path": "/tmp/order95-mypy.log",
+      "log_sha256": "9b4190ee183f29910db2db07351a159a06e79e2a7f9e0bb5966ef81e7f8c3b8a"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.0975310830399394,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ruff-format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04388362501049414,
+      "log_path": "/tmp/order95-ruff-format.log",
+      "log_sha256": "a784c15e3becc4e81cd4f5f5681546bb3fe77a7ebacaf7ad53154f9d621b4aac"
+    },
+    {
+      "label": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 6.873961041041184,
+      "log_path": "/tmp/order95-mypy.log",
+      "log_sha256": "2175510273e97d640d49809127d4a208e0f21803bd4011fb352cb3a7630aa9d7"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.08977433299878612,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ruff-format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04343483300181106,
+      "log_path": "/tmp/order95-ruff-format.log",
+      "log_sha256": "a784c15e3becc4e81cd4f5f5681546bb3fe77a7ebacaf7ad53154f9d621b4aac"
+    },
+    {
+      "label": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 6.412991791963577,
+      "log_path": "/tmp/order95-mypy.log",
+      "log_sha256": "45d97cc2f7d6d477b418f81b9c43b4bbe234a06c2ffc2c42e7ba5eaec3901f19"
+    },
+    {
+      "label": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 37.96158295898931,
+      "log_path": "/tmp/order95-pyright.log",
+      "log_sha256": "c26160aabb1f8da2c36ec28118b3de767b2adf4f5fa17bdd0a93a9c44cb7c894"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 0.08948412496829405,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "1b582a431910630a27353298977740dbaa00dceedb1e3a21882555f19a58c7a2"
+    },
+    {
+      "label": "identity-check",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_engine_build_identity.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.2424008749658242,
+      "log_path": "/tmp/order95-identity-check.log",
+      "log_sha256": "afaa94ba224ade7257200d81494e5f49b57f3e3a8d9c76a85c1f1934fd3a9646"
+    },
+    {
+      "label": "contract-generate",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--write-baseline",
+        "--base-ref",
+        "185d7c55"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 34.65482620795956,
+      "log_path": "/tmp/order95-contract-generate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "contract-base-check",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "185d7c55"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 40.40157970803557,
+      "log_path": "/tmp/order95-contract-base-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "wheel-smoke",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/smoke_installed_contract_wheel.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 7.750787292025052,
+      "log_path": "/tmp/order95-wheel-smoke.log",
+      "log_sha256": "ed48f2ea2e092c69eaa0c0b45ec135ae03256d0f5c7182bc16d07c54aa7a1b7e"
+    },
+    {
+      "label": "typescript-generate",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "scripts/generate-models.mjs",
+        "src/generated/openapi.ts"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5469752500066534,
+      "log_path": "/tmp/order95-typescript-generate.log",
+      "log_sha256": "edb59204ec85391c573a8b213fd0701fa66408413abc38ec018d1c4857d989dc"
+    },
+    {
+      "label": "typescript-check-generated",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "scripts/check-generated.mjs"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 0.4605122079956345,
+      "log_path": "/tmp/order95-typescript-check-generated.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "typescript-typecheck",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 0.3786285829846747,
+      "log_path": "/tmp/order95-typescript-typecheck.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "typescript-unit",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "--test",
+        "src/battlefield-conformance.test.ts",
+        "src/canonical-json.test.ts",
+        "src/interaction-conformance.test.ts"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 0.541719666973222,
+      "log_path": "/tmp/order95-typescript-unit.log",
+      "log_sha256": "da18d495dd8c6f6fabc67631167f4582f293c51155897a879ff2ac9649a863d7"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "record_note": "Recovered final successful static-check results from completed runner output after concurrent report append overwrote these rows; elapsed times rounded to 0.01s."
+    },
+    {
+      "label": "ruff-format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04,
+      "log_path": "/tmp/order95-ruff-format.log",
+      "log_sha256": "a57f71b6533d83fd6346e45ba4c9dedd9657e06edbf2a80e30dc0b92404f2151",
+      "record_note": "Recovered final successful static-check results from completed runner output after concurrent report append overwrote these rows; elapsed times rounded to 0.01s."
+    },
+    {
+      "label": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.78,
+      "log_path": "/tmp/order95-mypy.log",
+      "log_sha256": "499e11860b0b33980d28ad1bd810f6b769fcfd5929da502ff4a388da7a93fd80",
+      "record_note": "Recovered final successful static-check results from completed runner output after concurrent report append overwrote these rows; elapsed times rounded to 0.01s."
+    },
+    {
+      "label": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 39.98,
+      "log_path": "/tmp/order95-pyright.log",
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1",
+      "record_note": "Recovered final successful static-check results from completed runner output after concurrent report append overwrote these rows; elapsed times rounded to 0.01s."
+    },
+    {
+      "label": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.32,
+      "log_path": "/tmp/order95-imports.log",
+      "log_sha256": "30c9975408baf49f2830c7e9ee31c307e23ba84b67aecc7d450270e4bd417eb2",
+      "record_note": "Recovered final successful static-check results from completed runner output after concurrent report append overwrote these rows; elapsed times rounded to 0.01s."
+    },
+    {
+      "label": "typescript-conformance",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/main.ts"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 68.31865504197776,
+      "log_path": "/tmp/order95-typescript-conformance.log",
+      "log_sha256": "e2c6d815651f70d879c19e838adb03dca029e19d715edd96b7daf808f4c64f66"
+    },
+    {
+      "label": "contract-final-generate",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--write-baseline",
+        "--base-ref",
+        "185d7c55"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 65.65761770796962,
+      "log_path": "/tmp/order95-contract-final-generate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 1.4632675000466406,
+      "log_path": "/tmp/order95-precommit.log",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "label": "contract-final-base-check",
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/build_external_contract.py",
+        "--check",
+        "--base-ref",
+        "185d7c55"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 77.0905699590221,
+      "log_path": "/tmp/order95-contract-final-base-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "behavioral-iteration1",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order95-final-behavioral.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 865.7149441249785,
+      "log_path": "/tmp/order95-behavioral-iteration1.log",
+      "log_sha256": "edfb7582f73dbd968041440facf34d1e36142de0a6a292d7026dbdb5bf2e5181"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 0.07129575003637001,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "6fa5a093f97210535e27e5e65f855373554f688ef2088786098520c366a97317"
+    },
+    {
+      "label": "ruff-check",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.0433343339827843,
+      "log_path": "/tmp/order95-ruff-check.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "label": "ruff-format",
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04132708301767707,
+      "log_path": "/tmp/order95-ruff-format.log",
+      "log_sha256": "a57f71b6533d83fd6346e45ba4c9dedd9657e06edbf2a80e30dc0b92404f2151"
+    },
+    {
+      "label": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src",
+        "tests"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 1.5459547499776818,
+      "log_path": "/tmp/order95-mypy.log",
+      "log_sha256": "499e11860b0b33980d28ad1bd810f6b769fcfd5929da502ff4a388da7a93fd80"
+    },
+    {
+      "label": "final-regressions",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/unit/test_order65_firing_deck.py",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_r34_002_unactivated_unit_rejects_unproven_completion_pair",
+        "tests/unit/test_phase18d_ui_contract_artifacts.py::test_typescript_interaction_gate_has_no_decision_family_switches_or_engine_imports",
+        "-q",
+        "--no-cov"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 36.54064554197248,
+      "log_path": "/tmp/order95-final-regressions.log",
+      "log_sha256": "0d0b07fe08db6831c4338843470beca5b0f95b057438a6e30e52a47a6cb4e31d"
+    },
+    {
+      "label": "typescript-final-unit",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "--test",
+        "src/battlefield-conformance.test.ts",
+        "src/canonical-json.test.ts",
+        "src/interaction-conformance.test.ts",
+        "src/proposal-schema.test.ts"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5276555420132354,
+      "log_path": "/tmp/order95-typescript-final-unit.log",
+      "log_sha256": "685857856fcffd1f390c7f42ec7c62474c86b3dd64d96d62dc7e31cff511a83d"
+    },
+    {
+      "label": "typescript-final-typecheck",
+      "command": [
+        "/Users/andrzej.gorski/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "conformance/typescript",
+      "exit_code": 0,
+      "elapsed_seconds": 0.3987947920104489,
+      "log_path": "/tmp/order95-typescript-final-typecheck.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "pyright",
+      "command": [
+        "uv",
+        "run",
+        "pyright"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 40.06691670801956,
+      "log_path": "/tmp/order95-pyright.log",
+      "log_sha256": "f552d237ad0bd249c05f97eb62dbc65d2d0e4a5fe2346608e10fb7838dba9ed1"
+    },
+    {
+      "label": "imports",
+      "command": [
+        "uv",
+        "run",
+        "lint-imports"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.34311112499563023,
+      "log_path": "/tmp/order95-imports.log",
+      "log_sha256": "30c9975408baf49f2830c7e9ee31c307e23ba84b67aecc7d450270e4bd417eb2"
+    },
+    {
+      "label": "precommit",
+      "command": [
+        "uv",
+        "run",
+        "pre-commit",
+        "run",
+        "--all-files"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 1.263313667033799,
+      "log_path": "/tmp/order95-precommit.log",
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    },
+    {
+      "label": "behavioral-coverage",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--junitxml=/tmp/order95-final-behavioral.xml"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 850.8940868750215,
+      "log_path": "/tmp/order95-behavioral-coverage.log",
+      "log_sha256": "cb1ed2f3946d11d521ea6590a35c222647f2449e3d6a7f761381045e5d2fb99d"
+    },
+    {
+      "label": "shard-regeneration",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "/tmp/order95-final-behavioral.xml",
+        "--profile-source",
+        "Order 95 complete behavioral coverage run; Apple M5 Pro 64GiB macOS; xdist worksteal",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.20249258395051584,
+      "log_path": "/tmp/order95-shard-regeneration.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "shard-check",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.046789459011051804,
+      "log_path": "/tmp/order95-shard-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "code-quality-iteration1",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 110.99332570796832,
+      "log_path": "/tmp/order95-code-quality-iteration1.log",
+      "log_sha256": "bd19d21c82258607c5467e5159e9502012b78fa6b30a280d60684cbaf32f11e3"
+    },
+    {
+      "label": "order70-quality-regression",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality/test_order70_fights_first.py",
+        "-q",
+        "--no-cov"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "elapsed_seconds": 0.7218606669921428,
+      "log_path": "/tmp/order95-order70-quality-regression.log",
+      "log_sha256": "325cfd01dfe505e8089bf6b782d2d567ce577e1721b0421f4e77cefadeeb1b07"
+    },
+    {
+      "label": "order70-quality-regression",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality/test_order70_fights_first.py",
+        "-q",
+        "--no-cov"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 0.7714114169939421,
+      "log_path": "/tmp/order95-order70-quality-regression.log",
+      "log_sha256": "4a07fee0cbfe63fba40e0ae8f9269c89fc7a8bbed0d00e0447e9f70b7915b062"
+    },
+    {
+      "label": "code-quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "elapsed_seconds": 115.58619166701101,
+      "log_path": "/tmp/order95-code-quality.log",
+      "log_sha256": "133fc18e2c69368e05ab4c8882e5a4267ae95ba9197fe33276ecee765a518d67"
+    }
+  ],
+  "behavioral_suite_policy": "complete once with coverage; quality separately without coverage",
+  "full_game_samples": 0,
+  "full_game_certified": false,
+  "node_execution_note": "Bundled runtime provides node but no npm executable. TypeScript package scripts executed directly using their identical Node CLI entry points; no package scripts were skipped.",
+  "environment": {
+    "PATH_prefix": "${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin"
+  },
+  "behavioral_iteration1": {
+    "passed": 9795,
+    "failed": 3,
+    "coverage_percent": 85.21,
+    "repair_scope": "tests only: move schema-specific TypeScript test out of generic interaction gate; accept earlier precise restore diagnostic; preserve model presence in cargo drift fixture",
+    "runtime_changed": false
+  },
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c62586d84bbcf166e273482e3d8c3815292291dff6007c479dd209dcb51b293b",
+  "independent_review": {
+    "reviewer": "order95_review",
+    "status": "approved",
+    "unresolved_findings": 0,
+    "production_findings_fixed": [
+      "Correlated empty-proposal context tampering accepted on restore",
+      "Mandatory selected-unit consequences skipped on empty/targetless/no-candidate completion, including generic Shadow Legion registration"
+    ],
+    "independent_regression_tests_passed": 6,
+    "publication_review": "approved complete source/tests/contracts/docs/evidence; verified all 25 inherited report hashes and runtime identity",
+    "test_repair_review": "approved schema-specific client test relocation, precise restore rejection assertion, and valid presence in cargo drift fixtures; independently verified typed cargo drift rejection with exact unchanged lifecycle payload",
+    "regression_log_sha256": "4d6f74ba066cbba9bea4289d00d52dde4ec880b2ae0d74a7ae1995cec6c30aa0"
+  },
+  "quality_iteration1": {
+    "passed": 763,
+    "failed": 1,
+    "repair_scope": "remeasure Order70 against restored original matched Firing Deck fixture; all other inherited report fixture hashes verified current",
+    "runtime_changed": false
+  },
+  "final_validation": {
+    "status": "passed",
+    "behavioral_tests_passed": 9798,
+    "behavioral_failures": 0,
+    "coverage_percent": 85.21,
+    "code_quality_tests_passed": 764,
+    "code_quality_failures": 0,
+    "typescript_unit_tests_passed": 6,
+    "http_conformance_assertions_passed": 342,
+    "required_successful_gate_labels": [
+      "ruff-check",
+      "ruff-format",
+      "mypy",
+      "pyright",
+      "imports",
+      "identity-check",
+      "contract-final-base-check",
+      "wheel-smoke",
+      "typescript-check-generated",
+      "typescript-final-typecheck",
+      "typescript-final-unit",
+      "typescript-conformance",
+      "precommit",
+      "behavioral-coverage",
+      "shard-regeneration",
+      "shard-check",
+      "code-quality"
+    ],
+    "independent_review_status": "approved",
+    "unresolved_review_findings": 0,
+    "runtime_changed_after_final_behavioral_suite": false,
+    "full_game_certified": false
+  }
+}

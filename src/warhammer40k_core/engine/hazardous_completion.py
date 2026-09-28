@@ -42,7 +42,7 @@ def hazardous_candidates(
     sequence = context.attack_sequence
     if not any(
         has_weapon_keyword(pool.weapon_profile, WeaponKeyword.HAZARDOUS)
-        for pool in sequence.attack_pools
+        for pool in sequence.selected_weapons
     ):
         return ()
     return (

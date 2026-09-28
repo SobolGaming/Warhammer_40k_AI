@@ -2,6 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.targetless_weapons import TargetlessWeaponPayload
 from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold, validate_interpreted_d6
 
 from warhammer40k_core.engine.psychic_modifier_selection import PsychicAttackModifierIgnoreSelection
@@ -265,6 +266,7 @@ class WoundRollPayload(TypedDict):
 
 
 class AttackSequencePayload(TypedDict):
+    weapons_without_attacks: NotRequired[list[TargetlessWeaponPayload]]
     sequence_id: str
     source_phase: NotRequired[str]
     attacker_player_id: str

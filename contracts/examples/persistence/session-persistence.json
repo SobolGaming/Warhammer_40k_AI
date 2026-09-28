@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "476ab76003819022835c295b27c87c2a55743b4087095d5a265c2bece286a5ce",
+  "content_hash": "7d42353acd103b04d9582756346579fd74845f1687a1d601fa382d9c97996e81",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,17 +92,17 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c62586d84bbcf166e273482e3d8c3815292291dff6007c479dd209dcb51b293b",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
-  "external_contract_version": "41.0.0",
+  "external_contract_version": "42.0.0",
   "game_session_index": [
     {
       "game_id": "phase18l-contract-persistence",
       "session_id": "session-phase18l-contract-persistence"
     }
   ],
-  "schema_version": "session-persistence-v33-modifier-occurrences",
+  "schema_version": "session-persistence-v34-optional-ranged-targets",
   "sessions": [
     {
       "adapter_session": {
@@ -22251,11 +22251,11 @@
             },
             "operation": "start_session",
             "outcome_code": "command_committed",
-            "schema_version": "session-command-outcome-v41-contract",
+            "schema_version": "session-command-outcome-v42-contract",
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c62586d84bbcf166e273482e3d8c3815292291dff6007c479dd209dcb51b293b",
               "engine_version": "0.1.0",
               "event_cursor": "Pm8Te6CqPXYXCf5zrJwGRDIWC06NQPar_VkCfzZNuPqXhhJBfsvWM1svmD7Cwm3C",
               "game_id": "phase18l-contract-persistence",
@@ -22277,8 +22277,8 @@
                 "game": "warhammer_40000",
                 "version": "core-v2-setup-prebattle-ui-smoke"
               },
-              "schema_version": "session-metadata-v41-contract",
-              "server_contract_version": "41.0.0",
+              "schema_version": "session-metadata-v42-contract",
+              "server_contract_version": "42.0.0",
               "session_id": "session-phase18l-contract-persistence",
               "session_revision": 1,
               "session_state": "active",
@@ -22302,7 +22302,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "55955f0c8b8aad369857c06f45fc3d2f9fe8d7be215d3b1b1f922247461c6f9f",
+      "history_head": "897cc76ea4bfe135a6b74cc50426150c76d0488fe48047499f06fc8e7caa53d7",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -22424,7 +22424,7 @@
             },
             "token": "OaFTY-TrFLu0N0Uqqx3OIKpY4zBZxbBulzAoADIdUtx_X7NGItTnha38XDkvcOSt"
           },
-          "journal_entry_hash": "46a0d60d48bf0b97007365de26380272d1cb8cf010d654e7607c0790de185d30",
+          "journal_entry_hash": "ce28dbfad9eec735752f26e745ffaa49b3f64374436ae96cb52212c464c30d7f",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -22442,8 +22442,8 @@
             "origin_kind": "protocol_command"
           },
           "previous_revision_commitment": "b2915d05d8a51b5e53de22d0c9d74725807b7351fae700e4788b2352cbc74f72",
-          "response_hash": "dc47ce5adee8a082f114ee18341aa4ad1f338baf4c9f008cea8c95e35f8b0a6c",
-          "revision_commitment": "55955f0c8b8aad369857c06f45fc3d2f9fe8d7be215d3b1b1f922247461c6f9f",
+          "response_hash": "8b92029214bef5e4947843c87029e4c7b83133f7493050b2aa1d4488147ccaf9",
+          "revision_commitment": "897cc76ea4bfe135a6b74cc50426150c76d0488fe48047499f06fc8e7caa53d7",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "0530ae04f41a90f3e8eeada7bd154e8e4fd9d10af2dbd42230ada45fe7bb37e4",

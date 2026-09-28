@@ -102,9 +102,11 @@ def _base_attacks(
     index: int,
     pool: RangedAttackPool,
 ) -> int:
-    declaration = original.declarations[index]
+    declaration = tuple(
+        row for row in original.declarations if row.target_unit_instance_id is not None
+    )[index]
     prefix = (
-        f"{record.result.result_id}:declaration-{index + 1:03d}:"
+        f"{record.result.result_id}:declaration-{original.declarations.index(declaration) + 1:03d}:"
         f"{declaration.attacker_model_instance_id}:{declaration.wargear_id}:"
         f"{declaration.weapon_profile_id}:{declaration.target_unit_instance_id}:attacks"
     )
@@ -154,7 +156,12 @@ def _candidate_pool(
         weapon_profile_with_ranged_keyword_effects,
     )
 
-    declaration = replace(original.declarations[index], target_unit_instance_id=target_id)
+    declaration = replace(
+        tuple(row for row in original.declarations if row.target_unit_instance_id is not None)[
+            index
+        ],
+        target_unit_instance_id=target_id,
+    )
     if selected_ability_ids is not None:
         declaration = replace(declaration, selected_weapon_ability_ids=selected_ability_ids)
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=original.unit_instance_id)
@@ -222,7 +229,13 @@ def _candidate_pool(
                 state=state,
                 player_id=original.player_id,
                 required_target_ids=tuple(
-                    sorted({item.target_unit_instance_id for item in original.declarations})
+                    sorted(
+                        {
+                            item.target_unit_instance_id
+                            for item in original.declarations
+                            if item.target_unit_instance_id is not None
+                        }
+                    )
                 ),
             ),
             player_id=original.player_id,
@@ -284,7 +297,9 @@ def next_shooting_target_replacement(
     )
 
     validate_sequence_authority(decisions, record, sequence)
-    if len(original.declarations) != len(sequence.attack_pools):
+    if sum(row.target_unit_instance_id is not None for row in original.declarations) != len(
+        sequence.attack_pools
+    ):
         raise GameLifecycleError("Replacement weapon inventory drift.")
     from warhammer40k_core.engine.phases.shooting_validation import _enemy_placed_unit_ids
 

@@ -7041,7 +7041,7 @@ This terminal consumes the ordinary unit selection, applies the existing phase-e
 Action restriction and Firing Deck turn-end cargo restriction, and continues the
 phase. It does not mean the unit has shot: no attack sequence, shot membership,
 model/ranged attack history, One Shot expenditure, hidden-status loss or after-shot
-reaction is produced. No zero-entry attack proposal is introduced. The existing
+reaction is produced. Order 91 introduced no zero-entry attack proposal; Order 95 below adds explicit empty declarations when a proposal is offered. The existing
 phase-completion option can still skip remaining units. The shared adapter path
 projects these public shooting facts for both viewers; unrelated hidden decisions
 retain their existing redaction. Save/restore and replay authenticate the terminal
@@ -7220,3 +7220,54 @@ internal audit events, filtered by the shared adapter redaction owner. Public
 complete characteristic/AP traces, source roll inventories, and ignored-ID lists.
 The acting player's finite decision record retains its selected option; the
 trusted replay retains complete source evidence.
+
+
+## Order 95: optional ranged targets (Contract 42)
+
+The existing `submit_shooting_declaration` / `shooting_declaration` parameterized
+family accepts an empty `declarations` array. For a selected physical weapon,
+`target_unit_instance_id: null` explicitly declines its target. Omission of a
+weapon does not select it. A non-null target still requires the complete existing
+range, visibility, engagement, source, type and target validation. Adapters submit
+these choices through `ParameterizedSubmission`; they never construct attack pools.
+
+Every selected entry retains physical weapon/model/profile, wargear, shooting type,
+Firing Deck origin and `selected_weapon_ability_ids`. Requests with duplicated
+source families add `proposal_request.targetless_weapon_candidates`; each candidate
+has a null target and nested `required_weapon_ability_selections` using the existing
+finite source-instance choice contract. Clients select exactly one emitted source
+per duplicated family. No target-dependent ability source is invented for a null target.
+
+Selected weapons without attacks are serialized as optional
+`weapons_without_attacks` entries containing `declaration` and `source_profile`
+in accepted declaration events and AttackSequence state/completion events. An
+explicit empty array records an empty selected inventory; omission denotes an
+ordinary executor with actual attack pools. Attack pools remain strictly positive,
+targeted attacks. Hazardous counts the union of physical selected weapons; One Shot
+is spent on selection, including targetless selections. No A, hit, wound, save or
+damage dice are generated for a targetless weapon. Source-backed retained Hazardous
+automatic success, mortal wounds, pending damage decisions and cleanup retain their owners.
+
+A completely empty declaration has no weapon expenditure or Hazardous check, but
+uses the same completion owner to discharge obligations already incurred at unit
+selection, including a source-loaded Dark Pact. Completion bindings explicitly
+state whether they require actual attacks; selected-unit obligations do not.
+Automatic Order 91 completion still emits `shooting_without_attacks_completed`.
+When it has outstanding selected-unit obligations, that authenticated terminal is
+the alternative origin of a pending empty completion; no declaration is fabricated.
+Its existing activity and cargo restrictions remain the authority. Ordinary
+no-candidate completion with no such obligations keeps its existing immediate path.
+
+Both empty and all-targetless declarations consume the unit/type selection and
+apply Action and Firing Deck cargo restrictions. With no actual attacks they produce
+no shot membership, model/ranged attack participation, Hidden loss or after-shot
+hook. Mixed declarations record only actual attacking models in participation history.
+
+Stale source/context/cache, unavailable physical weapons/profiles, invalid source
+choices, duplicate selections and illegal type/cargo submissions reject before
+recording or mutation. Restore authenticates selected inventory against accepted
+proposals and offered profiles, One Shot expenditure, active/completed executors,
+retained continuations and restriction histories. Ordinary, reaction and retained
+hosts share validation and completion. Both viewers use the existing public battle
+projection and event redaction. Exact runtime matching still applies to persistence
+and replay; no historical saves are migrated.

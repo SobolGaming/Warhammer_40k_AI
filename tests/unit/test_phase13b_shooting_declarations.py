@@ -20166,7 +20166,11 @@ def test_r34_002_unactivated_unit_rejects_unproven_completion_pair(mutation: str
         effect["expiration"]["battle_round"] += 1
     with pytest.raises(
         GameLifecycleError,
-        match=r"(Activity restriction|Model attack history|Mutation decision authority)",
+        match=(
+            "Selected weapons lack an accepted declaration"
+            if mutation == "unaccepted_declaration"
+            else r"(Activity restriction|Model attack history|Mutation decision authority)"
+        ),
     ):
         GameLifecycle.from_payload(forged)
 

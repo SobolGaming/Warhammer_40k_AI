@@ -83,6 +83,7 @@ def _select_or_request_next_gathered_group(
                     attacker_player_id=current.attacker_player_id,
                     attacking_unit_instance_id=current.attacking_unit_instance_id,
                     attack_pools=current.attack_pools,
+                    weapons_without_attacks=current.weapons_without_attacks,
                     used_pool_indices=tuple(range(len(current.attack_pools))),
                     pool_index=len(current.attack_pools),
                     attack_index=0,

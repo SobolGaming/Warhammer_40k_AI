@@ -496,6 +496,7 @@ class GenericRuleAttackSequenceCompletedAbility:
     hook_id_builder: GenericRuleHookIdBuilder
     handler: AttackSequenceCompletedHandler
     candidate_handler: AttackSequenceCompletedCandidateHandler
+    requires_attacks: bool = True
 
     @property
     def hook_family(self) -> GenericRuleAbilityHookFamily:
@@ -514,6 +515,10 @@ class GenericRuleAttackSequenceCompletedAbility:
         )
         _validate_callable("Generic attack sequence completed handler", self.handler)
         _validate_callable("Generic attack completion candidate handler", self.candidate_handler)
+        if type(self.requires_attacks) is not bool:
+            raise GameLifecycleError(
+                "Generic completion participation requirement must be boolean."
+            )
 
     def _set_validated_identity(
         self,

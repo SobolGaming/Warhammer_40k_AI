@@ -104,7 +104,9 @@ def validate_retained_shooting_history(
             pools = payload["attack_pools"]
             if not isinstance(pools, list):
                 raise GameLifecycleError("Retained shooting completion pools are invalid.")
-            if pools:
+            if not pools and declarations and _object(declarations[0].payload)["attack_pools"]:
+                raise GameLifecycleError("Retained shooting discarded its declared attacks.")
+            if pools or declarations:
                 if len(declarations) != 1:
                     raise GameLifecycleError(
                         "Retained shooting completion lacks its exact declaration."
@@ -134,9 +136,8 @@ def validate_retained_shooting_history(
                     raise GameLifecycleError(
                         "Retained shooting completed before its attack sequence."
                     )
-                _validate_actor_pools(pools, execution)
-            elif declarations:
-                raise GameLifecycleError("Retained shooting discarded its declared attacks.")
+                if pools:
+                    _validate_actor_pools(pools, execution)
             record, _opening = opened[execution.cause_id]
             if not prior or prior[-1].event_type != "out_of_phase_shooting_completed":
                 raise GameLifecycleError(
@@ -227,20 +228,40 @@ def _validate_automatic_hazardous(
         raise GameLifecycleError("Retained shooting Hazardous exception lacks source authority.")
     declaration = _object(declarations[0].payload)
     raw_pools = declaration["attack_pools"]
-    _validate_actor_pools(raw_pools, execution)
+    if raw_pools:
+        _validate_actor_pools(raw_pools, execution)
     pools = tuple(
         RangedAttackPool.from_payload(cast(RangedAttackPoolPayload, pool))
         for pool in cast(list[JsonValue], raw_pools)
     )
-    pairs = tuple(
-        sorted(
-            {
-                (pool.weapon_instance_id, pool.weapon_profile.profile_id)
-                for pool in pools
-                if WeaponKeyword.HAZARDOUS in pool.weapon_profile.keywords
-            }
+    from warhammer40k_core.engine.targetless_weapons import (
+        TargetlessWeapon,
+        TargetlessWeaponPayload,
+    )
+
+    targetless_raw = declaration.get("weapons_without_attacks", [])
+    if not isinstance(targetless_raw, list):
+        raise GameLifecycleError("Retained shooting targetless inventory is invalid.")
+    targetless = tuple(
+        TargetlessWeapon.from_payload(cast(TargetlessWeaponPayload, row)) for row in targetless_raw
+    )
+    for row in targetless:
+        if row.attacker_model_instance_id != execution.model_instance_id:
+            raise GameLifecycleError("Retained shooting targetless owner drift.")
+    from warhammer40k_core.engine.attack_sequence_hazardous import (
+        _hazardous_weapon_identity_pairs,  # pyright: ignore[reportPrivateUsage]
+    )
+    from warhammer40k_core.engine.weapon_abilities import has_weapon_keyword
+
+    selected: tuple[RangedAttackPool | TargetlessWeapon, ...] = (*pools, *targetless)
+    ids, profiles = _hazardous_weapon_identity_pairs(
+        tuple(
+            row
+            for row in selected
+            if has_weapon_keyword(row.weapon_profile, WeaponKeyword.HAZARDOUS)
         )
     )
+    pairs = tuple(zip(ids, profiles, strict=True))
     expected = {
         "cause_id": execution.cause_id,
         "model_instance_id": execution.model_instance_id,
@@ -272,10 +293,19 @@ def _declarations(
         if event.event_type == "out_of_phase_shooting_declaration_accepted"
         and isinstance(event.payload, dict)
         and event.payload.get("source_rule_id") == execution.source_rule_id
-        and any(
-            isinstance(pool, dict)
-            and pool.get("attacker_model_instance_id") == execution.model_instance_id
-            for pool in cast(list[JsonValue], event.payload["attack_pools"])
+        and (
+            any(
+                isinstance(pool, dict)
+                and pool.get("attacker_model_instance_id") == execution.model_instance_id
+                for pool in cast(list[JsonValue], event.payload["attack_pools"])
+            )
+            or any(
+                isinstance(row, dict)
+                and isinstance(row.get("declaration"), dict)
+                and cast(dict[str, JsonValue], row["declaration"]).get("attacker_model_instance_id")
+                == execution.model_instance_id
+                for row in cast(list[JsonValue], event.payload.get("weapons_without_attacks", []))
+            )
         )
     )
 

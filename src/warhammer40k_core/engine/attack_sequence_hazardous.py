@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 
 from warhammer40k_core.engine.event_log import EventRecord
 
@@ -61,7 +62,7 @@ def _resolve_hazardous_tests(
         return status
     hazardous_pools = tuple(
         pool
-        for pool in attack_sequence.attack_pools
+        for pool in attack_sequence.selected_weapons
         if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.HAZARDOUS)
     )
     if not hazardous_pools:
@@ -393,7 +394,7 @@ def validate_hazardous_mortal_wound_source_context(
         raise GameLifecycleError("Hazardous mortal wound source context phase drift.")
     hazardous_pools = tuple(
         pool
-        for pool in attack_sequence.attack_pools
+        for pool in attack_sequence.selected_weapons
         if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.HAZARDOUS)
     )
     expected_weapon_instance_ids, expected_weapon_profile_ids = _hazardous_weapon_identity_pairs(
@@ -422,7 +423,7 @@ def validate_hazardous_mortal_wound_source_context(
 
 
 def _hazardous_weapon_identity_pairs(
-    hazardous_pools: tuple[RangedAttackPool, ...],
+    hazardous_pools: tuple[RangedAttackPool | TargetlessWeapon, ...],
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     weapon_instance_ids: list[str] = []
     weapon_profile_ids: list[str] = []

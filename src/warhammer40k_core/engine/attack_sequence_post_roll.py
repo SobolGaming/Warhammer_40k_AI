@@ -303,6 +303,7 @@ def _attack_sequence_for_post_roll_context(
         attacker_player_id=attack_sequence.attacker_player_id,
         attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
         attack_pools=attack_sequence.attack_pools,
+        weapons_without_attacks=attack_sequence.weapons_without_attacks,
         used_pool_indices=attack_sequence.used_pool_indices,
         selected_target_unit_instance_id=attack_sequence.selected_target_unit_instance_id,
         current_gathered_group=attack_sequence.current_gathered_group,

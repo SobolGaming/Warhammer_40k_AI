@@ -1354,6 +1354,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             hook_id_builder=_shadow_legion_dark_pact_completion_hook_id,
             handler=_resolve_shadow_legion_dark_pact_attack_sequence_completion,
             candidate_handler=_shadow_legion_dark_pact_completion_candidates,
+            requires_attacks=False,
         ),
         *daemonic_incursion_attack_sequence_completed_abilities(),
     ),

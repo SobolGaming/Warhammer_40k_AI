@@ -77,10 +77,13 @@ class AttackSequenceCompletedHookBinding:
     source_id: str
     handler: AttackSequenceCompletedHandler
     candidate_handler: AttackSequenceCompletedCandidateHandler | None = None
+    requires_attacks: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        if type(self.requires_attacks) is not bool:
+            raise GameLifecycleError("Attack completion participation requirement must be boolean.")
         if not callable(self.handler):
             raise GameLifecycleError("Attack sequence completion hook handler is not callable.")
         if self.candidate_handler is not None and not callable(self.candidate_handler):
@@ -112,6 +115,8 @@ class AttackSequenceCompletedHookRegistry:
 
         candidates = list(hazardous_candidates(context))
         for binding in self.bindings:
+            if binding.requires_attacks and not context.attack_sequence.attack_pools:
+                continue
             if binding.candidate_handler is None:
                 raise GameLifecycleError(
                     "Attack completion providers require pure candidate discovery."
@@ -142,7 +147,8 @@ class AttackSequenceCompletedHookRegistry:
             sequence_id=context.attack_sequence.sequence_id,
         )
         if (
-            completed.attack_pools != context.attack_sequence.attack_pools
+            completed.weapons_without_attacks != context.attack_sequence.weapons_without_attacks
+            or completed.attack_pools != context.attack_sequence.attack_pools
             or completed.attacker_player_id != context.attack_sequence.attacker_player_id
             or completed.attacking_unit_instance_id
             != context.attack_sequence.attacking_unit_instance_id
@@ -186,6 +192,13 @@ def attack_sequence_completed_event_id(
         payload = cast(dict[str, JsonValue], event.payload)
         if payload.get("sequence_id") == attack_sequence.sequence_id:
             return event.event_id
+    from warhammer40k_core.engine.shooting_selection_completion import selection_completion_origin
+
+    origin = selection_completion_origin(
+        events=decisions.event_log.records, sequence_id=attack_sequence.sequence_id
+    )
+    if origin is not None and origin[1] == attack_sequence:
+        return origin[0].event_id
     raise GameLifecycleError("Completed attack sequence event is missing.")
 
 
