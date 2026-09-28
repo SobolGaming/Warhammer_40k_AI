@@ -118,3 +118,10 @@ def test_roadmap_parser_rejects_ambiguous_closure_inventory(change: str) -> None
         document = document.replace("| 2 | P08A |", "| 3 | P08A |", 1)
     with pytest.raises(ValueError, match="Core roadmap"):
         roadmap_rows(document)
+
+
+def test_corpus_evidence_repairs_are_global_prerequisites_not_numbered_categories() -> None:
+    rows = roadmap_rows(ROADMAP.read_text(encoding="utf-8"))
+    assert next(row for row in rows if row.pr_id == "PEVIDENCE").finding_ids == ("CAUDIT-02",)
+    assert "PEVIDENCE" in rows[-1].prerequisites
+    assert all("PEVIDENCE" not in ids for ids in category_pr_ids(rows).values())

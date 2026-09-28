@@ -24,7 +24,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 01 Core Concepts | [01.00](https://www.40k.app/rules/01-core-concepts) | authoritative_app_mirror | owned; see roadmap | P01, P01B, P01C, P01D, P01E, P01F, P01G, P01H, P01I, P01J |
 | 02 Datasheets | [02.00](https://www.40k.app/rules/02-datasheets) | authoritative_app_mirror | owned; see roadmap | P02A, P02B, P02C, P02D, P02E, P02F, P02G, P02H, P02I |
 | 03 Moving | [03.00](https://www.40k.app/rules/03-moving) | authoritative_app_mirror | owned; see roadmap | P03A, P03B, P03C, P03D, P03E |
-| 04 Making Attacks | [04.00](https://www.40k.app/rules/04-making-attacks) | authoritative_app_mirror | owned; see roadmap | P04, P04B, P04C, P04D |
+| 04 Making Attacks | [04.00](https://www.40k.app/rules/04-making-attacks) | authoritative_app_mirror | owned; see roadmap | P04, P04B, P04C, P04D, P04E |
 | 05 Attack Sequence | [05.00](https://www.40k.app/rules/05-attack-sequence) | authoritative_app_mirror | owned; see roadmap | P05A, P05B, P05C, P05D |
 | 06 Other Concepts | [06.00](https://www.40k.app/rules/06-other-concepts) | authoritative_app_mirror | owned; see roadmap | P06A, P06B, P06C |
 | 07 The Battle Round | [07.00](https://www.40k.app/rules/07-the-battle-round) | authoritative_app_mirror | REVALIDATE | PFINAL |
@@ -44,7 +44,7 @@ Current 12.08 explicitly requires Objective Consolidation to finish unengaged an
 | 21 Flying and Surging | [21.00](https://www.40k.app/rules/21-flying-and-surging) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P21A, P21B, P21C |
 | 22 Other Rules And Abilities | [22.00](https://www.40k.app/rules/22-other-rules-and-abilities) | authoritative_app_mirror | owned; see roadmap | P22, P22B |
 | 23 Aircraft | [23.00](https://www.40k.app/rules/23-aircraft) | authoritative_app_mirror | owned; see roadmap | P23 |
-| 24 Core Abilities | [24.00](https://www.40k.app/rules/24-core-abilities) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P24F, P24G, P24D, P24C1, P24I, P24A, P24H, P24E, P24C2, P24B, P24J |
+| 24 Core Abilities | [24.00](https://www.40k.app/rules/24-core-abilities) | repository_transcription_not_observed_on_authoritative_app_mirror | owned; see roadmap | P24F, P24G, P24D, P24C1, P24I, P24A, P24H, P24E, P24C2, P24B, P24J, P24K |
 | 25 Muster Armies | [25.00](https://www.40k.app/rules/25-muster-armies) | authoritative_app_mirror | owned; see roadmap | P25A, P25B, P25C |
 
 Implementation findings were assessed for every category. Their itemized current behavior, required behavior, exact App rule basis, dependencies, and one-PR-at-a-time sequence are retained in `docs/CORE_RULES_REMEDIATION_ROADMAP.md`. Source/provider findings below are tracked separately so corpus provenance does not imply gameplay execution.

@@ -2,17 +2,20 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
-Current Core status: the requested Order 84 audit surveyed all 25 categories and 59 FAQs
-and found 11 scoped follow-ups. Core Rules and full-game performance remain uncertified.
-See the [compact roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) for the current
-sequence (PFINAL is now Order 95), and the [audit](docs/ORDER_84_AUDIT_REPORT.md) for
-findings and evidence limits. Earlier implementation notes below retain historical numbering.
+Current Core status: the requested Order 95 audit surveyed all 25 categories, 59 FAQs
+and all observed changelog versions after Orders 1–94 merged. It found two gameplay
+gaps and a missing complete clause-evidence inventory. Orders 95–97 own those
+repairs; PFINAL is Order 98. Core Rules and full-game performance remain uncertified.
+See the [roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md),
+[current audit](docs/ORDER_95_AUDIT_REPORT.md) and
+[evidence limits](docs/ORDER_95_AUDIT_NOTES.md). Earlier implementation notes below
+retain historical numbering.
 
 Order 84 / P01G implements source-assigned dice results and active-player
 selection among tied highest/lowest physical dice. See
 [scope and evidence](docs/ORDER_84_SCOPE_PLAN.md) and
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
-remains separate under Order 95. Orders 85–94 were open at that audit; the
+remains separate under PFINAL (currently Order 98). Orders 85–94 were open at that audit; the
 implementation entries below and roadmap record their later status.
 
 Order 93 / P02I preserves individual source operations until an authorized
