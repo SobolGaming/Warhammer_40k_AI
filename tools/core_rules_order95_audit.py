@@ -22,10 +22,33 @@ AUDIT = ROOT / "data/source_audits/order95/audit.json"
 REPORT = ROOT / "docs/ORDER_95_AUDIT_REPORT.md"
 REVIEW_SHA256 = "ad82717ccea80ea9e1315dbdeb03607aa5d760ae0d3842bf7e7b9f700a03e0fa"
 FINDING_OWNERS = {"C04-06": "P04E", "C24-11": "P24K", "CAUDIT-02": "PEVIDENCE"}
+# Explicit retirement proof for C24-11; the immutable negative observation stays
+# pinned to its reviewed commit. Both replacement owners must remain present.
+RETIRED_REFERENCE_SUCCESSORS = {
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py:"
+    "_reroll_wound_for_twin_linked_if_needed": (
+        "src/warhammer40k_core/engine/intrinsic_attack_rerolls.py:intrinsic_wound_reroll_contexts",
+        "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py:"
+        "build_source_backed_wound_reroll_request",
+    ),
+}
 
 
 class AuditError(ValueError):
     """The retained Order 95 evidence or its negative disposition changed."""
+
+
+def validate_owner_reference(reference: str, root: Path) -> None:
+    path, _, symbol = reference.replace("::", ":").partition(":")
+    target = root / path
+    present = target.is_file() and (not symbol or f"def {symbol}(" in target.read_text())
+    if reference in RETIRED_REFERENCE_SUCCESSORS:
+        if present:
+            raise AuditError(f"Order 95 retired owner was reintroduced: {reference}.")
+        for successor in RETIRED_REFERENCE_SUCCESSORS[reference]:
+            validate_owner_reference(successor, root)
+    elif not present:
+        raise AuditError(f"Order 95 owner/regression reference is absent: {reference}.")
 
 
 def _verified_file(evidence: dict[str, Any], root: Path) -> bytes:
@@ -112,15 +135,15 @@ def validate_audit(audit: dict[str, Any], *, root: Path = ROOT, roadmap: str | N
         if not set(row["source_rows"]) <= set(source_rows):
             raise AuditError("Order 95 changelog points to an unknown source row.")
     # Preserve hashes of the reviewed tree, but do not demand future source files
-    # keep those historical contents after a repair. References must still resolve.
+    # keep those historical contents after a repair. References must resolve to
+    # their current owner or an explicitly recorded retirement and its successors.
     references = [row["path"] for row in audit["evidence_files"]]
     references.extend(ref for row in audit["cross_category_reviews"] for ref in row["regressions"])
     references.extend(ref for row in audit["findings"] for ref in row["owners"])
+    if not set(RETIRED_REFERENCE_SUCCESSORS) <= set(references):
+        raise AuditError("Order 95 retirement mapping has no historical reference.")
     for reference in references:
-        path, _, symbol = reference.replace("::", ":").partition(":")
-        target = root / path
-        if not target.is_file() or (symbol and f"def {symbol}(" not in target.read_text()):
-            raise AuditError(f"Order 95 owner/regression reference is absent: {reference}.")
+        validate_owner_reference(reference, root)
     document = (
         (root / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text()
         if roadmap is None

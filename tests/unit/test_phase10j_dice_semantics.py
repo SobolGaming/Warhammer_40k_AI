@@ -1256,12 +1256,9 @@ def test_order84_assignment_does_not_reopen_twin_linked_or_conditional_source_re
     )
 
     from warhammer40k_core.core.weapon_profiles import WeaponKeyword
-    from warhammer40k_core.engine.attack_sequence import WoundRoll
     from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
         _request_source_backed_hit_reroll_if_available,
-    )
-    from warhammer40k_core.engine.attack_sequence_hit_wound import (
-        _reroll_wound_for_twin_linked_if_needed,
+        _request_source_backed_wound_reroll_if_available,
     )
     from warhammer40k_core.engine.phase import BattlePhase
 
@@ -1328,29 +1325,19 @@ def test_order84_assignment_does_not_reopen_twin_linked_or_conditional_source_re
         )
         is None
     )
-    wound = WoundRoll(
-        strength=4,
-        toughness=4,
-        target_number=4,
-        roll_state=assigned_wound,
-        unmodified_roll=1,
-        modifier=0,
-        capped_modifier=0,
-        final_roll=1,
-        successful=False,
-        critical=False,
-    )
     assert (
-        _reroll_wound_for_twin_linked_if_needed(
-            manager=manager,
+        _request_source_backed_wound_reroll_if_available(
+            state=state,
             decisions=lifecycle.decision_controller,
             pool=pool,
-            initial_wound_roll=wound,
-            toughness=4,
-            attacker_player_id="player-a",
+            roll_state=assigned_wound,
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            attacker_keywords=(),
+            source_phase=BattlePhase.SHOOTING,
             attack_context_id="order84:attack",
         )
-        is wound
+        is None
     )
     assert (manager.rng.to_payload(), lifecycle.to_payload()) == before
 

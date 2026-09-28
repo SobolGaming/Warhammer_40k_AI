@@ -10,6 +10,7 @@ import pytest
 from tests.absent_strength_helpers import strength_session
 from tests.lethal_hits_helpers import attack_completed, attack_steps, complete_attack
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+from tests.twin_linked_helpers import complete_optional_attack
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -107,7 +108,7 @@ def test_strength_interactions_through_attack_hosts_restore_and_replay(
     session = strength_session(phase, strength=strength)
     pending_request(session)
     initial = session.lifecycle.to_payload()
-    complete_attack(session)
+    complete_optional_attack(session, reroll=True)
     wounds = attack_steps(session, "wound")
     assert wounds
     for wound in wounds:
@@ -119,7 +120,7 @@ def test_strength_interactions_through_attack_hosts_restore_and_replay(
     rerolls = [
         event
         for event in session.lifecycle.decision_controller.event_log.records
-        if event.event_type == "weapon_ability_reroll_resolved"
+        if event.event_type == "dice_reroll_resolved"
     ]
     assert rerolls
     checkpoint = json.loads(json.dumps(session.to_persistence_payload()))

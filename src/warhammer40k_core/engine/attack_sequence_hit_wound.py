@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
+from warhammer40k_core.engine.dice_roll_history import roll_or_reuse_d3
 
 from warhammer40k_core.core.modifiers import bound_modified_roll
 
@@ -57,7 +58,6 @@ __all__ = (
     "_melta_damage_modifier",
     "_persisting_hit_roll_modifier",
     "_plunging_fire_ballistic_skill_improvement",
-    "_reroll_wound_for_twin_linked_if_needed",
     "_roll_hit",
     "_roll_wound",
     "_save_options_with_effect_invulnerable",
@@ -183,7 +183,8 @@ def _roll_hit(
         )
         == SUSTAINED_HITS_D3_VALUE
     ):
-        sustained_hits_d3_value = manager.roll_d3(
+        sustained_hits_d3_value = roll_or_reuse_d3(
+            manager=manager,
             reason=(
                 "Sustained Hits D3 generated hits for "
                 f"{pool.weapon_profile_id} attack {attack_context_id}"
@@ -299,93 +300,6 @@ def _critical_wound_threshold(
             current_critical_is_threshold=threshold is not None,
         )
     )
-
-
-def _reroll_wound_for_twin_linked_if_needed(
-    *,
-    manager: DiceRollManager,
-    decisions: DecisionController,
-    pool: RangedAttackPool,
-    initial_wound_roll: WoundRoll,
-    toughness: int,
-    attacker_player_id: str,
-    attack_context_id: str,
-) -> WoundRoll:
-    if initial_wound_roll.successful:
-        return initial_wound_roll
-    if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TWIN_LINKED):
-        return initial_wound_roll
-    if initial_wound_roll.roll_state is None or initial_wound_roll.target_number is None:
-        raise GameLifecycleError("Twin-linked reroll requires a wound roll state.")
-    if initial_wound_roll.roll_state.result_override is not None:
-        return initial_wound_roll
-    permission = RerollPermission(
-        source_id=TWIN_LINKED_RULE_ID,
-        timing_window="attack_sequence.wound",
-        owning_player_id=attacker_player_id,
-        eligible_roll_type=initial_wound_roll.roll_state.original_result.spec.roll_type,
-        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
-    )
-    request = manager.build_reroll_request(
-        initial_wound_roll.roll_state,
-        request_id=f"{attack_context_id}:twin-linked-reroll-request",
-        actor_id=attacker_player_id,
-        permission=permission,
-        extra_payload={
-            "source_rule_id": TWIN_LINKED_RULE_ID,
-            "attack_context_id": attack_context_id,
-            "weapon_profile_id": pool.weapon_profile_id,
-        },
-    )
-    reroll_option_ids = tuple(
-        option.option_id for option in request.options if option.option_id != "decline"
-    )
-    if len(reroll_option_ids) != 1:
-        raise GameLifecycleError("Twin-linked reroll must resolve exactly one option.")
-    result = DecisionResult.for_request(
-        result_id=f"{attack_context_id}:twin-linked-reroll-result",
-        request=request,
-        selected_option_id=reroll_option_ids[0],
-    )
-    updated_state = manager.resolve_reroll(
-        initial_wound_roll.roll_state,
-        request=request,
-        result=result,
-        record_decision=False,
-    )
-    unmodified = updated_state.current_total
-    capped_modifier = _cap_roll_modifier(initial_wound_roll.modifier)
-    final_roll = bound_modified_roll(unmodified + capped_modifier)
-    critical_threshold = CriticalRollThreshold(
-        initial_wound_roll.critical_threshold, initial_wound_roll.critical_is_threshold
-    )
-    critical = critical_threshold.matches(unmodified)
-    wound_roll = WoundRoll(
-        strength=pool.weapon_profile.strength_for_interaction(),
-        toughness=toughness,
-        target_number=initial_wound_roll.target_number,
-        roll_state=updated_state,
-        unmodified_roll=unmodified,
-        modifier=initial_wound_roll.modifier,
-        capped_modifier=capped_modifier,
-        final_roll=final_roll,
-        successful=critical or (unmodified != 1 and final_roll >= initial_wound_roll.target_number),
-        critical=critical,
-        critical_threshold=critical_threshold.value,
-        critical_is_threshold=critical_threshold.inclusive,
-    )
-    decisions.event_log.append(
-        "weapon_ability_reroll_resolved",
-        {
-            "source_rule_id": TWIN_LINKED_RULE_ID,
-            "attack_context_id": attack_context_id,
-            "weapon_profile_id": pool.weapon_profile_id,
-            "reroll_request": request.to_payload(),
-            "reroll_result": result.to_payload(),
-            "wound_roll": wound_roll.to_payload(),
-        },
-    )
-    return wound_roll
 
 
 def _emit_damage_event(

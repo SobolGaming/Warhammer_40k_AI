@@ -40,8 +40,10 @@ def test_modified_dice_and_targeting_ranges_use_the_shared_limits() -> None:
     assert "resolve_targeting_range" in _calls(
         "engine/lone_operative.py", "lone_operative_target_allowed"
     )
-    for name in ("_roll_hit", "_roll_wound", "_reroll_wound_for_twin_linked_if_needed"):
+    # Initial and rerolled wounds now share the same modifier owner on resume.
+    for name in ("_roll_hit", "_roll_wound"):
         assert "bound_modified_roll" in _calls("engine/attack_sequence_hit_wound.py", name)
+    assert "_roll_wound" in _calls("engine/attack_sequence_dice_rerolls.py", "_roll_hit_and_wound")
     assert "bound_modified_roll" in _calls("engine/saves.py", "_final_roll_for_save_option")
 
 
