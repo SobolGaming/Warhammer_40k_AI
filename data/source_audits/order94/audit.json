@@ -1,0 +1,218 @@
+{
+  "schema_id": "core-v2-order94-source-review-v1",
+  "audit_id": "order94-2026-09-28",
+  "finding_id": "C15-10",
+  "pr_id": "P15J",
+  "reviewed_commit": "94f7e18cf369461063dcd78eaa19199c72fb1374",
+  "runtime_input": false,
+  "caudit_01_closed": false,
+  "outcome": "complete_selected_observation_reconciled",
+  "comparison_status": "unversioned_observations_not_co_versioned",
+  "selected_observation": {
+    "provider_name": "40k.app",
+    "provider_non_affiliation_recorded": true,
+    "source_url": "https://www.40k.app/rules/15-stratagems#15.11",
+    "observed_at": "2026-09-28T15:41:12Z",
+    "app_data_version": null,
+    "app_build": null,
+    "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "rule_source_id": "gw-11e-core-stratagems:core:heroic-intervention",
+    "capture": {
+      "path": "data/source_audits/order94/40k-app-15.11.html",
+      "sha256": "073ebb3c3b65f0f43401f7a66774a762d91b377e98ca162791a61fe83cf9832b"
+    },
+    "capture_method": "Normal browser DOM section outerHTML, with one final LF added for repository storage. Visible accessibility text confirms base cost 1 CP; CP is CSS-rendered outside the captured text nodes. No full-page response or official App capture claimed.",
+    "transcription": "15.11 Heroic Intervention\nHeroic Intervention\nCharge Phase\nTarget\nOne friendly unengaged unit within 12\" of one or more enemy units. You can only select a VEHICLE unit if it is a CHARACTER/WALKER unit.\nWhen\nEnd of your opponent’s Charge phase.\nEffect\nResolve a charge with your unit (11.02). While doing so, before making the charge roll, you must select one of the following modes:\nLeap to Defend: When selecting charge targets, you can only select enemy units that made a charge move this phase and are within the maximum distance.\n+1 CP\nInto the Fray:\nWhen making the charge roll, if the result is greater than 6 (after modifiers), change it to 6.\nWhen selecting charge targets, you can select any enemy units that are within 6\" of your unit and within the maximum distance.\n1",
+    "transcription_sha256": "9d5dcb3991e603bbf4660b9ee32d390a498f57a76cb4059f4bb18b9a1b90f405",
+    "load_support_status": "not_loaded_review_artifact",
+    "semantic_execution_status": "not_reassessed",
+    "source_observation_sha256": "00c2d7207a6dd9fcc95a3f7a86a98bc6c34cf4fe7485b8f35437746e7b54c67d"
+  },
+  "historical_gdm": {
+    "audit_path": "data/source_audits/order84/audit.json",
+    "audit_sha256": "d4b624f91506ae85d89dee59825ec9c36c1c38adc004982c042558543afe87b6",
+    "audit_id": "order84-2026-09-24",
+    "row_id": "rule:15:15.11:1",
+    "observation": {
+      "provider": "Game Datamissions",
+      "provider_affiliation": "non-affiliated maintained direct App-data mirror",
+      "url": "https://game-datamissions.com/11th/rules/core-rules",
+      "asset_url": "https://game-datamissions.com/_next/static/chunks/app/11th/rules/core-rules/page-ec6350d45d9ddeb5.js",
+      "observed_at": "2026-09-24T18:41:22.161671+00:00",
+      "app_data_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "html_sha256": "6b9c78a492a9e26b28c2e03f332c1acb99b699abe98587a661f8a20b3fcb9100",
+      "asset_sha256": "6f4d27c5670489e9b6310bb8f43e837d8abaf2d5f7a8c8938f56690190edad0e",
+      "parsed_data_sha256": "8de4ad0ece648b0935d4eca6060ed789a22f6125a664d73151cc292fb0922a12",
+      "source_inventory_sha256": "9405274f48551a2431857c94d9004b779877f89345dc88955c9b72a74dd72921",
+      "complete_for_certification": false,
+      "retention": "Metadata and exact block hashes only; raw provider text is not redistributed. This artifact is not a registered runtime source package.",
+      "comparison": "40k.app category 15 inspected in normal browser; 15.11 complete there and truncated in GDM. No co-versioned full-corpus comparison or official-App observation available; changelog v946 is not a version assertion about this live body."
+    },
+    "source_row_sha256": "80349708666d785971d28fdc05ec0f63fc9448a23352026108896c33bf1fada1",
+    "blocks": [
+      "Cost: 1CP",
+      "WHEN: End of your opponent’s Charge phase.",
+      "TARGET: One friendly unengaged unit within 12\" of one or more enemy units. You can only select a VEHICLE unit if it is a CHARACTER/WALKER unit.",
+      "EFFECT: Resolve a charge with your unit (11.02).",
+      "While doing so, before making the charge roll, you must select one of the following modes:",
+      "• When selecting charge targets, you can only select enemy units that made a charge move this phase and are within the maximum distance.",
+      "• is greater than 6 (after modifiers), change it to 6.",
+      "can select any enemy units that are within 6\" of your unit and within the maximum distance."
+    ],
+    "completeness": "truncated_not_selected",
+    "retrieval_note": "Exact historical public asset retrieved 2026-09-28; raw SHA-256 and each block fingerprint match the September 24 inventory. This does not assign a new observation date or version to that historical inventory."
+  },
+  "official_evidence": {
+    "path": "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "source_id": "gw-11e-core-rules",
+    "page": 57,
+    "locator": "15.11",
+    "review_method": "Inspected complete rendered PDF page 57 and extracted text on 2026-09-28. Compared all ten operative clauses, including the placement of the +1CP badge. Flavor text is outside this operative review.",
+    "app_data_version": null,
+    "comparison": "operative_wording_matches_not_version_equivalence"
+  },
+  "prior_implementation_review": {
+    "path": "docs/ORDER_50_SCOPE_PLAN.md",
+    "sha256": "4320ff92a186e7ddc04db50ef70a7fa5439ac10833eb0818d383a67669d233d8"
+  },
+  "clause_reviews": [
+    {
+      "clause_id": "base-cost",
+      "description": "Base cost: 1 CP",
+      "selected_text": "1",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        1
+      ],
+      "gdm_disposition": "present",
+      "difference": "Same base cost; the browser accessibility view and official PDF supply the CP unit.",
+      "engine_owner": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows",
+      "regression": "tests/unit/test_heroic_intervention.py:test_heroic_shared_reroll_targets_decline_restore_and_exact_replay"
+    },
+    {
+      "clause_id": "target",
+      "description": "Friendly unengaged unit within 12 inches",
+      "selected_text": "One friendly unengaged unit within 12\" of one or more enemy units.",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        3
+      ],
+      "gdm_disposition": "present",
+      "difference": "Same target restriction.",
+      "engine_owner": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows",
+      "regression": "tests/unit/test_heroic_intervention.py:test_heroic_intervention_enters_shared_charge_declaration"
+    },
+    {
+      "clause_id": "vehicle",
+      "description": "VEHICLE must also be CHARACTER/WALKER",
+      "selected_text": "You can only select a VEHICLE unit if it is a CHARACTER/WALKER unit.",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        3
+      ],
+      "gdm_disposition": "present",
+      "difference": "Same keyword exception.",
+      "engine_owner": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows",
+      "regression": "tests/unit/test_heroic_intervention.py:test_heroic_uses_vehicle_exceptions_and_ordinary_aircraft_restriction"
+    },
+    {
+      "clause_id": "timing",
+      "description": "End of opponent Charge phase",
+      "selected_text": "End of your opponent’s Charge phase.",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        2
+      ],
+      "gdm_disposition": "present",
+      "difference": "Same timing.",
+      "engine_owner": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py:core_stratagem_rows",
+      "regression": "tests/unit/test_phase15a_charge_declarations.py:test_end_charge_heroic_ordinary_opportunity_is_independent_of_snarling_state"
+    },
+    {
+      "clause_id": "charge",
+      "description": "Resolve the ordinary charge under 11.02",
+      "selected_text": "Resolve a charge with your unit (11.02).",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        4
+      ],
+      "gdm_disposition": "present",
+      "difference": "Same shared Charge reference.",
+      "engine_owner": "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source",
+      "regression": "tests/unit/test_heroic_intervention.py:test_heroic_intervention_enters_shared_charge_declaration"
+    },
+    {
+      "clause_id": "choice",
+      "description": "Select one mode before rolling",
+      "selected_text": "While doing so, before making the charge roll, you must select one of the following modes:",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        5
+      ],
+      "gdm_disposition": "present",
+      "difference": "Same pre-roll choice timing; the missing labels below prevent complete interpretation.",
+      "engine_owner": "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source",
+      "regression": "tests/unit/test_heroic_intervention.py:test_missing_heroic_mode_is_rejected_before_spend_or_roll"
+    },
+    {
+      "clause_id": "leap",
+      "description": "Leap to Defend: only completed chargers within maximum distance",
+      "selected_text": "Leap to Defend: When selecting charge targets, you can only select enemy units that made a charge move this phase and are within the maximum distance.",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        6
+      ],
+      "gdm_disposition": "partial",
+      "difference": "GDM retains the restriction but omits the Leap to Defend label.",
+      "engine_owner": "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source",
+      "regression": "tests/unit/test_heroic_intervention.py:test_leap_targets_completed_charge_moves_not_fights_first_effects"
+    },
+    {
+      "clause_id": "fray-cost",
+      "description": "Into the Fray option and additional 1 CP",
+      "selected_text": "+1 CP\nInto the Fray:",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [],
+      "gdm_disposition": "omitted",
+      "difference": "GDM omits both the Into the Fray label and its additional cost. The retained DOM nests the cost with that mode; the PDF marks the same section.",
+      "engine_owner": "src/warhammer40k_core/engine/stratagems_selection.py:_heroic_intervention_mode_additional_cost",
+      "regression": "tests/unit/test_phase12c_core_stratagems.py:test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp"
+    },
+    {
+      "clause_id": "fray-roll",
+      "description": "Into the Fray: cap Charge result at 6 after modifiers",
+      "selected_text": "When making the charge roll, if the result is greater than 6 (after modifiers), change it to 6.",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        7
+      ],
+      "gdm_disposition": "partial",
+      "difference": "GDM drops the start of the sentence identifying the Charge roll and condition.",
+      "engine_owner": "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source",
+      "regression": "tests/unit/test_heroic_intervention.py:test_heroic_roll_modifiers_are_applied_before_source_cap"
+    },
+    {
+      "clause_id": "fray-target",
+      "description": "Into the Fray: enemies within 6 inches and maximum distance",
+      "selected_text": "When selecting charge targets, you can select any enemy units that are within 6\" of your unit and within the maximum distance.",
+      "official_pdf_review": "matches_selected_operative_wording",
+      "gdm_block_ordinals": [
+        8
+      ],
+      "gdm_disposition": "partial",
+      "difference": "GDM drops the start of the target-selection sentence.",
+      "engine_owner": "src/warhammer40k_core/engine/heroic_intervention_rolls.py:heroic_charge_source",
+      "regression": "tests/unit/test_heroic_intervention.py:test_fray_target_range_remains_six_with_extra_movement"
+    }
+  ],
+  "limits": [
+    "This is an offline source-review artifact, not a registered runtime source package. It does not claim project_authoritative_app_mirror loader status; no source-authority registry entry, runtime package, stable rule ID, or engine identity changes.",
+    "The complete selected 40k.app observation agrees with the retained official PDF and Order 50 implementation review. The truncated GDM observation is retained as negative evidence, never patched with text from another provider.",
+    "Neither mirror exposes an App-data version for these observations. Same-version agreement or disagreement is not established; changelog v946 does not version the live body. No official-App access or full-corpus comparison is claimed.",
+    "Existing co-versioned conflict rejection and the official-App disambiguation policy remain unchanged. This review finds completeness in the selected mirror and no operative conflict with existing complete evidence; it grants no general exception for truncated source selections.",
+    "Owner and regression links trace existing behavior; they do not independently certify every rule clause. PFINAL still requires a fresh complete Core audit after all prerequisite PRs merge.",
+    "Historical Order 84 evidence and its negative CAUDIT-01 outcome remain unchanged. No faction support, gameplay support-status upgrade, contract change, or full-game performance claim is made."
+  ]
+}
