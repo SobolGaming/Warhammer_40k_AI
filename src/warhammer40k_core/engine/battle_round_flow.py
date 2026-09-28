@@ -165,6 +165,17 @@ class BattleRoundFlow:
         if current_phase is None:
             raise GameLifecycleError("BattleRoundFlow requires a current battle phase.")
 
+        from warhammer40k_core.engine.turn_start_modifier_boundary import (
+            complete_turn_start_modifier_boundary,
+        )
+
+        modifier_status = complete_turn_start_modifier_boundary(
+            state=state,
+            decisions=decisions,
+            runtime_modifier_registry=self._runtime_modifier_registry,
+        )
+        if modifier_status is not None:
+            return modifier_status
         from warhammer40k_core.engine.model_destruction_triggers import (
             advance_model_destruction_triggers,
         )
@@ -229,12 +240,14 @@ class BattleRoundFlow:
                     "request_id": pending_start_request.request_id,
                 },
             )
-        _emit_phase_start_objective_proximity_snapshot_if_available(
+        modifier_status = _emit_phase_start_objective_proximity_snapshot_if_available(
             state=state,
             decisions=decisions,
             registry=self._phase_end_objective_control_hooks,
             runtime_modifier_registry=self._runtime_modifier_registry,
         )
+        if modifier_status is not None:
+            return modifier_status
         status = handler.begin_phase(
             state=state,
             decisions=decisions,
@@ -270,11 +283,13 @@ class BattleRoundFlow:
                 payload={"phase_body_status": "deferred_rules_ready"},
             )
 
-        prepare_phase_end_boundary(
+        modifier_status = prepare_phase_end_boundary(
             state=state,
             decisions=decisions,
             runtime_modifier_registry=self._runtime_modifier_registry,
         )
+        if modifier_status is not None:
+            return modifier_status
         timing_status = request_end_rules(
             state=state,
             decisions=decisions,
@@ -299,11 +314,13 @@ class BattleRoundFlow:
             resolution_order=_END_WINDOW_RESOLUTION_ORDER,
         )
         if _is_end_of_player_turn(state):
-            prepare_turn_end_control_boundary(
+            modifier_status = prepare_turn_end_control_boundary(
                 state=state,
                 decisions=decisions,
                 runtime_modifier_registry=self._runtime_modifier_registry,
             )
+            if modifier_status is not None:
+                return modifier_status
             turn_status = request_end_rules(
                 state=state,
                 decisions=decisions,
@@ -613,13 +630,13 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
     decisions: DecisionController,
     registry: PhaseEndObjectiveControlHookRegistry,
     runtime_modifier_registry: RuntimeModifierRegistry,
-) -> None:
+) -> LifecycleStatus | None:
     if type(registry) is not PhaseEndObjectiveControlHookRegistry:
         raise GameLifecycleError("Objective proximity snapshot requires a registry.")
     if not registry.all_bindings():
-        return
+        return None
     if state.mission_setup is None or state.battlefield_state is None:
-        return
+        return None
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Objective proximity snapshot requires a current phase.")
@@ -634,10 +651,13 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
         key="snapshot_id",
         value=snapshot_id,
     ):
-        return
-    from warhammer40k_core.engine.random_objective_control import evaluate_objective_control
+        return None
+    from warhammer40k_core.engine.objective_control import resolve_objective_control
+    from warhammer40k_core.engine.objective_control_modifier_evaluation import (
+        evaluate_objective_control_modifiers,
+    )
 
-    record = evaluate_objective_control(
+    prepared = evaluate_objective_control_modifiers(
         ObjectiveControlContext.from_game_state(
             state,
             timing=ObjectiveControlTiming.PHASE_END,
@@ -646,8 +666,15 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
             runtime_modifier_registry=runtime_modifier_registry,
         ),
         decisions=decisions,
-        scope_id=snapshot_id,
+        occurrence_id=snapshot_id,
+        ability_indexes_by_player_id={
+            player: runtime_modifier_registry.modifier_permission_index(player)
+            for player in state.player_ids
+        },
     )
+    if prepared.pending_status is not None:
+        return prepared.pending_status
+    record = resolve_objective_control(prepared.context)
     objective_ids_by_unit: dict[str, set[str]] = {}
     for result in record.results:
         for contribution in result.contributors:
@@ -670,6 +697,8 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
             "source_objective_control_record": record.to_payload(),
         },
     )
+
+    return None
 
 
 def _event_with_payload_id_exists(

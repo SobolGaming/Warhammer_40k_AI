@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -266,6 +266,12 @@ def available_melee_weapons_payloads(
                 "engaged_target_unit_instance_ids": list(target_ids),
             }
         )
+        if context is not None:
+            from warhammer40k_core.engine.weapon_modifier_selection import melee_row_with_context
+
+            if not isinstance(row, dict):
+                raise GameLifecycleError("Melee weapon row must be an object.")
+            row = melee_row_with_context(row, context)
         rows.append(row)
     return tuple(rows)
 
@@ -373,22 +379,6 @@ def validate_melee_declaration_rules(
                 message="Declared melee model is not engaged with any enemy unit.",
                 field="attacker_model_instance_id",
             )
-        if committed_budgets is None:
-            target_count_validation = _validate_melee_target_count_limit(
-                request=request,
-                declaration=declaration,
-                profile=profile,
-            )
-            if target_count_validation is not None:
-                return target_count_validation
-        for allocation in declaration.target_allocations:
-            if allocation.target_unit_instance_id not in engaged_target_ids:
-                return _invalid_melee_validation(
-                    request=request,
-                    violation_code="melee_target_not_engaged_with_model",
-                    message="Melee declaration target is not engaged with the attacking model.",
-                    field="target_allocations",
-                )
         context = melee_weapon_selection_context(
             state=state,
             runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
@@ -409,6 +399,33 @@ def validate_melee_declaration_rules(
             and row.get("wargear_id") == declaration.wargear_id
             and row.get("weapon_profile_id") == declaration.weapon_profile_id
         )
+        from warhammer40k_core.engine.weapon_modifier_selection import (
+            authenticated_weapon_modifier_context,
+        )
+
+        if len(matching_rows) == 1:
+            from warhammer40k_core.engine.weapon_selection_context import (
+                WeaponSelectionContext,
+                WeaponSelectionContextPayload,
+            )
+
+            try:
+                context = authenticated_weapon_modifier_context(
+                    context,
+                    WeaponSelectionContext.from_payload(
+                        cast(
+                            WeaponSelectionContextPayload,
+                            matching_rows[0]["weapon_ability_selection_context"],
+                        )
+                    ),
+                )
+            except GameLifecycleError as exc:
+                return _invalid_melee_validation(
+                    request=request,
+                    violation_code="weapon_modifier_inventory_drift",
+                    message=str(exc),
+                    field="declarations",
+                )
         if len(matching_rows) != 1 or matching_rows[0].get(
             "weapon_ability_selection_context"
         ) != validate_json_value(context.to_payload()):
@@ -418,6 +435,22 @@ def validate_melee_declaration_rules(
                 message="Melee source inventory differs from the pending request.",
                 field="declarations",
             )
+        if committed_budgets is None:
+            target_count_validation = _validate_melee_target_count_limit(
+                request=request,
+                declaration=declaration,
+                profile=context.raw_profile_for_target(engaged_target_ids[0]),
+            )
+            if target_count_validation is not None:
+                return target_count_validation
+        for allocation in declaration.target_allocations:
+            if allocation.target_unit_instance_id not in engaged_target_ids:
+                return _invalid_melee_validation(
+                    request=request,
+                    violation_code="melee_target_not_engaged_with_model",
+                    message="Melee declaration target is not engaged with the attacking model.",
+                    field="target_allocations",
+                )
         try:
             profiles = tuple(
                 context.selected_profile(target, declaration.selected_weapon_ability_ids)
@@ -478,6 +511,7 @@ def melee_attack_sequence_from_proposal(
     state: GameState | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     committed_budgets: dict[str, MeleeAttackBudget] | None = None,
+    selected_weapon_rows: tuple[JsonValue, ...] = (),
 ) -> AttackSequence:
     from warhammer40k_core.engine.fight_resolution import (
         _available_melee_weapons_by_key,
@@ -526,6 +560,16 @@ def melee_attack_sequence_from_proposal(
             target_unit_instance_ids=target_ids,
             profile=profile,
         )
+        if selected_weapon_rows:
+            from warhammer40k_core.engine.weapon_modifier_selection import (
+                selected_melee_context_for_physical_targets,
+            )
+
+            context = selected_melee_context_for_physical_targets(
+                state=state,
+                current=context,
+                offered_rows=selected_weapon_rows,
+            )
         profile = context.selected_profile(
             declaration.target_unit_instance_ids[0], declaration.selected_weapon_ability_ids
         )

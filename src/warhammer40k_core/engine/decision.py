@@ -147,7 +147,7 @@ def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
     if isinstance(value, dict):
         # Added interpretation evidence must not perturb unchanged physical dice
         # sequences. Assigned values and physical-component selections remain in
-        # authoritative history; only absent evidence is omitted from RNG input.
+        # authoritative history; absent or redundant evidence is omitted from RNG input.
         omit_absent_override = value.get("result_override") is None and any(
             field in value for field in ("component_values", "components", "component_id")
         )
@@ -156,12 +156,41 @@ def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
             and isinstance(previous := value.get("previous_values"), list)
             and len(previous) == 1
         )
+        save_option = value.get("save_kind") in ("armour", "invulnerable") and all(
+            field in value
+            for field in (
+                "characteristic_target_number",
+                "target_number",
+                "armor_penetration",
+                "cover_applied",
+            )
+        )
+        redundant_random_raw = (
+            value.get("value_kind") == "random"
+            and isinstance(evaluation := value.get("evaluation"), dict)
+            and value.get("evaluation_raw") == evaluation.get("raw")
+        )
+        # SaveOption validates inherent AP/cover operations against these existing
+        # scalar fields. Their new audit representation carries no additional
+        # gameplay input. Actual modifier operations and ignore choices remain bound.
         return {
             key: _without_rng_history_neutral_metadata(item)
             for key, item in value.items()
             if key not in _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS
             and not (key == "result_override" and omit_absent_override)
             and not (key == "component_index" and omit_single_die_index)
+            and not (key == "objective_control_modifier_scope_id" and item is None)
+            and not (key == "modifier_trace" and item is None)
+            and not (key == "evaluation_raw" and redundant_random_raw)
+            and not (key == "desperate_escape_roll_modifiers" and item == [])
+            and not (
+                save_option
+                and (
+                    key == "inherent_roll_modifiers"
+                    or (key in ("characteristic_trace", "armor_penetration_trace") and item is None)
+                    or (key in ("roll_modifiers", "ignored_roll_modifier_ids") and item == [])
+                )
+            )
         }
     if isinstance(value, list):
         return [_without_rng_history_neutral_metadata(item) for item in value]

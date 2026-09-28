@@ -64,7 +64,6 @@ __all__ = (
     "_target_has_effect_cover",
     "_target_has_effect_cover_denial",
     "_unit_instance_id_for_model",
-    "_wound_roll_modifier",
 )
 
 
@@ -78,6 +77,7 @@ def _roll_hit(
     source_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     psychic_modifier_selection: PsychicAttackModifierIgnoreSelection | None = None,
+    ignored_modifier_ids: tuple[str, ...] = (),
 ) -> HitRoll:
     from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
 
@@ -108,7 +108,7 @@ def _roll_hit(
             pool.weapon_profile.skill.characteristic,
             snapshots,
             tuple(item.modifier_id for item in snapshots),
-            (),
+            ignored_modifier_ids,
         )
     skill = selection.skill_value(ignored_ids=selection.ignored_modifier_ids)
     modifier = selection.effective_hit_roll_modifier
@@ -271,37 +271,6 @@ def _roll_wound(
         critical_threshold=critical_threshold.value,
         critical_is_threshold=critical_threshold.inclusive,
     )
-
-
-def _wound_roll_modifier(
-    *,
-    state: GameState,
-    pool: RangedAttackPool,
-    source_phase: BattlePhase,
-    toughness: int,
-    runtime_modifier_registry: RuntimeModifierRegistry | None,
-) -> int:
-    if type(pool) is not RangedAttackPool:
-        raise GameLifecycleError("Wound roll modifier requires a RangedAttackPool.")
-    modifier = 0
-    if LANCE_RULE_ID in pool.targeting_rule_ids:
-        modifier += 1
-    modifier += _runtime_modifier_registry(runtime_modifier_registry).wound_roll_modifier(
-        WoundRollModifierContext(
-            state=state,
-            source_phase=source_phase,
-            attacking_unit_instance_id=_unit_instance_id_for_model(
-                state=state,
-                model_instance_id=pool.attacker_model_instance_id,
-            ),
-            attacker_model_instance_id=pool.attacker_model_instance_id,
-            target_unit_instance_id=pool.target_unit_instance_id,
-            weapon_profile=pool.weapon_profile,
-            strength=pool.weapon_profile.strength_for_interaction(),
-            toughness=toughness,
-        )
-    )
-    return modifier
 
 
 def _critical_wound_threshold(
@@ -764,29 +733,15 @@ def _save_options_with_effect_invulnerable(
     )
     if effect_save is None:
         return save_options
-    if any(
-        option.save_kind is SaveKind.INVULNERABLE and option.target_number <= effect_save
-        for option in save_options
-    ):
-        return save_options
-    return tuple(
-        sorted(
-            (
-                *(
-                    option
-                    for option in save_options
-                    if option.save_kind is not SaveKind.INVULNERABLE
-                ),
-                SaveOption(
-                    save_kind=SaveKind.INVULNERABLE,
-                    target_number=effect_save,
-                    characteristic_target_number=effect_save,
-                    armor_penetration=armor_penetration,
-                    source_rule_ids=(GO_TO_GROUND_EFFECT_KIND,),
-                ),
-            ),
-            key=lambda option: option.save_kind.value,
-        )
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_options_with_invulnerable_characteristic,
+    )
+
+    return save_options_with_invulnerable_characteristic(
+        save_options,
+        target_number=effect_save,
+        source_id=GO_TO_GROUND_EFFECT_KIND,
+        only_if_better=True,
     )
 
 

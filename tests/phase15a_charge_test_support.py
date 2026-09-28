@@ -33,7 +33,6 @@ from tests.support.selected_target_charge_fixtures import (
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -69,7 +68,7 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookRegistry,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -106,11 +105,6 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.runtime_modifiers import (
-    ChargeRollModifierBinding,
-    ChargeRollModifierContext,
-    RuntimeModifierRegistry,
-)
 from warhammer40k_core.engine.stratagems import (
     HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND,
@@ -898,13 +892,19 @@ def _install_charge_declaration_registry(
     flow._phase_handlers[BattlePhase.CHARGE] = handler  # pyright: ignore[reportPrivateUsage]
 
 
-def _charge_modifier_ignore_ability_record(*, datasheet_id: str) -> AbilityCatalogRecord:
-    text = "This model can ignore any or all modifiers to Move, Advance and Charge."
+def _charge_modifier_ignore_ability_record(
+    *, datasheet_id: str, target_kind: RuleTargetKind = RuleTargetKind.THIS_MODEL
+) -> AbilityCatalogRecord:
+    text = (
+        "This unit can ignore any or all modifiers to Move, Advance and Charge."
+        if target_kind is RuleTargetKind.THIS_UNIT
+        else "This model can ignore any or all modifiers to Move, Advance and Charge."
+    )
     span = TextSpan(text=text, start=0, end=len(text))
     clause = RuleClause(
         clause_id="test:modifier-ignore:charge-clause",
         source_span=span,
-        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=span),
+        target=RuleTargetSpec(kind=target_kind, source_span=span),
         effects=(
             RuleEffectSpec(
                 kind=RuleEffectKind.GRANT_ABILITY,
@@ -956,77 +956,6 @@ def _charge_modifier_ignore_ability_record(*, datasheet_id: str) -> AbilityCatal
         source_kind=AbilitySourceKind.DATASHEET,
         datasheet_id=datasheet_id,
     )
-
-
-def _charge_modifier_ignore_registry() -> RuntimeModifierRegistry:
-    return RuntimeModifierRegistry.from_bindings(
-        charge_roll_modifier_bindings=(
-            ChargeRollModifierBinding(
-                modifier_id="test:modifier-ignore:charge-binding",
-                source_id="test:modifier-ignore:charge-binding-source",
-                handler=_modifier_ignore_charge_modifiers,
-            ),
-        )
-    )
-
-
-def _modifier_ignore_charge_modifiers(
-    context: ChargeRollModifierContext,
-) -> tuple[RollModifier, ...]:
-    return (
-        *context.current_roll_modifiers,
-        RollModifier(
-            modifier_id="test:modifier-ignore:charge-penalty",
-            source_id="test:modifier-ignore:charge-penalty-source",
-            operand=-1,
-        ),
-        RollModifier(
-            modifier_id="test:modifier-ignore:charge-bonus",
-            source_id="test:modifier-ignore:charge-bonus-source",
-            operand=1,
-        ),
-    )
-
-
-def _install_charge_modifier_ignore_runtime(
-    lifecycle: GameLifecycle,
-    *,
-    ability_index: AbilityCatalogIndex,
-    registry: RuntimeModifierRegistry,
-) -> None:
-    handler = replace(
-        lifecycle._charge_phase_handler,  # pyright: ignore[reportPrivateUsage]
-        ability_indexes_by_player_id={
-            "player-a": ability_index,
-            "player-b": AbilityCatalogIndex.from_records(()),
-        },
-        runtime_modifier_registry=registry,
-    )
-    lifecycle._charge_phase_handler = handler  # pyright: ignore[reportPrivateUsage]
-    flow = lifecycle._battle_round_flow  # pyright: ignore[reportPrivateUsage]
-    assert flow is not None
-    flow._phase_handlers[BattlePhase.CHARGE] = handler  # pyright: ignore[reportPrivateUsage]
-    bundle = lifecycle._runtime_content_bundle  # pyright: ignore[reportPrivateUsage]
-    assert bundle is not None
-    lifecycle._runtime_content_bundle = replace(  # pyright: ignore[reportPrivateUsage]
-        bundle,
-        runtime_modifier_registry=registry,
-        ability_indexes_by_player_id=handler.ability_indexes_by_player_id,
-    )
-    lifecycle._runtime_content_activation_input_hash = None  # pyright: ignore[reportPrivateUsage]
-    lifecycle._refresh_runtime_content_bundle_if_armies_mustered(preserve_existing_bundle=True)  # pyright: ignore[reportPrivateUsage]
-
-
-def _ignored_charge_modifier_ids(option: DecisionOption) -> tuple[str, ...]:
-    payload = option.payload
-    if not isinstance(payload, dict):
-        return ()
-    raw_context = payload.get("modifier_ignore_context")
-    if not isinstance(raw_context, dict):
-        return ()
-    ignored = raw_context.get("ignored_modifiers")
-    assert isinstance(ignored, list)
-    return tuple(cast(str, item["modifier_id"]) for item in ignored if isinstance(item, dict))
 
 
 def _charge_roll_request(*, player_id: str, unit_instance_id: str) -> ChargeRollRequest:
@@ -1374,7 +1303,6 @@ __all__ = (
     "_charge_lifecycle",
     "_charge_lifecycle_with_declaration_grants",
     "_charge_modifier_ignore_ability_record",
-    "_charge_modifier_ignore_registry",
     "_charge_move_proposal_request_for_value_tests",
     "_charge_move_request_after_selection",
     "_charge_path_witness_for_unit",
@@ -1394,11 +1322,8 @@ __all__ = (
     "_first_proposal_validation_violation",
     "_generated_snarling_protector_charge_lifecycle",
     "_heroic_proposal_from_request",
-    "_ignored_charge_modifier_ids",
     "_install_charge_declaration_registry",
-    "_install_charge_modifier_ignore_runtime",
     "_last_event_payload",
-    "_modifier_ignore_charge_modifiers",
     "_payload_has_displacements",
     "_require_pending_request",
     "_resolved_charge_move_for_tests",

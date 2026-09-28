@@ -218,7 +218,15 @@ def _attack_pools_for_proposal(
     shooting_player_id: str | None = None,
     out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...]]:
+    accepted_requests = tuple(
+        record.request
+        for record in decisions.records
+        if record.request.request_id == proposal.proposal_request_id
+    )
+    if len(accepted_requests) != 1:
+        raise GameLifecycleError("Shooting modifier selection requires its accepted declaration.")
     result = _attack_pools_or_validation(
+        pending_request=accepted_requests[0],
         state=state,
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
@@ -257,6 +265,7 @@ def _attack_pools_or_validation(
     committed_base_attacks: int | None = None,
     committed_attack_profile: AttackProfile | None = None,
     committed_selection_context: WeaponSelectionContext | None = None,
+    evaluated_selection_context: WeaponSelectionContext | None = None,
     validate_only: bool = False,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
@@ -382,6 +391,13 @@ def _attack_pools_or_validation(
             state=state,
             unit_instance_id=declaration.target_unit_instance_id,
         )
+        if target_rules_unit.owner_player_id == player_id:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="target_not_enemy_unit",
+                message="Shooting declarations must target an enemy rules unit.",
+                field="declarations",
+            )
         if committed_selection_context is not None:
             weapon_profile = weapon_with_committed_range(
                 weapon_profile, context=committed_selection_context
@@ -401,6 +417,33 @@ def _attack_pools_or_validation(
             shooting_context_matches_request,
         )
 
+        if evaluated_selection_context is not None:
+            from warhammer40k_core.engine.weapon_modifier_selection import (
+                authenticated_weapon_modifier_context,
+            )
+
+            selection_context = authenticated_weapon_modifier_context(
+                selection_context,
+                evaluated_selection_context.for_targets(
+                    tuple(target for target, _ in selection_context.target_profiles)
+                ),
+            )
+        if pending_request is not None:
+            from warhammer40k_core.engine.weapon_modifier_selection import (
+                shooting_modifier_context_from_request,
+            )
+
+            try:
+                selection_context = shooting_modifier_context_from_request(
+                    pending_request, selection_context
+                )
+            except GameLifecycleError as exc:
+                return ShootingProposalValidationResult.invalid(
+                    proposal_request_id=proposal.proposal_request_id,
+                    violation_code="weapon_modifier_inventory_drift",
+                    message=str(exc),
+                    field="declarations",
+                )
         weapon_profile = selection_context.raw_profile_for_target(
             declaration.target_unit_instance_id
         )
@@ -511,7 +554,11 @@ def _attack_pools_or_validation(
                 raise GameLifecycleError(
                     "Replacement cannot invent a new random Attacks expression."
                 )
-            attacks = committed_base_attacks if fixed_attacks is None else fixed_attacks
+            attacks = (
+                weapon_profile.attack_profile.resolve_value(committed_base_attacks)
+                if fixed_attacks is None
+                else fixed_attacks
+            )
         elif attack_count_manager is None:
             attacks = unresolved_attacks_for_validation(weapon_profile)
         else:

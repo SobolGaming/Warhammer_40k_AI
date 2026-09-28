@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import replace
 from typing import Literal, cast
 
 from tests.phase11c_command_phase_helpers import (
     default_unit_selection,
+    mustered_armies,
     unit_selection,
     with_model_offsets,
 )
@@ -18,6 +20,7 @@ from tests.setup_completion_helpers import (
     record_current_battlefield_placements_for_fixture,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.charge_movement_source import ChargePlacement
@@ -48,11 +51,12 @@ from warhammer40k_core.geometry.pose import Pose
 MovementCase = Literal["translation", "return", "zero", "rotation", "rotation_return"]
 
 
-def action_movement_session(
+def action_opportunity_session(
     *,
     attached: bool = False,
     mission_action_id: str = "maintain-control",
     pause_after_move: bool = False,
+    catalog_transform: Callable[[ArmyCatalog], ArmyCatalog] | None = None,
 ) -> tuple[LocalGameSession, str]:
     units = (
         (
@@ -157,6 +161,10 @@ def action_movement_session(
             for req in config.army_muster_requests
         ),
     )
+    if catalog_transform is not None:
+        assert config.army_catalog is not None
+        config = replace(config, army_catalog=catalog_transform(config.army_catalog))
+        state.army_definitions = list(mustered_armies(config))
     ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_completed_command_occurrences_for_fixture(state, decisions=decisions, config=config)
@@ -173,9 +181,24 @@ def action_movement_session(
         )
     )
     assert lifecycle.state is not None
+    return LocalGameSession(lifecycle), unit.unit_instance_id
+
+
+def action_movement_session(
+    *,
+    attached: bool = False,
+    mission_action_id: str = "maintain-control",
+    pause_after_move: bool = False,
+) -> tuple[LocalGameSession, str]:
+    session, _ = action_opportunity_session(
+        attached=attached,
+        mission_action_id=mission_action_id,
+        pause_after_move=pause_after_move,
+    )
+    lifecycle = session.lifecycle
     state = lifecycle.state
+    assert state is not None
     decisions = lifecycle.decision_controller
-    session = LocalGameSession(lifecycle)
     status = request_mission_action_start(
         state=state,
         decisions=decisions,

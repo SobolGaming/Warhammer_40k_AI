@@ -371,9 +371,23 @@ def validate_pending_order_restore_authority(
     if len(selected_unit_ids) == completed_count + 1 and (
         command_state.battle_shock_in_flight_test_request is None
     ):
-        raise GameLifecycleError(
-            "Command Battle-shock selected candidate lacks its in-flight test authority."
+        from warhammer40k_core.engine.battle_shock_modifier_evaluation import (
+            pending_command_modifier_has_candidate_authority,
         )
+
+        candidate = next(
+            item for item in candidates if item.unit_instance_id == selected_unit_ids[-1]
+        )
+        assert candidate.test_reason is not None
+        if not pending_command_modifier_has_candidate_authority(
+            state=state,
+            pending_requests=pending_decision_requests,
+            unit_instance_id=candidate.unit_instance_id,
+            reason=candidate.test_reason,
+        ):
+            raise GameLifecycleError(
+                "Command Battle-shock selected candidate lacks its in-flight test authority."
+            )
     remaining_candidates = tuple(
         candidate for candidate in candidates if candidate.unit_instance_id not in selected_unit_ids
     )

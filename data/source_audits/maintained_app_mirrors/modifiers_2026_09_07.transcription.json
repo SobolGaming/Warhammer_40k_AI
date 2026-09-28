@@ -29,7 +29,7 @@
     "slug": "ignore-individual-modifiers",
     "section": "02.02.02",
     "source_text": "Some rules enable a player, weapon, model or unit to ignore modifiers. When using such rules, the following points apply:\n\nUnless otherwise stated, that rule allows you to ignore modifiers to the unit's rolls and the unit's profile and weapon characteristics.\n\nWhen a rule states you can ignore modifiers to a stated roll or characteristic, you can choose to ignore all of those modifiers, or only some of them. For example, you can still choose to apply positive/beneficial modifiers while ignoring negative/detrimental modifiers.\n\nExample: Your unit can ignore characteristic modifiers and is under the effect of +2\" M and -2\" M. You can choose to ignore the -2\" M, meaning that unit's M characteristic will only be modified by the +2\" M.\n\nExample: Your unit's ranged attacks can ignore roll modifiers and are under the effect of +1 to hit rolls and -1 to hit rolls. You can choose to ignore the -1 to hit rolls, meaning those attacks will only be affected by the +1 to hit rolls.",
-    "consumer": "warhammer40k_core.engine.attack_sequence_psychic_modifiers",
+    "consumer": "warhammer40k_core.engine.modifier_evaluation",
     "source_url": "https://www.40k.app/rules/02-datasheets",
     "observed_at": "2026-09-07T16:05:47Z"
   },

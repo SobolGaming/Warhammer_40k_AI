@@ -306,6 +306,7 @@ class PrimaryMissionBoundaryCheckpoint:
     mission_action_prior_use_jsons: tuple[str, ...]
     checkpoint_id: str
     checkpoint_hash: str
+    objective_control_modifier_scope_id: str | None = None
     _active_secondary_mission_card_jsons_present: bool = field(
         default=True,
         compare=False,
@@ -328,6 +329,10 @@ class PrimaryMissionBoundaryCheckpoint:
     )
 
     def __post_init__(self) -> None:
+        if self.objective_control_modifier_scope_id is not None:
+            _validate_identifier(
+                "objective_control_modifier_scope_id", self.objective_control_modifier_scope_id
+            )
         for field_name in (
             "schema_version",
             "boundary_kind",
@@ -502,6 +507,7 @@ class PrimaryMissionBoundaryCheckpoint:
         starting_strength_record_jsons: tuple[str, ...],
         active_secondary_mission_ids: tuple[str, ...],
         mission_action_prior_use_jsons: tuple[str, ...],
+        objective_control_modifier_scope_id: str | None = None,
     ) -> Self:
         include_secondary_scoring_authority_witnesses = boundary_kind == "objective_control"
         canonical_models = _model_states(model_states)
@@ -571,6 +577,8 @@ class PrimaryMissionBoundaryCheckpoint:
             "active_secondary_mission_ids": list(canonical_secondaries),
             "mission_action_prior_use_jsons": list(canonical_prior_uses),
         }
+        if objective_control_modifier_scope_id is not None:
+            provisional["objective_control_modifier_scope_id"] = objective_control_modifier_scope_id
         if include_secondary_scoring_authority_witnesses:
             provisional.update(
                 {
@@ -606,6 +614,7 @@ class PrimaryMissionBoundaryCheckpoint:
             mission_action_prior_use_jsons=canonical_prior_uses,
             checkpoint_id=f"primary-mission-boundary:{digest}",
             checkpoint_hash=digest,
+            objective_control_modifier_scope_id=objective_control_modifier_scope_id,
             _active_secondary_mission_card_jsons_present=(
                 include_secondary_scoring_authority_witnesses
             ),
@@ -648,6 +657,10 @@ class PrimaryMissionBoundaryCheckpoint:
             "active_secondary_mission_ids": list(self.active_secondary_mission_ids),
             "mission_action_prior_use_jsons": list(self.mission_action_prior_use_jsons),
         }
+        if self.objective_control_modifier_scope_id is not None:
+            payload["objective_control_modifier_scope_id"] = (
+                self.objective_control_modifier_scope_id
+            )
         if self._active_secondary_mission_card_jsons_present:
             payload["active_secondary_mission_card_jsons"] = list(
                 self.active_secondary_mission_card_jsons
@@ -705,6 +718,7 @@ class PrimaryMissionBoundaryCheckpoint:
             label="Primary mission boundary checkpoint",
             required_keys=required_keys,
             optional_keys=(
+                "objective_control_modifier_scope_id",
                 "active_secondary_mission_card_jsons",
                 "completed_mission_action_state_jsons",
                 "primary_unit_destruction_state_jsons",
@@ -762,6 +776,11 @@ class PrimaryMissionBoundaryCheckpoint:
             mission_action_prior_use_jsons=_string_tuple(raw, "mission_action_prior_use_jsons"),
             checkpoint_id=_string(raw, "checkpoint_id"),
             checkpoint_hash=_string(raw, "checkpoint_hash"),
+            objective_control_modifier_scope_id=(
+                _string(raw, "objective_control_modifier_scope_id")
+                if "objective_control_modifier_scope_id" in raw
+                else None
+            ),
             _active_secondary_mission_card_jsons_present=has_secondary_card_witness,
             _completed_mission_action_state_jsons_present=has_completed_action_witness,
             _primary_unit_destruction_state_jsons_present=has_primary_destruction_witness,
@@ -780,12 +799,34 @@ def _validate_modifier_references(checkpoint: PrimaryMissionBoundaryCheckpoint) 
                     "Unresolved Objective Control snapshot cannot invent a value."
                 )
             continue
+        from warhammer40k_core.engine.profile_modifiers import resolved_profile_with_modifier_trace
+
+        source_value = resolved_profile_with_modifier_trace(source)
+        resolved_value = resolved_profile_with_modifier_trace(resolved)
+        source_trace = source_value.modifier_trace
+        resolved_trace = resolved_value.modifier_trace
+        profile_source_ids: set[str] = set()
+        selected_source_ids: set[str] = set()
+        if (
+            checkpoint.objective_control_modifier_scope_id is not None
+            and source_trace is not None
+            and resolved_trace is not None
+            and source_trace.source_value == resolved_trace.source_value
+            and all(operation in resolved_trace.modifiers for operation in source_trace.modifiers)
+        ):
+            profile_source_ids = {operation.modifier_id for operation in source_trace.modifiers}
+            selected_source_ids = profile_source_ids.intersection(
+                resolved_trace.ignored_modifier_ids
+            )
+        # Selection can change a catalog profile by omitting an existing source,
+        # without introducing an additional runtime modifier. The checkpoint's
+        # decision-history validator separately authenticates the chosen subset.
         added = set(resolved.applied_modifier_ids).difference(source.applied_modifier_ids)
-        if not added <= source_ids:
+        if not added <= source_ids | profile_source_ids:
             raise GameLifecycleError(
                 "Primary mission boundary Objective Control modifier source is missing."
             )
-        if resolved.final != source.final and not added:
+        if resolved.final != source.final and not added and not selected_source_ids:
             raise GameLifecycleError(
                 "Primary mission boundary Objective Control change lacks source identity."
             )

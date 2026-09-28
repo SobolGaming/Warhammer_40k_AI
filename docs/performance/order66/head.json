@@ -1,7 +1,7 @@
 {
   "workload_id": "order66-aircraft-v1",
-  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "revision": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -21,69 +21,69 @@
       "fleet_size": 1,
       "samples": [
         {
-          "preparation_seconds": 2.1610677919816226,
-          "guard_seconds": 0.003993749967776239,
-          "boundary_seconds": 0.055281166976783425,
+          "preparation_seconds": 2.115183583984617,
+          "guard_seconds": 0.0038526669959537685,
+          "boundary_seconds": 0.05786937504308298,
           "returned_aircraft": 1,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2563567910110578,
-          "guard_seconds": 0.003845667000859976,
-          "boundary_seconds": 0.0863649160019122,
+          "preparation_seconds": 0.28941920801298693,
+          "guard_seconds": 0.0036697089672088623,
+          "boundary_seconds": 0.055819124972913414,
           "returned_aircraft": 1,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2518136669532396,
-          "guard_seconds": 0.003865458013024181,
-          "boundary_seconds": 0.05469329102197662,
+          "preparation_seconds": 0.24935141700552776,
+          "guard_seconds": 0.003690292011015117,
+          "boundary_seconds": 0.05555658298544586,
           "returned_aircraft": 1,
           "complete": true
         },
         {
-          "preparation_seconds": 0.25253466702997684,
-          "guard_seconds": 0.003823417006060481,
-          "boundary_seconds": 0.05342800001380965,
+          "preparation_seconds": 0.24997908296063542,
+          "guard_seconds": 0.003712125006131828,
+          "boundary_seconds": 0.05517283402150497,
           "returned_aircraft": 1,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2537911250256002,
-          "guard_seconds": 0.0037443750188685954,
-          "boundary_seconds": 0.05192529200576246,
+          "preparation_seconds": 0.25006808299804106,
+          "guard_seconds": 0.003966749995015562,
+          "boundary_seconds": 0.055681708035990596,
           "returned_aircraft": 1,
           "complete": true
         },
         {
-          "preparation_seconds": 0.25436979095684364,
-          "guard_seconds": 0.0038579590036533773,
-          "boundary_seconds": 0.052333374973386526,
+          "preparation_seconds": 0.24949558300431818,
+          "guard_seconds": 0.0037711659679189324,
+          "boundary_seconds": 0.05449045798741281,
           "returned_aircraft": 1,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2530211249832064,
-          "guard_seconds": 0.004056249978020787,
-          "boundary_seconds": 0.06141249998472631,
+          "preparation_seconds": 0.24870179197750986,
+          "guard_seconds": 0.0037523749633692205,
+          "boundary_seconds": 0.0547885830164887,
           "returned_aircraft": 1,
           "complete": true
         }
       ],
       "summary": {
         "guard_seconds": {
-          "mean": 0.003883839426894805,
-          "median": 0.0038579590036533773,
-          "p95": 0.004056249978020787,
-          "maximum": 0.004056249978020787,
-          "operations_per_second": 257.47717402403447
+          "mean": 0.00377358341523047,
+          "median": 0.0037523749633692205,
+          "p95": 0.003966749995015562,
+          "maximum": 0.003966749995015562,
+          "operations_per_second": 265.0001046654816
         },
         "boundary_seconds": {
-          "mean": 0.05934836299690817,
-          "median": 0.05469329102197662,
-          "p95": 0.0863649160019122,
-          "maximum": 0.0863649160019122,
-          "operations_per_second": 16.849664413694043
+          "mean": 0.05562552372326276,
+          "median": 0.05555658298544586,
+          "p95": 0.05786937504308298,
+          "maximum": 0.05786937504308298,
+          "operations_per_second": 17.977358828565905
         }
       }
     },
@@ -91,69 +91,69 @@
       "fleet_size": 2,
       "samples": [
         {
-          "preparation_seconds": 0.27534933399874717,
-          "guard_seconds": 0.004856333020143211,
-          "boundary_seconds": 0.058616916998289526,
+          "preparation_seconds": 0.2514347499818541,
+          "guard_seconds": 0.0044766669743694365,
+          "boundary_seconds": 0.0599946670117788,
           "returned_aircraft": 2,
           "complete": true
         },
         {
-          "preparation_seconds": 0.25430841703200713,
-          "guard_seconds": 0.004671000002417713,
-          "boundary_seconds": 0.058329999970737845,
+          "preparation_seconds": 0.25099670799681917,
+          "guard_seconds": 0.004695874988101423,
+          "boundary_seconds": 0.0599791249842383,
           "returned_aircraft": 2,
           "complete": true
         },
         {
-          "preparation_seconds": 0.24958491703728214,
-          "guard_seconds": 0.004558499960694462,
-          "boundary_seconds": 0.05683608300751075,
+          "preparation_seconds": 0.2503331669722684,
+          "guard_seconds": 0.004658249963540584,
+          "boundary_seconds": 0.061336415994446725,
           "returned_aircraft": 2,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2512124999775551,
-          "guard_seconds": 0.0046584170195274055,
-          "boundary_seconds": 0.057036958052776754,
+          "preparation_seconds": 0.2519815409905277,
+          "guard_seconds": 0.004666958004236221,
+          "boundary_seconds": 0.061090582981705666,
           "returned_aircraft": 2,
           "complete": true
         },
         {
-          "preparation_seconds": 0.25565258297137916,
-          "guard_seconds": 0.005055916961282492,
-          "boundary_seconds": 0.06967937498120591,
+          "preparation_seconds": 0.2515968329971656,
+          "guard_seconds": 0.004636417026631534,
+          "boundary_seconds": 0.06072708300780505,
           "returned_aircraft": 2,
           "complete": true
         },
         {
-          "preparation_seconds": 0.2518530000234023,
-          "guard_seconds": 0.0046475830022245646,
-          "boundary_seconds": 0.058076417015399784,
+          "preparation_seconds": 0.2510403749765828,
+          "guard_seconds": 0.004535584012046456,
+          "boundary_seconds": 0.06132799998158589,
           "returned_aircraft": 2,
           "complete": true
         },
         {
-          "preparation_seconds": 0.25174566701753065,
-          "guard_seconds": 0.004691459005698562,
-          "boundary_seconds": 0.05972741701407358,
+          "preparation_seconds": 0.24990774999605492,
+          "guard_seconds": 0.004523290961515158,
+          "boundary_seconds": 0.10268149996409193,
           "returned_aircraft": 2,
           "complete": true
         }
       ],
       "summary": {
         "guard_seconds": {
-          "mean": 0.004734172710284058,
-          "median": 0.004671000002417713,
-          "p95": 0.005055916961282492,
-          "maximum": 0.005055916961282492,
-          "operations_per_second": 211.23014752454992
+          "mean": 0.004599005990062973,
+          "median": 0.004636417026631534,
+          "p95": 0.004695874988101423,
+          "maximum": 0.004695874988101423,
+          "operations_per_second": 217.43829039594428
         },
         "boundary_seconds": {
-          "mean": 0.05975759529142773,
-          "median": 0.058329999970737845,
-          "p95": 0.06967937498120591,
-          "maximum": 0.06967937498120591,
-          "operations_per_second": 16.734274448681685
+          "mean": 0.06673391056080748,
+          "median": 0.061090582981705666,
+          "p95": 0.10268149996409193,
+          "maximum": 0.10268149996409193,
+          "operations_per_second": 14.984885369317702
         }
       }
     }

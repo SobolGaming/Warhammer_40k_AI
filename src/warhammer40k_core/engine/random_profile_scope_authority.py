@@ -39,6 +39,30 @@ def validate_profile_scope(
         raise GameLifecycleError("Random profile evaluation phase is invalid.")
     if phase is not None and (type(turn_player) is not str or turn_player not in state.player_ids):
         raise GameLifecycleError("Random profile evaluation turn owner is invalid.")
+    if characteristic in {Characteristic.LEADERSHIP, Characteristic.OBJECTIVE_CONTROL}:
+        for request in requests:
+            if (
+                request.decision_type != "select_modifier_ignores"
+                or request.actor_id != player_id
+                or not isinstance(request.payload, dict)
+            ):
+                continue
+            subject = request.payload.get("subject")
+            if not isinstance(subject, dict):
+                continue
+            model_id = subject.get("model_instance_id")
+            suffix = (
+                "leadership" if characteristic is Characteristic.LEADERSHIP else "objective-control"
+            )
+            if (
+                subject.get("unit_instance_id") == unit_id
+                and subject.get("kind") == f"{characteristic.value}_characteristic"
+                and type(model_id) is str
+                and request.payload.get("occurrence_id") == f"{scope}:{suffix}:{model_id}"
+            ):
+                # The lifecycle's independent modifier origin authenticates the
+                # complete pending/accepted cursor before accepting this scope.
+                return
     if characteristic is Characteristic.WOUNDS and scope.startswith("muster-wounds:"):
         if phase is not None or not any(
             scope == f"muster-wounds:{army.army_id}"
@@ -222,20 +246,34 @@ def validate_profile_scope(
         if scope.startswith("mission-action-options:decision-request-"):
             suffix = scope.removeprefix("mission-action-options:decision-request-")
             request_id = f"decision-request-{suffix}"
-            if any(
-                request.request_id == request_id
-                and request.decision_type == "start_mission_action"
-                and isinstance(request.payload, dict)
-                and request.payload.get("phase") == phase
-                and request.payload.get("battle_round") == battle_round
-                for request in requests
-            ) or any(
-                event.event_type == "mission_action_profile_options_unavailable"
-                and isinstance(event.payload, dict)
-                and event.payload.get("request_id") == request_id
-                and event.payload.get("phase") == phase
-                and event.payload.get("battle_round") == battle_round
-                for event in events
+            if (
+                any(
+                    request.request_id == request_id
+                    and request.decision_type == "start_mission_action"
+                    and isinstance(request.payload, dict)
+                    and request.payload.get("phase") == phase
+                    and request.payload.get("battle_round") == battle_round
+                    for request in requests
+                )
+                or any(
+                    request.request_id == request_id
+                    and request.decision_type == "select_modifier_ignores"
+                    and isinstance(request.payload, dict)
+                    and isinstance(source := request.payload.get("source_context"), dict)
+                    and source.get("source_kind") == "mission_action_objective_control"
+                    and source.get("profile_scope_id") == scope
+                    and source.get("phase") == phase
+                    and source.get("battle_round") == battle_round
+                    for request in requests
+                )
+                or any(
+                    event.event_type == "mission_action_profile_options_unavailable"
+                    and isinstance(event.payload, dict)
+                    and event.payload.get("request_id") == request_id
+                    and event.payload.get("phase") == phase
+                    and event.payload.get("battle_round") == battle_round
+                    for event in events
+                )
             ):
                 return
         raise GameLifecycleError("Random OC occurrence is not an engine evaluation boundary.")

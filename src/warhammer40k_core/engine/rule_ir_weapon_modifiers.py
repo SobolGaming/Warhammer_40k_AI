@@ -7,11 +7,10 @@ from typing import cast
 from warhammer40k_core.core.attributes import (
     Characteristic,
 )
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
-    AttackProfile,
-    DamageProfile,
     RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
@@ -20,7 +19,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.profile_modifiers import profile_with_delta
+from warhammer40k_core.engine.profile_modifiers import profile_with_delta, range_with_delta
 
 
 def rule_ir_weapon_selector_applies(
@@ -80,16 +79,38 @@ def rule_ir_modified_weapon_profile(
         return with_weapon_skill_modifier(
             profile, modifier_id=modifier_id, source_id=source_id, delta=delta
         )
+    if characteristic is Characteristic.RANGE:
+        if profile.range_profile.kind is not RangeProfileKind.DISTANCE:
+            return profile
+        return replace(
+            profile,
+            range_profile=range_with_delta(
+                profile.range_profile,
+                delta,
+                source_id=source_id,
+                modifier_id=modifier_id,
+                target_id=profile.profile_id,
+            ),
+            source_ids=source_ids,
+        )
     if characteristic is Characteristic.ATTACKS:
         return replace(
             profile,
-            attack_profile=_modified_attack_profile(profile.attack_profile, delta),
+            attack_profile=profile.attack_profile.with_modifier(
+                ModifierTerm(ModifierOperation.ADD, delta).bind(
+                    modifier_id=modifier_id, source_id=source_id, characteristic=characteristic
+                )
+            ),
             source_ids=source_ids,
         )
     if characteristic is Characteristic.DAMAGE:
         return replace(
             profile,
-            damage_profile=_modified_damage_profile(profile.damage_profile, delta),
+            damage_profile=profile.damage_profile.with_modifier(
+                ModifierTerm(ModifierOperation.ADD, delta).bind(
+                    modifier_id=modifier_id, source_id=source_id, characteristic=characteristic
+                )
+            ),
             source_ids=source_ids,
         )
     raise GameLifecycleError("RuleIR weapon modifier characteristic is unsupported.")
@@ -214,30 +235,6 @@ def _required_positive_weapon_ability_value(parameters: Mapping[str, object]) ->
     if type(value) is not int or value < 1:
         raise GameLifecycleError("RuleIR weapon_ability_value must be a positive int.")
     return value
-
-
-def _modified_attack_profile(profile: AttackProfile, delta: int) -> AttackProfile:
-    if type(profile) is not AttackProfile:
-        raise GameLifecycleError("RuleIR Attacks modifier requires AttackProfile.")
-    if profile.fixed_attacks is not None:
-        return AttackProfile.fixed(max(1, profile.fixed_attacks + delta))
-    if profile.dice_expression is None:
-        raise GameLifecycleError("AttackProfile requires fixed attacks or dice expression.")
-    return AttackProfile.dice(
-        replace(profile.dice_expression, modifier=profile.dice_expression.modifier + delta)
-    )
-
-
-def _modified_damage_profile(profile: DamageProfile, delta: int) -> DamageProfile:
-    if type(profile) is not DamageProfile:
-        raise GameLifecycleError("RuleIR Damage modifier requires DamageProfile.")
-    if profile.fixed_damage is not None:
-        return DamageProfile.fixed(max(1, profile.fixed_damage + delta))
-    if profile.dice_expression is None:
-        raise GameLifecycleError("DamageProfile requires fixed damage or dice expression.")
-    return DamageProfile.dice(
-        replace(profile.dice_expression, modifier=profile.dice_expression.modifier + delta)
-    )
 
 
 def _source_ids_with(source_ids: tuple[str, ...], source_id: str) -> tuple[str, ...]:

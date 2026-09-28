@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
@@ -13,7 +14,7 @@ from tests.phase13b_shooting_declaration_helpers import (
 )
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword
+from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -24,7 +25,13 @@ from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.geometry.pose import Pose
 
 
-def psychic_session(phase: BattlePhase, *, native_stealth: bool = False) -> LocalGameSession:
+def psychic_session(
+    phase: BattlePhase,
+    *,
+    native_stealth: bool = False,
+    psychic: bool = True,
+    weapon_profile_transform: Callable[[WeaponProfile], WeaponProfile] | None = None,
+) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(
         _catalog_with_stealth_datasheet() if native_stealth else _canonical_catalog()
     )
@@ -36,7 +43,7 @@ def psychic_session(phase: BattlePhase, *, native_stealth: bool = False) -> Loca
                 weapon_profiles=tuple(
                     replace(
                         profile,
-                        keywords=(WeaponKeyword.PSYCHIC,),
+                        keywords=(WeaponKeyword.PSYCHIC,) if psychic else (),
                         abilities=(),
                         attack_profile=AttackProfile.fixed(1),
                     )
@@ -46,6 +53,19 @@ def psychic_session(phase: BattlePhase, *, native_stealth: bool = False) -> Loca
             for wargear in catalog.wargear
         ),
     )
+    if weapon_profile_transform is not None:
+        catalog = replace(
+            catalog,
+            wargear=tuple(
+                replace(
+                    wargear,
+                    weapon_profiles=tuple(
+                        weapon_profile_transform(profile) for profile in wargear.weapon_profiles
+                    ),
+                )
+                for wargear in catalog.wargear
+            ),
+        )
     if phase is BattlePhase.SHOOTING:
         lifecycle, units = _compact_shooting_lifecycle(catalog=catalog, game_id="psychic-sources")
         attacker = units["intercessor-1"]
@@ -183,6 +203,7 @@ def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) 
                 "declarations": [
                     {
                         "attacker_model_instance_id": weapon["model_instance_id"],
+                        "weapon_instance_id": weapon["weapon_instance_id"],
                         "wargear_id": weapon["wargear_id"],
                         "weapon_profile_id": weapon["weapon_profile_id"],
                         "target_allocations": [{"target_unit_instance_id": targets[0]}],

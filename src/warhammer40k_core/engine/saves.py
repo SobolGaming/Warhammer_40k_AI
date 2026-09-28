@@ -11,7 +11,15 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
-from warhammer40k_core.core.modifiers import bound_modified_roll
+from warhammer40k_core.core.modifiers import (
+    RollModifier,
+    RollModifierPayload,
+    bound_modified_roll,
+)
+from warhammer40k_core.core.profile_modifier_trace import (
+    CharacteristicModifierTrace,
+    CharacteristicModifierTracePayload,
+)
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.visibility import BenefitOfCoverResult, BenefitOfCoverResultPayload
@@ -40,6 +48,11 @@ class SaveOptionPayload(TypedDict):
     cover_applied: bool
     cover_result: BenefitOfCoverResultPayload | None
     source_rule_ids: list[str]
+    characteristic_trace: CharacteristicModifierTracePayload | None
+    armor_penetration_trace: CharacteristicModifierTracePayload | None
+    roll_modifiers: list[RollModifierPayload]
+    inherent_roll_modifiers: list[RollModifierPayload]
+    ignored_roll_modifier_ids: list[str]
 
 
 class SavingThrowPayload(TypedDict):
@@ -73,6 +86,11 @@ class SaveOption:
     cover_applied: bool = False
     cover_result: BenefitOfCoverResult | None = None
     source_rule_ids: tuple[str, ...] = ()
+    characteristic_trace: CharacteristicModifierTrace | None = None
+    armor_penetration_trace: CharacteristicModifierTrace | None = None
+    roll_modifiers: tuple[RollModifier, ...] = ()
+    inherent_roll_modifiers: tuple[RollModifier, ...] = ()
+    ignored_roll_modifier_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "save_kind", save_kind_from_token(self.save_kind))
@@ -102,6 +120,23 @@ class SaveOption:
         )
         if self.save_kind is SaveKind.INVULNERABLE and self.cover_applied:
             raise GameLifecycleError("Invulnerable saves must not apply Benefit of Cover.")
+        from warhammer40k_core.engine.save_modifier_operations import (
+            inherent_save_roll_modifiers,
+            validate_save_operations,
+        )
+
+        if self.save_kind is SaveKind.ARMOUR and not self.inherent_roll_modifiers:
+            object.__setattr__(
+                self,
+                "inherent_roll_modifiers",
+                inherent_save_roll_modifiers(
+                    self,
+                    armor_penetration=self.armor_penetration,
+                    cover_applied=self.cover_applied,
+                ),
+            )
+
+        validate_save_operations(self)
 
     @property
     def can_succeed_on_d6(self) -> bool:
@@ -116,12 +151,34 @@ class SaveOption:
             "cover_applied": self.cover_applied,
             "cover_result": None if self.cover_result is None else self.cover_result.to_payload(),
             "source_rule_ids": list(self.source_rule_ids),
+            "characteristic_trace": (
+                None
+                if self.characteristic_trace is None
+                else self.characteristic_trace.to_payload()
+            ),
+            "armor_penetration_trace": (
+                None
+                if self.armor_penetration_trace is None
+                else self.armor_penetration_trace.to_payload()
+            ),
+            "roll_modifiers": [modifier.to_payload() for modifier in self.roll_modifiers],
+            "inherent_roll_modifiers": [
+                modifier.to_payload() for modifier in self.inherent_roll_modifiers
+            ],
+            "ignored_roll_modifier_ids": list(self.ignored_roll_modifier_ids),
         }
 
     @classmethod
     def from_payload(cls, payload: SaveOptionPayload) -> Self:
+        if set(payload) != set(SaveOptionPayload.__annotations__):
+            raise GameLifecycleError("SaveOption payload fields drifted.")
         cover_payload = payload["cover_result"]
-        return cls(
+        characteristic_trace = payload["characteristic_trace"]
+        ap_trace = payload["armor_penetration_trace"]
+        for modifier in (*payload["roll_modifiers"], *payload["inherent_roll_modifiers"]):
+            if set(modifier) != set(RollModifierPayload.__annotations__):
+                raise GameLifecycleError("SaveOption roll modifier fields drifted.")
+        option = cls(
             save_kind=save_kind_from_token(payload["save_kind"]),
             target_number=payload["target_number"],
             characteristic_target_number=payload["characteristic_target_number"],
@@ -131,7 +188,25 @@ class SaveOption:
                 None if cover_payload is None else BenefitOfCoverResult.from_payload(cover_payload)
             ),
             source_rule_ids=tuple(payload["source_rule_ids"]),
+            characteristic_trace=(
+                None
+                if characteristic_trace is None
+                else CharacteristicModifierTrace.from_payload(characteristic_trace)
+            ),
+            armor_penetration_trace=(
+                None if ap_trace is None else CharacteristicModifierTrace.from_payload(ap_trace)
+            ),
+            roll_modifiers=tuple(
+                RollModifier.from_payload(item) for item in payload["roll_modifiers"]
+            ),
+            inherent_roll_modifiers=tuple(
+                RollModifier.from_payload(item) for item in payload["inherent_roll_modifiers"]
+            ),
+            ignored_roll_modifier_ids=tuple(payload["ignored_roll_modifier_ids"]),
         )
+        if option.to_payload() != payload:
+            raise GameLifecycleError("SaveOption source operations drifted during restoration.")
+        return option
 
 
 @dataclass(frozen=True, slots=True)
@@ -181,7 +256,7 @@ class SavingThrow:
         if self.resolution_rule is SaveResolutionRule.INVULNERABLE_SAVE:
             if self.save_kind is not SaveKind.INVULNERABLE:
                 raise GameLifecycleError("Invulnerable save resolution requires an InSv option.")
-            if self.unmodified_roll < self.target_number:
+            if self.final_roll < self.target_number:
                 raise GameLifecycleError("Invulnerable save resolution does not match the roll.")
         if self.resolution_rule is SaveResolutionRule.ARMOUR_SAVE:
             if self.save_kind is not SaveKind.ARMOUR:
@@ -391,6 +466,8 @@ def save_options_for_model(
     armor_penetration: int,
     cover_result: BenefitOfCoverResult | None = None,
     no_saves_allowed: bool = False,
+    armor_penetration_trace: CharacteristicModifierTrace | None = None,
+    armor_penetration_source_id: str = "core:armor-penetration",
 ) -> tuple[SaveOption, ...]:
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Saving throws require a ModelInstance.")
@@ -416,7 +493,27 @@ def save_options_for_model(
                     cover_result=cover_result,
                 ),
                 armor_penetration=armor_penetration,
-                cover_applied=_cover_applies_to_armour_save(
+                inherent_roll_modifiers=(
+                    RollModifier(
+                        f"{armor_penetration_source_id}:saving-throw-ap",
+                        armor_penetration,
+                        source_id=armor_penetration_source_id,
+                    ),
+                    RollModifier(
+                        "benefit_of_cover:saving-throw",
+                        int(
+                            cover_applies_to_armour_save(
+                                armor_save=armor_save,
+                                armor_penetration=armor_penetration,
+                                cover_result=cover_result,
+                            )
+                        ),
+                        source_id="benefit_of_cover",
+                    ),
+                ),
+                armor_penetration_trace=armor_penetration_trace,
+                characteristic_trace=_model_characteristic_trace(model, Characteristic.SAVE),
+                cover_applied=cover_applies_to_armour_save(
                     armor_save=armor_save,
                     armor_penetration=armor_penetration,
                     cover_result=cover_result,
@@ -424,7 +521,7 @@ def save_options_for_model(
                 cover_result=cover_result,
                 source_rule_ids=(
                     ("benefit_of_cover",)
-                    if _cover_applies_to_armour_save(
+                    if cover_applies_to_armour_save(
                         armor_save=armor_save,
                         armor_penetration=armor_penetration,
                         cover_result=cover_result,
@@ -442,6 +539,10 @@ def save_options_for_model(
                 characteristic_target_number=invulnerable_save,
                 target_number=invulnerable_save,
                 armor_penetration=armor_penetration,
+                armor_penetration_trace=armor_penetration_trace,
+                characteristic_trace=_model_characteristic_trace(
+                    model, Characteristic.INVULNERABLE_SAVE
+                ),
             )
         )
     return tuple(options)
@@ -452,45 +553,19 @@ def save_option_with_armor_penetration_modifier(
     *,
     delta: int,
     source_rule_id: str,
+    modifier_id: str | None = None,
 ) -> SaveOption:
-    if type(option) is not SaveOption:
-        raise GameLifecycleError("AP modifier requires a SaveOption.")
-    if type(delta) is not int:
-        raise GameLifecycleError("AP modifier delta must be an integer.")
-    source_id = _validate_identifier("source_rule_id", source_rule_id)
-    armor_penetration = min(0, option.armor_penetration + delta)
-    source_rule_ids = (
-        option.source_rule_ids
-        if source_id in option.source_rule_ids
-        else (*option.source_rule_ids, source_id)
+    from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_option_with_characteristic_terms,
     )
-    if option.save_kind is SaveKind.INVULNERABLE:
-        return SaveOption(
-            save_kind=option.save_kind,
-            target_number=option.target_number,
-            characteristic_target_number=option.characteristic_target_number,
-            armor_penetration=armor_penetration,
-            cover_applied=False,
-            cover_result=option.cover_result,
-            source_rule_ids=source_rule_ids,
-        )
-    cover_applied = _cover_applies_to_armour_save(
-        armor_save=option.characteristic_target_number,
-        armor_penetration=armor_penetration,
-        cover_result=option.cover_result,
-    )
-    return SaveOption(
-        save_kind=option.save_kind,
-        target_number=_armour_save_target_number(
-            armor_save=option.characteristic_target_number,
-            armor_penetration=armor_penetration,
-            cover_result=option.cover_result,
-        ),
-        characteristic_target_number=option.characteristic_target_number,
-        armor_penetration=armor_penetration,
-        cover_applied=cover_applied,
-        cover_result=option.cover_result,
-        source_rule_ids=source_rule_ids,
+
+    return save_option_with_characteristic_terms(
+        option,
+        characteristic=Characteristic.ARMOR_PENETRATION,
+        terms=(ModifierTerm(ModifierOperation.ADD, delta),),
+        source_id=source_rule_id,
+        modifier_id=f"{source_rule_id}:armor-penetration" if modifier_id is None else modifier_id,
     )
 
 
@@ -601,7 +676,8 @@ def _resolve_save_option_for_roll(
     )
     if (
         invulnerable_option is not None
-        and unmodified_roll >= invulnerable_option.characteristic_target_number
+        and _final_roll_for_save_option(option=invulnerable_option, unmodified_roll=unmodified_roll)
+        >= invulnerable_option.characteristic_target_number
     ):
         return invulnerable_option, SaveResolutionRule.INVULNERABLE_SAVE
     armour_option = next(
@@ -633,10 +709,9 @@ def _last_checked_save_option(options: tuple[SaveOption, ...]) -> SaveOption:
 
 
 def _final_roll_for_save_option(*, option: SaveOption, unmodified_roll: int) -> int:
-    if option.save_kind is SaveKind.INVULNERABLE:
-        return unmodified_roll
-    cover_modifier = 1 if option.cover_applied else 0
-    return bound_modified_roll(unmodified_roll + option.armor_penetration + cover_modifier)
+    from warhammer40k_core.engine.save_modifier_operations import save_roll_modifier
+
+    return bound_modified_roll(unmodified_roll + save_roll_modifier(option))
 
 
 def cover_result_has_bonus(cover_result: BenefitOfCoverResult | None) -> bool:
@@ -654,7 +729,7 @@ def _armour_save_target_number(
     cover_result: BenefitOfCoverResult | None,
 ) -> int:
     target = armor_save - armor_penetration
-    if _cover_applies_to_armour_save(
+    if cover_applies_to_armour_save(
         armor_save=armor_save,
         armor_penetration=armor_penetration,
         cover_result=cover_result,
@@ -663,7 +738,7 @@ def _armour_save_target_number(
     return max(target, 2)
 
 
-def _cover_applies_to_armour_save(
+def cover_applies_to_armour_save(
     *,
     armor_save: int,
     armor_penetration: int,
@@ -701,6 +776,18 @@ def _model_characteristic(model: ModelInstance, characteristic: Characteristic) 
             if value.is_dash:
                 return None
             return value.final
+    return None
+
+
+def _model_characteristic_trace(
+    model: ModelInstance,
+    characteristic: Characteristic,
+) -> CharacteristicModifierTrace | None:
+    from warhammer40k_core.engine.save_modifier_operations import profile_trace_for_save
+
+    for value in model.characteristics:
+        if value.characteristic is characteristic:
+            return profile_trace_for_save(value)
     return None
 
 

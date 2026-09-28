@@ -294,6 +294,7 @@ def primary_mission_action_start_evidence_for_selection(
     )
     if len(matching) != 1:
         raise GameLifecycleError("Selected Primary Mission Action target is not legal.")
+    scope_id = boundary_checkpoint_evidence.objective_control_modifier_scope_id
     action_option_ids = [option.option_id() for option in options]
     if opportunity:
         request_payload: dict[str, JsonValue] = {
@@ -301,6 +302,7 @@ def primary_mission_action_start_evidence_for_selection(
             "player_id": player_id,
             "battle_round": boundary_state.battle_round,
             "phase": phase.value,
+            "objective_control_modifier_scope_id": scope_id,
             "mission_action_opportunity": True,
             "legal_mission_action_ids": cast(
                 list[JsonValue],
@@ -324,6 +326,7 @@ def primary_mission_action_start_evidence_for_selection(
                                 player_id=player_id,
                                 phase=phase,
                             ),
+                            "objective_control_modifier_scope_id": scope_id,
                             "mission_action_opportunity": True,
                             "legal_action_option_ids": action_option_ids,
                         }
@@ -340,6 +343,7 @@ def primary_mission_action_start_evidence_for_selection(
                         "player_id": player_id,
                         "battle_round": boundary_state.battle_round,
                         "phase": phase.value,
+                        "objective_control_modifier_scope_id": scope_id,
                         "mission_action_opportunity": True,
                         "legal_action_option_ids": action_option_ids,
                     }
@@ -352,6 +356,7 @@ def primary_mission_action_start_evidence_for_selection(
             "player_id": player_id,
             "battle_round": boundary_state.battle_round,
             "phase": phase.value,
+            "objective_control_modifier_scope_id": scope_id,
             "mission_action_id": action.mission_action_id,
             "legal_option_ids": cast(list[JsonValue], action_option_ids),
         }
@@ -360,11 +365,14 @@ def primary_mission_action_start_evidence_for_selection(
                 option_id=option.option_id(),
                 label=option.label(state=boundary_state),
                 payload_json=canonical_json_object(
-                    option.payload(
-                        state=boundary_state,
-                        player_id=player_id,
-                        phase=phase,
-                    )
+                    {
+                        **option.payload(
+                            state=boundary_state,
+                            player_id=player_id,
+                            phase=phase,
+                        ),
+                        "objective_control_modifier_scope_id": scope_id,
+                    }
                 ),
             )
             for option in options

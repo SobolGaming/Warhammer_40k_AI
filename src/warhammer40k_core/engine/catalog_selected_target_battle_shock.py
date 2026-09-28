@@ -17,7 +17,6 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 from warhammer40k_core.engine.battle_shock_resolution import (
     BattleShockPassedStatePolicy,
     BattleShockResolutionResult,
-    resolve_battle_shock_test_with_optional_reroll,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
@@ -34,7 +33,6 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
@@ -204,24 +202,19 @@ def resolve_selected_target_battle_shock_effect(
         below_half_strength_context=below_half_context,
         dice_expression=dice_expression,
     )
-    decisions.event_log.append(
-        "battle_shock_test_requested",
-        validate_json_value(
-            {
-                **base_payload,
-                "battle_shock_test_request": request.to_payload(),
-            }
-        ),
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        resolve_battle_shock_after_modifier_choices,
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    roll_state = manager.roll(request.spec)
-    return resolve_battle_shock_test_with_optional_reroll(
+
+    return resolve_battle_shock_after_modifier_choices(
         state=state,
         decisions=decisions,
-        manager=manager,
         battle_shock_hooks=battle_shock_hooks,
         request=request,
-        roll_state=roll_state,
+        ability_index=_ability_index_for_player(
+            ability_indexes_by_player_id, player_id=request.player_id
+        ),
+        runtime_modifier_registry=runtime_modifier_registry,
         active_player_id=active_player_id,
         phase=phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,

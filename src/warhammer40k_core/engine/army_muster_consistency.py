@@ -164,7 +164,7 @@ def _armies_match_muster_runtime_state(
                         replace(
                             model,
                             characteristics=tuple(
-                                replace(value, evaluation=None, evaluation_id=None)
+                                value.without_evaluation()
                                 if isinstance(value, RandomProfileValue)
                                 else value
                                 for value in model.characteristics
@@ -307,9 +307,7 @@ def _runtime_model_matches_materialization_event(
         replace(
             event_model,
             characteristics=tuple(
-                replace(value, evaluation=None, evaluation_id=None)
-                if isinstance(value, RandomProfileValue)
-                else value
+                value.without_evaluation() if isinstance(value, RandomProfileValue) else value
                 for value in event_model.characteristics
             ),
         ).to_payload(),

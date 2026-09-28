@@ -247,6 +247,16 @@ def _validate_authoritative_action_request(
         faction_rule_execution_registry=faction_rule_execution_registry,
         runtime_content_activation=runtime_content_activation,
     )
+    from warhammer40k_core.engine.objective_control_checkpoint_selection import (
+        registry_for_checkpoint_selections,
+    )
+
+    runtime_modifier_registry = registry_for_checkpoint_selections(
+        state=state,
+        checkpoint=checkpoint,
+        decision_records=decisions.records,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     validate_primary_mission_boundary_checkpoint_modifier_sources(
         state=state,
         checkpoint=checkpoint,

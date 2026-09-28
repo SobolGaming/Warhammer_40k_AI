@@ -24,6 +24,7 @@ FAILED_SAVE_DAMAGE_TO_ZERO_SOURCE_ID = (
 )
 TIMING_POLICY = failed_save_damage_timing_source.TIMING_POLICY
 FAILED_SAVE_DAMAGE_REPLACED_EVENT_TYPE = "failed_save_damage_replaced"
+FAILED_SAVE_DAMAGE_REPLACEMENT_IGNORED_EVENT_TYPE = "failed_save_damage_replacement_ignored"
 
 
 def unused_failed_save_damage_replacement(
@@ -87,7 +88,10 @@ def _replacement_already_used(
     replacement: FailedSaveDamageReplacement,
 ) -> bool:
     for event in event_records:
-        if event.event_type != FAILED_SAVE_DAMAGE_REPLACED_EVENT_TYPE:
+        if event.event_type not in {
+            FAILED_SAVE_DAMAGE_REPLACED_EVENT_TYPE,
+            FAILED_SAVE_DAMAGE_REPLACEMENT_IGNORED_EVENT_TYPE,
+        }:
             continue
         payload = event.payload
         if not isinstance(payload, dict):

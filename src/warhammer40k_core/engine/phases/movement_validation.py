@@ -2,7 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-from warhammer40k_core.core.attributes import CharacteristicValue
+from warhammer40k_core.core.random_profile_values import ProfileCharacteristicValue
 from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
 
 
@@ -931,7 +931,7 @@ def _modified_movement_inches(
     state: GameState | None,
     unit_instance_id: str | None,
     model_instance_id: str | None,
-    movement: CharacteristicValue,
+    movement: ProfileCharacteristicValue,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> float:
     if state is None:

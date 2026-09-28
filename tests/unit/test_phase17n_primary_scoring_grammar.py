@@ -1265,13 +1265,69 @@ def test_phase17n_turn_start_evidence_is_atomic_per_player_turn() -> None:
     position_snapshot = state.primary_rules_unit_turn_start_snapshots[0]
 
     state.primary_rules_unit_turn_start_snapshots.clear()
+    before = state.to_payload()
     with pytest.raises(GameLifecycleError, match="objective evidence already exists"):
         record_primary_turn_start_evidence(state=state)
+    assert state.to_payload() == before
 
     state.primary_objective_turn_start_states.clear()
     state.primary_rules_unit_turn_start_snapshots = [position_snapshot]
+    before = state.to_payload()
     with pytest.raises(GameLifecycleError, match="position evidence already exists"):
         record_primary_turn_start_evidence(state=state)
+    assert state.to_payload() == before
+
+
+@pytest.mark.parametrize("retained_evidence", ["objective", "position"])
+def test_turn_start_partial_evidence_rejects_before_modifier_choice(
+    retained_evidence: str,
+) -> None:
+    from tests.order93_nonattack_helpers import add_nonattack_effects
+
+    from warhammer40k_core.engine.decision_controller import DecisionController
+
+    state, unit = _catalog_tracking_state()
+    assert state.mission_setup is not None
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    marker = state.mission_setup.objective_markers[0]
+    placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+    state.battlefield_state = battlefield.with_unit_placement(
+        replace(
+            placement,
+            model_placements=tuple(
+                replace(
+                    model,
+                    pose=Pose.at(marker.x_inches + 2 + index * 3, marker.y_inches),
+                )
+                for index, model in enumerate(placement.model_placements)
+            ),
+        )
+    )
+    record_primary_turn_start_evidence(state=state)
+    add_nonattack_effects(
+        state,
+        unit_id=unit.unit_instance_id,
+        owner=state.army_definitions[0].player_id,
+        characteristic="objective_control",
+    )
+    if retained_evidence == "objective":
+        state.primary_rules_unit_turn_start_snapshots.clear()
+    else:
+        state.primary_objective_turn_start_states.clear()
+    decisions = DecisionController()
+    before_state, before_decisions = state.to_payload(), decisions.to_payload()
+    with pytest.raises(GameLifecycleError, match=f"{retained_evidence} evidence already exists"):
+        record_primary_turn_start_evidence(state=state, decisions=decisions)
+    assert state.to_payload() == before_state
+    assert decisions.to_payload() == before_decisions
+
+    state.primary_rules_unit_turn_start_snapshots.clear()
+    state.primary_objective_turn_start_states.clear()
+    status = record_primary_turn_start_evidence(state=state, decisions=decisions)
+    assert status is not None
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_modifier_ignores"
 
 
 def test_phase17n_turn_start_snapshot_round_trip_and_exact_identity_lookups() -> None:

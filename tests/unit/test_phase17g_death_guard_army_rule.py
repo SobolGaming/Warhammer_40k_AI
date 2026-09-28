@@ -469,6 +469,10 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
         characteristic_target_number=3,
         armor_penetration=0,
     )
+    from warhammer40k_core.engine.generic_rule_save_modifiers import (
+        generic_rule_save_option_with_roll_modifier,
+    )
+
     call_order: list[str] = []
 
     def unit_characteristic_first(
@@ -511,25 +515,13 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
     def save_option_first(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
         call_order.append("save-option:first")
         option = context.save_options[0]
-        return (
-            replace(
-                option,
-                target_number=option.target_number + 1,
-                source_rule_ids=(*option.source_rule_ids, "runtime:first-save"),
-            ),
-        )
+        return (generic_rule_save_option_with_roll_modifier(option, -1, "runtime:first-save"),)
 
     def save_option_second(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
         call_order.append("save-option:second")
         option = context.save_options[0]
         assert option.target_number == 4
-        return (
-            replace(
-                option,
-                target_number=option.target_number + 1,
-                source_rule_ids=(*option.source_rule_ids, "runtime:second-save"),
-            ),
-        )
+        return (generic_rule_save_option_with_roll_modifier(option, -1, "runtime:second-save"),)
 
     def movement_first(context: MovementBudgetModifierContext) -> tuple[ModifierTerm, ...]:
         call_order.append("movement:first")
@@ -685,10 +677,10 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
             save_options=(save_option,),
         )
     ) == (
-        replace(
-            save_option,
-            target_number=5,
-            source_rule_ids=("runtime:first-save", "runtime:second-save"),
+        generic_rule_save_option_with_roll_modifier(
+            generic_rule_save_option_with_roll_modifier(save_option, -1, "runtime:first-save"),
+            -1,
+            "runtime:second-save",
         ),
     )
     assert (
@@ -908,7 +900,7 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
             model_instance_id=model_id,
             movement=cast(CharacteristicValue, object()),
         )
-    with pytest.raises(GameLifecycleError, match="base_value must not be negative"):
+    with pytest.raises(GameLifecycleError, match="base_value must be a non-negative integer"):
         UnitCharacteristicModifierContext(
             state=state,
             unit_instance_id=unit.unit_instance_id,
@@ -916,7 +908,7 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
             base_value=-1,
             current_value=4,
         )
-    with pytest.raises(GameLifecycleError, match="current_value must be an int"):
+    with pytest.raises(GameLifecycleError, match="current_value must be a non-negative integer"):
         UnitCharacteristicModifierContext(
             state=state,
             unit_instance_id=unit.unit_instance_id,
@@ -1181,7 +1173,8 @@ def test_registered_contagion_and_generic_operations_share_one_terminal_bound(
         model=model,
         runtime_modifier_registry=registry,
     )
-    assert checkpoint_oc.final == 1
+    # Scabrous limits its own reduction; another source can still reduce OC to 0.
+    assert checkpoint_oc.final == 0
     assert set(checkpoint_oc.applied_modifier_ids) <= {
         *(binding.modifier_id for binding in registry.all_objective_control_bindings()),
         *(effect.effect_id for effect in state.persisting_effects),
@@ -1215,7 +1208,7 @@ def test_registered_contagion_and_generic_operations_share_one_terminal_bound(
         if contribution.unit_instance_id == ENEMY_UNIT_ID
     )
     assert contributors
-    assert {contribution.objective_control for contribution in contributors} == {1}
+    assert {contribution.objective_control for contribution in contributors} == {0}
 
 
 def test_skullsquirm_blight_only_modifies_afflicted_melee_hit_rolls() -> None:

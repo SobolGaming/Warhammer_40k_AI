@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.random_profile_values import (
@@ -27,14 +26,26 @@ def same_profile_source(
     left: ProfileCharacteristicValue, right: ProfileCharacteristicValue
 ) -> bool:
     if isinstance(left, RandomProfileValue):
-        return isinstance(right, RandomProfileValue) and replace(
-            left, evaluation=None, evaluation_id=None
-        ) == replace(right, evaluation=None, evaluation_id=None)
+        return (
+            isinstance(right, RandomProfileValue)
+            and left.without_evaluation() == right.without_evaluation()
+        )
     return left == right
 
 
 def snapshot_modifier_ids(value: str) -> tuple[str, ...]:
     return profile_snapshot_from_json(value).applied_modifier_ids
+
+
+def snapshot_source_modifier_ids(value: str) -> tuple[str, ...]:
+    """Retain source operations suppressed by replacement or selected subsets."""
+    profile = profile_snapshot_from_json(value)
+    if isinstance(profile, RandomProfileValue):
+        return tuple(operation.modifier_id for operation in profile.modifiers)
+    trace = profile.modifier_trace
+    if trace is None:
+        return profile.applied_modifier_ids
+    return tuple(operation.modifier_id for operation in trace.modifiers)
 
 
 def validate_snapshot_profile_history(

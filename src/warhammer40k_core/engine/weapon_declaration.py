@@ -999,7 +999,7 @@ def attacks_for_profile(
         reason=f"Phase 13C random Attacks roll for {weapon_profile.profile_id}",
         actor_id=actor_id,
     )
-    return roll.value
+    return weapon_profile.attack_profile.resolve_value(roll.value)
 
 
 def unresolved_attacks_for_validation(weapon_profile: WeaponProfile) -> int:

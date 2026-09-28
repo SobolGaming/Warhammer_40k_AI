@@ -48,7 +48,6 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.core.datasheet import DamagedEffectKind
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
-from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.random_profile_values import resolved_profile_characteristic
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -292,7 +291,6 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
     HitRollModifierContext,
-    MovementBudgetModifierBinding,
     MovementBudgetModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -2929,43 +2927,40 @@ def test_csm_maulerfiend_siege_crawler_modifier_ignore_uses_actual_catalog_lifec
         if isinstance(option.payload, dict)
         and option.payload.get("movement_phase_action") == MovementPhaseActionKind.NORMAL_MOVE.value
     )
-    assert len(normal_options) == 2
-    ignore_option = next(option for option in normal_options if ":ignore:" in option.option_id)
-    assert isinstance(ignore_option.payload, dict)
-    context = cast(
-        dict[str, object],
-        ignore_option.payload["modifier_ignore_context"],
+    assert len(normal_options) == 1
+    request = _decision_request(
+        session.submit_option(
+            request_id=action_request.request_id,
+            option_id=normal_options[0].option_id,
+            result_id="csm-maulerfiend-siege-crawler-select-normal-move",
+        )
     )
-    permissions = cast(list[dict[str, object]], context["permissions"])
-    available = cast(list[dict[str, object]], context["available_modifiers"])
-    ignored = cast(list[dict[str, object]], context["ignored_modifiers"])
+    assert request.decision_type == "select_modifier_ignores"
+    assert isinstance(request.payload, dict)
+    permissions = cast(list[dict[str, object]], request.payload["permissions"])
+    inventory = cast(list[dict[str, object]], request.payload["modifiers"])
     assert [permission["source_id"] for permission in permissions] == [
         "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07:datasheet:000000968:3"
     ]
     assert [permission["clause_id"] for permission in permissions] == [
         "phase17k:chaos-space-marines:maulerfiend:datasheet:000000968:3:clause:001"
     ]
-    assert [modifier["modifier_id"] for modifier in available] == [
-        "test:csm-maulerfiend:movement-penalty"
-    ]
-    assert ignored == available
-    assert (
-        DecisionRequest.from_payload(
-            json.loads(json.dumps(action_request.to_payload(), sort_keys=True))
-        )
-        == action_request
+    assert [
+        cast(dict[str, object], modifier["operation"])["modifier_id"] for modifier in inventory
+    ] == ["test:csm-maulerfiend:movement-penalty"]
+    ignore_option = next(
+        option for option in request.options if option.option_id == "ignore-remaining"
     )
-
+    assert DecisionRequest.from_payload(json.loads(json.dumps(request.to_payload()))) == request
     status = session.submit_option(
-        request_id=action_request.request_id,
+        request_id=request.request_id,
         option_id=ignore_option.option_id,
         result_id="csm-maulerfiend-siege-crawler-ignore-movement-penalty",
     )
-
     assert status.status_kind not in {
         LifecycleStatusKind.INVALID,
         LifecycleStatusKind.UNSUPPORTED,
-    }
+    }, status
     current_maulerfiend = _unit_from_state(state, maulerfiend.unit_instance_id)
     model = current_maulerfiend.own_models[0]
     base_movement = next(
@@ -8380,35 +8375,38 @@ def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -
     state.replace_battlefield_state(battlefield.with_unit_placement(moved))
 
 
-def _install_csm_maulerfiend_movement_penalty(
-    lifecycle: GameLifecycle,
-) -> RuntimeModifierRegistry:
-    registry = RuntimeModifierRegistry.from_bindings(
-        movement_budget_modifier_bindings=(
-            MovementBudgetModifierBinding(
-                modifier_id="test:csm-maulerfiend:movement-penalty",
-                source_id="test:csm-maulerfiend:movement-penalty-source",
-                handler=_csm_maulerfiend_movement_penalty,
+def _install_csm_maulerfiend_movement_penalty(lifecycle: GameLifecycle) -> RuntimeModifierRegistry:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.effects import EffectExpiration
+
+    state = lifecycle.state
+    assert state is not None
+    unit = _unit_from_state(state, "army-a:source-battleline")
+    assert state.active_player_id is not None
+    effect = generic_effect(
+        effect_id="test:csm-maulerfiend:movement-penalty",
+        owner_player_id=state.active_player_id,
+        target_unit_instance_ids=(unit.unit_instance_id,),
+        target_kind="this_unit",
+        effect_kind="modify_characteristic",
+        parameters={"characteristic": "movement", "delta": -2},
+    )
+    payload = cast(dict[str, JsonValue], effect.effect_payload)
+    context = cast(dict[str, JsonValue], payload["context"])
+    state.record_persisting_effect(
+        replace(
+            effect,
+            started_phase=BattlePhase.MOVEMENT,
+            effect_payload={**payload, "context": {**context, "phase": BattlePhase.MOVEMENT.value}},
+            expiration=EffectExpiration.end_phase(
+                battle_round=state.battle_round,
+                phase=BattlePhase.MOVEMENT,
+                player_id=state.active_player_id,
             ),
         )
     )
-    handler = replace(
-        lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
-        runtime_modifier_registry=registry,
-    )
-    lifecycle._movement_phase_handler = handler  # pyright: ignore[reportPrivateUsage]
-    flow = lifecycle._battle_round_flow  # pyright: ignore[reportPrivateUsage]
-    assert flow is not None
-    flow._phase_handlers[BattlePhase.MOVEMENT] = handler  # pyright: ignore[reportPrivateUsage]
-    return registry
-
-
-def _csm_maulerfiend_movement_penalty(
-    context: MovementBudgetModifierContext,
-) -> tuple[ModifierTerm, ...]:
-    if context.unit_instance_id != "army-a:source-battleline":
-        return ()
-    return (ModifierTerm(ModifierOperation.ADD, -2),)
+    return RuntimeModifierRegistry.empty()
 
 
 def _move_unit_with_authenticated_normal_move(

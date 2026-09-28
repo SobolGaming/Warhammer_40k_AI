@@ -7,8 +7,6 @@ from functools import partial
 from types import MappingProxyType
 from typing import cast
 
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
-from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
@@ -33,22 +31,22 @@ from warhammer40k_core.engine.catalog_command_point_support import (
     CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
     clause_is_supported_destroyed_unit_command_point_gain,
     clause_is_supported_phase_command_point_gain,
-    clause_is_supported_phase_end_leadership_command_point_gain,
     clause_is_supported_stratagem_cost_modifier,
     clause_requires_source_unit_enemy_destruction,
     command_point_effect_parameters,
+)
+from warhammer40k_core.engine.catalog_command_point_test_evaluation import (
+    resolve_phase_command_point_gain as _resolve_phase_command_point_gain,
+)
+from warhammer40k_core.engine.catalog_command_point_test_evaluation import (
+    with_command_point_modifier_preflight,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
 )
-from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
-    LEADERSHIP_TEST_ROLL_TYPE,
-    selected_target_test_roll_modifiers,
-)
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
-from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
@@ -487,7 +485,16 @@ class CatalogCommandPointRuntime:
                 },
             )
             if candidate is not None:
-                candidates.append(candidate)
+                candidates.append(
+                    with_command_point_modifier_preflight(
+                        candidate,
+                        context=context,
+                        source=source,
+                        unit=unit,
+                        source_model_instance_id=model_id,
+                        ability_index=self.ability_indexes_by_player_id[source.owner_player_id],
+                    )
+                )
         return tuple(candidates)
 
     def _phase_gain_targets(
@@ -1095,136 +1102,6 @@ def _source_unit_destroyed_enemy_unit_this_phase(
     return False
 
 
-def _resolve_phase_command_point_gain(
-    *,
-    context: RuntimeContentEventContext,
-    source: _PhaseGainSource,
-    unit: UnitInstance,
-    source_model_instance_id: str,
-    ability_index: AbilityCatalogIndex,
-) -> JsonValue:
-    gate = _phase_gain_dice_gate(source.clause)
-    roll_payload: JsonValue = None
-    leadership_modified_roll_payload: JsonValue = None
-    leadership_target: int | None = None
-    success_threshold: int | None = None
-    rules_unit_id: str | None = None
-    test_kind = "automatic"
-    passed = True
-    if gate is not None:
-        gate_parameters = parameter_payload(gate.parameters)
-        roll_count = _mapping_positive_int(gate_parameters, key="roll_count")
-        if gate_parameters.get("roll_type") == "leadership":
-            test_kind = "leadership"
-            rules_unit_id = rules_unit_id_for_unit_id(
-                armies=tuple(context.state.army_definitions),
-                unit_instance_id=unit.unit_instance_id,
-            )
-            from warhammer40k_core.engine.leadership_evaluation import (
-                evaluate_leadership_test_target,
-            )
-
-            leadership_target = evaluate_leadership_test_target(
-                state=context.state,
-                decisions=context.decisions,
-                unit_instance_id=rules_unit_id,
-                scope_id=f"{context.event.event_id}:{source.record.definition.source_id}:{source_model_instance_id}",
-                model_instance_id=None
-                if gate_parameters.get("test_target") == "this_unit"
-                else source_model_instance_id,
-                ability_index=ability_index,
-                runtime_modifier_registry=context.runtime_modifier_registry,
-            )
-            success_threshold = leadership_target
-            roll_type = "catalog_ir.command_point_leadership_test"
-            reason = f"Command-point Leadership test for {source_model_instance_id}"
-        elif gate_parameters.get("roll_type") == "command_point_gain":
-            test_kind = "fixed_roll"
-            success_threshold = _mapping_positive_int(
-                gate_parameters,
-                key="success_threshold",
-            )
-            roll_type = "catalog_ir.command_point_gain_test"
-            reason = f"Command-point gain test for {source_model_instance_id}"
-        else:
-            raise GameLifecycleError("Catalog CP phase gain roll_type is unsupported.")
-        roll = DiceRollManager(
-            context.state.game_id,
-            event_log=context.decisions.event_log,
-        ).roll(
-            DiceRollSpec(
-                expression=DiceExpression(quantity=roll_count, sides=6),
-                reason=reason,
-                roll_type=roll_type,
-                actor_id=source_model_instance_id,
-            )
-        )
-        roll_payload = cast(JsonValue, roll.to_payload())
-        if test_kind == "leadership":
-            if rules_unit_id is None:
-                raise GameLifecycleError("Leadership test requires a rules-unit identity.")
-            modified_roll = ModifiedRollResult.from_unmodified(
-                UnmodifiedRollResult.from_state(roll),
-                modifiers=selected_target_test_roll_modifiers(
-                    state=context.state,
-                    unit_instance_id=rules_unit_id,
-                    roll_type=LEADERSHIP_TEST_ROLL_TYPE,
-                ),
-            )
-            leadership_modified_roll_payload = cast(JsonValue, modified_roll.to_payload())
-            passed = modified_roll.final_value >= success_threshold
-        else:
-            passed = roll.current_total >= success_threshold
-    gain_payload: JsonValue = None
-    if passed:
-        gain = context.state.gain_command_points(
-            player_id=source.owner_player_id,
-            amount=_command_point_gain_amount(source.clause),
-            source_id=source.record.definition.source_id,
-            source_kind=CommandPointSourceKind.OTHER,
-        )
-        gain_payload = cast(JsonValue, gain.to_payload())
-        context.decisions.event_log.append(
-            "command_points_gained"
-            if gain.status is CommandPointGainStatus.APPLIED
-            else "command_points_gain_capped",
-            gain_payload,
-        )
-    resolution = validate_json_value(
-        {
-            "runtime_event_id": context.event.event_id,
-            "game_id": context.state.game_id,
-            "battle_round": context.state.battle_round,
-            "phase": None if context.event.phase is None else context.event.phase.value,
-            "player_id": source.owner_player_id,
-            "source_rule_id": source.record.definition.source_id,
-            "source_record_id": source.record.record_id,
-            "source_clause_id": source.clause.clause_id,
-            "source_unit_instance_id": (
-                rules_unit_id if rules_unit_id is not None else unit.unit_instance_id
-            ),
-            "source_model_instance_id": source_model_instance_id,
-            "test_kind": test_kind,
-            "success_threshold": success_threshold,
-            "roll": roll_payload,
-            "leadership_target": leadership_target,
-            "leadership_roll": roll_payload if test_kind == "leadership" else None,
-            "leadership_modified_roll": leadership_modified_roll_payload,
-            "passed": passed,
-            "command_point_result": gain_payload,
-        }
-    )
-    context.decisions.event_log.append(
-        (
-            CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
-            if clause_is_supported_phase_end_leadership_command_point_gain(source.clause)
-            else CATALOG_IR_COMMAND_POINT_PHASE_GAIN_EVENT
-        ),
-        resolution,
-    )
-    return resolution
-
-
 def _phase_gain_subscription(source: _PhaseGainSource) -> RuntimeContentEventSubscription:
     return RuntimeContentEventSubscription(
         subscription_id=source.subscription_id,
@@ -1235,7 +1112,7 @@ def _phase_gain_subscription(source: _PhaseGainSource) -> RuntimeContentEventSub
     )
 
 
-def _phase_gain_dice_gate(clause: RuleClause) -> RuleCondition | None:
+def phase_gain_dice_gate(clause: RuleClause) -> RuleCondition | None:
     gates = tuple(
         condition
         for condition in clause.conditions

@@ -1,5 +1,8 @@
 # CORE V2 external contract
 
+Contract 41 preserves source modifier operations and engine-owned per-occurrence
+subset selections. See [40 to 41 migration](migrations/40-to-41.md).
+
 Contract 40.1 adds finite melee weapon commitment, optional physical weapon IDs
 in melee proposals, and recorded per-weapon random attack splits. See
 [Order 92](../docs/ORDER_92_SCOPE_PLAN.md) and the adapter decision contract.
@@ -20,7 +23,7 @@ from HealingEffect and requires source-bound engagement evidence on battlefield
 revival events. See [35 to 36 migration](migrations/35-to-36.md).
 
 
-Contract version: `40.1.0`
+Contract version: `41.0.0`
 
 Order 81 / P03E restores the existing pending-proposal contract for all 13
 parameterized families. Interaction conformance examples now preserve the four

@@ -7160,6 +7160,7 @@ def test_local_session_exposes_held_mission_action_and_decline_continues_shootin
         "player_id": "player-a",
         "battle_round": 1,
         "phase": BattlePhase.SHOOTING.value,
+        "objective_control_modifier_scope_id": None,
         "mission_action_opportunity": True,
         "legal_mission_action_ids": ["cleanse-objective"],
         "legal_action_option_ids": [
@@ -8186,7 +8187,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         initial_lifecycle_payload=terminal_payload,
         final_lifecycle=terminal_lifecycle,
     )
-    assert terminal_artifact.schema_version == "replay-artifact-v34-random-profiles"
+    assert terminal_artifact.schema_version == "replay-artifact-v35-modifier-occurrences"
     replay_snapshot = GameLifecycle.from_payload(terminal_artifact.initial_lifecycle_payload)
     replay_snapshot_state = replay_snapshot.state
     assert replay_snapshot_state is not None

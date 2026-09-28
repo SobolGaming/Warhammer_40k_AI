@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence_damage_resolution import _no_save_damage_order_roll_spec, _save_options_for_allocation, _resolve_lost_wound_stage, _apply_damage_after_feel_no_pain, _advance_after_resolved_hit, _destruction_reaction_status_if_needed, _optional_destruction_reaction_sources_after_trigger_rolls, _optional_destruction_reaction_trigger_descriptor, _optional_destruction_reaction_trigger_conditions_met, _optional_destruction_reaction_trigger_battle_round_is_current, _optional_destruction_reaction_active_effect_requirement_is_met, _destruction_reaction_trigger_threshold, _optional_destruction_reaction_trigger_roll_type, _resolve_mandatory_destruction_reactions_before_removal, _emit_mandatory_destruction_reaction_record, _resolve_deadly_demise_before_removal, _route_deadly_demise_mortal_wounds, _resolve_deadly_demise_secondary_destroyed_models, _continue_deadly_demise_after_secondary_destruction_reaction, _deadly_demise_secondary_continuation_payload, _is_deadly_demise_continuation, _destroyed_damage_applications, _deadly_demise_mortal_wounds_for_target, _emit_deadly_demise_mortal_wounds_applied, _deadly_demise_target_unit_ids, _deadly_demise_descriptor, _deadly_demise_source_context_payload, _deadly_demise_attack_context_from_source_context, _pre_removal_destruction_reaction_context_payload, _destruction_reaction_context_payload
     from warhammer40k_core.engine.attack_sequence_dice_rerolls import _roll_hit_and_wound, _roll_or_reuse_state, _latest_reroll_state_for_original_roll, _request_command_reroll_for_attack_roll_if_available, _request_source_backed_hit_reroll_if_available, _source_backed_hit_permission_for_attack, apply_source_backed_attack_dice_reroll_decision, _validate_current_source_backed_attack_reroll_context_if_required, _source_backed_attack_context_id_matches_active_pool, _source_backed_attack_kind_for_phase, _request_source_backed_wound_reroll_if_available, _source_backed_wound_permission_for_attack, _conditional_wound_full_reroll_applies, _target_unit_within_any_objective_marker_range, _canonical_keyword, _source_backed_reroll_already_answered, _command_reroll_opportunity_window, _command_reroll_opportunity_options, _command_reroll_opportunity_option, _command_reroll_opportunity_state_hash, _command_reroll_opportunity_boundary_state_payload, _dice_rolled_event_id_for_roll, _random_characteristic_roll_spec, _append_replay_resume_unique_event_once
     from warhammer40k_core.engine.attack_sequence_psychic_modifiers import _psychic_attack_modifier_ignore_request, _psychic_attack_modifier_ignore_options, _psychic_attack_modifier_ignore_selection_for_attack, validate_psychic_attack_modifier_ignore_decision, _has_detrimental_psychic_modifier, _has_beneficial_psychic_modifier
-    from warhammer40k_core.engine.attack_sequence_hit_wound import _roll_hit, _hit_reroll_forbidden_rule_ids, _roll_wound, _wound_roll_modifier, _reroll_wound_for_twin_linked_if_needed, _emit_damage_event, _destroyed_model_removal_record, _destroyed_model_placement_payload, _emit_event, _target_has_effect_cover, _target_has_effect_cover_denial, _benefit_of_cover_ballistic_skill_penalty, _hit_skill_modifier, _hit_roll_modifier, _plunging_fire_ballistic_skill_improvement, _persisting_hit_roll_modifier, _unit_instance_id_for_model, _save_options_with_effect_invulnerable, _cover_result_with_effect_source, _melta_damage_modifier, _devastating_wounds_resolution_for_attack
+    from warhammer40k_core.engine.attack_sequence_hit_wound import _roll_hit, _hit_reroll_forbidden_rule_ids, _roll_wound, _reroll_wound_for_twin_linked_if_needed, _emit_damage_event, _destroyed_model_removal_record, _destroyed_model_placement_payload, _emit_event, _target_has_effect_cover, _target_has_effect_cover_denial, _benefit_of_cover_ballistic_skill_penalty, _hit_skill_modifier, _hit_roll_modifier, _plunging_fire_ballistic_skill_improvement, _persisting_hit_roll_modifier, _unit_instance_id_for_model, _save_options_with_effect_invulnerable, _cover_result_with_effect_source, _melta_damage_modifier, _devastating_wounds_resolution_for_attack
     from warhammer40k_core.engine.attack_sequence_hazardous import _resolve_hazardous_tests, _emit_hazardous_test_resolved, _emit_hazardous_mortal_wounds_applied, _hazardous_feel_no_pain_status, _hazardous_source_context_payload, _hazardous_source_context_from_payload, _hazardous_mortal_wounds_for_attacker, _cover_for_allocated_model
     from warhammer40k_core.engine.attack_sequence_selection import identical_attack_signature, unresolved_target_unit_ids, gathered_attack_groups_for_target, build_select_resolve_target_unit_request, build_select_attack_weapon_group_request, selected_resolve_target_from_result, selected_attack_weapon_group_from_result, _fast_dice_pool_key, _pool_id, _resolve_target_option_id, _gathered_attack_group_from_indices, _gathered_attack_contribution, _gathered_attack_group_id, _synthetic_pool_for_gathered_group, _first_unresolved_pool_index, _first_unresolved_pool_index_from, _first_unresolved_pool_index_for_target, _first_unresolved_pool_index_for_target_from, _weapon_rule_tokens_for_signature, _validate_weapon_profile_signature_shape
     from warhammer40k_core.engine.attack_sequence_validation import _validate_gathered_group_matches_attack_pools, _validate_attack_pools, _validate_pool_index_tuple, _validate_pool_indices_within_attack_pools, _validate_gathered_attack_contributions, _validate_deferred_mortal_wounds, _validate_destroyed_transport_disembark_tuple, _validate_destruction_reaction_source_tuple, _validate_save_die_entry_tuple, _validate_save_die_entry_payload, _validate_allocation_group_payload_tuple, _validate_allocation_group_tuple, _validate_ordered_allocation_group_tuple, _first_allocation_group, _first_allocation_group_order, _validate_fast_dice_pools, _validate_roll_modifier_tuple, _payload_object, _nested_payload_object, _precision_selected_group_id, _precision_selected_model_ids, _lost_wound_context_payload, _lost_wound_context_from_payload, _validate_lost_wound_context_matches_sequence, _validate_grouped_request_context_matches_sequence, _validate_attack_context_matches_sequence, _attack_context_matches_pending_grouped_damage, _destruction_reaction_context_from_payload, _state_feel_no_pain_sources, _feel_no_pain_sources_for_attack, _feel_no_pain_source_applies_to_attack, _state_destruction_reaction_sources, _selected_destruction_reaction_source_from_request, _destruction_reaction_action_host, _state_feel_no_pain_decline_allowed, _payload_string, _optional_payload_string, _payload_int, _payload_string_list, _payload_bool, _payload_positive_int, _payload_positive_number, _payload_identifier_tuple, _cap_roll_modifier, _validate_d6_target, _validate_d6_value, _validate_d6_minimum_success, _validate_positive_int, _validate_non_negative_int, _validate_identifier_tuple, _validate_ordered_identifier_tuple, _validate_identifier, _validate_int, _validate_optional_identifier
@@ -179,91 +179,171 @@ def _damage_value(
     attacker_model_instance_id: str,
     target_unit_instance_id: str,
     weapon_profile: WeaponProfile,
+    attack_strength: int | None,
+    target_toughness: int | None,
     source_phase: BattlePhase,
     stratagem_index: StratagemCatalogIndex | None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    melta_bonus: int = 0,
+    allocated_model_instance_id: str | None = None,
 ) -> tuple[int | None, LifecycleStatus | None]:
+    from warhammer40k_core.core.modifiers import Modifier
+    from warhammer40k_core.engine.modifier_evaluation import ModifierEvaluationResult
+    from warhammer40k_core.engine.attack_damage_modifier_selection import (
+        allocated_damage_characteristic_operations,
+        damage_characteristic_operations,
+        damage_value_from_operations,
+        select_attack_damage_modifiers,
+    )
+    from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
+
     if type(profile) is not DamageProfile:
         raise GameLifecycleError("Damage resolution requires a DamageProfile.")
-    if profile.fixed_damage is not None:
-        return profile.fixed_damage, None
-    if profile.dice_expression is None:
-        raise GameLifecycleError("DamageProfile requires fixed damage or a dice expression.")
-    scope_id = f"{attack_context_id}:damage"
-    timing = RandomCharacteristicTiming.PER_ATTACK
-    roll_state = _roll_or_reuse_state(
-        manager,
-        _random_characteristic_roll_spec(
-            characteristic=Characteristic.DAMAGE,
-            timing=timing,
-            scope_id=scope_id,
-            expression=profile.dice_expression,
-            reason="Phase 13C random Damage roll",
-            actor_id=attacker_player_id,
-        ),
-    )
-    status = _request_source_backed_damage_reroll_if_available(
-        state=state,
-        decisions=decisions,
-        roll_state=roll_state,
-        attacking_unit_instance_id=attacking_unit_instance_id,
-        attacker_model_instance_id=attacker_model_instance_id,
-        target_unit_instance_id=target_unit_instance_id,
-        attack_context_id=attack_context_id,
-        source_phase=source_phase,
-        weapon_profile_id=weapon_profile.profile_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
-    if status is not None:
-        return None, status
-    status = _request_command_reroll_for_attack_roll_if_available(
-        state=state,
-        decisions=decisions,
-        roll_state=roll_state,
-        affected_unit_instance_id=affected_unit_instance_id,
-        source_phase=source_phase,
-        stratagem_index=stratagem_index,
-        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
-        phase_body_status="attack_damage_command_reroll_pending",
-    )
-    if status is not None:
-        return None, status
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
-    damage_modifier = runtime_modifiers.damage_roll_modifier(
-        DamageRollModifierContext(
+
+    def select[T: Modifier | RollModifier](
+        modifiers: tuple[T, ...],
+        kind: ModifierIgnoreKind,
+        stage: str,
+    ) -> ModifierEvaluationResult[T]:
+        return select_attack_damage_modifiers(
             state=state,
+            decisions=decisions,
+            registry=runtime_modifiers,
+            modifiers=modifiers,
+            kind=kind,
+            stage=stage,
+            attack_context_id=attack_context_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            attacker_player_id=attacker_player_id,
+            target_unit_instance_id=target_unit_instance_id,
+            weapon_profile=weapon_profile,
+            attack_strength=attack_strength,
+            target_toughness=target_toughness,
             source_phase=source_phase,
+            allocated_model_instance_id=allocated_model_instance_id,
+        )
+
+    selected = select(
+        damage_characteristic_operations(profile, melta_bonus=melta_bonus),
+        ModifierIgnoreKind.DAMAGE_CHARACTERISTIC,
+        "damage-characteristic",
+    )
+    if selected.pending_status is not None:
+        return None, selected.pending_status
+    operations = selected.modifiers
+    if profile.fixed_damage is not None:
+        source_value = (
+            profile.source_fixed_value
+            if profile.source_fixed_value is not None
+            else profile.fixed_damage
+        )
+    else:
+        if profile.dice_expression is None:
+            raise GameLifecycleError("DamageProfile requires fixed damage or a dice expression.")
+        scope_id = f"{attack_context_id}:damage"
+        timing = RandomCharacteristicTiming.PER_ATTACK
+        roll_state = _roll_or_reuse_state(
+            manager,
+            _random_characteristic_roll_spec(
+                characteristic=Characteristic.DAMAGE,
+                timing=timing,
+                scope_id=scope_id,
+                expression=profile.dice_expression,
+                reason="Phase 13C random Damage roll",
+                actor_id=attacker_player_id,
+            ),
+        )
+        status = _request_source_backed_damage_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=roll_state,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attacker_model_instance_id=attacker_model_instance_id,
             target_unit_instance_id=target_unit_instance_id,
-            weapon_profile=weapon_profile,
-            current_value=roll_state.current_total,
+            attack_context_id=attack_context_id,
+            source_phase=source_phase,
+            weapon_profile_id=weapon_profile.profile_id,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
-    )
-    random_roll = RandomCharacteristicRoll(
-        characteristic=Characteristic.DAMAGE,
-        timing=timing,
-        scope_id=scope_id,
-        roll_state=roll_state,
-        value=roll_state.current_total,
-    )
-    modified_roll = ModifiedRollResult.from_unmodified(
-        UnmodifiedRollResult.from_state(roll_state),
-        intrinsic_offset=profile.dice_expression.modifier,
-        modifiers=(RollModifier(f"{scope_id}:runtime-damage-modifier", damage_modifier),),
-    )
-    _append_replay_resume_unique_event_once(
-        decisions=decisions,
-        event_type="random_characteristic_rolled",
-        payload=validate_json_value(
-            {
-                **random_roll.to_payload(),
-                "modified_roll": modified_roll.to_payload(),
-            }
-        ),
-    )
-    return modified_roll.final_value, None
+        if status is not None:
+            return None, status
+        status = _request_command_reroll_for_attack_roll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=roll_state,
+            affected_unit_instance_id=affected_unit_instance_id,
+            source_phase=source_phase,
+            stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            phase_body_status="attack_damage_command_reroll_pending",
+        )
+        if status is not None:
+            return None, status
+        damage_modifiers = runtime_modifiers.damage_roll_modifiers(
+            DamageRollModifierContext(
+                state=state,
+                source_phase=source_phase,
+                attacking_unit_instance_id=attacking_unit_instance_id,
+                attacker_model_instance_id=attacker_model_instance_id,
+                target_unit_instance_id=target_unit_instance_id,
+                weapon_profile=weapon_profile,
+                current_value=roll_state.current_total,
+            )
+        )
+        roll_selection = select(damage_modifiers, ModifierIgnoreKind.DAMAGE_ROLL, "damage-roll")
+        if roll_selection.pending_status is not None:
+            return None, roll_selection.pending_status
+        random_roll = RandomCharacteristicRoll(
+            characteristic=Characteristic.DAMAGE,
+            timing=timing,
+            scope_id=scope_id,
+            roll_state=roll_state,
+            value=roll_state.current_total,
+        )
+        modified_roll = ModifiedRollResult.from_unmodified(
+            UnmodifiedRollResult.from_state(roll_state),
+            intrinsic_offset=profile.dice_expression.modifier,
+            modifiers=roll_selection.modifiers,
+        )
+        _append_replay_resume_unique_event_once(
+            decisions=decisions,
+            event_type="random_characteristic_rolled",
+            payload=validate_json_value(
+                {
+                    **random_roll.to_payload(),
+                    "modified_roll": modified_roll.to_payload(),
+                }
+            ),
+        )
+        source_value = modified_roll.final_value
+    value = damage_value_from_operations(source_value, operations)
+    if allocated_model_instance_id is not None:
+        allocated = runtime_modifiers.allocated_attack_damage_modifiers(
+            AllocatedAttackDamageModifierContext(
+                state=state,
+                source_phase=source_phase,
+                attacking_unit_instance_id=attacking_unit_instance_id,
+                attacker_model_instance_id=attacker_model_instance_id,
+                target_unit_instance_id=target_unit_instance_id,
+                allocated_model_instance_id=allocated_model_instance_id,
+                weapon_profile=weapon_profile,
+                current_value=value,
+            )
+        )
+        allocated_selection = select(
+            allocated_damage_characteristic_operations(allocated),
+            ModifierIgnoreKind.DAMAGE_CHARACTERISTIC,
+            "allocated-damage-characteristic",
+        )
+        if allocated_selection.pending_status is not None:
+            return None, allocated_selection.pending_status
+        value = damage_value_from_operations(
+            source_value, (*operations, *allocated_selection.modifiers)
+        )
+    return value, None
 
 
 def _model_is_alive(*, state: GameState, model_instance_id: str) -> bool:

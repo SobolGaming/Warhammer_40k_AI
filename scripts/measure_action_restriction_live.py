@@ -43,9 +43,43 @@ WORK_METRICS = frozenset(
         "decide_full",
     }
 )
+COLD_GEOMETRY_METRICS = frozenset({"resolve_visibility_pair", "resolve_visibility_pair_uncached"})
+
+
+def _clear_visibility_workload_caches() -> None:
+    # The unrestricted geometry budget covers setup plus the live slice from
+    # empty caches, independent of the tests previously assigned to this worker.
+    from warhammer40k_core.core.visibility import (
+        _context_fingerprint,  # pyright: ignore[reportPrivateUsage]
+        _physical_obstacle_entries,  # pyright: ignore[reportPrivateUsage]
+        _resolve_context,  # pyright: ignore[reportPrivateUsage]
+    )
+    from warhammer40k_core.engine.shooting_target_cache import clear_target_candidate_cache
+    from warhammer40k_core.geometry.continuous_visibility import resolve_visibility_pair
+
+    clear_target_candidate_cache()
+    _context_fingerprint.cache_clear()
+    _physical_obstacle_entries.cache_clear()
+    _resolve_context.cache_clear()
+    resolve_visibility_pair.cache_clear()
+
+
+def _work_counts(profiler: cProfile.Profile, metrics: frozenset[str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for entry in profiler.getstats():
+        if isinstance(entry.code, CodeType) and entry.code.co_name in metrics:
+            name = entry.code.co_name
+            counts[name] = counts.get(name, 0) + entry.callcount
+    return counts
 
 
 def live_sample(*, profile: bool, case: str) -> dict[str, object]:
+    profiler = cProfile.Profile()
+    setup_geometry_counts: dict[str, int] = {}
+    measure_cold_geometry = profile and case == "unrestricted"
+    if measure_cold_geometry:
+        _clear_visibility_workload_caches()
+        profiler.enable()
     started = time.perf_counter()
     if case == "retained":
         session, _model = pending_retained_attack(
@@ -76,7 +110,10 @@ def live_sample(*, profile: bool, case: str) -> dict[str, object]:
                 effect_payload={"effect_kind": "order34_workload_inventory"},
             )
         )
-    profiler = cProfile.Profile()
+    if measure_cold_geometry:
+        profiler.disable()
+        setup_geometry_counts = _work_counts(profiler, COLD_GEOMETRY_METRICS)
+        profiler.clear()
     prepared = time.perf_counter()
     initial_decisions = len(session.lifecycle.decision_controller.records)
     if profile:
@@ -164,18 +201,20 @@ def live_sample(*, profile: bool, case: str) -> dict[str, object]:
         profiler.disable()
     completed = time.perf_counter()
     assert reached_charge or case == "attached_selection"
-    counts: dict[str, int] = {}
-    if profile:
-        for entry in profiler.getstats():
-            if isinstance(entry.code, CodeType) and entry.code.co_name in WORK_METRICS:
-                name = entry.code.co_name
-                counts[name] = counts.get(name, 0) + entry.callcount
+    counts = _work_counts(profiler, WORK_METRICS) if profile else {}
     return {
         "case": case,
         "setup_seconds": prepared - started,
         "slice_seconds": completed - prepared,
         "inventory_size": INVENTORY_SIZE,
         "work_counts": counts,
+        "setup_geometry_work_counts": setup_geometry_counts,
+        "cold_geometry_work_counts": {
+            name: setup_geometry_counts.get(name, 0) + counts.get(name, 0)
+            for name in sorted(COLD_GEOMETRY_METRICS)
+        }
+        if measure_cold_geometry
+        else {},
         "decision_count": len(session.lifecycle.decision_controller.records) - initial_decisions,
         "reached_charge": reached_charge,
         "final_phase": state.current_battle_phase.value if state.current_battle_phase else None,

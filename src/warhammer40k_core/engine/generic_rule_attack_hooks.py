@@ -39,10 +39,6 @@ from warhammer40k_core.engine.generic_rule_effect_targets import (
     generic_effect_role_applies,
     generic_unit_effect_applies,
 )
-from warhammer40k_core.engine.generic_rule_save_modifiers import (
-    generic_rule_save_option_with_roll_modifier,
-    generic_rule_save_options_with_invulnerable_save,
-)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_modified_weapon_profile,
@@ -55,6 +51,7 @@ from warhammer40k_core.engine.rules_unit_effects import (
     rules_unit_effect_applications,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
+    AdvanceRollModifierContext,
     ChargeRollModifierContext,
     DamageRollModifierContext,
     HitRollMinimumUnmodifiedSuccessContext,
@@ -65,7 +62,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
     WoundRollModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveOption, save_option_with_armor_penetration_modifier
+from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
 
@@ -88,61 +85,15 @@ def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
 
 
 def generic_rule_wound_roll_modifier(context: WoundRollModifierContext) -> int:
-    if type(context) is not WoundRollModifierContext:
-        raise GameLifecycleError("Generic wound roll hooks require WoundRollModifierContext.")
-    return _dice_roll_modifier_for_attack(
-        state=context.state,
-        attacking_unit_instance_id=context.attacking_unit_instance_id,
-        attacker_model_instance_id=context.attacker_model_instance_id,
-        target_unit_instance_id=context.target_unit_instance_id,
-        source_phase=context.source_phase,
-        weapon_profile=context.weapon_profile,
-        attack_strength=context.strength,
-        target_toughness=context.toughness,
-        expected_roll_type="wound",
-        legacy_attacker_role_allowed=lambda effect: (
-            _required_int_parameter(
-                effect.parameters,
-                key="delta",
-            )
-            >= 0
-        ),
-        legacy_target_role_allowed=lambda effect: (
-            _required_int_parameter(
-                effect.parameters,
-                key="delta",
-            )
-            <= 0
-        ),
-    )
+    from warhammer40k_core.engine.generic_attack_roll_modifiers import generic_wound_roll_modifiers
+
+    return sum(modifier.operand for modifier in generic_wound_roll_modifiers(context))
 
 
 def generic_rule_damage_roll_modifier(context: DamageRollModifierContext) -> int:
-    if type(context) is not DamageRollModifierContext:
-        raise GameLifecycleError("Generic damage roll hooks require DamageRollModifierContext.")
-    return _dice_roll_modifier_for_attack(
-        state=context.state,
-        attacking_unit_instance_id=context.attacking_unit_instance_id,
-        attacker_model_instance_id=context.attacker_model_instance_id,
-        target_unit_instance_id=context.target_unit_instance_id,
-        source_phase=context.source_phase,
-        weapon_profile=context.weapon_profile,
-        expected_roll_type="damage",
-        legacy_attacker_role_allowed=lambda effect: (
-            _required_int_parameter(
-                effect.parameters,
-                key="delta",
-            )
-            >= 0
-        ),
-        legacy_target_role_allowed=lambda effect: (
-            _required_int_parameter(
-                effect.parameters,
-                key="delta",
-            )
-            <= 0
-        ),
-    )
+    from warhammer40k_core.engine.generic_attack_roll_modifiers import generic_damage_roll_modifiers
+
+    return sum(modifier.operand for modifier in generic_damage_roll_modifiers(context))
 
 
 def generic_rule_minimum_unmodified_hit_success(
@@ -156,114 +107,11 @@ def generic_rule_minimum_unmodified_hit_success(
 def generic_rule_modified_save_options(
     context: SaveOptionModifierContext,
 ) -> tuple[SaveOption, ...]:
-    if type(context) is not SaveOptionModifierContext:
-        raise GameLifecycleError("Generic save hooks require SaveOptionModifierContext.")
-    if (
-        context.attacking_unit_instance_id is None
-        or context.attacker_model_instance_id is None
-        or context.weapon_profile is None
-        or context.source_phase is None
-    ):
-        return context.save_options
-    current = context.save_options
-    for effect in generic_rule_matching_unit_effects(
-        state=context.state,
-        unit_instance_id=context.target_unit_instance_id,
-        effect_kind=RuleEffectKind.SET_CHARACTERISTIC,
-    ):
-        if _characteristic_parameter(effect.parameters) is not Characteristic.INVULNERABLE_SAVE:
-            continue
-        if context.allocated_model_instance_id is None:
-            if not _generic_this_model_effect_targets_only_alive_model(
-                state=context.state,
-                effect=effect,
-                unit_instance_id=context.target_unit_instance_id,
-            ):
-                continue
-        elif effect.source_model_instance_id != context.allocated_model_instance_id:
-            continue
-        current = generic_rule_save_options_with_invulnerable_save(
-            current,
-            target_number=_required_int_parameter(effect.parameters, key="value"),
-            source_id=generic_rule_modifier_source_id(effect),
-        )
-    for effect in _matching_generic_attack_effects(
-        state=context.state,
-        attacking_unit_instance_id=context.attacking_unit_instance_id,
-        attacker_model_instance_id=context.attacker_model_instance_id,
-        target_unit_instance_id=context.target_unit_instance_id,
-        source_phase=context.source_phase,
-        weapon_profile=context.weapon_profile,
-        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
-        legacy_attacker_role_allowed=lambda candidate: (
-            _required_int_parameter(
-                candidate.parameters,
-                key="delta",
-            )
-            <= 0
-        ),
-        legacy_target_role_allowed=lambda candidate: (
-            _required_int_parameter(
-                candidate.parameters,
-                key="delta",
-            )
-            >= 0
-        ),
-    ):
-        if not _roll_type_matches(effect.parameters, expected="save"):
-            continue
-        delta = _required_int_parameter(effect.parameters, key="delta")
-        source_id = generic_rule_modifier_source_id(effect)
-        current = tuple(
-            generic_rule_save_option_with_roll_modifier(option, delta, source_id)
-            for option in current
-        )
-    for effect in _matching_generic_attack_effects(
-        state=context.state,
-        attacking_unit_instance_id=context.attacking_unit_instance_id,
-        attacker_model_instance_id=context.attacker_model_instance_id,
-        target_unit_instance_id=context.target_unit_instance_id,
-        source_phase=context.source_phase,
-        weapon_profile=context.weapon_profile,
-        effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
-        legacy_attacker_role_allowed=lambda _candidate: False,
-        legacy_target_role_allowed=lambda _candidate: False,
-    ):
-        if _characteristic_parameter(effect.parameters) is not Characteristic.ARMOR_PENETRATION:
-            continue
-        delta = _required_int_parameter(effect.parameters, key="delta")
-        source_id = generic_rule_modifier_source_id(effect)
-        current = tuple(
-            save_option_with_armor_penetration_modifier(
-                option,
-                delta=delta,
-                source_rule_id=source_id,
-            )
-            for option in current
-        )
-    return current
-
-
-def _generic_this_model_effect_targets_only_alive_model(
-    *, state: object, effect: GenericAttackEffect, unit_instance_id: str
-) -> bool:
-    if effect.target_kind is not RuleTargetKind.THIS_MODEL:
-        return True
-    source_model_id = effect.source_model_instance_id
-    if source_model_id is None:
-        raise GameLifecycleError("Generic THIS_MODEL save effect requires source model.")
-    from warhammer40k_core.engine.game_state import GameState
-    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic THIS_MODEL save effect requires GameState.")
-    alive_ids = tuple(
-        model.model_instance_id
-        for model in rules_unit_view_by_id(
-            state=state, unit_instance_id=unit_instance_id
-        ).alive_models()
+    from warhammer40k_core.engine.generic_attack_save_modifiers import (
+        generic_rule_modified_save_options as modify,
     )
-    return alive_ids == (source_model_id,)
+
+    return modify(context)
 
 
 def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) -> WeaponProfile:
@@ -417,7 +265,11 @@ def generic_rule_modified_unit_characteristic(
 
 
 def generic_rule_characteristic_operations(
-    *, state: object, unit_instance_id: str, characteristic: Characteristic
+    *,
+    state: object,
+    unit_instance_id: str,
+    characteristic: Characteristic,
+    model_instance_id: str | None = None,
 ) -> tuple[Modifier, ...]:
     if type(characteristic) is not Characteristic:
         raise GameLifecycleError("Generic characteristic operations require Characteristic.")
@@ -428,11 +280,15 @@ def generic_rule_characteristic_operations(
             effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
         ),
         characteristic=characteristic,
+        model_instance_id=model_instance_id,
     )
 
 
 def generic_characteristic_operations_from_effects(
-    *, effects: tuple[GenericAttackEffect, ...], characteristic: Characteristic
+    *,
+    effects: tuple[GenericAttackEffect, ...],
+    characteristic: Characteristic,
+    model_instance_id: str | None = None,
 ) -> tuple[Modifier, ...]:
     return tuple(
         ModifierTerm(
@@ -444,7 +300,18 @@ def generic_characteristic_operations_from_effects(
         )
         for effect in effects
         if _characteristic_parameter(effect.parameters) is characteristic
+        and _characteristic_effect_model_applies(effect, model_instance_id)
     )
+
+
+def _characteristic_effect_model_applies(
+    effect: GenericAttackEffect, model_instance_id: str | None
+) -> bool:
+    if effect.target_kind is not RuleTargetKind.THIS_MODEL:
+        return True
+    if effect.source_model_instance_id is None:
+        raise GameLifecycleError("This-model characteristic modifier requires its source model.")
+    return effect.source_model_instance_id == model_instance_id
 
 
 def generic_rule_unit_characteristic_modifiers(
@@ -485,11 +352,12 @@ def generic_rule_modified_movement_inches(
     return current
 
 
-def generic_rule_charge_roll_modifiers(
-    context: ChargeRollModifierContext,
+def generic_rule_movement_roll_modifiers(
+    context: AdvanceRollModifierContext | ChargeRollModifierContext,
 ) -> tuple[RollModifier, ...]:
-    if type(context) is not ChargeRollModifierContext:
-        raise GameLifecycleError("Generic charge hooks require ChargeRollModifierContext.")
+    if type(context) not in {AdvanceRollModifierContext, ChargeRollModifierContext}:
+        raise GameLifecycleError("Generic movement roll hooks require a typed context.")
+    roll_type = "advance" if isinstance(context, AdvanceRollModifierContext) else "charge"
     from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
         charge_roll_modifiers_from_generic_rule_ir,
     )
@@ -500,7 +368,7 @@ def generic_rule_charge_roll_modifiers(
         unit_instance_id=context.unit_instance_id,
         effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
     ):
-        if not _roll_type_matches(effect.parameters, expected="charge"):
+        if not _roll_type_matches(effect.parameters, expected=roll_type):
             continue
         current.append(
             RollModifier(
@@ -509,45 +377,13 @@ def generic_rule_charge_roll_modifiers(
                 operand=_required_int_parameter(effect.parameters, key="delta"),
             )
         )
+    if isinstance(context, AdvanceRollModifierContext):
+        return tuple(sorted(current, key=lambda modifier: modifier.modifier_id))
     return charge_roll_modifiers_from_generic_rule_ir(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
         current_roll_modifiers=tuple(sorted(current, key=lambda modifier: modifier.modifier_id)),
     )
-
-
-def _dice_roll_modifier_for_attack(
-    *,
-    state: object,
-    attacking_unit_instance_id: str,
-    attacker_model_instance_id: str | None,
-    target_unit_instance_id: str,
-    source_phase: object,
-    expected_roll_type: str,
-    legacy_attacker_role_allowed: Callable[[GenericAttackEffect], bool],
-    legacy_target_role_allowed: Callable[[GenericAttackEffect], bool],
-    weapon_profile: WeaponProfile | None = None,
-    attack_strength: int | None = None,
-    target_toughness: int | None = None,
-) -> int:
-    total = 0
-    for effect in _matching_generic_attack_effects(
-        state=state,
-        attacking_unit_instance_id=attacking_unit_instance_id,
-        attacker_model_instance_id=attacker_model_instance_id,
-        target_unit_instance_id=target_unit_instance_id,
-        source_phase=source_phase,
-        attack_strength=attack_strength,
-        target_toughness=target_toughness,
-        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
-        legacy_attacker_role_allowed=legacy_attacker_role_allowed,
-        legacy_target_role_allowed=legacy_target_role_allowed,
-        weapon_profile=weapon_profile,
-    ):
-        if not _roll_type_matches(effect.parameters, expected=expected_roll_type):
-            continue
-        total += _required_int_parameter(effect.parameters, key="delta")
-    return total
 
 
 def generic_rule_matching_unit_effects(
@@ -569,25 +405,43 @@ def generic_rule_matching_unit_effects(
 
 
 def generic_matching_unit_effect_applications(
-    *, applications: tuple[RulesUnitEffectApplication, ...], effect_kind: RuleEffectKind
+    *,
+    applications: tuple[RulesUnitEffectApplication, ...],
+    effect_kind: RuleEffectKind,
+    role: AttackRole = "attacker",
+    application_filter: Callable[[GenericAttackEffect, str], bool] | None = None,
 ) -> tuple[GenericAttackEffect, ...]:
     """Share applicability, source-slot conflict checks and deduplication across time."""
-    matches_by_effect_slot: dict[str, GenericAttackEffect] = {}
+    matches_by_effect_slot: dict[tuple[str, str], GenericAttackEffect] = {}
     for application in applications:
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=application.effect,
             effective_target_unit_instance_ids=(application.unit_instance_id,),
-            role="attacker",
+            role=role,
             expected_effect_kind=effect_kind,
         )
         if generic_effect is None:
             continue
-        if not generic_unit_effect_applies(
-            effect=generic_effect, unit_instance_id=application.unit_instance_id
-        ):
+        applies = (
+            generic_unit_effect_applies(
+                effect=generic_effect, unit_instance_id=application.unit_instance_id
+            )
+            if application_filter is None
+            else application_filter(generic_effect, application.unit_instance_id)
+        )
+        if not applies:
             continue
+        # Distinct models can activate the same source clause. Deduplicating
+        # before retaining that identity would discard another model's own
+        # operation before the characteristic owner filters its inventory.
+        source_model_id = ""
+        if generic_effect.target_kind is RuleTargetKind.THIS_MODEL:
+            if generic_effect.source_model_instance_id is None:
+                raise GameLifecycleError("This-model unit modifier requires its source model.")
+            source_model_id = generic_effect.source_model_instance_id
         effect_slot = (
-            f"{generic_rule_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
+            f"{generic_rule_modifier_source_id(generic_effect)}:{generic_effect.effect_index}",
+            source_model_id,
         )
         existing = matches_by_effect_slot.get(effect_slot)
         if existing is not None and (
@@ -727,7 +581,7 @@ def _matching_generic_attack_effects(
                 legacy_target_role_allowed=legacy_target_role_allowed,
             ):
                 continue
-            if not _generic_effect_context_applies(
+            if not generic_effect_context_applies(
                 state=state,
                 effect=generic_effect,
                 attacking_unit_instance_id=attacker_id,
@@ -786,7 +640,7 @@ def _generic_attack_effect_or_none(
     )
 
 
-def _generic_effect_context_applies(
+def generic_effect_context_applies(
     *,
     state: object,
     effect: GenericAttackEffect,
@@ -797,6 +651,7 @@ def _generic_effect_context_applies(
     weapon_profile: WeaponProfile | None,
     attack_strength: int | None,
     target_toughness: int | None,
+    subject_model_instance_id: str | None = None,
 ) -> bool:
     if not generic_rule_triggering_attacker_applies(
         parameters=effect.parameters,
@@ -807,10 +662,23 @@ def _generic_effect_context_applies(
     if not generic_rule_source_model_applies(
         target_kind=effect.target_kind,
         source_model_instance_id=effect.source_model_instance_id,
-        attacker_model_instance_id=attacker_model_instance_id,
+        attacker_model_instance_id=(
+            attacker_model_instance_id
+            if subject_model_instance_id is None
+            else subject_model_instance_id
+        ),
         requires_source_model_instance_id=generic_rule_conditions_require_source_model_instance_id(
             effect.conditions
         ),
+    ):
+        return False
+    # THIS_MODEL identifies the effect's beneficiary. An explicit attack
+    # relationship separately identifies who makes the attack; a defensive
+    # beneficiary must not be silently substituted for that attacker.
+    if (
+        subject_model_instance_id is not None
+        and generic_rule_conditions_require_source_model_instance_id(effect.conditions)
+        and effect.source_model_instance_id != attacker_model_instance_id
     ):
         return False
     if not _generic_effect_source_phase_applies(effect=effect, source_phase=source_phase):

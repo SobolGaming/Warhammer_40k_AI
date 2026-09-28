@@ -202,7 +202,7 @@ def weapon_with_selected_range(
         return (
             weapon  # The engine has not yet reached the selected unit's Range evaluation boundary.
         )
-    if len(records) != 1 or replace(records[0].value, evaluation=None, evaluation_id=None) != value:
+    if len(records) != 1 or records[0].value.without_evaluation() != value:
         raise GameLifecycleError("Selected weapon Range descriptor drifted.")
     return {
         **weapon,
@@ -318,7 +318,7 @@ def validate_weapon_range_history(
                 for profile in item.weapon_profiles
                 if profile.profile_id == record.weapon_profile_id
             ]
-            if sources != [replace(record.value, evaluation=None, evaluation_id=None)]:
+            if sources != [record.value.without_evaluation()]:
                 raise GameLifecycleError("Random Range catalog source drifted.")
             roll = RandomCharacteristicRoll.from_payload(
                 cast(RandomCharacteristicRollPayload, body["roll"])
@@ -395,8 +395,8 @@ def weapon_with_committed_range(
         first is None
         or first.evaluation_id is None
         or any(item != first for item in committed_values)
-        or replace(first, modifiers=(), evaluation=None, evaluation_id=None)
-        != replace(value, modifiers=(), evaluation=None, evaluation_id=None)
+        or replace(first.without_evaluation(), modifiers=(), ignored_modifier_ids=())
+        != replace(value.without_evaluation(), modifiers=(), ignored_modifier_ids=())
     ):
         raise GameLifecycleError("Target replacement random Range evidence drifted.")
     return replace(

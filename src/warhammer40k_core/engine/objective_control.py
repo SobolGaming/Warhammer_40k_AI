@@ -13,9 +13,12 @@ from warhammer40k_core.core.objectives import (
     ObjectiveMarker,
     TerrainObjectiveAnchor,
 )
+from warhammer40k_core.core.profile_modifier_trace import (
+    CharacteristicModifierTrace,
+    CharacteristicModifierTracePayload,
+)
 from warhammer40k_core.core.random_profile_values import (
     RandomProfileValue,
-    resolved_profile_characteristic,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
@@ -62,6 +65,7 @@ from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -84,6 +88,7 @@ class ObjectiveControlScorePayload(TypedDict):
 
 
 class ObjectiveControlContributionPayload(TypedDict):
+    modifier_trace: CharacteristicModifierTracePayload | None
     player_id: str
     unit_instance_id: str
     model_instance_id: str
@@ -153,6 +158,7 @@ class ObjectiveControlContribution:
     battle_shocked: bool
     horizontal_distance_inches: float
     vertical_gap_inches: float
+    modifier_trace: CharacteristicModifierTrace | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
@@ -201,8 +207,20 @@ class ObjectiveControlContribution:
             _validate_non_negative_float("vertical_gap_inches", self.vertical_gap_inches),
         )
 
+        if self.modifier_trace is not None:
+            if (
+                type(self.modifier_trace) is not CharacteristicModifierTrace
+                or self.modifier_trace.characteristic is not Characteristic.OBJECTIVE_CONTROL
+            ):
+                raise GameLifecycleError("OC contribution modifier trace is invalid.")
+            if self.modifier_trace.resolve().final != self.objective_control:
+                raise GameLifecycleError("OC contribution modifier arithmetic drifted.")
+
     def to_payload(self) -> ObjectiveControlContributionPayload:
         return {
+            "modifier_trace": None
+            if self.modifier_trace is None
+            else self.modifier_trace.to_payload(),
             "player_id": self.player_id,
             "unit_instance_id": self.unit_instance_id,
             "model_instance_id": self.model_instance_id,
@@ -216,6 +234,9 @@ class ObjectiveControlContribution:
     @classmethod
     def from_payload(cls, payload: ObjectiveControlContributionPayload) -> Self:
         return cls(
+            modifier_trace=None
+            if payload["modifier_trace"] is None
+            else CharacteristicModifierTrace.from_payload(payload["modifier_trace"]),
             player_id=payload["player_id"],
             unit_instance_id=payload["unit_instance_id"],
             model_instance_id=payload["model_instance_id"],
@@ -437,6 +458,9 @@ class ObjectiveControlContext:
     objective_terrain_area_markers: tuple[ObjectiveMarker, ...] = ()
     terrain_areas: tuple[PlacedTerrainArea, ...] = ()
     state: GameState | None = None
+    modifier_traces: tuple[tuple[str, CharacteristicModifierTrace], ...] = ()
+    modifier_occurrence_id: str | None = None
+    modifier_decision_records: tuple[DecisionRecord, ...] = ()
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -614,6 +638,29 @@ class ObjectiveControlContext:
                 raise GameLifecycleError(
                     "ObjectiveControlContext objective source inventory drifted from MissionSetup."
                 )
+        if type(self.modifier_traces) is not tuple or len(
+            {model for model, _trace in self.modifier_traces}
+        ) != len(self.modifier_traces):
+            raise GameLifecycleError("Objective Control selected model identities drifted.")
+        for model_id, trace in self.modifier_traces:
+            _validate_identifier("Objective Control selected model", model_id)
+            if (
+                type(trace) is not CharacteristicModifierTrace
+                or trace.characteristic is not Characteristic.OBJECTIVE_CONTROL
+            ):
+                raise GameLifecycleError(
+                    "Objective Control selection must carry an OC modifier trace."
+                )
+        if (
+            self.modifier_traces
+            or self.modifier_occurrence_id is not None
+            or self.modifier_decision_records
+        ):
+            from warhammer40k_core.engine.objective_control_modifier_evaluation import (
+                validate_objective_control_modifier_traces,
+            )
+
+            validate_objective_control_modifier_traces(self)
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
                 "ObjectiveControlContext runtime_modifier_registry must be a registry."
@@ -871,6 +918,7 @@ def _objective_control_contribution(
     battle_shocked_unit_ids: tuple[str, ...],
     state: GameState | None,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    modifier_trace: CharacteristicModifierTrace | None,
 ) -> ObjectiveControlContribution:
     battle_shocked = (
         rules_unit_is_battle_shocked(
@@ -892,6 +940,7 @@ def _objective_control_contribution(
             unit_instance_id=measurement.unit_instance_id,
             runtime_modifier_registry=runtime_modifier_registry,
             model_instance_id=measurement.model_instance_id,
+            modifier_trace=modifier_trace,
         )
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
@@ -901,6 +950,7 @@ def _objective_control_contribution(
         unit_instance_id=measurement.unit_instance_id,
         runtime_modifier_registry=runtime_modifier_registry,
         model_instance_id=measurement.model_instance_id,
+        modifier_trace=modifier_trace,
     )
     return ObjectiveControlContribution(
         player_id=measurement.player_id,
@@ -913,6 +963,9 @@ def _objective_control_contribution(
         battle_shocked=battle_shocked,
         horizontal_distance_inches=measurement.horizontal_distance_inches,
         vertical_gap_inches=measurement.vertical_gap_inches,
+        modifier_trace=None
+        if objective_control_characteristic is None
+        else objective_control_characteristic.modifier_trace,
     )
 
 
@@ -927,6 +980,7 @@ def _objective_geometry_result(
             battle_shocked_unit_ids=context.battle_shocked_unit_ids,
             state=context.state,
             runtime_modifier_registry=context.runtime_modifier_registry,
+            modifier_trace=dict(context.modifier_traces).get(measurement.model_instance_id),
         )
         for rules_unit in rules_unit_views_from_armies(armies=context.scenario.armies)
         for measurement in measure_rules_unit_to_objective(
@@ -1052,6 +1106,7 @@ def model_objective_control_characteristic(
     unit_instance_id: str | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     model_instance_id: str | None = None,
+    modifier_trace: CharacteristicModifierTrace | None = None,
 ) -> CharacteristicValue:
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Objective control requires a ModelInstance.")
@@ -1062,9 +1117,17 @@ def model_objective_control_characteristic(
             Characteristic.OBJECTIVE_CONTROL,
             applied_modifier_ids=("battle_shock",),
         )
+    if modifier_trace is not None:
+        if modifier_trace.characteristic is not Characteristic.OBJECTIVE_CONTROL:
+            raise GameLifecycleError("Selected OC trace characteristic drifted.")
+        return modifier_trace.value()
     for profile_value in model.characteristics:
         if profile_value.characteristic is Characteristic.OBJECTIVE_CONTROL:
-            characteristic = resolved_profile_characteristic(profile_value)
+            from warhammer40k_core.engine.profile_modifiers import (
+                resolved_profile_with_modifier_trace,
+            )
+
+            characteristic = resolved_profile_with_modifier_trace(profile_value)
             if state is None:
                 return characteristic
             if unit_instance_id is None:
@@ -1073,24 +1136,15 @@ def model_objective_control_characteristic(
                 model.model_instance_id if model_instance_id is None else model_instance_id
             )
             runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
-            modified = runtime_modifiers.modified_objective_control(
+            return runtime_modifiers.resolve_objective_control(
                 ObjectiveControlModifierContext(
                     state=state,
                     unit_instance_id=unit_instance_id,
                     model_instance_id=resolved_model_id,
                     base_objective_control=characteristic.final,
                     current_objective_control=characteristic.final,
-                )
-            )
-            if modified == characteristic.final:
-                return characteristic
-            return CharacteristicValue(
-                characteristic=Characteristic.OBJECTIVE_CONTROL,
-                raw=characteristic.raw,
-                base=characteristic.base,
-                final=modified,
-                applied_modifier_ids=characteristic.applied_modifier_ids,
-                value_kind=characteristic.value_kind,
+                ),
+                value=characteristic,
             )
     raise GameLifecycleError("ModelInstance is missing Objective Control.")
 

@@ -317,7 +317,14 @@ def test_waaagh_modifies_melee_weapon_strength_and_attacks_only_while_active() -
     assert dice_modified.attack_profile.dice_expression == DiceExpression(
         quantity=1,
         sides=3,
-        modifier=1,
+        modifier=0,
+    )
+    assert dice_modified.attack_profile.resolve_value(2) == 3
+    operation = dice_modified.attack_profile.modifiers[0]
+    assert operation.source_id == army_rule.SOURCE_RULE_ID
+    assert (
+        dice_modified.attack_profile.resolve_value(2, ignored_modifier_ids=(operation.modifier_id,))
+        == 2
     )
     assert (
         army_rule.waaagh_weapon_profile_modifier(
@@ -401,7 +408,13 @@ def test_waaagh_adds_or_improves_five_plus_invulnerable_save() -> None:
     assert improved_invulnerable.target_number == 5
     assert improved_invulnerable.characteristic_target_number == 5
     assert army_rule.SOURCE_RULE_ID in improved_invulnerable.source_rule_ids
-    assert unchanged == (armour, strong_invulnerable)
+    assert unchanged[0] == armour
+    assert (
+        unchanged[1].characteristic_target_number
+        == strong_invulnerable.characteristic_target_number
+    )
+    assert unchanged[1].characteristic_trace is not None
+    assert unchanged[1].characteristic_trace.modifiers[0].source_id == army_rule.SOURCE_RULE_ID
     assert enemy_options == (armour,)
 
 

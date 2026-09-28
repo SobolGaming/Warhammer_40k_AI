@@ -34,6 +34,7 @@ def historical_generic_leadership_operations(
     *,
     historical: HistoricalBattleShockAuthorityContext,
     runtime_content_bundle: RuntimeContentBundle,
+    model_instance_id: str,
 ) -> tuple[Modifier, ...]:
     authority = HistoricalEffectAuthority(
         game_id=historical.game_id,
@@ -65,6 +66,7 @@ def historical_generic_leadership_operations(
             applications=applications, effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC
         ),
         characteristic=Characteristic.LEADERSHIP,
+        model_instance_id=model_instance_id,
     )
 
 

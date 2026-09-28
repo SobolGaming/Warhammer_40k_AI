@@ -267,6 +267,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.ENTITY_SELECTION,
             ("model_group",),
         ),
+        "select_modifier_ignores": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_psychic_attack_modifier_ignores": InteractionSpec(
             InteractionKind.FINITE_OPTION_LIST
         ),

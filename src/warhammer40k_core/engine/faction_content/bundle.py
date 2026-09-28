@@ -1652,6 +1652,7 @@ class RuntimeContentBundle:
         )
         damaged_runtime = CatalogDamagedEffectRuntime(armies=validated_armies)
         runtime_modifier_registry = RuntimeModifierRegistry.from_bindings(
+            modifier_permission_indexes=tuple(sorted(ability_indexes_by_player_id.items())),
             unit_characteristic_modifier_bindings=catalog_rules.unit_characteristic_modifier_bindings()
             + _contribution_values(
                 validated_contributions,

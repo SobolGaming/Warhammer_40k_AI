@@ -1,0 +1,148 @@
+{
+  "workload": "order93-no-permission-attack-slices-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ba430dc82d3bda374b14daf4cd488144a7f653b7de12d7ef3dcf160f3a403f3",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "full_game_samples": 0,
+  "fixture": "Two one-model units, no terrain, twelve Torrent/Twin-linked S1 vs T1 attacks",
+  "seeds": [
+    "order88-shooting",
+    "order88-fight"
+  ],
+  "policy": "First legal fixture option/proposal through LocalGameSession",
+  "timing_boundary": "First pending phase choice through attack-sequence completion; setup separate",
+  "warmup_runs_per_phase": 1,
+  "hashes": {
+    "scripts/benchmark_order93_modifiers.py": "57d24c3f1c9c85b94a7fce9b3c9469601055c40167919789083d1ae174eb5492",
+    "tests/absent_strength_helpers.py": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
+    "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "phase": "shooting",
+      "setup_seconds": [
+        0.2527147079817951,
+        0.26480533299036324,
+        0.25697283301269636,
+        0.2573624170036055,
+        0.25392229203134775
+      ],
+      "samples_seconds": [
+        0.2563651250093244,
+        0.2604495420237072,
+        0.3042423340375535,
+        0.2588539579883218,
+        0.2676647499902174
+      ],
+      "mean": 0.26951514180982483,
+      "median": 0.2604495420237072,
+      "p95_and_maximum": 0.3042423340375535,
+      "completed": 5,
+      "counts": [
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        }
+      ]
+    },
+    {
+      "phase": "fight",
+      "setup_seconds": [
+        0.4897681250004098,
+        0.4934114170027897,
+        0.4869015000294894,
+        0.4857874999870546,
+        0.4885547080193646
+      ],
+      "samples_seconds": [
+        0.14620050002122298,
+        0.14636150002479553,
+        0.14610549999633804,
+        0.1458015000098385,
+        0.18179724999936298
+      ],
+      "mean": 0.1532532500103116,
+      "median": 0.14620050002122298,
+      "p95_and_maximum": 0.18179724999936298,
+      "completed": 5,
+      "counts": [
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        }
+      ]
+    }
+  ],
+  "choice_diagnostic": {
+    "workload": "order93-thirteen-operation-charge-v1",
+    "status": "head-only diagnostic; base lacks the supported choice path",
+    "samples_seconds": [
+      5.38142633397365,
+      5.394313999975566,
+      5.417399875004776
+    ],
+    "mean": 5.397713402984664,
+    "maximum": 5.417399875004776,
+    "decision_counts": [
+      13,
+      13,
+      13
+    ],
+    "maximum_option_widths": [
+      4,
+      4,
+      4
+    ],
+    "fixture_sha256": "f7a46989f40954306d311bf8293e402ce473972b3a473ddc88d2b1b88469177b",
+    "timing_boundary": "First modifier choice through accepted arbitrary subset; no export/replay"
+  }
+}

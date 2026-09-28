@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battle_shock_stratagem_authority import (
 from warhammer40k_core.engine.catalog_desperate_escape import (
     CATALOG_FORCED_DESPERATE_ESCAPE_SOURCE_KIND,
     battle_shocked_modifier_for_record,
+    battle_shocked_roll_modifiers_for_record,
     falling_back_unit_allowed,
     force_desperate_escape_clause,
     matching_desperate_escape_records,
@@ -60,6 +61,7 @@ _CATALOG_KEYS = frozenset(
         "fall_back_unit_instance_id",
         "required_fall_back_mode",
         "desperate_escape_roll_modifier",
+        "desperate_escape_roll_modifiers",
         "battle_round",
         "phase",
     }
@@ -221,6 +223,14 @@ def _historical_catalog_sources(
                                         ),
                                     )
                                 ),
+                                "desperate_escape_roll_modifiers": [
+                                    modifier.to_payload()
+                                    for modifier in battle_shocked_roll_modifiers_for_record(
+                                        record=record,
+                                        target_unit_instance_id=fall_back_unit_instance_id,
+                                        battle_shocked_unit_ids=historical.battle_shocked_unit_ids,
+                                    )
+                                ],
                                 "battle_round": historical.request.battle_round,
                                 "phase": BattlePhase.MOVEMENT.value,
                             }

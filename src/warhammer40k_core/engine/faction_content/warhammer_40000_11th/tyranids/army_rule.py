@@ -26,7 +26,6 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockModifierApplicationAuthorityContext,
     BattleShockModifierContext,
-    BattleShockPendingOutcomeAuthorityContext,
     HistoricalBattleShockContribution,
     battle_shock_modifier_applications_from_modifiers,
 )
@@ -40,7 +39,6 @@ from warhammer40k_core.engine.battle_shock_test_service import (
     resolve_battle_shock_test,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
-    COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartCompletedBattleShockAuthorityContext,
     CommandPhaseStartEffectContext,
@@ -437,50 +435,9 @@ def _shadow_source_state_from_nested_request(
     *,
     context: CommandPhaseStartNestedResultContext | CommandPhaseStartNestedPendingAuthorityContext,
 ) -> FactionRuleState | None:
-    request = context.request
-    if request.decision_type == DICE_REROLL_DECISION_TYPE:
-        authority = parse_pending_battle_shock_reroll_authority(request)
-        if authority.source_kind != COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND:
-            return None
-        return _shadow_source_state_from_pending_authority(
-            state=context.state,
-            authority=authority,
-        )
-    outcome = context.battle_shock_hooks.pending_outcome_authority_for(
-        BattleShockPendingOutcomeAuthorityContext(
-            state=context.state,
-            decisions=context.decisions,
-            request=request,
-        )
-    )
-    if outcome is None:
-        return None
-    resolved_event = context.decisions.event_log.records[outcome.resolved_event_index]
-    resolved_payload = _payload_object(resolved_event.payload)
-    if (
-        resolved_event.event_type != "battle_shock_test_resolved"
-        or resolved_payload.get("battle_shock_result") != outcome.result.to_payload()
-    ):
-        raise GameLifecycleError("Shadow in the Warp outcome result authority drifted.")
-    raw_source_state = resolved_payload.get("source_faction_rule_state")
-    if not isinstance(raw_source_state, dict):
-        raise GameLifecycleError("Shadow in the Warp outcome lacks source-state authority.")
-    source_state = FactionRuleState.from_payload(cast(FactionRuleStatePayload, raw_source_state))
-    if source_state not in context.state.faction_rule_states:
-        raise GameLifecycleError("Shadow in the Warp outcome source state drifted.")
-    _validate_shadow_continuation_occurrence(
-        state=context.state,
-        decisions=context.decisions,
-        active_player_id=context.active_player_id,
-        source_state=source_state,
-    )
-    _validate_shadow_outcome_result_prefix(
-        state=context.state,
-        decisions=context.decisions,
-        source_state=source_state,
-        result=outcome.result,
-    )
-    return source_state
+    from .army_rule_modifier_continuation import shadow_source_state_from_nested_request
+
+    return shadow_source_state_from_nested_request(context=context)
 
 
 def shadow_in_the_warp_unleashed_for_player(state: GameState, *, player_id: str) -> bool:
@@ -751,7 +708,7 @@ def continue_shadow_in_the_warp_battle_shock_tests(
     )
 
 
-def _shadow_source_state_from_pending_authority(
+def shadow_source_state_from_pending_authority(
     *,
     state: GameState,
     authority: PendingBattleShockRerollAuthority,
@@ -775,7 +732,7 @@ def _shadow_source_state_from_pending_authority(
     return source_state
 
 
-def _validate_shadow_outcome_result_prefix(
+def validate_shadow_outcome_result_prefix(
     *,
     state: GameState,
     decisions: DecisionController,

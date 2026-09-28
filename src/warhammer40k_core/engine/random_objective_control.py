@@ -138,6 +138,7 @@ def prepare_mission_action_profile_values(
     player_id: str,
     actions: tuple[MissionActionDefinition, ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
+    scope_id: str | None = None,
 ) -> None:
     from warhammer40k_core.engine.mission_action_eligibility import (
         mission_action_pre_oc_ineligibility_reason,
@@ -158,7 +159,8 @@ def prepare_mission_action_profile_values(
     )
     if not actions or state.battlefield_state is None or phase is None:
         return
-    scope_id = f"mission-action-options:decision-request-{state.decision_request_count + 1:06d}"
+    if scope_id is None:
+        scope_id = f"mission-action-options:decision-request-{state.decision_request_count + 1:06d}"
     placed_ids = frozenset(state.battlefield_state.placed_model_ids())
     for unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
         if (

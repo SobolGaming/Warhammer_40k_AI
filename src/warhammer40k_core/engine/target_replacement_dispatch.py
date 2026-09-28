@@ -48,6 +48,12 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
                     sequence=active_shooting_sequence(state),
                 )
             )
+            if isinstance(current, LifecycleStatus):
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Replacement validation cannot request modifier choices.",
+                    payload={"invalid_reason": "target_replacement_context_drift"},
+                )
             if current is None:
                 return LifecycleStatus.invalid(
                     stage=state.stage,
@@ -79,6 +85,8 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
                 sequence=sequence,
             )
         )
+        if isinstance(current, LifecycleStatus):
+            raise GameLifecycleError("Replacement application cannot request modifier choices.")
         if current is None:
             raise GameLifecycleError("Prevalidated replacement disappeared.")
         target_ids = replacement_selection(

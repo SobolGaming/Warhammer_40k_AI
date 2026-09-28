@@ -18,6 +18,7 @@ from warhammer40k_core.engine.battle_shock_source_family_authority import (
     validate_battle_shock_source_family_authority,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.movement_state import (
@@ -55,6 +56,7 @@ def record_desperate_escape_battle_shock_resolution(
     battle_shock_hooks: BattleShockHookRegistry,
     resolution: BattleShockResolutionResult,
     reroll_result_id: str | None,
+    defer_completion: bool = False,
 ) -> LifecycleStatus | None:
     continuation = pending_desperate_escape_battle_shock_continuation(state)
     if resolution.resolved_payload is None:
@@ -66,6 +68,8 @@ def record_desperate_escape_battle_shock_resolution(
         if reroll_result_id is not None:
             raise GameLifecycleError("Desperate Escape Battle-shock reroll did not resolve.")
         _validate_pending_status_queue_head(decisions=decisions, status=status)
+        if _validate_modifier_preflight(continuation=continuation, request=status.decision_request):
+            return status
         pending_authority = parse_pending_battle_shock_reroll_authority(status.decision_request)
         _validate_pending_reroll_matches_continuation(
             continuation=continuation,
@@ -105,7 +109,10 @@ def record_desperate_escape_battle_shock_resolution(
     battle_shock_hooks.validate_completed_outcome_authority(
         BattleShockCompletedOutcomeAuthorityContext(state=state, decisions=decisions)
     )
-    _clear_continuation(state)
+    if defer_completion:
+        _replace_continuation(state, updated)
+    else:
+        _clear_continuation(state)
     return None
 
 
@@ -130,6 +137,8 @@ def validate_pending_desperate_escape_battle_shock_continuation(
             raise GameLifecycleError(
                 "Pending Desperate Escape Battle-shock reroll must be the sole queue head."
             )
+        if _validate_modifier_preflight(continuation=continuation, request=pending_requests[0]):
+            return
         pending_reroll_authority = parse_pending_battle_shock_reroll_authority(pending_requests[0])
         _validate_pending_reroll_matches_continuation(
             continuation=continuation,
@@ -436,3 +445,44 @@ __all__ = (
     "validate_pending_desperate_escape_battle_shock_continuation",
     "validate_restored_desperate_escape_battle_shock_continuation",
 )
+
+
+def _validate_modifier_preflight(
+    *,
+    continuation: PendingDesperateEscapeBattleShockContinuation,
+    request: DecisionRequest,
+) -> bool:
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        battle_shock_modifier_execution,
+    )
+
+    execution = battle_shock_modifier_execution(request)
+    if execution is None:
+        return False
+    test = execution["request"]
+    base = execution["base_payload"]
+    if not isinstance(test, dict) or not isinstance(base, dict):
+        raise GameLifecycleError("Desperate Escape modifier preflight payload is invalid.")
+    if (
+        execution["source_kind"] != _source_kind(continuation)
+        or test["request_id"] != continuation.battle_shock_request_id
+        or test["unit_instance_id"] != continuation.canonical_unit_instance_id
+        or base["unit_instance_id"] != continuation.canonical_unit_instance_id
+        or base["fall_back_result"] != continuation.fall_back_result.to_payload()
+        or base["action_result"] != continuation.action_result.to_payload()
+        or base["movement_proposal_request_id"] != continuation.movement_proposal_request_id
+        or continuation.battle_shock_reroll_request_id is not None
+    ):
+        raise GameLifecycleError("Desperate Escape modifier preflight occurrence drifted.")
+    if (
+        continuation.source_kind
+        is DesperateEscapeBattleShockContinuationSourceKind.VOLUNTARY_POST_MOVE
+    ):
+        transition = continuation.transition_batch
+        if transition is None or (
+            base["fall_back_applied_event_id"] != continuation.fall_back_applied_event_id
+            or base["movement_payload"] != continuation.movement_payload
+            or base["transition_batch"] != transition.to_payload()
+        ):
+            raise GameLifecycleError("Desperate Escape modifier preflight movement drifted.")
+    return True

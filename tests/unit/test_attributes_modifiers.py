@@ -874,3 +874,70 @@ def test_order37_non_cumulative_source_references_fail_closed(ids: tuple[str, ..
     modifier = ModifierTerm(ModifierOperation.ADD, 1).bind(modifier_id="cost", source_id="source")
     with pytest.raises(ModifierError, match="Non-cumulative increase IDs"):
         resolve_stratagem_cost(1, (modifier,), non_cumulative_increase_ids=ids)
+
+
+@pytest.mark.parametrize(
+    ("source_save", "penalty", "expected"), [(2, 0, 2), (3, 0, 3), (3, 1, 3), (4, 0, 3)]
+)
+def test_source_limited_delta_remains_atomic_until_complete_modifier_stack(
+    source_save: int,
+    penalty: int,
+    expected: int,
+) -> None:
+    limited = ModifierTerm(ModifierOperation.ADD, -1, result_floor=3).bind(
+        modifier_id="take-cover", source_id="source:take-cover", characteristic=Characteristic.SAVE
+    )
+    worsening = ModifierTerm(ModifierOperation.ADD, penalty).bind(
+        modifier_id="rattlejoint",
+        source_id="source:rattlejoint",
+        characteristic=Characteristic.SAVE,
+    )
+    for ordered in permutations((limited, worsening)):
+        assert ModifierStack(Characteristic.SAVE, source_save, ordered).resolve().final == expected
+    assert Modifier.from_payload(limited.to_payload()) == limited
+    assert limited.to_payload().get("result_floor") == 3
+    assert (
+        ModifierStack(Characteristic.SAVE, source_save, (worsening,)).resolve().final
+        == source_save + penalty
+    )
+
+
+def test_limited_source_does_not_clamp_an_independent_characteristic_improvement() -> None:
+    limited = ModifierTerm(ModifierOperation.ADD, -1, result_floor=3).bind(
+        modifier_id="z-limited", source_id="source:limited", characteristic=Characteristic.SAVE
+    )
+    other = ModifierTerm(ModifierOperation.ADD, -1).bind(
+        modifier_id="a-other", source_id="source:other", characteristic=Characteristic.SAVE
+    )
+    for ordered in permutations((limited, other)):
+        result = ModifierStack(Characteristic.SAVE, 4, ordered).resolve()
+        assert result.final == 2
+        assert result.applied_modifier_ids == ("z-limited", "a-other")
+
+
+@pytest.mark.parametrize(
+    ("operation", "operand", "floor"),
+    [
+        (ModifierOperation.ADD, -1, True),
+        (ModifierOperation.ADD, 1, 3),
+        (ModifierOperation.MULTIPLY, 2, 3),
+    ],
+)
+def test_source_limit_rejects_incoherent_operations(
+    operation: ModifierOperation,
+    operand: int,
+    floor: int | None,
+) -> None:
+    with pytest.raises(ModifierError, match="Source result"):
+        ModifierTerm(operation, operand, result_floor=floor)
+
+
+@pytest.mark.parametrize("invalid_floor", [None, True, "3"])
+def test_source_limit_payload_rejects_non_integer_field(invalid_floor: object) -> None:
+    modifier = ModifierTerm(ModifierOperation.ADD, -1, result_floor=3).bind(
+        modifier_id="take-cover", source_id="source:take-cover", characteristic=Characteristic.SAVE
+    )
+    payload = modifier.to_payload()
+    payload["result_floor"] = cast(int, invalid_floor)
+    with pytest.raises(ModifierError, match="Source result floor"):
+        Modifier.from_payload(payload)

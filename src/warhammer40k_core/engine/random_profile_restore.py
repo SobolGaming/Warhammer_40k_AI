@@ -151,11 +151,8 @@ def validate_random_profile_history(
                     "Random profile occurrence identity drifted or duplicated."
                 )
             seen_ids[expected_id] = {k: v for k, v in entry.items() if k != "reused"}
-            if (
-                value.evaluation
-                != value.evaluate(
-                    raw=roll.value, evaluation_id=expected_id, target_id=model_id
-                ).evaluation
+            if value != value.evaluate(
+                raw=roll.value, evaluation_id=expected_id, target_id=model_id
             ):
                 raise GameLifecycleError("Random profile resolved value drifted from dice.")
             original = roll.roll_state.original_result
@@ -216,7 +213,7 @@ def validate_random_profile_history(
             )
             if (
                 not isinstance(source, RandomProfileValue)
-                or replace(value, evaluation=None, evaluation_id=None, modifiers=()) != source
+                or replace(value.without_evaluation(), modifiers=()) != source
             ):
                 raise GameLifecycleError(
                     "Random profile descriptor drifted from its catalog source."

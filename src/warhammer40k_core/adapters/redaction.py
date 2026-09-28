@@ -95,6 +95,7 @@ _INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset(
     {
         "effect_snapshot_sha256",
         "psychic_modifier_history_origin",
+        "modifier_evaluation_history_origin",
     }
 )
 _INTERNAL_INGRESS_AUTHORITY_KEYS = frozenset(
@@ -335,7 +336,7 @@ def decision_request_hidden_from_context(
         raise GameLifecycleError("DecisionRequest redaction requires a DecisionRequest.")
     if type(viewer) is not ViewerContext:
         raise GameLifecycleError("DecisionRequest redaction requires a ViewerContext.")
-    if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
+    if request.decision_type in {TACTICAL_SECONDARY_SCORE_DECISION_TYPE, "select_modifier_ignores"}:
         return not (viewer.policy.omniscient or viewer.owns_player(request.actor_id))
     return secret_payload_hidden_from_context(
         actor_id=request.actor_id,
@@ -353,7 +354,7 @@ def decision_request_payload_hidden_from_context(
         raise GameLifecycleError("DecisionRequest redaction requires a ViewerContext.")
     actor_id = _optional_string(request_payload, key="actor_id")
     decision_type = _required_string(request_payload, key="decision_type")
-    if decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
+    if decision_type in {TACTICAL_SECONDARY_SCORE_DECISION_TYPE, "select_modifier_ignores"}:
         return not (viewer.policy.omniscient or viewer.owns_player(actor_id))
     return secret_payload_hidden_from_context(
         actor_id=actor_id,
@@ -536,6 +537,9 @@ def _event_record_hidden_from_context(
         "command_phase_start_order_requested",
         "sequencing_next_participant_selected",
         "sequencing_order_resolved",
+        "attack_save_modifiers_prepared",
+        "failed_save_damage_replacement_ignored",
+        "modifier_ignores_selected",
     }:
         return True
     if _player_owned_secret_event_hidden_from_context(payload=payload, viewer=viewer):
@@ -638,6 +642,8 @@ def _public_event_payload(
     payload: JsonValue,
     viewer: ViewerContext,
 ) -> JsonValue:
+    if event_type == "attack_sequence_step" and not viewer.policy.omniscient:
+        return _public_save_modifier_resolution(payload)
     if event_type in {
         "forced_fight_activation_queue_started",
         "forced_fight_activation_queue_completed",
@@ -1079,3 +1085,27 @@ def _public_error_string(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Public {field_name} must not be empty.")
     return stripped
+
+
+def _public_save_modifier_resolution(payload: JsonValue) -> JsonValue:
+    """Publish resolved saves without the unselected source-operation inventory."""
+    if isinstance(payload, list):
+        return [_public_save_modifier_resolution(item) for item in payload]
+    if not isinstance(payload, dict):
+        return payload
+    internal: set[str] = (
+        {
+            "characteristic_trace",
+            "armor_penetration_trace",
+            "roll_modifiers",
+            "inherent_roll_modifiers",
+            "ignored_roll_modifier_ids",
+        }
+        if "save_kind" in payload and "characteristic_trace" in payload
+        else set()
+    )
+    return {
+        key: _public_save_modifier_resolution(value)
+        for key, value in payload.items()
+        if key not in internal
+    }

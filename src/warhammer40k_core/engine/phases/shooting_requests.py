@@ -200,7 +200,7 @@ def _request_shooting_declaration(
         state=state,
         target_unit_ids=candidate_target_unit_ids,
     )
-    request_id = state.next_decision_request_id()
+    request_id = active_selection.result_id
     target_candidates: list[JsonValue] = []
     from warhammer40k_core.engine.attack_weapon_inventory import (
         shooting_weapon_selection_context,
@@ -213,6 +213,10 @@ def _request_shooting_declaration(
         required_target_ids=candidate_target_unit_ids,
     )
 
+    from dataclasses import replace
+    from warhammer40k_core.engine.weapon_modifier_selection import prepare_weapon_modifier_context
+
+    prepared_contexts: dict[tuple[str, str], WeaponSelectionContext] = {}
     for weapon in available_weapons:
         attacker_unit = _component_unit_for_available_weapon(rules_unit=rules_unit, weapon=weapon)
         if not candidate_target_unit_ids:
@@ -227,6 +231,31 @@ def _request_shooting_declaration(
             target_units=selection_targets,
             player_id=active_selection.player_id,
             profile=weapon["weapon_profile"],
+        )
+        context, modifier_status = prepare_weapon_modifier_context(
+            state=state,
+            decisions=decisions,
+            ability_index=_runtime_modifier_registry(
+                runtime_modifier_registry
+            ).modifier_permission_index(active_selection.player_id),
+            activation_id=active_selection.result_id,
+            unit_instance_id=rules_unit.unit_instance_id,
+            model_instance_id=weapon["model_instance_id"],
+            context=context,
+        )
+        if modifier_status is not None:
+            return modifier_status
+        prepared_contexts[(weapon["weapon_instance_id"], weapon["weapon_profile"].profile_id)] = (
+            context
+        )
+    request_id = state.next_decision_request_id()
+    for weapon in available_weapons:
+        attacker_unit = _component_unit_for_available_weapon(rules_unit=rules_unit, weapon=weapon)
+        if not candidate_target_unit_ids:
+            continue
+        context = replace(
+            prepared_contexts[(weapon["weapon_instance_id"], weapon["weapon_profile"].profile_id)],
+            source_request_id=request_id,
         )
         for target_id in candidate_target_unit_ids:
             profile = context.raw_profile_for_target(target_id)

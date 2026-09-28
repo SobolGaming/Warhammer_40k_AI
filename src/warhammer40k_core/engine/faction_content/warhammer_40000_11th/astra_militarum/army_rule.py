@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
-from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -338,10 +337,7 @@ def voice_of_command_unit_characteristic_modifier(
         unit_instance_id=context.unit_instance_id,
     )
     if order is VoiceOfCommandOrder.TAKE_COVER and context.characteristic is Characteristic.SAVE:
-        return (
-            ModifierTerm(ModifierOperation.ADD, -1),
-            ModifierTerm(ModifierOperation.FLOOR, min(context.current_value, 3)),
-        )
+        return (ModifierTerm(ModifierOperation.ADD, -1, result_floor=3),)
     if (
         order is VoiceOfCommandOrder.DUTY_AND_HONOUR
         and context.characteristic is Characteristic.LEADERSHIP
@@ -1105,38 +1101,27 @@ def _improve_armour_save_option(option: SaveOption) -> SaveOption:
         raise GameLifecycleError("Voice of Command save option modifier requires SaveOption.")
     if option.save_kind is not SaveKind.ARMOUR:
         return option
-    improved_characteristic = _improve_save(option.characteristic_target_number)
-    improvement = option.characteristic_target_number - improved_characteristic
-    if improvement <= 0:
-        return option
-    return replace(
-        option,
-        characteristic_target_number=improved_characteristic,
-        target_number=max(2, option.target_number - improvement),
-        source_rule_ids=_source_ids_with_voice_of_command(option.source_rule_ids),
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_option_with_characteristic_terms,
     )
 
-
-def _improve_save(current: int) -> int:
-    _validate_non_negative_int("save", current)
-    if current <= 3:
-        return current
-    return current - 1
+    return save_option_with_characteristic_terms(
+        option,
+        characteristic=Characteristic.SAVE,
+        terms=(ModifierTerm(ModifierOperation.ADD, -1, result_floor=3),),
+        source_id=SOURCE_RULE_ID,
+        modifier_id=f"{SOURCE_RULE_ID}:take-cover-save",
+    )
 
 
 def _attack_profile_with_plus_one(profile: AttackProfile) -> AttackProfile:
     if type(profile) is not AttackProfile:
         raise GameLifecycleError("Voice of Command attack profile requires AttackProfile.")
-    if profile.fixed_attacks is not None:
-        return AttackProfile.fixed(profile.fixed_attacks + 1)
-    expression = profile.dice_expression
-    if expression is None:
-        raise GameLifecycleError("Voice of Command attack profile is missing dice expression.")
-    return AttackProfile.dice(
-        DiceExpression(
-            quantity=expression.quantity,
-            sides=expression.sides,
-            modifier=expression.modifier + 1,
+    return profile.with_modifier(
+        ModifierTerm(ModifierOperation.ADD, 1).bind(
+            modifier_id=f"{SOURCE_RULE_ID}:attacks",
+            source_id=SOURCE_RULE_ID,
+            characteristic=Characteristic.ATTACKS,
         )
     )
 
@@ -1316,14 +1301,6 @@ def _validate_identifier_tuple(
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"Voice of Command {field_name} must be an integer.")
-    if value < 0:
-        raise GameLifecycleError(f"Voice of Command {field_name} must not be negative.")
-    return value
 
 
 def _validate_game_state(state: object) -> None:

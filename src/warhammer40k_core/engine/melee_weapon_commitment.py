@@ -114,7 +114,7 @@ class MeleeAttackBudget:
             or (original.quantity != expression.quantity or original.sides != expression.sides)
         ):
             raise GameLifecycleError("Melee attack dice expression changed after commitment.")
-        return max(1, self.base_attacks + expression.modifier - original.modifier)
+        return current.resolve_value(self.base_attacks + expression.modifier - original.modifier)
 
     def to_payload(self) -> dict[str, JsonValue]:
         return object_payload(

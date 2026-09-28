@@ -58,7 +58,22 @@ def test_failed_save_damage_replacement_has_one_post_save_mutation_owner() -> No
     assert lines["resolve_saving_throw"] < lines["unused_failed_save_damage_replacement"]
     assert lines["unused_failed_save_damage_replacement"] < lines["_damage_value"]
     replacement_line = lines["unused_failed_save_damage_replacement"]
-    assert replacement_line < lines["allocated_attack_damage_modifier"]
+    assert replacement_line < lines["select_attack_damage_modifiers"] < lines["_damage_value"]
+    damage_call = next(
+        node
+        for node in ast.walk(save_fn)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_damage_value"
+    )
+    assert any(keyword.arg == "allocated_model_instance_id" for keyword in damage_call.keywords)
+    damage_fn = _function_named(ENGINE / "attack_sequence_geometry_targets.py", "_damage_value")
+    damage_lines = _call_lines(damage_fn)
+    assert (
+        damage_lines["damage_value_from_operations"]
+        < damage_lines["allocated_attack_damage_modifiers"]
+        < damage_lines["allocated_damage_characteristic_operations"]
+    )
 
 
 def test_order58_performance_has_matched_inputs_and_passes_declared_budgets() -> None:

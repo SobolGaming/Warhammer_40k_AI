@@ -476,10 +476,28 @@ def _apply_movement_proposal_decision(
             )
         fall_back_result = fall_back_resolution
         if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+            from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (
+                prepare_desperate_escape_modifiers,
+            )
+            from warhammer40k_core.engine.phases.movement_options_dice import (
+                _desperate_escape_roll_modifiers,  # pyright: ignore[reportPrivateUsage]
+            )
+
+            pending = prepare_desperate_escape_modifiers(
+                state=state,
+                decisions=decisions,
+                ability_index=ability_index,
+                movement_proposal_result_id=result.result_id,
+                requirements=fall_back_resolution.desperate_escape_requirements,
+                modifiers=_desperate_escape_roll_modifiers(fall_back_resolution),
+            )
+            if pending is not None:
+                return pending
             desperate_escape_rolls = _roll_desperate_escape_dice(
                 state=state,
                 decisions=decisions,
                 resolution=fall_back_resolution,
+                movement_proposal_result_id=result.result_id,
             )
             fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
                 resolution=fall_back_resolution,

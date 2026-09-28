@@ -406,6 +406,18 @@ def retain_catalog_selected_target_remaining_battle_shock_reroll(
             "Catalog selected-target later Battle-shock reroll lacks its retained parent."
         )
     request = _validate_pending_status_queue_head(decisions=decisions, status=status)
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        battle_shock_modifier_execution,
+    )
+
+    execution = battle_shock_modifier_execution(request)
+    if execution is not None:
+        _validate_remaining_battle_shock_base_ancestry(
+            continuation=continuation,
+            base=_json_object("base_payload", execution["base_payload"]),
+            source_kind=_validate_identifier("source_kind", execution["source_kind"]),
+        )
+        return status
     if not is_battle_shock_reroll_request(
         request,
         source_kind="catalog_selected_target_effect",
@@ -1051,6 +1063,18 @@ def _validate_remaining_effect_pending_request(
         raise GameLifecycleError(
             "Catalog selected-target remaining-effects continuation phase drifted."
         )
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        battle_shock_modifier_execution,
+    )
+
+    execution = battle_shock_modifier_execution(request)
+    if execution is not None:
+        _validate_remaining_battle_shock_base_ancestry(
+            continuation=continuation,
+            base=_json_object("base_payload", execution["base_payload"]),
+            source_kind=_validate_identifier("source_kind", execution["source_kind"]),
+        )
+        return
     _validate_remaining_mortal_wound_pending_request(
         continuation=continuation,
         decisions=decisions,
@@ -1133,7 +1157,19 @@ def _validate_remaining_battle_shock_reroll_ancestry(
     continuation: PendingCatalogSelectedTargetBattleShockContinuation,
     authority: PendingBattleShockRerollAuthority,
 ) -> None:
-    base = authority.base_payload
+    _validate_remaining_battle_shock_base_ancestry(
+        continuation=continuation,
+        base=authority.base_payload,
+        source_kind=authority.source_kind,
+    )
+
+
+def _validate_remaining_battle_shock_base_ancestry(
+    *,
+    continuation: PendingCatalogSelectedTargetBattleShockContinuation,
+    base: dict[str, JsonValue],
+    source_kind: str,
+) -> None:
     selected_request = continuation.selected_target_request.to_payload()
     selected_result = continuation.selected_target_result.to_payload()
     recorded_before = _payload_object_tuple(
@@ -1157,7 +1193,7 @@ def _validate_remaining_battle_shock_reroll_ancestry(
         continuation.resolved_battle_shock_payload,
     )
     if (
-        authority.source_kind != "catalog_selected_target_effect"
+        source_kind != "catalog_selected_target_effect"
         or base.get("selected_target_decision_request") != selected_request
         or base.get("selected_target_decision_result") != selected_result
         or base.get("selected_target_payload") != continuation.selected_target_payload

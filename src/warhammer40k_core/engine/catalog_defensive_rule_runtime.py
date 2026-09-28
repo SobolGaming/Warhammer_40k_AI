@@ -13,7 +13,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     CatalogInvulnerableSaveDescriptor,
 )
 from warhammer40k_core.engine.runtime_modifiers import SaveOptionModifierContext
-from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.rules.rule_ir import RuleTargetKind
 
 
@@ -121,21 +121,13 @@ def _save_options_with_invulnerable_grant(
     target_number: int,
     source_rule_id: str,
 ) -> tuple[SaveOption, ...]:
-    if any(
-        option.save_kind is SaveKind.INVULNERABLE
-        and option.target_number <= target_number
-        and option.characteristic_target_number <= target_number
-        for option in save_options
-    ):
-        return save_options
-    replacement = SaveOption(
-        save_kind=SaveKind.INVULNERABLE,
-        target_number=target_number,
-        characteristic_target_number=target_number,
-        armor_penetration=0,
-        source_rule_ids=(source_rule_id,),
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_options_with_invulnerable_characteristic,
     )
-    return (
-        *tuple(option for option in save_options if option.save_kind is not SaveKind.INVULNERABLE),
-        replacement,
+
+    return save_options_with_invulnerable_characteristic(
+        save_options,
+        target_number=target_number,
+        source_id=source_rule_id,
+        only_if_better=True,
     )

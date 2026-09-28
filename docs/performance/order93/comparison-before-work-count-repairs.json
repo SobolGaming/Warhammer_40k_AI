@@ -1,0 +1,54 @@
+{
+  "workload": "order93-no-permission-attack-slices-v1",
+  "rule": "head mean <= base mean * 1.25 + 0.05 seconds",
+  "base_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b8c0dab7c098c7dea3ad443e0d8e4fec251df4da13f994198e1d8a4f70550da",
+  "evidence_sha256": {
+    "base.json": "68682e3aae5c84ccc5efb254b6e587ae324378d01186fc2fe8219db7de135d9e",
+    "head.json": "2958c141f9b05820525d53b3e33b2e50080545785fdcfe0790bb72683612578a"
+  },
+  "matched_environment_and_workload": true,
+  "rows": [
+    {
+      "phase": "shooting",
+      "base_mean_seconds": 0.25552644160343335,
+      "head_mean_seconds": 0.26602858339902014,
+      "allowed_mean_seconds": 0.36940805200429166,
+      "counts_match": true,
+      "passed": true
+    },
+    {
+      "phase": "fight",
+      "base_mean_seconds": 0.14268979179905728,
+      "head_mean_seconds": 0.1616760082077235,
+      "allowed_mean_seconds": 0.22836223974882158,
+      "counts_match": true,
+      "passed": true
+    }
+  ],
+  "choice_diagnostic": {
+    "workload": "order93-thirteen-operation-charge-v1",
+    "status": "head-only diagnostic; base lacks the supported choice path",
+    "samples_seconds": [
+      5.57352879201062,
+      5.561954416974913,
+      5.538579707965255
+    ],
+    "mean": 5.558020972316929,
+    "maximum": 5.57352879201062,
+    "decision_counts": [
+      13,
+      13,
+      13
+    ],
+    "maximum_option_widths": [
+      4,
+      4,
+      4
+    ],
+    "fixture_sha256": "f7a46989f40954306d311bf8293e402ce473972b3a473ddc88d2b1b88469177b",
+    "timing_boundary": "First modifier choice through accepted arbitrary subset; no export/replay"
+  },
+  "full_game_samples": 0,
+  "full_game_certified": false
+}

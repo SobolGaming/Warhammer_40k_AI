@@ -5329,6 +5329,7 @@ def test_phase17n_action_restore_rejects_extra_opportunity_option_family() -> No
         "battle_round": action.battle_round_started,
         "phase": action.phase_started,
         "mission_action_opportunity": True,
+        "objective_control_modifier_scope_id": None,
         "legal_mission_action_ids": validate_json_value(
             sorted([action.mission_action_id, forged_action_id])
         ),
@@ -5348,6 +5349,7 @@ def test_phase17n_action_restore_rejects_extra_opportunity_option_family() -> No
                 "battle_round": action.battle_round_started,
                 "phase": action.phase_started,
                 "mission_action_opportunity": True,
+                "objective_control_modifier_scope_id": None,
                 "legal_action_option_ids": action_option_ids,
             }
         ),

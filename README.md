@@ -12,7 +12,16 @@ Order 84 / P01G implements source-assigned dice results and active-player
 selection among tied highest/lowest physical dice. See
 [scope and evidence](docs/ORDER_84_SCOPE_PLAN.md) and
 [Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
-remains separate under Order 95; Orders 85–94 remain open.
+remains separate under Order 95. Orders 85–94 were open at that audit; the
+implementation entries below and roadmap record their later status.
+
+Order 93 / P02I preserves individual source operations until an authorized
+player selects which modifiers to ignore. A bounded finite decision serves
+characteristics and rolls across movement, attacks, saves, Leadership, Objective
+Control and source-backed healing, with model/weapon ownership and authenticated
+restore/replay. See the [scope and evidence](docs/ORDER_93_SCOPE_PLAN.md),
+[owner inventory](docs/ORDER_93_OWNER_INVENTORY.md), and
+[Contract 41 migration](contracts/migrations/40-to-41.md).
 
 Order 92 / P04D implements recorded random melee attack splits under the owner's
 provisional timing convention. Weapons/profiles commit before one physical A roll

@@ -367,6 +367,7 @@ def parse_battle_shock_resolution_authority(
     if rolling_state != result.roll_state:
         raise GameLifecycleError("Battle-shock roll history drifted.")
     modifier = _modifier_authority(
+        decision_records=decision_records,
         prior_events=prior_events,
         request_payload=request_payload,
         request_base=request_base,
@@ -524,6 +525,7 @@ def _result_actor(record: DecisionRecord) -> str:
 
 def _modifier_authority(
     *,
+    decision_records: tuple[DecisionRecord, ...],
     prior_events: tuple[EventRecord, ...],
     request_payload: dict[str, JsonValue],
     request_base: dict[str, JsonValue],
@@ -568,6 +570,13 @@ def _modifier_authority(
     )
     flattened = tuple(
         modifier for application in applications for modifier in application.modifiers
+    )
+    from warhammer40k_core.engine.battle_shock_modifier_evaluation import (
+        selected_battle_shock_roll_modifiers,
+    )
+
+    flattened = selected_battle_shock_roll_modifiers(
+        decision_records=decision_records, request=result.request, modifiers=flattened
     )
     keys = tuple((application.hook_id, application.source_id) for application in applications)
     if (

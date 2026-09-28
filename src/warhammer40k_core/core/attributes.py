@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict
+
+if TYPE_CHECKING:
+    from warhammer40k_core.core.profile_modifier_trace import (
+        CharacteristicModifierTrace,
+        CharacteristicModifierTracePayload,
+    )
 
 
 class CharacteristicError(ValueError):
@@ -47,6 +53,7 @@ class CharacteristicValuePayload(TypedDict):
     base: int
     final: int
     applied_modifier_ids: list[str]
+    modifier_trace: NotRequired[CharacteristicModifierTracePayload]
 
 
 class CharacteristicBoundPolicyPayload(TypedDict):
@@ -82,6 +89,7 @@ class CharacteristicValue:
     final: int
     applied_modifier_ids: tuple[str, ...] = ()
     value_kind: CharacteristicValueKind = CharacteristicValueKind.NUMERIC
+    modifier_trace: CharacteristicModifierTrace | None = None
 
     def __post_init__(self) -> None:
         characteristic = _ensure_characteristic(self.characteristic)
@@ -107,6 +115,10 @@ class CharacteristicValue:
         )
         if ids != self.applied_modifier_ids:
             object.__setattr__(self, "applied_modifier_ids", ids)
+        if self.modifier_trace is not None:
+            from warhammer40k_core.core.profile_modifier_trace import validate_characteristic_trace
+
+            validate_characteristic_trace(self)
 
     @classmethod
     def from_raw(cls, characteristic: Characteristic, raw: int) -> Self:
@@ -162,7 +174,7 @@ class CharacteristicValue:
         }
 
     def to_payload(self) -> CharacteristicValuePayload:
-        return {
+        payload: CharacteristicValuePayload = {
             "characteristic": self.characteristic.value,
             "value_kind": self.value_kind.value,
             "raw": self.raw,
@@ -170,9 +182,14 @@ class CharacteristicValue:
             "final": self.final,
             "applied_modifier_ids": list(self.applied_modifier_ids),
         }
+        if self.modifier_trace is not None:
+            payload["modifier_trace"] = self.modifier_trace.to_payload()
+        return payload
 
     @classmethod
     def from_payload(cls, payload: CharacteristicValuePayload) -> Self:
+        from warhammer40k_core.core.profile_modifier_trace import CharacteristicModifierTrace
+
         return cls(
             characteristic=characteristic_from_token(payload["characteristic"]),
             value_kind=characteristic_value_kind_from_token(payload["value_kind"]),
@@ -180,6 +197,11 @@ class CharacteristicValue:
             base=payload["base"],
             final=payload["final"],
             applied_modifier_ids=tuple(payload["applied_modifier_ids"]),
+            modifier_trace=(
+                CharacteristicModifierTrace.from_payload(payload["modifier_trace"])
+                if "modifier_trace" in payload
+                else None
+            ),
         )
 
 

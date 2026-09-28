@@ -5,7 +5,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from fractions import Fraction
 from math import ceil, isfinite
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import (
     TARGETING_RANGE_MAXIMUM,
@@ -73,6 +73,7 @@ class ModifierPayload(TypedDict):
     operand: int
     priority: int
     exclusive_group: str | None
+    result_floor: NotRequired[int]
 
 
 class ModifierStackPayload(TypedDict):
@@ -138,6 +139,7 @@ class ModifierTerm:
 
     operation: ModifierOperation
     operand: int
+    result_floor: int | None = None
 
     def bind(
         self, *, modifier_id: str, source_id: str, characteristic: Characteristic | None = None
@@ -154,6 +156,7 @@ class ModifierTerm:
             timing=min(timings, key=lambda timing: timing.order),
             operation=self.operation,
             operand=self.operand,
+            result_floor=self.result_floor,
         )
 
     def __post_init__(self) -> None:
@@ -319,6 +322,7 @@ class Modifier:
     priority: int = 0
     source_id: str | None = None
     exclusive_group: str | None = None
+    result_floor: int | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -360,12 +364,13 @@ class Modifier:
             raise ModifierError("Symbolic replacement modifiers require a zero numeric operand.")
         if timing not in _OPERATION_TIMINGS[operation]:
             raise ModifierError("Modifier operation is not supported at the supplied timing.")
+        _validate_source_result_limits(self)
 
     def applies_to(self, characteristic: Characteristic, *, target_id: str | None = None) -> bool:
         return self.scope.matches(characteristic, target_id=target_id)
 
     def to_payload(self) -> ModifierPayload:
-        return {
+        payload: ModifierPayload = {
             "modifier_id": self.modifier_id,
             "source_id": self.source_id,
             "scope": self.scope.to_payload(),
@@ -375,9 +380,14 @@ class Modifier:
             "priority": self.priority,
             "exclusive_group": self.exclusive_group,
         }
+        if self.result_floor is not None:
+            payload["result_floor"] = self.result_floor
+        return payload
 
     @classmethod
     def from_payload(cls, payload: ModifierPayload) -> Self:
+        if "result_floor" in payload and type(payload["result_floor"]) is not int:
+            raise ModifierError("Source result floor must be an integer when supplied.")
         return cls(
             modifier_id=payload["modifier_id"],
             source_id=payload["source_id"],
@@ -387,6 +397,7 @@ class Modifier:
             operand=payload["operand"],
             priority=payload["priority"],
             exclusive_group=payload["exclusive_group"],
+            result_floor=payload.get("result_floor"),
         )
 
 
@@ -532,6 +543,8 @@ class ModifierStack:
             if modifier.operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR}:
                 raise ModifierError("Symbolic replacement requires characteristic resolution.")
             modified = _apply_numeric_operation(modifier.operation.value, modifier.operand, value)
+            if modifier.result_floor is not None:
+                modified = max(modified, min(value, Fraction(modifier.result_floor)))
             steps.append(ModifierArithmeticStep(modifier, value, modified))
             value = modified
             if (
@@ -979,9 +992,27 @@ def _validate_supported_stacking(modifiers: tuple[Modifier, ...]) -> None:
         exclusive_groups.add(modifier.exclusive_group)
 
 
-def _modifier_order_key(modifier: Modifier) -> tuple[int, int, str]:
+def _validate_source_result_limits(modifier: Modifier) -> None:
+    floor = modifier.result_floor
+    if floor is None:
+        return
+    if (
+        type(floor) is not int
+        or modifier.source_id is None
+        or modifier.operation is not ModifierOperation.ADD
+        or modifier.operand >= 0
+    ):
+        raise ModifierError("Source result floor requires a sourced negative addition.")
+
+
+def _modifier_order_key(modifier: Modifier) -> tuple[int, int, int, int, str]:
+    # A source-local limit must not clamp another source's unrestricted change.
+    # Resolve limited changes first within their arithmetic family, strictest first.
+    bound = None if modifier.result_floor is None else -modifier.result_floor
     return (
         _operation_order(modifier.operation.value, modifier.operand),
+        int(bound is None),
+        0 if bound is None else bound,
         modifier.priority,
         modifier.modifier_id,
     )

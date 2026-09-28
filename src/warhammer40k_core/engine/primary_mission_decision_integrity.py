@@ -68,6 +68,7 @@ _ACTION_RESULT_KEYS: Final = frozenset(
         "player_id",
         "battle_round",
         "phase",
+        "objective_control_modifier_scope_id",
         "mission_action_id",
         "mission_id",
         "mission_kind",
@@ -93,6 +94,7 @@ _DIRECT_ACTION_REQUEST_KEYS: Final = frozenset(
         "player_id",
         "battle_round",
         "phase",
+        "objective_control_modifier_scope_id",
         "mission_action_id",
         "legal_option_ids",
     }
@@ -103,6 +105,7 @@ _ACTION_OPPORTUNITY_REQUEST_KEYS: Final = frozenset(
         "player_id",
         "battle_round",
         "phase",
+        "objective_control_modifier_scope_id",
         "mission_action_opportunity",
         "legal_mission_action_ids",
         "legal_action_option_ids",
@@ -445,6 +448,7 @@ def _validate_action_request(
         "player_id",
         "battle_round",
         "phase",
+        "objective_control_modifier_scope_id",
     )
     if any(request_payload.get(key) != result_payload.get(key) for key in shared):
         raise GameLifecycleError("Primary Mission Action request/result context drifted.")

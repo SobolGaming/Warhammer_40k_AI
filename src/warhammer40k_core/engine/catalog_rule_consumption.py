@@ -3497,38 +3497,21 @@ def catalog_leadership_characteristic_for_unit(
     unit: UnitInstance,
     current_model_instance_ids: tuple[str, ...],
 ) -> int | None:
-    _validate_ability_index(ability_index)
-    _validate_unit(unit)
-    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
-    resolved_value: int | None = None
-    resolved_source_id: str | None = None
-    for record in _unit_scoped_generic_records(
+    from warhammer40k_core.engine.catalog_leadership_modifiers import (
+        catalog_leadership_modifiers_for_unit,
+    )
+
+    modifiers = catalog_leadership_modifiers_for_unit(
         ability_index=ability_index,
         unit=unit,
-        current_model_instance_ids=current_ids,
-        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
-    ):
-        rule_ir = _rule_ir_from_record(record)
-        for clause in rule_ir.clauses:
-            if (
-                not _clause_targets_this_unit(clause)
-                or clause.trigger is not None
-                or clause.conditions
-            ):
-                continue
-            for effect in clause.effects:
-                if not _effect_is_leadership_set(effect):
-                    continue
-                value = _leadership_value(parameter_payload(effect.parameters).get("value"))
-                if resolved_value is not None and resolved_value != value:
-                    raise GameLifecycleError(
-                        "Catalog Leadership query found conflicting set-characteristic effects."
-                    )
-                resolved_value = value
-                resolved_source_id = record.definition.source_id
-    if resolved_value is not None and resolved_source_id is None:
-        raise GameLifecycleError("Catalog Leadership query resolved without a source.")
-    return resolved_value
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    values = {modifier.operand for modifier in modifiers}
+    if len(values) > 1:
+        raise GameLifecycleError(
+            "Catalog Leadership query found conflicting set-characteristic effects."
+        )
+    return next(iter(values)) if values else None
 
 
 def record_catalog_feel_no_pain_sources_for_unit(
@@ -5729,18 +5712,6 @@ def _int_parameter(parameters: Mapping[str, object], *, key: str) -> int:
     if type(value) is not int:
         raise GameLifecycleError(f"Catalog rule parameter {key} must be an integer.")
     return value
-
-
-def _leadership_value(value: object) -> int:
-    if type(value) is int:
-        return value
-    if type(value) is str:
-        stripped = value.strip()
-        if stripped.endswith("+"):
-            stripped = stripped[:-1]
-        if stripped.isdecimal():
-            return int(stripped)
-    raise GameLifecycleError("Catalog Leadership set-characteristic value is invalid.")
 
 
 def _validate_ability_index(ability_index: object) -> AbilityCatalogIndex:

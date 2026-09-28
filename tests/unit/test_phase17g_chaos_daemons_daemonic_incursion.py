@@ -360,6 +360,12 @@ def test_argath_adds_shadow_bonus_to_bearer_melee_attacks_and_strength() -> None
     )
 
     assert modified.attack_profile.fixed_attacks == 3
+    operation = modified.attack_profile.modifiers[0]
+    assert operation.source_id == enhancements.ARGATH_SOURCE_RULE_ID
+    assert (
+        modified.attack_profile.resolve_value(1, ignored_modifier_ids=(operation.modifier_id,))
+        == profile.attack_profile.fixed_attacks
+    )
     assert modified.strength.final == profile.strength.final + 2
     assert enhancements.ARGATH_SOURCE_RULE_ID in modified.source_ids
 

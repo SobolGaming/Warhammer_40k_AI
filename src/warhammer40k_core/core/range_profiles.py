@@ -7,6 +7,10 @@ from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.profile_modifier_trace import (
+    CharacteristicModifierTrace,
+    CharacteristicModifierTracePayload,
+)
 from warhammer40k_core.core.random_profile_values import (
     RandomProfileValue,
     RandomProfileValuePayload,
@@ -23,6 +27,7 @@ class RangeProfilePayload(TypedDict):
     kind: str
     distance_inches: int | None
     random_value: NotRequired[RandomProfileValuePayload]
+    modifier_trace: NotRequired[CharacteristicModifierTracePayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,11 +35,20 @@ class RangeProfile:
     kind: RangeProfileKind
     distance_inches: int | None = None
     random_value: RandomProfileValue | None = None
+    modifier_trace: CharacteristicModifierTrace | None = None
 
     def __post_init__(self) -> None:
         kind = _validate_range_kind(self.kind)
         if kind != self.kind:
             object.__setattr__(self, "kind", kind)
+
+        if self.modifier_trace is not None and (
+            kind is not RangeProfileKind.DISTANCE
+            or self.random_value is not None
+            or self.modifier_trace.characteristic is not Characteristic.RANGE
+            or self.distance_inches != self.modifier_trace.resolve().final
+        ):
+            raise WeaponProfileError("Range modifier trace or arithmetic drift.")
 
         if self.random_value is not None:
             if (
@@ -83,6 +97,8 @@ class RangeProfile:
         }
         if self.random_value is not None:
             payload["random_value"] = self.random_value.to_payload()
+        if self.modifier_trace is not None:
+            payload["modifier_trace"] = self.modifier_trace.to_payload()
         return payload
 
     @classmethod
@@ -90,6 +106,7 @@ class RangeProfile:
         if type(cast(object, payload)) is not dict or set(payload) not in (
             {"kind", "distance_inches"},
             {"kind", "distance_inches", "random_value"},
+            {"kind", "distance_inches", "modifier_trace"},
         ):
             raise WeaponProfileError("Range profile payload fields are invalid.")
         return cls(
@@ -97,6 +114,9 @@ class RangeProfile:
             distance_inches=payload["distance_inches"],
             random_value=RandomProfileValue.from_payload(payload["random_value"])
             if "random_value" in payload
+            else None,
+            modifier_trace=CharacteristicModifierTrace.from_payload(payload["modifier_trace"])
+            if "modifier_trace" in payload
             else None,
         )
 

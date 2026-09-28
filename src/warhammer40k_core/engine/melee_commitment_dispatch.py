@@ -55,7 +55,14 @@ def current_selection_request(host: GameLifecycle, request_id: str) -> DecisionR
         runtime_modifier_registry=host._fight_phase_handler.runtime_modifier_registry,  # pyright: ignore[reportPrivateUsage]
     )
     from warhammer40k_core.engine.melee_pool_authority import commitment_inventory
+    from warhammer40k_core.engine.weapon_modifier_selection import melee_modifier_rows_from_history
 
+    rows = melee_modifier_rows_from_history(
+        decisions=host.decision_controller,
+        activation_id=activation.result_id,
+        unit_instance_id=unit.unit_instance_id,
+        rows=rows,
+    )
     rows = commitment_inventory(rows, state)
     records = selection_records(host.decision_controller, activation.result_id)
     for index, record in enumerate(records):

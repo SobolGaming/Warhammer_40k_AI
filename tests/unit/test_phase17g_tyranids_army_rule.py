@@ -2516,3 +2516,81 @@ def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
         object.__getattribute__(lifecycle, "_require_runtime_content_bundle"),
     )
     return require_runtime_content_bundle()
+
+
+def test_shadow_modifier_choice_resumes_target_batch_through_facade() -> None:
+    from tests.order93_nonattack_helpers import add_nonattack_effects
+
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    lifecycle = _battle_ready_lifecycle(
+        game_id="order93-shadow-subset",
+        active_player_id="player-b",
+        enemy_unit_count=2,
+        authenticate_reposition=True,
+    )
+    state = _require_state(lifecycle)
+    for unit in state.army_definitions[1].units:
+        add_nonattack_effects(
+            state,
+            unit_id=unit.unit_instance_id,
+            owner="player-b",
+            characteristic="leadership",
+            operations=False,
+        )
+    session = LocalGameSession(lifecycle=lifecycle)
+    initial = lifecycle.to_payload()
+    request = lifecycle.advance_until_decision_or_terminal().decision_request
+    assert request is not None
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order93:unleash",
+        option_id=army_rule.SHADOW_UNLEASH_OPTION_ID,
+    )
+    choices = 0
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == "select_modifier_ignores"
+    ):
+        request = status.decision_request
+        snapshot = lifecycle.to_payload()
+        assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+        assert isinstance(request.payload, dict)
+        subject = request.payload["subject"]
+        assert isinstance(subject, dict)
+        assert subject["kind"] == "battle_shock_roll"
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:ignore",
+            option_id="ignore-remaining",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        choices += 1
+    assert choices == 1
+    resolved = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("source_kind") == "command_phase_start_battle_shock"
+    )
+    assert len(resolved) == 2
+    for event in resolved:
+        payload = cast(dict[str, JsonValue], event.payload)
+        result_payload = cast(dict[str, JsonValue], payload["battle_shock_result"])
+        modified = cast(dict[str, JsonValue], result_payload["modified_roll"])
+        assert modified["modifiers"] == []
+    snapshot = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    assert (
+        ReplayRunner.from_payload(
+            ReplayArtifact.capture(
+                artifact_id="order93-shadow-subset",
+                initial_lifecycle_payload=initial,
+                final_lifecycle=lifecycle,
+            ).to_payload()
+        )
+        .run()
+        .reproduced_exactly
+    )

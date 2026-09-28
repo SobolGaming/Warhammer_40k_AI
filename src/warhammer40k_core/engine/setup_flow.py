@@ -80,6 +80,7 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_state_for_state,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.start_battle_hooks import (
     StartBattleHookRegistry,
@@ -132,6 +133,9 @@ class _AuthoritativeSetupRequest:
 
 @dataclass(slots=True)
 class SetupFlow:
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
     battle_formation_hooks: BattleFormationHookRegistry = field(
         default_factory=BattleFormationHookRegistry.empty
     )
@@ -422,6 +426,7 @@ class SetupFlow:
                 return invalid_status
             battle_start = setup_completion_gate.complete_setup_and_enter_battle(
                 state=state,
+                runtime_modifier_registry=self.runtime_modifier_registry,
                 decisions=decisions,
                 config=config,
                 reaction_frame_count=reaction_frame_count,

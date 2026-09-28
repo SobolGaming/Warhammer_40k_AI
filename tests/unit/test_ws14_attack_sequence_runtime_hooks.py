@@ -182,6 +182,270 @@ def test_ws14_generic_selected_target_wound_and_damage_hooks_use_explicit_attack
     )
 
 
+@pytest.mark.parametrize("roll_type", ["wound", "damage"])
+def test_order93_opposing_attack_roll_sources_survive_net_zero(roll_type: str) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    for identity, delta in (("bonus", 1), ("penalty", -1)):
+        state.record_persisting_effect(
+            _generic_effect(
+                effect_id=f"order93:{identity}",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                target_kind="this_unit",
+                effect_kind="modify_dice_roll",
+                parameters={"roll_type": roll_type, "delta": delta, "attack_role": "attacker"},
+            )
+        )
+    registry = RuntimeModifierRegistry.empty()
+    if roll_type == "wound":
+        terms = registry.wound_roll_modifiers(
+            WoundRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=profile,
+                strength=4,
+                toughness=4,
+            )
+        )
+    else:
+        terms = registry.damage_roll_modifiers(
+            DamageRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=profile,
+                current_value=3,
+            )
+        )
+    assert len(terms) == 2
+    assert {term.operand for term in terms} == {-1, 1}
+    assert sum(term.operand for term in terms) == 0
+    assert len({term.modifier_id for term in terms}) == 2
+    assert all(term.source_id is not None for term in terms)
+
+
+def test_order93_save_roll_operations_do_not_change_characteristic_and_survive_ap() -> None:
+    from warhammer40k_core.engine.generic_rule_save_modifiers import (
+        generic_rule_save_option_with_roll_modifier,
+    )
+    from warhammer40k_core.engine.saves import save_option_with_armor_penetration_modifier
+
+    original = SaveOption(SaveKind.ARMOUR, 5, 3, -2)
+    bonus = generic_rule_save_option_with_roll_modifier(original, 1, "source:save-bonus")
+    cancelled = generic_rule_save_option_with_roll_modifier(bonus, -1, "source:save-penalty")
+    assert cancelled.characteristic_target_number == 3
+    assert cancelled.target_number == 5
+    assert tuple(term.operand for term in cancelled.roll_modifiers) == (1, -1)
+    assert SaveOption.from_payload(cancelled.to_payload()) == cancelled
+    ap_changed = save_option_with_armor_penetration_modifier(
+        bonus, delta=1, source_rule_id="source:ap-bonus"
+    )
+    assert ap_changed.characteristic_target_number == 3
+    assert ap_changed.armor_penetration == -1
+    assert ap_changed.target_number == 3
+    assert ap_changed.roll_modifiers == bonus.roll_modifiers
+    assert ap_changed.armor_penetration_trace is not None
+    assert ap_changed.armor_penetration_trace.source_value == -2
+    assert ap_changed.armor_penetration_trace.modifiers[0].source_id == "source:ap-bonus"
+
+
+def test_order93_save_operations_bound_once_and_resolve_independent_subsets() -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_option_ignoring_modifiers,
+        save_option_with_characteristic_terms,
+    )
+    from warhammer40k_core.engine.saves import save_option_with_armor_penetration_modifier
+
+    option = SaveOption(SaveKind.ARMOUR, 5, 3, -2)
+    for identity, delta in (("bonus", -2), ("penalty", 2)):
+        option = save_option_with_characteristic_terms(
+            option,
+            characteristic=Characteristic.SAVE,
+            terms=(ModifierTerm(ModifierOperation.ADD, delta),),
+            source_id=f"source:{identity}",
+            modifier_id=f"save:{identity}",
+        )
+    assert option.characteristic_target_number == 3
+    assert (
+        save_option_ignoring_modifiers(option, ("save:penalty",)).characteristic_target_number == 2
+    )
+    assert save_option_ignoring_modifiers(option, ("save:bonus",)).characteristic_target_number == 5
+    for identity, delta in (("improve", 3), ("worsen", -2)):
+        option = save_option_with_armor_penetration_modifier(
+            option, delta=delta, source_rule_id=f"source:{identity}", modifier_id=f"ap:{identity}"
+        )
+    assert option.armor_penetration == -1
+    assert save_option_ignoring_modifiers(option, ("ap:improve",)).armor_penetration == -4
+    assert SaveOption.from_payload(option.to_payload()) == option
+    payload = option.to_payload()
+    payload["target_number"] = 99
+    with pytest.raises(GameLifecycleError, match="arithmetic"):
+        SaveOption.from_payload(payload)
+    with pytest.raises(GameLifecycleError, match="unknown or duplicated"):
+        save_option_ignoring_modifiers(option, ("invented",))
+
+
+@pytest.mark.parametrize("save_kind", [SaveKind.ARMOUR, SaveKind.INVULNERABLE])
+@pytest.mark.parametrize("assigned", [1, 2, 6, 7])
+def test_order93_save_roll_modifiers_preserve_unmodified_one_and_assigned_results(
+    save_kind: SaveKind,
+    assigned: int,
+) -> None:
+    from warhammer40k_core.core.dice import DiceRollResult, DiceRollState
+    from warhammer40k_core.engine.generic_rule_save_modifiers import (
+        generic_rule_save_option_with_roll_modifier,
+    )
+    from warhammer40k_core.engine.saves import resolve_saving_throw, saving_throw_roll_spec
+
+    spec = saving_throw_roll_spec(
+        save_kind=save_kind,
+        player_id="defender",
+        allocated_model_id="model",
+        attack_context_id="order93:save",
+    )
+    roll = DiceRollState.from_result(
+        DiceRollResult.from_values(
+            roll_id="order93:save",
+            spec=spec,
+            values=(2,),
+            source="fixed",
+        )
+    ).with_result_override(
+        decision_id="assigned-result",
+        request_id="assigned-request",
+        source_rule_id="gw-11e-core-dice-results:treated-as-set-to",
+        replacement_value=assigned,
+    )
+    option = generic_rule_save_option_with_roll_modifier(
+        SaveOption(save_kind, 3, 3, 0),
+        1,
+        "source:save-bonus",
+    )
+    resolved = resolve_saving_throw(roll_state=roll, option=option)
+    assert resolved.successful is (assigned != 1)
+    assert resolved.unmodified_roll == assigned
+    assert resolved.final_roll == assigned + 1
+    assert resolved.target_number == 3
+
+
+def test_order93_damage_keeps_profile_melta_and_allocated_operations_until_bound() -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+    from warhammer40k_core.core.weapon_profiles import DamageProfile
+    from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+        AllocatedAttackDamageModifierBinding,
+        AllocatedAttackDamageModifierContext,
+    )
+    from warhammer40k_core.engine.attack_sequence_geometry_targets import _damage_value
+    from warhammer40k_core.engine.dice import DiceRollManager
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    observed: list[int] = []
+
+    def allocated(context: AllocatedAttackDamageModifierContext) -> int:
+        observed.append(context.current_value)
+        return 1
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        allocated_attack_damage_modifier_bindings=(
+            AllocatedAttackDamageModifierBinding("allocated:bonus", "source:allocated", allocated),
+        )
+    )
+    profile = DamageProfile.fixed(1).with_modifier(
+        ModifierTerm(ModifierOperation.ADD, -3).bind(
+            modifier_id="damage:penalty",
+            source_id="source:penalty",
+            characteristic=Characteristic.DAMAGE,
+        )
+    )
+    weapon = replace(
+        _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0]), damage_profile=profile
+    )
+    result, status = _damage_value(
+        state=state,
+        decisions=DecisionController(),
+        manager=DiceRollManager("order93-damage"),
+        profile=profile,
+        attack_context_id="order93:damage",
+        attacker_player_id="player-a",
+        affected_unit_instance_id=attacker.unit_instance_id,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=weapon,
+        attack_strength=None,
+        target_toughness=None,
+        source_phase=BattlePhase.SHOOTING,
+        stratagem_index=None,
+        runtime_modifier_registry=registry,
+        melta_bonus=2,
+        allocated_model_instance_id=defender.own_models[0].model_instance_id,
+    )
+    assert status is None
+    assert observed == [1]
+    assert result == 1  # 1 - 3 + 2 + 1, with the bound applied once after all sources.
+
+
+def test_order93_invulnerable_grants_preserve_prior_save_roll_and_ap_sources() -> None:
+    from warhammer40k_core.engine.generic_rule_save_modifiers import (
+        generic_rule_save_option_with_roll_modifier,
+    )
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_options_with_invulnerable_characteristic,
+    )
+    from warhammer40k_core.engine.saves import save_option_with_armor_penetration_modifier
+
+    armour = generic_rule_save_option_with_roll_modifier(
+        SaveOption(SaveKind.ARMOUR, 5, 3, -2),
+        1,
+        "source:roll",
+    )
+    armour = save_option_with_armor_penetration_modifier(
+        armour, delta=1, source_rule_id="source:ap"
+    )
+    options = save_options_with_invulnerable_characteristic(
+        (armour,),
+        target_number=5,
+        source_id="source:invul",
+        only_if_better=True,
+    )
+    invulnerable = next(option for option in options if option.save_kind is SaveKind.INVULNERABLE)
+    assert invulnerable.characteristic_target_number == 5
+    assert invulnerable.target_number == 4
+    assert invulnerable.roll_modifiers == armour.roll_modifiers
+    assert invulnerable.armor_penetration_trace == armour.armor_penetration_trace
+    improved = save_options_with_invulnerable_characteristic(
+        options,
+        target_number=4,
+        source_id="source:better-invul",
+        only_if_better=True,
+    )
+    invulnerable = next(option for option in improved if option.save_kind is SaveKind.INVULNERABLE)
+    assert invulnerable.target_number == 3
+    assert invulnerable.characteristic_trace is not None
+    assert invulnerable.characteristic_trace.source_value == 5
+
+
 def test_ws14_generic_contextual_status_lowers_critical_wound_threshold() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
@@ -316,7 +580,8 @@ def test_ws14_generic_save_and_weapon_profile_hooks_execute_from_persisted_paylo
     )
     assert modified_profile.strength.final == profile.strength.final + 1
     assert modified_saves[0].target_number == 3
-    assert modified_saves[0].characteristic_target_number == 3
+    assert modified_saves[0].characteristic_target_number == 4
+    assert len(modified_saves[0].roll_modifiers) == 1
 
 
 def test_ws14_incoming_ap_modifier_is_bounded_and_scoped_to_triggering_attacker() -> None:
@@ -376,7 +641,7 @@ def test_ws14_incoming_ap_modifier_is_bounded_and_scoped_to_triggering_attacker(
     ap_zero = registry.modified_save_options(
         replace(
             context,
-            save_options=(replace(options[0], target_number=4, armor_penetration=0),),
+            save_options=(SaveOption(SaveKind.ARMOUR, 4, 4, 0),),
         )
     )
     wrong_attacker = registry.modified_save_options(
@@ -1656,3 +1921,554 @@ def _replace_unit(state: GameState, replacement: UnitInstance) -> None:
     if not did_update:
         raise AssertionError(f"Unknown unit id: {replacement.unit_instance_id}")
     state.army_definitions = updated_armies
+
+
+@pytest.mark.parametrize("random_damage", [False, True])
+def test_order93_save_damage_subsets_use_facade_restore_and_exact_replay(
+    random_damage: bool,
+) -> None:
+    from typing import cast
+
+    from tests.order93_save_damage_helpers import save_damage_session
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner
+
+    session = save_damage_session(random_damage=random_damage)
+    kinds: set[str] = set()
+    save_models: set[str] = set()
+    for _ in range(80):
+        request = pending_request(session)
+        if request.decision_type != "select_modifier_ignores":
+            submit_fixture_request(session, request)
+            continue
+        payload = cast(dict[str, JsonValue], request.payload)
+        subject = cast(dict[str, JsonValue], payload["subject"])
+        kind = cast(str, subject["kind"])
+        kinds.add(kind)
+        assert request.actor_id == ("player-b" if kind == "save_roll" else "player-a")
+        if kind == "save_roll":
+            save_models.add(cast(str, subject["model_instance_id"]))
+        restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
+        assert restored.to_payload() == session.lifecycle.to_payload()
+        inventory = cast(list[dict[str, JsonValue]], payload["modifiers"])
+        decided = cast(list[str], payload["decided_modifier_ids"])
+        operation = cast(dict[str, JsonValue], inventory[len(decided)]["operation"])
+        # Retain each penalty and discard its opposing bonus, proving source-level selection.
+        prefix = "ignore:" if cast(int, operation["operand"]) > 0 else "keep:"
+        option = next(
+            (option for option in request.options if option.option_id.startswith(prefix)),
+            next(
+                option
+                for option in request.options
+                if option.option_id
+                == ("ignore-remaining" if prefix == "ignore:" else "keep-remaining")
+            ),
+        )
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:subset",
+            option_id=option.option_id,
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        events = session.lifecycle.decision_controller.event_log.records
+        if any(
+            event.event_type == "attack_sequence_step"
+            and isinstance(event.payload, dict)
+            and event.payload.get("step") == "damage"
+            for event in events
+        ):
+            break
+    else:
+        raise AssertionError("Save/Damage evaluation did not reach Damage mutation.")
+    assert {"save_roll", "damage_characteristic"} <= kinds
+    assert ("damage_roll" in kinds) is random_damage
+    assert len(save_models) == 2
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="save-damage-subsets"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+@pytest.mark.parametrize("kind", ["save_roll", "damage_characteristic", "damage_roll"])
+def test_order93_save_damage_rejects_stale_state_before_queue_pop(kind: str) -> None:
+    from tests.order93_save_damage_helpers import reach_save_damage_request, save_damage_session
+
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = save_damage_session(random_damage=True)
+    request = reach_save_damage_request(session, kind=kind)
+    state = session.lifecycle.state
+    assert state is not None
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="source-drift",
+            owner_player_id="player-b",
+            target_unit_instance_ids=("army-beta:enemy",),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "save", "delta": 1, "attack_role": "target"},
+        )
+    )
+    before = session.lifecycle.decision_controller.to_payload()
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id=f"{request.request_id}:stale",
+        option_id="keep-remaining",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.decision_controller.to_payload() == before
+
+
+def test_order93_save_choice_rejects_tampered_source_restore_and_scopes_model_permission() -> None:
+    from copy import deepcopy
+    from typing import cast
+
+    from tests.order93_save_damage_helpers import reach_save_damage_request, save_damage_session
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = save_damage_session(model_scoped_save=True)
+    request = reach_save_damage_request(session)
+    payload = cast(dict[str, JsonValue], request.payload)
+    subject = cast(dict[str, JsonValue], payload["subject"])
+    permitted_model = subject["model_instance_id"]
+    saved = deepcopy(session.lifecycle.to_payload())
+    # The source inventory and its finite choices are engine evidence, not adapter input.
+    queued = cast(list[dict[str, JsonValue]], saved["decisions"]["queue"]["pending_requests"])
+    pending_payload = cast(dict[str, JsonValue], queued[0]["payload"])
+    inventory = cast(list[dict[str, JsonValue]], pending_payload["modifiers"])
+    cast(dict[str, JsonValue], inventory[0]["operation"])["operand"] = 91
+    with pytest.raises(
+        (GameLifecycleError, ValueError), match=r"[Dd]rift|[Ii]nventory|[Oo]ption|[Rr]eplay"
+    ):
+        GameLifecycle.from_payload(saved)
+    for _ in range(50):
+        if request.decision_type == "select_modifier_ignores":
+            body = cast(dict[str, JsonValue], request.payload)
+            current_subject = cast(dict[str, JsonValue], body["subject"])
+            if current_subject["kind"] == "save_roll":
+                assert current_subject["model_instance_id"] == permitted_model
+            status = session.submit_option(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:selected",
+                option_id="ignore-remaining"
+                if current_subject["kind"] == "save_roll"
+                else "keep-remaining",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        else:
+            submit_fixture_request(session, request)
+        if any(
+            event.event_type == "attack_sequence_step"
+            and isinstance(event.payload, dict)
+            and event.payload.get("step") == "allocate"
+            for event in session.lifecycle.decision_controller.event_log.records
+        ):
+            break
+        request = pending_request(session)
+    else:
+        raise AssertionError("Save choices did not produce allocation grouping.")
+    allocations = [
+        event.payload
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "attack_sequence_step"
+        and isinstance(event.payload, dict)
+        and event.payload.get("step") == "allocate"
+    ]
+    groups = cast(
+        list[dict[str, JsonValue]],
+        cast(dict[str, JsonValue], allocations[-1]["payload"])["allocation_groups"],
+    )
+    assert len(groups) == 2
+
+
+def test_order93_incoming_ap_is_independent_and_preserves_required_save_order() -> None:
+    from warhammer40k_core.engine.save_modifier_operations import save_option_ignoring_modifiers
+    from warhammer40k_core.engine.saves import mandatory_save_option
+
+    armour = SaveOption(SaveKind.ARMOUR, 5, 3, -2)
+    invulnerable = SaveOption(SaveKind.INVULNERABLE, 4, 4, -2)
+    assert mandatory_save_option((armour, invulnerable)) == invulnerable
+    ap_operation = armour.inherent_roll_modifiers[0]
+    assert ap_operation.operand == -2
+    assert ap_operation.source_id is not None
+    selected = save_option_ignoring_modifiers(armour, (ap_operation.modifier_id,))
+    assert selected.armor_penetration == -2
+    assert selected.characteristic_target_number == 3
+    assert selected.target_number == 3
+    assert mandatory_save_option((selected, invulnerable)) == invulnerable
+    from warhammer40k_core.core.dice import DiceRollResult, DiceRollState
+    from warhammer40k_core.engine.saves import resolve_saving_throw, saving_throw_roll_spec
+
+    roll = DiceRollState.from_result(
+        DiceRollResult.from_values(
+            roll_id="order93:ap-save",
+            spec=saving_throw_roll_spec(
+                save_kind=SaveKind.INVULNERABLE,
+                player_id="player-b",
+                allocated_model_id="model",
+                attack_context_id="order93:ap-save",
+            ),
+            values=(3,),
+            source="fixed",
+        )
+    )
+    assert not resolve_saving_throw(options=(armour, invulnerable), roll_state=roll).successful
+    resolved = resolve_saving_throw(options=(selected, invulnerable), roll_state=roll)
+    assert resolved.successful
+    assert resolved.save_kind is SaveKind.ARMOUR
+    assert SaveOption.from_payload(selected.to_payload()) == selected
+    payload = selected.to_payload()
+    payload["inherent_roll_modifiers"][0]["operand"] = -4
+    with pytest.raises(GameLifecycleError, match="inherent roll arithmetic"):
+        SaveOption.from_payload(payload)
+
+
+def test_order93_attacker_ap_selection_precedes_defender_incoming_ap_roll_inventory() -> None:
+    from typing import cast
+
+    from tests.order93_save_damage_helpers import reach_save_damage_request, save_damage_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+
+    session = save_damage_session(modified_ap=True)
+    request = reach_save_damage_request(session, kind="armor_penetration_characteristic")
+    for _ in range(8):
+        payload = cast(dict[str, JsonValue], request.payload)
+        subject = cast(dict[str, JsonValue], payload["subject"])
+        inventory = cast(list[dict[str, JsonValue]], payload["modifiers"])
+        if subject["kind"] == "save_roll":
+            assert request.actor_id == "player-b"
+            inherent = next(
+                row
+                for row in inventory
+                if cast(str, cast(dict[str, JsonValue], row["operation"])["modifier_id"]).endswith(
+                    ":saving-throw-ap"
+                )
+            )
+            assert cast(dict[str, JsonValue], inherent["operation"])["operand"] == -4
+            assert (
+                GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+                == session.lifecycle.to_payload()
+            )
+            return
+        assert subject["kind"] == "armor_penetration_characteristic"
+        assert request.actor_id == "player-a"
+        operation = cast(
+            dict[str, JsonValue],
+            inventory[len(cast(list[str], payload["decided_modifier_ids"]))]["operation"],
+        )
+        ignore = cast(int, operation["operand"]) < 0
+        prefix = "ignore:" if ignore else "keep:"
+        option = next(
+            (option for option in request.options if option.option_id.startswith(prefix)),
+            next(
+                option
+                for option in request.options
+                if option.option_id == ("ignore-remaining" if ignore else "keep-remaining")
+            ),
+        )
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:ap-subset",
+            option_id=option.option_id,
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        request = pending_request(session)
+    raise AssertionError("Did not reach the defender's selected AP inventory.")
+
+
+def test_order93_weaker_invulnerable_source_survives_ignoring_stronger_grant() -> None:
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_option_ignoring_modifiers,
+        save_options_with_invulnerable_characteristic,
+    )
+
+    options: tuple[SaveOption, ...] = (SaveOption(SaveKind.INVULNERABLE, 6, 6, 0),)
+    for value, source in ((4, "source:stronger"), (5, "source:weaker")):
+        options = save_options_with_invulnerable_characteristic(
+            options,
+            target_number=value,
+            source_id=source,
+            only_if_better=True,
+        )
+    option = options[0]
+    assert option.characteristic_target_number == 4
+    assert option.characteristic_trace is not None
+    assert len(option.characteristic_trace.modifiers) == 2
+    selected = save_option_ignoring_modifiers(option, ("source:stronger:invulnerable-save",))
+    assert selected.characteristic_target_number == 5
+    assert SaveOption.from_payload(selected.to_payload()) == selected
+
+
+@pytest.mark.parametrize("ignore", [False, True])
+def test_order93_failed_save_zero_replacement_is_selectable_after_save_and_consumed(
+    ignore: bool,
+) -> None:
+    from typing import cast
+
+    from tests.order93_save_damage_helpers import reach_save_damage_request, save_damage_session
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner
+
+    session = save_damage_session(damage_zero_replacement=True)
+    request = reach_save_damage_request(
+        session,
+        kind="damage_characteristic",
+        stage="failed-save-damage-replacement",
+    )
+    assert request.actor_id == "player-a"
+    payload = cast(dict[str, JsonValue], request.payload)
+    operation = cast(
+        dict[str, JsonValue], cast(list[dict[str, JsonValue]], payload["modifiers"])[0]["operation"]
+    )
+    assert operation["operation"] == "set"
+    assert operation["operand"] == 0
+    before_events = session.lifecycle.decision_controller.event_log.records
+    assert any(
+        event.event_type == "attack_sequence_step"
+        and isinstance(event.payload, dict)
+        and event.payload.get("step") == "save"
+        for event in before_events
+    )
+    assert not any(event.event_type.startswith("failed_save_damage") for event in before_events)
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
+    )
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id=f"{request.request_id}:zero-subset",
+        option_id="ignore-remaining" if ignore else "keep-remaining",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    event_type = (
+        "failed_save_damage_replacement_ignored" if ignore else "failed_save_damage_replaced"
+    )
+    assert (
+        sum(
+            event.event_type == event_type
+            for event in session.lifecycle.decision_controller.event_log.records
+        )
+        == 1
+    )
+    for _ in range(40):
+        events = session.lifecycle.decision_controller.event_log.records
+        damage_events = [
+            event
+            for event in events
+            if event.event_type == "attack_sequence_step"
+            and isinstance(event.payload, dict)
+            and event.payload.get("step") == "damage"
+        ]
+        if len(damage_events) >= 2:
+            break
+        request = pending_request(session)
+        if request.decision_type == "select_modifier_ignores":
+            body = cast(dict[str, JsonValue], request.payload)
+            assert (
+                cast(dict[str, JsonValue], body["source_context"])["evaluation_stage"]
+                != "failed-save-damage-replacement"
+            )
+            status = session.submit_option(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:keep",
+                option_id="keep-remaining",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        else:
+            submit_fixture_request(session, request)
+    else:
+        raise AssertionError("The two wounds did not resolve.")
+    assert (
+        sum(
+            event.event_type.startswith("failed_save_damage")
+            for event in session.lifecycle.decision_controller.event_log.records
+        )
+        == 1
+    )
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
+    )
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="ignored-failed-save-zero"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_order93_cover_bonus_retains_source_when_ignored_without_double_ap_application() -> None:
+    from tests.phase13b_shooting_declaration_helpers import _benefit_of_cover_result
+
+    from warhammer40k_core.core.ruleset_descriptor import CoverEffect
+    from warhammer40k_core.engine.save_modifier_operations import save_option_ignoring_modifiers
+
+    cover = replace(_benefit_of_cover_result(), cover_effect=CoverEffect.SAVE_BONUS)
+    option = SaveOption(SaveKind.ARMOUR, 4, 4, -1, cover_applied=True, cover_result=cover)
+    ap_operation, cover_operation = option.inherent_roll_modifiers
+    assert (ap_operation.operand, cover_operation.operand) == (-1, 1)
+    without_cover = save_option_ignoring_modifiers(option, (cover_operation.modifier_id,))
+    assert without_cover.target_number == 5
+    assert not without_cover.cover_applied
+    assert without_cover.inherent_roll_modifiers == option.inherent_roll_modifiers
+    without_ap = save_option_ignoring_modifiers(option, (ap_operation.modifier_id,))
+    assert without_ap.target_number == 3
+    assert without_ap.cover_applied
+    assert SaveOption.from_payload(without_cover.to_payload()) == without_cover
+
+
+@pytest.mark.parametrize(("ignore_take_cover", "expected_save"), [(False, 3), (True, 4)])
+def test_order93_take_cover_retains_atomic_limit_against_real_rattlejoint_provider(
+    ignore_take_cover: bool,
+    expected_save: int,
+) -> None:
+    from copy import deepcopy
+    from typing import cast
+
+    from tests.order93_save_damage_helpers import (
+        reach_save_damage_request,
+        take_cover_rattlejoint_session,
+    )
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.replay import ReplayRunner
+
+    session = take_cover_rattlejoint_session()
+    request = reach_save_damage_request(session, kind="save_characteristic")
+    payload = cast(dict[str, JsonValue], request.payload)
+    inventory = cast(list[dict[str, JsonValue]], payload["modifiers"])
+    assert len(inventory) == 2
+    operations = [cast(dict[str, JsonValue], row["operation"]) for row in inventory]
+    # The registry's real Astra provider is evaluated before its Death Guard provider.
+    assert [operation["operand"] for operation in operations] == [-1, 1]
+    assert operations[0]["result_floor"] == 3
+    assert "result_floor" not in operations[1]
+    assert all(operation["operation"] == "add" for operation in operations)
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
+    )
+    tampered = deepcopy(session.lifecycle.to_payload())
+    pending = tampered["decisions"]["queue"]["pending_requests"][0]
+    body = cast(dict[str, JsonValue], pending["payload"])
+    rows = cast(list[dict[str, JsonValue]], body["modifiers"])
+    cast(dict[str, JsonValue], rows[0]["operation"]).pop("result_floor")
+    with pytest.raises(
+        (GameLifecycleError, ValueError), match=r"[Dd]rift|[Ii]nventory|[Oo]ption|[Rr]eplay"
+    ):
+        GameLifecycle.from_payload(tampered)
+    for _ in range(20):
+        if request.decision_type == "select_modifier_ignores":
+            body = cast(dict[str, JsonValue], request.payload)
+            subject = cast(dict[str, JsonValue], body["subject"])
+            if subject["kind"] == "save_characteristic":
+                rows = cast(list[dict[str, JsonValue]], body["modifiers"])
+                decided = cast(list[str], body["decided_modifier_ids"])
+                operation = cast(dict[str, JsonValue], rows[len(decided)]["operation"])
+                ignore = ignore_take_cover and "result_floor" in operation
+                prefix = "ignore:" if ignore else "keep:"
+                option = next(
+                    (option for option in request.options if option.option_id.startswith(prefix)),
+                    None,
+                )
+                option_id = (
+                    option.option_id
+                    if option is not None
+                    else ("ignore-remaining" if ignore else "keep-remaining")
+                )
+            else:
+                option_id = "keep-remaining"
+            status = session.submit_option(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:bounded-source",
+                option_id=option_id,
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        else:
+            submit_fixture_request(session, request)
+        snapshots = [
+            event.payload
+            for event in session.lifecycle.decision_controller.event_log.records
+            if event.event_type == "attack_save_modifiers_prepared"
+        ]
+        if snapshots:
+            break
+        request = pending_request(session)
+    else:
+        raise AssertionError("The bounded source selection did not complete.")
+    snapshot = cast(dict[str, JsonValue], snapshots[0])
+    options = cast(list[dict[str, JsonValue]], snapshot["selected_options"])
+    assert options[0]["characteristic_target_number"] == expected_save
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
+    )
+    assert (
+        ReplayRunner.from_payload(
+            session.replay_artifact(artifact_id=f"take-cover-source-limit-{ignore_take_cover}")
+        )
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_order93_runtime_save_modifier_uses_raw_random_source_before_minimum() -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.dice import DiceExpression
+    from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
+    from warhammer40k_core.core.random_profile_values import RandomProfileValue
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_option_with_characteristic_terms,
+    )
+    from warhammer40k_core.engine.saves import save_options_for_model
+
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    unit = _unit(catalog=catalog, army_id="army-a", unit_selection_id="random-save")
+    model = unit.own_models[0]
+    random_save = RandomProfileValue(
+        Characteristic.SAVE, DiceExpression(1, 6), "source:random-save"
+    ).evaluate(
+        raw=1, evaluation_id="source:random-save:evaluated", target_id=model.model_instance_id
+    )
+    assert random_save.final == 2
+    model = replace(
+        model,
+        characteristics=tuple(
+            random_save if value.characteristic is Characteristic.SAVE else value
+            for value in model.characteristics
+        ),
+    )
+    option = next(
+        option
+        for option in save_options_for_model(model=model, armor_penetration=0)
+        if option.save_kind is SaveKind.ARMOUR
+    )
+    worsened = save_option_with_characteristic_terms(
+        option,
+        characteristic=Characteristic.SAVE,
+        terms=(ModifierTerm(ModifierOperation.ADD, 1),),
+        source_id="source:rattlejoint",
+        modifier_id="rattlejoint",
+    )
+    assert worsened.characteristic_target_number == 2
+    assert worsened.characteristic_trace is not None
+    assert worsened.characteristic_trace.source_value == 1
+    assert SaveOption.from_payload(worsened.to_payload()) == worsened

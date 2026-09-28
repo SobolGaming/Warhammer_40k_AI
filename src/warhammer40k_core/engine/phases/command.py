@@ -1297,6 +1297,24 @@ def _resolve_battle_shock_step(
                 phase=BattlePhase.COMMAND,
                 phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
             )
+            from warhammer40k_core.engine.battle_shock_modifier_evaluation import (
+                prepare_battle_shock_modifiers,
+            )
+
+            prepared = prepare_battle_shock_modifiers(
+                state=state,
+                decisions=decisions,
+                request=request,
+                ability_index=ability_index,
+                runtime_modifier_registry=runtime_modifier_registry,
+                battle_shock_hooks=battle_shock_hooks,
+                active_player_id=active_player_id,
+                phase=BattlePhase.COMMAND,
+                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+            )
+            if prepared.pending_status is not None:
+                return prepared.pending_status
+            request = prepared.request
             command_state = command_state.with_in_flight_battle_shock_test_request(request)
             state.replace_command_step_state(command_state)
         else:

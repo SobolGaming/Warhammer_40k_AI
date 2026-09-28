@@ -177,6 +177,7 @@ from warhammer40k_core.engine.mission_decisions import (
     invalid_mission_decision_status,
     mission_decision_pauses_after_apply,
 )
+from warhammer40k_core.engine.modifier_evaluation_history import ModifierEvaluationHistoryOrigin
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
 )
@@ -343,6 +344,7 @@ class GameLifecyclePayload(TypedDict):
     reaction_queue: ReactionQueuePayload
     runtime_content_audit: NotRequired[dict[str, JsonValue]]
     psychic_modifier_history_origin: NotRequired[dict[str, JsonValue]]
+    modifier_evaluation_history_origin: NotRequired[dict[str, JsonValue]]
     ingress_placement_history_origin: NotRequired[dict[str, JsonValue]]
     off_battlefield_revival_history_origin: NotRequired[dict[str, JsonValue]]
 
@@ -549,6 +551,7 @@ class GameLifecycle:
     state: GameState | None = None
     parameterized_movement_proposals: bool = True
     _psychic_modifier_history_origin: _pmh.PsychicModifierHistoryOrigin | None = None
+    _modifier_evaluation_history_origin: ModifierEvaluationHistoryOrigin | None = None
     _ingress_placement_history_origin: _iph.IngressPlacementHistoryOrigin | None = None
     _off_battlefield_revival_history_origin: _obh.OffBattlefieldRevivalHistoryOrigin | None = None
     _config: GameConfig | None = None
@@ -775,13 +778,14 @@ class GameLifecycle:
                 request=pending_request,
                 runtime_content_bundle=self._runtime_content_bundle,
             )
-        history_origin, ingress_origin, revival_origin = _history_origins.capture(
+        history_origin, ingress_origin, revival_origin, modifier_origin = _history_origins.capture(
             self, pending_request
         )
         record = self.decision_controller.submit_result(result)
         self._psychic_modifier_history_origin = history_origin
         self._ingress_placement_history_origin = ingress_origin
         self._off_battlefield_revival_history_origin = revival_origin
+        self._modifier_evaluation_history_origin = modifier_origin
         status = self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
             record,
             result,
@@ -1108,9 +1112,13 @@ class GameLifecycle:
             core_ability_selection_dispatch_handler,
         )
         from warhammer40k_core.engine.dice_extremum import dice_extremum_dispatch_handler
+        from warhammer40k_core.engine.modifier_evaluation_dispatch import (
+            modifier_evaluation_dispatch_handler,
+        )
 
         return build_decision_dispatch_registry(
             (
+                modifier_evaluation_dispatch_handler(self),
                 dice_extremum_dispatch_handler(
                     state_provider=self._require_state,
                     decisions=self.decision_controller,
@@ -2726,6 +2734,7 @@ class GameLifecycle:
         self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
             battle_formation_hooks=bundle.battle_formation_hook_registry,
             start_battle_hooks=StartBattleHookRegistry.from_bindings(
                 (

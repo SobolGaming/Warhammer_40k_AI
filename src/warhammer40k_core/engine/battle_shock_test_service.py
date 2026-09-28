@@ -27,7 +27,6 @@ from warhammer40k_core.engine.battle_shock_resolution import (
     BattleShockResolutionResult,
     apply_battle_shock_reroll_resolution_decision,
     is_battle_shock_reroll_request,
-    resolve_battle_shock_test_with_optional_reroll,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -95,6 +94,8 @@ class BattleShockTestRuntime:
 
 @dataclass(frozen=True, slots=True)
 class BattleShockTestExecution:
+    """Retain the source request; resolution carries any selected Leadership target."""
+
     request: BattleShockTestRequest
     resolution: BattleShockResolutionResult
 
@@ -266,21 +267,17 @@ def resolve_battle_shock_test(
             }
         ),
     )
-    decisions.event_log.append(
-        "battle_shock_test_requested",
-        {
-            **base_payload,
-            "battle_shock_test_request": validate_json_value(request.to_payload()),
-        },
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        resolve_battle_shock_after_modifier_choices,
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    resolution = resolve_battle_shock_test_with_optional_reroll(
+
+    resolution = resolve_battle_shock_after_modifier_choices(
         state=state,
         decisions=decisions,
-        manager=manager,
         battle_shock_hooks=runtime.battle_shock_hook_registry,
         request=request,
-        roll_state=manager.roll(request.spec),
+        ability_index=runtime.ability_indexes_by_player_id[request.player_id],
+        runtime_modifier_registry=runtime.runtime_modifier_registry,
         active_player_id=active_player,
         phase=phase,
         phase_start_battle_shocked_unit_ids=phase_start_ids,

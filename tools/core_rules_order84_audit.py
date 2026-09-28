@@ -53,6 +53,20 @@ FINDING_OWNERS = {
     "C02-09": "P02I",
     "C15-10": "P15J",
 }
+# Current locations are separate from the immutable historical audit records.
+# Order 93 replaced the former modifier-ignore decision owner with these modules.
+EVIDENCE_RELOCATIONS = {
+    "src/warhammer40k_core/engine/modifier_ignore.py": (
+        "src/warhammer40k_core/engine/modifier_evaluation.py",
+        "src/warhammer40k_core/engine/modifier_evaluation_dispatch.py",
+    ),
+}
+
+
+def current_evidence_paths(historical_path: str) -> tuple[str, ...]:
+    if historical_path in EVIDENCE_RELOCATIONS:
+        return EVIDENCE_RELOCATIONS[historical_path]
+    return (historical_path,)
 
 
 def load_audit() -> dict[str, Any]:
@@ -98,8 +112,9 @@ def validate_audit(audit: dict[str, Any], *, roadmap: str | None = None) -> None
         if not row["engine_owners"] or not row["regression_files"] or not row["assessment"]:
             raise ValueError("Order 84 category must identify its owners and evidence limits.")
         for path in (*row["engine_owners"], *row["regression_files"]):
-            if not (ROOT / path).is_file():
-                raise ValueError(f"Order 84 evidence path is missing: {path}.")
+            for current_path in current_evidence_paths(path):
+                if not (ROOT / current_path).is_file():
+                    raise ValueError(f"Order 84 evidence path is missing: {current_path}.")
     findings = audit["findings"]
     if (
         len(findings) != len(FINDING_OWNERS)
@@ -180,22 +195,33 @@ def markdown(audit: dict[str, Any]) -> str:
         "source equivalence and clause-specific facade/replay/visibility proof remain open.",
         "The [audit notes](ORDER_84_AUDIT_NOTES.md) describe reproduction, scope and validation.",
         "",
-        "## Selected candidate observation",
-        "",
-        f"Provider: [{observation['provider']}]({observation['url']}).",
-        "This is a non-affiliated maintained mirror.",
-        f"Observed: `{observation['observed_at']}`. App-data version: **not exposed**.",
-        f"Public asset SHA-256: `{observation['asset_sha256']}`.",
-        f"Source inventory SHA-256: `{observation['source_inventory_sha256']}`.",
-        "",
-        observation["comparison"],
-        "This candidate is incomplete for certification (C15-10). The retained metadata and",
-        "block fingerprints are not a runtime source package or a complete verbatim archive.",
-        "The two distinct 09.07.01 entries and untitled 24.37.01 remain separate inventory rows.",
-        "",
-        "## Findings requiring scoped follow-ups",
+        "Later source relocations preserve the original audit paths and observations in the JSON:",
         "",
     ]
+    for historical_path, current_paths in EVIDENCE_RELOCATIONS.items():
+        links = ", ".join(f"[{Path(path).name}](../{path})" for path in current_paths)
+        lines.append(f"- Order 93: `{historical_path}` now routes through {links}.")
+    lines.extend(
+        [
+            "",
+            "## Selected candidate observation",
+            "",
+            f"Provider: [{observation['provider']}]({observation['url']}).",
+            "This is a non-affiliated maintained mirror.",
+            f"Observed: `{observation['observed_at']}`. App-data version: **not exposed**.",
+            f"Public asset SHA-256: `{observation['asset_sha256']}`.",
+            f"Source inventory SHA-256: `{observation['source_inventory_sha256']}`.",
+            "",
+            observation["comparison"],
+            "This candidate is incomplete for certification (C15-10). The retained metadata and",
+            "block fingerprints are not a runtime source package or a complete verbatim archive.",
+            "The two distinct 09.07.01 entries and untitled 24.37.01 remain "
+            "separate inventory rows.",
+            "",
+            "## Findings requiring scoped follow-ups",
+            "",
+        ]
+    )
     for finding in audit["findings"]:
         lines.extend(
             [

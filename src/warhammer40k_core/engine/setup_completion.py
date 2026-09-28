@@ -34,6 +34,7 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_legality_context_for_player,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveStatus
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SETUP_COMPLETION_GATE_SOURCE_ID = "core_rules_setup_completion_gate"
@@ -841,6 +842,7 @@ class SetupCompletionGate:
         decisions: DecisionController,
         config: GameConfig,
         reaction_frame_count: int = 0,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> BattleStartRecord:
         report = self.evaluate(
             state=state,
@@ -861,7 +863,7 @@ class SetupCompletionGate:
             value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
         )
         completed_setup_step = state.complete_final_setup_step_before_battle()
-        state.enter_battle(decisions=decisions)
+        state.enter_battle(decisions=decisions, runtime_modifier_registry=runtime_modifier_registry)
         record_new_primary_turn_start_evidence_events(
             state=state,
             event_log=decisions.event_log,

@@ -853,7 +853,6 @@ def resolve_battle_shock_effect(
     from warhammer40k_core.engine.battle_shock_hooks import BattleShockDiceExpressionContext
     from warhammer40k_core.engine.battle_shock_resolution import (
         BattleShockPassedStatePolicy,
-        resolve_battle_shock_test_with_optional_reroll,
     )
 
     target_rules_unit = rules_unit_view_by_id(
@@ -947,22 +946,17 @@ def resolve_battle_shock_effect(
         movement_action=movement_action,
         effect=effect,
     )
-    decisions.event_log.append(
-        "battle_shock_test_requested",
-        {
-            **base_payload,
-            "battle_shock_test_request": validate_json_value(request.to_payload()),
-        },
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        resolve_battle_shock_after_modifier_choices,
     )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    roll_state = manager.roll(request.spec)
-    resolution = resolve_battle_shock_test_with_optional_reroll(
+
+    resolution = resolve_battle_shock_after_modifier_choices(
         state=state,
         decisions=decisions,
-        manager=manager,
         battle_shock_hooks=battle_shock_hooks,
         request=request,
-        roll_state=roll_state,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
         active_player_id=_active_player_id(state),
         phase=completed_phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,

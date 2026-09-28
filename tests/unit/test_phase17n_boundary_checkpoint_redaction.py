@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+import pytest
+
 from warhammer40k_core.adapters.access_control import (
     ROLE_POLICY_BY_ROLE,
     PrincipalRole,
@@ -56,6 +58,7 @@ from warhammer40k_core.engine.mortal_wound_target_lineage import (
     MortalWoundTargetLineage,
 )
 from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
 )
@@ -302,7 +305,10 @@ def test_contract_10_checkpoint_without_card_witness_preserves_legacy_hash() -> 
     assert restored.to_payload() == legacy_payload
 
 
-def test_phase17n_boundary_checkpoint_is_owner_and_administrator_only() -> None:
+@pytest.mark.parametrize("modifier_scope_id", [None, "objective-control:test-scope"])
+def test_phase17n_boundary_checkpoint_is_owner_and_administrator_only(
+    modifier_scope_id: str | None,
+) -> None:
     owner_card = SecondaryMissionCardState.active_fixed(
         player_id="player-a",
         secondary_mission_id="secret-secondary-card",
@@ -336,8 +342,24 @@ def test_phase17n_boundary_checkpoint_is_owner_and_administrator_only() -> None:
         starting_strength_record_jsons=(),
         active_secondary_mission_ids=("secret-secondary-card",),
         mission_action_prior_use_jsons=(),
+        objective_control_modifier_scope_id=modifier_scope_id,
     )
     payload = checkpoint.to_payload()
+    # Every serialized content field participates in the checkpoint identity;
+    # a boundary with no modifier evaluation has no source scope to serialize.
+    assert ("objective_control_modifier_scope_id" in payload) is (modifier_scope_id is not None)
+    assert checkpoint.checkpoint_hash == canonical_payload_sha256(
+        {
+            key: value
+            for key, value in payload.items()
+            if key not in {"checkpoint_id", "checkpoint_hash"}
+        }
+    )
+    for invalid_scope in (None, "", 7):
+        with pytest.raises(GameLifecycleError, match="objective_control_modifier_scope_id"):
+            PrimaryMissionBoundaryCheckpoint.from_payload(
+                {**payload, "objective_control_modifier_scope_id": invalid_scope}
+            )
 
     owner_event = public_event_record_payload(
         event_id="phase17n-checkpoint-event",

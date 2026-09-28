@@ -8,7 +8,6 @@ from functools import partial
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
-from warhammer40k_core.engine.battle_shock import battle_shock_leadership_target_for_unit
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import rules_units_within
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
@@ -30,7 +29,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.movement_model import (
     MovementPhaseActionKind,
     PendingMovementActionSelection,
@@ -139,43 +138,44 @@ def _resolve_denial(
     identity: str,
     ability_indexes: Mapping[str, AbilityCatalogIndex],
     modifiers: RuntimeModifierRegistry,
-) -> None:
-    from warhammer40k_core.core.attributes import Characteristic
-    from warhammer40k_core.engine.random_profile_evaluation import (
-        evaluate_unit_profile_characteristics,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.nonattack_modifier_evaluation import (
+        evaluate_leadership_modifiers,
     )
 
-    evaluate_unit_profile_characteristics(
+    target = rules_unit_view_by_id(state=state, unit_instance_id=pending.unit_instance_id)
+    model_ids = tuple(
+        sorted(
+            model_id
+            for component in target.components
+            for model_id in catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                state=state, unit=component.unit
+            )
+        )
+    )
+    evaluation = evaluate_leadership_modifiers(
         state=state,
         decisions=decisions,
-        unit_instance_id=pending.unit_instance_id,
-        scope_id=f"{pending.result_id}:{identity}",
-        characteristics=(Characteristic.LEADERSHIP,),
-    )
-    target = rules_unit_view_by_id(state=state, unit_instance_id=pending.unit_instance_id)
-    index = ability_indexes[target.owner_player_id]
-    components = tuple(
-        (
-            component,
-            catalog_rule_current_placed_alive_model_instance_ids_for_unit(
-                state=state, unit=component.unit
-            ),
-        )
-        for component in target.components
-    )
-    living = tuple((component, ids) for component, ids in components if ids)
-    if not living:
-        raise GameLifecycleError("Fall Back denial target has no placed alive models.")
-    leadership = min(
-        battle_shock_leadership_target_for_unit(
-            component.unit,
-            current_model_ids=ids,
-            ability_index=index,
+        unit_instance_id=target.unit_instance_id,
+        occurrence_id=f"{pending.result_id}:{identity}",
+        ability_index=ability_indexes[target.owner_player_id],
+        runtime_modifier_registry=modifiers,
+        model_instance_ids=model_ids,
+        roll_modifiers=selected_target_test_roll_modifiers(
             state=state,
-            runtime_modifier_registry=modifiers,
-        )
-        for component, ids in living
+            unit_instance_id=target.unit_instance_id,
+            roll_type=LEADERSHIP_TEST_ROLL_TYPE,
+        ),
+        source_context={
+            "continuation": "phase",
+            "source_kind": "fall_back_denial",
+            "movement_action_result_id": pending.result_id,
+            "timing_participant_id": identity,
+        },
     )
+    if evaluation.pending_status is not None:
+        return evaluation.pending_status
+    leadership = evaluation.leadership_target
     roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=2, sides=6),
@@ -186,11 +186,7 @@ def _resolve_denial(
     )
     modified = ModifiedRollResult.from_unmodified(
         UnmodifiedRollResult.from_state(roll),
-        modifiers=selected_target_test_roll_modifiers(
-            state=state,
-            unit_instance_id=target.unit_instance_id,
-            roll_type=LEADERSHIP_TEST_ROLL_TYPE,
-        ),
+        modifiers=evaluation.roll_modifiers,
     )
     source = effect.effect_payload
     if not isinstance(source, dict):
@@ -215,3 +211,4 @@ def _resolve_denial(
         "fall_back_denied": modified.final_value < leadership,
     }
     decisions.event_log.append(CATALOG_FALL_BACK_LEADERSHIP_TEST_EVENT, payload)
+    return None

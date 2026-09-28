@@ -53,7 +53,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     SaveOptionModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
     StratagemCostChoiceRequestContext,
@@ -522,7 +522,7 @@ def infamy_objective_control_modifier(
         target_unit_instance_id=context.unit_instance_id,
     ):
         return ()
-    return (ModifierTerm(ModifierOperation.ADD, -1), ModifierTerm(ModifierOperation.FLOOR, 1))
+    return (ModifierTerm(ModifierOperation.ADD, -1, result_floor=1),)
 
 
 def voidstone_save_option_modifier(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
@@ -534,23 +534,17 @@ def voidstone_save_option_modifier(context: SaveOptionModifierContext) -> tuple[
         effect_kind=VOIDSTONE_EFFECT_KIND,
     ):
         return context.save_options
-    if any(
-        option.save_kind is SaveKind.INVULNERABLE and option.target_number <= 5
-        for option in context.save_options
-    ):
-        return context.save_options
-    armor_penetration = context.save_options[0].armor_penetration if context.save_options else 0
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_options_with_invulnerable_characteristic,
+    )
+
     return tuple(
         sorted(
-            (
-                *context.save_options,
-                SaveOption(
-                    save_kind=SaveKind.INVULNERABLE,
-                    target_number=5,
-                    characteristic_target_number=5,
-                    armor_penetration=armor_penetration,
-                    source_rule_ids=(VOIDSTONE_SOURCE_RULE_ID,),
-                ),
+            save_options_with_invulnerable_characteristic(
+                context.save_options,
+                target_number=5,
+                source_id=VOIDSTONE_SOURCE_RULE_ID,
+                only_if_better=True,
             ),
             key=lambda option: (option.save_kind.value, option.target_number),
         )
