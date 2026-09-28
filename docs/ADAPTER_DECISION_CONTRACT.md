@@ -7108,6 +7108,31 @@ bearer. Persisted permission evidence includes the actual effect ID, unchanged
 source context and expiration. Attached component membership, current weapon
 ownership and authenticated retained-model presence remain engine-owned.
 
+At an attack boundary, `source_context.permission_attack_context` is required.
+It binds the actual attacking unit and model, target unit, subject role
+(`attacker` or `target`), source phase, full weapon profile, and nullable resolved
+`attack_strength` and `target_toughness`. The engine uses these same facts when
+discovering permissions and validating a submission before queue pop. A
+defender's Save or Toughness subject is distinct from the model making the attack.
+Pending restore and replay reconstruct the occurrence independently; clients
+cannot supply, remove, swap or reinterpret its identities or condition values.
+
+Restrictions that need an attack target or weapon are unsupported at a
+pre-declaration or non-attack boundary that has no such occurrence. A comparison
+requiring Strength/Toughness is unsupported until both values have been resolved
+by their owners; it must not use an invented value or circularly assume the
+outcome of an unmade modifier choice. These cases raise an explicit typed
+unsupported-context error. Matching kinds with sufficient attack facts evaluate
+their descriptor restrictions normally; a nonmatching target or role grants no
+permission. Defensive `source_unit_below_starting_strength` and
+`source_unit_below_half_strength` restrictions are also explicitly unsupported:
+the occurrence authenticates the attacker and beneficiary, but does not identify
+a separate permission source unit. They must never inspect the enemy attacker
+as that source. Existing `ability_required` and
+`requires_charge_move_this_turn` predicates still describe the attacker;
+`required_keyword` and `required_keyword_sequence` describe the subject role.
+Unconditional permissions remain valid outside attacks.
+
 Options keep or ignore the next operation, or keep or ignore all remaining
 operations. `keep-remaining` and `ignore-remaining` finish the occurrence;
 individual choices advance an immutable inventory prefix and emit a fresh

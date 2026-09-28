@@ -15,6 +15,7 @@ from warhammer40k_core.engine.modifier_evaluation import (
     SELECT_MODIFIER_IGNORES_DECISION_TYPE,
     ModifierEvaluationSubject,
     modifier_evaluation_options,
+    permission_attack_context_from_source,
     selection_history,
 )
 from warhammer40k_core.engine.modifier_evaluation_history import validate_modifier_origin
@@ -65,6 +66,9 @@ def _validate(lifecycle: GameLifecycle, request: DecisionRequest, result: Decisi
     index = lifecycle._require_runtime_content_bundle().ability_indexes_by_player_id[
         owner.owner_player_id
     ]
+    source_context = payload["source_context"]
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Modifier choice source context must be an object.")
     permissions = modifier_ignore_permissions_for_subject(
         state=state,
         ability_index=index,
@@ -72,6 +76,7 @@ def _validate(lifecycle: GameLifecycle, request: DecisionRequest, result: Decisi
         kind=subject.kind,
         model_instance_id=subject.model_instance_id,
         weapon_profile_id=subject.weapon_profile_id,
+        attack_context=permission_attack_context_from_source(source_context),
     )
     if payload["permissions"] != [permission.to_payload() for permission in permissions]:
         raise GameLifecycleError("Modifier evaluation source permission drifted.")

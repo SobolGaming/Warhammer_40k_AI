@@ -720,6 +720,8 @@ def test_random_damage_preserves_intrinsic_expression_and_modified_event(delta: 
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
         target_unit_instance_id=target.unit_instance_id,
         weapon_profile=profile,
+        attack_strength=None,
+        target_toughness=None,
         source_phase=BattlePhase.SHOOTING,
         stratagem_index=None,
     )

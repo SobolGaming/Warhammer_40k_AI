@@ -40,6 +40,20 @@ before-pop validation, source inventory, lifecycle continuation and replay
 authority. Permission discovery is `catalog_modifier_ignore.py`, including
 catalog ownership and applicable persisted `GRANT_ABILITY` effects.
 
+Persisted attack restrictions are evaluated with the actual attacker, defender,
+subject role, phase, weapon and available resolved Strength/Toughness. That
+context is retained in the request and reconstructed for before-pop validation,
+pending restoration and replay. Unit/model beneficiary scope is separate from
+which model makes the attack. Pre-declaration and non-attack boundaries lack a
+unique attack context; restricted grants needing those missing facts produce an
+explicit unsupported-context diagnostic. Strength/Toughness comparisons are
+likewise unsupported before both characteristic owners have resolved their
+values. Defensive source-unit Starting/Half Strength restrictions are explicitly
+unsupported until a separate permission source unit can be authenticated; the
+enemy attacker must not stand in for that source. These limitations are distinct
+from a correctly evaluated nonmatching
+target or role. See R93-001 in the [repair evidence](performance/order93/r93_001/README.md).
+
 | Subject | Owner and source/producer inventory |
 | --- | --- |
 | Movement, Advance, Charge | `movement_modifier_evaluation.py`; movement/charge phase owners and reaction continuations. Catalog Maulerfiend permission, catalog Charge modifiers, generic IR effects and faction runtime bindings preserve separate operations. Choices belong to the movement/charge occurrence. |

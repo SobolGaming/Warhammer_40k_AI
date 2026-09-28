@@ -44,6 +44,33 @@ def test_general_modifier_options_do_not_enumerate_power_sets() -> None:
     assert not offenders, f"Subset choices must keep bounded option width, lines: {offenders}"
 
 
+def test_attack_permission_consumers_supply_occurrence_context() -> None:
+    for name in (
+        "attack_modifier_evaluation.py",
+        "attack_save_modifier_selection.py",
+        "attack_damage_modifier_selection.py",
+    ):
+        calls = [
+            node
+            for node in ast.walk(ast.parse((ENGINE / name).read_text()))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "select_modifiers"
+        ]
+        assert calls, name
+        assert all("attack_context" in {key.arg for key in call.keywords} for call in calls), name
+    for name in ("modifier_evaluation.py", "modifier_evaluation_dispatch.py"):
+        calls = [
+            node
+            for node in ast.walk(ast.parse((ENGINE / name).read_text()))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "modifier_ignore_permissions_for_subject"
+        ]
+        assert len(calls) == 1, name
+        assert "attack_context" in {key.arg for key in calls[0].keywords}, name
+
+
 def test_nonattack_selection_owners_do_not_collapse_profile_or_catalog_operations() -> None:
     scalar_queries = {
         "resolved_profile_characteristic",

@@ -1,5 +1,10 @@
 # Order 93 modifier evaluation performance
 
+This page records the original published revision `d0f6e96d` and runtime
+`6ba430dc`. The subsequent R93-001 permission-context repair has separate
+[current validation and performance evidence](r93_001/README.md). Historical
+measurements here are retained without relabeling their runtime identities.
+
 Workload: `order93-no-permission-attack-slices-v1`, versioned in
 `scripts/benchmark_order93_modifiers.py`. It reuses the existing deterministic
 12-attack Shooting/Fight fixture on the same provisional host and dependency

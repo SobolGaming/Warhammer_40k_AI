@@ -15,10 +15,152 @@ from warhammer40k_core.core.random_profile_values import RandomProfileValue
 from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
+
+
+@pytest.mark.parametrize(
+    ("kind", "role", "selected_target_matches", "expected_permission"),
+    [
+        ("hit_roll", "attacker", True, True),
+        ("hit_roll", "attacker", False, False),
+        ("hit_roll", "target", None, False),
+        ("save_characteristic", "target", None, True),
+        ("save_characteristic", "attacker", None, False),
+        ("save_roll", "target", None, True),
+        ("save_roll", "attacker", None, False),
+    ],
+)
+def test_attack_modifier_permissions_follow_actual_target_and_subject_role(
+    kind: str, role: str, selected_target_matches: bool | None, expected_permission: bool
+) -> None:
+    from tests.order93_attack_permission_helpers import attack_permission_session
+
+    session = attack_permission_session(
+        kind=kind, role=role, selected_target_matches=selected_target_matches
+    )
+    observed = _complete_context_permission_attack(session, kind=kind)
+    assert bool(observed) is expected_permission
+    for request in observed:
+        _assert_permission_attack_context(request, kind=kind, strength=20)
+
+
+@pytest.mark.parametrize(("strength", "expected_permission"), [(20, True), (3, False)])
+def test_attack_modifier_permission_strength_condition_uses_real_attack_values(
+    strength: int, expected_permission: bool
+) -> None:
+    from tests.order93_attack_permission_helpers import attack_permission_session
+
+    session = attack_permission_session(
+        kind="wound_roll", role="attacker", strength_gate=True, strength=strength
+    )
+    observed = _complete_context_permission_attack(session, kind="wound_roll")
+    assert bool(observed) is expected_permission
+    for request in observed:
+        _assert_permission_attack_context(request, kind="wound_roll", strength=strength)
+
+
+@pytest.mark.parametrize(
+    "field", ["target_unit_instance_id", "subject_role", "weapon_profile", "attack_strength"]
+)
+def test_attack_modifier_permission_context_drift_rejects_before_queue_pop(field: str) -> None:
+    from tests.order93_attack_permission_helpers import OTHER_TARGET_ID, attack_permission_session
+    from tests.order93_modifier_helpers import reach_modifier_request
+
+    session = attack_permission_session(
+        kind="hit_roll", role="attacker", selected_target_matches=True
+    )
+    request = reach_modifier_request(session)
+    payload = cast(dict[str, JsonValue], request.payload)
+    context = cast(dict[str, JsonValue], payload["source_context"])
+    attack = cast(dict[str, JsonValue], context["permission_attack_context"])
+    if field == "target_unit_instance_id":
+        attack[field] = OTHER_TARGET_ID
+    elif field == "subject_role":
+        attack[field] = "target"
+    elif field == "weapon_profile":
+        weapon = cast(dict[str, JsonValue], attack[field])
+        attack[field] = {**weapon, "profile_id": "unselected-weapon-profile"}
+    else:
+        attack[field] = 1
+    before = canonical_json(session.lifecycle.to_payload())
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id="ignore-remaining",
+        result_id=f"{request.request_id}:drifted-context",
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID, status
+    assert canonical_json(session.lifecycle.to_payload()) == before
+    assert session.lifecycle.decision_controller.queue.peek_next() == request
+
+
+def _assert_permission_attack_context(
+    request: DecisionRequest, *, kind: str, strength: int
+) -> None:
+    from tests.order93_attack_permission_helpers import ATTACKER_ID, TARGET_ID
+
+    payload = cast(dict[str, JsonValue], request.payload)
+    source = cast(dict[str, JsonValue], payload["source_context"])
+    attack = cast(dict[str, JsonValue], source["permission_attack_context"])
+    assert attack["attacking_unit_instance_id"] == ATTACKER_ID
+    assert attack["attacker_model_instance_id"] == f"{ATTACKER_ID}:core-intercessor-like:001"
+    assert attack["target_unit_instance_id"] == TARGET_ID
+    assert attack["subject_role"] == ("target" if kind.startswith("save") else "attacker")
+    assert attack["source_phase"] == "shooting"
+    weapon = cast(dict[str, JsonValue], attack["weapon_profile"])
+    assert cast(dict[str, JsonValue], weapon["range_profile"])["kind"] == "distance"
+    if kind == "wound_roll":
+        assert attack["attack_strength"] == strength
+        assert attack["target_toughness"] == 4
+
+
+def _complete_context_permission_attack(
+    session: LocalGameSession, *, kind: str
+) -> tuple[DecisionRequest, ...]:
+    requests: list[DecisionRequest] = []
+    for _ in range(45):
+        request = pending_request(session)
+        if request.decision_type == "select_modifier_ignores":
+            payload = cast(dict[str, JsonValue], request.payload)
+            subject = cast(dict[str, JsonValue], payload["subject"])
+            assert subject["kind"] == kind
+            actor_id = "player-b" if kind.startswith("save") else "player-a"
+            assert request.actor_id == actor_id
+            requests.append(request)
+            snapshot = session.lifecycle.to_payload()
+            assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+            opponent = "player-a" if actor_id == "player-b" else "player-b"
+            assert "permission_attack_context" in canonical_json(
+                session.view(viewer_player_id=actor_id)
+            )
+            assert "permission_attack_context" not in canonical_json(
+                session.view(viewer_player_id=opponent)
+            )
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id="ignore-remaining",
+                result_id=f"{request.request_id}:ignore-restricted",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        else:
+            submit_fixture_request(session, request)
+        if any(
+            event.event_type == "attack_sequence_completed"
+            for event in session.lifecycle.decision_controller.event_log.records
+        ):
+            break
+    else:
+        raise AssertionError("Context-restricted attack did not complete.")
+    snapshot = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id=f"permission-context-{kind}"))
+        .run()
+        .reproduced_exactly
+    )
+    return tuple(requests)
 
 
 def _record_effect(

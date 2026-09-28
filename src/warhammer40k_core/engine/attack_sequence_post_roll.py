@@ -367,6 +367,8 @@ def defer_grouped_devastating_wounds(
             attacker_model_instance_id=pool.attacker_model_instance_id,
             target_unit_instance_id=attack_context["target_unit_instance_id"],
             weapon_profile=pool.weapon_profile,
+            attack_strength=attack_context["wound_roll"]["strength"],
+            target_toughness=attack_context["wound_roll"]["toughness"],
             source_phase=attack_sequence.source_phase,
             stratagem_index=stratagem_index,
             stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,

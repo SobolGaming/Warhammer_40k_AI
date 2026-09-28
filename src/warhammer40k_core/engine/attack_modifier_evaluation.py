@@ -18,6 +18,7 @@ from warhammer40k_core.engine.damage_allocation import allocation_context_for_un
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.modifier_evaluation import ModifierEvaluationSubject, select_modifiers
+from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -94,6 +95,16 @@ def select_hit_modifiers(
                 unit_id, kind, pool.attacker_model_instance_id, pool.weapon_profile_id
             ),
             modifiers=operations,
+            attack_context=ModifierPermissionAttackContext(
+                attacking_unit_instance_id=unit_id,
+                attacker_model_instance_id=pool.attacker_model_instance_id,
+                target_unit_instance_id=pool.target_unit_instance_id,
+                subject_role="attacker",
+                source_phase=source_phase,
+                weapon_profile=pool.weapon_profile,
+                attack_strength=None,
+                target_toughness=None,
+            ),
             source_context=attack_modifier_source_context(
                 pool=pool, attack_context_id=attack_context_id, source_phase=source_phase
             ),
@@ -145,6 +156,16 @@ def select_wound_modifiers(
         ),
         modifiers=strength.modifiers,
         source_context=source_context,
+        attack_context=ModifierPermissionAttackContext(
+            attacking_unit_instance_id=unit_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            subject_role="attacker",
+            source_phase=source_phase,
+            weapon_profile=pool.weapon_profile,
+            attack_strength=None,
+            target_toughness=None,
+        ),
     )
     if selection.pending_status is not None:
         return WoundModifierEvaluation(pool, 0, 0, selection.pending_status)
@@ -186,6 +207,16 @@ def select_wound_modifiers(
             ),
             modifiers=operations,
             source_context={**source_context, "source_value": trace.source_value},
+            attack_context=ModifierPermissionAttackContext(
+                attacking_unit_instance_id=unit_id,
+                attacker_model_instance_id=pool.attacker_model_instance_id,
+                target_unit_instance_id=pool.target_unit_instance_id,
+                subject_role="target",
+                source_phase=source_phase,
+                weapon_profile=pool.weapon_profile,
+                attack_strength=pool.weapon_profile.strength_for_interaction(),
+                target_toughness=None,
+            ),
         )
         if selection.pending_status is not None:
             return WoundModifierEvaluation(pool, 0, 0, selection.pending_status)
@@ -229,6 +260,16 @@ def select_wound_modifiers(
             pool.weapon_profile_id,
         ),
         modifiers=wound_operations,
+        attack_context=ModifierPermissionAttackContext(
+            attacking_unit_instance_id=unit_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            subject_role="attacker",
+            source_phase=source_phase,
+            weapon_profile=pool.weapon_profile,
+            attack_strength=pool.weapon_profile.strength_for_interaction(),
+            target_toughness=toughness,
+        ),
         source_context={
             **source_context,
             "strength": pool.weapon_profile.strength_for_interaction(),

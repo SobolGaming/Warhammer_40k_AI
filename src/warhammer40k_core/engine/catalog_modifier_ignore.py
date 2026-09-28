@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
@@ -29,6 +29,8 @@ from warhammer40k_core.rules.rule_ir import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.generic_rule_effect_targets import GenericAttackEffect
+    from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
     from warhammer40k_core.engine.rules_units import RulesUnitView
 
 
@@ -276,6 +278,7 @@ def modifier_ignore_permissions_for_subject(
     kind: ModifierIgnoreKind,
     model_instance_id: str | None = None,
     weapon_profile_id: str | None = None,
+    attack_context: ModifierPermissionAttackContext | None = None,
 ) -> tuple[CatalogModifierIgnorePermission, ...]:
     """Resolve current permission sources without granting physical weapon authority.
 
@@ -285,12 +288,15 @@ def modifier_ignore_permissions_for_subject(
     """
     from warhammer40k_core.engine.ability_presence import ability_presence
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     if type(state) is not GameState or type(ability_index) is not AbilityCatalogIndex:
         raise GameLifecycleError("Modifier-ignore subject query requires state and ability index.")
     if type(kind) is not ModifierIgnoreKind:
         raise GameLifecycleError("Modifier-ignore query requires a typed kind.")
+    if attack_context is not None and type(attack_context) is not ModifierPermissionAttackContext:
+        raise GameLifecycleError("Modifier-ignore query requires a typed attack context.")
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     model_id = (
         None
@@ -329,6 +335,14 @@ def modifier_ignore_permissions_for_subject(
         kind=kind,
         subject_context=subject_context,
     )
+    if permissions and attack_context is not None:
+        _permission_attack_context_for_subject(
+            state=state,
+            view=view,
+            model_id=model_id,
+            profile_id=profile_id,
+            context=attack_context,
+        )
     permissions.extend(
         _persisted_subject_permissions(
             state=state,
@@ -338,6 +352,7 @@ def modifier_ignore_permissions_for_subject(
             profile_id=profile_id,
             kind=kind,
             subject_context=subject_context,
+            attack_context=attack_context,
         )
     )
     return tuple(sorted(permissions, key=lambda permission: permission.permission_id))
@@ -508,20 +523,43 @@ def _persisted_subject_permissions(
     profile_id: str | None,
     kind: ModifierIgnoreKind,
     subject_context: dict[str, JsonValue],
+    attack_context: ModifierPermissionAttackContext | None,
 ) -> list[CatalogModifierIgnorePermission]:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_effect_context_applies,
-        generic_rule_matching_unit_effects,
+        generic_matching_unit_effect_applications,
+    )
+    from warhammer40k_core.engine.generic_rule_effect_targets import generic_effect_role_applies
+    from warhammer40k_core.engine.rules_unit_effects import (
+        rules_unit_effect_applications_from_inventory,
     )
 
     permissions: list[CatalogModifierIgnorePermission] = []
-    for effect in generic_rule_matching_unit_effects(
-        state=state,
-        unit_instance_id=view.unit_instance_id,
+    # Candidate discovery cannot use the unit helper's attacker-only role gate:
+    # the permission may belong to the defending unit or allocated model.
+    candidates = generic_matching_unit_effect_applications(
+        applications=rules_unit_effect_applications_from_inventory(
+            armies=tuple(state.army_definitions),
+            effects=tuple(state.persisting_effects),
+            rules_unit=view,
+        ),
         effect_kind=RuleEffectKind.GRANT_ABILITY,
-    ):
-        if effect.parameters.get("ability") != "modifier_ignore_permission":
-            continue
+        role="attacker" if attack_context is None else attack_context.subject_role,
+        application_filter=lambda effect, _unit_id: (
+            effect.parameters.get("ability") == "modifier_ignore_permission"
+            and kind in _permission_kinds(effect.parameters)
+        ),
+    )
+    context = None
+    if candidates and attack_context is not None:
+        context = _permission_attack_context_for_subject(
+            state=state,
+            view=view,
+            model_id=model_id,
+            profile_id=profile_id,
+            context=attack_context,
+        )
+    for effect in candidates:
         if effect.target_kind not in {
             RuleTargetKind.THIS_MODEL,
             RuleTargetKind.THIS_UNIT,
@@ -546,41 +584,42 @@ def _persisted_subject_permissions(
                 model_id is not None or current_ids != (effect.source_model_instance_id,)
             ):
                 continue
-        if any(
-            condition.get("kind") != RuleConditionKind.TARGET_CONSTRAINT.value
-            for condition in effect.conditions
+        if context is not None and not generic_effect_role_applies(
+            effect=effect,
+            role=context.subject_role,
+            attacking_unit_instance_id=(
+                effect.effective_target_unit_instance_ids[0]
+                if context.subject_role == "attacker"
+                else context.attacking_unit_instance_id
+            ),
+            target_unit_instance_id=(
+                effect.effective_target_unit_instance_ids[0]
+                if context.subject_role == "target"
+                else context.target_unit_instance_id
+            ),
+            legacy_attacker_role_allowed=lambda _effect: True,
+            legacy_target_role_allowed=lambda _effect: True,
         ):
-            raise GameLifecycleError("Persisted modifier-ignore condition kind is unsupported.")
-        supported_keys = {
-            "ability",
-            "selection",
-            "modifier_kinds",
-            "source_phase",
-            "required_keyword",
-            "required_keyword_sequence",
-            "target_constraint",
-            "attack_role",
-            "ability_required",
-            "requires_charge_move_this_turn",
-            "target_required_keyword",
-            "selected_target_unit_instance_id",
-            "target_allegiance",
-            "attacker_scope",
-        }
-        if set(effect.parameters) - supported_keys:
-            raise GameLifecycleError("Persisted modifier-ignore restriction is unsupported.")
+            continue
+        _require_permission_restriction_context(effect=effect, context=context)
+        subject_model_id = (
+            current_ids[0] if model_id is None and len(current_ids) == 1 else model_id
+        )
         if not generic_effect_context_applies(
             state=state,
             effect=effect,
-            attacking_unit_instance_id=view.unit_instance_id,
-            attacker_model_instance_id=(
-                current_ids[0] if model_id is None and len(current_ids) == 1 else model_id
+            attacking_unit_instance_id=(
+                view.unit_instance_id if context is None else context.attacking_unit_instance_id
             ),
-            target_unit_instance_id=None,
-            source_phase=state.current_battle_phase,
-            weapon_profile=None,
-            attack_strength=None,
-            target_toughness=None,
+            attacker_model_instance_id=(
+                subject_model_id if context is None else context.attacker_model_instance_id
+            ),
+            target_unit_instance_id=None if context is None else context.target_unit_instance_id,
+            source_phase=state.current_battle_phase if context is None else context.source_phase,
+            weapon_profile=None if context is None else context.weapon_profile,
+            attack_strength=None if context is None else context.attack_strength,
+            target_toughness=None if context is None else context.target_toughness,
+            subject_model_instance_id=subject_model_id,
         ):
             continue
         permissions.append(
@@ -603,3 +642,160 @@ def _persisted_subject_permissions(
             )
         )
     return permissions
+
+
+def _permission_attack_context_for_subject(
+    *,
+    state: GameState,
+    view: RulesUnitView,
+    model_id: str | None,
+    profile_id: str | None,
+    context: ModifierPermissionAttackContext,
+) -> ModifierPermissionAttackContext:
+    """Bind supplied attack identities to the subject's current rules-unit lineage.
+
+    The attack owner authenticates the profile and resolved values against its
+    active attack record; this query authenticates their unit/model relationship.
+    """
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    attacker = (
+        view
+        if context.attacking_unit_instance_id == view.unit_instance_id
+        else rules_unit_view_by_id(state=state, unit_instance_id=context.attacking_unit_instance_id)
+    )
+    target = (
+        view
+        if context.target_unit_instance_id == view.unit_instance_id
+        else rules_unit_view_by_id(state=state, unit_instance_id=context.target_unit_instance_id)
+    )
+    attacker_component_id = attacker.component_unit_id_for_model(context.attacker_model_instance_id)
+    if context.attacking_unit_instance_id not in {attacker.unit_instance_id, attacker_component_id}:
+        raise GameLifecycleError("Modifier permission attacker model has wrong component owner.")
+    expected_subject_id = (
+        attacker.unit_instance_id if context.subject_role == "attacker" else target.unit_instance_id
+    )
+    if view.unit_instance_id != expected_subject_id:
+        raise GameLifecycleError("Modifier permission subject role has wrong rules-unit owner.")
+    if (
+        context.subject_role == "attacker"
+        and model_id is not None
+        and context.attacker_model_instance_id != model_id
+    ):
+        raise GameLifecycleError("Modifier permission subject differs from the attacking model.")
+    if profile_id is not None and profile_id != context.weapon_profile.profile_id:
+        raise GameLifecycleError("Modifier permission weapon profile identity drift.")
+    return replace(
+        context,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        target_unit_instance_id=target.unit_instance_id,
+    )
+
+
+def _require_permission_restriction_context(
+    *, effect: GenericAttackEffect, context: ModifierPermissionAttackContext | None
+) -> None:
+    from warhammer40k_core.engine.generic_rule_attack_conditions import (
+        generic_rule_conditions_require_source_model_instance_id,
+        generic_rule_target_allegiance_values,
+        generic_rule_target_constraint_values,
+    )
+    from warhammer40k_core.engine.generic_rule_strength_constraints import (
+        TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
+        TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH,
+    )
+    from warhammer40k_core.engine.modifier_permission_context import (
+        UnsupportedModifierPermissionContextError,
+    )
+    from warhammer40k_core.engine.phase import BattlePhase
+
+    supported_keys = {
+        "ability",
+        "selection",
+        "modifier_kinds",
+        "source_phase",
+        "required_keyword",
+        "required_keyword_sequence",
+        "target_constraint",
+        "attack_role",
+        "ability_required",
+        "requires_charge_move_this_turn",
+        "target_required_keyword",
+        "selected_target_unit_instance_id",
+        "target_allegiance",
+        "attacker_scope",
+    }
+    if set(effect.parameters) - supported_keys:
+        raise GameLifecycleError("Persisted modifier-ignore restriction is unsupported.")
+    for condition in effect.conditions:
+        if condition.get("kind") != RuleConditionKind.TARGET_CONSTRAINT.value:
+            raise GameLifecycleError("Persisted modifier-ignore condition kind is unsupported.")
+        parameters = condition.get("parameters")
+        if not isinstance(parameters, dict) or set(parameters) - {
+            "target_constraint",
+            "target_allegiance",
+            "relationship",
+        }:
+            raise GameLifecycleError(
+                "Persisted modifier-ignore condition restriction is unsupported."
+            )
+        if "relationship" in parameters and parameters["relationship"] != "this_model_makes_attack":
+            raise GameLifecycleError(
+                "Persisted modifier-ignore condition relationship is unsupported."
+            )
+    required_phase = effect.parameters.get("source_phase")
+    if required_phase is not None:
+        if type(required_phase) is not str:
+            raise GameLifecycleError("Persisted modifier-ignore source phase must be a string.")
+        try:
+            BattlePhase(required_phase)
+        except ValueError as exc:
+            raise GameLifecycleError(
+                "Persisted modifier-ignore source phase is unsupported."
+            ) from exc
+    constraints = generic_rule_target_constraint_values(
+        parameters=effect.parameters, conditions=effect.conditions
+    )
+    allegiances = generic_rule_target_allegiance_values(
+        parameters=effect.parameters, conditions=effect.conditions
+    )
+    local_constraints = {
+        TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
+        TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH,
+    }
+    if (
+        context is not None
+        and context.subject_role == "target"
+        and local_constraints.intersection(constraints)
+    ):
+        raise UnsupportedModifierPermissionContextError(
+            "Defensive modifier-ignore source-strength restrictions are unsupported without "
+            "authenticated source-unit ownership."
+        )
+    needs_attack_context = (
+        any(
+            key in effect.parameters
+            for key in {
+                "attack_role",
+                "target_required_keyword",
+                "selected_target_unit_instance_id",
+                "attacker_scope",
+            }
+        )
+        or bool(allegiances)
+        or bool(set(constraints) - local_constraints)
+        or generic_rule_conditions_require_source_model_instance_id(effect.conditions)
+    )
+    if context is None and needs_attack_context:
+        raise UnsupportedModifierPermissionContextError(
+            "Persisted modifier-ignore restriction is unsupported without attack context."
+        )
+    if (
+        context is not None
+        and "attack_strength_greater_than_target_toughness" in constraints
+        and (context.attack_strength is None or context.target_toughness is None)
+    ):
+        raise UnsupportedModifierPermissionContextError(
+            "Persisted modifier-ignore restriction is unsupported without resolved attack "
+            "Strength and target Toughness."
+        )

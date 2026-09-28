@@ -14,6 +14,7 @@ from warhammer40k_core.engine.modifier_evaluation import (
     selected_modifiers_for_occurrence,
     selection_history,
 )
+from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.save_modifier_operations import save_option_ignoring_modifiers
 from warhammer40k_core.engine.saves import SaveKind, SaveOption, SaveOptionPayload
@@ -137,6 +138,19 @@ def prepare_attack_save_modifiers(
                 occurrence_id=evaluation.occurrence_id,
                 subject=evaluation.subject,
                 modifiers=evaluation.modifiers,
+                attack_context=ModifierPermissionAttackContext(
+                    attacking_unit_instance_id=attack_context["attacking_unit_instance_id"],
+                    attacker_model_instance_id=attack_context["attacker_model_instance_id"],
+                    target_unit_instance_id=attack_context["target_unit_instance_id"],
+                    subject_role="attacker"
+                    if evaluation.subject.kind
+                    is ModifierIgnoreKind.ARMOR_PENETRATION_CHARACTERISTIC
+                    else "target",
+                    source_phase=sequence.source_phase,
+                    weapon_profile=sequence.current_pool().weapon_profile,
+                    attack_strength=attack_context["wound_roll"]["strength"],
+                    target_toughness=attack_context["wound_roll"]["toughness"],
+                ),
                 source_context={
                     "continuation": "attack",
                     "evaluation_stage": "save",

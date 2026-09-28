@@ -393,6 +393,8 @@ def test_order93_damage_keeps_profile_melta_and_allocated_operations_until_bound
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
         target_unit_instance_id=defender.unit_instance_id,
         weapon_profile=weapon,
+        attack_strength=None,
+        target_toughness=None,
         source_phase=BattlePhase.SHOOTING,
         stratagem_index=None,
         runtime_modifier_registry=registry,

@@ -22,6 +22,7 @@ from warhammer40k_core.engine.catalog_modifier_ignore import (
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 
 if TYPE_CHECKING:
@@ -97,6 +98,7 @@ def select_modifiers[T: Modifier | RollModifier](
     subject: ModifierEvaluationSubject,
     modifiers: tuple[T, ...],
     source_context: dict[str, JsonValue],
+    attack_context: ModifierPermissionAttackContext | None = None,
 ) -> ModifierEvaluationResult[T]:
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
@@ -109,6 +111,10 @@ def select_modifiers[T: Modifier | RollModifier](
     )
     if not modifiers and previous is None:
         return ModifierEvaluationResult(modifiers)
+    if "permission_attack_context" in source_context:
+        raise GameLifecycleError("Modifier permission attack context is owned by its evaluator.")
+    if (source_context.get("continuation") == "attack") != (attack_context is not None):
+        raise GameLifecycleError("Attack modifier evaluation requires its occurrence context.")
     permissions = modifier_ignore_permissions_for_subject(
         state=state,
         ability_index=ability_index,
@@ -116,7 +122,15 @@ def select_modifiers[T: Modifier | RollModifier](
         kind=subject.kind,
         model_instance_id=subject.model_instance_id,
         weapon_profile_id=subject.weapon_profile_id,
+        attack_context=attack_context,
     )
+    if not permissions and previous is None:
+        return ModifierEvaluationResult(modifiers)
+    if attack_context is not None:
+        source_context = {
+            **source_context,
+            "permission_attack_context": attack_context.to_payload(),
+        }
     context = _object(
         validate_json_value(
             {
@@ -301,7 +315,7 @@ def _validate_selection_payload(payload: dict[str, JsonValue]) -> None:
         raise GameLifecycleError("Modifier evaluation payload fields drifted.")
     _identifier(payload["occurrence_id"])
     ModifierEvaluationSubject.from_payload(payload["subject"])
-    _object(payload["source_context"])
+    permission_attack_context_from_source(_object(payload["source_context"]))
     inventory = _inventory_ids(payload)
     if not inventory or len(set(inventory)) != len(inventory):
         raise GameLifecycleError("Modifier evaluation inventory is empty or duplicated.")
@@ -316,6 +330,20 @@ def _validate_selection_payload(payload: dict[str, JsonValue]) -> None:
     ignored = _ids(payload["ignored_modifier_ids"])
     if decided != inventory[: len(decided)] or not set(ignored).issubset(decided):
         raise GameLifecycleError("Modifier evaluation subset or cursor drift.")
+
+
+def permission_attack_context_from_source(
+    source_context: dict[str, JsonValue],
+) -> ModifierPermissionAttackContext | None:
+    if source_context.get("continuation") == "attack":
+        return ModifierPermissionAttackContext.from_payload(
+            source_context.get("permission_attack_context")
+        )
+    if "permission_attack_context" in source_context:
+        raise GameLifecycleError(
+            "Non-attack modifier occurrence contains attack permission context."
+        )
+    return None
 
 
 def _inventory_ids(payload: dict[str, JsonValue]) -> tuple[str, ...]:

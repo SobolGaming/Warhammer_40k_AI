@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.modifiers import Modifier, ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.core.profile_modifier_trace import CharacteristicModifierTrace
-from warhammer40k_core.core.weapon_profiles import DamageProfile
+from warhammer40k_core.core.weapon_profiles import DamageProfile, WeaponProfile
 from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
 from warhammer40k_core.engine.damage_allocation import SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
@@ -16,6 +16,7 @@ from warhammer40k_core.engine.modifier_evaluation import (
     ModifierEvaluationSubject,
     select_modifiers,
 )
+from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.weapon_abilities import MELTA_RULE_ID
 
@@ -55,7 +56,9 @@ def select_attack_damage_modifiers[T: Modifier | RollModifier](
     attacker_model_instance_id: str,
     attacker_player_id: str,
     target_unit_instance_id: str,
-    weapon_profile_id: str,
+    weapon_profile: WeaponProfile,
+    attack_strength: int | None,
+    target_toughness: int | None,
     source_phase: BattlePhase,
     allocated_model_instance_id: str | None,
 ) -> ModifierEvaluationResult[T]:
@@ -68,9 +71,19 @@ def select_attack_damage_modifiers[T: Modifier | RollModifier](
             attacking_unit_instance_id,
             kind,
             attacker_model_instance_id,
-            weapon_profile_id,
+            weapon_profile.profile_id,
         ),
         modifiers=modifiers,
+        attack_context=ModifierPermissionAttackContext(
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+            subject_role="attacker",
+            source_phase=source_phase,
+            weapon_profile=weapon_profile,
+            attack_strength=attack_strength,
+            target_toughness=target_toughness,
+        ),
         source_context={
             "continuation": "attack",
             "evaluation_stage": stage,

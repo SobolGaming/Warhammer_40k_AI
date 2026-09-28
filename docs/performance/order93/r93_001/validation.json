@@ -1,0 +1,244 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+  "base_ref": "d7bcb10bd9e34b1eabb060465be7f9517d8417eb",
+  "reviewed_head_before_repair": "d0f6e96d540b7342d7373701e13a0ee9a177124c",
+  "finding": "R93-001: persisted modifier permissions must evaluate authenticated attack occurrence facts and subject roles",
+  "behavioral": {
+    "tests": 9756,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 811.729,
+    "junit_sha256": "56a434d1fdb5a042a0784d4209c26bb8f5478e135a216f89a845c30b5a4df987",
+    "log_sha256": "0a41e4550abe900245594ae006b80da2dd962ca040a5472f10690dcccc60f7bc",
+    "coverage_percent": 85.20337902454574,
+    "coverage_json_sha256": "cccd927380c0264f4e8f7128c2c47c2051adb0d4a29092922e08ac8dbf5d0965"
+  },
+  "code_quality": {
+    "tests": 705,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 116.981,
+    "junit_sha256": "dd4e2d472314f56e0fb05e205fb95bee4e3b0bc47b19bedd6e733c9f010609c1",
+    "log_sha256": "014f5d471f026c34576f466a70e724a1c10ab9f6a99af20dab7554aa16125e0d"
+  },
+  "distribution": "18 xdist work-stealing workers; complete behavioral suite once with coverage, then code-quality once without coverage",
+  "suite_commands": [
+    {
+      "name": "behavior",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests",
+        "--ignore=tests/code_quality",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--cov=warhammer40k_core",
+        "--cov-report=term-missing",
+        "--cov-fail-under=85",
+        "--durations=50",
+        "--junitxml=/private/tmp/order93-r93-001-behavior.xml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 814.1872685829876
+    },
+    {
+      "name": "coverage-json",
+      "command": [
+        "uv",
+        "run",
+        "coverage",
+        "json",
+        "-o",
+        "/private/tmp/order93-r93-001-coverage.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 13.634456208033953
+    },
+    {
+      "name": "shards-generate",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--junit",
+        "/private/tmp/order93-r93-001-behavior.xml",
+        "--profile-source",
+        "R93-001 repair; runtime warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75; Apple M5 Pro macOS 26.7 Python 3.14.5; 18 xdist work-stealing workers; complete local behavioral coverage run",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.10649237496545538
+    },
+    {
+      "name": "shards",
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/build_test_shards.py",
+        "--check",
+        "--shard-count",
+        "8"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.04722808301448822
+    },
+    {
+      "name": "quality",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/code_quality",
+        "-q",
+        "-n",
+        "auto",
+        "--dist=worksteal",
+        "--no-cov",
+        "--durations=50",
+        "--junitxml=/private/tmp/order93-r93-001-quality.xml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 117.50663837499451
+    }
+  ],
+  "gate_runs": [
+    {
+      "gate": "ruff",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "gate": "format",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "log_sha256": "e8bdae4285b5eb3b4191d5105a49f064e437f4af36230538d8b45e9d87bfa606"
+    },
+    {
+      "gate": "mypy",
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "log_sha256": "a10176fd6879da959721db05618041577bf816960a984e9cb9062a5f205b656f"
+    },
+    {
+      "gate": "pyright",
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    {
+      "gate": "imports",
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "log_sha256": "beaa779f13113b29025e92ac223dc0c0c4dae725768476464f92a8a8c49ea91e"
+    },
+    {
+      "gate": "source-check",
+      "command": "uv run python tools/build_core_modifiers_source.py --check",
+      "exit_code": 0,
+      "log_sha256": "43257ba6ad41a65e6e57b47deea1772ad41dbf163511050ea1037dea8e9c4530"
+    },
+    {
+      "gate": "build-check",
+      "command": "uv run python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "log_sha256": "b1b22ca84a698371baac564225064bbbeb2d80ca9cb9fcb5af494572519fe690"
+    },
+    {
+      "gate": "contract-check",
+      "command": "uv run python scripts/build_external_contract.py --check --base-ref d7bcb10bd9e34b1eabb060465be7f9517d8417eb",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "ts-check",
+      "command": "npm run check",
+      "exit_code": 0,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "gate": "ts-unit",
+      "command": "npm run test:unit",
+      "exit_code": 0,
+      "log_sha256": "0ebf9779435b08489c444f1a359cefb720e910d3176e8ad5dc483ac972508a56"
+    },
+    {
+      "gate": "ts-conformance",
+      "command": "npm run conformance",
+      "exit_code": 0,
+      "log_sha256": "859c0a19b0990f030c0be325fc0099e7a2e2c2fa8f7ffea5bef8a195aaf808d5"
+    },
+    {
+      "gate": "wheel",
+      "command": "uv run python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "log_sha256": "21c5a81afc5ee29c8435f8f68362bc558c6703ddd031aec5cf4a2fa32ea183f4"
+    },
+    {
+      "gate": "shards",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "precommit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "red_green_evidence": [
+    {
+      "case": "Initial real-session target/role and comparison regressions",
+      "red_failures": 6,
+      "red_passes": 3,
+      "red_log_sha256": "d7465c4998bf7d88c2cf849af541d01f16d9a278b9dafd30cc0018c89ae3bbb7",
+      "green_passes": 13,
+      "green_log_sha256": "805a5ef6719fb6fe63244ebc351f31a660dcfcf2072f0de27aa8a6d84844e9f8",
+      "note": "Expanded green cases include context tampering; final aggregate covers all on final runtime"
+    },
+    {
+      "case": "Independent review: defensive source-unit Starting/Half Strength restrictions",
+      "red_failures": 4,
+      "red_log_sha256": "a2a82077f623e374465a3cf6a43c65b580dea6aad16e1c3353e81b7bea79c4fe",
+      "green_coverage": "Four cases included in final complete behavioral suite"
+    }
+  ],
+  "independent_review": {
+    "status": "approved for publication",
+    "reviewer": "Independent r93_001_independent_review subagent",
+    "code_architecture_status": "approved",
+    "resolved_findings": [
+      "R93-001 actual attack context and subject role survive discovery, pre-pop validation, restoration and replay",
+      "Defensive source-unit Strength restrictions are explicitly unsupported pending authenticated separate source identity"
+    ],
+    "remaining_actionable_code_findings": 0,
+    "approved_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:699ca0e11f45466d9a7d0c16706fde3562d231d7856d7d70bbe2ef6b4a994e75",
+    "remaining_actionable_findings": 0,
+    "publication_sequence": "Explicit independent approval after final validation and before repair commit/push; subsequent edits record the verdict only."
+  },
+  "performance": {
+    "comparison": "comparison.json",
+    "inherited_reports": "inherited-refresh.json",
+    "inherited_report_count": 25,
+    "budgets": "unchanged",
+    "baseline_measurement_order": "Exact reviewed head measured before production edits",
+    "full_game_samples": 0,
+    "full_game_targets": "unverified"
+  },
+  "limitations": [
+    "Attack-restricted permissions at nonattack/pre-declaration boundaries are explicitly unsupported when required occurrence facts are unavailable",
+    "Strength/Toughness comparisons require both values resolved by their owners",
+    "Defensive source-unit Starting/Half Strength restrictions require separately authenticated source ownership and remain explicitly unsupported",
+    "No new descriptor families or named content support are claimed"
+  ]
+}

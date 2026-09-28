@@ -405,7 +405,11 @@ def generic_rule_matching_unit_effects(
 
 
 def generic_matching_unit_effect_applications(
-    *, applications: tuple[RulesUnitEffectApplication, ...], effect_kind: RuleEffectKind
+    *,
+    applications: tuple[RulesUnitEffectApplication, ...],
+    effect_kind: RuleEffectKind,
+    role: AttackRole = "attacker",
+    application_filter: Callable[[GenericAttackEffect, str], bool] | None = None,
 ) -> tuple[GenericAttackEffect, ...]:
     """Share applicability, source-slot conflict checks and deduplication across time."""
     matches_by_effect_slot: dict[tuple[str, str], GenericAttackEffect] = {}
@@ -413,14 +417,19 @@ def generic_matching_unit_effect_applications(
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=application.effect,
             effective_target_unit_instance_ids=(application.unit_instance_id,),
-            role="attacker",
+            role=role,
             expected_effect_kind=effect_kind,
         )
         if generic_effect is None:
             continue
-        if not generic_unit_effect_applies(
-            effect=generic_effect, unit_instance_id=application.unit_instance_id
-        ):
+        applies = (
+            generic_unit_effect_applies(
+                effect=generic_effect, unit_instance_id=application.unit_instance_id
+            )
+            if application_filter is None
+            else application_filter(generic_effect, application.unit_instance_id)
+        )
+        if not applies:
             continue
         # Distinct models can activate the same source clause. Deduplicating
         # before retaining that identity would discard another model's own
@@ -642,6 +651,7 @@ def generic_effect_context_applies(
     weapon_profile: WeaponProfile | None,
     attack_strength: int | None,
     target_toughness: int | None,
+    subject_model_instance_id: str | None = None,
 ) -> bool:
     if not generic_rule_triggering_attacker_applies(
         parameters=effect.parameters,
@@ -652,10 +662,23 @@ def generic_effect_context_applies(
     if not generic_rule_source_model_applies(
         target_kind=effect.target_kind,
         source_model_instance_id=effect.source_model_instance_id,
-        attacker_model_instance_id=attacker_model_instance_id,
+        attacker_model_instance_id=(
+            attacker_model_instance_id
+            if subject_model_instance_id is None
+            else subject_model_instance_id
+        ),
         requires_source_model_instance_id=generic_rule_conditions_require_source_model_instance_id(
             effect.conditions
         ),
+    ):
+        return False
+    # THIS_MODEL identifies the effect's beneficiary. An explicit attack
+    # relationship separately identifies who makes the attack; a defensive
+    # beneficiary must not be silently substituted for that attacker.
+    if (
+        subject_model_instance_id is not None
+        and generic_rule_conditions_require_source_model_instance_id(effect.conditions)
+        and effect.source_model_instance_id != attacker_model_instance_id
     ):
         return False
     if not _generic_effect_source_phase_applies(effect=effect, source_phase=source_phase):
