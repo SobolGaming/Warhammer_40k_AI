@@ -17,6 +17,11 @@ if TYPE_CHECKING:
 
 def advance_once(host: GameLifecycle) -> LifecycleStatus:
     state = host._require_state()
+    from warhammer40k_core.engine.modifier_evaluation_history import capture_modifier_origin
+
+    host._modifier_evaluation_history_origin = capture_modifier_origin(
+        host, host._modifier_evaluation_history_origin
+    )
     selection_status = request_core_ability_selection_if_needed(
         state=state,
         decisions=host.decision_controller,

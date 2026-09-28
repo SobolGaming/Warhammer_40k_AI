@@ -1,0 +1,330 @@
+{
+  "base_revision": "d7bcb10bd9e34b1eabb060465be7f9517d8417eb",
+  "cases": [
+    {
+      "action_status": "interrupted",
+      "base_component_sha256": {
+        "final_lifecycle": "61454a818297d6129a32a553022b453ba5abcaf235659cc16e551a0346fdb2ef",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "9777b1723baea8761d93adecc526180df5a5c531b773be9e43b6c24ba9750e10",
+        "request": "91c840fde3b78b86cdc52cb92e7805c4a3a12d70055ee79b9db3dc2253675551",
+        "restored_lifecycle": "61454a818297d6129a32a553022b453ba5abcaf235659cc16e551a0346fdb2ef",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "base_payload_sha256": "2ac9fc0ad9e6a2390932f132748b4ddf426bcb71efcd9419c581dafa3d4a6e22",
+      "case": "translation",
+      "head_component_sha256": {
+        "final_lifecycle": "61454a818297d6129a32a553022b453ba5abcaf235659cc16e551a0346fdb2ef",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "9777b1723baea8761d93adecc526180df5a5c531b773be9e43b6c24ba9750e10",
+        "request": "91c840fde3b78b86cdc52cb92e7805c4a3a12d70055ee79b9db3dc2253675551",
+        "restored_lifecycle": "61454a818297d6129a32a553022b453ba5abcaf235659cc16e551a0346fdb2ef",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "head_payload_sha256": "2ac9fc0ad9e6a2390932f132748b4ddf426bcb71efcd9419c581dafa3d4a6e22",
+      "restored_payload_identical": true,
+      "submission_status": "waiting_for_decision"
+    },
+    {
+      "action_status": "interrupted",
+      "base_component_sha256": {
+        "final_lifecycle": "ad8f860d0452ddd9f8fc2518469dda1a49b5c22290cebbb7bbdf9446edef26c4",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "97e7e6dee514dce737d8c8b6529f70279772117574370bb2d937940fad32165b",
+        "request": "828ceba17aa19727f9494ec9045c7435578503ec75d7c653dedf17d29768d6d4",
+        "restored_lifecycle": "ad8f860d0452ddd9f8fc2518469dda1a49b5c22290cebbb7bbdf9446edef26c4",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "base_payload_sha256": "5f05066f1ca41c4fb14f4c054e649a07b005351ecebc5952167f27178f0c4e95",
+      "case": "return",
+      "head_component_sha256": {
+        "final_lifecycle": "ad8f860d0452ddd9f8fc2518469dda1a49b5c22290cebbb7bbdf9446edef26c4",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "97e7e6dee514dce737d8c8b6529f70279772117574370bb2d937940fad32165b",
+        "request": "828ceba17aa19727f9494ec9045c7435578503ec75d7c653dedf17d29768d6d4",
+        "restored_lifecycle": "ad8f860d0452ddd9f8fc2518469dda1a49b5c22290cebbb7bbdf9446edef26c4",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "head_payload_sha256": "5f05066f1ca41c4fb14f4c054e649a07b005351ecebc5952167f27178f0c4e95",
+      "restored_payload_identical": true,
+      "submission_status": "waiting_for_decision"
+    },
+    {
+      "action_status": "interrupted",
+      "base_component_sha256": {
+        "final_lifecycle": "eeb4a7a00505bbe5272fce98f676c647ef8644a2bbe69d35bf22182096e159ab",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "fde23e773a85632a8020cd4cf7ca629978fc44ab3a05ccfb17180ede5bda0876",
+        "request": "78b61955a5fdd4a9bb4c7cd6a51f237c63b1b41f59a6c6614d66367cfa599d4d",
+        "restored_lifecycle": "eeb4a7a00505bbe5272fce98f676c647ef8644a2bbe69d35bf22182096e159ab",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "base_payload_sha256": "d34bbf08a3c2f250eb605d8e4d11d5e27838ae2fd5327aa596e2c5ff0c2e342c",
+      "case": "zero",
+      "head_component_sha256": {
+        "final_lifecycle": "eeb4a7a00505bbe5272fce98f676c647ef8644a2bbe69d35bf22182096e159ab",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "fde23e773a85632a8020cd4cf7ca629978fc44ab3a05ccfb17180ede5bda0876",
+        "request": "78b61955a5fdd4a9bb4c7cd6a51f237c63b1b41f59a6c6614d66367cfa599d4d",
+        "restored_lifecycle": "eeb4a7a00505bbe5272fce98f676c647ef8644a2bbe69d35bf22182096e159ab",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "head_payload_sha256": "d34bbf08a3c2f250eb605d8e4d11d5e27838ae2fd5327aa596e2c5ff0c2e342c",
+      "restored_payload_identical": true,
+      "submission_status": "waiting_for_decision"
+    },
+    {
+      "action_status": "interrupted",
+      "base_component_sha256": {
+        "final_lifecycle": "d984b22144dc680466d9c0a6035cc2b99348ae2da778aa26adcbe81181dd44cb",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "c00d6d67a00a87c8b5d7add7582c1215fc60d9f0eea87be0e7635138a2f03ae5",
+        "request": "9989de5aaf4d40c95b8b63842e44bf9962ba708f0f99afbe99c2ece1a8987ebc",
+        "restored_lifecycle": "d984b22144dc680466d9c0a6035cc2b99348ae2da778aa26adcbe81181dd44cb",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "base_payload_sha256": "7421cc30746552aa9dcdfbc338341a9a34713cc565165e0da563b315ac3cc931",
+      "case": "rotation",
+      "head_component_sha256": {
+        "final_lifecycle": "d984b22144dc680466d9c0a6035cc2b99348ae2da778aa26adcbe81181dd44cb",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "c00d6d67a00a87c8b5d7add7582c1215fc60d9f0eea87be0e7635138a2f03ae5",
+        "request": "9989de5aaf4d40c95b8b63842e44bf9962ba708f0f99afbe99c2ece1a8987ebc",
+        "restored_lifecycle": "d984b22144dc680466d9c0a6035cc2b99348ae2da778aa26adcbe81181dd44cb",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "head_payload_sha256": "7421cc30746552aa9dcdfbc338341a9a34713cc565165e0da563b315ac3cc931",
+      "restored_payload_identical": true,
+      "submission_status": "waiting_for_decision"
+    },
+    {
+      "action_status": "interrupted",
+      "base_component_sha256": {
+        "final_lifecycle": "e56479a4c6467dd7c652402f135afda5b3507ac6ab2ec269f7ae8390e81bedb1",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "2c7d01e7754aebf0c5d1b972fd74b6b9100ad9742b22c1591fc0de427da64383",
+        "request": "daee19119ed088aa8ee9d9104881f515ed09c1910c4208a3c95744f8c7ab2584",
+        "restored_lifecycle": "e56479a4c6467dd7c652402f135afda5b3507ac6ab2ec269f7ae8390e81bedb1",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "base_payload_sha256": "1591a33fb891d500277cbde2170f1435177119ca24a3eb07268db2ad7623999d",
+      "case": "rotation_return",
+      "head_component_sha256": {
+        "final_lifecycle": "e56479a4c6467dd7c652402f135afda5b3507ac6ab2ec269f7ae8390e81bedb1",
+        "initial_lifecycle": "17a485a37e873d09d7a314a24ccd96b17580139d813e7e585116bb18b4107fed",
+        "pending_lifecycle": "2c7d01e7754aebf0c5d1b972fd74b6b9100ad9742b22c1591fc0de427da64383",
+        "request": "daee19119ed088aa8ee9d9104881f515ed09c1910c4208a3c95744f8c7ab2584",
+        "restored_lifecycle": "e56479a4c6467dd7c652402f135afda5b3507ac6ab2ec269f7ae8390e81bedb1",
+        "status": "1531753f8ba6f8831251fb1d822962bf249174ce8321ede22140450d38f2355b",
+        "submission": "7bf22bd4cf393e6c543e3db3176e14ee574baeff2102953773c86109cecfa6f4"
+      },
+      "head_payload_sha256": "1591a33fb891d500277cbde2170f1435177119ca24a3eb07268db2ad7623999d",
+      "restored_payload_identical": true,
+      "submission_status": "waiting_for_decision"
+    }
+  ],
+  "changed_files": {
+    "tests/action_movement_interruption_helpers.py": {
+      "base_sha256": "6547f50aaaf3e03a377d40b0d3152ff3e9912a929eabd351901fde3602bbc102",
+      "head_sha256": "31ef2e759c99b7709b5afe9c7d442b1ee96c47ed837f5f6e0e3cca80d76bbc0d",
+      "reason": "Extracts unchanged opportunity preparation for modifier tests; optional catalog_transform defaults to None in the inherited workload."
+    }
+  },
+  "entrypoint": "action_movement_session",
+  "entrypoint_kwargs": {
+    "pause_after_move": true
+  },
+  "loaded_test_dependency_sha256": {
+    "tests/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "tests/phase11c_command_phase_helpers.py": "c37e20ee74053dbe02916b39b5a5ff34da7bbd5a85d574d6ab715d8b6e35ea01",
+    "tests/phase17n_primary_mission_helpers.py": "1b150f4642c616e1582874547929ead9209bae9f8dbbbb4cb2602d426b20341f",
+    "tests/phase17n_step5g_pairing_certification_helpers.py": "8f0cb5be0cef51209ef8f56bafe9b7a96e0a7e7874647886b9d8c57e43380ce6",
+    "tests/setup_completion_helpers.py": "928c24e7775f97890720fee9619432029bed4821ff1a5c72871148af02c12c15"
+  },
+  "method": "Import the original and current helper files as separate modules through importlib; resolve every engine and tests.* dependency from the unchanged d7bcb10 baseline. For each of the five movement cases call action_movement_session(pause_after_move=True), request_action_move, select the first non-decline option and submit result_id order77-measured-move through LocalGameSession. Compare full canonical initial lifecycle, request, pending lifecycle, submission, returned status, final lifecycle and authenticated restored lifecycle for exact equality before computing SHA-256. No timing samples, production changes, injected dice, altered engine modules or alternate validation paths.",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "schema_version": 1,
+  "scope": "Order 93 extraction of action_opportunity_session and optional catalog_transform leaves the default Order 77 movement workload byte-identical on one unchanged base runtime. Original timing baselines and budgets are retained.",
+  "strength_fixture_migration": {
+    "cases": [
+      {
+        "added_wire_evidence": [],
+        "base_component_sha256": {
+          "initial_lifecycle": "9d8d7e08492986cb8408b1a565944c5aef52d3b1315b747cde177ecb22241ae9",
+          "normalized_rng_tokens": "672189466332d16812b84555c44b6b8cac151ff0e7d9467c819eb61775382b6c",
+          "pending_request": "ba78b6638fbfe91f0751df476a69595a128db252426be80af6dde915fec7e48a",
+          "prepared_lifecycle": "d2c0a30a5d24a96bd0499a6e83878bd7db66f5800e328b8f5ccdabb02caf5b67",
+          "wound_steps": "94e9f636d1c561bdcbbc80babf4732d2b8a7ab2622dabed54a3094001a66d4f2"
+        },
+        "base_final_lifecycle_sha256": "dfb3e1d92e1ee5d53d0cf3971c0a80c39e1c4bb582bcf0ad5a448b3d48bf05d6",
+        "game_id": "order88-shooting",
+        "head_component_sha256": {
+          "initial_lifecycle": "9d8d7e08492986cb8408b1a565944c5aef52d3b1315b747cde177ecb22241ae9",
+          "normalized_rng_tokens": "672189466332d16812b84555c44b6b8cac151ff0e7d9467c819eb61775382b6c",
+          "pending_request": "ba78b6638fbfe91f0751df476a69595a128db252426be80af6dde915fec7e48a",
+          "prepared_lifecycle": "d2c0a30a5d24a96bd0499a6e83878bd7db66f5800e328b8f5ccdabb02caf5b67",
+          "wound_steps": "94e9f636d1c561bdcbbc80babf4732d2b8a7ab2622dabed54a3094001a66d4f2"
+        },
+        "head_final_lifecycle_sha256": "dfb3e1d92e1ee5d53d0cf3971c0a80c39e1c4bb582bcf0ad5a448b3d48bf05d6",
+        "head_final_without_added_wire_evidence_sha256": "dfb3e1d92e1ee5d53d0cf3971c0a80c39e1c4bb582bcf0ad5a448b3d48bf05d6",
+        "normalized_rng_event_count": 152,
+        "phase": "shooting",
+        "physical_weapon_bindings": [],
+        "wound_count": 12
+      },
+      {
+        "added_wire_evidence": [
+          {
+            "path": [
+              "decisions",
+              "event_log",
+              32,
+              "payload",
+              "result",
+              "payload",
+              "declarations",
+              0,
+              "weapon_instance_id"
+            ],
+            "value": "weapon-instance:eeb23edb061d50704b3ebea0397b3dfc8f93be0984bfc900039784fcfd797d1e"
+          },
+          {
+            "path": [
+              "decisions",
+              "event_log",
+              33,
+              "payload",
+              "proposal",
+              "declarations",
+              0,
+              "weapon_instance_id"
+            ],
+            "value": "weapon-instance:eeb23edb061d50704b3ebea0397b3dfc8f93be0984bfc900039784fcfd797d1e"
+          },
+          {
+            "path": [
+              "decisions",
+              "records",
+              3,
+              "result",
+              "payload",
+              "declarations",
+              0,
+              "weapon_instance_id"
+            ],
+            "value": "weapon-instance:eeb23edb061d50704b3ebea0397b3dfc8f93be0984bfc900039784fcfd797d1e"
+          },
+          {
+            "path": [
+              "state",
+              "model_destruction_cause_authorities",
+              0,
+              "source_decision_records",
+              0,
+              "result",
+              "payload",
+              "declarations",
+              0,
+              "weapon_instance_id"
+            ],
+            "value": "weapon-instance:eeb23edb061d50704b3ebea0397b3dfc8f93be0984bfc900039784fcfd797d1e"
+          },
+          {
+            "path": [
+              "state",
+              "model_destruction_cause_authorities",
+              0,
+              "source_event_records",
+              0,
+              "payload",
+              "result",
+              "payload",
+              "declarations",
+              0,
+              "weapon_instance_id"
+            ],
+            "value": "weapon-instance:eeb23edb061d50704b3ebea0397b3dfc8f93be0984bfc900039784fcfd797d1e"
+          }
+        ],
+        "base_component_sha256": {
+          "initial_lifecycle": "603c398bc9b7074f80a47bdaaf0aa38d11f69b4d09999d0bca3eadab59cc956c",
+          "normalized_rng_tokens": "b98620cd34e715e449ad6da4000022fba9c0fe2c95247f9d9c8c1eceaf0999e0",
+          "pending_request": "939e8d976decdd39c579eb03417a46807799d0e14601bae108a79995a12c685e",
+          "prepared_lifecycle": "0d1fd6d29fd13e6499df955cfde986c5013940a19148ec7775ddbdcad0017b67",
+          "wound_steps": "1107dab7490983126828d5bb0c1d3fa90f719d563e84ae39a5620ccdf33ad948"
+        },
+        "base_final_lifecycle_sha256": "8a3a3c39a7992a1795ada477ece81632222151f49500b6e23b0a3da647203523",
+        "game_id": "order88-fight",
+        "head_component_sha256": {
+          "initial_lifecycle": "603c398bc9b7074f80a47bdaaf0aa38d11f69b4d09999d0bca3eadab59cc956c",
+          "normalized_rng_tokens": "b98620cd34e715e449ad6da4000022fba9c0fe2c95247f9d9c8c1eceaf0999e0",
+          "pending_request": "939e8d976decdd39c579eb03417a46807799d0e14601bae108a79995a12c685e",
+          "prepared_lifecycle": "0d1fd6d29fd13e6499df955cfde986c5013940a19148ec7775ddbdcad0017b67",
+          "wound_steps": "1107dab7490983126828d5bb0c1d3fa90f719d563e84ae39a5620ccdf33ad948"
+        },
+        "head_final_lifecycle_sha256": "463280d4c7603057ab6e1e3d6c74445f161dcb160f4a750d7073243723364e28",
+        "head_final_without_added_wire_evidence_sha256": "8a3a3c39a7992a1795ada477ece81632222151f49500b6e23b0a3da647203523",
+        "normalized_rng_event_count": 118,
+        "phase": "fight",
+        "physical_weapon_bindings": [
+          {
+            "attacker_model_instance_id": "army-alpha:intercessor-1:core-character-leader:001",
+            "available_match_count": 1,
+            "target_allocations": [
+              {
+                "target_unit_instance_id": "army-beta:enemy"
+              }
+            ],
+            "wargear_id": "core-leader-blade",
+            "weapon_instance_id": "weapon-instance:eeb23edb061d50704b3ebea0397b3dfc8f93be0984bfc900039784fcfd797d1e",
+            "weapon_profile_id": "core-leader-blade:standard"
+          }
+        ],
+        "wound_count": 12
+      }
+    ],
+    "changed_files": {
+      "tests/psychic_modifier_helpers.py": {
+        "base_sha256": "64bd3f5977170151081dd89edc083c2d7ded5b96b6686771d240b044ea66ede0",
+        "head_sha256": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+        "reason": "Optional psychic/weapon transform fixture parameters keep their defaults; the exercised Fight submission now states the already-selected physical weapon identity explicitly."
+      }
+    },
+    "comparison_revision": "d7bcb10bd9e34b1eabb060465be7f9517d8417eb",
+    "comparison_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+    "driver_entrypoints": [
+      "pending_request",
+      "complete_attack"
+    ],
+    "entrypoint": "strength_session",
+    "entrypoint_kwargs": {
+      "strength": 1
+    },
+    "historical_baseline_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d687c193f560a9c1cdbbc32ab3566440a5994c5c7ec6515ded0b7448b7a8310f",
+    "loaded_test_dependency_sha256": {
+      "tests": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "tests.absent_strength_helpers": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
+      "tests.core_stratagem_helpers": "c364a97338c29de3fec9deaf82138779a734c3b170ba54e61bcd3c07a4b404b9",
+      "tests.disembark_eligibility_helpers": "0dc8cae31e6419b2d4605f32718320243c89ca6fc958ca92dd4e160e9cd3a1cb",
+      "tests.generic_modifier_helpers": "03e2c0fc9376229b6ba2cd399a2de3d0f62a520e2ebedaaa66876ef6bcd2e2dd",
+      "tests.lethal_hits_helpers": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+      "tests.order60_emergency_disembark_helpers": "dc1c3439d5fa7075b4719b8a6dcd01ae5698f44c7fa1f57faf442a13abe6e0e3",
+      "tests.phase13b_shooting_declaration_helpers": "c1c66067bd49667d7986fb4388e1002b469edea1c9ed76a824c65da183a3f99b",
+      "tests.phase15c_fight_order_helpers": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
+      "tests.setup_completion_helpers": "928c24e7775f97890720fee9619432029bed4821ff1a5c72871148af02c12c15",
+      "tests.unit_keyword_helpers": "3f290f4f7bcd08cdb65d01f8b3cb062da3ba919aa426a4ba190fae1eafd862a5"
+    },
+    "method": "Extract the exact original tests/psychic_modifier_helpers.py from git d7bcb10 (SHA-256 64bd3f5...) and load each original/current file as tests.psychic_modifier_helpers through importlib in a separate process. Resolve every other test and engine module from the same unchanged d7bcb10 snapshot and verify the runtime build. Run the unchanged strength_session(phase, strength=1), pending_request and complete_attack driver for Shooting and Fight. Compare full initial and prepared lifecycle/request, twelve wound records, engine-normalized RNG tokens and complete final lifecycle. Final Fight differences must be only explicit weapon_instance_id additions in five copies of the accepted declaration; each must match the unique source-owned available weapon selected by the same model, wargear, profile and target. Remove only those added fields for the final payload equality comparison. No dice injection, runtime changes, fallback, renamed samples or timing measurements.",
+    "schema_version": 1,
+    "scope": "Order 88 inherited numeric Strength workload: original d687c193 runtime timing baseline is retained. Current physical-weapon evidence cannot load against that older proposal schema. This separate fixture equivalence proof uses the unchanged d7bcb10 runtime that accepts both original and current helper schemas; it does not relabel or replace timing samples."
+  }
+}

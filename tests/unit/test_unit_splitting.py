@@ -1230,17 +1230,17 @@ def test_split_generic_numerical_effects_apply_after_restore(target_scope: str) 
         assert tuple(e.to_payload() for e in state.persisting_effects) == before_effects
         profile = current.lifecycle.config.army_catalog.wargear[0].weapon_profiles[0]
         for view in rules_unit_views_from_armies(armies=(state.army_definitions[0],)):
-            contains_leader = any(m.model_instance_id == model_id for m in view.own_models)
-            assert generic_rule_modified_unit_characteristic(
-                UnitCharacteristicModifierContext(
-                    state=state,
-                    unit_instance_id=view.unit_instance_id,
-                    characteristic=Characteristic.MOVEMENT,
-                    base_value=6,
-                    current_value=6,
-                )
-            ) == (8 if whole_unit or contains_leader else 6)
             for model in view.alive_models():
+                assert generic_rule_modified_unit_characteristic(
+                    UnitCharacteristicModifierContext(
+                        state=state,
+                        unit_instance_id=view.unit_instance_id,
+                        model_instance_id=model.model_instance_id,
+                        characteristic=Characteristic.MOVEMENT,
+                        base_value=6,
+                        current_value=6,
+                    )
+                ) == (8 if whole_unit or model.model_instance_id == model_id else 6)
                 assert generic_rule_hit_roll_modifier(
                     HitRollModifierContext(
                         state=state,

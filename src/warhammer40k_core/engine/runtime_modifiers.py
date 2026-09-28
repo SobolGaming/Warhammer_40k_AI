@@ -5,10 +5,11 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.modifiers import ModifierTerm, RollModifier
+from warhammer40k_core.core.modifiers import Modifier, ModifierTerm, RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.core.weapon_skill_modifiers import same_weapon_skill_source
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierBinding,
     AllocatedAttackDamageModifierContext,
@@ -27,6 +28,9 @@ from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
 from warhammer40k_core.engine.runtime_binding_validation import (
     validate_bindings as _validate_bindings,
 )
+from warhammer40k_core.engine.runtime_characteristic_context import (
+    UnitCharacteristicModifierContext as UnitCharacteristicModifierContext,
+)
 from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
@@ -39,6 +43,9 @@ if TYPE_CHECKING:
         HistoricalBattleShockAuthorityContext,
     )
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.objective_control_selection_scope import (
+        ObjectiveControlSelectionScope,
+    )
 
 
 type UnitCharacteristicModifierHandler = Callable[
@@ -78,41 +85,6 @@ type FailedSaveDamageReplacementHandler = Callable[
     ["FailedSaveDamageReplacementContext"],
     "FailedSaveDamageReplacement | None",
 ]
-
-
-@dataclass(frozen=True, slots=True)
-class UnitCharacteristicModifierContext:
-    state: GameState
-    unit_instance_id: str
-    characteristic: Characteristic
-    base_value: int
-    current_value: int
-
-    def __post_init__(self) -> None:
-        from warhammer40k_core.engine.game_state import GameState
-
-        if type(self.state) is not GameState:
-            raise GameLifecycleError("Unit characteristic modifier state must be GameState.")
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier("unit_instance_id", self.unit_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "characteristic",
-            _characteristic_from_token(self.characteristic),
-        )
-        object.__setattr__(
-            self,
-            "base_value",
-            _validate_non_negative_int("base_value", self.base_value),
-        )
-        object.__setattr__(
-            self,
-            "current_value",
-            _validate_non_negative_int("current_value", self.current_value),
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -766,6 +738,8 @@ class FailedSaveDamageReplacementBinding:
 
 @dataclass(frozen=True, slots=True)
 class RuntimeModifierRegistry:
+    modifier_permission_indexes: tuple[tuple[str, AbilityCatalogIndex], ...] = ()
+    objective_control_selection_scope: ObjectiveControlSelectionScope | None = None
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
     model_ability_grant_bindings: tuple[ModelAbilityGrantBinding, ...] = ()
@@ -792,6 +766,11 @@ class RuntimeModifierRegistry:
     ] = ()
 
     def __post_init__(self) -> None:
+        from warhammer40k_core.engine.runtime_modifier_permissions import (
+            validate_permission_indexes,
+        )
+
+        validate_permission_indexes(self.modifier_permission_indexes)
         object.__setattr__(
             self,
             "unit_characteristic_modifier_bindings",
@@ -932,10 +911,16 @@ class RuntimeModifierRegistry:
     def empty(cls) -> Self:
         return cls()
 
+    def modifier_permission_index(self, player_id: str) -> AbilityCatalogIndex:
+        from warhammer40k_core.engine.runtime_modifier_permissions import permission_index_for_owner
+
+        return permission_index_for_owner(self.modifier_permission_indexes, player_id)
+
     @classmethod
     def from_bindings(
         cls,
         *,
+        modifier_permission_indexes: tuple[tuple[str, AbilityCatalogIndex], ...] = (),
         unit_characteristic_modifier_bindings: tuple[
             UnitCharacteristicModifierBinding,
             ...,
@@ -965,6 +950,7 @@ class RuntimeModifierRegistry:
         ] = (),
     ) -> Self:
         return cls(
+            modifier_permission_indexes=modifier_permission_indexes,
             unit_characteristic_modifier_bindings=unit_characteristic_modifier_bindings,
             hit_roll_modifier_bindings=hit_roll_modifier_bindings,
             model_ability_grant_bindings=model_ability_grant_bindings,
@@ -1057,6 +1043,35 @@ class RuntimeModifierRegistry:
             raise GameLifecycleError("Multiple failed-save damage replacements are available.")
         return candidates[0] if candidates else None
 
+    def unit_characteristic_operations(
+        self,
+        context: UnitCharacteristicModifierContext,
+    ) -> tuple[Modifier, ...]:
+        from warhammer40k_core.engine.runtime_characteristic_modifiers import (
+            runtime_characteristic_operations,
+        )
+
+        return runtime_characteristic_operations(
+            context=context,
+            bindings=self.unit_characteristic_modifier_bindings,
+        )
+
+    def objective_control_operations(
+        self,
+        context: ObjectiveControlModifierContext,
+        *,
+        value: CharacteristicValue,
+    ) -> tuple[Modifier, ...]:
+        from warhammer40k_core.engine.runtime_characteristic_modifiers import (
+            runtime_objective_control_operations,
+        )
+
+        return runtime_objective_control_operations(
+            context=context,
+            value=value,
+            bindings=self.objective_control_modifier_bindings,
+        )
+
     def modified_unit_characteristic(self, context: UnitCharacteristicModifierContext) -> int:
         from warhammer40k_core.engine.runtime_characteristic_modifiers import (
             resolve_runtime_characteristic,
@@ -1091,51 +1106,50 @@ class RuntimeModifierRegistry:
             generic_rule_minimum_unmodified_hit_success(context),
         )
 
-    def wound_roll_modifier(self, context: WoundRollModifierContext) -> int:
+    def wound_roll_modifiers(self, context: WoundRollModifierContext) -> tuple[RollModifier, ...]:
         if type(context) is not WoundRollModifierContext:
             raise GameLifecycleError("Wound roll modifiers require a context.")
-        from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_wound_roll_modifier,
+        from warhammer40k_core.engine.runtime_attack_modifiers import (
+            registered_wound_roll_modifiers,
         )
 
-        total = 0
-        for binding in self.wound_roll_modifier_bindings:
-            total += _validate_int(
-                f"{binding.modifier_id} returned modifier",
-                binding.handler(context),
-            )
-        total += generic_rule_wound_roll_modifier(context)
-        return total
+        return registered_wound_roll_modifiers(context, self.wound_roll_modifier_bindings)
 
-    def damage_roll_modifier(self, context: DamageRollModifierContext) -> int:
+    def wound_roll_modifier(self, context: WoundRollModifierContext) -> int:
+        return sum(modifier.operand for modifier in self.wound_roll_modifiers(context))
+
+    def damage_roll_modifiers(self, context: DamageRollModifierContext) -> tuple[RollModifier, ...]:
         if type(context) is not DamageRollModifierContext:
             raise GameLifecycleError("Damage roll modifiers require a context.")
-        from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_damage_roll_modifier,
+        from warhammer40k_core.engine.runtime_attack_modifiers import (
+            registered_damage_roll_modifiers,
         )
 
-        total = 0
-        for binding in self.damage_roll_modifier_bindings:
-            total += _validate_int(
-                f"{binding.modifier_id} returned modifier",
-                binding.handler(context),
-            )
-        total += generic_rule_damage_roll_modifier(context)
-        return total
+        return registered_damage_roll_modifiers(context, self.damage_roll_modifier_bindings)
+
+    def damage_roll_modifier(self, context: DamageRollModifierContext) -> int:
+        return sum(modifier.operand for modifier in self.damage_roll_modifiers(context))
+
+    def allocated_attack_damage_modifiers(
+        self,
+        context: AllocatedAttackDamageModifierContext,
+    ) -> tuple[RollModifier, ...]:
+        if type(context) is not AllocatedAttackDamageModifierContext:
+            raise GameLifecycleError("Allocated-attack Damage modifiers require a context.")
+        from warhammer40k_core.engine.runtime_attack_modifiers import (
+            registered_allocated_attack_damage_modifiers,
+        )
+
+        return registered_allocated_attack_damage_modifiers(
+            context,
+            self.allocated_attack_damage_modifier_bindings,
+        )
 
     def allocated_attack_damage_modifier(
         self,
         context: AllocatedAttackDamageModifierContext,
     ) -> int:
-        if type(context) is not AllocatedAttackDamageModifierContext:
-            raise GameLifecycleError("Allocated-attack Damage modifiers require a context.")
-        total = 0
-        for binding in self.allocated_attack_damage_modifier_bindings:
-            total += _validate_int(
-                f"{binding.modifier_id} returned modifier",
-                binding.handler(context),
-            )
-        return total
+        return sum(modifier.operand for modifier in self.allocated_attack_damage_modifiers(context))
 
     def modified_save_options(
         self,
@@ -1190,6 +1204,9 @@ class RuntimeModifierRegistry:
             resolve_runtime_objective_control,
         )
 
+        scope = self.objective_control_selection_scope
+        if scope is not None and scope.includes(context.model_instance_id):
+            return scope.resolve(registry=self, context=context, value=value)
         return resolve_runtime_objective_control(
             context=context,
             value=value,
@@ -1199,6 +1216,8 @@ class RuntimeModifierRegistry:
     def advance_roll_modifiers(
         self,
         context: AdvanceRollModifierContext,
+        *,
+        apply_selection: bool = True,
     ) -> tuple[RollModifier, ...]:
         if type(context) is not AdvanceRollModifierContext:
             raise GameLifecycleError("Advance roll modifiers require a context.")
@@ -1208,14 +1227,26 @@ class RuntimeModifierRegistry:
                 f"{binding.modifier_id} returned advance roll modifiers",
                 binding.handler(replace(context, current_roll_modifiers=current)),
             )
-        from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
-        from warhammer40k_core.engine.modifier_ignore import ignored_modifier_ids_for_context
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_movement_roll_modifiers,
+        )
 
+        current = generic_rule_movement_roll_modifiers(
+            replace(context, current_roll_modifiers=current)
+        )
+        from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
+        from warhammer40k_core.engine.movement_modifier_evaluation import (
+            movement_evaluation_ignored_ids,
+        )
+
+        if not apply_selection:
+            return current
         ignored_ids = frozenset(
-            ignored_modifier_ids_for_context(
+            movement_evaluation_ignored_ids(
                 state=context.state,
                 unit_instance_id=context.unit_instance_id,
                 kind=ModifierIgnoreKind.ADVANCE_ROLL,
+                modifiers=current,
             )
         )
         return tuple(modifier for modifier in current if modifier.modifier_id not in ignored_ids)
@@ -1223,11 +1254,13 @@ class RuntimeModifierRegistry:
     def charge_roll_modifiers(
         self,
         context: ChargeRollModifierContext,
+        *,
+        apply_selection: bool = True,
     ) -> tuple[RollModifier, ...]:
         if type(context) is not ChargeRollModifierContext:
             raise GameLifecycleError("Charge roll modifiers require a context.")
         from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_charge_roll_modifiers,
+            generic_rule_movement_roll_modifiers,
         )
 
         current = context.current_roll_modifiers
@@ -1236,17 +1269,22 @@ class RuntimeModifierRegistry:
                 f"{binding.modifier_id} returned charge roll modifiers",
                 binding.handler(replace(context, current_roll_modifiers=current)),
             )
-        current = generic_rule_charge_roll_modifiers(
+        current = generic_rule_movement_roll_modifiers(
             replace(context, current_roll_modifiers=current)
         )
         from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
-        from warhammer40k_core.engine.modifier_ignore import ignored_modifier_ids_for_context
+        from warhammer40k_core.engine.movement_modifier_evaluation import (
+            movement_evaluation_ignored_ids,
+        )
 
+        if not apply_selection:
+            return current
         ignored_ids = frozenset(
-            ignored_modifier_ids_for_context(
+            movement_evaluation_ignored_ids(
                 state=context.state,
                 unit_instance_id=context.unit_instance_id,
                 kind=ModifierIgnoreKind.CHARGE_ROLL,
+                modifiers=current,
             )
         )
         return tuple(modifier for modifier in current if modifier.modifier_id not in ignored_ids)
@@ -1359,17 +1397,6 @@ def _validate_weapon_profile(field_name: str, value: object) -> WeaponProfile:
     if type(value) is not WeaponProfile:
         raise GameLifecycleError(f"{field_name} must be a WeaponProfile.")
     return value
-
-
-def _characteristic_from_token(token: object) -> Characteristic:
-    if type(token) is Characteristic:
-        return token
-    if type(token) is not str:
-        raise GameLifecycleError("Runtime modifier characteristic must be a Characteristic.")
-    try:
-        return Characteristic(token)
-    except ValueError as exc:
-        raise GameLifecycleError(f"Unsupported runtime modifier characteristic: {token}.") from exc
 
 
 def _battle_phase_from_token(token: object) -> BattlePhase:

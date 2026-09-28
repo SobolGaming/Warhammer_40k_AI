@@ -64,7 +64,7 @@ def armies_with_historical_random_profiles(
                             characteristics=tuple(
                                 latest.get(
                                     (model.model_instance_id, value.characteristic),
-                                    replace(value, evaluation=None, evaluation_id=None),
+                                    value.without_evaluation(),
                                 )
                                 if isinstance(value, RandomProfileValue)
                                 and value.characteristic in characteristics

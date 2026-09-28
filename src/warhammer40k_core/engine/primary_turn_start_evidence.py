@@ -11,7 +11,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
     resolve_objective_control,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.random_objective_control import (
     objective_control_boundary_scope,
     prepare_objective_control,
@@ -481,19 +481,20 @@ def record_primary_turn_start_evidence(
     state: GameState,
     decisions: DecisionController | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
-) -> None:
+) -> LifecycleStatus | None:
     """Atomically derive objective control and exact rules-unit position evidence."""
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
         raise GameLifecycleError("Primary turn-start tracking requires GameState.")
     if state.mission_setup is None or state.battlefield_state is None:
-        return
+        return None
     if state.active_player_id is None:
         raise GameLifecycleError("Primary turn-start tracking requires an active player.")
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Primary turn-start tracking requires a battle phase.")
+    _require_unrecorded_turn_evidence(state=state)
     context = ObjectiveControlContext.from_game_state(
         state,
         timing=ObjectiveControlTiming.TURN_START,
@@ -501,9 +502,32 @@ def record_primary_turn_start_evidence(
         ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
         runtime_modifier_registry=runtime_modifier_registry,
     )
-    context = prepare_objective_control(
-        context, decisions=decisions, scope_id=objective_control_boundary_scope(context)
-    )
+    if decisions is None:
+        from warhammer40k_core.engine.objective_control_modifier_evaluation import (
+            require_objective_control_without_choices,
+        )
+
+        context = prepare_objective_control(
+            context, decisions=None, scope_id=objective_control_boundary_scope(context)
+        )
+        require_objective_control_without_choices(context)
+    else:
+        from warhammer40k_core.engine.objective_control_modifier_evaluation import (
+            evaluate_objective_control_modifiers,
+        )
+
+        registry = context.runtime_modifier_registry
+        prepared = evaluate_objective_control_modifiers(
+            context,
+            decisions=decisions,
+            occurrence_id=objective_control_boundary_scope(context),
+            ability_indexes_by_player_id={
+                player: registry.modifier_permission_index(player) for player in state.player_ids
+            },
+        )
+        if prepared.pending_status is not None:
+            return prepared.pending_status
+        context = prepared.context
     objective_record = resolve_objective_control(context)
     objective_state = PrimaryObjectiveTurnStartState(
         state_id=_turn_evidence_id("primary-turn-start", state),
@@ -532,6 +556,8 @@ def record_primary_turn_start_evidence(
     )
     state.record_primary_objective_turn_start_state(objective_state)
     state.record_primary_rules_unit_turn_start_snapshot(position_snapshot)
+
+    return None
 
 
 def build_primary_rules_unit_turn_start_snapshot(
@@ -1004,12 +1030,7 @@ def _current_primary_rules_unit_turn_start_snapshot(
     return snapshots[0]
 
 
-def _validate_new_turn_evidence(
-    *,
-    state: GameState,
-    objective_state: PrimaryObjectiveTurnStartState,
-    position_snapshot: PrimaryRulesUnitTurnStartSnapshot,
-) -> None:
+def _require_unrecorded_turn_evidence(*, state: GameState) -> None:
     turn_key = (state.active_player_id, state.battle_round)
     if any(
         (stored.active_player_id, stored.battle_round) == turn_key
@@ -1021,6 +1042,14 @@ def _validate_new_turn_evidence(
         for stored in state.primary_rules_unit_turn_start_snapshots
     ):
         raise GameLifecycleError("Primary turn-start position evidence already exists.")
+
+
+def _validate_new_turn_evidence(
+    *,
+    state: GameState,
+    objective_state: PrimaryObjectiveTurnStartState,
+    position_snapshot: PrimaryRulesUnitTurnStartSnapshot,
+) -> None:
     expected_component_ids = {
         unit.unit_instance_id for army in state.army_definitions for unit in army.units
     }

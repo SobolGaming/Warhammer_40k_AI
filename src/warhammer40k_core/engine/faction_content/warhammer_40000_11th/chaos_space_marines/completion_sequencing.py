@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from functools import partial
 
-from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -31,7 +30,6 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.random_profile_evaluation import evaluate_unit_profile_characteristics
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
@@ -102,19 +100,34 @@ def _activate(context: AttackSequenceCompletedContext) -> LifecycleStatus | None
             ),
         )
         return None
-    evaluate_unit_profile_characteristics(
+    from warhammer40k_core.engine.nonattack_modifier_evaluation import (
+        evaluate_leadership_modifiers,
+    )
+
+    evaluation = evaluate_leadership_modifiers(
         state=context.state,
         decisions=context.decisions,
         unit_instance_id=rules_unit.unit_instance_id,
-        scope_id=f"leadership-test:{context.attack_sequence_completed_event_id}:{effect.effect_id}",
-        characteristics=(Characteristic.LEADERSHIP,),
+        occurrence_id=f"leadership-test:{context.attack_sequence_completed_event_id}:{effect.effect_id}",
+        ability_index=context.runtime_modifier_registry.modifier_permission_index(
+            rules_unit.owner_player_id
+        ),
+        runtime_modifier_registry=context.runtime_modifier_registry,
+        roll_modifiers=selected_target_test_roll_modifiers(
+            state=context.state,
+            unit_instance_id=rules_unit.unit_instance_id,
+            roll_type=LEADERSHIP_TEST_ROLL_TYPE,
+        ),
+        source_context={
+            "continuation": "phase",
+            "source_kind": "dark_pact",
+            "attack_sequence_id": context.attack_sequence.sequence_id,
+            "source_effect_id": effect.effect_id,
+        },
     )
-    rules_unit = rules_unit_view_by_id(
-        state=context.state, unit_instance_id=rules_unit.unit_instance_id
-    )
-    leadership_target = _rules.leadership_target_for_rules_unit(
-        context=context, rules_unit=rules_unit
-    )
+    if evaluation.pending_status is not None:
+        return evaluation.pending_status
+    leadership_target = evaluation.leadership_target
     leadership_roll = context.dice_manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=2, sides=6),
@@ -125,11 +138,7 @@ def _activate(context: AttackSequenceCompletedContext) -> LifecycleStatus | None
     )
     modified_leadership_roll = ModifiedRollResult.from_unmodified(
         UnmodifiedRollResult.from_state(leadership_roll),
-        modifiers=selected_target_test_roll_modifiers(
-            state=context.state,
-            unit_instance_id=rules_unit.unit_instance_id,
-            roll_type=LEADERSHIP_TEST_ROLL_TYPE,
-        ),
+        modifiers=evaluation.roll_modifiers,
     )
     passed = modified_leadership_roll.final_value >= leadership_target
     if passed:

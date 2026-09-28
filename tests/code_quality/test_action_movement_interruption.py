@@ -177,6 +177,49 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
         "tests/phase17n_secondary_certification_fixtures.py",
         "tests/phase17n_step6g_secondary_certification_helpers.py",
     }
+    movement_proof = json.loads(
+        (ROOT / "docs/performance/order93/inherited-fixture-migration.json").read_text()
+    )
+    movement_migration = movement_proof["changed_files"]
+    movement_helper = "tests/action_movement_interruption_helpers.py"
+    assert movement_proof["schema_version"] == 1
+    assert set(movement_migration) == {movement_helper}
+    assert movement_proof["base_revision"] == "d7bcb10bd9e34b1eabb060465be7f9517d8417eb"
+    assert (
+        movement_proof["runtime_build_id"]
+        == json.loads((ROOT / "docs/performance/order93/base.json").read_text())["runtime_build_id"]
+    )
+    assert movement_proof["entrypoint"] == "action_movement_session"
+    assert movement_proof["entrypoint_kwargs"] == {"pause_after_move": True}
+    assert (
+        movement_migration[movement_helper]["head_sha256"]
+        == hashlib.sha256((ROOT / movement_helper).read_bytes()).hexdigest()
+    )
+    assert [row["case"] for row in movement_proof["cases"]] == [
+        "translation",
+        "return",
+        "zero",
+        "rotation",
+        "rotation_return",
+    ]
+    for row in movement_proof["cases"]:
+        assert row["base_payload_sha256"] == row["head_payload_sha256"]
+        assert row["base_component_sha256"] == row["head_component_sha256"]
+        assert set(row["base_component_sha256"]) == {
+            "initial_lifecycle",
+            "request",
+            "pending_lifecycle",
+            "submission",
+            "status",
+            "final_lifecycle",
+            "restored_lifecycle",
+        }
+        assert row["submission_status"] == "waiting_for_decision"
+        assert row["action_status"] == "interrupted"
+        assert row["restored_payload_identical"] is True
+        for digest in (row["base_payload_sha256"], *row["base_component_sha256"].values()):
+            assert len(digest) == 64
+            assert all(character in "0123456789abcdef" for character in digest)
     assert base.keys() == head.keys()
     for name in base:
         if name in changes:
@@ -189,6 +232,9 @@ def _assert_versioned_fixture_inputs(base: dict[str, str], head: dict[str, str])
         elif name in quarter_migration:
             assert base[name] == quarter_migration[name]["base_sha256"], name
             assert head[name] == quarter_migration[name]["head_sha256"], name
+        elif name in movement_migration:
+            assert base[name] == movement_migration[name]["base_sha256"], name
+            assert head[name] == movement_migration[name]["head_sha256"], name
         else:
             assert base[name] == head[name], name
     # The movement workload uses these unchanged roster/mission initializers;

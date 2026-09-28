@@ -81,6 +81,19 @@ def resume_move_start_action(
     )
     if status is not None:
         return status
+    from warhammer40k_core.engine.movement_modifier_evaluation import prepare_movement_modifiers
+
+    status = prepare_movement_modifiers(
+        state=state,
+        decisions=decisions,
+        pending=pending_action,
+        ability_index=_ability_index_for_player(
+            ability_indexes_by_player_id, player_id=pending_action.player_id
+        ),
+        registry=runtime_modifier_registry,
+    )
+    if status is not None:
+        return status
     state.replace_movement_phase_state(movement.without_pending_action())
     grants = selected_movement_grants(decisions, pending_action)
     if pending_action.movement_phase_action is MovementPhaseActionKind.FALL_BACK:

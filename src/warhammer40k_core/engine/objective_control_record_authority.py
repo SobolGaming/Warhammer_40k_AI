@@ -919,6 +919,10 @@ def _base_result_from_authority(
             or not model.alive
             or model.presence != "battlefield"
             or contribution.battle_shocked is not shocked
+            or (
+                contribution.modifier_trace
+                != (None if isinstance(resolved, RandomProfileValue) else resolved.modifier_trace)
+            )
             or contribution.objective_control != expected_base
             or contribution.effective_objective_control != expected_effective
         ):

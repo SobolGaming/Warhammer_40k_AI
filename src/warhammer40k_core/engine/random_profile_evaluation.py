@@ -219,9 +219,7 @@ def evaluate_model_profile_inventory(
             prior_value = RandomProfileValue.from_payload(
                 cast(RandomProfileValuePayload, prior_value_payload)
             )
-            if replace(prior_value, evaluation=None, evaluation_id=None) != replace(
-                value, evaluation=None, evaluation_id=None
-            ):
+            if prior_value.without_evaluation() != value.without_evaluation():
                 raise GameLifecycleError("Random profile descriptor changed during its evaluation.")
             rolls[key] = RandomCharacteristicRoll.from_payload(
                 cast(RandomCharacteristicRollPayload, prior_roll_payload)

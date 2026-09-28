@@ -22,8 +22,8 @@ def same_weapon_skill_source(left: WeaponProfile, right: WeaponProfile) -> bool:
     """Compare the source before runtime operations without evaluating random skill."""
     if isinstance(left.skill, RandomProfileValue):
         return isinstance(right.skill, RandomProfileValue) and replace(
-            left.skill, modifiers=(), evaluation=None, evaluation_id=None
-        ) == replace(right.skill, modifiers=(), evaluation=None, evaluation_id=None)
+            left.skill.without_evaluation(), modifiers=()
+        ) == replace(right.skill.without_evaluation(), modifiers=())
     return not isinstance(right.skill, RandomProfileValue) and (
         left.skill.characteristic == right.skill.characteristic
         and left.skill.raw == right.skill.raw
@@ -80,7 +80,7 @@ def with_weapon_skill_modifier(
         sorted((*profile.skill_modifiers, modifier), key=lambda item: item.modifier_id)
     )
     skill = (
-        replace(profile.skill, modifiers=modifiers, evaluation=None, evaluation_id=None)
+        replace(profile.skill.without_evaluation(), modifiers=modifiers)
         if isinstance(profile.skill, RandomProfileValue)
         else ModifierStack(profile.skill.characteristic, profile.skill.raw, modifiers).resolve()
     )

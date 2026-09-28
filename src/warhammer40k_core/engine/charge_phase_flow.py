@@ -84,7 +84,7 @@ def begin_phase(
                 "active_player_id": _charge._active_player_id(state),
             }
         ),
-        options=_modifier_ignore.charging_unit_options_with_modifier_ignore_choices(
+        options=_modifier_ignore.charging_unit_options(
             state=state,
             unit_ids=legal_unit_ids,
             include_complete=charge_state.interruption is None,

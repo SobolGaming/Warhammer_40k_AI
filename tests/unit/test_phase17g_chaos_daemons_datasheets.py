@@ -272,6 +272,12 @@ def test_skarbrand_and_keeper_weapon_auras_modify_friendly_melee_profiles() -> N
         )
     )
     assert rage_modified.attack_profile.fixed_attacks == 2
+    operation = rage_modified.attack_profile.modifiers[0]
+    assert operation.source_id == datasheets.SKARBRAND_RAGE_EMBODIED_ABILITY_ID
+    assert (
+        rage_modified.attack_profile.resolve_value(1, ignored_modifier_ids=(operation.modifier_id,))
+        == 1
+    )
     assert rage_modified.armor_penetration.final == -1
     assert datasheets.SKARBRAND_RAGE_EMBODIED_ABILITY_ID in rage_modified.source_ids
 

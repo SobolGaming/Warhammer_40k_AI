@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import math
 from collections.abc import Mapping
 from dataclasses import replace
@@ -128,6 +127,7 @@ from warhammer40k_core.engine.catalog_command_point_support import (
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_desperate_escape import (
     CATALOG_FORCED_DESPERATE_ESCAPE_SOURCE_KIND,
+    battle_shocked_roll_modifiers_for_record,
     catalog_forced_desperate_escape_sources_for_unit,
 )
 from warhammer40k_core.engine.catalog_fight_end_triggered_movement_runtime import (
@@ -144,6 +144,7 @@ from warhammer40k_core.engine.catalog_modifier_ignore import (
     ModifierIgnoreKind,
     catalog_modifier_ignore_permissions_for_unit,
     clause_is_modifier_ignore_permission,
+    modifier_ignore_permissions_for_subject,
 )
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_runtime import (
     CatalogMovementEndReactiveNormalMoveRuntime,
@@ -299,12 +300,6 @@ from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
-)
-from warhammer40k_core.engine.modifier_ignore import (
-    ModifierIgnoreSnapshot,
-    ignored_modifier_ids_for_context,
-    options_with_modifier_ignore_choices,
-    record_modifier_ignore_selection,
 )
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
@@ -563,8 +558,71 @@ def test_catalog_desperate_escape_consumer_uses_source_rule_ir_and_state_context
     assert source["fall_back_unit_instance_id"] == target_unit.unit_instance_id
     assert source["required_fall_back_mode"] == "desperate_escape"
     assert source["desperate_escape_roll_modifier"] == -1
+    modifiers = source["desperate_escape_roll_modifiers"]
+    assert isinstance(modifiers, list)
+    assert len(modifiers) == 1
+    assert isinstance(modifiers[0], dict)
+    assert modifiers[0]["operand"] == -1
     assert source["battle_round"] == 1
     assert source["phase"] == BattlePhase.MOVEMENT.value
+
+
+def test_catalog_desperate_escape_keeps_all_sibling_operations_with_scoped_force_record() -> None:
+    from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+
+    target_army, source_army = _mustered_core_armies()
+    target_id = target_army.units[0].unit_instance_id
+    original = _desperate_escape_record(source_unit=source_army.units[0])
+    rule_ir = rule_ir_from_execution_payload(original.definition.replay_payload)
+    force_clause = next(
+        clause
+        for clause in rule_ir.clauses
+        if any(
+            effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS for effect in clause.effects
+        )
+    )
+    penalty_clause = next(
+        clause
+        for clause in rule_ir.clauses
+        if any(effect.kind is RuleEffectKind.MODIFY_DICE_ROLL for effect in clause.effects)
+    )
+    bonus_clause = replace(
+        penalty_clause,
+        clause_id=f"{penalty_clause.clause_id}:separate-bonus",
+        effects=tuple(
+            replace(
+                effect,
+                parameters=tuple(
+                    replace(parameter, value=1) if parameter.key == "delta" else parameter
+                    for parameter in effect.parameters
+                ),
+            )
+            for effect in penalty_clause.effects
+        ),
+    )
+    record = _ability_record(
+        record_id=original.record_id,
+        rule_ir=replace(rule_ir, clauses=(*rule_ir.clauses, bonus_clause)),
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+        runtime_clause_id=force_clause.clause_id,
+        datasheet_id=source_army.units[0].datasheet_id,
+    )
+
+    modifiers = battle_shocked_roll_modifiers_for_record(
+        record=record,
+        target_unit_instance_id=target_id,
+        battle_shocked_unit_ids=(target_id,),
+    )
+
+    assert tuple(modifier.operand for modifier in modifiers) == (-1, 1)
+    assert len({modifier.modifier_id for modifier in modifiers}) == 2
+    assert {modifier.source_id for modifier in modifiers} == {rule_ir.source_id}
+    assert (
+        battle_shocked_roll_modifiers_for_record(
+            record=record, target_unit_instance_id=target_id, battle_shocked_unit_ids=()
+        )
+        == ()
+    )
 
 
 def test_catalog_desperate_escape_consumer_filters_keywords_distance_and_shape_drift() -> None:
@@ -4185,10 +4243,14 @@ def test_catalog_datasheet_runtime_executes_scoped_shield_wargear_rule_ir() -> N
         source_rule_ids=("test:better-invulnerable-save",),
     )
     existing_better_options = (base_save, better_invulnerable_save)
+    preserved = shimmer_binding.handler(replace(save_context, save_options=existing_better_options))
+    assert preserved[0] == base_save
     assert (
-        shimmer_binding.handler(replace(save_context, save_options=existing_better_options))
-        == existing_better_options
+        preserved[1].characteristic_target_number
+        == better_invulnerable_save.characteristic_target_number
     )
+    assert preserved[1].characteristic_trace is not None
+    assert preserved[1].characteristic_trace.modifiers[0].source_id == "000000593:shimmershield"
 
     serpent_shield = runtime_for(
         source_id="000000590:serpent-shield",
@@ -7000,12 +7062,7 @@ def test_catalog_command_point_runtime_helpers_fail_fast_on_contract_drift() -> 
         )
         is TimingTriggerKind.START_PHASE
     )
-    assert (
-        command_point_runtime._phase_gain_dice_gate(  # pyright: ignore[reportPrivateUsage]
-            phase_clause
-        )
-        is None
-    )
+    assert command_point_runtime.phase_gain_dice_gate(phase_clause) is None
     with pytest.raises(GameLifecycleError, match="trigger edge is malformed"):
         command_point_runtime._phase_gain_trigger_kind(  # pyright: ignore[reportPrivateUsage]
             replace(
@@ -8260,7 +8317,7 @@ def test_catalog_modifier_ignore_permission_classifier_and_query_are_fail_closed
         ),
         replace(
             clause,
-            target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+            target=RuleTargetSpec(kind=RuleTargetKind.ENEMY_UNIT, source_span=_span()),
         ),
         replace(clause, duration=replace(base_duration, kind=RuleDurationKind.IMMEDIATE)),
         replace(
@@ -8305,7 +8362,7 @@ def test_catalog_modifier_ignore_permission_classifier_and_query_are_fail_closed
                     base_effect,
                     parameters=_parameters(
                         ("ability", "modifier_ignore_permission"),
-                        ("modifier_kinds", ("hit_roll",)),
+                        ("modifier_kinds", ("unknown_roll",)),
                         ("selection", "any_or_all"),
                     ),
                 ),
@@ -8323,291 +8380,6 @@ def test_catalog_modifier_ignore_permission_classifier_and_query_are_fail_closed
         )
         == ()
     )
-
-
-def test_modifier_ignore_options_effect_and_records_round_trip_deterministically() -> None:
-    source_army, _target_army = _mustered_core_armies()
-    source_unit = source_army.units[0]
-    unit_id = source_unit.unit_instance_id
-    model_id = source_unit.own_models[0].model_instance_id
-    permission = CatalogModifierIgnorePermission(
-        permission_id="test:modifier-ignore:permission",
-        record_id="test:modifier-ignore:record",
-        source_id="test:modifier-ignore:source",
-        rule_ir_hash="test:modifier-ignore:rule-ir-hash",
-        clause_id="test:modifier-ignore:clause",
-        modifier_kinds=(
-            ModifierIgnoreKind.CHARGE_ROLL,
-            ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
-            ModifierIgnoreKind.ADVANCE_ROLL,
-        ),
-    )
-    snapshots = (
-        ModifierIgnoreSnapshot(
-            kind=ModifierIgnoreKind.CHARGE_ROLL,
-            modifier_id="test:modifier-ignore:charge",
-            source_id="test:modifier-ignore:charge-source",
-        ),
-        ModifierIgnoreSnapshot(
-            kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
-            modifier_id="test:modifier-ignore:movement",
-            source_id="test:modifier-ignore:movement-source",
-            model_instance_id=model_id,
-        ),
-        ModifierIgnoreSnapshot(
-            kind=ModifierIgnoreKind.ADVANCE_ROLL,
-            modifier_id="test:modifier-ignore:advance",
-            source_id="test:modifier-ignore:advance-source",
-        ),
-    )
-    base_option = DecisionOption(
-        option_id="advance",
-        label="Advance",
-        payload={"unit_instance_id": unit_id},
-    )
-
-    options = options_with_modifier_ignore_choices(
-        option=base_option,
-        unit_instance_id=unit_id,
-        permissions=(permission,),
-        available_modifiers=tuple(reversed(snapshots)),
-    )
-    repeated = options_with_modifier_ignore_choices(
-        option=base_option,
-        unit_instance_id=unit_id,
-        permissions=(permission,),
-        available_modifiers=snapshots,
-    )
-    assert options == repeated
-    assert len(options) == 8
-    assert len({option.option_id for option in options}) == 8
-    assert options[0].option_id == base_option.option_id
-    assert all(option.option_id.startswith("advance:ignore:") for option in options[1:])
-
-    request = DecisionRequest(
-        request_id="test:modifier-ignore:request",
-        decision_type="select_movement_action",
-        actor_id=source_army.player_id,
-        payload={"unit_instance_id": unit_id},
-        options=options,
-    )
-    request_payload = json.loads(json.dumps(request.to_payload(), sort_keys=True))
-    restored_request = DecisionRequest.from_payload(request_payload)
-    assert restored_request == request
-    selected_option = options[-1]
-    assert isinstance(selected_option.payload, dict)
-    selected_context = cast(
-        dict[str, object],
-        selected_option.payload["modifier_ignore_context"],
-    )
-    assert len(cast(list[object], selected_context["ignored_modifiers"])) == 3
-    result = DecisionResult.for_request(
-        result_id="test:modifier-ignore:result",
-        request=request,
-        selected_option_id=selected_option.option_id,
-    )
-    decisions = DecisionController()
-    decisions.request_decision(request)
-    decisions.submit_result(result)
-    state = _state_without_battlefield(
-        active_player_id=source_army.player_id,
-        phase=BattlePhase.MOVEMENT,
-    )
-    state.record_army_definition(source_army)
-    effect = record_modifier_ignore_selection(
-        state=state,
-        result=result,
-        unit_instance_id=unit_id,
-        phase=BattlePhaseKind.MOVEMENT,
-    )
-    assert effect is not None
-    assert ignored_modifier_ids_for_context(
-        state=state,
-        unit_instance_id=unit_id,
-        kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
-        model_instance_id=model_id,
-    ) == ("test:modifier-ignore:movement",)
-    assert ignored_modifier_ids_for_context(
-        state=state,
-        unit_instance_id=unit_id,
-        kind=ModifierIgnoreKind.ADVANCE_ROLL,
-    ) == ("test:modifier-ignore:advance",)
-    assert ignored_modifier_ids_for_context(
-        state=state,
-        unit_instance_id=unit_id,
-        kind=ModifierIgnoreKind.CHARGE_ROLL,
-    ) == ("test:modifier-ignore:charge",)
-
-    controller_payload = json.loads(json.dumps(decisions.to_payload(), sort_keys=True))
-    state_payload = json.loads(json.dumps(state.to_payload(), sort_keys=True))
-    assert DecisionController.from_payload(controller_payload).to_payload() == controller_payload
-    restored_state = GameState.from_payload(state_payload)
-    assert restored_state.to_payload() == state_payload
-    assert ignored_modifier_ids_for_context(
-        state=restored_state,
-        unit_instance_id=unit_id,
-        kind=ModifierIgnoreKind.CHARGE_ROLL,
-    ) == ("test:modifier-ignore:charge",)
-    assert "object at 0x" not in json.dumps(
-        {"decision": controller_payload, "state": state_payload}, sort_keys=True
-    )
-
-
-def test_modifier_ignore_context_rejects_duplicate_and_unpermitted_replay_shapes() -> None:
-    source_army, _target_army = _mustered_core_armies()
-    source_unit = source_army.units[0]
-    unit_id = source_unit.unit_instance_id
-    permission = CatalogModifierIgnorePermission(
-        permission_id="test:modifier-ignore:invalid-permission",
-        record_id="test:modifier-ignore:invalid-record",
-        source_id="test:modifier-ignore:invalid-source",
-        rule_ir_hash="test:modifier-ignore:invalid-hash",
-        clause_id="test:modifier-ignore:invalid-clause",
-        modifier_kinds=(ModifierIgnoreKind.ADVANCE_ROLL,),
-    )
-    advance_snapshot = ModifierIgnoreSnapshot(
-        kind=ModifierIgnoreKind.ADVANCE_ROLL,
-        modifier_id="test:modifier-ignore:invalid-advance",
-        source_id="test:modifier-ignore:invalid-advance-source",
-    )
-    base_option = DecisionOption(
-        option_id="advance",
-        label="Advance",
-        payload={"unit_instance_id": unit_id},
-    )
-    with pytest.raises(GameLifecycleError, match="snapshot identities must be unique"):
-        options_with_modifier_ignore_choices(
-            option=base_option,
-            unit_instance_id=unit_id,
-            permissions=(permission,),
-            available_modifiers=(advance_snapshot, advance_snapshot),
-        )
-
-    option = options_with_modifier_ignore_choices(
-        option=base_option,
-        unit_instance_id=unit_id,
-        permissions=(permission,),
-        available_modifiers=(advance_snapshot,),
-    )[1]
-    assert isinstance(option.payload, dict)
-    valid_payload = cast(dict[str, object], option.payload)
-    valid_context = cast(dict[str, object], valid_payload["modifier_ignore_context"])
-    request = DecisionRequest(
-        request_id="test:modifier-ignore:invalid-request",
-        decision_type="select_movement_action",
-        actor_id="player-a",
-        payload={},
-        options=(option,),
-    )
-    valid_result = DecisionResult.for_request(
-        result_id="test:modifier-ignore:invalid-result",
-        request=request,
-        selected_option_id=option.option_id,
-    )
-
-    for expected_message, context in (
-        (
-            "permission IDs are duplicated",
-            {
-                **valid_context,
-                "permissions": [
-                    *cast(list[object], valid_context["permissions"]),
-                    *cast(list[object], valid_context["permissions"]),
-                ],
-            },
-        ),
-        (
-            "available modifier kind is not permitted",
-            {
-                **valid_context,
-                "available_modifiers": [
-                    ModifierIgnoreSnapshot(
-                        kind=ModifierIgnoreKind.CHARGE_ROLL,
-                        modifier_id="test:modifier-ignore:unpermitted-charge",
-                        source_id="test:modifier-ignore:unpermitted-charge-source",
-                    ).to_payload()
-                ],
-                "ignored_modifiers": [
-                    ModifierIgnoreSnapshot(
-                        kind=ModifierIgnoreKind.CHARGE_ROLL,
-                        modifier_id="test:modifier-ignore:unpermitted-charge",
-                        source_id="test:modifier-ignore:unpermitted-charge-source",
-                    ).to_payload()
-                ],
-            },
-        ),
-        (
-            "ignored modifiers are duplicated",
-            {
-                **valid_context,
-                "ignored_modifiers": [
-                    *cast(list[object], valid_context["ignored_modifiers"]),
-                    *cast(list[object], valid_context["ignored_modifiers"]),
-                ],
-            },
-        ),
-    ):
-        forged = replace(
-            valid_result,
-            payload=validate_json_value({**valid_payload, "modifier_ignore_context": context}),
-        )
-        state = _state_without_battlefield(
-            active_player_id="player-a",
-            phase=BattlePhase.MOVEMENT,
-        )
-        with pytest.raises(GameLifecycleError, match=expected_message):
-            record_modifier_ignore_selection(
-                state=state,
-                result=forged,
-                unit_instance_id=unit_id,
-                phase=BattlePhaseKind.MOVEMENT,
-            )
-        assert state.persisting_effects == []
-
-    valid_state = _state_without_battlefield(
-        active_player_id=source_army.player_id,
-        phase=BattlePhase.MOVEMENT,
-    )
-    valid_state.record_army_definition(source_army)
-    valid_effect = record_modifier_ignore_selection(
-        state=valid_state,
-        result=valid_result,
-        unit_instance_id=unit_id,
-        phase=BattlePhaseKind.MOVEMENT,
-    )
-    assert valid_effect is not None
-    assert isinstance(valid_effect.effect_payload, dict)
-    replay_effect_payload = cast(dict[str, object], valid_effect.effect_payload)
-    replay_context = cast(
-        dict[str, object],
-        replay_effect_payload["modifier_ignore_context"],
-    )
-    replay_permissions = cast(list[object], replay_context["permissions"])
-    malformed_replay_effect = replace(
-        valid_effect,
-        effect_id="test:modifier-ignore:malformed-replay-effect",
-        effect_payload=validate_json_value(
-            {
-                **replay_effect_payload,
-                "modifier_ignore_context": {
-                    **replay_context,
-                    "permissions": [*replay_permissions, *replay_permissions],
-                },
-            }
-        ),
-    )
-    replay_state = _state_without_battlefield(
-        active_player_id=source_army.player_id,
-        phase=BattlePhase.MOVEMENT,
-    )
-    replay_state.record_army_definition(source_army)
-    replay_state.record_persisting_effect(malformed_replay_effect)
-    with pytest.raises(GameLifecycleError, match="permission IDs are duplicated"):
-        ignored_modifier_ids_for_context(
-            state=replay_state,
-            unit_instance_id=unit_id,
-            kind=ModifierIgnoreKind.ADVANCE_ROLL,
-        )
 
 
 def test_catalog_charge_roll_modifier_classifier_is_fail_closed() -> None:
@@ -10892,3 +10664,515 @@ def _unit_with_dead_model(unit: UnitInstance, *, index: int) -> UnitInstance:
     model = models[index]
     models[index] = replace(model, wounds_remaining=0)
     return replace(unit, own_models=tuple(models))
+
+
+@pytest.mark.parametrize("kind", tuple(ModifierIgnoreKind))
+def test_modifier_ignore_subject_unrestricted_permission_covers_typed_kinds(
+    kind: ModifierIgnoreKind,
+) -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    state = _modifier_permission_state((source_army, target_army))
+    clause = _modifier_ignore_permission_clause(clause_id="ignore:default", modifier_kinds=())
+    clause = replace(
+        clause,
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+        effects=(
+            replace(
+                clause.effects[0],
+                parameters=_parameters(
+                    ("ability", "modifier_ignore_permission"),
+                    ("selection", "any_or_all"),
+                ),
+            ),
+        ),
+    )
+    record = _ability_record(
+        record_id="record:ignore:default",
+        rule_ir=_rule_ir(source_id="source:ignore:default", clauses=(clause,)),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        datasheet_id=source_unit.datasheet_id,
+    )
+    permissions = modifier_ignore_permissions_for_subject(
+        state=state,
+        ability_index=AbilityCatalogIndex.from_records((record,)),
+        unit_instance_id=source_unit.unit_instance_id,
+        kind=kind,
+        model_instance_id=source_unit.own_models[0].model_instance_id,
+    )
+    assert len(permissions) == 1
+    assert permissions[0].supports(kind)
+    context = permissions[0].source_context
+    assert isinstance(context, dict)
+    assert context["source_unit_instance_id"] == source_unit.unit_instance_id
+    assert context["subject_model_instance_id"] == source_unit.own_models[0].model_instance_id
+    assert validate_json_value(permissions[0].to_payload()) == permissions[0].to_payload()
+
+
+@pytest.mark.parametrize("target_kind", [RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT])
+def test_modifier_ignore_subject_retains_attached_component_and_model_ownership(
+    target_kind: RuleTargetKind,
+) -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    state = _modifier_permission_state((source_army, target_army))
+    leader = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    bodyguard = next(unit for unit in source_army.units if unit is not leader)
+    leader_model = leader.own_models[0]
+    bodyguard_model = bodyguard.own_models[0]
+    rules_unit_id = source_army.attached_units[0].attached_unit_instance_id
+    clause = replace(
+        _modifier_ignore_permission_clause(
+            clause_id="ignore:attached",
+            modifier_kinds=(ModifierIgnoreKind.HIT_ROLL.value,),
+        ),
+        target=RuleTargetSpec(kind=target_kind, source_span=_span()),
+    )
+    record = _ability_record(
+        record_id="record:ignore:attached",
+        datasheet_id=leader.datasheet_id,
+        rule_ir=_rule_ir(source_id="source:ignore:attached", clauses=(clause,)),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+    index = AbilityCatalogIndex.from_records((record,))
+    assert (
+        len(
+            modifier_ignore_permissions_for_subject(
+                state=state,
+                ability_index=index,
+                unit_instance_id=rules_unit_id,
+                model_instance_id=leader_model.model_instance_id,
+                kind=ModifierIgnoreKind.HIT_ROLL,
+            )
+        )
+        == 1
+    )
+    assert bool(
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=index,
+            unit_instance_id=rules_unit_id,
+            model_instance_id=bodyguard_model.model_instance_id,
+            kind=ModifierIgnoreKind.HIT_ROLL,
+        )
+    ) is (target_kind is RuleTargetKind.THIS_UNIT)
+    assert (
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=index,
+            unit_instance_id=rules_unit_id,
+            model_instance_id=leader_model.model_instance_id,
+            kind=ModifierIgnoreKind.WOUND_ROLL,
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="component"):
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=index,
+            unit_instance_id=bodyguard.unit_instance_id,
+            model_instance_id=leader_model.model_instance_id,
+            kind=ModifierIgnoreKind.HIT_ROLL,
+        )
+    dead_leader = _unit_with_dead_model(leader, index=0)
+    state.army_definitions[0] = replace(source_army, units=(bodyguard, dead_leader))
+    assert (
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=index,
+            unit_instance_id=rules_unit_id,
+            model_instance_id=bodyguard_model.model_instance_id,
+            kind=ModifierIgnoreKind.HIT_ROLL,
+        )
+        == ()
+    )
+
+
+def test_modifier_ignore_subject_filters_live_wargear_timing_and_keyword_restrictions() -> None:
+    from warhammer40k_core.engine.abilities import KeywordGate
+
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    state = _modifier_permission_state((source_army, target_army))
+    model = source_unit.own_models[0]
+    wargear_id = model.wargear_ids[0]
+    clause = _modifier_ignore_permission_clause(
+        clause_id="ignore:wargear",
+        modifier_kinds=(ModifierIgnoreKind.HIT_ROLL.value,),
+    )
+    record = _ability_record(
+        record_id="record:ignore:wargear",
+        datasheet_id=source_unit.datasheet_id,
+        source_kind=AbilitySourceKind.WARGEAR,
+        wargear_id=wargear_id,
+        rule_ir=_rule_ir(source_id="source:ignore:wargear", clauses=(clause,)),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+
+    def query(candidate: AbilityCatalogRecord) -> tuple[CatalogModifierIgnorePermission, ...]:
+        return modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=AbilityCatalogIndex.from_records((candidate,)),
+            unit_instance_id=source_unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            kind=ModifierIgnoreKind.HIT_ROLL,
+        )
+
+    assert len(query(record)) == 1
+    assert query(replace(record, disabled=True)) == ()
+    assert query(replace(record, wargear_id="absent-wargear")) == ()
+    assert (
+        query(
+            replace(
+                record,
+                definition=replace(
+                    record.definition,
+                    keyword_gate=KeywordGate(required_keywords=("TITANIC",)),
+                ),
+            )
+        )
+        == ()
+    )
+    assert (
+        query(
+            replace(
+                record,
+                definition=replace(
+                    record.definition,
+                    timing=AbilityTimingDescriptor(
+                        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+                        phase=BattlePhaseKind.FIGHT,
+                    ),
+                ),
+            )
+        )
+        == ()
+    )
+    assert (
+        query(
+            replace(
+                record,
+                definition=replace(
+                    record.definition,
+                    timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_PHASE),
+                ),
+            )
+        )
+        == ()
+    )
+    state.battlefield_state = None
+    assert query(record) == ()
+
+
+def test_modifier_ignore_persisted_grant_tracks_real_effect_identity_scope_and_expiry() -> None:
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+
+    source_army, target_army = _mustered_core_armies()
+    unit = source_army.units[0]
+    state = _modifier_permission_state((source_army, target_army))
+    source_model_id = unit.own_models[0].model_instance_id
+    other_model_id = unit.own_models[1].model_instance_id
+    clause = _modifier_ignore_permission_clause(
+        clause_id="ignore:temporary",
+        modifier_kinds=(ModifierIgnoreKind.WOUND_ROLL.value,),
+    )
+    rule_ir = _rule_ir(source_id="source:ignore:temporary", clauses=(clause,))
+    assert clause.target is not None
+    effect = PersistingEffect(
+        effect_id="effect:ignore:temporary",
+        source_rule_id=rule_ir.source_id,
+        owner_player_id=source_army.player_id,
+        target_unit_instance_ids=(unit.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            player_id=source_army.player_id,
+            phase=BattlePhaseKind.SHOOTING,
+        ),
+        effect_payload=validate_json_value(
+            {
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "source_id": rule_ir.source_id,
+                "rule_id": rule_ir.rule_id,
+                "rule_ir_hash": rule_ir.ir_hash(),
+                "clause_id": clause.clause_id,
+                "effect_index": 0,
+                "effect": clause.effects[0].to_payload(),
+                "target": clause.target.to_payload(),
+                "context": {
+                    "source_unit_instance_id": unit.unit_instance_id,
+                    "source_model_instance_id": source_model_id,
+                },
+            }
+        ),
+    )
+    state.record_persisting_effect(effect)
+
+    def query(model_id: str) -> tuple[CatalogModifierIgnorePermission, ...]:
+        return modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=AbilityCatalogIndex.from_records(()),
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model_id,
+            kind=ModifierIgnoreKind.WOUND_ROLL,
+        )
+
+    permissions = query(source_model_id)
+    assert len(permissions) == 1
+    assert permissions[0].record_id == effect.effect_id
+    assert permissions[0].source_id == rule_ir.source_id
+    context = permissions[0].source_context
+    assert isinstance(context, dict)
+    assert context["persisting_effect"] == effect.to_payload()
+    assert query(other_model_id) == ()
+    state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.phase_end(
+            battle_round=state.battle_round,
+            player_id=source_army.player_id,
+            phase=BattlePhaseKind.SHOOTING,
+        )
+    )
+    assert query(source_model_id) == ()
+
+
+def _modifier_permission_state(armies: tuple[ArmyDefinition, ArmyDefinition]) -> GameState:
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="modifier-permission-subject",
+        armies=armies,
+    )
+    return _state_with_battlefield(
+        armies=armies,
+        battlefield=scenario.battlefield_state,
+        active_player_id=armies[0].player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+
+
+def test_modifier_ignore_weapon_source_requires_current_model_wargear_and_profile() -> None:
+    source_army, target_army = _mustered_core_armies()
+    unit = source_army.units[0]
+    model = unit.own_models[0]
+    state = _modifier_permission_state((source_army, target_army))
+    profile = next(
+        profile
+        for wargear in ArmyCatalog.phase9a_canonical_content_pack().wargear
+        if wargear.wargear_id in model.wargear_ids
+        for profile in wargear.weapon_profiles
+    )
+    wargear_id = next(
+        wargear.wargear_id
+        for wargear in ArmyCatalog.phase9a_canonical_content_pack().wargear
+        if profile in wargear.weapon_profiles
+    )
+    clause = _modifier_ignore_permission_clause(
+        clause_id="ignore:weapon",
+        modifier_kinds=(ModifierIgnoreKind.STRENGTH_CHARACTERISTIC.value,),
+    )
+    record = replace(
+        _ability_record(
+            record_id="record:ignore:weapon",
+            datasheet_id=unit.datasheet_id,
+            rule_ir=_rule_ir(source_id="source:ignore:weapon", clauses=(clause,)),
+            trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        ),
+        source_kind=AbilitySourceKind.WEAPON,
+        wargear_id=wargear_id,
+        weapon_profile_id=profile.profile_id,
+    )
+
+    def query(
+        candidate: AbilityCatalogRecord, profile_id: str | None
+    ) -> tuple[CatalogModifierIgnorePermission, ...]:
+        return modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=AbilityCatalogIndex.from_records((candidate,)),
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            kind=ModifierIgnoreKind.STRENGTH_CHARACTERISTIC,
+            weapon_profile_id=profile_id,
+        )
+
+    assert len(query(record, profile.profile_id)) == 1
+    assert query(record, None) == ()
+    assert query(record, "unowned-profile") == ()
+    assert query(replace(record, wargear_id="unowned-wargear"), profile.profile_id) == ()
+    assert query(replace(record, wargear_id=None), profile.profile_id) == ()
+    assert query(replace(record, datasheet_id="unowned-datasheet"), profile.profile_id) == ()
+    with pytest.raises(GameLifecycleError, match="model owner"):
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=AbilityCatalogIndex.from_records((record,)),
+            unit_instance_id=unit.unit_instance_id,
+            kind=ModifierIgnoreKind.STRENGTH_CHARACTERISTIC,
+            weapon_profile_id=profile.profile_id,
+        )
+    with pytest.raises(GameLifecycleError, match="not in the rules unit"):
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=AbilityCatalogIndex.from_records((record,)),
+            unit_instance_id=unit.unit_instance_id,
+            kind=ModifierIgnoreKind.STRENGTH_CHARACTERISTIC,
+            model_instance_id=target_army.units[0].own_models[0].model_instance_id,
+        )
+
+
+@pytest.mark.parametrize(
+    ("parameters", "expected"),
+    [
+        ((("source_phase", "shooting"),), True),
+        ((("source_phase", "fight"),), False),
+        ((("required_keyword", "INFANTRY"),), True),
+        ((("required_keyword", "TITANIC"),), False),
+    ],
+)
+def test_modifier_ignore_persisted_grant_reuses_shared_context_restrictions(
+    parameters: tuple[tuple[str, RuleParameterValue], ...],
+    expected: bool,
+) -> None:
+    armies = _mustered_core_armies()
+    state = _modifier_permission_state(armies)
+    unit = armies[0].units[0]
+    effect_spec = _effect(
+        RuleEffectKind.GRANT_ABILITY,
+        ("ability", "modifier_ignore_permission"),
+        ("selection", "any_or_all"),
+        *parameters,
+    )
+    effect = PersistingEffect(
+        effect_id="effect:ignore:restricted",
+        source_rule_id="source:ignore:restricted",
+        owner_player_id=armies[0].player_id,
+        target_unit_instance_ids=(unit.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+        effect_payload=validate_json_value(
+            {
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "source_id": "source:ignore:restricted",
+                "rule_id": "rule:ignore:restricted",
+                "rule_ir_hash": "test-ir-hash",
+                "clause_id": "clause:ignore:restricted",
+                "effect_index": 0,
+                "effect": effect_spec.to_payload(),
+                "target": RuleTargetSpec(
+                    kind=RuleTargetKind.THIS_UNIT, source_span=_span()
+                ).to_payload(),
+            }
+        ),
+    )
+    state.record_persisting_effect(effect)
+    result = modifier_ignore_permissions_for_subject(
+        state=state,
+        ability_index=AbilityCatalogIndex.from_records(()),
+        unit_instance_id=unit.unit_instance_id,
+        kind=ModifierIgnoreKind.HIT_ROLL,
+        model_instance_id=unit.own_models[0].model_instance_id,
+    )
+    assert bool(result) is expected
+
+
+@pytest.mark.parametrize("source_kind", [AbilitySourceKind.DATASHEET, AbilitySourceKind.WARGEAR])
+def test_modifier_ignore_subject_retains_authenticated_destroyed_bearer_permission(
+    source_kind: AbilitySourceKind,
+) -> None:
+    armies = _mustered_core_armies()
+    state = _modifier_permission_state(armies)
+    unit = armies[0].units[0]
+    model_id = unit.own_models[0].model_instance_id
+    clause = _modifier_ignore_permission_clause(
+        clause_id="ignore:retained",
+        modifier_kinds=(ModifierIgnoreKind.HIT_ROLL.value,),
+    )
+    record = _ability_record(
+        record_id="record:ignore:retained",
+        datasheet_id=unit.datasheet_id,
+        source_kind=source_kind,
+        wargear_id=unit.own_models[0].wargear_ids[0]
+        if source_kind is AbilitySourceKind.WARGEAR
+        else None,
+        rule_ir=_rule_ir(source_id="source:ignore:retained", clauses=(clause,)),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+    index = AbilityCatalogIndex.from_records((record,))
+    assert state.battlefield_state is not None
+    placement = state.battlefield_state.model_placement_by_id(model_id)
+    state.army_definitions[0] = replace(armies[0], units=(_unit_with_dead_model(unit, index=0),))
+    assert (
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=index,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model_id,
+            kind=ModifierIgnoreKind.HIT_ROLL,
+        )
+        == ()
+    )
+    state.replace_battlefield_state(state.battlefield_state.with_removed_models((model_id,)))
+    retain_destroyed_model_for_fixture(
+        state=state,
+        placement=placement,
+        decisions=DecisionController(),
+        effect_id="effect:ignore:retained-fixture",
+        source_rule_id="source:ignore:retained-fixture",
+        source_phase=BattlePhaseKind.SHOOTING,
+    )
+    assert (
+        len(
+            modifier_ignore_permissions_for_subject(
+                state=state,
+                ability_index=index,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model_id,
+                kind=ModifierIgnoreKind.HIT_ROLL,
+            )
+        )
+        == 1
+    )
+
+
+@pytest.mark.parametrize("target_kind", [None, RuleTargetKind.WEAPON])
+def test_modifier_ignore_persisted_grant_rejects_missing_physical_subject_authority(
+    target_kind: RuleTargetKind | None,
+) -> None:
+    armies = _mustered_core_armies()
+    state = _modifier_permission_state(armies)
+    unit = armies[0].units[0]
+    effect = _effect(
+        RuleEffectKind.GRANT_ABILITY,
+        ("ability", "modifier_ignore_permission"),
+        ("selection", "any_or_all"),
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="effect:ignore:bad-subject",
+            source_rule_id="source:ignore:bad-subject",
+            owner_player_id=armies[0].player_id,
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=validate_json_value(
+                {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "source_id": "source:ignore:bad-subject",
+                    "rule_id": "rule:ignore:bad-subject",
+                    "rule_ir_hash": "test-ir-hash",
+                    "clause_id": "clause:ignore:bad-subject",
+                    "effect_index": 0,
+                    "effect": effect.to_payload(),
+                    "target": None
+                    if target_kind is None
+                    else RuleTargetSpec(kind=target_kind, source_span=_span()).to_payload(),
+                }
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="subject scope"):
+        modifier_ignore_permissions_for_subject(
+            state=state,
+            ability_index=AbilityCatalogIndex.from_records(()),
+            unit_instance_id=unit.unit_instance_id,
+            kind=ModifierIgnoreKind.HIT_ROLL,
+            model_instance_id=unit.own_models[0].model_instance_id,
+        )

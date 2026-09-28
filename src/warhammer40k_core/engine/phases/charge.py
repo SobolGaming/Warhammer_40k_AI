@@ -684,7 +684,7 @@ def invalid_charging_unit_selection_status(
                 "field": "unit_instance_id",
             },
         )
-    current_options = _modifier_ignore.charging_unit_options_with_modifier_ignore_choices(
+    current_options = _modifier_ignore.charging_unit_options(
         state=state,
         unit_ids=current_legal_ids,
         include_complete=True,
@@ -696,7 +696,7 @@ def invalid_charging_unit_selection_status(
         target_candidate_provider=_charge_target_candidates,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
-    return _modifier_ignore.invalid_charge_modifier_ignore_context_status(
+    return _modifier_ignore.invalid_charging_unit_option_status(
         state=state,
         result=result,
         current_options=current_options,
@@ -833,12 +833,6 @@ def _apply_charging_unit_selection_decision(
     )
     if unit_instance_id not in legal_unit_ids:
         raise GameLifecycleError("Charging unit selection is not currently legal.")
-    _modifier_ignore.record_charge_modifier_ignore_selection(
-        state=state,
-        decisions=decisions,
-        result=result,
-        unit_instance_id=unit_instance_id,
-    )
     from warhammer40k_core.engine.take_to_the_skies import flight_selection
 
     selection = ChargingUnitSelection(

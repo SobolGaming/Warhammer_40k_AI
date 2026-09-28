@@ -1,4 +1,4 @@
-"""Hash-pinned modifiers and Psychic individual selection for P02A/P02B/P02C/P24I."""
+"""Hash-pinned modifiers and Psychic individual selection for P02A/P02B/P02C/P02I/P24I."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "e3f5c89313fd43ba71473013a799929f402e68831b3bdee2f9b045c90fae4dc9"
+EXPECTED_ARTIFACT_SHA256: Final = "1ac10341f079842acb14666e0f8c74b72a7528b597b240ae9c80679dc86c8a5f"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-modifiers"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-07"
 ORDERED_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ordered-modifiers"

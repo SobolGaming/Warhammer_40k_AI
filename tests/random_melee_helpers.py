@@ -26,6 +26,7 @@ def random_melee_session(
     attacker_models: int = 1,
     attached: bool = False,
     fixed_bodyguard: bool = False,
+    fixed_attacks: int | None = None,
 ) -> LocalGameSession:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     if fixed_bodyguard:
@@ -62,6 +63,8 @@ def random_melee_session(
         )
     blade = next(item for item in catalog.wargear if item.wargear_id == "core-leader-blade")
     primary = blade.weapon_profiles[0]
+    if fixed_attacks is not None:
+        primary = replace(primary, attack_profile=AttackProfile.fixed(fixed_attacks))
     if cleave:
         primary = replace(
             primary, keywords=(WeaponKeyword.CLEAVE,), abilities=(AbilityDescriptor.cleave(2),)

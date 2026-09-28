@@ -164,7 +164,19 @@ def _advance_active_fight_activation(
     if selected_to_fight_stratagem_status is not None:
         return selected_to_fight_stratagem_status
     from warhammer40k_core.engine.melee_pool_authority import commitment_inventory
+    from warhammer40k_core.engine.weapon_modifier_selection import prepare_melee_modifier_rows
 
+    available_weapons, modifier_status = prepare_melee_modifier_rows(
+        state=state,
+        decisions=decisions,
+        registry=handler.runtime_modifier_registry,
+        activation_id=activation.result_id,
+        unit_instance_id=melee_rules_unit.unit_instance_id,
+        player_id=activation.player_id,
+        rows=available_weapons,
+    )
+    if modifier_status is not None:
+        return modifier_status
     available_weapons = commitment_inventory(available_weapons, state)
     commitment_status = prepare_melee_commitment(
         state=state, decisions=decisions, activation=activation, rows=available_weapons
@@ -342,6 +354,7 @@ def _apply_melee_declaration_decision(
     )
     commitment = commitment_for_activation(decisions, proposal.source_decision_result_id)
     attack_sequence = rules_unit_melee_attack_sequence_from_proposal(
+        selected_weapon_rows=proposal_request.available_weapons,
         committed_budgets=None if commitment is None else budgets_from_commitment(commitment),
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),

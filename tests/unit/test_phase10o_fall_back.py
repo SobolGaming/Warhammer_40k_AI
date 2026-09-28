@@ -544,6 +544,7 @@ def test_voluntary_desperate_escape_requires_one_hazard_roll_for_every_model() -
         fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
     )
     rolls = _roll_desperate_escape_dice(
+        movement_proposal_result_id="test:desperate-escape-proposal",
         state=state,
         decisions=DecisionController(),
         resolution=resolution,
@@ -579,6 +580,7 @@ def test_forced_desperate_escape_rolls_every_model() -> None:
     )
     decisions = DecisionController()
     rolls = _roll_desperate_escape_dice(
+        movement_proposal_result_id="test:desperate-escape-proposal",
         state=state,
         decisions=decisions,
         resolution=resolution,
@@ -2122,7 +2124,9 @@ def _generic_movement_transit_effect(*, target_unit_instance_id: str) -> Persist
     )
 
 
-def _forced_desperate_escape_descriptor() -> DatasheetAbilityDescriptor:
+def _forced_desperate_escape_descriptor(
+    *, with_penalty: bool = False
+) -> DatasheetAbilityDescriptor:
     source_text = RuleSourceText.from_raw(
         objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase10o:catalog-ability:forced-desperate-escape",
@@ -2130,6 +2134,12 @@ def _forced_desperate_escape_descriptor() -> DatasheetAbilityDescriptor:
             "Each time an enemy unit (excluding Monsters and Vehicles) that is within "
             "Engagement Range of one or more units from your army with this ability is selected "
             "to Fall Back, models in that enemy unit must take Desperate Escape tests."
+            + (
+                " If that enemy unit is also Battle-shocked, subtract 1 from each of those "
+                "Desperate Escape tests."
+                if with_penalty
+                else ""
+            )
         ),
     )
     rule_ir = compile_rule_source_text(
@@ -2411,6 +2421,7 @@ def _movement_lifecycle_with_overflight_engagement(
     *,
     prepare_delirium_target: bool = False,
     delirium_target_wounds_remaining: int = 4,
+    modifier_ignore_for_shocked_target: bool = False,
 ) -> tuple[GameLifecycle, LifecycleStatus]:
     mission_setup = config.mission_setup
     assert mission_setup is not None
@@ -2582,6 +2593,16 @@ def _movement_lifecycle_with_overflight_engagement(
             )
         )
     record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
+    if modifier_ignore_for_shocked_target:
+        from tests.order93_nonattack_helpers import add_nonattack_effects
+
+        add_nonattack_effects(
+            state,
+            unit_id="army-alpha:intercessor-unit-1",
+            owner="player-a",
+            characteristic="leadership",
+            operations=False,
+        )
     if prepare_delirium_target:
         state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
         lifecycle = GameLifecycle.from_payload(
@@ -2608,6 +2629,37 @@ def _movement_lifecycle_with_overflight_engagement(
                 target_unit_instance_id="army-alpha:intercessor-unit-1",
             )
         )
+        if modifier_ignore_for_shocked_target:
+            from warhammer40k_core.adapters.local_session import LocalGameSession
+            from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+            session = LocalGameSession(lifecycle=lifecycle)
+            command_status = session.submit_parameterized_payload(
+                request_id=insane_bravery_request.request_id,
+                result_id=f"{config.game_id}:decline-insane-bravery",
+                payload=stratagem_decline_payload(),
+            )
+            while (
+                command_status.decision_request is not None
+                and command_status.decision_request.decision_type
+                in {SELECT_FEEL_NO_PAIN_DECISION_TYPE, "select_modifier_ignores"}
+            ):
+                fnp = command_status.decision_request
+                command_status = session.submit_option(
+                    request_id=fnp.request_id,
+                    result_id=f"{fnp.request_id}:fnp",
+                    option_id="keep-remaining"
+                    if fnp.decision_type == "select_modifier_ignores"
+                    else fnp.options[-1].option_id,
+                )
+            assert "army-alpha:intercessor-unit-1" in _state(lifecycle).battle_shocked_unit_ids, (
+                command_status
+            )
+            assert (
+                _decision_request(command_status).decision_type
+                == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+            )
+            return lifecycle, command_status
         command_status = lifecycle.submit_decision(
             DecisionResult(
                 result_id=f"{config.game_id}:use-insane-bravery",
@@ -3047,3 +3099,95 @@ def _transition_batch_from_event_payload(
 ) -> BattlefieldTransitionBatch:
     transition_payload = cast(BattlefieldTransitionBatchPayload, payload["transition_batch"])
     return BattlefieldTransitionBatch.from_payload(transition_payload)
+
+
+def test_desperate_escape_modifiers_wait_before_every_hazard_roll_and_replay() -> None:
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+
+    config = _config(
+        game_id="order93-desperate-escape-subset-1",
+        with_chaos_knights_delirium=True,
+        with_transport=True,
+    )
+    config = replace(
+        config,
+        army_catalog=_catalog_with_datasheet_ability(
+            config.army_catalog,
+            _forced_desperate_escape_descriptor(with_penalty=True),
+        ),
+    )
+    lifecycle, status = _movement_lifecycle_with_overflight_engagement(
+        config,
+        prepare_delirium_target=True,
+        modifier_ignore_for_shocked_target=True,
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    initial = lifecycle.to_payload()
+    request = _decision_request(status)
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order93:escape-unit",
+        option_id="army-alpha:intercessor-unit-1",
+    )
+    request = _decision_request(status)
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="order93:escape-action",
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+    )
+    placement = _state(lifecycle).battlefield_state
+    assert placement is not None
+    unit = placement.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    status = submit_movement_proposal(
+        lifecycle,
+        request=_decision_request(status),
+        result_id="order93:escape-proposal",
+        unit_instance_id=unit.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(unit, first_model_end_pose=_fall_back_forward_pose(unit)),
+    )
+    choices = 0
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == "select_modifier_ignores"
+    ):
+        request = status.decision_request
+        assert isinstance(request.payload, dict)
+        subject = request.payload["subject"]
+        assert isinstance(subject, dict)
+        is_hazard = subject["kind"] == "desperate_escape_roll"
+        if is_hazard:
+            assert not _event_payloads(lifecycle, "desperate_escape_roll_resolved")
+        else:
+            assert subject["kind"] == "leadership_characteristic"
+        snapshot = lifecycle.to_payload()
+        assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:ignore",
+            option_id="ignore-remaining" if is_hazard else "keep-remaining",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        choices += int(is_hazard)
+    assert choices == 1
+    rows = _event_payloads(lifecycle, "desperate_escape_roll_resolved")
+    assert len(rows) == 1
+    for row in rows:
+        roll = cast(dict[str, JsonValue], row["desperate_escape_roll"])
+        assert roll["roll_modifiers"] == []
+    snapshot = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    assert (
+        ReplayRunner.from_payload(
+            ReplayArtifact.capture(
+                artifact_id="order93-desperate-escape-subset",
+                initial_lifecycle_payload=initial,
+                final_lifecycle=lifecycle,
+            ).to_payload()
+        )
+        .run()
+        .reproduced_exactly
+    )

@@ -1354,24 +1354,25 @@ def _profile_with_attack_modifier(
         return profile
     return replace(
         profile,
-        attack_profile=_attack_profile_with_delta(profile.attack_profile, delta=1),
+        attack_profile=_attack_profile_with_delta(
+            profile.attack_profile, delta=1, source_id=source_id
+        ),
         source_ids=tuple(sorted({*profile.source_ids, source_id})),
     )
 
 
-def _attack_profile_with_delta(profile: AttackProfile, *, delta: int) -> AttackProfile:
+def _attack_profile_with_delta(
+    profile: AttackProfile, *, delta: int, source_id: str
+) -> AttackProfile:
     if type(profile) is not AttackProfile:
         raise GameLifecycleError("Rage Embodied requires an AttackProfile.")
     if type(delta) is not int:
         raise GameLifecycleError("AttackProfile delta must be an integer.")
-    if profile.fixed_attacks is not None:
-        return AttackProfile.fixed(max(1, profile.fixed_attacks + delta))
-    if profile.dice_expression is None:
-        raise GameLifecycleError("AttackProfile requires fixed attacks or dice expression.")
-    return AttackProfile.dice(
-        replace(
-            profile.dice_expression,
-            modifier=profile.dice_expression.modifier + delta,
+    return profile.with_modifier(
+        ModifierTerm(ModifierOperation.ADD, delta).bind(
+            modifier_id=f"{source_id}:attacks",
+            source_id=source_id,
+            characteristic=Characteristic.ATTACKS,
         )
     )
 

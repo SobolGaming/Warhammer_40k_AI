@@ -3,13 +3,17 @@ from __future__ import annotations
 from functools import partial
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.modifiers import RollModifier, resolve_roll_modifiers
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.attack_completion_sequencing import (
     resolve_attack_completion_candidates,
 )
 from warhammer40k_core.engine.attack_sequence_completion_hooks import AttackSequenceCompletedContext
+from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.modifier_evaluation import ModifierEvaluationSubject, select_modifiers
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -69,11 +73,45 @@ def _activate(
     bearer: UnitInstance,
     event_id: str,
     payload: dict[str, JsonValue],
-) -> None:
+) -> LifecycleStatus | None:
     bearer_model_id = _enhancements.payload_identifier(payload, "attacking_model_instance_id")
     shadow_bonus = (
         1 if _enhancements.bearer_within_shadow(context.state, army=army, bearer=bearer) else 0
     )
+    subject_unit = rules_unit_view_by_id(
+        state=context.state, unit_instance_id=bearer.unit_instance_id
+    )
+    selected = select_modifiers(
+        state=context.state,
+        decisions=context.decisions,
+        ability_index=context.runtime_modifier_registry.modifier_permission_index(army.player_id),
+        occurrence_id=f"soulstealer:{context.attack_sequence.sequence_id}:{event_id}",
+        subject=ModifierEvaluationSubject(
+            unit_instance_id=subject_unit.unit_instance_id,
+            model_instance_id=bearer_model_id,
+            kind=ModifierIgnoreKind.HEALING_ROLL,
+        ),
+        modifiers=(
+            (
+                RollModifier(
+                    modifier_id=f"{_enhancements.SOULSTEALER_SOURCE_RULE_ID}:shadow-bonus",
+                    source_id=_enhancements.SOULSTEALER_SOURCE_RULE_ID,
+                    operand=shadow_bonus,
+                ),
+            )
+            if shadow_bonus
+            else ()
+        ),
+        source_context={
+            "owner": "attack_completion",
+            "sequence_id": context.attack_sequence.sequence_id,
+            "attack_sequence_completed_event_id": context.attack_sequence_completed_event_id,
+            "destroyed_model_event_id": event_id,
+            "source_rule_id": _enhancements.SOULSTEALER_SOURCE_RULE_ID,
+        },
+    )
+    if selected.pending_status is not None:
+        return selected.pending_status
     d6_result = context.dice_manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
@@ -82,7 +120,7 @@ def _activate(
             actor_id=bearer_model_id,
         )
     )
-    roll_total = d6_result.current_total + shadow_bonus
+    roll_total = resolve_roll_modifiers(d6_result.current_total, selected.modifiers).final
     heal_succeeded = roll_total >= 4
     before_wounds, after_wounds = _enhancements.heal_bearer_model(
         state=context.state,
@@ -108,3 +146,4 @@ def _activate(
             after_wounds=after_wounds,
         ),
     )
+    return None

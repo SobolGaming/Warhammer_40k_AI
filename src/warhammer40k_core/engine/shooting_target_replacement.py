@@ -140,7 +140,9 @@ def _candidate_pool(
     selected_ability_ids: tuple[str, ...] | None = None,
     committed_selection_context: WeaponSelectionContext | None = None,
     validate_only: bool = False,
-) -> RangedAttackPool | ShootingProposalValidationResult:
+    decisions: DecisionController,
+    request_modifier_choices: bool = False,
+) -> RangedAttackPool | ShootingProposalValidationResult | LifecycleStatus:
     from warhammer40k_core.engine.phases import shooting_declaration_validation as validation
     from warhammer40k_core.engine.phases.shooting_firing_deck import _available_weapons_for_model
     from warhammer40k_core.engine.phases.shooting_model import _AvailableWeapon
@@ -198,7 +200,51 @@ def _candidate_pool(
             declaration.firing_deck_source_unit_instance_id
         )
         committed["firing_deck_source_model_instance_id"] = source_model_id
+    from warhammer40k_core.engine.attack_weapon_inventory import (
+        shooting_weapon_selection_context,
+        shooting_weapon_selection_targets,
+    )
+    from warhammer40k_core.engine.random_weapon_range import weapon_with_committed_range
+    from warhammer40k_core.engine.weapon_modifier_selection import retarget_weapon_modifier_context
+
+    evaluated_context = None
+    if committed_selection_context is not None:
+        current_context = shooting_weapon_selection_context(
+            state=state,
+            runtime_modifier_registry=handler.runtime_modifier_registry,
+            attacking_unit_instance_id=rules_unit.component_unit_for_model(
+                declaration.attacker_model_instance_id
+            ).unit_instance_id,
+            attacker_model_instance_id=declaration.attacker_model_instance_id,
+            weapon_instance_id=declaration.weapon_instance_id,
+            source_request_id=original.proposal_request_id,
+            target_units=shooting_weapon_selection_targets(
+                state=state,
+                player_id=original.player_id,
+                required_target_ids=tuple(
+                    sorted({item.target_unit_instance_id for item in original.declarations})
+                ),
+            ),
+            player_id=original.player_id,
+            profile=weapon_with_committed_range(profile, context=committed_selection_context),
+        )
+        evaluated_context, modifier_status = retarget_weapon_modifier_context(
+            state=state,
+            decisions=decisions,
+            ability_index=handler.runtime_modifier_registry.modifier_permission_index(
+                original.player_id
+            ),
+            activation_id=original.source_decision_result_id,
+            unit_instance_id=original.unit_instance_id,
+            model_instance_id=declaration.attacker_model_instance_id,
+            current=current_context,
+            committed=committed_selection_context,
+            request_choices=request_modifier_choices,
+        )
+        if modifier_status is not None:
+            return modifier_status
     result = validation._attack_pools_or_validation(
+        evaluated_selection_context=evaluated_context,
         state=state,
         proposal=replace(original, declarations=(declaration,)),
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
@@ -224,7 +270,8 @@ def next_shooting_target_replacement(
     state: GameState,
     decisions: DecisionController,
     sequence: AttackSequence,
-) -> ShootingTargetReplacement | None:
+    request_modifier_choices: bool = False,
+) -> ShootingTargetReplacement | LifecycleStatus | None:
     from warhammer40k_core.engine.phases.shooting_validation import _ruleset_descriptor_for_handler
 
     if _ruleset_descriptor_for_handler(handler).ruleset_id.edition is not RulesetEdition.ELEVENTH:
@@ -246,6 +293,8 @@ def next_shooting_target_replacement(
             continue
         base_attacks = _base_attacks(decisions, record, original, index, pool)
         existing = _candidate_pool(
+            decisions=decisions,
+            request_modifier_choices=request_modifier_choices,
             handler=handler,
             state=state,
             original=original,
@@ -257,6 +306,8 @@ def next_shooting_target_replacement(
             committed_selection_context=pool.weapon_selection_context,
             validate_only=True,
         )
+        if isinstance(existing, LifecycleStatus):
+            return existing
         if isinstance(existing, RangedAttackPool) or existing.is_valid:
             continue
         indices = tuple(
@@ -282,6 +333,8 @@ def next_shooting_target_replacement(
                 candidates: list[tuple[int, RangedAttackPool] | None] = []
                 for ability_ids in choices:
                     candidate = _candidate_pool(
+                        decisions=decisions,
+                        request_modifier_choices=request_modifier_choices,
                         handler=handler,
                         state=state,
                         original=original,
@@ -298,6 +351,8 @@ def next_shooting_target_replacement(
                             source_pool,
                         ),
                     )
+                    if isinstance(candidate, LifecycleStatus):
+                        return candidate
                     if isinstance(candidate, RangedAttackPool):
                         candidates.append((candidate_index, candidate))
                 alternatives.append(tuple(candidates) if candidates else (None,))
@@ -366,13 +421,14 @@ def request_shooting_target_replacement(
     sequence: AttackSequence,
 ) -> LifecycleStatus | None:
     replacement = next_shooting_target_replacement(
+        request_modifier_choices=True,
         handler=handler,
         state=state,
         decisions=decisions,
         sequence=sequence,
     )
-    if replacement is None:
-        return None
+    if replacement is None or isinstance(replacement, LifecycleStatus):
+        return replacement
     request = replacement_request(
         request_id=state.next_decision_request_id(), context=replacement.context
     )

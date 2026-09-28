@@ -562,8 +562,9 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
     profile = retained_sources.stratagem_profile()
     lifecycle, units = fight_lifecycle(
         catalog=unending_fidelity_catalog(),
-        # Preserve the first-pool casualty with Order 84 retention evidence hashes.
-        game_id="order84-fidelity-3"
+        # Contract 41 authenticates new SaveOption evidence in retention hashes;
+        # this fixture ID preserves the required first-pool casualty branch.
+        game_id="order93-fidelity-retention-3"
         if attached and action is RetainedAttackAction.FIGHT
         else "order56-fidelity-1-order64-0",
         alpha_unit_ids=("alpha",),
@@ -1067,7 +1068,8 @@ def test_order_30_unending_fidelity_rejects_a_model_that_already_fought() -> Non
 
 @pytest.mark.parametrize(
     ("game_id", "child_before_parent"),
-    [("order-30-presence", False), ("order32-nested-retained-0", True)],
+    # Contract 41 authenticated SaveOption evidence changes retention hashes.
+    [("order93-nested-retained-3", False), ("order93-child-first-retained-0", True)],
 )
 def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority(
     game_id: str,
@@ -1412,8 +1414,11 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
         )
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
-        # Preserve the nested casualty with Order 84 retention evidence hashes.
-        game_id="order56-nested-action-10-order64-1" if titanic else "order84-nested-action-2",
+        # Contract 41 authenticates new SaveOption evidence in retention hashes;
+        # re-anchor the non-Titanic fixture to retain the nested casualty branch.
+        game_id="order56-nested-action-10-order64-1"
+        if titanic
+        else "order93-nested-action-retention-4",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

@@ -528,16 +528,17 @@ def test_voice_of_command_modifiers_cover_all_orders() -> None:
         characteristic_target_number=3,
         armor_penetration=0,
     )
-    assert (
-        army_rule.voice_of_command_save_option_modifier(
-            SaveOptionModifierContext(
-                state=state,
-                target_unit_instance_id=INFANTRY_UNIT_ID,
-                save_options=(already_capped_armour,),
-            )
-        )[0]
-        == already_capped_armour
-    )
+    capped_with_source = army_rule.voice_of_command_save_option_modifier(
+        SaveOptionModifierContext(
+            state=state,
+            target_unit_instance_id=INFANTRY_UNIT_ID,
+            save_options=(already_capped_armour,),
+        )
+    )[0]
+    assert capped_with_source.characteristic_target_number == 3
+    assert capped_with_source.characteristic_trace is not None
+    assert len(capped_with_source.characteristic_trace.modifiers) == 1
+    assert capped_with_source.characteristic_trace.modifiers[0].result_floor == 3
     assert (
         resolve_characteristic_handler(
             army_rule.voice_of_command_unit_characteristic_modifier,
@@ -1097,7 +1098,14 @@ def test_voice_of_command_non_applicable_modifiers_and_battle_shock_noops() -> N
         )
     )
     assert improved_dice.attack_profile.dice_expression is not None
-    assert improved_dice.attack_profile.dice_expression.modifier == 3
+    assert improved_dice.attack_profile.dice_expression.modifier == 2
+    assert improved_dice.attack_profile.resolve_value(4) == 5
+    operation = improved_dice.attack_profile.modifiers[0]
+    assert operation.source_id == army_rule.SOURCE_RULE_ID
+    assert (
+        improved_dice.attack_profile.resolve_value(4, ignored_modifier_ids=(operation.modifier_id,))
+        == 4
+    )
     assert improved_dice.source_ids == (army_rule.SOURCE_RULE_ID,)
 
 

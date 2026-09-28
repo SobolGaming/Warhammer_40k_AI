@@ -43,11 +43,11 @@ def bind_characteristic_terms(
     )
 
 
-def resolve_runtime_characteristic(
+def runtime_characteristic_operations(
     *,
     context: UnitCharacteristicModifierContext,
     bindings: Iterable[UnitCharacteristicModifierBinding] = (),
-) -> CharacteristicValue:
+) -> tuple[Modifier, ...]:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_rule_characteristic_operations,
     )
@@ -70,7 +70,20 @@ def resolve_runtime_characteristic(
             state=context.state,
             unit_instance_id=context.unit_instance_id,
             characteristic=context.characteristic,
+            model_instance_id=context.model_instance_id,
         )
+    )
+    return tuple(modifiers)
+
+
+def resolve_runtime_characteristic(
+    *,
+    context: UnitCharacteristicModifierContext,
+    bindings: Iterable[UnitCharacteristicModifierBinding] = (),
+    selected_modifiers: tuple[Modifier, ...] | None = None,
+) -> CharacteristicValue:
+    modifiers = _selected_operations(
+        runtime_characteristic_operations(context=context, bindings=bindings), selected_modifiers
     )
     resolved = ModifierStack(
         characteristic=context.characteristic,
@@ -85,12 +98,12 @@ def resolve_runtime_characteristic(
     return resolved
 
 
-def resolve_runtime_objective_control(
+def runtime_objective_control_operations(
     *,
     context: ObjectiveControlModifierContext,
     value: CharacteristicValue,
     bindings: Iterable[ObjectiveControlModifierBinding] = (),
-) -> CharacteristicValue:
+) -> tuple[Modifier, ...]:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_rule_characteristic_operations,
     )
@@ -106,7 +119,6 @@ def resolve_runtime_objective_control(
     if value.final != context.current_objective_control:
         raise GameLifecycleError("Objective Control characteristic context drifted.")
     modifiers: list[Modifier] = []
-    origin_ids: dict[str, str] = {}
     for binding in bindings:
         operations = bind_characteristic_terms(
             modifier_id=binding.modifier_id,
@@ -115,7 +127,6 @@ def resolve_runtime_objective_control(
             terms=binding.handler(context),
         )
         modifiers.extend(operations)
-        origin_ids.update((operation.modifier_id, binding.modifier_id) for operation in operations)
     # Other effect families cannot supply generic characteristic operations.
     # Avoid rebuilding attached-unit applicability when no generic rules exist.
     if any(
@@ -128,8 +139,44 @@ def resolve_runtime_objective_control(
                 state=context.state,
                 unit_instance_id=context.unit_instance_id,
                 characteristic=Characteristic.OBJECTIVE_CONTROL,
+                model_instance_id=context.model_instance_id,
             )
         )
+    return tuple(modifiers)
+
+
+def resolve_runtime_objective_control(
+    *,
+    context: ObjectiveControlModifierContext,
+    value: CharacteristicValue,
+    bindings: Iterable[ObjectiveControlModifierBinding] = (),
+    selected_modifiers: tuple[Modifier, ...] | None = None,
+) -> CharacteristicValue:
+    binding_tuple = tuple(bindings)
+    modifiers = _selected_operations(
+        runtime_objective_control_operations(context=context, value=value, bindings=binding_tuple),
+        selected_modifiers,
+    )
+    if not modifiers:
+        return value
+    if value.modifier_trace is not None:
+        from warhammer40k_core.core.profile_modifier_trace import CharacteristicModifierTrace
+
+        trace = value.modifier_trace
+        return CharacteristicModifierTrace(
+            characteristic=trace.characteristic,
+            source_value=trace.source_value,
+            modifiers=(*trace.modifiers, *modifiers),
+            bounded=trace.bounded,
+            ignored_modifier_ids=trace.ignored_modifier_ids,
+        ).value()
+    origin_ids = {
+        operation.modifier_id: binding.modifier_id
+        for operation in modifiers
+        for binding in binding_tuple
+        if operation.modifier_id == binding.modifier_id
+        or operation.modifier_id.startswith(f"{binding.modifier_id}:operation:")
+    }
     resolved = resolve_characteristic_value(
         replace(value, raw=value.final),
         modifiers,
@@ -157,3 +204,16 @@ def resolve_runtime_objective_control(
             )
         ),
     )
+
+
+def _selected_operations(
+    available: tuple[Modifier, ...], selected: tuple[Modifier, ...] | None
+) -> tuple[Modifier, ...]:
+    if selected is None:
+        return available
+    if (
+        type(selected) is not tuple
+        or tuple(item for item in available if item in selected) != selected
+    ):
+        raise GameLifecycleError("Selected characteristic operations differ from source inventory.")
+    return selected

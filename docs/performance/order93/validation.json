@@ -1,0 +1,150 @@
+{
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ba430dc82d3bda374b14daf4cd488144a7f653b7de12d7ef3dcf160f3a403f3",
+  "base_ref": "d7bcb10bd9e34b1eabb060465be7f9517d8417eb",
+  "behavioral": {
+    "tests": 9729,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 861.076,
+    "junit_sha256": "074dd2eeffb7a8aae3092222d387f8926d254509064ba9b6e03e0a8e06759ddc",
+    "log_sha256": "dad7461631c04b9e4bee280671fbc9f763f871629c3878580e084fe5addd7ecc",
+    "coverage_percent": 85.20462034623887,
+    "coverage_json_sha256": "c0f4cfd928e83604b3001aba4475de84d6d9241f8da29f9a3c1929e2ba89ca1b"
+  },
+  "code_quality": {
+    "tests": 704,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 121.213,
+    "junit_sha256": "d4b3f460e22671009ae544646c2864f5d3f91423ded26ec0caea23403a9e1532",
+    "log_sha256": "1fddf3d20731443ff8cb7d5478599e8e8adbe8a192879bee6efdd373bf32fced"
+  },
+  "distribution": "18 xdist work-stealing workers; complete successful behavioral run with coverage, then code-quality without coverage",
+  "gate_runs": [
+    {
+      "gate": "ruff",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "gate": "format",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "log_sha256": "ace1e01fe2e28a286c08ac7d257a711166f743349b6ea7753cab414bf3384cc2"
+    },
+    {
+      "gate": "mypy",
+      "command": "uv run mypy src tests",
+      "exit_code": 0,
+      "log_sha256": "443dd4d1b9afbecaf1bb32e27db2577390dd0548915c6a2d35cd764607a2ad14"
+    },
+    {
+      "gate": "pyright",
+      "command": "uv run pyright",
+      "exit_code": 0,
+      "log_sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    {
+      "gate": "imports",
+      "command": "uv run lint-imports",
+      "exit_code": 0,
+      "log_sha256": "10f1094eee30a9a99e36895b0cacadf45d8ac5ba07c48fb72c8a888e8ded496f"
+    },
+    {
+      "gate": "source-check",
+      "command": "uv run python tools/build_core_modifiers_source.py --check",
+      "exit_code": 0,
+      "log_sha256": "43257ba6ad41a65e6e57b47deea1772ad41dbf163511050ea1037dea8e9c4530"
+    },
+    {
+      "gate": "build-check",
+      "command": "uv run python scripts/build_engine_build_identity.py --check",
+      "exit_code": 0,
+      "log_sha256": "2895aafbec3c5dad9a8f5dbc6594f1b01f5f6f32d5d651f7431d000868689268"
+    },
+    {
+      "gate": "contract-check",
+      "command": "uv run python scripts/build_external_contract.py --check --base-ref d7bcb10bd9e34b1eabb060465be7f9517d8417eb",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "ts-check",
+      "command": "npm run check",
+      "exit_code": 0,
+      "log_sha256": "9e7ab751f77855e07ce584ab819ae18ac057e4db9ccd3bc1e78a191aa32bdf13"
+    },
+    {
+      "gate": "ts-unit",
+      "command": "npm run test:unit",
+      "exit_code": 0,
+      "log_sha256": "a10e2da6651fcc7c7ebb7b4ac395506860555635d73d0cbcac6cc840b043b978"
+    },
+    {
+      "gate": "ts-conformance",
+      "command": "npm run conformance",
+      "exit_code": 0,
+      "log_sha256": "859c0a19b0990f030c0be325fc0099e7a2e2c2fa8f7ffea5bef8a195aaf808d5"
+    },
+    {
+      "gate": "wheel",
+      "command": "uv run python scripts/smoke_installed_contract_wheel.py",
+      "exit_code": 0,
+      "log_sha256": "1f000f32f7fe5a1b3c98eaab6249c5f8d92479b0b256534ac4b836bd53d7ff0a"
+    },
+    {
+      "gate": "shards",
+      "command": "uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "precommit",
+      "command": "uv run pre-commit run --all-files",
+      "exit_code": 0,
+      "log_sha256": "84617e5ab13858c275ee0228d2588844cac631a8dce9f3d2dadc36a8d5320d67"
+    }
+  ],
+  "prior_diagnostics": [
+    {
+      "kind": "behavioral",
+      "passed": 9726,
+      "failed": 0,
+      "coverage_percent": 85.2,
+      "reason": "Successful earlier runtime 1b8c0dab; superseded by final coverage after narrow source-probe and expiry-entry changes.",
+      "junit_sha256": "1951f7827b3819f50e44335ed3d970a5a946d16f4246b02097a51d89bfb608f3"
+    },
+    {
+      "kind": "code_quality",
+      "passed": 664,
+      "failed": 37,
+      "reason": "Stale runtime-bound performance reports, static owner/documentation references, two new live-work regressions, and the preexisting Order34 geometry measurement-boundary failure; repaired and independently reviewed before final rerun.",
+      "log_sha256": "be4be62ec6adebb0539399ddc5d5d559aba1042b8f3abe8cd046d3a6297bb9c3"
+    }
+  ],
+  "independent_review": {
+    "status": "approved",
+    "resolved_findings": [
+      "Preserve catalog Leadership SET operations and source ownership",
+      "Retain random Leadership/Objective Control raw values",
+      "Keep source-local floors atomic with their modifier",
+      "Authenticate independent random evaluation raw values under symbolic replacements",
+      "Preserve inherited benchmark fixture equivalence",
+      "Correct preexisting cache-dependent geometry measurement boundary with matched historical proof"
+    ],
+    "reviewer": "Independent order93_independent_review subagent",
+    "approved_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ba430dc82d3bda374b14daf4cd488144a7f653b7de12d7ef3dcf160f3a403f3",
+    "remaining_actionable_findings": 0,
+    "publication_sequence": "Explicit approval obtained before first commit/push; administrative approval-record updates authorized by reviewer."
+  },
+  "performance": {
+    "full_game_samples": 0,
+    "full_game_targets": "unverified",
+    "component_report": "README.md",
+    "runtime_diagnostics": "inherited-refresh.json",
+    "baseline_measurement_order": "Matched original-base timing collected after implementation began; chronological limitation disclosed."
+  }
+}

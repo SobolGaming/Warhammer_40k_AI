@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -99,7 +100,7 @@ def catalog_forced_desperate_escape_sources_for_unit(
                         record=record,
                         source_unit=source_unit,
                         fall_back_unit_instance_id=requested_unit_id,
-                        battle_shocked_modifier=battle_shocked_modifier_for_record(
+                        roll_modifiers=battle_shocked_roll_modifiers_for_record(
                             record=record,
                             target_unit_instance_id=requested_unit_id,
                             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
@@ -238,10 +239,39 @@ def battle_shocked_modifier_for_record(
     target_unit_instance_id: str,
     battle_shocked_unit_ids: tuple[str, ...],
 ) -> int:
+    return sum(
+        modifier.operand
+        for modifier in battle_shocked_roll_modifiers_for_record(
+            record=record,
+            target_unit_instance_id=target_unit_instance_id,
+            battle_shocked_unit_ids=battle_shocked_unit_ids,
+        )
+    )
+
+
+def battle_shocked_roll_modifiers_for_record(
+    *,
+    record: AbilityCatalogRecord,
+    target_unit_instance_id: str,
+    battle_shocked_unit_ids: tuple[str, ...],
+) -> tuple[RollModifier, ...]:
+    """Keep sibling modifier clauses from the force rule's complete source IR."""
+    from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+
     if target_unit_instance_id not in battle_shocked_unit_ids:
-        return 0
-    modifier = 0
-    for clause in catalog_rule_clauses_from_record(record):
+        return ()
+    rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
+    force_clauses = tuple(
+        clause
+        for clause in rule_ir.clauses
+        if any(
+            effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS for effect in clause.effects
+        )
+    )
+    if len(force_clauses) != 1:
+        raise GameLifecycleError("Desperate Escape modifier source requires one force clause.")
+    modifiers: list[RollModifier] = []
+    for clause in rule_ir.clauses:
         if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL:
             continue
         trigger_parameters = parameter_payload(clause.trigger.parameters)
@@ -249,7 +279,7 @@ def battle_shocked_modifier_for_record(
             continue
         if not _clause_requires_battle_shocked_target(clause):
             continue
-        for effect in clause.effects:
+        for effect_index, effect in enumerate(clause.effects):
             if effect.kind is not RuleEffectKind.MODIFY_DICE_ROLL:
                 continue
             effect_parameters = parameter_payload(effect.parameters)
@@ -258,8 +288,17 @@ def battle_shocked_modifier_for_record(
             delta = effect_parameters.get("delta")
             if type(delta) is not int:
                 raise GameLifecycleError("Catalog Desperate Escape modifier delta is invalid.")
-            modifier += delta
-    return modifier
+            modifiers.append(
+                RollModifier(
+                    modifier_id=(
+                        f"{record.record_id}:{clause.clause_id}:effect:{effect_index}:"
+                        f"desperate-escape:{target_unit_instance_id}"
+                    ),
+                    source_id=record.definition.source_id,
+                    operand=delta,
+                )
+            )
+    return tuple(modifiers)
 
 
 def _clause_requires_battle_shocked_target(clause: RuleClause) -> bool:
@@ -281,7 +320,7 @@ def _catalog_desperate_escape_source_payload(
     record: AbilityCatalogRecord,
     source_unit: UnitInstance,
     fall_back_unit_instance_id: str,
-    battle_shocked_modifier: int,
+    roll_modifiers: tuple[RollModifier, ...],
 ) -> dict[str, JsonValue]:
     from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
 
@@ -297,7 +336,8 @@ def _catalog_desperate_escape_source_payload(
         "forcing_unit_instance_id": source_unit.unit_instance_id,
         "fall_back_unit_instance_id": fall_back_unit_instance_id,
         "required_fall_back_mode": "desperate_escape",
-        "desperate_escape_roll_modifier": battle_shocked_modifier,
+        "desperate_escape_roll_modifier": sum(modifier.operand for modifier in roll_modifiers),
+        "desperate_escape_roll_modifiers": [modifier.to_payload() for modifier in roll_modifiers],
         "battle_round": state.battle_round,
         "phase": None if state.current_battle_phase is None else state.current_battle_phase.value,
     }

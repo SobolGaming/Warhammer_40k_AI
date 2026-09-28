@@ -3,12 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 from warhammer40k_core.core.modifiers import RollModifier
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
-from warhammer40k_core.engine.catalog_modifier_ignore import (
-    ModifierIgnoreKind,
-    catalog_modifier_ignore_permissions_for_unit,
-)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_modifiers_for_unit,
 )
@@ -19,16 +15,9 @@ from warhammer40k_core.engine.charge_declaration import (
 from warhammer40k_core.engine.charge_roll_permissions import (
     current_model_instance_ids_for_charge_unit,
 )
-from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import validate_json_value
-from warhammer40k_core.engine.modifier_ignore import (
-    ModifierIgnoreSnapshot,
-    options_with_modifier_ignore_choices,
-    record_modifier_ignore_selection,
-)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -69,7 +58,7 @@ class _ChargeTargetCandidateProvider(Protocol):
     ) -> tuple[ChargeTargetCandidate, ...]: ...
 
 
-def charging_unit_options_with_modifier_ignore_choices(
+def charging_unit_options(
     *,
     state: GameState,
     unit_ids: tuple[str, ...],
@@ -112,39 +101,9 @@ def charging_unit_options_with_modifier_ignore_choices(
                 }
             ),
         )
-        permissions = tuple(
-            permission
-            for component in unit.living_components
-            for permission in catalog_modifier_ignore_permissions_for_unit(
-                ability_index=ability_index,
-                unit=component.unit,
-                current_model_instance_ids=current_model_instance_ids_for_charge_unit(
-                    state=state, unit=component.unit
-                ),
-            )
-        )
-        roll_modifiers = charge_roll_modifiers_for_unit(
-            state=state,
-            ability_index=ability_index,
-            unit=unit,
-            runtime_modifier_registry=runtime_modifier_registry,
-        )
         from warhammer40k_core.engine.take_to_the_skies import flight_choices
 
-        variants = options_with_modifier_ignore_choices(
-            option=option,
-            unit_instance_id=unit_id,
-            permissions=permissions,
-            available_modifiers=tuple(
-                ModifierIgnoreSnapshot.for_roll_modifier(
-                    kind=ModifierIgnoreKind.CHARGE_ROLL,
-                    modifier=modifier,
-                )
-                for modifier in roll_modifiers
-            ),
-        )
-        for variant in variants:
-            options.extend(flight_choices(option=variant, unit=unit, ruleset=ruleset_descriptor))
+        options.extend(flight_choices(option=option, unit=unit, ruleset=ruleset_descriptor))
     if include_complete:
         options.append(
             DecisionOption(
@@ -172,6 +131,7 @@ def charge_roll_modifiers_for_unit(
     ability_index: AbilityCatalogIndex,
     unit: UnitInstance | RulesUnitView,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    apply_selection: bool = True,
 ) -> tuple[RollModifier, ...]:
     view = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
     by_id: dict[str, RollModifier] = {}
@@ -194,11 +154,12 @@ def charge_roll_modifiers_for_unit(
             state=state,
             unit_instance_id=view.unit_instance_id,
             current_roll_modifiers=roll_modifiers,
-        )
+        ),
+        apply_selection=apply_selection,
     )
 
 
-def invalid_charge_modifier_ignore_context_status(
+def invalid_charging_unit_option_status(
     *,
     state: GameState,
     result: DecisionResult,
@@ -212,39 +173,9 @@ def invalid_charge_modifier_ignore_context_status(
         return None
     return LifecycleStatus.invalid(
         stage=state.stage,
-        message="Charging unit modifier context is stale.",
+        message="Charging unit eligibility context is stale.",
         payload={
             "invalid_reason": "charging_unit_option_drift",
-            "field": "modifier_ignore_context",
+            "field": "charging_unit_context",
         },
     )
-
-
-def record_charge_modifier_ignore_selection(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    result: DecisionResult,
-    unit_instance_id: str,
-) -> PersistingEffect | None:
-    effect = record_modifier_ignore_selection(
-        state=state,
-        result=result,
-        unit_instance_id=unit_instance_id,
-        phase=BattlePhaseKind.CHARGE,
-    )
-    if effect is None:
-        return None
-    decisions.event_log.append(
-        "modifier_ignores_selected",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.CHARGE.value,
-            "unit_instance_id": unit_instance_id,
-            "source_decision_request_id": result.request_id,
-            "source_decision_result_id": result.result_id,
-            "modifier_ignore_effect": effect.to_payload(),
-        },
-    )
-    return effect

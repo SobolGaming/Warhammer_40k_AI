@@ -104,12 +104,21 @@ def test_shooting_unit_selection_has_engine_preflight_before_recording() -> None
 
 @pytest.mark.parametrize("case", ["unrestricted", "attached_selection", "retained"])
 def test_r34_003_live_consumers_stay_within_versioned_work_budgets(case: str) -> None:
-    from scripts.measure_action_restriction_live import LIVE_CASES, WORK_METRICS, live_sample
+    from scripts.measure_action_restriction_live import (
+        COLD_GEOMETRY_METRICS,
+        LIVE_CASES,
+        WORK_METRICS,
+        live_sample,
+    )
 
     budgets = json.loads((ROOT / "docs/performance/order34/budgets.json").read_text())
     assert set(budgets["live_cases"]) == set(LIVE_CASES)
     budget = budgets["live_cases"][case]
-    assert set(budget["work_limits"]) == WORK_METRICS
+    cold_limits: dict[str, int] = (
+        budget["cold_geometry_work_limits"] if case == "unrestricted" else {}
+    )
+    assert set(budget["work_limits"]).isdisjoint(cold_limits)
+    assert set(budget["work_limits"]) | set(cold_limits) == WORK_METRICS
     result = live_sample(profile=True, case=case)
     assert result["inventory_size"] == budget["inventory_size"] == 32
     assert result["decision_count"] == budget["decision_count"]
@@ -119,6 +128,29 @@ def test_r34_003_live_consumers_stay_within_versioned_work_budgets(case: str) ->
     assert counts["invalid_shooting_unit_selection_status"] == 1
     for metric, maximum in budget["work_limits"].items():
         assert counts.get(metric, 0) <= maximum, (case, metric, counts)
+    if case == "unrestricted":
+        assert set(cold_limits) == COLD_GEOMETRY_METRICS
+        setup = cast(dict[str, int], result["setup_geometry_work_counts"])
+        cold = cast(dict[str, int], result["cold_geometry_work_counts"])
+        assert set(cold) == COLD_GEOMETRY_METRICS
+        for metric, maximum in cold_limits.items():
+            assert cold[metric] == setup.get(metric, 0) + counts.get(metric, 0)
+            assert cold[metric] <= maximum, (case, metric, cold)
+
+
+def test_r34_cold_geometry_work_is_independent_of_repetition_and_case_order() -> None:
+    from scripts.measure_action_restriction_live import live_sample
+
+    first = live_sample(profile=True, case="unrestricted")
+    repeated = live_sample(profile=True, case="unrestricted")
+    live_sample(profile=True, case="attached_selection")
+    reordered = live_sample(profile=True, case="unrestricted")
+    for result in (repeated, reordered):
+        assert result["cold_geometry_work_counts"] == first["cold_geometry_work_counts"]
+        assert result["setup_geometry_work_counts"] == first["setup_geometry_work_counts"]
+        assert result["decision_count"] == first["decision_count"] == 6
+        assert result["inventory_size"] == first["inventory_size"] == 32
+        assert result["final_phase"] == first["final_phase"] == "fight"
 
 
 def test_r34_003_selection_checks_bound_candidates_without_skipping_legality() -> None:

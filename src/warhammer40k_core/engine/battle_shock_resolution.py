@@ -19,6 +19,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockOutcomeContext,
     BattleShockRerollPermissionContext,
 )
+from warhammer40k_core.engine.battle_shock_modifier_evaluation import (
+    selected_battle_shock_roll_modifiers,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -335,8 +338,14 @@ def record_battle_shock_result_and_outcome_events(
         result_id=f"{request.request_id}:result",
         request=request,
         roll_state=roll_state,
-        modifiers=tuple(
-            modifier for application in modifier_applications for modifier in application.modifiers
+        modifiers=selected_battle_shock_roll_modifiers(
+            decision_records=decisions.records,
+            request=request,
+            modifiers=tuple(
+                modifier
+                for application in modifier_applications
+                for modifier in application.modifiers
+            ),
         ),
     )
     return record_precomputed_battle_shock_result_and_outcome_events(
@@ -397,7 +406,12 @@ def record_precomputed_battle_shock_result_and_outcome_events(
     flattened = tuple(
         modifier for application in applications for modifier in application.modifiers
     )
-    if tuple(sorted(flattened, key=lambda modifier: modifier.modifier_id)) != (
+    selected = selected_battle_shock_roll_modifiers(
+        decision_records=decisions.records,
+        request=result.request,
+        modifiers=flattened,
+    )
+    if tuple(sorted(selected, key=lambda modifier: modifier.modifier_id)) != (
         result.modified_roll.modifiers
     ):
         raise GameLifecycleError("Precomputed Battle-shock modifier authority drifted.")
@@ -473,7 +487,12 @@ def record_precomputed_battle_shock_result_events(
     flattened = tuple(
         modifier for application in applications for modifier in application.modifiers
     )
-    if tuple(sorted(flattened, key=lambda modifier: modifier.modifier_id)) != (
+    selected = selected_battle_shock_roll_modifiers(
+        decision_records=decisions.records,
+        request=result.request,
+        modifiers=flattened,
+    )
+    if tuple(sorted(selected, key=lambda modifier: modifier.modifier_id)) != (
         result.modified_roll.modifiers
     ):
         raise GameLifecycleError("Battle-shock result modifiers lack exact application authority.")

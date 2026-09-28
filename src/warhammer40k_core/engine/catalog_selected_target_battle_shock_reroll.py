@@ -7,6 +7,7 @@ from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battle_shock_resolution import (
     BattleShockPassedStatePolicy,
+    BattleShockResolutionResult,
     apply_battle_shock_reroll_resolution_decision,
     is_battle_shock_reroll_request,
 )
@@ -44,19 +45,6 @@ def apply_catalog_selected_target_battle_shock_reroll_decision(
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.catalog_selected_target_effects import (
-        continue_selected_target_effect_records,
-        selected_target_json_object_tuple,
-    )
-    from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-        payload_int,
-        payload_object,
-        payload_string,
-    )
-    from warhammer40k_core.engine.catalog_selected_target_event import (
-        append_selected_target_event,
-    )
-
     battle_shock_resolution = apply_battle_shock_reroll_resolution_decision(
         state=state,
         decisions=decisions,
@@ -70,9 +58,52 @@ def apply_catalog_selected_target_battle_shock_reroll_decision(
         decisions=decisions,
         result=result,
     )
+    return continue_catalog_selected_target_battle_shock_resolution(
+        state=state,
+        decisions=decisions,
+        battle_shock_resolution=battle_shock_resolution,
+        battle_shock_hooks=battle_shock_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+    )
+
+
+def continue_catalog_selected_target_battle_shock_resolution(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    battle_shock_resolution: BattleShockResolutionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.catalog_selected_target_effects import (
+        continue_selected_target_effect_records,
+        selected_target_json_object_tuple,
+    )
+    from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+        payload_int,
+        payload_object,
+        payload_string,
+    )
+    from warhammer40k_core.engine.catalog_selected_target_event import (
+        append_selected_target_event,
+    )
+
+    if battle_shock_resolution.resolved_payload is None:
+        status = battle_shock_resolution.pending_status
+        if status is None:
+            raise GameLifecycleError("Selected-target test did not resolve or suspend.")
+        if state.pending_catalog_selected_target_battle_shock_continuation is not None:
+            from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
+                retain_catalog_selected_target_remaining_battle_shock_reroll,
+            )
+
+            retain_catalog_selected_target_remaining_battle_shock_reroll(
+                state=state, decisions=decisions, status=status
+            )
+        return status
     resolved_payload = battle_shock_resolution.resolved_payload
-    if resolved_payload is None:
-        raise GameLifecycleError("Selected-target Battle-shock reroll did not resolve.")
     try:
         phase = BattlePhase(payload_string(resolved_payload, key="phase"))
     except ValueError as exc:

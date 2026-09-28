@@ -4,7 +4,7 @@ from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
     RandomProfileValue,
@@ -48,7 +48,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
@@ -280,35 +280,15 @@ def waaagh_save_option_modifier(context: SaveOptionModifierContext) -> tuple[Sav
     ):
         return context.save_options
 
-    invulnerable = [
-        option for option in context.save_options if option.save_kind is SaveKind.INVULNERABLE
-    ]
-    if not invulnerable:
-        return (
-            *context.save_options,
-            SaveOption(
-                save_kind=SaveKind.INVULNERABLE,
-                target_number=5,
-                characteristic_target_number=5,
-                armor_penetration=0,
-                source_rule_ids=(SOURCE_RULE_ID,),
-            ),
-        )
-    if len(invulnerable) > 1:
-        raise GameLifecycleError("Waaagh! save option lookup found multiple invulnerable saves.")
-
-    existing = invulnerable[0]
-    if existing.target_number <= 5 and existing.characteristic_target_number <= 5:
-        return context.save_options
-    improved = replace(
-        existing,
-        target_number=5,
-        characteristic_target_number=5,
-        source_rule_ids=_source_ids_with_waaagh(existing.source_rule_ids),
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_options_with_invulnerable_characteristic,
     )
-    return tuple(
-        improved if option.save_kind is SaveKind.INVULNERABLE else option
-        for option in context.save_options
+
+    return save_options_with_invulnerable_characteristic(
+        context.save_options,
+        target_number=5,
+        source_id=SOURCE_RULE_ID,
+        only_if_better=True,
     )
 
 
@@ -567,16 +547,11 @@ def _unit_and_army_by_id(
 def _attack_profile_with_plus_one(profile: AttackProfile) -> AttackProfile:
     if type(profile) is not AttackProfile:
         raise GameLifecycleError("Waaagh! attack profile requires AttackProfile.")
-    if profile.fixed_attacks is not None:
-        return AttackProfile.fixed(profile.fixed_attacks + 1)
-    expression = profile.dice_expression
-    if expression is None:
-        raise GameLifecycleError("Waaagh! attack profile is missing a dice expression.")
-    return AttackProfile.dice(
-        DiceExpression(
-            quantity=expression.quantity,
-            sides=expression.sides,
-            modifier=expression.modifier + 1,
+    return profile.with_modifier(
+        ModifierTerm(ModifierOperation.ADD, 1).bind(
+            modifier_id=f"{SOURCE_RULE_ID}:attacks",
+            source_id=SOURCE_RULE_ID,
+            characteristic=Characteristic.ATTACKS,
         )
     )
 

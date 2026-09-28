@@ -372,6 +372,20 @@ def test_random_movement_is_rolled_at_facade_selection_once_for_the_unit() -> No
         event["payload"][field] = forged
         with pytest.raises(GameLifecycleError):
             GameLifecycle.from_payload(tampered)
+    tampered = json.loads(json.dumps(lifecycle.to_payload()))
+    event = next(
+        item
+        for item in tampered["decisions"]["event_log"]
+        if item["event_type"] == "random_profile_values_evaluated"
+    )
+    for entry in event["payload"]["entries"]:
+        profile_value = entry["profile_value"]
+        forged_raw = 3 if profile_value["evaluation_raw"] == 2 else 2
+        profile_value["evaluation_raw"] = forged_raw
+        for field in ("raw", "base", "final"):
+            profile_value["evaluation"][field] = forged_raw
+    with pytest.raises(GameLifecycleError, match="drifted from dice"):
+        GameLifecycle.from_payload(tampered)
 
 
 def test_mixed_attached_movement_preserves_fixed_values_and_separates_expressions() -> None:

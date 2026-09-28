@@ -26,6 +26,7 @@ from warhammer40k_core.engine import (
 from warhammer40k_core.engine import mission_terrain as _mission_terrain
 from warhammer40k_core.engine import model_destruction_cause_authority as _mdca
 from warhammer40k_core.engine import objective_control_record_authority as _oc_authority
+from warhammer40k_core.engine import phase as _phase
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_scoring_transaction_integrity as _primary_vp_integrity
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
@@ -2032,7 +2033,12 @@ class GameState:
         self.setup_step_index = None
         return current
 
-    def enter_battle(self, *, decisions: DecisionController | None = None) -> None:
+    def enter_battle(
+        self,
+        *,
+        decisions: DecisionController | None = None,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> None:
         if self.stage is not GameLifecycleStage.SETUP:
             raise GameLifecycleError("GameState can enter battle only from setup.")
         self.stage = GameLifecycleStage.BATTLE
@@ -2041,8 +2047,11 @@ class GameState:
         self.battle_phase_index = 0
         self._expire_persisting_effects_at_current_battle_round_start()
         self._expire_persisting_effects_at_current_turn_start()
-        self._record_primary_objective_turn_start_boundary_if_available(decisions=decisions)
-        self._expire_persisting_effects_at_current_phase_start()
+        pending = self._record_primary_objective_turn_start_boundary_if_available(
+            decisions=decisions, runtime_modifier_registry=runtime_modifier_registry
+        )
+        if pending is None:
+            self._expire_persisting_effects_at_current_phase_start()
 
     def replace_active_player_scopes(
         self, scopes: tuple[_active_scopes.ActivePlayerScope, ...]
@@ -2140,10 +2149,11 @@ class GameState:
         if battle_round_ended:
             self._expire_persisting_effects_at_current_battle_round_start()
         self._expire_persisting_effects_at_current_turn_start()
-        self._record_primary_objective_turn_start_boundary_if_available(
+        pending = self._record_primary_objective_turn_start_boundary_if_available(
             decisions=decisions, runtime_modifier_registry=runtime_modifier_registry
         )
-        self._expire_persisting_effects_at_current_phase_start()
+        if pending is None:
+            self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
 
     def determine_current_phase_end_objective_control(
@@ -5411,8 +5421,8 @@ class GameState:
         *,
         decisions: DecisionController | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
-    ) -> None:
-        record_primary_turn_start_evidence(
+    ) -> _phase.LifecycleStatus | None:
+        return record_primary_turn_start_evidence(
             decisions=decisions,
             state=self,
             runtime_modifier_registry=runtime_modifier_registry,

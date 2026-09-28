@@ -1,0 +1,276 @@
+{
+  "after_runtime_fingerprint": "6ba430dc82d3bda374b14daf4cd488144a7f653b7de12d7ef3dcf160f3a403f3",
+  "base_revision": "d7bcb10b",
+  "base_runtime_fingerprint": "01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "before_runtime_fingerprint": "1b8c0dab7c098c7dea3ad443e0d8e4fec251df4da13f994198e1d8a4f70550da",
+  "evidence_kind": "instrumented_work_counts_not_timing_certification",
+  "expiry_predicate_assessment": "The measured unrestricted and retained paths each add one positive short-circuit predicate invocation,129\u2192130 and228\u2192229 respectively. Suppressed method entries alone do not demonstrate reduced expiration work. Candidate-source probing separately reduces rules-unit lookups and effect applicability scans.",
+  "expiry_predicate_work": {
+    "attached_selection": {
+      "after": {},
+      "before": {}
+    },
+    "retained": {
+      "after": {
+        "expire_persisting_effects_at_boundary": 7,
+        "expires_at": 229,
+        "matches_boundary": 229
+      },
+      "before": {
+        "expire_persisting_effects_at_boundary": 11,
+        "expires_at": 228,
+        "matches_boundary": 228
+      }
+    },
+    "unrestricted": {
+      "after": {
+        "expire_persisting_effects_at_boundary": 3,
+        "expires_at": 130,
+        "matches_boundary": 130
+      },
+      "before": {
+        "expire_persisting_effects_at_boundary": 4,
+        "expires_at": 129,
+        "matches_boundary": 129
+      }
+    }
+  },
+  "geometry_calibration": "The baseline-identical visibility failure recorded here is superseded by the explicit cold setup-plus-live accounting in visibility-boundary-evidence.json and visibility-boundary-calibration.md. The original7 live-only limit remains historical evidence; current geometry total limit26 derives from pre-Order91 setup19+live7. Other live limits are unchanged.",
+  "input_sha256": {
+    "docs/performance/order34/budgets.json": {
+      "base": "b812f1233d602220d8b35d9f56e789edb7f7a9220867e45ba294c3235c7b7141",
+      "head": "b812f1233d602220d8b35d9f56e789edb7f7a9220867e45ba294c3235c7b7141"
+    },
+    "scripts/measure_action_restriction_live.py": {
+      "base": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+      "head": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5"
+    },
+    "tests/indirect_shooting_helpers.py": {
+      "base": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+      "head": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9"
+    },
+    "tests/retained_attack_helpers.py": {
+      "base": "067022adcbd00614efaf29b6daea330837c53e3d1e9d36267ef10c33cd5c50d2",
+      "head": "067022adcbd00614efaf29b6daea330837c53e3d1e9d36267ef10c33cd5c50d2"
+    }
+  },
+  "known_preexisting_failure": "Unrestricted resolve_visibility_pair and resolve_visibility_pair_uncached are12againstbudget7 in both untouched archived base and head. The exact base pytest case reproduces with verified base source imports. Other head work limits pass; no visibility source or ceiling was changed.",
+  "measurement": "One cold-process cProfile run per revision before the geometry measurement-boundary calibration; cases unrestricted, attached_selection, retained in that order. The original driver measured only its live submission slice. Setup excluded. Driver and original budget hashes are retained for this historical comparison.",
+  "repairs": [
+    "A conservative current-source candidate query avoids whole-army per-model permission resolution when no catalog clause or persisted generic effect can grant permission. All candidate cases still use the original subject applicability owner.",
+    "The shared phase-end expiry owner constructs the typed boundary and suppresses no-op mutator method entries when no current effect matches. This is not an expiration-scan optimization: the caller still queries the current inventory and a positive match is checked again by the mutation owner."
+  ],
+  "reports": {
+    "after_redundancy_repair": [
+      {
+        "case": "unrestricted",
+        "decision_count": 6,
+        "exceeded_limits": {
+          "resolve_visibility_pair": {
+            "actual": 12,
+            "maximum": 7
+          },
+          "resolve_visibility_pair_uncached": {
+            "actual": 12,
+            "maximum": 7
+          }
+        },
+        "final_phase": "fight",
+        "inventory_size": 32,
+        "reached_charge": true,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 3,
+          "applies_to_unit": 7046,
+          "expire_persisting_effects_at_boundary": 3,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 171,
+          "resolve_line_of_sight": 27,
+          "resolve_visibility_pair": 12,
+          "resolve_visibility_pair_uncached": 12,
+          "rules_unit_identity_ids": 10,
+          "rules_unit_view_by_id": 230
+        }
+      },
+      {
+        "case": "attached_selection",
+        "decision_count": 1,
+        "exceeded_limits": {},
+        "final_phase": "shooting",
+        "inventory_size": 32,
+        "reached_charge": false,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 2,
+          "applies_to_unit": 416,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 8,
+          "rules_unit_view_by_id": 9
+        }
+      },
+      {
+        "case": "retained",
+        "decision_count": 5,
+        "exceeded_limits": {},
+        "final_phase": "movement",
+        "inventory_size": 32,
+        "reached_charge": true,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 3,
+          "applies_to_unit": 6274,
+          "expire_persisting_effects_at_boundary": 7,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 148,
+          "resolve_line_of_sight": 29,
+          "resolve_visibility_pair": 3,
+          "resolve_visibility_pair_uncached": 3,
+          "rules_unit_identity_ids": 11,
+          "rules_unit_view_by_id": 261
+        }
+      }
+    ],
+    "base": [
+      {
+        "case": "unrestricted",
+        "decision_count": 6,
+        "exceeded_limits": {
+          "resolve_visibility_pair": {
+            "actual": 12,
+            "maximum": 7
+          },
+          "resolve_visibility_pair_uncached": {
+            "actual": 12,
+            "maximum": 7
+          }
+        },
+        "final_phase": "fight",
+        "inventory_size": 32,
+        "reached_charge": true,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 3,
+          "applies_to_unit": 6374,
+          "expire_persisting_effects_at_boundary": 4,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 154,
+          "resolve_line_of_sight": 27,
+          "resolve_visibility_pair": 12,
+          "resolve_visibility_pair_uncached": 12,
+          "rules_unit_identity_ids": 10,
+          "rules_unit_view_by_id": 204
+        }
+      },
+      {
+        "case": "attached_selection",
+        "decision_count": 1,
+        "exceeded_limits": {},
+        "final_phase": "shooting",
+        "inventory_size": 32,
+        "reached_charge": false,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 2,
+          "applies_to_unit": 416,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 8,
+          "rules_unit_view_by_id": 9
+        }
+      },
+      {
+        "case": "retained",
+        "decision_count": 5,
+        "exceeded_limits": {},
+        "final_phase": "movement",
+        "inventory_size": 32,
+        "reached_charge": true,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 3,
+          "applies_to_unit": 5358,
+          "expire_persisting_effects_at_boundary": 10,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 128,
+          "resolve_line_of_sight": 24,
+          "resolve_visibility_pair": 3,
+          "resolve_visibility_pair_uncached": 3,
+          "rules_unit_identity_ids": 11,
+          "rules_unit_view_by_id": 230
+        }
+      }
+    ],
+    "before_redundancy_repair": [
+      {
+        "case": "unrestricted",
+        "decision_count": 6,
+        "exceeded_limits": {
+          "resolve_visibility_pair": {
+            "actual": 12,
+            "maximum": 7
+          },
+          "resolve_visibility_pair_uncached": {
+            "actual": 12,
+            "maximum": 7
+          },
+          "rules_unit_view_by_id": {
+            "actual": 270,
+            "maximum": 240
+          }
+        },
+        "final_phase": "fight",
+        "inventory_size": 32,
+        "reached_charge": true,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 3,
+          "applies_to_unit": 7442,
+          "expire_persisting_effects_at_boundary": 4,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 181,
+          "resolve_line_of_sight": 27,
+          "resolve_visibility_pair": 12,
+          "resolve_visibility_pair_uncached": 12,
+          "rules_unit_identity_ids": 10,
+          "rules_unit_view_by_id": 270
+        }
+      },
+      {
+        "case": "attached_selection",
+        "decision_count": 1,
+        "exceeded_limits": {},
+        "final_phase": "shooting",
+        "inventory_size": 32,
+        "reached_charge": false,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 2,
+          "applies_to_unit": 416,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 8,
+          "rules_unit_view_by_id": 9
+        }
+      },
+      {
+        "case": "retained",
+        "decision_count": 5,
+        "exceeded_limits": {
+          "applies_to_unit": {
+            "actual": 6378,
+            "maximum": 6300
+          },
+          "expire_persisting_effects_at_boundary": {
+            "actual": 11,
+            "maximum": 10
+          }
+        },
+        "final_phase": "movement",
+        "inventory_size": 32,
+        "reached_charge": true,
+        "work_counts": {
+          "_legal_shooting_unit_ids": 3,
+          "applies_to_unit": 6378,
+          "expire_persisting_effects_at_boundary": 11,
+          "invalid_shooting_unit_selection_status": 1,
+          "persisting_effects_for_lineage": 151,
+          "resolve_line_of_sight": 29,
+          "resolve_visibility_pair": 3,
+          "resolve_visibility_pair_uncached": 3,
+          "rules_unit_identity_ids": 11,
+          "rules_unit_view_by_id": 273
+        }
+      }
+    ]
+  }
+}

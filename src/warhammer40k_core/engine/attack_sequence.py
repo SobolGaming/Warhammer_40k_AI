@@ -302,7 +302,6 @@ __all__ = (
     "_validate_save_die_entry_tuple",
     "_validate_weapon_profile_signature_shape",
     "_weapon_rule_tokens_for_signature",
-    "_wound_roll_modifier",
     "apply_allocation_order_decision",
     "apply_attack_weapon_group_decision",
     "apply_damage_allocation_model_decision",

@@ -85,6 +85,7 @@ _REQUEST_PAYLOAD_KEYS: Final = frozenset(
         "battle_round",
         "phase",
         "mission_action_opportunity",
+        "objective_control_modifier_scope_id",
         "legal_mission_action_ids",
         "legal_action_option_ids",
         "legal_option_ids",
@@ -97,6 +98,7 @@ _RESULT_PAYLOAD_KEYS: Final = frozenset(
         "battle_round",
         "phase",
         "mission_action_opportunity",
+        "objective_control_modifier_scope_id",
         "legal_action_option_ids",
     }
 )
@@ -575,6 +577,8 @@ def _validate_decline_decision(
         or request_payload.get("player_id") != player_id
         or request_payload.get("battle_round") != battle_round
         or request_payload.get("phase") != phase
+        or request_payload["objective_control_modifier_scope_id"]
+        != result_payload["objective_control_modifier_scope_id"]
         or request_payload.get("mission_action_opportunity") is not True
         or result_payload.get("mission_action_opportunity") is not True
         or phase != BattlePhase.SHOOTING.value

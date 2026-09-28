@@ -8223,6 +8223,7 @@ def test_command_battle_shock_pending_reroll_context_drift_is_rejected() -> None
     object.__setattr__(wrong_owner_authority, "test_request", wrong_owner_request)
     with pytest.raises(GameLifecycleError, match="target owner drifted"):
         battle_shock_pending_authority._expected_live_test_request(
+            decision_records=(),
             state=state,
             authority=wrong_owner_authority,
             runtime_content_bundle=runtime_bundle,
@@ -8235,12 +8236,14 @@ def test_command_battle_shock_pending_reroll_context_drift_is_rejected() -> None
     )
     with pytest.raises(GameLifecycleError, match="every alive model"):
         battle_shock_pending_authority._expected_live_test_request(
+            decision_records=(),
             state=unplaced_state,
             authority=authority,
             runtime_content_bundle=runtime_bundle,
         )
     with pytest.raises(GameLifecycleError, match="lacks ability authority"):
         battle_shock_pending_authority._expected_live_test_request(
+            decision_records=(),
             state=state,
             authority=authority,
             runtime_content_bundle=replace(

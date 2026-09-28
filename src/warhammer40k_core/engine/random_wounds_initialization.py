@@ -91,7 +91,7 @@ def restore_muster_random_wounds(
                 value = values.pop(model.model_instance_id, None)
                 if (
                     value is None
-                    or replace(value, evaluation=None, evaluation_id=None) != descriptor
+                    or value.without_evaluation() != descriptor
                     or value.evaluation_id
                     != f"{scope}:{unit.unit_instance_id}:{model.model_instance_id}:wounds"
                 ):
@@ -176,10 +176,7 @@ def restore_initialized_model_wounds(
                 )
                 source = by_id[model_id].characteristic(Characteristic.WOUNDS)
                 identity = f"{scope_id}:{unit_instance_id}:{model_id}:wounds"
-                if (
-                    replace(value, evaluation=None, evaluation_id=None) != source
-                    or value.evaluation_id != identity
-                ):
+                if value.without_evaluation() != source or value.evaluation_id != identity:
                     raise GameLifecycleError("Created model Wounds descriptor drifted.")
                 roll = RandomCharacteristicRoll.from_payload(
                     cast(RandomCharacteristicRollPayload, entry["roll"])

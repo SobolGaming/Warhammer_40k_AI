@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
@@ -329,6 +328,10 @@ def nurgles_gift_modified_save_options(
     target_unit_instance_id: str,
     save_options: tuple[SaveOption, ...],
 ) -> tuple[SaveOption, ...]:
+    from warhammer40k_core.engine.save_modifier_operations import (
+        save_option_with_characteristic_terms,
+    )
+
     if type(save_options) is not tuple:
         raise GameLifecycleError("Nurgle's Gift save modifier requires save options tuple.")
     if not _unit_afflicted_by_plague(
@@ -345,11 +348,12 @@ def nurgles_gift_modified_save_options(
             modified.append(option)
             continue
         modified.append(
-            replace(
+            save_option_with_characteristic_terms(
                 option,
-                characteristic_target_number=option.characteristic_target_number + 1,
-                target_number=option.target_number + 1,
-                source_rule_ids=tuple(dict.fromkeys((*option.source_rule_ids, SOURCE_RULE_ID))),
+                characteristic=Characteristic.SAVE,
+                terms=(ModifierTerm(ModifierOperation.ADD, 1),),
+                source_id=SOURCE_RULE_ID,
+                modifier_id=f"{SOURCE_RULE_ID}:rattlejoint-save",
             )
         )
     return tuple(modified)
@@ -489,10 +493,7 @@ def nurgles_gift_objective_control_modifier(
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Nurgle's Gift Objective Control modifier requires context.")
     return (
-        (
-            ModifierTerm(ModifierOperation.ADD, -1),
-            ModifierTerm(ModifierOperation.FLOOR, 1),
-        )
+        (ModifierTerm(ModifierOperation.ADD, -1, result_floor=1),)
         if _unit_afflicted_by_plague(
             state=context.state,
             target_unit_instance_id=context.unit_instance_id,

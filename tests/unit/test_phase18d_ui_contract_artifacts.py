@@ -438,8 +438,8 @@ def test_session_metadata_contract_version_accepts_current_major_releases() -> N
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "40.0.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "41.0.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "40.1.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -516,17 +516,17 @@ def test_current_contract_preserves_model_projections_and_advances_visibility_wr
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v40-contract"
+        == "session-metadata-v41-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v40-contract"
+        == "session-command-result-v41-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v40-contract"
+        == "session-command-outcome-v41-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]
@@ -2048,3 +2048,76 @@ def _json_list(value: JsonValue) -> list[JsonValue]:
 def _json_string(value: JsonValue) -> str:
     assert type(value) is str, "Expected JSON string."
     return value
+
+
+@pytest.mark.parametrize("profile_kind", ["characteristic", "range", "attacks", "damage"])
+@pytest.mark.parametrize("limited", [False, True])
+def test_order93_profile_operation_evidence_has_a_closed_external_schema(
+    profile_kind: str, limited: bool
+) -> None:
+    from warhammer40k_core.core.attributes import Characteristic
+    from warhammer40k_core.core.count_profiles import AttackProfile, DamageProfile
+    from warhammer40k_core.core.modifiers import (
+        Modifier,
+        ModifierOperation,
+        ModifierScope,
+        ModifierTiming,
+    )
+    from warhammer40k_core.core.profile_modifier_trace import CharacteristicModifierTrace
+    from warhammer40k_core.core.range_profiles import RangeProfile, RangeProfileKind
+
+    characteristic = {
+        "characteristic": Characteristic.STRENGTH,
+        "range": Characteristic.RANGE,
+        "attacks": Characteristic.ATTACKS,
+        "damage": Characteristic.DAMAGE,
+    }[profile_kind]
+    modifier = Modifier(
+        modifier_id="source:order93:bonus",
+        source_id="source:order93",
+        scope=ModifierScope.for_characteristics((characteristic,)),
+        operand=-1 if limited else 1,
+        timing=ModifierTiming.ADDITIVE,
+        operation=ModifierOperation.ADD,
+        result_floor=3 if limited else None,
+    )
+    trace = CharacteristicModifierTrace(characteristic, 6, (modifier,))
+    if profile_kind == "range":
+        payload = validate_json_value(
+            RangeProfile(
+                kind=RangeProfileKind.DISTANCE,
+                distance_inches=trace.resolve().final,
+                modifier_trace=trace,
+            ).to_payload()
+        )
+    elif profile_kind == "attacks":
+        payload = validate_json_value(AttackProfile.fixed(6).with_modifier(modifier).to_payload())
+    elif profile_kind == "damage":
+        payload = validate_json_value(DamageProfile.fixed(6).with_modifier(modifier).to_payload())
+    else:
+        payload = validate_json_value(trace.value().to_payload())
+    assert isinstance(payload, dict)
+    definition = {
+        "characteristic": "characteristic_value",
+        "range": "range_profile",
+        "attacks": "attack_profile",
+        "damage": "damage_profile",
+    }[profile_kind]
+    schema = _json_object(_read_json(REPO_ROOT / "contracts/schemas/proposal-payload.schema.json"))
+    validator = cast(
+        _PayloadValidator,
+        Draft202012Validator(
+            {
+                "$defs": schema["$defs"],
+                "$ref": f"#/$defs/{definition}",
+            }
+        ),
+    )
+    validator.validate(payload)
+    with pytest.raises(ValidationError):
+        validator.validate({**payload, "unowned_modifier": "invented"})
+    if profile_kind in {"attacks", "damage"}:
+        incomplete = dict(payload)
+        del incomplete["source_fixed_value"]
+        with pytest.raises(ValidationError):
+            validator.validate(incomplete)

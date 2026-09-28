@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.engine.battle_shock import (
     BattleShockTestRequest,
-    battle_shock_leadership_target_for_rules_unit,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockDiceExpressionContext,
@@ -28,6 +27,9 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
+from warhammer40k_core.engine.nonattack_modifier_evaluation import (
+    leadership_target_from_modifier_history,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
@@ -98,6 +100,7 @@ def validate_live_pending_battle_shock_reroll_authority(
     expected_request = _expected_live_test_request(
         state=state,
         authority=authority,
+        decision_records=decision_records,
         runtime_content_bundle=runtime_content_bundle,
     )
     if authority.test_request != expected_request:
@@ -162,6 +165,7 @@ def _expected_live_test_request(
     *,
     state: GameState,
     authority: PendingBattleShockRerollAuthority,
+    decision_records: tuple[DecisionRecord, ...],
     runtime_content_bundle: RuntimeContentBundle,
 ) -> BattleShockTestRequest:
     retained = authority.test_request
@@ -202,12 +206,14 @@ def _expected_live_test_request(
     )
     return replace(
         retained,
-        leadership_target=battle_shock_leadership_target_for_rules_unit(
-            rules_unit,
-            current_model_ids=current_model_ids,
-            ability_index=ability_index,
+        leadership_target=leadership_target_from_modifier_history(
             state=state,
+            decision_records=decision_records,
+            unit_instance_id=rules_unit.unit_instance_id,
+            occurrence_id=retained.request_id,
+            ability_index=ability_index,
             runtime_modifier_registry=runtime_content_bundle.runtime_modifier_registry,
+            model_instance_ids=current_model_ids,
         ),
         below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
             rules_unit=rules_unit,

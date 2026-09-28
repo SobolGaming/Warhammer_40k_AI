@@ -2,22 +2,11 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-from warhammer40k_core.core.attributes import CharacteristicValue
-from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
-
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
-from warhammer40k_core.engine.catalog_modifier_ignore import (
-    ModifierIgnoreKind,
-    catalog_modifier_ignore_permissions_for_unit,
-)
-from warhammer40k_core.engine.modifier_ignore import (
-    ModifierIgnoreSnapshot,
-    options_with_modifier_ignore_choices,
-)
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
@@ -253,111 +242,7 @@ def _movement_action_options(
                         )
                     )
             continue
-    return _movement_options_with_modifier_ignore_choices(
-        state=state,
-        ability_index=ability_index,
-        runtime_modifier_registry=runtime_modifier_registry,
-        rules_unit_placement=rules_unit_placement,
-        options=tuple(options),
-    )
-
-
-def _movement_options_with_modifier_ignore_choices(
-    *,
-    state: GameState,
-    ability_index: AbilityCatalogIndex,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-    rules_unit_placement: RulesUnitPlacement,
-    options: tuple[DecisionOption, ...],
-) -> tuple[DecisionOption, ...]:
-    if type(rules_unit_placement) is not RulesUnitPlacement:
-        raise GameLifecycleError("Movement modifier choices require RulesUnitPlacement.")
-    movement_unit_id = rules_unit_placement.rules_unit_instance_id
-    current_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in rules_unit_placement.model_placements)
-    )
-    component_units = tuple(
-        _unit_instance_by_id(state=state, unit_instance_id=component_id)
-        for component_id in rules_unit_placement.component_unit_instance_ids
-    )
-    permissions = tuple(
-        permission
-        for unit in component_units
-        for permission in catalog_modifier_ignore_permissions_for_unit(
-            ability_index=ability_index,
-            unit=unit,
-            current_model_instance_ids=tuple(
-                sorted(
-                    placement.model_instance_id
-                    for placement in rules_unit_placement.model_placements
-                    if placement.unit_instance_id == unit.unit_instance_id
-                )
-            ),
-        )
-    )
-    if not permissions:
-        return options
-    models_by_id = {
-        model.model_instance_id: model for unit in component_units for model in unit.own_models
-    }
-    movement_snapshots: list[ModifierIgnoreSnapshot] = []
-    for model_id in current_model_ids:
-        model = models_by_id.get(model_id)
-        if model is None:
-            raise GameLifecycleError("Movement modifier snapshot model is not owned by unit.")
-        _modified, applications = runtime_modifier_registry.movement_budget_modifier_trace(
-            MovementBudgetModifierContext(
-                state=state,
-                unit_instance_id=movement_unit_id,
-                model_instance_id=model_id,
-                movement=model_movement_characteristic(model),
-            )
-        )
-        movement_snapshots.extend(
-            ModifierIgnoreSnapshot(
-                kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
-                modifier_id=application.modifier_id,
-                source_id=application.source_id,
-                model_instance_id=model_id,
-            )
-            for application in applications
-        )
-    advance_modifiers = runtime_modifier_registry.advance_roll_modifiers(
-        AdvanceRollModifierContext(
-            state=state,
-            unit_instance_id=movement_unit_id,
-            current_roll_modifiers=(),
-        )
-    )
-    advance_snapshots = tuple(
-        ModifierIgnoreSnapshot.for_roll_modifier(
-            kind=ModifierIgnoreKind.ADVANCE_ROLL,
-            modifier=modifier,
-        )
-        for modifier in advance_modifiers
-    )
-    expanded: list[DecisionOption] = []
-    for option in options:
-        if not isinstance(option.payload, dict):
-            raise GameLifecycleError("Movement action option payload must be an object.")
-        action = movement_phase_action_kind_from_token(
-            _payload_string(option.payload, key="movement_phase_action")
-        )
-        if action is MovementPhaseActionKind.REMAIN_STATIONARY:
-            expanded.append(option)
-            continue
-        snapshots: tuple[ModifierIgnoreSnapshot, ...] = tuple(movement_snapshots)
-        if action is MovementPhaseActionKind.ADVANCE:
-            snapshots = (*snapshots, *advance_snapshots)
-        expanded.extend(
-            options_with_modifier_ignore_choices(
-                option=option,
-                unit_instance_id=movement_unit_id,
-                permissions=permissions,
-                available_modifiers=snapshots,
-            )
-        )
-    return tuple(expanded)
+    return tuple(options)
 
 
 def _advance_roll_request_for_action(
@@ -568,7 +453,17 @@ def _roll_desperate_escape_dice(
     state: GameState,
     decisions: DecisionController,
     resolution: FallBackActionResult,
+    movement_proposal_result_id: str,
 ) -> tuple[DesperateEscapeRoll, ...]:
+    from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
+    from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (
+        desperate_escape_modifier_occurrence,
+    )
+    from warhammer40k_core.engine.modifier_evaluation import (
+        ModifierEvaluationSubject,
+        selected_modifiers_for_occurrence,
+    )
+
     rolls: list[DesperateEscapeRoll] = []
     manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
     roll_modifiers = _desperate_escape_roll_modifiers(resolution)
@@ -588,7 +483,20 @@ def _roll_desperate_escape_dice(
         roll = DesperateEscapeRoll.from_roll_state(
             requirement=requirement,
             roll_state=manager.roll(requirement.roll_spec()),
-            roll_modifiers=roll_modifiers,
+            roll_modifiers=selected_modifiers_for_occurrence(
+                decision_records=decisions.records,
+                occurrence_id=desperate_escape_modifier_occurrence(
+                    movement_proposal_result_id, requirement.requirement_id
+                ),
+                subject=ModifierEvaluationSubject(
+                    unit_instance_id=rules_unit_view_by_id(
+                        state=state, unit_instance_id=requirement.unit_instance_id
+                    ).unit_instance_id,
+                    model_instance_id=requirement.model_instance_id,
+                    kind=ModifierIgnoreKind.DESPERATE_ESCAPE_ROLL,
+                ),
+                modifiers=roll_modifiers,
+            ),
         )
         decisions.event_log.append(
             "desperate_escape_roll_resolved",
@@ -723,23 +631,21 @@ def _resolve_forced_desperate_escape_battle_shock(
         "action_result": validate_json_value(action_result.to_payload()),
         "movement_proposal_request_id": movement_proposal_request_id,
     }
-    requested_payload = {
-        **base_payload,
-        "battle_shock_test_request": request.to_payload(),
-    }
-    decisions.event_log.append("battle_shock_test_requested", requested_payload)
-    decisions.event_log.append(
-        "forced_desperate_escape_battle_shock_requested",
-        requested_payload,
+    from warhammer40k_core.engine.battle_shock_modifier_continuation import (
+        resolve_battle_shock_after_modifier_choices,
     )
-    manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
-    battle_shock_resolution = resolve_battle_shock_test_with_optional_reroll(
+
+    battle_shock_resolution = resolve_battle_shock_after_modifier_choices(
         state=state,
         decisions=decisions,
-        manager=manager,
         battle_shock_hooks=battle_shock_hooks,
         request=request,
-        roll_state=manager.roll(request.spec),
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        requested_event_types=(
+            "battle_shock_test_requested",
+            "forced_desperate_escape_battle_shock_requested",
+        ),
         active_player_id=_active_player_id(state),
         phase=BattlePhase.MOVEMENT,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
@@ -780,6 +686,21 @@ def _desperate_escape_roll_modifiers(
         if not isinstance(raw_source, dict):
             raise GameLifecycleError("forced_desperate_escape_sources must contain objects.")
         source = cast(dict[str, object], raw_source)
+        if source.get("source_kind") == "catalog_rule_ir":
+            raw_modifiers = source.get("desperate_escape_roll_modifiers")
+            if not isinstance(raw_modifiers, list):
+                raise GameLifecycleError("Desperate Escape catalog modifier inventory is missing.")
+            source_modifiers = tuple(
+                RollModifier.from_payload(cast(RollModifierPayload, value))
+                for value in cast(list[object], raw_modifiers)
+            )
+            if (
+                sum(modifier.operand for modifier in source_modifiers)
+                != source["desperate_escape_roll_modifier"]
+            ):
+                raise GameLifecycleError("Desperate Escape catalog modifier total drifted.")
+            modifiers.extend(source_modifiers)
+            continue
         delta = source.get("desperate_escape_roll_modifier", 0)
         if type(delta) is not int:
             raise GameLifecycleError("desperate_escape_roll_modifier must be an integer.")

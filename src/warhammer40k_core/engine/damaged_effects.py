@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
     DamagedEffectDefinition,
     DamagedEffectKind,
@@ -11,7 +12,6 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
-    AttackProfile,
     RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
@@ -424,9 +424,9 @@ def _profile_with_damaged_attacks_effect(
     if effect.effect_kind is DamagedEffectKind.WEAPON_ATTACKS_MODIFIER:
         if effect.modifier is None:
             raise GameLifecycleError("DAMAGED weapon Attacks modifier is missing.")
-        attacks = max(1, fixed_attacks + effect.modifier)
+        term = ModifierTerm(ModifierOperation.ADD, effect.modifier)
     elif effect.effect_kind is DamagedEffectKind.WEAPON_ATTACKS_HALVE:
-        attacks = max(1, (fixed_attacks + 1) // 2)
+        term = ModifierTerm(ModifierOperation.DIVIDE, 2)
     else:
         raise GameLifecycleError("DAMAGED weapon Attacks effect kind is unsupported.")
     source_ids = (
@@ -436,7 +436,13 @@ def _profile_with_damaged_attacks_effect(
     )
     return replace(
         profile,
-        attack_profile=AttackProfile.fixed(attacks),
+        attack_profile=profile.attack_profile.with_modifier(
+            term.bind(
+                modifier_id=effect.damaged_effect_id,
+                source_id=effect.source_id,
+                characteristic=Characteristic.ATTACKS,
+            )
+        ),
         source_ids=source_ids,
     )
 

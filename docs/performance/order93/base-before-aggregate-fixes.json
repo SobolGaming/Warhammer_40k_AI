@@ -1,0 +1,125 @@
+{
+  "workload": "order93-no-permission-attack-slices-v1",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "hardware_status": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "full_game_samples": 0,
+  "fixture": "Two one-model units, no terrain, twelve Torrent/Twin-linked S1 vs T1 attacks",
+  "seeds": [
+    "order88-shooting",
+    "order88-fight"
+  ],
+  "policy": "First legal fixture option/proposal through LocalGameSession",
+  "timing_boundary": "First pending phase choice through attack-sequence completion; setup separate",
+  "warmup_runs_per_phase": 1,
+  "hashes": {
+    "scripts/benchmark_order93_modifiers.py": "57d24c3f1c9c85b94a7fce9b3c9469601055c40167919789083d1ae174eb5492",
+    "tests/absent_strength_helpers.py": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
+    "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
+  },
+  "rows": [
+    {
+      "phase": "shooting",
+      "setup_seconds": [
+        0.25451866700313985,
+        0.2522113750455901,
+        0.24605970800621435,
+        0.24359866604208946,
+        0.24385400000028312
+      ],
+      "samples_seconds": [
+        0.2493519999552518,
+        0.24991729098837823,
+        0.26919845800148323,
+        0.23478991695446894,
+        0.23278287501307204
+      ],
+      "mean": 0.24720810818253086,
+      "median": 0.2493519999552518,
+      "p95_and_maximum": 0.26919845800148323,
+      "completed": 5,
+      "counts": [
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 5,
+          "modifier_decisions": 0
+        }
+      ]
+    },
+    {
+      "phase": "fight",
+      "setup_seconds": [
+        0.4813078750157729,
+        0.480671291006729,
+        0.4813606250099838,
+        0.4807132499990985,
+        0.4804194589960389
+      ],
+      "samples_seconds": [
+        0.13726704200962558,
+        0.13953516696346924,
+        0.137094666948542,
+        0.13706787500996143,
+        0.13715341599890962
+      ],
+      "mean": 0.13762363338610156,
+      "median": 0.13715341599890962,
+      "p95_and_maximum": 0.13953516696346924,
+      "completed": 5,
+      "counts": [
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        },
+        {
+          "wounds": 12,
+          "decisions": 6,
+          "modifier_decisions": 0
+        }
+      ]
+    }
+  ]
+}

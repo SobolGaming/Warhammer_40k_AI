@@ -71,6 +71,7 @@ from warhammer40k_core.engine.primary_mission_state import (
 from warhammer40k_core.engine.profile_snapshot import (
     profile_snapshot_from_json,
     snapshot_modifier_ids,
+    snapshot_source_modifier_ids,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -149,6 +150,11 @@ def capture_primary_mission_boundary_checkpoint(
     include_secondary_scoring_authority = boundary_kind == "objective_control"
     checkpoint = PrimaryMissionBoundaryCheckpoint.create(
         boundary_kind=boundary_kind,
+        objective_control_modifier_scope_id=(
+            None
+            if runtime_modifier_registry.objective_control_selection_scope is None
+            else runtime_modifier_registry.objective_control_selection_scope.occurrence_id
+        ),
         game_id=state.game_id,
         player_id=player_id,
         active_player_id=state.active_player_id,
@@ -291,6 +297,14 @@ def validate_primary_mission_boundary_checkpoint_source_registry(
             faction_rule_execution_registry=faction_rule_execution_registry,
             runtime_content_activation=runtime_content_activation,
         )
+        from warhammer40k_core.engine.objective_control_checkpoint_selection import (
+            validate_checkpoint_modifier_selections,
+        )
+
+        validate_checkpoint_modifier_selections(
+            checkpoint=checkpoint,
+            decision_records=decision_records,
+        )
         _validate_checkpoint_modifier_source_registry(
             checkpoint=checkpoint,
             runtime_modifier_registry=runtime_modifier_registry,
@@ -308,6 +322,7 @@ def validate_primary_mission_boundary_checkpoint_source_registry(
             _validate_current_checkpoint_oc_resolutions(
                 state=state,
                 checkpoint=checkpoint,
+                decision_records=decision_records,
                 runtime_modifier_registry=runtime_modifier_registry,
             )
     if checkpoint_rows:
@@ -545,6 +560,23 @@ def validate_primary_mission_action_request_checkpoint(
             event_records=event_records,
             request_id=request_id,
         )
+    )
+    request_event_payload = event_records[checkpoint_index + 1].payload
+    if not isinstance(request_event_payload, dict):
+        raise GameLifecycleError("Mission Action checkpoint request event is invalid.")
+    action_payload = request_event_payload["payload"]
+    if (
+        not isinstance(action_payload, dict)
+        or action_payload.get("objective_control_modifier_scope_id")
+        != checkpoint.objective_control_modifier_scope_id
+    ):
+        raise GameLifecycleError("Mission Action checkpoint OC occurrence drifted.")
+    from warhammer40k_core.engine.objective_control_checkpoint_selection import (
+        validate_checkpoint_modifier_selections,
+    )
+
+    validate_checkpoint_modifier_selections(
+        checkpoint=checkpoint, decision_records=decision_records
     )
     if reference != expected_reference:
         raise GameLifecycleError("Primary mission Action request checkpoint drifted.")
@@ -1041,7 +1073,7 @@ def _applied_oc_modifier_ids(values: tuple[tuple[str, str], ...]) -> tuple[str, 
                 modifier_id
                 for source_json, resolved_json in values
                 for modifier_id in set(snapshot_modifier_ids(resolved_json)).difference(
-                    snapshot_modifier_ids(source_json)
+                    snapshot_source_modifier_ids(source_json)
                 )
             }
         )
@@ -1095,8 +1127,19 @@ def _validate_current_checkpoint_oc_resolutions(
     *,
     state: GameState,
     checkpoint: PrimaryMissionBoundaryCheckpoint,
+    decision_records: tuple[DecisionRecord, ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
+    from warhammer40k_core.engine.objective_control_checkpoint_selection import (
+        registry_for_checkpoint_selections,
+    )
+
+    runtime_modifier_registry = registry_for_checkpoint_selections(
+        state=state,
+        checkpoint=checkpoint,
+        decision_records=decision_records,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     models_by_id = {
         model.model_instance_id: (unit.unit_instance_id, model)
         for army in state.army_definitions

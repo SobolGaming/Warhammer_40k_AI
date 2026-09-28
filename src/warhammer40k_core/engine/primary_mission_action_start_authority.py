@@ -225,8 +225,22 @@ def _runtime_oc_retains_source_lineage(
         return False
     if source.characteristic is not resolved.characteristic:
         return False
-    if not source.is_numeric or source.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO:
+    source_trace = source.modifier_trace
+    if source_trace is None and (
+        not source.is_numeric or source.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO
+    ):
         return resolved == source
+    trace = resolved.modifier_trace
+    if trace is not None:
+        source_value = source.final if source_trace is None else source_trace.source_value
+        source_operations = () if source_trace is None else source_trace.modifiers
+        return (
+            trace.source_value == source_value
+            and trace.modifiers[: len(source_operations)] == source_operations
+            and trace.resolve().final == resolved.final
+        )
+    if source_trace is not None:
+        return False
     if resolved.is_numeric and resolved.raw != source.raw:
         return False
     if resolved.value_kind is CharacteristicValueKind.SOURCE_DASH:

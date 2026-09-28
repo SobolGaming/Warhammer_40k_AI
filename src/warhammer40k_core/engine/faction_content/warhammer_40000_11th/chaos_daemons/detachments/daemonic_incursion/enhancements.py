@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
     RandomProfileValue,
@@ -246,6 +247,7 @@ def _profile_with_attacks_and_strength_delta(
             profile.attack_profile,
             delta=attacks_delta,
             rule_label=rule_label,
+            source_id=source_id,
         ),
         strength=_strength_with_delta(
             profile.strength,
@@ -288,19 +290,17 @@ def _attack_profile_with_delta(
     *,
     delta: int,
     rule_label: str,
+    source_id: str,
 ) -> AttackProfile:
     if type(profile) is not AttackProfile:
         raise GameLifecycleError(f"{rule_label} requires an AttackProfile.")
     if type(delta) is not int:
         raise GameLifecycleError(f"{rule_label} attack delta must be an integer.")
-    if profile.fixed_attacks is not None:
-        return AttackProfile.fixed(profile.fixed_attacks + delta)
-    if profile.dice_expression is None:
-        raise GameLifecycleError(f"{rule_label} attack profile is invalid.")
-    return AttackProfile.dice(
-        replace(
-            profile.dice_expression,
-            modifier=profile.dice_expression.modifier + delta,
+    return profile.with_modifier(
+        ModifierTerm(ModifierOperation.ADD, delta).bind(
+            modifier_id=f"{source_id}:attacks",
+            source_id=source_id,
+            characteristic=Characteristic.ATTACKS,
         )
     )
 

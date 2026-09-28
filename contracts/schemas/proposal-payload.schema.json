@@ -155,13 +155,41 @@
             "fixed_attacks": {
               "minimum": 1,
               "type": "integer"
+            },
+            "source_fixed_value": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "modifiers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/profile_modifier"
+              }
+            },
+            "ignored_modifier_ids": {
+              "$ref": "#/$defs/identifier_array"
             }
           },
           "required": [
             "fixed_attacks",
             "dice_expression"
           ],
-          "type": "object"
+          "type": "object",
+          "dependentRequired": {
+            "source_fixed_value": [
+              "modifiers",
+              "ignored_modifier_ids"
+            ],
+            "modifiers": [
+              "source_fixed_value",
+              "ignored_modifier_ids"
+            ],
+            "ignored_modifier_ids": [
+              "source_fixed_value",
+              "modifiers"
+            ]
+          }
         },
         {
           "additionalProperties": false,
@@ -171,13 +199,40 @@
             },
             "fixed_attacks": {
               "type": "null"
+            },
+            "source_fixed_value": {
+              "type": "null"
+            },
+            "modifiers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/profile_modifier"
+              }
+            },
+            "ignored_modifier_ids": {
+              "$ref": "#/$defs/identifier_array"
             }
           },
           "required": [
             "fixed_attacks",
             "dice_expression"
           ],
-          "type": "object"
+          "type": "object",
+          "dependentRequired": {
+            "source_fixed_value": [
+              "modifiers",
+              "ignored_modifier_ids"
+            ],
+            "modifiers": [
+              "source_fixed_value",
+              "ignored_modifier_ids"
+            ],
+            "ignored_modifier_ids": [
+              "source_fixed_value",
+              "modifiers"
+            ]
+          }
         }
       ]
     },
@@ -202,13 +257,41 @@
             "fixed_damage": {
               "minimum": 1,
               "type": "integer"
+            },
+            "source_fixed_value": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "modifiers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/profile_modifier"
+              }
+            },
+            "ignored_modifier_ids": {
+              "$ref": "#/$defs/identifier_array"
             }
           },
           "required": [
             "fixed_damage",
             "dice_expression"
           ],
-          "type": "object"
+          "type": "object",
+          "dependentRequired": {
+            "source_fixed_value": [
+              "modifiers",
+              "ignored_modifier_ids"
+            ],
+            "modifiers": [
+              "source_fixed_value",
+              "ignored_modifier_ids"
+            ],
+            "ignored_modifier_ids": [
+              "source_fixed_value",
+              "modifiers"
+            ]
+          }
         },
         {
           "additionalProperties": false,
@@ -218,13 +301,40 @@
             },
             "fixed_damage": {
               "type": "null"
+            },
+            "source_fixed_value": {
+              "type": "null"
+            },
+            "modifiers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/profile_modifier"
+              }
+            },
+            "ignored_modifier_ids": {
+              "$ref": "#/$defs/identifier_array"
             }
           },
           "required": [
             "fixed_damage",
             "dice_expression"
           ],
-          "type": "object"
+          "type": "object",
+          "dependentRequired": {
+            "source_fixed_value": [
+              "modifiers",
+              "ignored_modifier_ids"
+            ],
+            "modifiers": [
+              "source_fixed_value",
+              "ignored_modifier_ids"
+            ],
+            "ignored_modifier_ids": [
+              "source_fixed_value",
+              "modifiers"
+            ]
+          }
         }
       ]
     },
@@ -337,6 +447,9 @@
             "kind": {
               "const": "distance",
               "type": "string"
+            },
+            "modifier_trace": {
+              "$ref": "#/$defs/characteristic_modifier_trace"
             }
           },
           "required": [
@@ -488,6 +601,9 @@
             "string",
             "null"
           ]
+        },
+        "result_floor": {
+          "type": "integer"
         }
       },
       "required": [
@@ -1577,6 +1693,9 @@
             "replacement_star"
           ],
           "type": "string"
+        },
+        "modifier_trace": {
+          "$ref": "#/$defs/characteristic_modifier_trace"
         }
       },
       "required": [
@@ -1661,6 +1780,9 @@
             "string",
             "null"
           ]
+        },
+        "result_floor": {
+          "type": "integer"
         }
       },
       "required": [
@@ -1701,6 +1823,17 @@
         },
         "evaluation_id": {
           "$ref": "#/$defs/identifier"
+        },
+        "evaluation_raw": {
+          "type": "integer"
+        },
+        "ignored_modifier_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -1711,12 +1844,49 @@
       ],
       "dependentRequired": {
         "evaluation": [
-          "evaluation_id"
+          "evaluation_id",
+          "evaluation_raw"
         ],
         "evaluation_id": [
-          "evaluation"
+          "evaluation",
+          "evaluation_raw"
+        ],
+        "evaluation_raw": [
+          "evaluation",
+          "evaluation_id"
         ]
       }
+    },
+    "characteristic_modifier_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "characteristic": {
+          "$ref": "#/$defs/identifier"
+        },
+        "source_value": {
+          "type": "integer"
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/profile_modifier"
+          }
+        },
+        "bounded": {
+          "type": "boolean"
+        },
+        "ignored_modifier_ids": {
+          "$ref": "#/$defs/identifier_array"
+        }
+      },
+      "required": [
+        "characteristic",
+        "source_value",
+        "modifiers",
+        "bounded",
+        "ignored_modifier_ids"
+      ]
     }
   }
 }

@@ -119,7 +119,7 @@ are trace anchors, not claims of complete source-clause regression coverage.
 | C01-10 | [Embarked healing and step validation](../src/warhammer40k_core/engine/healing.py), [battlefield revival](../src/warhammer40k_core/engine/healing_revival.py) |
 | C04-04 | [Shooting unit/type eligibility](../src/warhammer40k_core/engine/phases/shooting_eligibility.py) |
 | C04-05 | [Melee allocation validator](../src/warhammer40k_core/engine/fight_resolution.py) |
-| C02-09 | [Modifier-ignore descriptors](../src/warhammer40k_core/engine/catalog_modifier_ignore.py), [shared decisions](../src/warhammer40k_core/engine/modifier_ignore.py) |
+| C02-09 | [Modifier-ignore descriptors](../src/warhammer40k_core/engine/catalog_modifier_ignore.py); audited shared owner `engine/modifier_ignore.py`, replaced in Order 93 by [modifier evaluation](../src/warhammer40k_core/engine/modifier_evaluation.py) and [decision dispatch](../src/warhammer40k_core/engine/modifier_evaluation_dispatch.py). |
 | C15-10 | [Source policy](CORE_RULES_SOURCE_POLICY.md), [retained Heroic source review](ORDER_50_SCOPE_PLAN.md) |
 
 ## Prior work and full-game assessment

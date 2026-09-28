@@ -1429,6 +1429,28 @@ Adapters continue to submit the emitted
 owns target policies, use limits, Action state, immediate or turn-end
 completion, marker/status effects, and follow-up Primary choices.
 
+Order 93 evaluates each relevant model's OC operations before the automatic
+Shooting-phase Action opportunity enumerates its options. A required
+`select_modifier_ignores` request resumes that same opportunity, retaining its
+profile-roll scope and selected-operation evidence in the Action checkpoint.
+The required nullable `objective_control_modifier_scope_id` field on the
+`start_mission_action` request and options is non-null when that evaluation has
+operation traces. With no relevant operations it remains null. Pending and
+accepted Action reconstruction authenticate the scope and original sources;
+ignoring a positive modifier can remove an Action by leaving every model at
+OC 0.
+The boundary checkpoint includes `objective_control_modifier_scope_id` only
+when a source scope exists; a present value must be a nonempty string. Its
+content hash covers every serialized field. Omitting the absent scope preserves
+checkpoint identity at boundaries without a modifier evaluation.
+
+`request_mission_action_start` is an internal engine request-construction helper,
+used by isolated owner tests and an already-authenticated explicit continuation.
+It is not a separate adapter entry command. An adapter starts Actions through
+the lifecycle's automatic opportunity and submits its finite options. Calling
+the helper externally before lifecycle history capture does not establish an
+independently replayable modifier occurrence.
+
 On lifecycle restore, a pending `start_mission_action` or
 `select_primary_mission_choice` request is accepted only as the sole queue
 head, with exactly one matching `decision_requested` event, no matching
@@ -6923,6 +6945,9 @@ Random model and weapon characteristics use a source-linked descriptor with
 `value_kind: "random"`, an integral dice `expression`, and a stable `source_id`.
 Catalog values contain no evaluation or runtime modifiers. Runtime values may
 add source-bound `modifiers` and the paired `evaluation` / `evaluation_id` fields.
+Contract 41 requires `evaluation_raw` with both evaluation fields. It retains
+the physical source result when a selected operation replaces the value with
+a dash or star; restore authenticates it against the recorded random roll.
 A missing evaluation is an explicit unresolved value, never numeric zero.
 
 The engine evaluates Movement after accepting a unit's move selection. Fixed
@@ -7062,3 +7087,111 @@ events, commitment identity, every accepted pool's physical/profile/ability iden
 single-target and split totals, and replacement history. Replay
 regenerates the same decisions and dice. Existing exact runtime identity rejects
 older histories; no compatibility conversion is introduced. Shooting is unchanged.
+
+## Order 93: source-bound modifier subset decisions
+
+Contract 41 adds the finite `select_modifier_ignores` family at engine-owned
+modifier evaluation boundaries. The controlling player may keep or ignore each
+individual source operation, including beneficial and detrimental operations
+independently. A source permission with no explicit `modifier_kinds` uses the
+Core default: model and equipped-weapon characteristics and rolls. A source's
+explicit subset limits that grant. Save and invulnerable-save characteristics
+are separate typed kinds. Source display names and prose are not authority.
+
+The pending payload contains `occurrence_id`, `subject`, `modifiers`,
+`permissions`, `source_context`, `decided_modifier_ids`,
+and `ignored_modifier_ids`. The subject fixes `unit_instance_id`, `kind`,
+`model_instance_id` and `weapon_profile_id`. Each inventory row fixes its
+`operation_type` (`characteristic` or `roll`) and complete source operation.
+Catalog permission evidence binds its RuleIR/source record and current physical
+bearer. Persisted permission evidence includes the actual effect ID, unchanged
+source context and expiration. Attached component membership, current weapon
+ownership and authenticated retained-model presence remain engine-owned.
+
+Options keep or ignore the next operation, or keep or ignore all remaining
+operations. `keep-remaining` and `ignore-remaining` finish the occurrence;
+individual choices advance an immutable inventory prefix and emit a fresh
+request when further choices remain. Equivalent terminal outcomes are emitted
+once. Any subset, including retaining everything, is reachable without an
+exponential option inventory. The adapter submits only an emitted option ID
+through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle`.
+
+A pending submission must still match the full source inventory, permission
+scope, physical subject, owning occurrence and current state. Invalid option
+IDs, stale or altered inventories and wrong ownership are rejected before queue
+pop and authoritative mutation. No query or projection creates a decision or
+rolls dice. Accepted choices affect only the owning evaluation; later attacks,
+rolls or characteristic evaluations require their own occurrence authority.
+
+Fixed characteristics and fixed Range preserve `modifier_trace` with original
+source value, operations, bounds policy and ignored IDs. Attacks and Damage
+retain source operations separately from their intrinsic dice expressions.
+Save options preserve their characteristic and AP traces plus individual roll
+operations. Removing selected operations precedes the shared replacement,
+arithmetic, rounding and bounds pipeline. A trace's reported result must match
+its source operations and selected subset. Clients treat these fields as
+engine output; no profile arithmetic is delegated to an adapter.
+
+Range and Attacks choices precede weapon target legality and declaration. Each
+physical weapon/profile gets one inventory across its target-specific source
+profiles. Melee commitment consumes the selected Attacks operations before any
+A dice, and fixed-A split limits use the selected total. Random Range and A
+retain the original rolls. If reactions change a retargeted weapon's Range or
+Attacks source inventory, the retarget owner requests a fresh occurrence before
+showing replacement targets; pure validation reconstructs that choice from
+records. Exact matching inventories retain their previously selected subset.
+
+Decision requests, their options, records and resulting events are visible only
+to the controlling player through the shared viewer redaction owner.
+The independent restore origin is stripped from all
+viewer projections and deltas. Private restore/replay origin evidence does not
+appear in projections or response metadata. Persistence and replay authenticate
+recorded occurrence identity and source evidence; old histories require their
+original runtime and are not filled with inferred decisions. See
+[Contract 40 to 41](../contracts/migrations/40-to-41.md) for wire versions and
+client migration.
+
+Random profile values additionally preserve optional `ignored_modifier_ids` while
+retaining all source `modifiers` and the original dice expression. Re-evaluation
+applies the recorded subset to the existing raw result. SaveOption payloads
+include required `inherent_roll_modifiers` alongside `roll_modifiers`; incoming
+AP and applicable cover contribute distinct source operations to the saving
+throw inventory.
+
+Source-limited characteristic reductions carry an optional integer
+`result_floor` on the same `Modifier` operation. Unrestricted operations omit
+it. A selection retains or ignores the complete operation and its source limit;
+the reduction and limit never appear as independent choices. The limit applies
+only to that reduction, cannot worsen an already lower value, and does not cap
+other unrestricted reductions.
+
+The first-failed-save Damage-to-zero replacement participates as a sourced
+`SET 0` Damage operation. Ignoring it records
+`failed_save_damage_replacement_ignored` with the same source/occurrence fields
+as `failed_save_damage_replaced`, consuming that first occurrence.
+
+Actual modifiers to a model's healing-trigger roll use `healing_roll`, including
+Soulstealer's conditional +1. The attack-completion owner requests the existing
+finite choice before the healing die or mutation and resumes the same source
+occurrence. Intrinsic healing amounts and granted ability thresholds are not
+roll operations. See [the owner inventory](ORDER_93_OWNER_INVENTORY.md) for the
+source/consumer boundaries and audit limits.
+
+Desperate Escape uses `desperate_escape_roll` for each physical model's hazard
+roll. The accepted movement proposal owns these occurrences and waits for all
+required choices before any hazard dice or movement mutation. Catalog entries
+in `forced_desperate_escape_sources` include required
+`desperate_escape_roll_modifiers`, the ordered list of complete `RollModifier`
+payloads, alongside their summed `desperate_escape_roll_modifier`. Each source
+effect retains its own modifier ID, including effects in sibling clauses of the
+same authenticated RuleIR. Restore validates both the full inventory and its
+sum against the source record; adapters do not reconstruct terms from the sum.
+An empty inventory preserves the existing unmodified movement behavior.
+
+Modifier provenance snapshots (`attack_save_modifiers_prepared`,
+`failed_save_damage_replacement_ignored`, and `modifier_ignores_selected`) are
+internal audit events, filtered by the shared adapter redaction owner. Public
+`attack_sequence_step` save resolutions retain resolved save values but omit the
+complete characteristic/AP traces, source roll inventories, and ignored-ID lists.
+The acting player's finite decision record retains its selected option; the
+trusted replay retains complete source evidence.

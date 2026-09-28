@@ -439,10 +439,14 @@ def test_heroic_declaration_loads_modifier_ignore_permission_from_catalog() -> N
         CatalogJsonObject,
         DatasheetAbilityDescriptor,
     )
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.rules.rule_ir import RuleTargetKind
 
     base = ArmyCatalog.phase9a_canonical_content_pack()
     sheet = base.datasheet_by_id("core-intercessor-like-infantry")
-    definition = _charge_modifier_ignore_ability_record(datasheet_id=sheet.datasheet_id).definition
+    definition = _charge_modifier_ignore_ability_record(
+        datasheet_id=sheet.datasheet_id, target_kind=RuleTargetKind.THIS_UNIT
+    ).definition
     assert isinstance(definition.replay_payload, dict)
     ability = DatasheetAbilityDescriptor(
         ability_id=definition.ability_id,
@@ -465,22 +469,31 @@ def test_heroic_declaration_loads_modifier_ignore_permission_from_catalog() -> N
     session, unit_id = heroic_session(natural=False, catalog=catalog)
     add_heroic_modifier(session, unit_id, delta=-20)
     declaration = use_heroic(session, unit_id)
-    options = [o for o in declaration.options if o.option_id != unit_id]
-    assert len(options) == 1
-    session.submit_option(
+    assert tuple(option.option_id for option in declaration.options) == (unit_id,)
+    status = session.submit_option(
         request_id=declaration.request_id,
-        option_id=options[0].option_id,
-        result_id="ignore-penalty",
+        option_id=unit_id,
+        result_id="heroic-declaration",
     )
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == "select_modifier_ignores"
+    status = session.submit_option(
+        request_id=request.request_id, option_id="ignore-remaining", result_id="ignore-penalty"
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
     state = session.lifecycle.state
     assert state is not None
-    ignore_effect = next(
-        e
-        for e in state.persisting_effects_for_unit(unit_id)
-        if e.source_rule_id == "core:modifier-ignore-selection"
+    event = next(
+        event
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "modifier_ignores_selected"
     )
-    assert ignore_effect.owner_player_id == "player-a"
-    assert ignore_effect.expiration.player_id == "player-b"
+    assert isinstance(event.payload, dict)
+    ignore_effect = cast(dict[str, object], event.payload["modifier_ignore_effect"])
+    assert ignore_effect["owner_player_id"] == "player-a"
+    expiration = cast(dict[str, object], ignore_effect["expiration"])
+    assert expiration["player_id"] == "player-b"
     roll = latest_heroic_roll(session)
     assert roll.value == min(roll.roll_state.current_total, 6)
     assert roll.movement_budget.modified_roll.unbounded_value == roll.roll_state.current_total

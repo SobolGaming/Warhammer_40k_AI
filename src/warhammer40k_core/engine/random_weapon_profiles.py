@@ -54,7 +54,7 @@ def evaluate_attack_weapon_profile(
             "model_instance_id": pool.attacker_model_instance_id,
             "weapon_instance_id": pool.weapon_instance_id,
             "weapon_profile_id": pool.weapon_profile_id,
-            "descriptor": replace(value, evaluation=None, evaluation_id=None).to_payload(),
+            "descriptor": value.without_evaluation().to_payload(),
         }
         previous = [
             event.payload

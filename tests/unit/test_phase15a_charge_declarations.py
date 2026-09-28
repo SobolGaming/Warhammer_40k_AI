@@ -16,8 +16,6 @@ from tests.phase15a_charge_test_support import (
     _assert_invalid_charge_submission_keeps_pending_clean,
     _charge_lifecycle,
     _charge_lifecycle_with_declaration_grants,
-    _charge_modifier_ignore_ability_record,
-    _charge_modifier_ignore_registry,
     _charge_move_proposal_request_for_value_tests,
     _charge_move_request_after_selection,
     _charge_path_witness_for_unit,
@@ -34,9 +32,7 @@ from tests.phase15a_charge_test_support import (
     _first_proposal_validation_violation,
     _generated_snarling_protector_charge_lifecycle,
     _heroic_proposal_from_request,
-    _ignored_charge_modifier_ids,
     _install_charge_declaration_registry,
-    _install_charge_modifier_ignore_runtime,
     _last_event_payload,
     _payload_has_displacements,
     _require_pending_request,
@@ -110,7 +106,6 @@ from warhammer40k_core.engine.charge_required_targets import (
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
-from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -146,9 +141,6 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
-from warhammer40k_core.engine.runtime_modifiers import (
-    RuntimeModifierRegistry,
-)
 from warhammer40k_core.engine.stratagem_catalog import (
     eleventh_edition_core_stratagem_catalog_records,
 )
@@ -1352,117 +1344,43 @@ def test_charging_unit_modifier_ignore_subsets_use_finite_lifecycle_and_round_tr
     ignored_modifier_id: str,
     expected_modifier_ids: tuple[str, ...],
 ) -> None:
-    lifecycle, units = _charge_lifecycle(
-        alpha_unit_ids=("intercessor-1",),
-        enemy_model_poses=_compact_test_unit_poses(
-            origin=Pose.at(20.0, 20.0),
-            model_count=5,
-        ),
-        game_id=f"phase15a-modifier-ignore-{ignored_modifier_id.rsplit(':', maxsplit=1)[1]}",
+    from tests.order93_movement_helpers import (
+        finish_modifier_choices,
+        movement_modifier_session,
+        start_modifier_action,
     )
-    source_unit = units["intercessor-1"]
-    ability_index = AbilityCatalogIndex.from_records(
-        (_charge_modifier_ignore_ability_record(datasheet_id=source_unit.datasheet_id),)
-    )
-    _install_charge_modifier_ignore_runtime(
-        lifecycle,
-        ability_index=ability_index,
-        registry=_charge_modifier_ignore_registry(),
-    )
-    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    unit_options = tuple(
-        option
-        for option in selection_request.options
-        if isinstance(option.payload, dict)
-        and option.payload.get("submission_kind") == SELECT_CHARGING_UNIT_DECISION_TYPE
-    )
-    assert len(unit_options) == 4
-    selected_option = next(
-        option
-        for option in unit_options
-        if _ignored_charge_modifier_ids(option) == (ignored_modifier_id,)
-    )
-    restored_request = DecisionRequest.from_payload(
-        json.loads(json.dumps(selection_request.to_payload(), sort_keys=True))
-    )
-    assert restored_request == selection_request
 
-    status = _submit_option(
-        lifecycle,
-        request=selection_request,
-        option_id=selected_option.option_id,
-        result_id=(
-            f"phase15a-modifier-ignore-select-{ignored_modifier_id.rsplit(':', maxsplit=1)[1]}"
-        ),
-    )
+    session = movement_modifier_session(BattlePhase.CHARGE)
+    start_modifier_action(session)
+    finish_modifier_choices(session, (ignored_modifier_id,))
+    lifecycle = session.lifecycle
     roll_result = _roll_result_from_event(lifecycle, "charge_roll_resolved")
     assert (
         tuple(modifier.modifier_id for modifier in roll_result.request.roll_modifiers)
         == expected_modifier_ids
     )
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert lifecycle.decision_controller.records[-1].result.payload == selected_option.payload
-    modifier_events = _event_payloads(lifecycle, "modifier_ignores_selected")
-    assert len(modifier_events) == 1
-    effect_payload = cast(dict[str, object], modifier_events[0]["modifier_ignore_effect"])
-    assert effect_payload["source_rule_id"] == "core:modifier-ignore-selection"
-    lifecycle_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
-    )
-    restored = GameLifecycle.from_payload(
-        lifecycle_payload,
-        runtime_content_bundle=lifecycle._runtime_content_bundle,  # pyright: ignore[reportPrivateUsage]
-    )
-    assert restored.to_payload() == lifecycle_payload
-    assert "object at 0x" not in json.dumps(lifecycle_payload, sort_keys=True)
+    payload = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
 
 
 def test_charging_unit_modifier_ignore_option_drift_rejects_before_queue_pop() -> None:
-    lifecycle, units = _charge_lifecycle(
-        alpha_unit_ids=("intercessor-1",),
-        enemy_model_poses=_compact_test_unit_poses(
-            origin=Pose.at(20.0, 20.0),
-            model_count=5,
-        ),
-        game_id="phase15a-modifier-ignore-stale",
-    )
-    source_unit = units["intercessor-1"]
-    ability_index = AbilityCatalogIndex.from_records(
-        (_charge_modifier_ignore_ability_record(datasheet_id=source_unit.datasheet_id),)
-    )
-    _install_charge_modifier_ignore_runtime(
-        lifecycle,
-        ability_index=ability_index,
-        registry=_charge_modifier_ignore_registry(),
-    )
-    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    stale_option = next(
-        option
-        for option in selection_request.options
-        if _ignored_charge_modifier_ids(option) == ("test:modifier-ignore:charge-penalty",)
-    )
-    _install_charge_modifier_ignore_runtime(
-        lifecycle,
-        ability_index=ability_index,
-        registry=RuntimeModifierRegistry.empty(),
-    )
+    from tests.order93_movement_helpers import movement_modifier_session, start_modifier_action
 
-    status = _submit_option(
-        lifecycle,
-        request=selection_request,
-        option_id=stale_option.option_id,
-        result_id="phase15a-modifier-ignore-stale-select",
+    session = movement_modifier_session(BattlePhase.CHARGE)
+    request = start_modifier_action(session)
+    state = session.lifecycle.state
+    assert state is not None
+    state.persisting_effects = [
+        effect
+        for effect in state.persisting_effects
+        if effect.effect_id != "test:modifier-ignore:charge-penalty"
+    ]
+    before = session.lifecycle.to_payload()
+    status = session.submit_option(
+        request_id=request.request_id, option_id="ignore-remaining", result_id="stale-selection"
     )
-
     assert status.status_kind is LifecycleStatusKind.INVALID
-    assert isinstance(status.payload, dict)
-    assert status.payload["invalid_reason"] == "charging_unit_option_drift"
-    assert status.payload["field"] == "modifier_ignore_context"
-    assert lifecycle.decision_controller.queue.pending_requests == (selection_request,)
-    assert lifecycle.decision_controller.records == ()
-    assert _event_payloads(lifecycle, "modifier_ignores_selected") == ()
-    assert _event_payloads(lifecycle, "charge_roll_resolved") == ()
+    assert session.lifecycle.to_payload() == before
 
 
 def test_successful_charge_roll_creates_phase15b_movement_boundary() -> None:

@@ -251,6 +251,28 @@ def _resolve_charge_roll_state(
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.movement_modifier_evaluation import prepare_charge_modifiers
+
+    operations = _modifier_ignore.charge_roll_modifiers_for_unit(
+        state=state,
+        ability_index=ability_index,
+        unit=_charge._unit_for_selection(state=state, selection=selection),
+        runtime_modifier_registry=runtime_modifier_registry,
+        apply_selection=False,
+    )
+    status = prepare_charge_modifiers(
+        state=state,
+        decisions=decisions,
+        ability_index=ability_index,
+        unit_instance_id=selection.unit_instance_id,
+        modifiers=operations,
+        source_context={
+            "continuation": "phase",
+            "charge_roll_request": validate_json_value(roll_request.to_payload()),
+        },
+    )
+    if status is not None:
+        return status
     budget = current_charge_movement_budget(
         state=state,
         request=roll_request,

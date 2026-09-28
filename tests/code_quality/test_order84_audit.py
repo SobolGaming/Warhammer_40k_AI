@@ -3,7 +3,14 @@ from __future__ import annotations
 from copy import deepcopy
 
 import pytest
-from tools.core_rules_order84_audit import REPORT, ROOT, load_audit, markdown, validate_audit
+from tools.core_rules_order84_audit import (
+    REPORT,
+    ROOT,
+    current_evidence_paths,
+    load_audit,
+    markdown,
+    validate_audit,
+)
 from tools.core_rules_order84_capture import capture_literals
 
 
@@ -16,6 +23,23 @@ def test_order84_inventory_and_generated_report_are_complete_and_negative() -> N
     assert len({r["row_id"] for r in duplicated_number}) == 2
     assert len({r["title"] for r in duplicated_number}) == 2
     assert sum(r["category"] == "FAQ" for r in audit["source_inventory"]) == 59
+
+
+def test_order84_retains_historical_modifier_owner_with_explicit_current_locations() -> None:
+    audit = load_audit()
+    historical_owner = "src/warhammer40k_core/engine/modifier_ignore.py"
+    category = next(row for row in audit["category_reviews"] if row["category"] == "02")
+    assert historical_owner in category["engine_owners"]
+    assert current_evidence_paths(historical_owner) == (
+        "src/warhammer40k_core/engine/modifier_evaluation.py",
+        "src/warhammer40k_core/engine/modifier_evaluation_dispatch.py",
+    )
+    for path in current_evidence_paths(historical_owner):
+        assert (ROOT / path).is_file()
+        assert f"(../{path})" in markdown(audit)
+    category["engine_owners"] = ["src/warhammer40k_core/engine/unknown-owner.py"]
+    with pytest.raises(ValueError, match="evidence path is missing"):
+        validate_audit(audit)
 
 
 @pytest.mark.parametrize(

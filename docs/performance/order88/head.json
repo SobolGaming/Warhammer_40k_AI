@@ -1,6 +1,6 @@
 {
   "workload": "order88-numeric-strength-attacks-v1",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ba430dc82d3bda374b14daf4cd488144a7f653b7de12d7ef3dcf160f3a403f3",
   "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
   "python": "3.14.5",
   "cpu": "Apple M5 Pro",
@@ -19,25 +19,25 @@
     "scripts/benchmark_order88_strength.py": "6ea19e9377d0ab0b4c51e818a2f22420891742b29878e8c6d3604b7a9fd33de6",
     "tests/absent_strength_helpers.py": "f082912488a4cf4ff582a23781325d7ca7da4f7c2a54ce8bb8bf6487da70cfae",
     "tests/lethal_hits_helpers.py": "f55d0df7ce3137cd11d8d4e530dbee3f12baf00dcdf9e02d15094519c220ba96",
-    "tests/psychic_modifier_helpers.py": "64bd3f5977170151081dd89edc083c2d7ded5b96b6686771d240b044ea66ede0",
+    "tests/psychic_modifier_helpers.py": "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
     "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58"
   },
   "rows": [
     {
       "phase": "shooting",
       "setup_seconds": [
-        2.1384382499963976,
-        0.24936774995876476,
-        0.25057695899158716,
-        0.2524259579950012,
-        0.24955495801987126
+        2.150118999998085,
+        0.259833250020165,
+        0.2596120829693973,
+        0.25251291698077694,
+        0.24887400004081428
       ],
       "samples_seconds": [
-        0.28087541699642316,
-        0.24278025003150105,
-        0.24237925000488758,
-        0.2782505420036614,
-        0.24249837500974536
+        0.3188876250060275,
+        0.25568245799513534,
+        0.2784460420371033,
+        0.2856280410196632,
+        0.25006379099795595
       ],
       "wound_count": [
         12,
@@ -46,26 +46,26 @@
         12,
         12
       ],
-      "mean": 0.2573567668092437,
-      "median": 0.24278025003150105,
-      "p95_and_maximum": 0.28087541699642316,
-      "slices_per_second": 3.885656524202503
+      "mean": 0.27774159141117705,
+      "median": 0.2784460420371033,
+      "p95_and_maximum": 0.3188876250060275,
+      "slices_per_second": 3.6004690364129504
     },
     {
       "phase": "fight",
       "setup_seconds": [
-        0.4945343749714084,
-        0.4943773749982938,
-        0.49448949994985014,
-        0.5382230000104755,
-        0.49813920800806955
+        0.4910425420384854,
+        0.5432233330211602,
+        0.49608666700078174,
+        0.49269708298379555,
+        0.5044173749629408
       ],
       "samples_seconds": [
-        0.143558458017651,
-        0.14296879200264812,
-        0.14390508300857618,
-        0.14304458297556266,
-        0.1437609589775093
+        0.14921766601037234,
+        0.15239395800745115,
+        0.1497421659878455,
+        0.1493070000433363,
+        0.1516352500184439
       ],
       "wound_count": [
         12,
@@ -74,10 +74,10 @@
         12,
         12
       ],
-      "mean": 0.14344757499638944,
-      "median": 0.143558458017651,
-      "p95_and_maximum": 0.14390508300857618,
-      "slices_per_second": 6.971187906279837
+      "mean": 0.15045920801348983,
+      "median": 0.1497421659878455,
+      "p95_and_maximum": 0.15239395800745115,
+      "slices_per_second": 6.646319711521692
     }
   ],
   "completion_rate": 1.0,

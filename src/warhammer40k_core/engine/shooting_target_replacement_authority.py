@@ -9,7 +9,7 @@ import msgspec
 from warhammer40k_core.engine.charge_target_continuation import is_charge_target_replacement_request
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.target_replacement import (
     SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
     TargetReplacementContext,
@@ -299,6 +299,7 @@ def validate_restored_replacements(
         )
         if (
             current is None
+            or isinstance(current, LifecycleStatus)
             or replacement_request(request_id=pending.request_id, context=current.context)
             != pending
         ):

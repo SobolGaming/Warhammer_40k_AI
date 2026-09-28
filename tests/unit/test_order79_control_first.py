@@ -374,3 +374,68 @@ def test_action_restriction_lasts_past_control_determination_until_cleanup() -> 
     validate_activity_restriction_inventory(
         state=state, event_records=decisions.event_log.records, decision_records=decisions.records
     )
+
+
+def test_phase_expiry_rechecks_current_effects_without_mutating_empty_matches() -> None:
+    import cProfile
+    from dataclasses import replace
+    from types import CodeType
+
+    from tests.generic_modifier_helpers import generic_effect
+    from tests.phase11c_command_phase_helpers import battle_state
+
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.effects import EffectExpiration
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.turn_end_boundary import expire_completed_phase_effects
+
+    state = battle_state(decisions=DecisionController())
+    unit_id = state.army_definitions[0].units[0].unit_instance_id
+    phase_effect = generic_effect(
+        effect_id="expiry:phase",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(unit_id,),
+        target_kind="this_unit",
+        effect_kind="modify_characteristic",
+        parameters={"characteristic": "objective_control", "delta": 1},
+    )
+    phase_effect = replace(
+        phase_effect,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1, phase=BattlePhase.FIGHT, player_id="player-a"
+        ),
+    )
+    turn_effect = replace(
+        phase_effect,
+        effect_id="expiry:turn",
+        expiration=EffectExpiration.end_turn(battle_round=1, player_id="player-a"),
+    )
+    state.record_persisting_effect(turn_effect)
+    state.record_persisting_effect(phase_effect)
+    profiler = cProfile.Profile()
+    profiler.enable()
+    expire_completed_phase_effects(
+        state=state, completed_phase=BattlePhase.FIGHT, player_id="player-a"
+    )
+    assert state.persisting_effects == [turn_effect]
+    expire_completed_phase_effects(
+        state=state, completed_phase=BattlePhase.FIGHT, player_id="player-a"
+    )
+    assert state.persisting_effects == [turn_effect]
+    # A resumed boundary sees effects created since its previous invocation.
+    new_effect = replace(phase_effect, effect_id="expiry:later-phase")
+    state.record_persisting_effect(new_effect)
+    expire_completed_phase_effects(
+        state=state, completed_phase=BattlePhase.FIGHT, player_id="player-a"
+    )
+    profiler.disable()
+    assert state.persisting_effects == [turn_effect]
+    assert (
+        sum(
+            entry.callcount
+            for entry in profiler.getstats()
+            if isinstance(entry.code, CodeType)
+            and entry.code.co_name == "expire_persisting_effects_at_boundary"
+        )
+        == 2
+    )

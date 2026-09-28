@@ -56,6 +56,7 @@ from warhammer40k_core.engine.generic_effect_history import (
     _expired_at_test as historical_effect_expired,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.generic_rule_attack_hooks import (
+    generic_rule_characteristic_operations,
     generic_rule_unit_characteristic_modifiers,
 )
 from warhammer40k_core.engine.interpreted_dice import CriticalRollThreshold
@@ -185,6 +186,24 @@ def test_completed_battle_shock_restores_generic_leadership_history(
         if effect.source_rule_id == "fixture:historical-leadership"
     ]
     assert len(effects) == (0 if expires else (2 if duplicate else 1))
+    if not expires:
+        unit = rules_unit_view_from_armies(
+            armies=tuple(lifecycle.state.army_definitions),
+            unit_instance_id=lifecycle.state.army_definitions[0].units[0].unit_instance_id,
+        )
+        model_operation_ids: list[str] = []
+        for model in unit.alive_models():
+            operations = generic_rule_characteristic_operations(
+                state=lifecycle.state,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                characteristic=Characteristic.LEADERSHIP,
+            )
+            assert len(operations) == 1
+            model_operation_ids.append(operations[0].modifier_id)
+        # Each model's own activation remains separate; a unit-wide source
+        # remains one shared operation for every model in the rules unit.
+        assert len(set(model_operation_ids)) == (2 if duplicate else 1)
     persisted = session.to_persistence_payload()
     assert (
         LocalGameSession.from_persistence_payload(persisted).to_persistence_payload() == persisted

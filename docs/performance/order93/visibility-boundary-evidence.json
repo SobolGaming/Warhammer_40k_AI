@@ -1,0 +1,383 @@
+{
+  "cache_policy": "Each proof runs in a new interpreter and resets target-candidate, context-result, physical-obstacle and geometry-result caches before setup. The committed driver additionally clears the context-fingerprint cache. Setup and live misses are counted separately; no warmup or cache insertion is used.",
+  "calibrated_driver_sha256": "fe88e5059e9c52f576f373c4db5d3f4295154d9ab0792cbbbc24f4c106fd5845",
+  "cold_geometry_limit": 26,
+  "declaration_payload_sha256_equal_across_revisions": true,
+  "derivation": "Historical pre-Order91 cold setup19 plus original live ceiling7 equals26. Current base/head setup2 plus live12 equals14. Five shooter-to-enemy pairs moved from setup to live;12 observer-to-target setup pairs were eliminated by correct target-independent eligibility. No workload geometry or outcomes changed.",
+  "dice_payloads_sha256_equal_across_revisions": true,
+  "driver_sha256_equal_across_revisions": true,
+  "evidence_kind": "cold_geometry_work_boundary_migration_not_timing_certification",
+  "fixture_sha256_equal_across_revisions": true,
+  "historical_live_geometry_limit": 7,
+  "measurement": "sys.setprofile counted actual function entries, identifying live_sample setup versus live from its prepared timestamp local. Only the work counts are evidence; instrumented wall times are excluded. The current committed driver uses cProfile separately for setup and live and sums both for the migrated geometry budget.",
+  "model_wounds_sha256_equal_across_revisions": true,
+  "reports": [
+    {
+      "cold_geometry_work_counts": {
+        "resolve_visibility_pair": 26,
+        "resolve_visibility_pair_uncached": 26
+      },
+      "decision_count": 6,
+      "declaration_payload_sha256": "7d6c54f256a34dd4ec5edd6627e6f8764619a86003bd4b100fcb5c4168fa81ff",
+      "dice_payloads_sha256": "bef24d32dca385bae4e78e10cddf0605908997a0c295fd4f7d671457b8952267",
+      "driver_sha256": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc0f39d591efe6594d13c63adb5970dc12a69d8a8df1b039b772ad45c041bb01",
+      "final_phase": "fight",
+      "fixture_sha256": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+      "game_id": "order33-shooting",
+      "geometry_pairs": [
+        {
+          "observer_model_id": "army-beta:enemy:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-alpha:intercessor-1:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-beta:enemy:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-alpha:intercessor-1:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:002",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:002",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:002",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:002",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:002",
+          "stage": "setup",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:observer:core-intercessor-like:002",
+          "stage": "setup",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        }
+      ],
+      "geometry_work_counts": {
+        "setup": {
+          "resolve_line_of_sight": 60,
+          "resolve_visibility_pair": 19,
+          "resolve_visibility_pair_uncached": 19
+        },
+        "slice": {
+          "resolve_line_of_sight": 66,
+          "resolve_visibility_pair": 7,
+          "resolve_visibility_pair_uncached": 7
+        }
+      },
+      "inventory_size": 32,
+      "model_wounds_sha256": "8ea862253ca83f3d2a89c18f4f1b30382fcc8a3a3720e5c9ddc8930d9d779f96",
+      "revision": "cacde87c9e4d94e25ee60522bc2cbcf7a07a0269",
+      "revision_label": "pre91"
+    },
+    {
+      "cold_geometry_work_counts": {
+        "resolve_visibility_pair": 14,
+        "resolve_visibility_pair_uncached": 14
+      },
+      "decision_count": 6,
+      "declaration_payload_sha256": "7d6c54f256a34dd4ec5edd6627e6f8764619a86003bd4b100fcb5c4168fa81ff",
+      "dice_payloads_sha256": "bef24d32dca385bae4e78e10cddf0605908997a0c295fd4f7d671457b8952267",
+      "driver_sha256": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:01ced161f9bddcc59df61bea4ede7647cab4261ae044c3365364ded5650fa70d",
+      "final_phase": "fight",
+      "fixture_sha256": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+      "game_id": "order33-shooting",
+      "geometry_pairs": [
+        {
+          "observer_model_id": "army-beta:enemy:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-alpha:intercessor-1:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-beta:enemy:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-alpha:intercessor-1:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        }
+      ],
+      "geometry_work_counts": {
+        "setup": {
+          "resolve_line_of_sight": 6,
+          "resolve_visibility_pair": 2,
+          "resolve_visibility_pair_uncached": 2
+        },
+        "slice": {
+          "resolve_line_of_sight": 27,
+          "resolve_visibility_pair": 12,
+          "resolve_visibility_pair_uncached": 12
+        }
+      },
+      "inventory_size": 32,
+      "model_wounds_sha256": "8ea862253ca83f3d2a89c18f4f1b30382fcc8a3a3720e5c9ddc8930d9d779f96",
+      "revision": "d7bcb10b",
+      "revision_label": "base"
+    },
+    {
+      "cold_geometry_work_counts": {
+        "resolve_visibility_pair": 14,
+        "resolve_visibility_pair_uncached": 14
+      },
+      "decision_count": 6,
+      "declaration_payload_sha256": "7d6c54f256a34dd4ec5edd6627e6f8764619a86003bd4b100fcb5c4168fa81ff",
+      "dice_payloads_sha256": "bef24d32dca385bae4e78e10cddf0605908997a0c295fd4f7d671457b8952267",
+      "driver_sha256": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ba430dc82d3bda374b14daf4cd488144a7f653b7de12d7ef3dcf160f3a403f3",
+      "final_phase": "fight",
+      "fixture_sha256": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+      "game_id": "order33-shooting",
+      "geometry_pairs": [
+        {
+          "observer_model_id": "army-beta:enemy:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-alpha:intercessor-1:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-beta:enemy:core-intercessor-like:001",
+          "stage": "setup",
+          "target_model_id": "army-alpha:intercessor-1:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:001",
+          "stage": "slice",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:001"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:002"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:003"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:004"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:enemy:core-intercessor-like:005"
+        },
+        {
+          "observer_model_id": "army-alpha:intercessor-1:core-intercessor-like:002",
+          "stage": "slice",
+          "target_model_id": "army-beta:engager:core-intercessor-like:001"
+        }
+      ],
+      "geometry_work_counts": {
+        "setup": {
+          "resolve_line_of_sight": 6,
+          "resolve_visibility_pair": 2,
+          "resolve_visibility_pair_uncached": 2
+        },
+        "slice": {
+          "resolve_line_of_sight": 27,
+          "resolve_visibility_pair": 12,
+          "resolve_visibility_pair_uncached": 12
+        }
+      },
+      "inventory_size": 32,
+      "model_wounds_sha256": "8ea862253ca83f3d2a89c18f4f1b30382fcc8a3a3720e5c9ddc8930d9d779f96",
+      "revision": "working-tree",
+      "revision_label": "head"
+    }
+  ],
+  "source_change": "ad096b7f238bd623c7c1c17c0cd42d70564e87d8 Order91: _legal_shooting_unit_ids no longer invokes _rules_unit_has_legal_shooting_declaration before a shooting unit is selected."
+}

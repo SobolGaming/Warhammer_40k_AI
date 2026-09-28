@@ -2407,7 +2407,7 @@ def test_corsair_enhancements_apply_infamy_voidstone_and_webway_pathstone_effect
             save_options=(
                 SaveOption(
                     save_kind=SaveKind.ARMOUR,
-                    target_number=4,
+                    target_number=6,
                     characteristic_target_number=4,
                     armor_penetration=-2,
                 ),
@@ -2482,7 +2482,7 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
                 save_options=(
                     SaveOption(
                         save_kind=SaveKind.ARMOUR,
-                        target_number=4,
+                        target_number=5,
                         characteristic_target_number=4,
                         armor_penetration=-1,
                     ),
@@ -2500,7 +2500,7 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
     existing_invulnerable_options = (
         SaveOption(
             save_kind=SaveKind.ARMOUR,
-            target_number=4,
+            target_number=5,
             characteristic_target_number=4,
             armor_penetration=-1,
         ),
@@ -2511,15 +2511,19 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
             armor_penetration=-1,
         ),
     )
-    assert (
-        enhancements.voidstone_save_option_modifier(
-            SaveOptionModifierContext(
-                state=state,
-                target_unit_instance_id=_VOIDSTONE_UNIT_ID,
-                save_options=existing_invulnerable_options,
-            )
+    modified_options = enhancements.voidstone_save_option_modifier(
+        SaveOptionModifierContext(
+            state=state,
+            target_unit_instance_id=_VOIDSTONE_UNIT_ID,
+            save_options=existing_invulnerable_options,
         )
-        == existing_invulnerable_options
+    )
+    assert modified_options[0] == existing_invulnerable_options[0]
+    assert modified_options[1].characteristic_target_number == 4
+    assert modified_options[1].characteristic_trace is not None
+    assert (
+        modified_options[1].characteristic_trace.modifiers[0].source_id
+        == enhancements.VOIDSTONE_SOURCE_RULE_ID
     )
 
 

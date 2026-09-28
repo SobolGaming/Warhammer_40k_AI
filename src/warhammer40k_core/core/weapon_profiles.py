@@ -14,7 +14,18 @@ from warhammer40k_core.core.attributes import (
     CharacteristicError,
     CharacteristicValue,
 )
-from warhammer40k_core.core.dice import DiceExpression, DiceExpressionPayload, DiceRollSpecError
+from warhammer40k_core.core.count_profiles import (
+    AttackProfile as AttackProfile,
+)
+from warhammer40k_core.core.count_profiles import (
+    AttackProfilePayload as AttackProfilePayload,
+)
+from warhammer40k_core.core.count_profiles import (
+    DamageProfile as DamageProfile,
+)
+from warhammer40k_core.core.count_profiles import (
+    DamageProfilePayload as DamageProfilePayload,
+)
 from warhammer40k_core.core.modifiers import Modifier, ModifierPayload
 from warhammer40k_core.core.random_profile_values import (
     ProfileCharacteristicValue,
@@ -101,16 +112,6 @@ class AntiKeywordMatchMode(StrEnum):
 class TargetKeywordMatchMode(StrEnum):
     HAS_KEYWORD = "has_keyword"
     MISSING_KEYWORD = "missing_keyword"
-
-
-class AttackProfilePayload(TypedDict):
-    fixed_attacks: int | None
-    dice_expression: DiceExpressionPayload | None
-
-
-class DamageProfilePayload(TypedDict):
-    fixed_damage: int | None
-    dice_expression: DiceExpressionPayload | None
 
 
 AbilityParameterValue = int | float | str | bool
@@ -511,100 +512,6 @@ class AbilityDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
-class AttackProfile:
-    fixed_attacks: int | None = None
-    dice_expression: DiceExpression | None = None
-
-    def __post_init__(self) -> None:
-        _validate_exactly_one_expression(
-            "AttackProfile",
-            self.fixed_attacks,
-            self.dice_expression,
-        )
-        if self.fixed_attacks is not None:
-            _validate_positive_int("AttackProfile fixed_attacks", self.fixed_attacks)
-        if self.dice_expression is not None:
-            _validate_dice_expression("AttackProfile dice_expression", self.dice_expression)
-
-    @classmethod
-    def fixed(cls, attacks: int) -> Self:
-        return cls(fixed_attacks=attacks)
-
-    @classmethod
-    def dice(cls, expression: DiceExpression) -> Self:
-        return cls(dice_expression=expression)
-
-    def to_payload(self) -> AttackProfilePayload:
-        dice_payload = None
-        if self.dice_expression is not None:
-            dice_payload = self.dice_expression.to_payload()
-        return {
-            "fixed_attacks": self.fixed_attacks,
-            "dice_expression": dice_payload,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: AttackProfilePayload) -> Self:
-        dice_payload = payload["dice_expression"]
-        try:
-            return cls(
-                fixed_attacks=payload["fixed_attacks"],
-                dice_expression=(
-                    None if dice_payload is None else DiceExpression.from_payload(dice_payload)
-                ),
-            )
-        except DiceRollSpecError as exc:
-            raise WeaponProfileError("AttackProfile dice_expression payload is invalid.") from exc
-
-
-@dataclass(frozen=True, slots=True)
-class DamageProfile:
-    fixed_damage: int | None = None
-    dice_expression: DiceExpression | None = None
-
-    def __post_init__(self) -> None:
-        _validate_exactly_one_expression(
-            "DamageProfile",
-            self.fixed_damage,
-            self.dice_expression,
-        )
-        if self.fixed_damage is not None:
-            _validate_positive_int("DamageProfile fixed_damage", self.fixed_damage)
-        if self.dice_expression is not None:
-            _validate_dice_expression("DamageProfile dice_expression", self.dice_expression)
-
-    @classmethod
-    def fixed(cls, damage: int) -> Self:
-        return cls(fixed_damage=damage)
-
-    @classmethod
-    def dice(cls, expression: DiceExpression) -> Self:
-        return cls(dice_expression=expression)
-
-    def to_payload(self) -> DamageProfilePayload:
-        dice_payload = None
-        if self.dice_expression is not None:
-            dice_payload = self.dice_expression.to_payload()
-        return {
-            "fixed_damage": self.fixed_damage,
-            "dice_expression": dice_payload,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: DamageProfilePayload) -> Self:
-        dice_payload = payload["dice_expression"]
-        try:
-            return cls(
-                fixed_damage=payload["fixed_damage"],
-                dice_expression=(
-                    None if dice_payload is None else DiceExpression.from_payload(dice_payload)
-                ),
-            )
-        except DiceRollSpecError as exc:
-            raise WeaponProfileError("DamageProfile dice_expression payload is invalid.") from exc
-
-
-@dataclass(frozen=True, slots=True)
 class WeaponProfile:
     profile_id: str
     name: str
@@ -925,31 +832,6 @@ def _validate_ability_parameter_value(value: object) -> AbilityParameterValue:
     raise WeaponProfileError("AbilityParameter value must be JSON-safe scalar data.")
 
 
-def _validate_positive_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise WeaponProfileError(f"{field_name} must be an integer.")
-    if value < 1:
-        raise WeaponProfileError(f"{field_name} must be at least 1.")
-    return value
-
-
-def _validate_exactly_one_expression(
-    field_name: str,
-    fixed_value: object | None,
-    dice_expression: object | None,
-) -> None:
-    if fixed_value is None and dice_expression is None:
-        raise WeaponProfileError(f"{field_name} must include a parsed value.")
-    if fixed_value is not None and dice_expression is not None:
-        raise WeaponProfileError(f"{field_name} must not mix fixed and dice values.")
-
-
-def _validate_dice_expression(field_name: str, expression: object) -> DiceExpression:
-    if type(expression) is not DiceExpression:
-        raise WeaponProfileError(f"{field_name} must be a DiceExpression.")
-    return expression
-
-
 def _validate_range_profile(profile: object) -> RangeProfile:
     if type(profile) is not RangeProfile:
         raise WeaponProfileError("WeaponProfile range_profile must be a RangeProfile.")
@@ -991,6 +873,8 @@ def _validate_unmodified_characteristic_profile(
         allowed_characteristics,
     )
     if isinstance(characteristic_value, RandomProfileValue):
+        return characteristic_value
+    if characteristic_value.modifier_trace is not None:
         return characteristic_value
     if (
         characteristic_value.raw != characteristic_value.base

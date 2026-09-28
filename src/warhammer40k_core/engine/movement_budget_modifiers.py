@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from math import isfinite
 from typing import TYPE_CHECKING, cast
 
@@ -60,12 +60,12 @@ class MovementBudgetModifierContext:
             raise GameLifecycleError("Movement modifiers require a typed Movement characteristic.")
 
 
-def model_movement_characteristic(model: ModelInstance) -> CharacteristicValue:
+def model_movement_characteristic(model: ModelInstance) -> ProfileCharacteristicValue:
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Movement model must be a ModelInstance.")
     for value in model.characteristics:
         if value.characteristic is Characteristic.MOVEMENT:
-            return resolved_profile_characteristic(value)
+            return value
     raise GameLifecycleError("Normal Move requires a Movement characteristic.")
 
 
@@ -110,17 +110,21 @@ def movement_budget_modifier_trace(
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("Movement budget modifiers require a context.")
     from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
-    from warhammer40k_core.engine.modifier_ignore import ignored_modifier_ids_for_context
+    from warhammer40k_core.engine.movement_modifier_evaluation import (
+        movement_evaluation_ignored_ids,
+    )
 
+    operations = movement_characteristic_operations(context, bindings=bindings)
     ignored_ids = frozenset(
-        ignored_modifier_ids_for_context(
+        movement_evaluation_ignored_ids(
             state=context.state,
             unit_instance_id=context.unit_instance_id,
             model_instance_id=context.model_instance_id,
             kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
+            modifiers=operations,
         )
     )
-    return _resolve_movement(context, bindings=bindings, ignored_ids=ignored_ids)
+    return _resolve_movement(context, operations=operations, ignored_ids=ignored_ids)
 
 
 def generic_rule_movement_modifier_trace(
@@ -134,55 +138,87 @@ def generic_rule_movement_modifier_trace(
         type(modifier_id) is not str or not modifier_id for modifier_id in ignored_modifier_ids
     ):
         raise GameLifecycleError("Generic movement ignored modifier IDs must be a frozenset.")
-    return _resolve_movement(context, bindings=(), ignored_ids=ignored_modifier_ids)
+    return _resolve_movement(
+        context,
+        operations=movement_characteristic_operations(context, bindings=()),
+        ignored_ids=ignored_modifier_ids,
+    )
 
 
-def _resolve_movement(
+def movement_characteristic_operations(
     context: MovementBudgetModifierContext,
     *,
     bindings: tuple[MovementBudgetModifierBinding, ...],
-    ignored_ids: frozenset[str],
-) -> tuple[float, tuple[MovementBudgetModifierApplication, ...]]:
+) -> tuple[Modifier, ...]:
+    """The unfiltered source inventory; move-distance deltas are not M modifiers."""
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_rule_characteristic_operations,
     )
     from warhammer40k_core.engine.runtime_characteristic_modifiers import bind_characteristic_terms
 
-    modifiers: list[Modifier] = []
-    binding_ids: dict[str, str] = {}
+    profile = resolved_profile_characteristic(context.movement)
+    operations = list(
+        context.movement.modifiers
+        if isinstance(context.movement, RandomProfileValue)
+        else profile.modifier_trace.modifiers
+        if profile.modifier_trace is not None
+        else ()
+    )
     for binding in bindings:
-        if binding.modifier_id in ignored_ids:
-            continue
-        terms = bind_characteristic_terms(
-            modifier_id=binding.modifier_id,
-            source_id=binding.source_id,
-            characteristic=Characteristic.MOVEMENT,
-            terms=binding.handler(context),
+        operations.extend(
+            bind_characteristic_terms(
+                modifier_id=binding.modifier_id,
+                source_id=binding.source_id,
+                characteristic=Characteristic.MOVEMENT,
+                terms=binding.handler(context),
+            )
         )
-        modifiers.extend(terms)
-        binding_ids.update((term.modifier_id, binding.modifier_id) for term in terms)
-    modifiers.extend(
-        modifier
-        for modifier in generic_rule_characteristic_operations(
+    operations.extend(
+        generic_rule_characteristic_operations(
             state=context.state,
             unit_instance_id=context.unit_instance_id,
             characteristic=Characteristic.MOVEMENT,
+            model_instance_id=context.model_instance_id,
         )
-        if modifier.modifier_id not in ignored_ids
+    )
+    return tuple(operations)
+
+
+def _resolve_movement(
+    context: MovementBudgetModifierContext,
+    *,
+    operations: tuple[Modifier, ...],
+    ignored_ids: frozenset[str],
+) -> tuple[float, tuple[MovementBudgetModifierApplication, ...]]:
+    modifiers = tuple(
+        modifier for modifier in operations if modifier.modifier_id not in ignored_ids
+    )
+    profile = resolved_profile_characteristic(context.movement)
+    recoverable_source = (
+        isinstance(context.movement, RandomProfileValue) or profile.modifier_trace is not None
+    )
+    source = (
+        profile.modifier_trace.source_value
+        if profile.modifier_trace is not None
+        else context.movement.raw
+        if isinstance(context.movement, RandomProfileValue)
+        else profile.final
+    )
+    evaluate_source = recoverable_source or (
+        profile.is_numeric and profile.value_kind is not CharacteristicValueKind.REPLACEMENT_ZERO
     )
     resolved = resolve_characteristic_value(
-        replace(resolved_profile_characteristic(context.movement), raw=context.movement.final),
+        CharacteristicValue.from_raw(Characteristic.MOVEMENT, source)
+        if evaluate_source
+        else profile,
         modifiers,
         target_id=context.model_instance_id,
     )
     applications: list[MovementBudgetModifierApplication] = []
-    if (
-        context.movement.is_numeric
-        and context.movement.value_kind is not CharacteristicValueKind.REPLACEMENT_ZERO
-    ):
+    if evaluate_source:
         stack = ModifierStack(
             characteristic=Characteristic.MOVEMENT,
-            raw_value=context.movement.final,
+            raw_value=source,
             modifiers=tuple(modifiers),
             target_id=context.model_instance_id,
         )
@@ -191,9 +227,7 @@ def _resolve_movement(
                 if step.before != step.after:
                     applications.append(
                         MovementBudgetModifierApplication(
-                            modifier_id=binding_ids.get(
-                                step.modifier.modifier_id, step.modifier.modifier_id
-                            ),
+                            modifier_id=step.modifier.modifier_id,
                             source_id=step.modifier.source_id,
                             before_inches=float(step.before),
                             after_inches=float(step.after),
@@ -203,7 +237,7 @@ def _resolve_movement(
             replacement = stack.applicable_modifiers()[0]
             applications.append(
                 MovementBudgetModifierApplication(
-                    modifier_id=binding_ids.get(replacement.modifier_id, replacement.modifier_id),
+                    modifier_id=replacement.modifier_id,
                     source_id=replacement.source_id,
                     before_inches=float(context.movement.final),
                     after_inches=0.0,

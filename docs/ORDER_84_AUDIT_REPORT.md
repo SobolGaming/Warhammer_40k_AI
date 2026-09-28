@@ -15,6 +15,10 @@ status. Family regressions do not prove every individual operative clause. Exact
 source equivalence and clause-specific facade/replay/visibility proof remain open.
 The [audit notes](ORDER_84_AUDIT_NOTES.md) describe reproduction, scope and validation.
 
+Later source relocations preserve the original audit paths and observations in the JSON:
+
+- Order 93: `src/warhammer40k_core/engine/modifier_ignore.py` now routes through [modifier_evaluation.py](../src/warhammer40k_core/engine/modifier_evaluation.py), [modifier_evaluation_dispatch.py](../src/warhammer40k_core/engine/modifier_evaluation_dispatch.py).
+
 ## Selected candidate observation
 
 Provider: [Game Datamissions](https://game-datamissions.com/11th/rules/core-rules).

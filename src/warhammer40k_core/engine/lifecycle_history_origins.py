@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine import healing_off_battlefield_history as revival
 from warhammer40k_core.engine import ingress_placement_history as ingress
+from warhammer40k_core.engine import modifier_evaluation_history as modifiers
 from warhammer40k_core.engine import psychic_modifier_history_origin as psychic
 
 if TYPE_CHECKING:
@@ -20,6 +21,7 @@ def capture(
     psychic.PsychicModifierHistoryOrigin | None,
     ingress.IngressPlacementHistoryOrigin | None,
     revival.OffBattlefieldRevivalHistoryOrigin | None,
+    modifiers.ModifierEvaluationHistoryOrigin | None,
 ]:
     return (
         psychic.capture_psychic_history_origin(
@@ -37,10 +39,15 @@ def capture(
             request=request,
             existing=lifecycle._off_battlefield_revival_history_origin,
         ),
+        modifiers.capture_modifier_origin(lifecycle, lifecycle._modifier_evaluation_history_origin),
     )
 
 
 def serialize(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
+    if lifecycle._modifier_evaluation_history_origin is not None:
+        payload["modifier_evaluation_history_origin"] = (
+            lifecycle._modifier_evaluation_history_origin.to_payload()
+        )
     if lifecycle._psychic_modifier_history_origin is not None:
         payload["psychic_modifier_history_origin"] = (
             lifecycle._psychic_modifier_history_origin.to_payload()
@@ -57,6 +64,13 @@ def serialize(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
 
 
 def restore(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
+    lifecycle._modifier_evaluation_history_origin = (
+        modifiers.ModifierEvaluationHistoryOrigin.from_payload(
+            payload["modifier_evaluation_history_origin"]
+        )
+        if "modifier_evaluation_history_origin" in payload
+        else None
+    )
     lifecycle._psychic_modifier_history_origin = (
         psychic.PsychicModifierHistoryOrigin.from_payload(
             payload["psychic_modifier_history_origin"]
@@ -82,6 +96,7 @@ def restore(lifecycle: GameLifecycle, payload: GameLifecyclePayload) -> None:
 
 
 def validate(lifecycle: GameLifecycle) -> None:
+    modifiers.validate_modifier_origin(lifecycle, lifecycle._modifier_evaluation_history_origin)
     psychic.validate_psychic_history_origin(
         lifecycle=lifecycle, origin=lifecycle._psychic_modifier_history_origin
     )

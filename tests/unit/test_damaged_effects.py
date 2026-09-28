@@ -178,6 +178,16 @@ def test_damaged_effects_modify_fixed_weapon_attacks_by_scope() -> None:
 
     assert profile.attack_profile.fixed_attacks == 5
     assert modified_profile.attack_profile.fixed_attacks == 4
+    operations = modified_profile.attack_profile.modifiers
+    assert len(operations) == 2
+    assert modified_profile.attack_profile.source_fixed_value == 5
+    assert (
+        modified_profile.attack_profile.resolve_value(
+            5, ignored_modifier_ids=tuple(item.modifier_id for item in operations)
+        )
+        == 5
+    )
+    assert all(item.source_id for item in operations)
 
 
 def test_damaged_effects_modify_named_weapon_attacks_only_for_matching_profiles() -> None:

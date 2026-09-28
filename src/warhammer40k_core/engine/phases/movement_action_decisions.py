@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
-from warhammer40k_core.engine.modifier_ignore import record_modifier_ignore_selection
 from warhammer40k_core.core.dice import RandomCharacteristicTiming
 from warhammer40k_core.engine.rule_frequency import (
     consume_optional_ability_frequency_usage,
@@ -430,26 +429,6 @@ def _apply_movement_action_decision(
             and not disembarked_state.can_move_further
         ):
             raise GameLifecycleError("Disembarked unit cannot move further.")
-
-    modifier_ignore_effect = record_modifier_ignore_selection(
-        state=state,
-        result=result,
-        unit_instance_id=active_selection.unit_instance_id,
-        phase=BattlePhaseKind.MOVEMENT,
-    )
-    if modifier_ignore_effect is not None:
-        decisions.event_log.append(
-            "modifier_ignores_selected",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.MOVEMENT.value,
-                "unit_instance_id": active_selection.unit_instance_id,
-                "source_decision_request_id": result.request_id,
-                "source_decision_result_id": result.result_id,
-                "modifier_ignore_effect": modifier_ignore_effect.to_payload(),
-            },
-        )
 
     if action is MovementPhaseActionKind.REMAIN_STATIONARY:
         _complete_movement_activation(

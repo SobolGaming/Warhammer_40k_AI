@@ -190,7 +190,11 @@ def validate_rules_unit_melee_declaration(
             and row["weapon_profile_id"]
             == committed_budgets[str(row["weapon_instance_id"])].weapon_profile_id
         )
-    if expected_rows != request.available_weapons:
+    from warhammer40k_core.engine.weapon_modifier_selection import authenticated_melee_modifier_rows
+
+    try:
+        expected_rows = authenticated_melee_modifier_rows(expected_rows, request.available_weapons)
+    except GameLifecycleError:
         return _invalid(request=request, code="weapon_ability_inventory_drift")
     if not rules_unit.is_attached_rules_unit and not _request_has_attached_target(
         state=state,
@@ -249,6 +253,15 @@ def validate_rules_unit_melee_declaration(
             state=state,
             source_decision_result_id=request.source_decision_result_id,
         )
+        from warhammer40k_core.engine.weapon_modifier_selection import (
+            selected_melee_rows_for_physical_targets,
+        )
+
+        physical_rows = selected_melee_rows_for_physical_targets(
+            state=state,
+            current=physical_rows,
+            offered_rows=request.available_weapons,
+        )
         if not declarations and not any(_row_has_engaged_target(row) for row in physical_rows):
             continue
         physical_declarations = _physical_component_declarations(
@@ -294,6 +307,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
     state: GameState,
     runtime_modifier_registry: RuntimeModifierRegistry,
     committed_budgets: dict[str, MeleeAttackBudget] | None = None,
+    selected_weapon_rows: tuple[JsonValue, ...] = (),
 ) -> AttackSequence:
     rules_unit = _canonical_rules_unit(
         state=state,
@@ -304,6 +318,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
         proposal=proposal,
     ):
         return melee_attack_sequence_from_proposal(
+            selected_weapon_rows=selected_weapon_rows,
             committed_budgets=committed_budgets,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -343,6 +358,7 @@ def rules_unit_melee_attack_sequence_from_proposal(
             require_mapping=True,
         )
         component_sequence = melee_attack_sequence_from_proposal(
+            selected_weapon_rows=selected_weapon_rows,
             committed_budgets=committed_budgets,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,

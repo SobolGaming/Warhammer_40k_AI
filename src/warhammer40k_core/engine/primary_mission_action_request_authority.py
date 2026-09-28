@@ -97,6 +97,12 @@ def _validate_recomputed_request_authority(
         mission_action_start_options,
     )
 
+    request_payload = json.loads(authority.request_payload_json)
+    if "objective_control_modifier_scope_id" not in request_payload:
+        raise GameLifecycleError("Mission Action request lacks its OC occurrence.")
+    scope_id = request_payload["objective_control_modifier_scope_id"]
+    if scope_id is not None and (type(scope_id) is not str or not scope_id):
+        raise GameLifecycleError("Mission Action request lacks its OC occurrence.")
     phase = BattlePhase.SHOOTING
     registry = (
         RuntimeModifierRegistry.empty()
@@ -117,6 +123,7 @@ def _validate_recomputed_request_authority(
             "player_id": player_id,
             "battle_round": battle_round,
             "phase": phase.value,
+            "objective_control_modifier_scope_id": scope_id,
             "mission_action_opportunity": True,
             "legal_mission_action_ids": cast(
                 list[JsonValue],
@@ -136,6 +143,7 @@ def _validate_recomputed_request_authority(
                     player_id=player_id,
                     phase=phase,
                     opportunity_action_option_ids=action_option_ids,
+                    scope_id=scope_id,
                 )
                 for option in options
             ),
@@ -148,6 +156,7 @@ def _validate_recomputed_request_authority(
                         "player_id": player_id,
                         "battle_round": battle_round,
                         "phase": phase.value,
+                        "objective_control_modifier_scope_id": scope_id,
                         "mission_action_opportunity": True,
                         "legal_action_option_ids": action_option_ids,
                     }
@@ -175,6 +184,7 @@ def _validate_recomputed_request_authority(
             "player_id": player_id,
             "battle_round": battle_round,
             "phase": phase.value,
+            "objective_control_modifier_scope_id": scope_id,
             "mission_action_id": selected_mission_action_id,
             "legal_option_ids": cast(list[JsonValue], action_option_ids),
         }
@@ -185,6 +195,7 @@ def _validate_recomputed_request_authority(
                 player_id=player_id,
                 phase=phase,
                 opportunity_action_option_ids=None,
+                scope_id=scope_id,
             )
             for option in options
         )
@@ -213,8 +224,10 @@ def _option_authority_row(
     player_id: str,
     phase: BattlePhase,
     opportunity_action_option_ids: list[str] | None,
+    scope_id: str | None,
 ) -> tuple[str, str, str]:
     payload: dict[str, object] = dict(option.payload(state=state, player_id=player_id, phase=phase))
+    payload["objective_control_modifier_scope_id"] = scope_id
     if opportunity_action_option_ids is not None:
         payload = {
             **payload,

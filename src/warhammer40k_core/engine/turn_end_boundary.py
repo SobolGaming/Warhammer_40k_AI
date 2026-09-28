@@ -91,16 +91,15 @@ def prepare_turn_end_boundary(
 def expire_completed_phase_effects(
     *, state: GameState, completed_phase: BattlePhase, player_id: str
 ) -> None:
-    # The final phase can already have expired before turn rules. Cleanup often
-    # leaves no effects at all; avoid a redundant expiry call in that case.
-    # Effects created by turn-end rules still expire at the later phase advance.
-    if completed_phase is state.battle_phase_sequence[-1] and not state.persisting_effects:
-        return
-    state.expire_persisting_effects_at_boundary(
-        EffectExpirationBoundary.phase_end(
-            battle_round=state.battle_round, phase=completed_phase, player_id=player_id
-        )
+    boundary = EffectExpirationBoundary.phase_end(
+        battle_round=state.battle_round, phase=completed_phase, player_id=player_id
     )
+    # A modifier-choice continuation or later phase advance can revisit this
+    # boundary. Query the current inventory so newly created effects still expire,
+    # without repeating mutation work for an already empty matching set.
+    if not any(effect.expires_at(boundary) for effect in state.persisting_effects):
+        return
+    state.expire_persisting_effects_at_boundary(boundary)
 
 
 def _validate_boundary(state: GameState, completed_phase: BattlePhase) -> str:

@@ -14,6 +14,7 @@ _SHARED_RESOLUTION_FUNCTIONS = frozenset(
         "resolve_battle_shock_test_with_optional_reroll",
         "apply_battle_shock_reroll_resolution_decision",
         "record_battle_shock_result_and_outcome_events",
+        "resolve_battle_shock_after_modifier_choices",
     }
 )
 
@@ -34,7 +35,17 @@ _EXPECTED_CALLS = {
     (
         "battle_shock_test_service.py",
         "resolve_battle_shock_test",
+        "resolve_battle_shock_after_modifier_choices",
+    ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
+    (
+        "battle_shock_modifier_continuation.py",
+        "resolve_battle_shock_after_modifier_choices",
         "resolve_battle_shock_test_with_optional_reroll",
+    ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
+    (
+        "battle_shock_modifier_continuation.py",
+        "resume_battle_shock_modifier_choices",
+        "resolve_battle_shock_after_modifier_choices",
     ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
     (
         "battle_shock_test_service.py",
@@ -48,13 +59,13 @@ _EXPECTED_CALLS = {
     (
         "catalog_selected_target_battle_shock.py",
         "resolve_selected_target_battle_shock_effect",
-        "resolve_battle_shock_test_with_optional_reroll",
+        "resolve_battle_shock_after_modifier_choices",
     ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
     (
         "catalog_selected_target_battle_shock_reroll.py",
         "apply_catalog_selected_target_battle_shock_reroll_decision",
         "apply_battle_shock_reroll_resolution_decision",
-    ): _ExpectedCall(_Policy.BOTH_FIELDS),
+    ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
     (
         "unit_move_completed_hooks.py",
         "apply_unit_move_completed_battle_shock_reroll_decision",
@@ -67,7 +78,7 @@ _EXPECTED_CALLS = {
     (
         "unit_move_completed_hooks.py",
         "resolve_battle_shock_effect",
-        "resolve_battle_shock_test_with_optional_reroll",
+        "resolve_battle_shock_after_modifier_choices",
     ): _ExpectedCall(_Policy.BOTH_FIELDS),
     (
         "phases/command.py",
@@ -100,7 +111,7 @@ _EXPECTED_CALLS = {
     (
         "phases/movement_options_dice.py",
         "_resolve_forced_desperate_escape_battle_shock",
-        "resolve_battle_shock_test_with_optional_reroll",
+        "resolve_battle_shock_after_modifier_choices",
     ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
     (
         "phases/movement_resolution_flow.py",
@@ -142,6 +153,38 @@ def test_every_shared_battle_shock_resolution_caller_has_an_explicit_parent_poli
             )
         else:
             assert len(expected.proof) >= 80, f"{key} lacks a substantive no-local-parent proof"
+
+
+def test_shared_battle_shock_parent_continuations_consume_both_result_fields() -> None:
+    for module, function_name, argument_name in (
+        (
+            "catalog_selected_target_battle_shock_reroll.py",
+            "continue_catalog_selected_target_battle_shock_resolution",
+            "battle_shock_resolution",
+        ),
+        (
+            "phases/movement_battle_shock_continuation.py",
+            "record_desperate_escape_battle_shock_resolution",
+            "resolution",
+        ),
+    ):
+        tree = ast.parse((ENGINE_ROOT / module).read_text(encoding="utf-8"))
+        function = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == function_name
+        )
+        argument = next(arg for arg in function.args.kwonlyargs if arg.arg == argument_name)
+        assert isinstance(argument.annotation, ast.Name)
+        assert argument.annotation.id == "BattleShockResolutionResult"
+        attributes = {
+            node.attr
+            for node in ast.walk(function)
+            if isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == argument_name
+        }
+        assert {"resolved_payload", "pending_status"} <= attributes, function_name
 
 
 class _CallInventory(dict[tuple[str, str, str], ast.Call]):
@@ -216,6 +259,6 @@ def _whole_result_is_forwarded(node: ast.Call, parents: dict[ast.AST, ast.AST]) 
         isinstance(child, ast.Name)
         and child.id == assigned_name
         and isinstance(parents.get(child), ast.keyword)
-        and cast(ast.keyword, parents[child]).arg == "resolution"
+        and cast(ast.keyword, parents[child]).arg in {"resolution", "battle_shock_resolution"}
         for child in ast.walk(function)
     )
