@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import StrEnum
+from fractions import Fraction
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -11,6 +12,8 @@ from warhammer40k_core.geometry.base import (
     BaseShape,
     BaseShapePayload,
     CircularBase,
+    OvalBase,
+    RectangularBase,
     base_distance,
     base_shape_from_payload,
     bases_overlap,
@@ -24,6 +27,18 @@ from warhammer40k_core.geometry.pose import (
     validate_finite_number,
     validate_pose,
 )
+from warhammer40k_core.geometry.visibility_algebra import (
+    Formula,
+    RealTerm,
+    both,
+    decide,
+    either,
+    implies,
+    quantified,
+    term,
+    variable,
+)
+from warhammer40k_core.geometry.visibility_shapes import rational_rotation
 from warhammer40k_core.geometry.volume import Model, ModelPayload
 
 MILLIMETERS_PER_INCH = 25.4
@@ -285,7 +300,22 @@ class DistanceMeasurementContext:
         horizontal_only: bool = False,
     ) -> bool:
         distance = _validate_positive_inches("distance_inches", distance_inches)
-        if not self._measures_parts():
+        if not self.target_subjects:
+            return self._support_base_wholly_within(distance, horizontal_only=horizontal_only)
+        return all(
+            _frame_prism_wholly_within(
+                sources=self._source_measurements(),
+                target=target,
+                distance_inches=distance,
+                horizontal_only=horizontal_only,
+            )
+            for target in self._target_measurements()
+        )
+
+    def _support_base_wholly_within(self, distance: float, *, horizontal_only: bool) -> bool:
+        """Ordinary targets use the support base, even when the source is FRAME."""
+
+        if not self.source_subjects:
             vertical_gap = 0.0 if horizontal_only else self.vertical_gap_inches()
             if vertical_gap > distance:
                 return False
@@ -299,15 +329,11 @@ class DistanceMeasurementContext:
                 self.target_pose,
             )
             return source_area.covers(target_area)
-        sources = self._source_measurements()
-        return all(
-            _buffered_sources_cover_target(
-                sources=sources,
-                target=target,
-                distance_inches=distance,
-                horizontal_only=horizontal_only,
-            )
-            for target in self._target_measurements()
+        return _closest_gap_cover(
+            sources=self._source_measurements(),
+            target=self._target_measurements()[0],
+            distance_inches=distance,
+            horizontal_only=horizontal_only,
         )
 
     def _measures_parts(self) -> bool:
@@ -664,33 +690,57 @@ def _part_from_model(model: Model) -> _MeasurementPart:
     return _MeasurementPart(model.base, model.pose, bottom, bottom + model.volume.height)
 
 
-def _buffered_sources_cover_target(
+def _closest_gap_cover(
     *,
     sources: tuple[_MeasurementPart, ...],
     target: _MeasurementPart,
     distance_inches: float,
     horizontal_only: bool,
 ) -> bool:
-    """Cover the target prism, not merely its footprint at the closest height.
+    """Cover an ordinary support base using each source part's closest vertical gap."""
 
-    Horizontal-only measurement ignores height. A three-dimensional check samples
-    every height where a source's vertical distance stops changing, and at each
-    height unions the buffers allowed by that same height. A nearest-gap buffer
-    would accept a target that rises far above an overlapping source.
+    covered = None
+    footprint = shapely_backend.footprint_for_base(target.base, target.pose)
+    for source in sources:
+        if horizontal_only:
+            allowance = distance_inches
+        else:
+            vertical_gap = _vertical_gap(source.bottom, source.top, target.bottom, target.top)
+            if vertical_gap > distance_inches:
+                continue
+            allowance = math.sqrt(
+                (distance_inches * distance_inches) - (vertical_gap * vertical_gap)
+            )
+        area = shapely_backend.footprint_for_base(source.base, source.pose).buffer(allowance)
+        covered = area if covered is None else covered.union(area)
+    if covered is None:
+        return False
+    return covered.covers(footprint)
+
+
+def _frame_prism_wholly_within(
+    *,
+    sources: tuple[_MeasurementPart, ...],
+    target: _MeasurementPart,
+    distance_inches: float,
+    horizontal_only: bool,
+) -> bool:
+    """Every point of a FRAME prism must lie within the source union.
+
+    One source is worst at a target endpoint, because distance to a single
+    vertical interval is maximized there. Several sources can cover those
+    endpoints and still leave an interior height outside every part, so that
+    case is a continuous real-arithmetic proof rather than a height sample.
     """
 
     if horizontal_only:
         return _sources_cover_footprint(sources, target, distance_inches, height=None)
-    heights = [target.bottom, target.top]
-    for source in sources:
-        if target.bottom < source.bottom < target.top:
-            heights.append(source.bottom)
-        if target.bottom < source.top < target.top:
-            heights.append(source.top)
-    return all(
-        _sources_cover_footprint(sources, target, distance_inches, height=height)
-        for height in heights
-    )
+    if len(sources) == 1:
+        return all(
+            _sources_cover_footprint(sources, target, distance_inches, height=height)
+            for height in (target.bottom, target.top)
+        )
+    return not _prism_has_point_beyond_union(sources, target, distance_inches)
 
 
 def _sources_cover_footprint(
@@ -714,6 +764,206 @@ def _sources_cover_footprint(
     if covered is None:
         return False
     return covered.covers(shapely_backend.footprint_for_base(target.base, target.pose))
+
+
+def _prism_has_point_beyond_union(
+    sources: tuple[_MeasurementPart, ...],
+    target: _MeasurementPart,
+    distance_inches: float,
+) -> bool:
+    """True when some point of the target prism is outside every source offset."""
+
+    x, y, z = variable("x"), variable("y"), variable("z")
+    outside: list[Formula] = []
+    names = ["x", "y", "z"]
+    for index, source in enumerate(sources):
+        formula, auxiliaries = _point_outside_prism(source, x, y, z, distance_inches, index)
+        outside.append(formula)
+        names.extend(auxiliaries)
+    body = both(
+        z.ge(_rational(target.bottom)),
+        z.le(_rational(target.top)),
+        _footprint_contains(target.base, target.pose, x, y),
+        *outside,
+    )
+    return decide(quantified("exists", tuple(names), body))
+
+
+def _point_outside_prism(
+    part: _MeasurementPart,
+    x: RealTerm,
+    y: RealTerm,
+    z: RealTerm,
+    distance_inches: float,
+    index: int,
+) -> tuple[Formula, tuple[str, ...]]:
+    if type(part.base) is CircularBase:
+        return _outside_disk(part, x, y, z, distance_inches, index)
+    if type(part.base) is RectangularBase:
+        return _outside_rectangle(part, x, y, z, distance_inches, index)
+    return _outside_oval(part, x, y, z, distance_inches, index)
+
+
+def _outside_disk(
+    part: _MeasurementPart,
+    point_x: RealTerm,
+    point_y: RealTerm,
+    point_z: RealTerm,
+    distance_inches: float,
+    index: int,
+) -> tuple[Formula, tuple[str, ...]]:
+    name = f"s{index}"
+    radius = cast(CircularBase, part.base).radius
+    radial = variable(name)
+    squared = (point_x - _rational(part.pose.position.x)) ** 2 + (
+        point_y - _rational(part.pose.position.y)
+    ) ** 2
+    limit = _rational(distance_inches) ** 2
+    outward = (radial - _rational(radius)) ** 2
+    above = (point_z - _rational(part.top)) ** 2
+    below = (_rational(part.bottom) - point_z) ** 2
+    return both(
+        radial.ge(0),
+        (radial**2).eq(squared),
+        either(
+            both(radial.le(_rational(radius)), point_z.gt(_rational(part.top)), above.gt(limit)),
+            both(radial.le(_rational(radius)), point_z.lt(_rational(part.bottom)), below.gt(limit)),
+            both(
+                radial.ge(_rational(radius)),
+                point_z.ge(_rational(part.bottom)),
+                point_z.le(_rational(part.top)),
+                outward.gt(limit),
+            ),
+            both(
+                radial.ge(_rational(radius)),
+                point_z.gt(_rational(part.top)),
+                (outward + above).gt(limit),
+            ),
+            both(
+                radial.ge(_rational(radius)),
+                point_z.lt(_rational(part.bottom)),
+                (outward + below).gt(limit),
+            ),
+        ),
+    ), (name,)
+
+
+def _outside_rectangle(
+    part: _MeasurementPart,
+    point_x: RealTerm,
+    point_y: RealTerm,
+    point_z: RealTerm,
+    distance_inches: float,
+    index: int,
+) -> tuple[Formula, tuple[str, ...]]:
+    base = cast(RectangularBase, part.base)
+    local_x, local_y = _model_local(part.pose, point_x, point_y)
+    outward_x, exact_x = _exact_outward(local_x, base.length / 2.0, f"u{index}")
+    outward_y, exact_y = _exact_outward(local_y, base.width / 2.0, f"v{index}")
+    vertical, exact_z = _exact_vertical(point_z, part, f"w{index}")
+    limit = _rational(distance_inches) ** 2
+    return both(
+        exact_x,
+        exact_y,
+        exact_z,
+        (outward_x**2 + outward_y**2 + vertical**2).gt(limit),
+    ), (f"u{index}", f"v{index}", f"w{index}")
+
+
+def _outside_oval(
+    part: _MeasurementPart,
+    point_x: RealTerm,
+    point_y: RealTerm,
+    point_z: RealTerm,
+    distance_inches: float,
+    index: int,
+) -> tuple[Formula, tuple[str, ...]]:
+    qx, qy = variable(f"e{index}x"), variable(f"e{index}y")
+    member = _footprint_contains(part.base, part.pose, qx, qy)
+    horizontal = (point_x - qx) ** 2 + (point_y - qy) ** 2
+    limit = _rational(distance_inches) ** 2
+    above = (point_z - _rational(part.top)) ** 2
+    below = (_rational(part.bottom) - point_z) ** 2
+
+    def beyond(vertical: RealTerm) -> Formula:
+        return quantified(
+            "forall",
+            (f"e{index}x", f"e{index}y"),
+            implies(member, (horizontal + vertical).gt(limit)),
+        )
+
+    return either(
+        both(point_z.gt(_rational(part.top)), beyond(above)),
+        both(point_z.lt(_rational(part.bottom)), beyond(below)),
+        both(
+            point_z.ge(_rational(part.bottom)),
+            point_z.le(_rational(part.top)),
+            beyond(term(0)),
+        ),
+    ), ()
+
+
+def _exact_outward(offset: RealTerm, half: float, name: str) -> tuple[RealTerm, Formula]:
+    excess = variable(name)
+    limit = _rational(half)
+    positive = offset - limit
+    negative = -offset - limit
+    exact = either(
+        both(excess.eq(0), offset.le(limit), (-offset).le(limit)),
+        both(excess.eq(positive), positive.ge(0), positive.ge(negative)),
+        both(excess.eq(negative), negative.ge(0), negative.ge(positive)),
+    )
+    return excess, exact
+
+
+def _exact_vertical(value: RealTerm, part: _MeasurementPart, name: str) -> tuple[RealTerm, Formula]:
+    excess = variable(name)
+    above = value - _rational(part.top)
+    below = _rational(part.bottom) - value
+    exact = either(
+        both(excess.eq(0), value.ge(_rational(part.bottom)), value.le(_rational(part.top))),
+        both(excess.eq(above), above.ge(0), above.ge(below)),
+        both(excess.eq(below), below.ge(0), below.ge(above)),
+    )
+    return excess, exact
+
+
+def _footprint_contains(
+    base: BaseShape, pose: Pose, point_x: RealTerm, point_y: RealTerm
+) -> Formula:
+    if type(base) is CircularBase:
+        dx = point_x - _rational(pose.position.x)
+        dy = point_y - _rational(pose.position.y)
+        return (dx**2 + dy**2).le(_rational(base.radius) ** 2)
+    local_x, local_y = _model_local(pose, point_x, point_y)
+    if type(base) is RectangularBase:
+        half_length = _rational(base.length / 2.0)
+        half_width = _rational(base.width / 2.0)
+        return both(
+            local_x.le(half_length),
+            (-local_x).le(half_length),
+            local_y.le(half_width),
+            (-local_y).le(half_width),
+        )
+    if type(base) is OvalBase:
+        semi_major = _rational(base.length / 2.0)
+        semi_minor = _rational(base.width / 2.0)
+        return (semi_minor**2 * local_x**2 + semi_major**2 * local_y**2).le(
+            semi_major**2 * semi_minor**2
+        )
+    raise GeometryError("Unsupported footprint for FRAME whole-distance containment.")
+
+
+def _model_local(pose: Pose, point_x: RealTerm, point_y: RealTerm) -> tuple[RealTerm, RealTerm]:
+    cosine, sine = rational_rotation(pose.facing.degrees)
+    dx = point_x - _rational(pose.position.x)
+    dy = point_y - _rational(pose.position.y)
+    rotation_c, rotation_s = term(cosine), term(sine)
+    return rotation_c * dx + rotation_s * dy, -rotation_s * dx + rotation_c * dy
+
+
+def _rational(value: float) -> RealTerm:
+    return term(Fraction(value))
 
 
 def _vertical_distance_to_interval(height: float, bottom: float, top: float) -> float:

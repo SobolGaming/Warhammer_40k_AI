@@ -2096,6 +2096,24 @@
             "role": "semantic",
             "assertion": "assert ordinary.target_wholly_within_distance(3) is True",
             "proves": "The same support base without FRAME measurement remains wholly within three inches."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_cooperating_frame_parts_leave_an_uncovered_interior_height",
+            "role": "semantic",
+            "assertion": "assert context.target_wholly_within_distance(1) is False",
+            "proves": "Source parts that cover the target ends still leave an interior height outside one inch."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_source_preserves_ordinary_target_support_base_containment",
+            "role": "semantic",
+            "assertion": "assert framed_context.target_wholly_within_distance(3) is True",
+            "proves": "Marking the source FRAME, without changing its geometry, keeps ordinary support-base containment."
+          },
+          {
+            "nodeid": "tests/unit/test_order100_frame_measurement.py::test_frame_source_preserves_ordinary_target_support_base_containment",
+            "role": "semantic",
+            "assertion": "assert ordinary_context.target_wholly_within_distance(3) is True",
+            "proves": "The ordinary source and ordinary target are wholly within three inches."
           }
         ],
         "qualifications": [

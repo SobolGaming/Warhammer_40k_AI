@@ -50,7 +50,7 @@
     },
     {
       "path": "data/source_audits/order97/categories/01.json",
-      "sha256": "97e5e3cb00abf4a775509d4d8732dd518036e9b55ee9da6ada800f1b90c72f01"
+      "sha256": "c4805f6cdd6e09a56aab9cf84c6edc9f85d965cf72997b3fd86a80a76e2fd063"
     },
     {
       "path": "data/source_audits/order97/categories/02.json",
@@ -206,7 +206,7 @@
     },
     {
       "path": "src/warhammer40k_core/_engine_build_manifest.json",
-      "sha256": "e798c0b46eb294708c504609f48aafe3ef58d22ec5710ff841320d89d75051dd"
+      "sha256": "17958170722cf8620ed9da4d8f27904f53f1a5496e5b1b5837d9ca7eb7f84bde"
     },
     {
       "path": "tests/absent_strength_helpers.py",
@@ -742,7 +742,7 @@
     },
     {
       "path": "tests/unit/test_order100_frame_measurement.py",
-      "sha256": "07c761010f1d601521860ef5a8c574c35fb90b795daab5548f25554908c03cda"
+      "sha256": "a9df41a2c3224a664c751955524398ab4596caadfb5e20457f2769f586ec6058"
     },
     {
       "path": "tests/unit/test_order36_sequencing.py",

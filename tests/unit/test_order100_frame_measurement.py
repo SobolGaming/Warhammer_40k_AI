@@ -172,6 +172,51 @@ def test_based_frame_engagement_restores_for_both_viewers_and_replays() -> None:
     assert replay.status is ReplayRunStatus.REPRODUCED
 
 
+def test_cooperating_frame_parts_leave_an_uncovered_interior_height() -> None:
+    source = Model(
+        "source",
+        Pose.at(10, 10),
+        CircularBase(1),
+        ModelVolume(9),
+        body_parts=(
+            ModelBodyPart("lower", CircularBase(3), 3, 0, 0, 1, "lower"),
+            ModelBodyPart("upper", CircularBase(3), 3, 0, 8, 1, "upper"),
+        ),
+        measures_every_part=True,
+    )
+    target = Model(
+        "target",
+        Pose.at(16.5, 10),
+        CircularBase(0.25),
+        ModelVolume(9),
+        body_parts=(ModelBodyPart("body", CircularBase(0.25), 0, 0, 0, 9, "body"),),
+        measures_every_part=True,
+    )
+    context = DistanceMeasurementContext.from_models(source, target)
+
+    assert context.target_wholly_within_distance(1) is False
+
+
+def test_frame_source_preserves_ordinary_target_support_base_containment() -> None:
+    target = Model("target", Pose.at(12.5, 10), CircularBase(0.5), ModelVolume(10))
+    ordinary = Model("source", Pose.at(10, 10), CircularBase(1), ModelVolume(1))
+    framed = Model(
+        "source",
+        Pose.at(10, 10),
+        CircularBase(1),
+        ModelVolume(1),
+        body_parts=(ModelBodyPart("body", CircularBase(1), 0, 0, 0, 1, "body"),),
+        measures_every_part=True,
+    )
+    ordinary_context = DistanceMeasurementContext.from_models(ordinary, target)
+    framed_context = DistanceMeasurementContext.from_models(framed, target)
+
+    assert ordinary_context.target_wholly_within_distance(3) is True
+    assert framed_context.target_wholly_within_distance(3) is True
+    assert ordinary_context.target_wholly_within_distance(3, horizontal_only=True) is True
+    assert framed_context.target_wholly_within_distance(3, horizontal_only=True) is True
+
+
 def test_frame_wholly_within_rejects_a_tall_body_inside_the_horizontal_buffer() -> None:
     source = Model("source", Pose.at(10, 10), CircularBase(1), ModelVolume(1))
     frame = Model(
